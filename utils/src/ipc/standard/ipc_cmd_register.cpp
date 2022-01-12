@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,8 +15,8 @@
 
 #include "ipc_cmd_register.h"
 
-#include "device_manager_errno.h"
-#include "device_manager_log.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,8 +26,8 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 {
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
     if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
-        DMLOG(DM_LOG_ERROR, "cmdCode:%d not register SetRequestFunc", cmdCode);
-        return DEVICEMANAGER_IPC_NOT_REGISTER_FUNC;
+        LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
+        return DM_IPC_NOT_REGISTER_FUNC;
     }
     return (setRequestMapIter->second)(pBaseReq, data);
 }
@@ -36,8 +36,8 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 {
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
-        DMLOG(DM_LOG_ERROR, "cmdCode:%d not register ReadResponseFunc", cmdCode);
-        return DEVICEMANAGER_IPC_NOT_REGISTER_FUNC;
+        LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
+        return DM_IPC_NOT_REGISTER_FUNC;
     }
     return (readResponseMapIter->second)(reply, pBaseRsp);
 }
@@ -46,8 +46,8 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
 {
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
-        DMLOG(DM_LOG_ERROR, "cmdCode:%d not register OnIpcCmdFunc", cmdCode);
-        return DEVICEMANAGER_IPC_NOT_REGISTER_FUNC;
+        LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
+        return DM_IPC_NOT_REGISTER_FUNC;
     }
     return (onIpcCmdMapIter->second)(data, reply);
 }

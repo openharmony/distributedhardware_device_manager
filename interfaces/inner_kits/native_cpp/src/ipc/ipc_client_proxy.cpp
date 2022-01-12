@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +15,23 @@
 
 #include "ipc_client_proxy.h"
 
-#include "device_manager_log.h"
-#include "device_manager_errno.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t IpcClientProxy::Init(std::string &pkgName)
+int32_t IpcClientProxy::Init(const std::string &pkgName)
 {
     if (ipcClientManager_ == nullptr) {
-        return DEVICEMANAGER_NULLPTR;
+        return DM_POINT_NULL;
     }
     return ipcClientManager_->Init(pkgName);
 }
 
-int32_t IpcClientProxy::UnInit(std::string &pkgName)
+int32_t IpcClientProxy::UnInit(const std::string &pkgName)
 {
     if (ipcClientManager_ == nullptr) {
-        return DEVICEMANAGER_NULLPTR;
+        return DM_POINT_NULL;
     }
     return ipcClientManager_->UnInit(pkgName);
 }
@@ -39,8 +39,8 @@ int32_t IpcClientProxy::UnInit(std::string &pkgName)
 int32_t IpcClientProxy::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (req == nullptr || rsp == nullptr || ipcClientManager_ == nullptr) {
-        DMLOG(DM_LOG_INFO, "req,rsp or ipc client is null");
-        return DEVICEMANAGER_NULLPTR;
+        LOGI("req,rsp or ipc client is null");
+        return DM_POINT_NULL;
     }
     return ipcClientManager_->SendRequest(cmdCode, req, rsp);
 }

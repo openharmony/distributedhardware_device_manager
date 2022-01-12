@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,11 @@
 
 #include "ipc_client_stub.h"
 
-#include "device_manager_errno.h"
-#include "device_manager_log.h"
 #include "device_manager_notify.h"
-
-#include "ipc_def.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "ipc_cmd_register.h"
+#include "ipc_def.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,16 +29,16 @@ static int32_t ClientIpcInterfaceMsgHandle(const IpcContext *ctx, void *ipcMsg, 
 {
     (void)arg;
     if (ipcMsg == nullptr || io == nullptr) {
-        DMLOG(DM_LOG_ERROR, "invalid param");
-        return DEVICEMANAGER_INVALID_PARAM;
+        LOGE("invalid param");
+        return DM_INPUT_PARA_EMPTY;
     }
 
     uint32_t code = 0;
     GetCode(ipcMsg, &code);
-    int32_t errCode = DEVICEMANAGER_OK;
+    int32_t errCode = DM_OK;
 
     errCode = IpcCmdRegister::GetInstance().OnIpcCmd(code, *io);
-    DMLOG(DM_LOG_INFO, "receive ipc transact code:%u, retCode=%d", code, errCode);
+    LOGI("receive ipc transact code:%u, retCode=%d", code, errCode);
     FreeBuffer(ctx, ipcMsg);
     return errCode;
 }
@@ -48,14 +47,14 @@ int32_t IpcClientStub::Init()
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     if (bInit) {
-        return DEVICEMANAGER_OK;
+        return DM_OK;
     }
     if (RegisterIpcCallback(ClientIpcInterfaceMsgHandle, 0, IPC_WAIT_FOREVER, &clientIdentity_, nullptr) != 0) {
-        DMLOG(DM_LOG_ERROR, "register ipc cb failed");
-        return DEVICEMANAGER_FAILED;
+        LOGE("register ipc cb failed");
+        return DM_FAILED;
     }
     bInit = true;
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

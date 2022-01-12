@@ -25,11 +25,11 @@ if (defined(ohos_lite)) {
       "include/ipc",
       "include/ipc/lite",
       "include/notify",
-      "${utils_path}/include/log",
-      "${utils_path}/include/ipc/lite",
+      "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${common_path}/include",
+      "${utils_path}/include",
+      "${utils_path}/include/ipc/lite",
     ]
     include_dirs += [
       "//utils/native/lite/include",
@@ -70,18 +70,20 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("devicemanagersdk") {
     include_dirs = [
-      "//utils/native/base/include",
-      "//utils/system/safwk/native/include",
       "include",
-      "include/ipc/standard",
       "include/ipc",
+      "include/ipc/standard",
       "include/notify",
-      "${utils_path}/include/log",
+      "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
+      "${utils_path}/include",
       "${utils_path}/include/ipc/standard",
-      "${common_path}/include",
       "//third_party/json/include",
+      "//utils/native/base/include",
+      "//utils/system/safwk/native/include",
+      "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+      "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     ]
 
     sources = [
@@ -97,6 +99,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${utils_path}:devicemanagerutils",
+      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
       "//utils/native/base:utils",
     ]
 

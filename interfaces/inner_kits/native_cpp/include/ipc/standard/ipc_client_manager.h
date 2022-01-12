@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_IPC_CLIENT_MANAGER_H
-#define OHOS_DEVICE_MANAGER_IPC_CLIENT_MANAGER_H
+#ifndef OHOS_DM_IPC_CLIENT_MANAGER_H
+#define OHOS_DM_IPC_CLIENT_MANAGER_H
 
 #include <cstdint>
-#include <mutex>
 #include <map>
+#include <mutex>
 #include <string>
-
-#include "iremote_object.h"
 
 #include "ipc_client.h"
 #include "ipc_client_stub.h"
 #include "ipc_def.h"
 #include "ipc_remote_broker.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,21 +37,24 @@ public:
 };
 
 class IpcClientManager : public IpcClient {
-friend class DmDeathRecipient;
-DECLARE_IPC_INTERFACE(IpcClientManager);
+    friend class DmDeathRecipient;
+    DECLARE_IPC_INTERFACE(IpcClientManager);
+
 public:
-    virtual int32_t Init(std::string &pkgName) override;
-    virtual int32_t UnInit(std::string &pkgName) override;
+    virtual int32_t Init(const std::string &pkgName) override;
+    virtual int32_t UnInit(const std::string &pkgName) override;
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
+
 private:
-    bool IsInit(std::string &pkgName);
+    bool IsInit(const std::string &pkgName);
     int32_t ClientInit();
+
 private:
     std::mutex lock_;
     std::map<std::string, sptr<IpcClientStub>> dmListener_;
-    sptr<IpcRemoteBroker> dmInterface_ {nullptr};
-    sptr<DmDeathRecipient> dmRecipient_ {nullptr};
+    sptr<IpcRemoteBroker> dmInterface_{nullptr};
+    sptr<DmDeathRecipient> dmRecipient_{nullptr};
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_IPC_CLIENT_MANAGER_H
+#endif // OHOS_DM_IPC_CLIENT_MANAGER_H

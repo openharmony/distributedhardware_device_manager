@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,43 +13,48 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_MANAGER_H
-#define DEVICE_MANAGER_H
+#ifndef OHOS_DEVICE_MANAGER_H
+#define OHOS_DEVICE_MANAGER_H
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "device_manager_callback.h"
+#include "dm_device_info.h"
 #include "dm_subscribe_info.h"
-#include "dm_app_image_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManager {
 public:
     static DeviceManager &GetInstance();
+
 public:
-    virtual int32_t InitDeviceManager(std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback) = 0;
-    virtual int32_t UnInitDeviceManager(std::string &pkgName) = 0;
-    virtual int32_t GetTrustedDeviceList(std::string &pkgName, std::string &extra,
-        std::vector<DmDeviceInfo> &deviceList) = 0;
-    virtual int32_t RegisterDevStateCallback(std::string &pkgName, std::string &extra,
-        std::shared_ptr<DeviceStateCallback> callback) = 0;
-    virtual int32_t UnRegisterDevStateCallback(std::string &pkgName) = 0;
-    virtual int32_t StartDeviceDiscovery(std::string &pkgName, DmSubscribeInfo &subscribeInfo,
-        std::shared_ptr<DiscoverCallback> callback) = 0;
-    virtual int32_t StopDeviceDiscovery(std::string &pkgName, uint16_t subscribeId) = 0;
-    virtual int32_t AuthenticateDevice(std::string &pkgName, const DmDeviceInfo &deviceInfo,
-        const DmAppImageInfo &imageInfo, std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
-    virtual int32_t CheckAuthentication(std::string &pkgName, std::string &authPara,
-        std::shared_ptr<CheckAuthCallback> callback) = 0;
-    virtual int32_t GetAuthenticationParam(std::string &pkgName, DmAuthParam &authParam) = 0;
-    virtual int32_t SetUserOperation(std::string &pkgName, int32_t action) = 0;
-    virtual int32_t RegisterDeviceManagerFaCallback(std::string &packageName,
-        std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
-    virtual int32_t UnRegisterDeviceManagerFaCallback(std::string &pkgName) = 0;
+    virtual int32_t InitDeviceManager(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback) = 0;
+    virtual int32_t UnInitDeviceManager(const std::string &pkgName) = 0;
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                         std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &deviceInfo) = 0;
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
+                                             std::shared_ptr<DeviceStateCallback> callback) = 0;
+    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) = 0;
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
+                                         const std::string &extra, std::shared_ptr<DiscoveryCallback> callback) = 0;
+    virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
+    virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &deviceInfo,
+                                       const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
+                                         std::shared_ptr<VerifyAuthCallback> callback) = 0;
+    virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
+                                                    std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
+    virtual int32_t UnRegisterDeviceManagerFaCallback(const std::string &pkgName) = 0;
+    virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) = 0;
+    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) = 0;
+    virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid) = 0;
+    virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_H
+#endif // DEVICE_MANAGER_H

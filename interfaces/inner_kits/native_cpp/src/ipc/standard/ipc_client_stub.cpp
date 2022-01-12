@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,31 +15,28 @@
 
 #include "ipc_client_stub.h"
 
+#include "dm_constants.h"
+#include "dm_log.h"
+#include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 
-#include "ipc_cmd_register.h"
-
-#include "device_manager_log.h"
-#include "device_manager_errno.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageOption &option)
+int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    DMLOG(DM_LOG_INFO, "code = %d, flags= %d.", code, option.GetFlags());
-    if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_OK;
+    LOGI("code = %d, flags= %d.", code, option.GetFlags());
+    if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DM_OK) {
+        return DM_OK;
     }
-    DMLOG(DM_LOG_WARN, "unsupport code: %d", code);
+    LOGW("unsupport code: %d", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    DMLOG(DM_LOG_ERROR, "error");
-    return DEVICEMANAGER_OK;
+    LOGE("error");
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

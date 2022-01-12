@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,65 +15,64 @@
 
 #include "device_manager_notify.h"
 
-#include "device_manager_log.h"
-#include "device_manager_errno.h"
-#include "nlohmann/json.hpp"
-#include "constants.h"
 #include "device_manager.h"
+#include "dm_constants.h"
+#include "dm_log.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 
-void DeviceManagerNotify::RegisterDeathRecipientCallback(std::string &pkgName,
-    std::shared_ptr<DmInitCallback> dmInitCallback)
+void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
+                                                         std::shared_ptr<DmInitCallback> dmInitCallback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_[pkgName] = dmInitCallback;
 }
 
-void DeviceManagerNotify::UnRegisterDeathRecipientCallback(std::string &pkgName)
+void DeviceManagerNotify::UnRegisterDeathRecipientCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::RegisterDeviceStateCallback(std::string &pkgName,
-    std::shared_ptr<DeviceStateCallback> callback)
+void DeviceManagerNotify::RegisterDeviceStateCallback(const std::string &pkgName,
+                                                      std::shared_ptr<DeviceStateCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_[pkgName] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterDeviceStateCallback(std::string &pkgName)
+void DeviceManagerNotify::UnRegisterDeviceStateCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::RegisterDiscoverCallback(std::string &pkgName, uint16_t subscribeId,
-    std::shared_ptr<DiscoverCallback> callback)
+void DeviceManagerNotify::RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
+                                                    std::shared_ptr<DiscoveryCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceDiscoverCallbacks_.count(pkgName) == 0) {
-        deviceDiscoverCallbacks_[pkgName] = std::map<uint16_t, std::shared_ptr<DiscoverCallback>>();
+    if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
+        deviceDiscoveryCallbacks_[pkgName] = std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>();
     }
-    deviceDiscoverCallbacks_[pkgName][subscribeId] = callback;
+    deviceDiscoveryCallbacks_[pkgName][subscribeId] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterDiscoverCallback(std::string &pkgName, uint16_t subscribeId)
+void DeviceManagerNotify::UnRegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceDiscoverCallbacks_.count(pkgName) > 0) {
-        deviceDiscoverCallbacks_[pkgName].erase(subscribeId);
-        if (deviceDiscoverCallbacks_[pkgName].empty()) {
-            deviceDiscoverCallbacks_.erase(pkgName);
+    if (deviceDiscoveryCallbacks_.count(pkgName) > 0) {
+        deviceDiscoveryCallbacks_[pkgName].erase(subscribeId);
+        if (deviceDiscoveryCallbacks_[pkgName].empty()) {
+            deviceDiscoveryCallbacks_.erase(pkgName);
         }
     }
 }
 
-void DeviceManagerNotify::RegisterAuthenticateCallback(std::string &pkgName, std::string &deviceId,
-    std::shared_ptr<AuthenticateCallback> callback)
+void DeviceManagerNotify::RegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId,
+                                                       std::shared_ptr<AuthenticateCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
@@ -82,7 +81,7 @@ void DeviceManagerNotify::RegisterAuthenticateCallback(std::string &pkgName, std
     authenticateCallback_[pkgName][deviceId] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterAuthenticateCallback(std::string &pkgName, std::string &deviceId)
+void DeviceManagerNotify::UnRegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) > 0) {
@@ -93,185 +92,192 @@ void DeviceManagerNotify::UnRegisterAuthenticateCallback(std::string &pkgName, s
     }
 }
 
-void DeviceManagerNotify::UnRegisterPackageCallback(std::string &pkgName)
+void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
-    deviceDiscoverCallbacks_.erase(pkgName);
+    deviceDiscoveryCallbacks_.erase(pkgName);
     authenticateCallback_.erase(pkgName);
     dmInitCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::RegisterCheckAuthenticationCallback(std::string &pkgName, std::string &authPara,
-    std::shared_ptr<CheckAuthCallback> callback)
+void DeviceManagerNotify::RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
+                                                               std::shared_ptr<VerifyAuthCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    checkauthcallback_[pkgName] = callback;
+    verifyAuthCallback_[pkgName] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterCheckAuthenticationCallback(std::string &pkgName)
+void DeviceManagerNotify::UnRegisterVerifyAuthenticationCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    checkauthcallback_.erase(pkgName);
+    verifyAuthCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::RegisterDeviceManagerFaCallback(std::string &packageName,
-    std::shared_ptr<DeviceManagerFaCallback> callback)
+void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
+                                                          std::shared_ptr<DeviceManagerFaCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    dmFaCallback_[packageName] = callback;
+    dmFaCallback_[pkgName] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(std::string &pkgName)
+void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
+    if (dmFaCallback_.count(pkgName) == 0) {
+        LOGE("DeviceManager UnRegisterDeviceManagerFaCallback not register");
+        return;
+    }
     dmFaCallback_.erase(pkgName);
 }
 
-
 void DeviceManagerNotify::OnRemoteDied()
 {
-    DMLOG(DM_LOG_WARN, "DeviceManager : OnRemoteDied");
+    LOGW("DeviceManager : OnRemoteDied");
     for (auto iter : dmInitCallback_) {
         iter.second->OnRemoteDied();
     }
 }
 
-void DeviceManagerNotify::OnDeviceOnline(std::string &pkgName, const DmDeviceInfo &deviceInfo)
+void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceOnline pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManager OnDeviceOnline pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDeviceOnlinecallback not register");
+        LOGE("DeviceManager OnDeviceOnlinecallback not register");
         return;
     }
     deviceStateCallback_[pkgName]->OnDeviceOnline(deviceInfo);
 }
 
-void DeviceManagerNotify::OnDeviceOffline(std::string &pkgName, const DmDeviceInfo &deviceInfo)
+void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceOffline pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManager OnDeviceOffline pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDeviceOfflinecallback not register");
+        LOGE("DeviceManager OnDeviceOfflinecallback not register");
         return;
     }
     deviceStateCallback_[pkgName]->OnDeviceOffline(deviceInfo);
 }
 
-void DeviceManagerNotify::OnDeviceChanged(std::string &pkgName, const DmDeviceInfo &deviceInfo)
+void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceChanged pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManager OnDeviceChanged pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDeviceChangedcallback not register");
+        LOGE("DeviceManager OnDeviceChangedcallback not register");
         return;
     }
     deviceStateCallback_[pkgName]->OnDeviceChanged(deviceInfo);
 }
 
-void DeviceManagerNotify::OnDeviceFound(std::string &pkgName, uint16_t subscribeId,
-    const DmDeviceInfo &deviceInfo)
+void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceFound pkgName:%s, subscribeId:%d.", pkgName.c_str(),
-        (int32_t)subscribeId);
+    LOGI("DeviceManager OnDeviceReady pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceDiscoverCallbacks_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDeviceFound: no register discoverCallback for this package");
+    if (deviceStateCallback_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnDeviceReadycallback not register");
         return;
     }
-    std::map<uint16_t, std::shared_ptr<DiscoverCallback>> &discoverCallMap = deviceDiscoverCallbacks_[pkgName];
+    deviceStateCallback_[pkgName]->OnDeviceReady(deviceInfo);
+}
+
+void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
+                                        const DmDeviceInfo &deviceInfo)
+{
+    LOGI("DeviceManager OnDeviceFound pkgName:%s, subscribeId:%d.", pkgName.c_str(), (int32_t)subscribeId);
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnDeviceFound: no register DiscoveryCallback for this package");
+        return;
+    }
+    std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDeviceFound: no register discoverCallback for subscribeId %d",
-            subscribeId);
+        LOGE("DeviceManager OnDeviceFound: no register DiscoveryCallback for subscribeId %d", subscribeId);
         return;
     }
     iter->second->OnDeviceFound(subscribeId, deviceInfo);
 }
 
-void DeviceManagerNotify::OnDiscoverFailed(std::string &pkgName, uint16_t subscribeId, int32_t failedReason)
+void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDiscoverFailed pkgName:%s, subscribeId %d, reason %d",
-        pkgName.c_str(), subscribeId, failedReason);
+    LOGI("DeviceManager OnDiscoveryFailed pkgName:%s, subscribeId %d, reason %d", pkgName.c_str(), subscribeId,
+         failedReason);
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceDiscoverCallbacks_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDiscoverFailed: no register discoverCallback for this package");
+    if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnDiscoveryFailed: no register DiscoveryCallback for this package");
         return;
     }
-    std::map<uint16_t, std::shared_ptr<DiscoverCallback>> &discoverCallMap = deviceDiscoverCallbacks_[pkgName];
+    std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDiscoverFailed: no register discoverCallback for subscribeId %d",
-            subscribeId);
+        LOGE("DeviceManager OnDiscoveryFailed: no register DiscoveryCallback for subscribeId %d", subscribeId);
         return;
     }
-    iter->second->OnDiscoverFailed(subscribeId, failedReason);
+    iter->second->OnDiscoveryFailed(subscribeId, failedReason);
 }
 
-void DeviceManagerNotify::OnDiscoverySuccess(std::string &pkgName, uint16_t subscribeId)
+void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_t subscribeId)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnDiscoverySuccess pkgName:%s, subscribeId:%d.", pkgName.c_str(),
-        subscribeId);
+    LOGI("DeviceManager OnDiscoverySuccess pkgName:%s, subscribeId:%d.", pkgName.c_str(), subscribeId);
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceDiscoverCallbacks_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDiscoverySuccess: no register discoverCallback for this package");
+    if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnDiscoverySuccess: no register DiscoveryCallback for this package");
         return;
     }
-    std::map<uint16_t, std::shared_ptr<DiscoverCallback>> &discoverCallMap = deviceDiscoverCallbacks_[pkgName];
+    std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnDiscoverySuccess: no register discoverCallback for subscribeId %d",
-            subscribeId);
+        LOGE("DeviceManager OnDiscoverySuccess: no register DiscoveryCallback for subscribeId %d", subscribeId);
         return;
     }
     iter->second->OnDiscoverySuccess(subscribeId);
 }
 
-void DeviceManagerNotify::OnAuthResult(std::string &pkgName, std::string &deviceId, int32_t pinToken,
-    uint32_t status, uint32_t reason)
+void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
+                                       const std::string &token, uint32_t status, uint32_t reason)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%d",
-        pkgName.c_str(), status, reason);
+    LOGI("DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%d", pkgName.c_str(), status, reason);
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnAuthResult: no register authCallback for this package");
+        LOGE("DeviceManager OnAuthResult: no register authCallback for this package");
         return;
     }
     std::map<std::string, std::shared_ptr<AuthenticateCallback>> &authCallMap = authenticateCallback_[pkgName];
     auto iter = authCallMap.find(deviceId);
     if (iter == authCallMap.end()) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnAuthResult: no register authCallback for deviceID ");
+        LOGE("DeviceManager OnAuthResult: no register authCallback for deviceID ");
         return;
     }
-    iter->second->OnAuthResult(deviceId, pinToken, status, reason);
+    iter->second->OnAuthResult(deviceId, token, status, reason);
     authenticateCallback_[pkgName].erase(deviceId);
     if (authenticateCallback_[pkgName].empty()) {
         authenticateCallback_.erase(pkgName);
     }
 }
 
-void DeviceManagerNotify::OnCheckAuthResult(std::string &pkgName, std::string &deviceId, int32_t resultCode,
-    int32_t flag)
+void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId,
+                                             int32_t resultCode, int32_t flag)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManagerNotify::OnCheckAuthResult pkgName:%s, resultCode:%d, flag:%d",
-        pkgName.c_str(), resultCode, flag);
+    LOGI("DeviceManagerNotify::OnCheckAuthResult pkgName:%s, resultCode:%d, flag:%d", pkgName.c_str(), resultCode,
+         flag);
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (checkauthcallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager OnCheckAuthResult: no register authCallback for this package");
+    if (verifyAuthCallback_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnCheckAuthResult: no register authCallback for this package");
         return;
     }
-
-    checkauthcallback_[pkgName]->OnCheckAuthResult(deviceId, resultCode, flag);
-    checkauthcallback_.erase(pkgName);
+    verifyAuthCallback_[pkgName]->OnVerifyAuthResult(deviceId, resultCode, flag);
+    verifyAuthCallback_.erase(pkgName);
 }
 
 void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager OnFaCallback pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManager OnFaCallback pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmFaCallback_.count(pkgName) == 0) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager DmFaCallback not register");
+        LOGE("DeviceManager DmFaCallback not register");
         return;
     }
     dmFaCallback_[pkgName]->OnCall(paramJson);

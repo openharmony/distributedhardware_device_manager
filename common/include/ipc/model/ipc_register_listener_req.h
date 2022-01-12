@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_IPC_REGISTER_LISTENER_REQ_H
-#define OHOS_DEVICE_MANAGER_IPC_REGISTER_LISTENER_REQ_H
+#ifndef OHOS_DM_IPC_REGISTER_LISTENER_REQ_H
+#define OHOS_DM_IPC_REGISTER_LISTENER_REQ_H
 
 #include "ipc_req.h"
 
@@ -27,7 +27,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 class IpcRegisterListenerReq : public IpcReq {
-DECLARE_IPC_MODEL(IpcRegisterListenerReq);
+    DECLARE_IPC_MODEL(IpcRegisterListenerReq);
+
 public:
 #ifdef LITE_DEVICE
     SvcIdentity GetSvcIdentity() const
@@ -59,4 +60,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_IPC_REGISTER_LISTENER_REQ_H
+#endif // OHOS_DM_IPC_REGISTER_LISTENER_REQ_H
