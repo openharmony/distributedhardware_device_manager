@@ -11,14 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#------------------------device manager------------------------------#
 devicemanager_path = "//foundation/distributedhardware/devicemanager"
 
 common_path = "${devicemanager_path}/common"
-
 utils_path = "${devicemanager_path}/utils"
-
-services_path = "${devicemanager_path}/services"
-
+services_path = "${devicemanager_path}/services/devicemanagerservice"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
+ext_path = "${devicemanager_path}/ext"
 
+#--------------------------softbus----------------------------------#
+
+#---------------------------hichan----------------------------------#
+
+#----------------------compilation options--------------------------#
 dm_ldflags = [ "-lpthread" ]

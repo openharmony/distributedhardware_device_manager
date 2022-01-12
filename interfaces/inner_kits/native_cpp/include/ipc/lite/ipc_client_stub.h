@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,31 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_IPC_CLIENT_STUB_H
-#define OHOS_DEVICE_MANAGER_IPC_CLIENT_STUB_H
+#ifndef OHOS_DM_IPC_CLIENT_STUB_H
+#define OHOS_DM_IPC_CLIENT_STUB_H
 
-#include <mutex>
 #include <cstdint>
+#include <mutex>
 
 #include "liteipc_adapter.h"
-
 #include "single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class IpcClientStub {
-DECLARE_SINGLE_INSTANCE(IpcClientStub);
+    DECLARE_SINGLE_INSTANCE(IpcClientStub);
+
 public:
     int32_t Init();
     SvcIdentity GetSvcIdentity() const
     {
         return clientIdentity_;
     }
+
 private:
     std::mutex lock_;
-    bool bInit {false};
+    bool bInit{false};
     SvcIdentity clientIdentity_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_IPC_CLIENT_STUB_H
+#endif // OHOS_DM_IPC_CLIENT_STUB_H

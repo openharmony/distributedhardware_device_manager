@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_DEVICE_INFO_H
-#define OHOS_DEVICE_MANAGER_DEVICE_INFO_H
+#ifndef OHOS_DM_DEVICE_INFO_H
+#define OHOS_DM_DEVICE_INFO_H
 
 #include <cstdint>
 
@@ -25,31 +25,34 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-typedef enum DMDeviceType {
+typedef enum DmDeviceType {
     DEVICE_TYPE_UNKNOWN = 0x00,
     DEVICE_TYPE_WIFI_CAMERA = 0x08,
     DEVICE_TYPE_AUDIO = 0x0A,
+    DEVICE_TYPE_PC = 0x0C,
     DEVICE_TYPE_PHONE = 0x0E,
     DEVICE_TYPE_PAD = 0x11,
     DEVICE_TYPE_WATCH = 0x6D,
     DEVICE_TYPE_CAR = 0x83,
     DEVICE_TYPE_TV = 0x9C,
-} DMDeviceType;
+} DmDeviceType;
 
 typedef enum DmDeviceState {
     DEVICE_STATE_UNKNOWN = 0,
     DEVICE_STATE_ONLINE = 1,
     DEVICE_STATE_OFFLINE = 2,
     DEVICE_INFO_CHANGED = 3,
+    DEVICE_INFO_READY = 4,
 } DmDeviceState;
 
 typedef struct DmDeviceInfo {
     char deviceId[DM_MAX_DEVICE_ID_LEN];
     char deviceName[DM_MAX_DEVICE_NAME_LEN];
-    DMDeviceType deviceTypeId;
+    uint16_t deviceTypeId;
 } DmDeviceInfo;
 
 typedef struct DmAuthParam {
+    std::string authToken;
     std::string packageName;
     std::string appName;
     std::string appDescription;
@@ -60,6 +63,7 @@ typedef struct DmAuthParam {
     int32_t pinToken;
     DmAppImageInfo imageinfo;
 } DmAuthParam;
+
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_DEVICE_INFO_H
+#endif // OHOS_DM_DEVICE_INFO_H

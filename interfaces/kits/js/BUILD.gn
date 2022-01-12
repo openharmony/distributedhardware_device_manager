@@ -16,17 +16,18 @@ import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 ohos_shared_library("devicemanager") {
   include_dirs = [
+    "include",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${utils_path}/include",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
     "//third_party/node/src",
     "//third_party/json/include",
-    "${common_path}/include",
     "//foundation/ace/napi/native_engine",
     "//foundation/ace/napi/interfaces/kits",
     "//utils/native/base/include",
-    "include",
-    "${utils_path}/include/log",
-    "${common_path}/include/ipc",
-    "${innerkits_path}/native_cpp/include",
-    "${innerkits_path}/native_cpp/include/standard",
   ]
 
   sources = [
