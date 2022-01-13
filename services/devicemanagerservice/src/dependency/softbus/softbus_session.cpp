@@ -78,23 +78,25 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
     return sessionId;
 }
 
-void SoftbusSession::CloseAuthSession(int32_t sessionId)
+int32_t SoftbusSession::CloseAuthSession(int32_t sessionId)
 {
     LOGI("SoftbusSession::CloseAuthSession");
     ::CloseSession(sessionId);
+    return DM_OK;
 }
 
-void SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevId)
+int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevId)
 {
     char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
     int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
     if (ret == 0) {
         peerDevId = peerDeviceId;
         LOGI("GetPeerDeviceId success for session:%d, peerDeviceId:%s", sessionId, GetAnonyString(peerDevId).c_str());
-        return;
+        return DM_FAILED;
     }
     LOGE("GetPeerDeviceId failed for session:%d", sessionId);
     peerDevId = "";
+    return DM_OK;
 }
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)

@@ -300,7 +300,7 @@ std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string r
     return jsonObject.dump();
 }
 
-void HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupInfo> &groupList)
+int32_t HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupInfo> &groupList)
 {
     LOGI("HiChainConnector::GetRelatedGroups Start to get local related groups.");
     uint32_t groupNum = 0;
@@ -309,35 +309,36 @@ void HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupI
         deviceGroupManager_->getRelatedGroups(DM_PKG_NAME.c_str(), deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("HiChainConnector::GetRelatedGroups faild , ret: %d.", ret);
-        return;
+        return DM_FAILED;
     }
     if (returnGroups == nullptr) {
         LOGE("HiChainConnector::GetRelatedGroups failed , returnGroups is nullptr");
-        return;
+        return DM_FAILED;
     }
     if (groupNum == 0) {
         LOGE("HiChainConnector::GetRelatedGroups group failed, groupNum is 0.");
-        return;
+        return DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
-        return;
+        return DM_FAILED;
     }
     std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
     if (groupInfos.size() == 0) {
         LOGE("HiChainConnector::GetRelatedGroups group failed, groupInfos is empty.");
-        return;
+        return DM_FAILED;
     }
     groupList = groupInfos;
+    return DM_OK;
 }
 
-void HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList)
+int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList)
 {
     if (groupList.empty()) {
         LOGE("groupList is empty.");
-        return;
+        return DM_FAILED;
     }
     for (auto group : groupList) {
         if (IsGroupInfoInvalid(group)) {
@@ -345,6 +346,7 @@ void HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, std::
         }
         syncGroupList.push_back(group.groupId);
     }
+    return DM_OK;
 }
 
 bool HiChainConnector::IsDevicesInGroup(std::string hostDevice, std::string peerDevice)
@@ -374,7 +376,7 @@ bool HiChainConnector::IsGroupInfoInvalid(GroupInfo &group)
     return false;
 }
 
-void HiChainConnector::SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList)
+int32_t HiChainConnector::SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList)
 {
     std::vector<GroupInfo> groupInfoList;
     GetRelatedGroups(deviceId, groupInfoList);
@@ -387,6 +389,7 @@ void HiChainConnector::SyncGroups(std::string deviceId, std::vector<std::string>
             (void)DelMemberFromGroup(groupInfo.groupId, deviceId);
         }
     }
+    return DM_OK;
 }
 
 int32_t HiChainConnector::DelMemberFromGroup(std::string groupId, std::string deviceId)
@@ -406,7 +409,7 @@ int32_t HiChainConnector::DelMemberFromGroup(std::string groupId, std::string de
     return DM_OK;
 }
 
-void HiChainConnector::DeleteGroup(std::string &groupId)
+int32_t HiChainConnector::DeleteGroup(std::string &groupId)
 {
     int64_t requestId = GenRequestId();
     nlohmann::json jsonObj;
@@ -415,7 +418,9 @@ void HiChainConnector::DeleteGroup(std::string &groupId)
     int32_t ret = deviceGroupManager_->deleteGroup(requestId, DM_PKG_NAME.c_str(), disbandParams.c_str());
     if (ret != 0) {
         LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
+        return DM_FAILED;
     }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

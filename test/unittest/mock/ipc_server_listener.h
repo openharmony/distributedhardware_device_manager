@@ -16,9 +16,8 @@
 #ifndef OHOS_DM_IPC_SERVER_LISTENER_H
 #define OHOS_DM_IPC_SERVER_LISTENER_H
 
-#include <iostream>
 #include <memory>
-
+#include <iostream>
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 
@@ -28,7 +27,6 @@ class IpcServerListener {
 public:
     IpcServerListener() = default;
     virtual ~IpcServerListener() = default;
-
 public:
     int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
     int32_t SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);

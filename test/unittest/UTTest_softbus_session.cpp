@@ -142,12 +142,12 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, OnSessionClosed_001, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 3;
-    int ret = softbusSession->OnSessionClosed(sessionId);
-    EXPECT_EQ(ret, DM_OK);
-}
+// HWTEST_F(SoftbusSessionTest, OnSessionClosed_001, testing::ext::TestSize.Level0)
+// {
+//     int32_t sessionId = 3;
+//     int ret = softbusSession->OnSessionClosed(sessionId);
+//     EXPECT_EQ(ret, DM_OK);
+// }
 
 /**
  * @tc.name: OnBytesReceived_002
@@ -155,14 +155,14 @@ HWTEST_F(SoftbusSessionTest, OnSessionClosed_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, OnBytesReceived_002, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 3;
-    void *data;
-    uint32_t dataLen = 1;
-    int ret = softbusSession->OnBytesReceived(sessionId, data, dataLen);
-    EXPECT_EQ(ret, DM_OK);
-}
+// HWTEST_F(SoftbusSessionTest, OnBytesReceived_002, testing::ext::TestSize.Level0)
+// {
+//     int32_t sessionId = 3;
+//     void *data;
+//     uint32_t dataLen = 1;
+//     int ret = softbusSession->OnBytesReceived(sessionId, data, dataLen);
+//     EXPECT_EQ(ret, DM_OK);
+// }
 
 /**
  * @tc.name: CloseAuthSession_001

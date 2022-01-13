@@ -41,8 +41,6 @@ public:
     virtual void SetUp() override;
     virtual void TearDown() override;
 };
-}
-}
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_HICHAIN_CONNECTOR_H

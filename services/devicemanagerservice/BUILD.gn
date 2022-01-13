@@ -112,6 +112,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
       "startup_l2:syspara",
+      "startup_l2:syspara_watchagent",
     ]
 
     subsystem_name = "distributedhardware"

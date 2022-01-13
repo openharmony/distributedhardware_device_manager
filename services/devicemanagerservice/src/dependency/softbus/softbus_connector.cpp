@@ -18,9 +18,6 @@
 #include <securec.h>
 #include <unistd.h>
 
-#include <cstdlib>
-#include <string>
-
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -110,6 +107,7 @@ int32_t SoftbusConnector::Init()
         LOGI("service unpublish result is : %d", ret);
     }
 
+    ret = WatchParameter(DISCOVER_STATUS_KEY.c_str(), &SoftbusConnector::OnParameterChgCallback, nullptr);
     LOGI("register Watch Parameter result is : %d");
     return ret;
 }
@@ -399,7 +397,7 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
     return nullptr;
 }
 
-void SoftbusConnector::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
+int32_t SoftbusConnector::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), nodeBasicInfo.networkId,
@@ -411,6 +409,7 @@ void SoftbusConnector::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBa
         LOGE("copy data failed");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
+    return DM_OK;
 }
 
 void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)

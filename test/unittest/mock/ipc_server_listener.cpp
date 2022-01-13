@@ -25,6 +25,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     req_ = req;
+    std::cout<<req_->GetPkgName()<<"\n";
     return 0;
 }
 } // namespace DistributedHardware

@@ -319,116 +319,6 @@ HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::
 }
 
 /**
- * @tc.name: OnPublishSuccess_001
- * @tc.desc: go to the corrort case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnPublishSuccess_001, testing::ext::TestSize.Level0)
-{
-    int32_t publishId = 0;
-    int ret = softbusConnector->OnPublishSuccess(publishId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnPublishSuccess_001
- * @tc.desc: go to the corrort case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnPublishFail1, testing::ext::TestSize.Level0)
-{
-    int32_t publishId = 0;
-    PublishFailReason reason;
-    reason = PUBLISH_FAIL_REASON_NOT_SUPPORT_MEDIUM;
-    int ret = softbusConnector->OnPublishFail(publishId, reason);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: set  info to some corrort parp. and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_001, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo info;
-    int ret = softbusConnector->OnSoftBusDeviceOnline(&info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceOffline_001
- * @tc.desc: set  info to some corrort parp. and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_001, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo info;
-    int ret = softbusConnector->OnSoftbusDeviceOffline(&info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceInfoChanged_001
- * @tc.desc: go to the corrort case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceInfoChanged_001, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo info;
-    NodeBasicInfoType type;
-    type = TYPE_NETWORK_ID;
-    int ret = softbusConnector->OnSoftbusDeviceInfoChanged(type, &info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceFound_001
- * @tc.desc: set device some corrort para and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level0)
-{
-    DeviceInfo device;
-    int ret = softbusConnector->OnSoftbusDeviceFound(&device);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftbusDiscoveryFailed_001
- * @tc.desc: set some corrort para  and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryFailed_001, testing::ext::TestSize.Level0)
-{
-    int32_t subscribeId = 0;
-    DiscoveryFailReason failReason;
-    failReason = DISCOVERY_FAIL_REASON_NOT_SUPPORT_MEDIUM;
-    int ret = softbusConnector->OnSoftbusDiscoveryFailed(subscribeId, failReason);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnSoftbusDiscoverySuccess_001
- * @tc.desc: set some corrort para  and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoverySuccess_001, testing::ext::TestSize.Level0)
-{
-    int32_t subscribeId = 0;
-    int ret = softbusConnector->OnSoftbusDiscoverySuccess(subscribeId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: OnParameterChgCallback_001
  * @tc.desc: set some corrort para  and return DM_OK
  * @tc.type: FUNC
@@ -436,11 +326,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoverySuccess_001, testing::ext::Test
  */
 HWTEST_F(SoftbusConnectorTest, OnParameterChgCallback_001, testing::ext::TestSize.Level0)
 {
-    char *key;
-    char *value;
-    void *context = nullptr;
-    int ret = softbusConnector->OnParameterChgCallback(key, value, context);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(DM_OK, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

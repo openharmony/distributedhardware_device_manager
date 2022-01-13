@@ -58,14 +58,14 @@ public:
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
     int32_t AddMember(std::string deviceId, std::string &connectInfo);
     int32_t DelMemberFromGroup(std::string groupId, std::string deviceId);
-    void DeleteGroup(std::string &groupId);
+    int32_t DeleteGroup(std::string &groupId);
     bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
-    void GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
+    int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
 
 private:
     int64_t GenRequestId();
-    void SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
-    void GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList);
+    int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
+    int32_t GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList);
     int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
     std::string GetConnectPara(std::string deviceId, std::string reqDeviceId);
     bool IsGroupCreated(std::string groupName, GroupInfo &groupInfo);

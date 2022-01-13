@@ -40,9 +40,9 @@ public:
     int32_t RegisterSessionCallback(const std::string &pkgName, std::shared_ptr<ISoftbusSessionCallback> callback);
     int32_t UnRegisterSessionCallback(const std::string &pkgName);
     int32_t OpenAuthSession(const std::string &deviceId);
-    void CloseAuthSession(int32_t sessionId);
+    int32_t CloseAuthSession(int32_t sessionId);
     int32_t SendData(int32_t sessionId, std::string &message);
-    void GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
+    int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
 
 private:
     static std::map<std::string, std::shared_ptr<ISoftbusSessionCallback>> sessionCallbackMap_;
