@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class SoftbusSessionTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -44,6 +43,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#undef private
-#undef protected
 #endif

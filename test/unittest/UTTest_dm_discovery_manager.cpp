@@ -22,12 +22,11 @@
 #include "dm_anonymous.h"
 #include "ipc_server_listener.h"
 #include "device_manager_service_listener.h"
-#include "UTTest_dm_discovery_manager.h"
 #include "discovery_service.h"
+#include "UTTest_dm_discovery_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-
 void DmDiscoveryManagerTest::SetUp() {
 }
 
@@ -40,8 +39,7 @@ void DmDiscoveryManagerTest::SetUpTestCase() {
 void DmDiscoveryManagerTest::TearDownTestCase() {
 }
 
-namespace 
-{
+namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector_ = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmDiscoveryManager> discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_);
@@ -72,7 +70,8 @@ HWTEST_F(DmDiscoveryManagerTest, DmDiscoveryManager_002, testing::ext::TestSize.
 
 /**
  * @tc.name:StartDeviceDiscovery_001
- * @tc.desc: keeping pkgame unchanged, call StartDeviceDiscovery twice so that its discoveryQueue is not empty and return DM_DISCOVERY_REPEATED
+ * @tc.desc: keeping pkgame unchanged, call StartDeviceDiscovery twice 
+ *           so that its discoveryQueue is not empty and return DM_DISCOVERY_REPEATED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -88,7 +87,8 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_001, testing::ext::TestSiz
 
 /**
  * @tc.name:StartDeviceDiscovery_002
- * @tc.desc: pkgame changed, call StartDeviceDiscovery twice so that its discoveryQueue is not empty and return DM_DISCOVERY_REPEATED
+ * @tc.desc: pkgame changed, call StartDeviceDiscovery twice 
+ *           so that its discoveryQueue is not empty and return DM_DISCOVERY_REPEATED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -109,7 +109,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-//doing
+// doing
 HWTEST_F(DmDiscoveryManagerTest, StopDeviceDiscovery_001, testing::ext::TestSize.Level0) 
 {
     std::string pkgName = "com.ohos.helloworld";
@@ -131,18 +131,18 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
 {
     std::string pkgName = "com.ohos.helloworld";
     uint16_t aaa = 11;
-    DmDiscoveryContext context{pkgName, "121110", aaa};
+    DmDiscoveryContext context{ pkgName, "121110", aaa };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     sleep(1);
     DmDeviceInfo info;
     info.deviceId[0] = '\0';
-     info.deviceName[0] = '\0';
+    info.deviceName[0] = '\0';
     discoveryMgr_->OnDeviceFound(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
-    EXPECT_EQ (ret1, 1);
+    EXPECT_EQ(ret1, 1);
     std ::string ret = pReq->GetPkgName();
-    EXPECT_EQ (ret,pkgName);
+    EXPECT_EQ(ret, pkgName);
 }
 
 /**
@@ -248,5 +248,3 @@ HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestS
 }
 }
 }
-
-

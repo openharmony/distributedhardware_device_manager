@@ -36,7 +36,6 @@ void AuthResponseStateTest::TearDownTestCase()
 }
 
 namespace {
-
 /**
  * @tc.name: AuthResponseInitState::SetAuthManager_001
  * @tc.desc: 1 set authManager not null

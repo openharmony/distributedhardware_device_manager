@@ -23,13 +23,11 @@
 #include "dm_log.h"
 #include "dm_constants.h"
 #include "dm_random.h"
-#include "UTTest_hichain_connector.h"
 #include "hichain_connector.h"
+#include "UTTest_hichain_connector.h"
 
-namespace OHOS 
-{
-namespace DistributedHardware 
-{
+namespace OHOS {
+namespace DistributedHardware {
 void HichainConnectorTest::SetUp() 
 {
 }
@@ -264,7 +262,7 @@ HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSi
     std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->RegisterHiChainCallback(pkgName, std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
-    int ret1 = HiChainConnector:: hiChainConnectorCallbackMap_.count(pkgName);
+    int ret1 = HiChainConnector::hiChainConnectorCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 1);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -283,7 +281,7 @@ HWTEST_F(HichainConnectorTest, IsGroupCreated_001, testing::ext::TestSize.Level0
     std::vector<GroupInfo> groupList ;
     GroupInfo  groupInfo;
     std::shared_ptr<HiChainConnector> hichainConnector  = std::make_shared<HiChainConnector>();
-    bool ret = hichainConnector->IsGroupCreated( groupName, groupInfo);
+    bool ret = hichainConnector->IsGroupCreated(groupName, groupInfo);
     EXPECT_EQ(ret, false);
 }
 
@@ -386,7 +384,7 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0
     std::shared_ptr<HiChainConnector> hichainConnector  = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(pkgName, std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
     std::string ret = hichainConnector->GetConnectPara(deviceId, reqDeviceId);
-    EXPECT_EQ(ret,"");
+    EXPECT_EQ(ret, "");
 }
 
 /**
@@ -400,7 +398,7 @@ HWTEST_F(HichainConnectorTest,  DeleteGroup_001, testing::ext::TestSize.Level0)
     std::string groupId = "34567";
     std::shared_ptr<HiChainConnector> hichainConnector  = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->DeleteGroup(groupId);
-    EXPECT_EQ(ret,DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**

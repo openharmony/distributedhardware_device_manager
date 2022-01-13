@@ -36,8 +36,7 @@ void AuthMessageProcessorTest::TearDownTestCase()
 {
 }
 
-namespace{
-
+namespace {
 /**
  * @tc.name: AuthMessageProcessor::CreateNegotiateMessage_001
  * @tc.desc: 1 set cryptoAdapter_ to null
@@ -177,7 +176,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext:
     jsonObj[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseResponseFinishMessage(jsonObj);
-    ASSERT_EQ(authMessageProcessor->authResponseContext_,authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -247,7 +246,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
     jsonThumbnail[TAG_REQUEST_ID] = authResponseContext->requestId;
     authMessageProcessor->authSplitJsonList_.push_back(jsonThumbnail);
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage();
-    ASSERT_EQ(ret,DM_FAILED);
+    ASSERT_EQ(ret, DM_FAILED);
     sleep(15);
 }
 
@@ -283,7 +282,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_REQUEST_ID] = authResponseContext->requestId;
     authMessageProcessor->authSplitJsonList_.push_back(jsonThumbnail);
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage();
-    ASSERT_EQ(ret,DM_OK);
+    ASSERT_EQ(ret, DM_OK);
     sleep(15);
 }
 
@@ -306,7 +305,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::Test
     jsonObj[TAG_CRYPTO_SUPPORT] = authMessageProcessor->authResponseContext_->cryptoSupport;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
-    ASSERT_EQ( authMessageProcessor->authResponseContext_, authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -329,7 +328,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::Test
     jsonObj[TAG_CRYPTO_NAME] = authResponseContext->cryptoSupport;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
-    ASSERT_EQ( authMessageProcessor->authResponseContext_, authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -352,7 +351,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::Test
     jsonObj[TAG_CRYPTO_VERSION] = authResponseContext->cryptoSupport;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
-    ASSERT_EQ( authMessageProcessor->authResponseContext_, authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -375,7 +374,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::Test
     jsonObj[TAG_DEVICE_ID] = authResponseContext->deviceId;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
-    ASSERT_EQ( authMessageProcessor->authResponseContext_, authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -398,7 +397,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
     jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
-    ASSERT_EQ( authMessageProcessor->authResponseContext_, authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -416,7 +415,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_001, testing::ext::TestSize
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->SetRequestContext(authRequestContext);
-    ASSERT_EQ(authMessageProcessor->authRequestContext_,authRequestContext);
+    ASSERT_EQ(authMessageProcessor->authRequestContext_, authRequestContext);
     sleep(15);
 }
 
@@ -434,7 +433,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_002, testing::ext::TestSize
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->SetRequestContext(nullptr);
-    ASSERT_EQ(authMessageProcessor->authRequestContext_,nullptr);
+    ASSERT_EQ(authMessageProcessor->authRequestContext_, nullptr);
     sleep(15);
 }
 
@@ -452,7 +451,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_001, testing::ext::TestSiz
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    ASSERT_EQ(authMessageProcessor->authResponseContext_,authResponseContext);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
     sleep(15);
 }
 
@@ -470,7 +469,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_002, testing::ext::TestSiz
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(nullptr);
-    ASSERT_EQ(authMessageProcessor->authResponseContext_,nullptr);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, nullptr);
     sleep(15);
 }
 
@@ -506,7 +505,7 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSiz
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<DmAuthResponseContext> authResponseContext  = authMessageProcessor->GetResponseContext();
-    ASSERT_NE(authResponseContext,nullptr);
+    ASSERT_NE(authResponseContext, nullptr);
     sleep(15);
 }
 }

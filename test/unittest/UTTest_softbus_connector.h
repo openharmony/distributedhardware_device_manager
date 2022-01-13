@@ -15,9 +15,6 @@
 #ifndef OHOS_UTTest_DM_SOFTBUS_CONNECTOR_H
 #define OHOS_UTTest_DM_SOFTBUS_CONNECTOR_H
 
-#define private public // hack complier
-#define protected public
-
 #include <gtest/gtest.h>
 #include <refbase.h>
 
@@ -38,9 +35,9 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_session.h"
 #include "softbus_state_callback.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-
 class SoftbusConnectorTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -50,6 +47,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#undef private
-#undef protected
 #endif

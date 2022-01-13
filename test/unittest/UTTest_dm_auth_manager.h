@@ -42,6 +42,6 @@ public:
     virtual void SetUp() override;
     virtual void TearDown() override;
 };
-}
-} 
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif

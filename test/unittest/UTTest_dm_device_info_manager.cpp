@@ -37,7 +37,6 @@ void DeviceManagerImplTest::TearDownTestCase()
 }
 
 namespace {
-
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager = std::make_shared<DmDeviceInfoManager>(softbusConnector);

@@ -34,7 +34,6 @@ void AuthRequestStateTest::TearDownTestCase()
 }
 
 namespace {
-
 std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
 std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
 std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";

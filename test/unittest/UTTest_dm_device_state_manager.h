@@ -24,13 +24,9 @@
 #include "softbus_session_callback.h"
 #include "dm_discovery_manager.h"
 
-namespace OHOS
-{
-namespace DistributedHardware 
-{
-
-class DmDeviceStateManagerTest : public testing::Test 
-{
+namespace OHOS {
+namespace DistributedHardware {
+class DmDeviceStateManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -39,6 +35,4 @@ public:
 };
 }
 }
-#undef private
-#undef protected
 #endif 

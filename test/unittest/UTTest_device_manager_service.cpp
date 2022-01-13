@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
@@ -39,8 +38,8 @@ void DeviceManagerServiceTest::SetUpTestCase()
 void DeviceManagerServiceTest::TearDownTestCase()
 {
 }
-namespace {
 
+namespace {
 std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
 
 /**

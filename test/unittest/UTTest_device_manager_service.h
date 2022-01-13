@@ -32,7 +32,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class DeviceManagerServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -42,6 +41,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#undef private
-#undef protected
 #endif

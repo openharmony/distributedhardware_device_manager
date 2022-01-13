@@ -37,8 +37,7 @@ void DmAuthManagerTest::TearDownTestCase()
 {
 }
 
-namespace{
-
+namespace {
     std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
     std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
     std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";
@@ -64,8 +63,8 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
     std::string extra = "333";
     authRequestState->SetAuthContext(context);
     authManager->SetAuthRequestState(authRequestState);
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
-    ASSERT_EQ(ret,DM_AUTH_BUSINESS_BUSY);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, DM_AUTH_BUSINESS_BUSY);
 }
 
 /**
@@ -87,8 +86,8 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level
     const std::string extra = "333";
     authResponseState->SetAuthContext(context);
     authManager->SetAuthResponseState(authResponseState);
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
-    ASSERT_EQ(ret,DM_AUTH_BUSINESS_BUSY);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, DM_AUTH_BUSINESS_BUSY);
 }
 
 /**
@@ -108,7 +107,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_003, testing::ext::TestSize.Level
     int32_t authType = 1;
     std::string deviceId = "222";
     std::string extra = "";
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_INPUT_PARA_EMPTY);
 }
 
@@ -131,7 +130,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     const std::string deviceId = "222";
     const std::string extra = "targetPkgName";
     authRequestContext->targetPkgName =  "targetPkgName";
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_INPUT_PARA_EMPTY);
 }
 
@@ -155,7 +154,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_005, testing::ext::TestSize.Level
     const std::string extra = "targetPkgName";
     authRequestContext->targetPkgName =  "targetPkgName";
     json[TARGET_PKG_NAME_KEY] =  authRequestContext->targetPkgName;
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -179,7 +178,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_006, testing::ext::TestSize.Level
     const std::string extra = "appName";
     authRequestContext->targetPkgName =  "appName";
     json[APP_NAME_KEY] =  authRequestContext->targetPkgName;
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -203,7 +202,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_007, testing::ext::TestSize.Level
     const std::string extra = "appDescription";
     authRequestContext->targetPkgName =  "appDescription";
     json[APP_DESCRIPTION_KEY] =  authRequestContext->targetPkgName;
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -227,7 +226,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_008, testing::ext::TestSize.Level
     const std::string extra = "appThumbnail";
     authRequestContext->targetPkgName =  "appThumbnail";
     json[APP_THUMBNAIL] =  authRequestContext->targetPkgName;
-    int32_t ret =authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -251,7 +250,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_009, testing::ext::TestSize.Level
     const std::string extra = "appIcon";
     authRequestContext->targetPkgName =  "appIcon";
     json[APP_ICON_KEY] =  authRequestContext->targetPkgName;
-    int32_t ret = authManager->AuthenticateDevice(pkgName,authType,deviceId,extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -270,8 +269,8 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Lev
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     std::string pkgName = "";
     std::string deviceId = "222";
-    int32_t ret =authManager->UnAuthenticateDevice(pkgName,deviceId);
-    ASSERT_EQ(ret,DM_FAILED);
+    int32_t ret = authManager->UnAuthenticateDevice(pkgName, deviceId);
+    ASSERT_EQ(ret, DM_FAILED);
 }
 
 /**
@@ -293,12 +292,9 @@ HWTEST_F(DmAuthManagerTest, VerifyAuthentication_001, testing::ext::TestSize.Lev
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
     authManager->authResponseContext_=nullptr;
     authManager->SetAuthRequestState(authRequestState);
-    int32_t ret =authManager->HandleAuthenticateTimeout();
-    ASSERT_EQ(ret,DM_FAILED);
+    int32_t ret = authManager->HandleAuthenticateTimeout();
+    ASSERT_EQ(ret, DM_FAILED);
 }
-
-
-
 
 /**
  * @tc.name: DmAuthManager::HandleAuthenticateTimeout_001
@@ -317,8 +313,8 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSiz
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
     authManager->authResponseContext_=nullptr;
     authManager->SetAuthRequestState(authRequestState);
-    int32_t ret =authManager->HandleAuthenticateTimeout();
-    ASSERT_EQ(ret,DM_FAILED);
+    int32_t ret = authManager->HandleAuthenticateTimeout();
+    ASSERT_EQ(ret, DM_FAILED);
 }
 
 /**
@@ -337,8 +333,8 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_002, testing::ext::TestSiz
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager->SetAuthRequestState(authRequestState);
-    int32_t ret =authManager->HandleAuthenticateTimeout();
-    ASSERT_EQ(ret,DM_OK);
+    int32_t ret = authManager->HandleAuthenticateTimeout();
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -358,7 +354,7 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_001, testing::ext::TestSize.Lev
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     std::string deviceId1;
-    int32_t ret =authManager->EstablishAuthChannel(deviceId1);
+    int32_t ret = authManager->EstablishAuthChannel(deviceId1);
     ASSERT_EQ(ret, DM_FAILED);
 }
 
@@ -382,7 +378,7 @@ HWTEST_F(DmAuthManagerTest, SendAuthRequest_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->cryptoSupport = true;
     authManager->SetAuthRequestState(authRequestState);
     int32_t sessionId=1;
-    int32_t ret =authManager->SendAuthRequest(sessionId);
+    int32_t ret = authManager->SendAuthRequest(sessionId);
     ASSERT_EQ(ret, DM_FAILED);
 }
 
@@ -403,8 +399,8 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_001, testing::ext::TestSize.Level0)
     authManager->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
     authManager->SetAuthResponseState(authResponseState);
     int32_t action = 0;
-    int32_t ret =authManager->StartAuthProcess(action);
-    ASSERT_EQ(ret,DM_FAILED);
+    int32_t ret = authManager->StartAuthProcess(action);
+    ASSERT_EQ(ret, DM_FAILED);
 }
 
 /**
@@ -426,8 +422,8 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_002, testing::ext::TestSize.Level0)
     authManager->SetAuthResponseState(authResponseState);
     authManager->authResponseContext_->sessionId=111;
     int32_t action = 1;
-    int32_t ret =authManager->StartAuthProcess(action);
-    ASSERT_EQ(ret,DM_OK);
+    int32_t ret = authManager->StartAuthProcess(action);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -451,8 +447,8 @@ HWTEST_F(DmAuthManagerTest, CreateGroup_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->requestId=111;
     authManager->authResponseContext_->groupName="111";
     int32_t action = 1;
-    int32_t ret =authManager->StartAuthProcess(action);
-    ASSERT_EQ(ret,DM_OK);
+    int32_t ret = authManager->StartAuthProcess(action);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -486,8 +482,8 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     jsonObject[TAG_DEVICE_ID] = authManager->authResponseContext_->deviceId;
     std::string deviceId = "44444";
     authManager->SetAuthResponseState(authResponseState);
-    int32_t ret =authManager->AddMember(deviceId);
-    ASSERT_EQ(ret,DM_OK);
+    int32_t ret = authManager->AddMember(deviceId);
+    ASSERT_EQ(ret, DM_OK);
     sleep(15);
 }
 
@@ -510,7 +506,7 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager->SetAuthRequestState(authRequestState);
-    int32_t ret =authManager->JoinNetwork();
+    int32_t ret = authManager->JoinNetwork();
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -527,8 +523,8 @@ HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_001, testing::ext::TestSize.Level
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
     authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
     bool isCryptoSupport = false;
-    int32_t ret =authManager->GetIsCryptoSupport(isCryptoSupport);
-    ASSERT_EQ(ret,DM_OK);
+    int32_t ret = authManager->GetIsCryptoSupport(isCryptoSupport);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -545,7 +541,7 @@ HWTEST_F(DmAuthManagerTest, SetAuthResponseState_001, testing::ext::TestSize.Lev
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
     authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
     authManager->SetAuthResponseState(authResponseState);
-    int32_t ret =authManager->SetAuthResponseState(authResponseState);
+    int32_t ret = authManager->SetAuthResponseState(authResponseState);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -561,8 +557,8 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();;
-    int32_t ret =authManager->GetPinCode();
-    ASSERT_EQ(ret,authManager->authResponseContext_->code);
+    int32_t ret = authManager->GetPinCode();
+    ASSERT_EQ(ret, authManager->authResponseContext_->code);
 }
 }
 }

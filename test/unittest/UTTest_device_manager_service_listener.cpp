@@ -40,8 +40,8 @@ void DeviceManagerServiceListenerTest::SetUpTestCase()
 void DeviceManagerServiceListenerTest::TearDownTestCase()
 {
 }
-namespace {
 
+namespace {
 /**
  * @tc.name: OnDeviceStateChange_001
  * @tc.desc: OnDeviceStateChange, construct a dummy listener, pass in pkgName, use the constructed listener to get

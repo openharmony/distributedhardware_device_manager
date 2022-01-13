@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class DeviceManagerServiceListenerTest : public testing::Test {
 public:
     static void SetUpTestCase();

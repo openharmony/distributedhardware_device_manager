@@ -37,7 +37,6 @@ void SoftbusSessionTest::TearDownTestCase()
 }
 
 namespace {
-
 std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 
 /**

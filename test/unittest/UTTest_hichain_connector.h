@@ -30,14 +30,11 @@
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "dm_device_state_manager.h"
-#include  "hichain_connector.h"
+#include "hichain_connector.h"
 
-namespace OHOS 
-{
-namespace DistributedHardware 
-{
-class HichainConnectorTest : public testing::Test 
-{
+namespace OHOS {
+namespace DistributedHardware {
+class HichainConnectorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -46,6 +43,6 @@ public:
 };
 }
 }
-#undef private
-#undef protected
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // OHOS_HICHAIN_CONNECTOR_H

@@ -16,6 +16,10 @@
 #include "softbus_connector.h"
 
 #include <securec.h>
+#include <unistd.h>
+
+#include <cstdlib>
+#include <string>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"

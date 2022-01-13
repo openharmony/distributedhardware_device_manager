@@ -15,6 +15,8 @@
 
 #include "event_manager_adapt.h"
 
+#include <thread>
+
 #include "dm_constants.h"
 
 using namespace OHOS::EventFwk;

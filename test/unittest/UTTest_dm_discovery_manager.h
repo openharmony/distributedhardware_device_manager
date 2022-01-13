@@ -15,6 +15,7 @@
 
 #ifndef OHOS_UTTEST_DM_DISCOVERY_MANAGER_H
 #define OHOS_UTTEST_DM_DISCOVERY_MANAGER_H
+
 #include <gtest/gtest.h>
 #include <refbase.h>
 #include <queue>
@@ -26,10 +27,8 @@
 #include "ipc_notify_discover_result_req.h"
 
 #define private public
-namespace OHOS 
-{
-namespace DistributedHardware 
-{
+namespace OHOS {
+namespace DistributedHardware {
 class DmDiscoveryManagerTest : public testing::Test 
 {
 public:
