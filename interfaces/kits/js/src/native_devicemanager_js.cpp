@@ -26,13 +26,12 @@
 using namespace OHOS::DistributedHardware;
 
 namespace {
-#define GET_PARAMS(env, info, num) do {                                       \
-    size_t argc = num;                                                        \
-    napi_value argv[num] = {nullptr};                                         \
-    napi_value thisVar = nullptr;                                             \
-    void *data = nullptr;                                                     \
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data)) \
-} while(0)
+#define GET_PARAMS(env, info, num)    \
+    size_t argc = num;                \
+    napi_value argv[num] = {nullptr}; \
+    napi_value thisVar = nullptr;     \
+    void *data = nullptr;             \
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data))
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_FOUND = "deviceFound";

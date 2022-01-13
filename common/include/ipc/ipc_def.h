@@ -21,7 +21,7 @@ namespace DistributedHardware {
 #define DEVICE_MANAGER_SERVICE_NAME "dev_mgr_svc"
 #define MAX_DM_IPC_LEN 2048
 
-#define DECLARE_IPC_MODEL(className) do {             \
+#define DECLARE_IPC_MODEL(className)                  \
 public:                                               \
     className() = default;                            \
     virtual ~className() = default;                   \
@@ -30,8 +30,7 @@ public:                                               \
     className(const className &) = delete;            \
     className &operator=(const className &) = delete; \
     className(className &&) = delete;                 \
-    className &operator=(className &&) = delete       \
-} while(0)
+    className &operator=(className &&) = delete
 
 #define DECLARE_IPC_INTERFACE(className) DECLARE_IPC_MODEL(className)
 

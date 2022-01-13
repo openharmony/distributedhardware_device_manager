@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#define ON_IPC_SET_REQUEST(cmdCode, paraA, paraB, paraC, paraD) do {                               \
+#define ON_IPC_SET_REQUEST(cmdCode, paraA, paraB, paraC, paraD)                                    \
     static int32_t IpcSetRequest##cmdCode(paraA, paraB, paraC, paraD);                             \
     struct IpcRegisterSetRequestFunc##cmdCode {                                                    \
         IpcRegisterSetRequestFunc##cmdCode()                                                       \
@@ -36,10 +36,9 @@ namespace DistributedHardware {
         }                                                                                          \
     };                                                                                             \
     IpcRegisterSetRequestFunc##cmdCode g_IpcRegisterSetRequestFunc##cmdCode;                       \
-    static int32_t IpcSetRequest##cmdCode(paraA, paraB, paraC, paraD)                              \
-} while(0)
+    static int32_t IpcSetRequest##cmdCode(paraA, paraB, paraC, paraD)
 
-#define ON_IPC_READ_RESPONSE(cmdCode, paraA, paraB) do {                                               \
+#define ON_IPC_READ_RESPONSE(cmdCode, paraA, paraB)                                                    \
     static int32_t IpcReadResponse##cmdCode(paraA, paraB);                                             \
     struct IpcRegisterReadResponseFunc##cmdCode {                                                      \
         IpcRegisterReadResponseFunc##cmdCode()                                                         \
@@ -48,10 +47,9 @@ namespace DistributedHardware {
         }                                                                                              \
     };                                                                                                 \
     IpcRegisterReadResponseFunc##cmdCode g_IpcRegisterReadResponseFunc##cmdCode;                       \
-    static int32_t IpcReadResponse##cmdCode(paraA, paraB)                                              \
-} while(0)
+    static int32_t IpcReadResponse##cmdCode(paraA, paraB)
 
-#define ON_IPC_CMD(cmdCode, paraA) do {                                                            \
+#define ON_IPC_CMD(cmdCode, paraA)                                                                 \
     static void IpcCmdProcess##cmdCode(paraA);                                                     \
     struct IpcRegisterCmdProcessFunc##cmdCode {                                                    \
         IpcRegisterCmdProcessFunc##cmdCode()                                                       \
@@ -60,10 +58,9 @@ namespace DistributedHardware {
         }                                                                                          \
     };                                                                                             \
     IpcRegisterCmdProcessFunc##cmdCode g_IpcRegisterCmdProcessFunc##cmdCode;                       \
-    static void IpcCmdProcess##cmdCode(paraA)                                                      \
-} while(0)
+    static void IpcCmdProcess##cmdCode(paraA)
 
-#define ON_IPC_SERVER_CMD(cmdCode, paraA, paraB) do {                                                          \
+#define ON_IPC_SERVER_CMD(cmdCode, paraA, paraB)                                                               \
     static void IpcServerCmdProcess##cmdCode(paraA, paraB);                                                    \
     class IpcRegisterServerCmdProcessFunc##cmdCode {                                                           \
     public:                                                                                                    \
@@ -73,8 +70,7 @@ namespace DistributedHardware {
         }                                                                                                      \
     };                                                                                                         \
     IpcRegisterServerCmdProcessFunc##cmdCode g_IpcRegisterServerCmdProcessFunc##cmdCode;                       \
-    static void IpcServerCmdProcess##cmdCode(paraA, paraB)                                                     \
-} while(0)
+    static void IpcServerCmdProcess##cmdCode(paraA, paraB)
 
 using SetIpcRequestFunc = int32_t (*)(std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                                       size_t bufferLen);
