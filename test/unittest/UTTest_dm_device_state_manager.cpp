@@ -47,7 +47,7 @@ namespace {
   
 std::shared_ptr<SoftbusConnector> softbusConnector  = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager  = std::shared_ptr<DmDeviceStateManager>(new DmDeviceStateManager(softbusConnector, listener_));
+std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager  = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
 
 /**
  * @tc.name: DmDeviceStateManager_001
@@ -57,7 +57,7 @@ std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager  = std::shared_ptr<Dm
  */
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestSize.Level0) 
 {
-    std::shared_ptr<DmDeviceStateManager> p = std::shared_ptr<DmDeviceStateManager>(new DmDeviceStateManager(softbusConnector, listener_));
+    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
     ASSERT_NE(p, nullptr);
 
 }
@@ -70,7 +70,7 @@ HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestS
  */
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_002, testing::ext::TestSize.Level0) 
 {
-    std::shared_ptr<DmDeviceStateManager> p = std::shared_ptr<DmDeviceStateManager>(new DmDeviceStateManager(softbusConnector, listener_));
+    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
     p.reset();
     EXPECT_EQ(p, nullptr);
 }

@@ -16,7 +16,6 @@
 #include "dm_ability_manager.h"
 
 #include "dm_constants.h"
-#include "semaphore.h"
 
 namespace OHOS {
 namespace DistributedHardware {

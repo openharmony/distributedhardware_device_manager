@@ -80,13 +80,6 @@ DmAuthManager::~DmAuthManager()
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                           const std::string &extra)
 {
-    // TODO:检查pkgName的权限
-
-    // std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
-    // if (authentication == nullptr) {
-    //     LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
-    //     return DM_AUTH_NOT_SUPPORT;
-    // }
     LOGE("DmAuthManager::AuthenticateDevice is");
     if (authRequestState_ != nullptr && authResponseState_ != nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.",
@@ -141,7 +134,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         }
     }
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
-    authRequestState_ = std::shared_ptr<AuthRequestState>(new AuthRequestInitState());
+    authRequestState_ = std::make_shared<AuthRequestInitState>();
     authRequestState_->SetAuthManager(shared_from_this());
     authRequestState_->SetAuthContext(authRequestContext_);
     authRequestState_->Enter();
@@ -181,7 +174,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
         return DM_FAILED;
     }
-    // groupId = authResponseContext_->groupId;
     return DM_OK;
 }
 
@@ -201,7 +193,7 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
     switch (ret) {
         case DM_OK:
         {
-            authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestJoinState()));
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
         }
         break;
         case DM_AUTH_INPUT_FAILED:
@@ -214,7 +206,7 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
         default:
         {
             CancelDisplay();
-            authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         }
     }
 
@@ -228,7 +220,7 @@ void DmAuthManager::OnSessionOpened(const std::string &pkgName, int32_t sessionI
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
-            authResponseState_ = std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+            authResponseState_ = std::make_shared<AuthResponseInitState>();
             authResponseState_->SetAuthManager(shared_from_this());
             authResponseState_->Enter();
             hiChainConnector_->RegisterHiChainCallback(pkgName, shared_from_this());
@@ -255,7 +247,7 @@ void DmAuthManager::OnSessionOpened(const std::string &pkgName, int32_t sessionI
             authRequestState_->SetAuthContext(authRequestContext_);
             authMessageProcessor_->SetRequestContext(authRequestContext_);
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-            authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestNegotiateState()));
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
         } else {
             LOGE("DmAuthManager::OnSessionOpened but request state %d is wrong", authRequestState_->GetStateType());
         }
@@ -292,7 +284,7 @@ void DmAuthManager::OnDataReceived(const std::string &pkgName, int32_t sessionId
         case MSG_TYPE_NEGOTIATE:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
                 timerMap_[WAIT_NEGOTIATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-                authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState()));
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
             } else {
                 LOGE("Device manager auth state error");
             }
@@ -300,21 +292,21 @@ void DmAuthManager::OnDataReceived(const std::string &pkgName, int32_t sessionId
         case MSG_TYPE_REQ_AUTH:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
                 timerMap_[WAIT_REQUEST_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-                authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseConfirmState()));
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
             } else {
                 LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_RESP_AUTH:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
-                authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestReplyState()));
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestReplyState>());
             } else {
                 LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_RESP_NEGOTIATE:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE) {
-                authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestNegotiateDoneState()));
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateDoneState>());
             } else {
                 LOGE("Device manager auth state error");
             }
@@ -322,7 +314,7 @@ void DmAuthManager::OnDataReceived(const std::string &pkgName, int32_t sessionId
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             if (authResponseState_ != nullptr &&
                 authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
-                authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseFinishState()));
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             } else if (authRequestState_ != nullptr &&
                        authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
                 LOGE("Device manager auth state error");
@@ -353,7 +345,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
-    authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseShowState()));
+    authResponseState_->TransitionTo(std::make_shared<AuthResponseShowState>());
 }
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
@@ -365,16 +357,14 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     if (authRequestState_ != nullptr) {
         timerMap_[ADD_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
-            if (authRequestState_ == nullptr) {
-                // authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseFinishState()));
-            } else {
+            if (authRequestState_ != nullptr) {
                 authResponseContext_->reply = AuthState::AUTH_REQUEST_JOIN;
                 authRequestContext_->reason = DM_AUTH_INPUT_FAILED;
-                authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
                 return;
             }
         }
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestNetworkState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
     }
 }
 
@@ -388,7 +378,7 @@ void DmAuthManager::HandleAuthenticateTimeout()
         }
         authResponseContext_->reply = authRequestState_->GetStateType();
         authRequestContext_->reason = DM_TIME_OUT;
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
     LOGI("DmAuthManager::HandleAuthenticateTimeout start complete");
 }
@@ -403,7 +393,7 @@ void DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
         authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         authResponseContext_->reply = AuthState::AUTH_REQUEST_NEGOTIATE;
         authRequestContext_->reason = DM_AUTH_OPEN_SESSION_FAILED;
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 }
 
@@ -466,7 +456,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     }
 
     if (authResponseContext_->reply == DM_AUTH_PEER_REJECT) {
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
 
@@ -488,7 +478,7 @@ void DmAuthManager::StartAuthProcess(const int32_t &action)
     authResponseContext_->reply = action;
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
-        authResponseState_->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseGroupState()));
+        authResponseState_->TransitionTo(std::make_shared<AuthResponseGroupState>());
     } else {
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
@@ -504,12 +494,12 @@ void DmAuthManager::StartRespAuthProcess()
         std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(INPUT_TIMEOUT_TASK);
         timerMap_[INPUT_TIMEOUT_TASK] = inputStartTimer;
         inputStartTimer->Start(INPUT_TIMEOUT, TimeOut, this);
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestInputState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestInputState>());
     } else {
         LOGE("do not accept");
         authResponseContext_->reply = AuthState::AUTH_REQUEST_REPLY;
         authRequestContext_->reason = DM_AUTH_PEER_REJECT;
-        authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 }
 
@@ -557,7 +547,7 @@ void DmAuthManager::JoinNetwork()
     timerMap_[AUTHENTICATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     authResponseContext_->reply = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
-    authRequestState_->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestFinishState()));
+    authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
 }
 
 void DmAuthManager::AuthenticateFinish()

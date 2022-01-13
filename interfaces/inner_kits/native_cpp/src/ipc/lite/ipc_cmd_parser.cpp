@@ -287,7 +287,6 @@ ON_IPC_CMD(SERVER_AUTH_RESULT, IpcIo &reply)
     std::string pkgName = (const char *)IpcIoPopString(&reply, &len);
     size_t devIdLen = 0;
     std::string deviceId = (const char *)IpcIoPopString(&reply, &devIdLen);
-    //    int32_t pinToken = IpcIoPopInt32(&reply);
     int32_t status = IpcIoPopInt32(&reply);
     int32_t reason = IpcIoPopInt32(&reply);
 

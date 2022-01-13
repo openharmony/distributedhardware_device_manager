@@ -21,8 +21,6 @@
 #include <vector>
 
 #include "device_manager_callback.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

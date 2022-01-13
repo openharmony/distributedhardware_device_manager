@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t MAX_VERIFY_TIMES = 3;
 PinAuth::PinAuth()
 {
     LOGI("PinAuth constructor");
@@ -59,7 +60,7 @@ int32_t PinAuth::VerifyAuthentication(std::string pinToken, int32_t code, const 
     int32_t inputPinToken = jsonObject[PIN_TOKEN];
     if (code == inputPinCode && stoi(pinToken) == inputPinToken) {
         return DM_OK;
-    } else if (code != inputPinCode && times_ < 3) {
+    } else if (code != inputPinCode && times_ < MAX_VERIFY_TIMES) {
         return DM_AUTH_INPUT_FAILED;
     } else {
         return DM_FAILED;

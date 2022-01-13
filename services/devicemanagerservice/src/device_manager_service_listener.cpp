@@ -15,8 +15,6 @@
 
 #include "device_manager_service_listener.h"
 
-#include <memory>
-
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -91,7 +89,6 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
     pReq->SetDeviceId(deviceId);
     pReq->SetToken(token);
     pReq->SetStatus(status);
-    //    pReq->SetReason(reason);
     ipcServerListener_.SendRequest(SERVER_AUTH_RESULT, pReq, pRsp);
 }
 

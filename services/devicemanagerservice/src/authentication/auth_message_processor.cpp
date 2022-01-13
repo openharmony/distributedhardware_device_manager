@@ -219,7 +219,6 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
     authResponseContext_->reply = json[TAG_REPLY];
     authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     authResponseContext_->token = json[TAG_TOKEN];
-    // authResponseContext_->deviceId = json[TAG_GROUPIDS];
     if (authResponseContext_->reply == 0) {
         authResponseContext_->code = json[PIN_CODE_KEY];
         authResponseContext_->networkId = json[TAG_NET_ID];
@@ -237,7 +236,6 @@ void AuthMessageProcessor::ParseAuthRequestMessage()
     nlohmann::json jsonObject = authSplitJsonList_.front();
     authResponseContext_->deviceId = jsonObject[TAG_DEVICE_ID];
     authResponseContext_->reply = jsonObject[TAG_REPLY];
-    //    authResponseContext_->syncGroupList = jsonObject[TAG_GROUPIDS];
     authResponseContext_->authType = jsonObject[TAG_AUTH_TYPE];
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage %d,%d", authResponseContext_->reply);
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());

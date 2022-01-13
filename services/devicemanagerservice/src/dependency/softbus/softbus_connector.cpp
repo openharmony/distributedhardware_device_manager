@@ -16,10 +16,6 @@
 #include "softbus_connector.h"
 
 #include <securec.h>
-#include <unistd.h>
-
-#include <cstdlib>
-#include <string>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -110,7 +106,6 @@ int32_t SoftbusConnector::Init()
         LOGI("service unpublish result is : %d", ret);
     }
 
-//    ret = WatchParameter(DISCOVER_STATUS_KEY.c_str(), &SoftbusConnector::OnParameterChgCallback, nullptr);
     LOGI("register Watch Parameter result is : %d");
     return ret;
 }

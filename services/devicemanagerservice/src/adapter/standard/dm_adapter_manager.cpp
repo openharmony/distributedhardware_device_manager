@@ -15,8 +15,6 @@
 
 #include "dm_adapter_manager.h"
 
-#include <dlfcn.h>
-
 #include "config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
