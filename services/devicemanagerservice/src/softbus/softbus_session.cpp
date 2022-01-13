@@ -49,7 +49,8 @@ static void MessageReceived(int32_t sessionId, const void *data, uint32_t dataLe
     DMLOG(DM_LOG_INFO, "sessionId:%d, dataLen:%d", sessionId, dataLen);
 }
 
-static void StreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext, const FrameInfo *param)
+static void StreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
+    const StreamFrameInfo *param)
 {
     (void)sessionId;
     (void)data;
