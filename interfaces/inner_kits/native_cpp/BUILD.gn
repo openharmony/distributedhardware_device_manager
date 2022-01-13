@@ -20,52 +20,6 @@ import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
   shared_library("devicemanagersdk") {
-    include_dirs = [
-      "include",
-      "include/ipc",
-      "include/ipc/lite",
-      "include/notify",
-      "${common_path}/include",
-      "${common_path}/include/ipc",
-      "${common_path}/include/ipc/model",
-      "${utils_path}/include",
-      "${utils_path}/include/ipc/lite",
-    ]
-    include_dirs += [
-      "//utils/native/lite/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
-      "//third_party/bounds_checking_function/include",
-      "//foundation/communication/ipc_lite/interfaces/kits",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-      "//third_party/json/include",
-    ]
-
-    sources = [
-      "src/device_manager.cpp",
-      "src/device_manager_impl.cpp",
-      "src/ipc/ipc_client_proxy.cpp",
-      "src/ipc/lite/ipc_client_manager.cpp",
-      "src/ipc/lite/ipc_client_server_proxy.cpp",
-      "src/ipc/lite/ipc_client_stub.cpp",
-      "src/ipc/lite/ipc_cmd_parser.cpp",
-      "src/notify/device_manager_notify.cpp",
-    ]
-
-    defines = [
-      "LITE_DEVICE",
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagerkit\"",
-      "LOG_DOMAIN=0xD004100",
-    ]
-
-    deps = [
-      "${utils_path}:devicemanagerutils",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//foundation/communication/ipc_lite:liteipc_adapter",
-      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
-      "//third_party/bounds_checking_function:libsec_shared",
-      "//utils/native/lite:utils",
-    ]
   }
 } else {
   ohos_shared_library("devicemanagersdk") {
