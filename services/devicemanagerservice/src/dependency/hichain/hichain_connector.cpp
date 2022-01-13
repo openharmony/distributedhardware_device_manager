@@ -196,9 +196,6 @@ int32_t HiChainConnector::AddMember(std::string deviceId, std::string &connectIn
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfomation.c_str();
     std::string tmpStr = jsonObj.dump();
     int64_t requestId = jsonObject[TAG_REQUEST_ID];
-    // LOGI("HiChainConnector::AddMember completed requestId%d, jsonObject[TAG_GROUP_ID]%s ", requestId,
-    // groupId.c_str()); LOGI("HiChainConnector::AddMember completed  DM_PKG_NAME %s", DM_PKG_NAME.c_str());
-    // LOGI("HiChainConnector::AddMember completedtmpStr%s", tmpStr.c_str());
     int32_t ret = deviceGroupManager_->addMemberToGroup(requestId, DM_PKG_NAME.c_str(), tmpStr.c_str());
     LOGI("HiChainConnector::AddMember completed");
     return ret;

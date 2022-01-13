@@ -530,7 +530,6 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     uint8_t *appThumbnailBufferPtr = nullptr;
     int32_t appThumbnailBufferLen = 0;
     JsToDmBuffer(env, object, "appThumbnail", &appThumbnailBufferPtr, appThumbnailBufferLen);
-    // appImageInfo.Reset(appIconBufferPtr, appIconBufferLen, appThumbnailBufferPtr, appThumbnailBufferLen);
     if (appIconBufferPtr != nullptr) {
         free(appIconBufferPtr);
         appIconBufferPtr = nullptr;
@@ -1048,7 +1047,6 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
         return result;
     } else {
         LOGE("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
-        // DmFilterOptions filterOptions;
         napi_deferred deferred;
         napi_value promise = 0;
         napi_create_promise(env, &deferred, &promise);
@@ -1125,8 +1123,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         return promise;
     } else if (argc == 1) {
         return CallDeviceList(env, info, deviceInfoAsyncCallbackInfo);
-    } else if (argc == 2) {
-        // DmFilterOptions filterOptions;
+    } else if (argc == DM_NAPI_ARGS_TWO) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         napi_valuetype valueType;
         napi_typeof(env, argv[0], &valueType);
@@ -1389,10 +1386,6 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
     NAPI_ASSERT(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
     char type[DM_NAPI_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
-    if (num) {
-        // DmFilterOptions filterOptions;
-        // JsToDmFilterOptions(env, argv[1], filterOptions);
-    }
 
     std::string eventType = type;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
@@ -1413,7 +1406,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
     size_t argc = 0;
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-    if (argc == 3) {
+    if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
         NAPI_ASSERT(env, argc >= DM_NAPI_ARGS_THREE, "Wrong number of arguments, required 2");
@@ -1427,7 +1420,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
         NAPI_ASSERT(env, valueType == napi_object, "type mismatch for parameter 2");
 
         napi_valuetype eventHandleType = napi_undefined;
-        napi_typeof(env, argv[2], &eventHandleType);
+        napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
         NAPI_ASSERT(env, eventHandleType == napi_function, "type mismatch for parameter 3");
 
         return JsOnFrench(env, 1, thisVar, argv);
@@ -1475,7 +1468,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     size_t argc = 0;
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-    if (argc == 3) {
+    if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
         size_t requireArgc = 1;
@@ -1491,7 +1484,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 
         if (argc > requireArgc) {
             napi_valuetype eventHandleType = napi_undefined;
-            napi_typeof(env, argv[2], &eventHandleType);
+            napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
             NAPI_ASSERT(env, eventValueType == napi_function, "type mismatch for parameter 2");
         }
         return JsOffFrench(env, 1, thisVar, argv);

@@ -50,8 +50,7 @@ HWTEST_F(AuthResponseStateTest, SetAuthManager_001, testing::ext::TestSize.Level
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->authManager_.use_count();
     ASSERT_EQ(ret, 1);
@@ -68,8 +67,7 @@ HWTEST_F(AuthResponseStateTest, SetAuthManager_001, testing::ext::TestSize.Level
  */
 HWTEST_F(AuthResponseStateTest, SetAuthManager_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->authManager_.use_count();
     ASSERT_EQ(ret, 0);
@@ -89,11 +87,10 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager = nullptr;
     authResponseState->authManager_ = authManager;
-    int32_t ret = authResponseState->TransitionTo(std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState()));
+    int32_t ret = authResponseState->TransitionTo(std::make_shared<AuthResponseNegotiateState>(););
     ASSERT_EQ(ret, DM_FAILED);
     sleep(15);
 }
@@ -112,14 +109,14 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
     std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    std::shared_ptr<AuthRequestState> authRequestState = std::shared_ptr<AuthRequestState>(new AuthRequestInitState());
-    authManager->authRequestState_ = std::shared_ptr<AuthRequestState>(new AuthRequestNegotiateState());
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
+    authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     context->sessionId = 123456;
     authRequestState->SetAuthContext(context);
     authRequestState->SetAuthManager(authManager);
-    int32_t ret = authRequestState->TransitionTo(std::shared_ptr<AuthRequestState>(new AuthRequestNegotiateState()));
+    int32_t ret = authRequestState->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
     ASSERT_EQ(ret, DM_OK);
     sleep(20);
 }
@@ -133,8 +130,7 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_INIT);
     sleep(15);
@@ -149,8 +145,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, Enter_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseInitState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);
     sleep(15);
@@ -165,8 +160,7 @@ HWTEST_F(AuthResponseStateTest, Enter_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseNegotiateState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_NEGOTIATE);
     sleep(15);
@@ -185,8 +179,7 @@ HWTEST_F(AuthResponseStateTest, Enter_002, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseNegotiateState>();
     authManager = nullptr;
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
@@ -207,14 +200,13 @@ HWTEST_F(AuthResponseStateTest, Enter_003, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseNegotiateState>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authResponseState_ = std::shared_ptr<AuthResponseState>(new AuthResponseNegotiateState());
-    authManager->authRequestState_ = std::shared_ptr<AuthRequestState>(new AuthRequestNegotiateState());
+    authManager->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
+    authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     authManager->authResponseContext_->deviceId = "111";
     authManager->authResponseContext_->localDeviceId = "222";
     authResponseState->SetAuthManager(authManager);
@@ -235,8 +227,7 @@ HWTEST_F(AuthResponseStateTest, Enter_003, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_003, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseConfirmState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_CONFIRM);
     sleep(15);
@@ -255,8 +246,7 @@ HWTEST_F(AuthResponseStateTest, Enter_004, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseConfirmState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_FAILED);
@@ -276,8 +266,7 @@ HWTEST_F(AuthResponseStateTest, Enter_005, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseConfirmState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);
@@ -293,8 +282,7 @@ HWTEST_F(AuthResponseStateTest, Enter_005, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_004, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseGroupState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseGroupState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_GROUP);
     sleep(15);
@@ -313,8 +301,7 @@ HWTEST_F(AuthResponseStateTest, Enter_006, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseGroupState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseGroupState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_FAILED);
@@ -334,8 +321,7 @@ HWTEST_F(AuthResponseStateTest, Enter_007, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseGroupState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseGroupState>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -354,8 +340,7 @@ HWTEST_F(AuthResponseStateTest, Enter_007, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_005, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseShowState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_SHOW);
     sleep(15);
@@ -374,8 +359,7 @@ HWTEST_F(AuthResponseStateTest, Enter_008, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseShowState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_FAILED);
@@ -395,8 +379,7 @@ HWTEST_F(AuthResponseStateTest, Enter_009, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseShowState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);
@@ -412,8 +395,7 @@ HWTEST_F(AuthResponseStateTest, Enter_009, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, GetStateType_006, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseFinishState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
     int32_t ret = authResponseState->GetStateType();
     ASSERT_EQ(ret, AuthState::AUTH_RESPONSE_FINISH);
     sleep(15);
@@ -432,8 +414,7 @@ HWTEST_F(AuthResponseStateTest, Enter_010, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseFinishState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_FAILED);
@@ -453,10 +434,9 @@ HWTEST_F(AuthResponseStateTest, Enter_011, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<AuthResponseState> authResponseState =
-        std::shared_ptr<AuthResponseState>(new AuthResponseFinishState());
-    authManager->authRequestState_ = std::shared_ptr<AuthRequestState>(new AuthRequestFinishState());
-    authManager->authResponseState_ = std::shared_ptr<AuthResponseState>(new AuthResponseFinishState());
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
+    authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);

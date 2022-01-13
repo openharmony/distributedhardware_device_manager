@@ -12,11 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DEVICE_MESSAGE_TEST_H
 #define OHOS_DEVICE_MESSAGE_TEST_H
-#define private public  
-#define protected public
 
 #include <memory>
 #include <vector>
@@ -35,6 +33,4 @@ public:
 };
 }
 }
-#endif // OHOS_DM_IMPL_TEST_H
-#undef private
-#undef protected
+#endif // OHOS_DEVICE_MESSAGE_TEST_H

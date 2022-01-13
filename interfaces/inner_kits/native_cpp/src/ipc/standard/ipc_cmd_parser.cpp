@@ -233,7 +233,6 @@ ON_IPC_SET_REQUEST(AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, Messag
     int32_t authType = pReq->GetAuthType();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
     std::string deviceId = deviceInfo.deviceId;
-    //    DmAppImageInfo imageInfo = pReq->GetAppImageInfo();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");

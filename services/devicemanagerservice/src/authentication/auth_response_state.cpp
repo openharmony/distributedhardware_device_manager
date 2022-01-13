@@ -94,7 +94,6 @@ void AuthResponseConfirmState::Enter()
 {
     //委托授权UI模块进行用户交互
     //如果交互成功
-    // TransitionTo(new AuthResponseGroupState());
     LOGI("AuthResponse:: AuthResponseConfirmState  Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
@@ -112,7 +111,6 @@ int32_t AuthResponseGroupState::GetStateType()
 void AuthResponseGroupState::Enter()
 {
     //    //1.创建群组,
-    //    authManagerPtr_->GetHiChainConnector()->CreateGroup();
     LOGI("AuthResponse:: AuthResponseGroupState  Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {

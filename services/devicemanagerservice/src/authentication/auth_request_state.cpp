@@ -15,8 +15,6 @@
 
 #include "auth_request_state.h"
 
-#include <utility>
-
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
 
@@ -31,10 +29,6 @@ void AuthRequestState::SetAuthManager(std::shared_ptr<DmAuthManager> authManager
 {
     authManager_ = std::move(authManager);
 }
-
-// void AuthRequestState::SetLastState(std::shared_ptr<AuthRequestState> state) {
-//     lastState_ = state;
-// }
 
 void AuthRequestState::SetAuthContext(std::shared_ptr<DmAuthRequestContext> context)
 {
@@ -99,12 +93,6 @@ int32_t AuthRequestNegotiateDoneState::GetStateType()
 
 void AuthRequestNegotiateDoneState::Enter()
 {
-    //   //1. 获取对端加解密信息,并对比两端状态
-    //
-    //   //2. 保存加解密状态，发送认证请求
-    //    authMessageProcessor_->CreateMessage(MSG_TYPE_REQ_AUTH);
-    //    std::string message;
-    //    softbusSession_->SendData(context_.sessionId, message);
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

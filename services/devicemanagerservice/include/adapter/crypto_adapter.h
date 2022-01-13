@@ -15,9 +15,6 @@
 
 #ifndef OHOS_DM_CRYPTO_ADAPTER_H
 #define OHOS_DM_CRYPTO_ADAPTER_H
-
-#include <cstdint>
-
 namespace OHOS {
 namespace DistributedHardware {
 class ICryptoAdapter {

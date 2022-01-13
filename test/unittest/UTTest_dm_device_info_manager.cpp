@@ -40,8 +40,7 @@ namespace {
 
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager =
-    std::shared_ptr<DmDeviceInfoManager>(new DmDeviceInfoManager(softbusConnector));
+std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager = std::make_shared<DmDeviceInfoManager>(softbusConnector);
 
 /**
  * @tc.name: DmDeviceInfoManager_001
@@ -53,8 +52,7 @@ std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager =
  */
 HWTEST_F(DeviceManagerImplTest, DmDeviceInfoManager_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDeviceInfoManager> p =
-        std::shared_ptr<DmDeviceInfoManager>(new DmDeviceInfoManager(softbusConnector));
+    std::shared_ptr<DmDeviceInfoManager> p = std::make_shared<DmDeviceInfoManager>(softbusConnector);
     ASSERT_NE(p, nullptr);
 }
 } // namespace

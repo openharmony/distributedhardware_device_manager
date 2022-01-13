@@ -100,7 +100,6 @@ void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDev
 
 void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std::string deviceId)
 {
-    //deviceId is uuid;
     DmDeviceInfo saveInfo;
     auto iter = remoteDeviceInfos_.find(deviceId);
     if (iter == remoteDeviceInfos_.end()) {

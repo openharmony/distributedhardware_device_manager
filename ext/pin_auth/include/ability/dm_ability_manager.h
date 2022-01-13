@@ -16,9 +16,6 @@
 #ifndef OHOS_DM_ABILITY_MANAGER_H
 #define OHOS_DM_ABILITY_MANAGER_H
 
-#include <semaphore.h>
-
-#include <mutex>
 #include <string>
 #include <vector>
 
