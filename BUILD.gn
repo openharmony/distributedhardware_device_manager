@@ -18,9 +18,6 @@ if (defined(ohos_lite)) {
     if (ohos_kernel_type == "liteos_m") {
     } else {
       features = [
-        "utils:devicemanagerutils",
-        "services/devicemanagerservice:devicemanagerservice",
-        "interfaces/inner_kits/native_cpp:devicemanagersdk",
       ]
     }
   }
