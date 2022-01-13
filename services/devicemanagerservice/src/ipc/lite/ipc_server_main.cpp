@@ -13,37 +13,13 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
-
 #include <cstdint>
-
-#include "device_manager_service.h"
-#include "dm_constants.h"
-#include "dm_log.h"
-#include "ipc_server_stub.h"
-
-using namespace OHOS::DistributedHardware;
-
-static void InitAll()
-{
-    const int32_t DM_SERVICE_INIT_DELAY = 2;
-    sleep(DM_SERVICE_INIT_DELAY);
-    if (IpcServerStubInit() != DM_OK) {
-        LOGE("IpcServerStubInit failed");
-        return;
-    }
-    if (DeviceManagerService::GetInstance().Init() != DM_OK) {
-        LOGE("module init failed");
-        return;
-    }
-    LOGI("DM ipc server Init success");
-}
+#include <unistd.h>
 
 int32_t main(int32_t argc, char *argv[])
 {
     (void)argc;
     (void)argv;
-    InitAll();
     while (1) {
         pause();
     }
