@@ -156,6 +156,7 @@ void SoftbusSession::OnBytesReceived(int32_t sessionId, const void *data, uint32
     std::string message = std::string((const char *)data, dataLen);
     for (auto &iter : sessionCallbackMap_) {
         iter.second->OnDataReceived(iter.first, sessionId, message);
+        return;
     }
     LOGI("OnBytesReceived completed");
 }
