@@ -103,7 +103,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
   sources = [
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/adapter/standard/dm_adapter_manager.cpp",
-    "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/config/config_manager.cpp",
+    "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/config/dm_config_manager.cpp",
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/dependency/softbus/softbus_connector.cpp",
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/dependency/softbus/softbus_session.cpp",
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/src/dependency/timer/dm_timer.cpp",
