@@ -26,55 +26,40 @@
 #include "common_event_subscriber.h"
 #include "dm_log.h"
 #include "matching_skills.h"
+#include "single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using CommomEventCallback = void (*)(void);
 
 class DmCommonEventManager {
-public:
-    static DmCommonEventManager &GetInstance();
-
+DECLARE_SINGLE_INSTANCE_BASE(DmCommonEventManager);
 public:
     bool SubscribeServiceEvent(const std::string &event, CommomEventCallback callback);
     bool UnsubscribeServiceEvent(const std::string &event);
-
+    void Test(const std::string &event);
     class EventSubscriber : public EventFwk::CommonEventSubscriber {
     public:
-        explicit EventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
-            : EventFwk::CommonEventSubscriber(subscribeInfo)
-        {
-        }
-
+        EventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, CommomEventCallback callback,
+            std::string event) : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback), event_(event) {}
         void OnReceiveEvent(const EventFwk::CommonEventData &data);
-        void addEventCallback(const std::string &event, CommomEventCallback callback);
-        void deleteEventCallback(const std::string &event);
-
+        void TestCommonEvent(const std::string &event);
     private:
-        std::mutex callbackLock_;
-        std::map<std::string, CommomEventCallback> dmEventCallback_;
+        CommomEventCallback callback_;  
+        std::string event_;
     };
-
 private:
-    DmCommonEventManager() = default;
-    virtual ~DmCommonEventManager();
-    DmCommonEventManager(const DmCommonEventManager &) = delete;
-    DmCommonEventManager &operator=(const DmCommonEventManager &) = delete;
-    DmCommonEventManager(DmCommonEventManager &&) = delete;
-    DmCommonEventManager &operator=(DmCommonEventManager &&) = delete;
-
+    DmCommonEventManager();
+    ~DmCommonEventManager();
 private:
     static void DealCallback(void);
-    static void InitCallbackThread(void);
-
 private:
-    static std::once_flag onceFlag_;
-    static std::list<CommomEventCallback> callbackQueue_;
     static std::mutex callbackQueueMutex_;
+    static std::mutex eventSubscriberMutex_;
     static std::condition_variable notEmpty_;
+    static std::list<CommomEventCallback> callbackQueue_;
     std::map<std::string, std::shared_ptr<EventSubscriber>> dmEventSubscriber_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_EVENT_MANAGER_ADAPT_H
