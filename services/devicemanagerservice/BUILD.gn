@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
       "src/authentication/auth_ui.cpp",
       "src/authentication/dm_auth_manager.cpp",
       "src/config/config_manager.cpp",
-      "src/dependency/commonevent/event_manager_adapt.cpp",
+      "src/dependency/commonevent/dm_common_event_manager.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
       "src/dependency/softbus/softbus_connector.cpp",
       "src/dependency/softbus/softbus_session.cpp",
