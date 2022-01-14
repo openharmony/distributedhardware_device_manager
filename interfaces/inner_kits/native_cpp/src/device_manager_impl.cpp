@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,279 +15,520 @@
 
 #include "device_manager_impl.h"
 
-#include "device_manager_errno.h"
-#include "device_manager_log.h"
-#include "device_manager_notify.h"
-#include "constants.h"
+#include "bundle_constants.h"
+#include "bundle_info.h"
+#include "bundle_mgr_client.h"
+#include "bundle_mgr_interface.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
+#include "device_manager_notify.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
-#include "ipc_check_authenticate_req.h"
+#include "ipc_get_dmfaparam_rsp.h"
+#include "ipc_get_info_by_network_req.h"
+#include "ipc_get_info_by_network_rsp.h"
+#include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
-#include "ipc_rsp.h"
 #include "ipc_req.h"
+#include "ipc_rsp.h"
+#include "ipc_set_useroperation_req.h"
+#include "ipc_skeleton.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
-#include "ipc_get_authenticationparam_rsp.h"
-#include "ipc_set_useroperation_req.h"
+#include "ipc_unauthenticate_device_req.h"
+#include "ipc_verify_authenticate_req.h"
+#include "securec.h"
+
+using namespace OHOS::AppExecFwk;
+using namespace OHOS::AppExecFwk::Constants;
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceManagerImpl);
-
-int32_t DeviceManagerImpl::InitDeviceManager(std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback)
+bool DeviceManagerImpl::isSystemAppCalling(void)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::InitDeviceManager start, pkgName: %s", pkgName.c_str());
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    if (uid < 0) {
+        LOGI("app caller uid is: %d,", uid);
+        return false;
+    }
+    
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        LOGE("failed to get system ability mgr.");
+        return false;
+    }
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        LOGE("failed to get bundle manager proxy.");
+        return false;
+    }
+
+    LOGI("get bundle manager proxy success.");
+    sptr<IBundleMgr> iBundleMgr = iface_cast<IBundleMgr>(remoteObject);
+    return iBundleMgr->CheckIsSystemAppByUid(uid);
+}
+
+DeviceManagerImpl &DeviceManagerImpl::GetInstance()
+{
+    static DeviceManagerImpl instance;
+    return instance;
+}
+
+int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback)
+{
+    LOGI("DeviceManager::InitDeviceManager start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
     if (pkgName.empty() || dmInitCallback == nullptr) {
-        DMLOG(DM_LOG_ERROR, "InitDeviceManager error: Invalid parameter");
-        return DEVICEMANAGER_INVALID_VALUE;
+        LOGE("InitDeviceManager error: Invalid parameter");
+        return DM_INVALID_VALUE;
     }
 
     int32_t ret = ipcClientProxy_->Init(pkgName);
-    if (ret != DEVICEMANAGER_OK) {
-        return ret;
+    if (ret != DM_OK) {
+        LOGE("InitDeviceManager error: proxy init failed ret: %d", ret);
+        return DM_INIT_FAILED;
     }
+
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
-    DMLOG(DM_LOG_INFO, "success");
-    return DEVICEMANAGER_OK;
+    LOGI("InitDeviceManager success");
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UnInitDeviceManager(std::string &pkgName)
+int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
     if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "InitDeviceManager error: Invalid parameter");
-        return DEVICEMANAGER_INVALID_VALUE;
+        LOGE("UnInitDeviceManager error: Invalid parameter");
+        return DM_INVALID_VALUE;
     }
 
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
-    if (ret != DEVICEMANAGER_OK) {
-        return ret;
+    if (ret != DM_OK) {
+        LOGE("UnInitDeviceManager error: proxy unInit failed ret: %d", ret);
+        return DM_UNINIT_FAILED;
     }
+
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(pkgName);
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnInitDeviceManager completed with errcode %d", ret);
-    return DEVICEMANAGER_OK;
+    LOGI("UnInitDeviceManager success");
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GetTrustedDeviceList(std::string &pkgName, std::string &extra,
-    std::vector<DmDeviceInfo> &deviceList)
+int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                                std::vector<DmDeviceInfo> &deviceList)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::GetTrustedDeviceList start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+    LOGI("DeviceManager::GetTrustedDeviceList start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
     }
 
-    std::shared_ptr<IpcGetTrustdeviceReq> req = std::make_shared<IpcGetTrustdeviceReq>();
-    std::shared_ptr<IpcGetTrustdeviceRsp> rsp = std::make_shared<IpcGetTrustdeviceRsp>();
+    if (pkgName.empty()) {
+        LOGE("GetTrustedDeviceList error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+
+    std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
+    std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
-    if (ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("GetTrustedDeviceList error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
     }
-    if (rsp->GetErrCode() == DEVICEMANAGER_OK) {
-        deviceList = rsp->GetDeviceVec();
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("GetTrustedDeviceList error: failed ret: %d", ret);
+        return DM_IPC_RESPOND_ERROR;
     }
-    DMLOG(DM_LOG_INFO, "DeviceManager::GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+
+    deviceList = rsp->GetDeviceVec();
+    LOGI("GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::RegisterDevStateCallback(std::string &pkgName, std::string &extra,
-    std::shared_ptr<DeviceStateCallback> callback)
+int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &info)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::GetLocalDeviceInfo start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceInfoRsp> rsp = std::make_shared<IpcGetLocalDeviceInfoRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("GetLocalDeviceInfo error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("GetLocalDeviceInfo error: failed ret: %d", ret);
+        return DM_IPC_RESPOND_ERROR;
+    }
+
+    info = rsp->GetLocalDeviceInfo();
+    LOGI("GetLocalDeviceInfo completed,pkgname%s", req->GetPkgName().c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
+                                                    std::shared_ptr<DeviceStateCallback> callback)
+{
+    LOGI("DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
     if (pkgName.empty() || callback == nullptr) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+        LOGE("RegisterDevStateCallback error: Invalid para");
+        return DM_INVALID_VALUE;
     }
 
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
-    DMLOG(DM_LOG_INFO, "DeviceManager::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+    LOGI("RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UnRegisterDevStateCallback(std::string &pkgName)
+int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
     if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+        LOGE("UnRegisterDevStateCallback error: Invalid para");
+        return DM_INVALID_VALUE;
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+    LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StartDeviceDiscovery(std::string &pkgName, DmSubscribeInfo &subscribeInfo,
-    std::shared_ptr<DiscoverCallback> callback)
+int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
+                                                const std::string &extra, std::shared_ptr<DiscoveryCallback> callback)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty() || callback == nullptr) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+    LOGI("DeviceManager::StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
     }
 
-    DMLOG(DM_LOG_INFO, "DeviceManager StartDeviceDiscovery in, pkgName %s", pkgName.c_str());
-    DeviceManagerNotify::GetInstance().RegisterDiscoverCallback(pkgName, subscribeInfo.subscribeId, callback);
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("StartDeviceDiscovery error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+
+    LOGI("DeviceManager StartDeviceDiscovery in, pkgName %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
 
     std::shared_ptr<IpcStartDiscoveryReq> req = std::make_shared<IpcStartDiscoveryReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
+    req->SetExtra(extra);
     req->SetSubscribeInfo(subscribeInfo);
-    if (ipcClientProxy_->SendRequest(START_DEVICE_DISCOVER, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    int32_t ret = ipcClientProxy_->SendRequest(START_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartDeviceDiscovery error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    int32_t ret = rsp->GetErrCode();
-    if (ret != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "DeviceManager StartDeviceDiscovery Failed with ret %d", ret);
-        return ret;
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartDeviceDiscovery error: Failed with ret %d", ret);
+        return DM_IPC_RESPOND_ERROR;
     }
-    return DEVICEMANAGER_OK;
+
+    LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StopDeviceDiscovery(std::string &pkgName, uint16_t subscribeId)
+int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::StopDeviceDiscovery start , pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+    LOGI("DeviceManager::StopDeviceDiscovery start , pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
     }
 
-    DMLOG(DM_LOG_INFO, "StopDeviceDiscovery in, pkgName %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("StopDeviceDiscovery error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+
+    LOGI("StopDeviceDiscovery in, pkgName %s", pkgName.c_str());
     std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetSubscribeId(subscribeId);
-    if (ipcClientProxy_->SendRequest(STOP_DEVICE_DISCOVER, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopDeviceDiscovery error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    int32_t ret = rsp->GetErrCode();
-    if (ret != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "StopDeviceDiscovery Failed with ret %d", ret);
-        return ret;
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopDeviceDiscovery error: Failed with ret %d", ret);
+        return DM_IPC_RESPOND_ERROR;
     }
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoverCallback(pkgName, subscribeId);
-    DMLOG(DM_LOG_INFO, "DeviceManager::StopDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    LOGI("StopDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::AuthenticateDevice(std::string &pkgName, const DmDeviceInfo &deviceInfo,
-    const DmAppImageInfo &imageInfo, std::string &extra, std::shared_ptr<AuthenticateCallback> callback)
+int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+                                              const DmDeviceInfo &deviceInfo, const std::string &extra,
+                                              std::shared_ptr<AuthenticateCallback> callback)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::AuthenticateDevice start , pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+    LOGI("DeviceManager::AuthenticateDevice start , pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
     }
 
-    DMLOG(DM_LOG_INFO, "AuthenticateDevice in, pkgName %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("AuthenticateDevice error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+
     std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
+    req->SetAuthType(authType);
     req->SetDeviceInfo(deviceInfo);
-    req->SetAppImageInfo(imageInfo);
-    if (ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    int32_t ret = ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("AuthenticateDevice error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    int32_t ret = rsp->GetErrCode();
-    if (ret != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "AuthenticateDevice Failed with ret %d", ret);
-        return ret;
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("AuthenticateDevice error: Failed with ret %d", ret);
+        return DM_IPC_RESPOND_ERROR;
     }
+
     std::string strDeviceId = deviceInfo.deviceId;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
-    DMLOG(DM_LOG_INFO, "DeviceManager::AuthenticateDevice completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+    LOGI("DeviceManager::AuthenticateDevice completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::CheckAuthentication(std::string &pkgName, std::string &authPara,
-    std::shared_ptr<CheckAuthCallback> callback)
+int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::CheckAuthentication start , pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+    LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(), deviceId.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
     }
-    DMLOG(DM_LOG_INFO, "CheckAuthentication in, pkgName %s", pkgName.c_str());
-    std::shared_ptr<IpcCheckAuthenticateReq> req = std::make_shared<IpcCheckAuthenticateReq>();
+
+    if (deviceId.empty()) {
+        LOGE("UnAuthenticateDevice error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+
+    DmDeviceInfo deviceInfo;
+    strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
+    std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceInfo(deviceInfo);
+    int32_t ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnAuthenticateDevice error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnAuthenticateDevice error: Failed with ret %d", ret);
+        return DM_IPC_RESPOND_ERROR;
+    }
+
+    DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
+    LOGI("UnAuthenticateDevice completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pkgName,
+                                                           std::shared_ptr<DeviceManagerFaCallback> callback)
+{
+    LOGI("DeviceManager::RegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("RegisterDeviceManagerFaCallback error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
+    LOGI("DeviceManager::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
+{
+    LOGI("DeviceManager::UnRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("UnRegisterDeviceManagerFaCallback error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
+    LOGI("DeviceManager::UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
+                                                std::shared_ptr<VerifyAuthCallback> callback)
+{
+    LOGI("DeviceManager::VerifyAuthentication start, pkgName: %s", pkgName.c_str());
+    if (!isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+    if (pkgName.empty()) {
+        LOGE("VerifyAuthentication error: Invalid para");
+        return DM_INVALID_VALUE;
+    }
+    
+    DeviceManagerNotify::GetInstance().RegisterVerifyAuthenticationCallback(pkgName, authPara, callback);
+
+    std::shared_ptr<IpcVerifyAuthenticateReq> req = std::make_shared<IpcVerifyAuthenticateReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetAuthPara(authPara);
-    if (ipcClientProxy_->SendRequest(CHECK_AUTHENTICATION, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
-    }
 
-    int32_t ret = rsp->GetErrCode();
-    if (ret != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "CheckAuthentication Failed with ret %d", ret);
+    int32_t ret = ipcClientProxy_->SendRequest(VERIFY_AUTHENTICATION, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("VerifyAuthentication error: Send Request failed ret: %d", ret);
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("VerifyAuthentication error: Failed with ret %d", ret);
         return ret;
     }
-    DeviceManagerNotify::GetInstance().RegisterCheckAuthenticationCallback(pkgName, authPara, callback);
-    DMLOG(DM_LOG_INFO, "DeviceManager::CheckAuthentication completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+
+    LOGI("VerifyAuthentication completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GetAuthenticationParam(std::string &pkgName, DmAuthParam &authParam)
+int32_t DeviceManagerImpl::GetFaParam(const std::string &pkgName, DmAuthParam &dmFaParam)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::GetAuthenticationParam start");
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetAuthParamRsp> rsp = std::make_shared<IpcGetAuthParamRsp>();
-    req->SetPkgName(pkgName);
-    if (ipcClientProxy_->SendRequest(SERVER_GET_AUTHENTCATION_INFO, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    LOGI("DeviceManager::GetFaParam start, pkgName: %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("VerifyAuthentication failed, pkgName is empty");
+        return DM_INVALID_VALUE;
     }
-    authParam = rsp->GetAuthParam();
-    return DEVICEMANAGER_OK;
+
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetDmFaParamRsp> rsp = std::make_shared<IpcGetDmFaParamRsp>();
+    req->SetPkgName(pkgName);
+
+    if (ipcClientProxy_->SendRequest(SERVER_GET_DMFA_INFO, req, rsp) != DM_OK) {
+        LOGI("DeviceManagerImpl::GetFaParam start 2");
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    dmFaParam = rsp->GetDmAuthParam();
+    LOGI("GetFaParam completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::SetUserOperation(std::string &pkgName, int32_t action)
+int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t action)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::SetUserOperation start");
+    LOGI("DeviceManager::SetUserOperation start, pkgName: %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("VerifyAuthentication failed, pkgName is empty");
+        return DM_INVALID_VALUE;
+    }
+
     std::shared_ptr<IpcGetOperationReq> req = std::make_shared<IpcGetOperationReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
     req->SetPkgName(pkgName);
     req->SetOperation(action);
 
-    if (ipcClientProxy_->SendRequest(SERVER_USER_AUTHORIZATION_OPERATION, req, rsp) != DEVICEMANAGER_OK) {
-        return DEVICEMANAGER_IPC_FAILED;
+    if (ipcClientProxy_->SendRequest(SERVER_USER_AUTH_OPERATION, req, rsp) != DM_OK) {
+        return DM_IPC_SEND_REQUEST_FAILED;
     }
     int32_t ret = rsp->GetErrCode();
-    if (ret != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "CheckAuthentication Failed with ret %d", ret);
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
         return ret;
     }
-    return DEVICEMANAGER_OK;
+    LOGI("SetUserOperation completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
 }
 
-int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(std::string &packageName,
-    std::shared_ptr<DeviceManagerFaCallback> callback)
+int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                              std::string &udid)
 {
-    DMLOG(DM_LOG_INFO, "DeviceManager::RegisterDeviceManagerFaCallback start, pkgName: %s", packageName.c_str());
-    if (packageName.empty() || callback == nullptr) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
-    }
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
-    DMLOG(DM_LOG_INFO, "DeviceManager::RegisterDevStateCallback completed, pkgName: %s", packageName.c_str());
-    return DEVICEMANAGER_OK;
-}
-
-int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(std::string &pkgName)
-{
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
-        DMLOG(DM_LOG_ERROR, "Invalid para");
-        return DEVICEMANAGER_INVALID_VALUE;
+        LOGE("VerifyAuthentication failed, pkgName is empty");
+        return DM_INVALID_VALUE;
     }
-    DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
-    DMLOG(DM_LOG_INFO, "DeviceManager::UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
-    return DEVICEMANAGER_OK;
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(netWorkId);
+
+    if (ipcClientProxy_->SendRequest(GET_UDID_BY_NETWORK, req, rsp) != DM_OK) {
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
+        return ret;
+    }
+    udid = rsp->GetUdid();
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                              std::string &uuid)
+{
+    if (pkgName.empty()) {
+        LOGE("VerifyAuthentication failed, pkgName is empty");
+        return DM_INVALID_VALUE;
+    }
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(netWorkId);
+
+    if (ipcClientProxy_->SendRequest(GET_UUID_BY_NETWORK, req, rsp) != DM_OK) {
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
+        return ret;
+    }
+    uuid = rsp->GetUuid();
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

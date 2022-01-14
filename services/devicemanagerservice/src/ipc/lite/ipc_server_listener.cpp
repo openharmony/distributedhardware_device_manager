@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,11 @@
 
 #include "ipc_server_listener.h"
 
-#include "device_manager_log.h"
-#include "device_manager_errno.h"
-
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_server_listenermgr.h"
-#include "ipc_server_adapter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,33 +36,34 @@ void IpcServerListener::CommonSvcToIdentity(CommonSvcId *svcId, SvcIdentity *ide
 int32_t IpcServerListener::GetIdentityByPkgName(std::string &name, SvcIdentity *svc)
 {
     CommonSvcId svcId;
-    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(name, &svcId) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "get identity failed.");
-        return DEVICEMANAGER_FAILED;
+    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(name, &svcId) != DM_OK) {
+        LOGE("get identity failed.");
+        return DM_FAILED;
     }
     CommonSvcToIdentity(&svcId, svc);
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     std::string pkgName = req->GetPkgName();
     SvcIdentity svc;
-    if (GetIdentityByPkgName(pkgName, &svc) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "ondevice found callback get listener failed.");
-        return DEVICEMANAGER_FAILED;
+    if (GetIdentityByPkgName(pkgName, &svc) != DM_OK) {
+        LOGE("OnDeviceFound callback get listener failed.");
+        return DM_FAILED;
     }
 
     IpcIo io;
     uint8_t data[MAX_DM_IPC_LEN] = {0};
-    if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_DEBUG, "SetRequest failed cmdCode:%d", cmdCode);
-        return DEVICEMANAGER_FAILED;
+    if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
+        LOGE("SetRequest failed cmdCode:%d", cmdCode);
+        return DM_FAILED;
     }
-    if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_DEBUG, "SendRequest failed cmdCode:%d", cmdCode);
+
+    if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
+        LOGI("SendRequest failed cmdCode:%d", cmdCode);
     }
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
@@ -77,17 +76,17 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         std::string pkgName = kv.first;
 
         req->SetPkgName(pkgName);
-        if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DEVICEMANAGER_OK) {
-            DMLOG(DM_LOG_DEBUG, "SetRequest failed cmdCode:%d", cmdCode);
+        if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
+            LOGE("SetRequest failed cmdCode:%d", cmdCode);
             continue;
         }
         CommonSvcId svcId = kv.second;
         CommonSvcToIdentity(&svcId, &svc);
-        if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DEVICEMANAGER_OK) {
-            DMLOG(DM_LOG_DEBUG, "SendRequest failed cmdCode:%d", cmdCode);
+        if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
+            LOGI("SendRequest failed cmdCode:%d", cmdCode);
         }
     }
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

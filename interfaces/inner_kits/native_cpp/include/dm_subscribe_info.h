@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_SUBSCRIBE_INFO_H
-#define OHOS_DEVICE_MANAGER_SUBSCRIBE_INFO_H
+#ifndef OHOS_DM_SUBSCRIBE_INFO_H
+#define OHOS_DM_SUBSCRIBE_INFO_H
 
 #include <stdbool.h>
 
@@ -26,7 +26,7 @@ typedef enum DmDiscoverMode {
     /* Passive */
     DM_DISCOVER_MODE_PASSIVE = 0x55,
     /* Proactive */
-    DM_DISCOVER_MODE_ACTIVE  = 0xAA
+    DM_DISCOVER_MODE_ACTIVE = 0xAA
 } DmDiscoverMode;
 
 typedef enum DmExchangeMedium {
@@ -76,4 +76,4 @@ typedef struct DmSubscribeInfo {
 } DmSubscribeInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_SUBSCRIBE_INFO_H
+#endif // OHOS_DM_SUBSCRIBE_INFO_H

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,10 @@
  */
 
 #include "ipc_server_listener.h"
-#include "ipc_server_stub.h"
 
-#include "device_manager_errno.h"
-#include "device_manager_log.h"
+#include "dm_constants.h"
+#include "dm_log.h"
+#include "ipc_server_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,8 +26,8 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     std::string pkgName = req->GetPkgName();
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
-        DMLOG(DM_LOG_INFO, "cannot get listener for package:%s.", pkgName.c_str());
-        return DEVICEMANAGER_NULLPTR;
+        LOGI("cannot get listener for package:%s.", pkgName.c_str());
+        return DM_POINT_NULL;
     }
     return listener->SendCmd(cmdCode, req, rsp);
 }
@@ -42,7 +42,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
         listener->SendCmd(cmdCode, req, rsp);
     }
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

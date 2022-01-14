@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,15 @@
 
 #ifndef OHOS_DEVICE_MANAGER_IPC_GET_USER_OPERATION_REQ_H
 #define OHOS_DEVICE_MANAGER_IPC_GET_USER_OPERATION_REQ_H
-#include "ipc_req.h"
+
 #include "dm_device_info.h"
+#include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class IpcGetOperationReq : public IpcReq {
-DECLARE_IPC_MODEL(IpcGetOperationReq);
+    DECLARE_IPC_MODEL(IpcGetOperationReq);
+
 public:
     int32_t GetOperation() const
     {
@@ -34,7 +36,7 @@ public:
     }
 
 private:
-    int32_t action_ {0};
+    int32_t action_ { 0 };
 };
 } // namespace DistributedHardware
 } // namespace OHOS

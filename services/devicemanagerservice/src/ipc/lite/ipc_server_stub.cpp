@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,27 +15,24 @@
 
 #include "ipc_server_stub.h"
 
-#include "securec.h"
-
-#include "liteipc_adapter.h"
-#include "ohos_init.h"
-#include "samgr_lite.h"
-#include "iproxy_server.h"
-
-#include "device_manager_log.h"
-#include "device_manager_errno.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "dm_subscribe_info.h"
-
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_server_listenermgr.h"
-#include "ipc_server_adapter.h"
+#include "iproxy_server.h"
+#include "liteipc_adapter.h"
+#include "ohos_init.h"
+#include "samgr_lite.h"
+#include "securec.h"
 
 namespace {
-    const int32_t WAIT_FOR_SERVER = 2;
-    const int32_t STACK_SIZE = 0x1000;
-    const int32_t QUEUE_SIZE = 32;
-}
+const int32_t WAIT_FOR_SERVER = 2;
+const int32_t STACK_SIZE = 0x1000;
+const int32_t QUEUE_SIZE = 32;
+const int32_t MALLOC_MAX_LEN = 2 * 1024 * 1024;
+} // namespace
 
 using namespace OHOS::DistributedHardware;
 
@@ -55,16 +52,16 @@ static int32_t DeathCb(const IpcContext *context, void *ipcMsg, IpcIo *data, voi
     (void)ipcMsg;
     (void)data;
     if (arg == NULL) {
-        DMLOG(DM_LOG_ERROR, "package name is NULL.");
-        return DEVICEMANAGER_INVALID_PARAM;
+        LOGE("package name is NULL.");
+        return DM_INVALID_VALUE;
     }
     CommonSvcId svcId = {0};
     std::string pkgName = (const char *)arg;
-    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "not found client by package name.");
+    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
+        LOGE("not found client by package name.");
         free(arg);
         arg = NULL;
-        return DEVICEMANAGER_FAILED;
+        return DM_FAILED;
     }
     IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     free(arg);
@@ -77,18 +74,18 @@ static int32_t DeathCb(const IpcContext *context, void *ipcMsg, IpcIo *data, voi
     sid.token = svcId.token;
     sid.cookie = svcId.cookie;
     UnregisterDeathCallback(sid, svcId.cbId);
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 
 int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
-    DMLOG(DM_LOG_INFO, "register service listener.");
+    LOGI("register service listener.");
     size_t len = 0;
     uint8_t *name = IpcIoPopString(req, &len);
     SvcIdentity *svc = IpcIoPopSvc(req);
     if (name == NULL || svc == NULL || len == 0) {
-        DMLOG(DM_LOG_ERROR, "get para failed");
-        return DEVICEMANAGER_INVALID_PARAM;
+        LOGE("get para failed");
+        return DM_INVALID_VALUE;
     }
 
     CommonSvcId svcId = {0};
@@ -103,15 +100,19 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     free(svc);
     svc = NULL;
 #endif
+    if (len == 0 || len > MALLOC_MAX_LEN) {
+        LOGE("malloc length invalid!");
+        return DM_MALLOC_ERROR;
+    }
     char *pkgName = (char *)malloc(len + 1);
     if (pkgName == NULL) {
-        DMLOG(DM_LOG_ERROR, "malloc failed!");
-        return DEVICEMANAGER_MALLOC_ERROR;
+        LOGE("malloc failed!");
+        return DM_MALLOC_ERROR;
     }
-    if (strcpy_s(pkgName, len + 1, (const char *)name) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "strcpy_s failed!");
+    if (strcpy_s(pkgName, len + 1, (const char *)name) != DM_OK) {
+        LOGE("strcpy_s failed!");
         free(pkgName);
-        return DEVICEMANAGER_COPY_FAILED;
+        return DM_COPY_FAILED;
     }
     uint32_t cbId = 0;
     RegisterDeathCallback(NULL, sid, DeathCb, pkgName, &cbId);
@@ -122,20 +123,20 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 
 int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
-    DMLOG(DM_LOG_INFO, "unregister service listener.");
+    LOGI("unregister service listener.");
     size_t len = 0;
     std::string pkgName = (const char *)IpcIoPopString(req, &len);
     if (pkgName == "" || len == 0) {
-        DMLOG(DM_LOG_ERROR, "get para failed");
-        return DEVICEMANAGER_FAILED;
+        LOGE("get para failed");
+        return DM_FAILED;
     }
     CommonSvcId svcId;
-    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DEVICEMANAGER_OK) {
-        DMLOG(DM_LOG_ERROR, "not found listener by package name.");
-        return DEVICEMANAGER_FAILED;
+    if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
+        LOGE("not found listener by package name.");
+        return DM_FAILED;
     }
     int32_t ret = IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
-    if (ret == DEVICEMANAGER_OK) {
+    if (ret == DM_OK) {
 #ifdef __LINUX__
         BinderRelease(svcId.ipcCtx, svcId.handle);
 #endif
@@ -157,7 +158,7 @@ static const char *GetName(Service *service)
 static BOOL Initialize(Service *service, Identity identity)
 {
     if (service == NULL) {
-        DMLOG(DM_LOG_WARN, "invalid param");
+        LOGW("invalid param");
         return FALSE;
     }
 
@@ -169,7 +170,7 @@ static BOOL Initialize(Service *service, Identity identity)
 static BOOL MessageHandle(Service *service, Request *request)
 {
     if ((service == NULL) || (request == NULL)) {
-        DMLOG(DM_LOG_WARN, "invalid param");
+        LOGW("invalid param");
         return FALSE;
     }
     return TRUE;
@@ -182,10 +183,9 @@ static TaskConfig GetTaskConfig(Service *service)
     return config;
 }
 
-static int32_t OnRemoteRequest(IServerProxy *iProxy, int32_t funcId, void *origin,
-    IpcIo *req, IpcIo *reply)
+static int32_t OnRemoteRequest(IServerProxy *iProxy, int32_t funcId, void *origin, IpcIo *req, IpcIo *reply)
 {
-    DMLOG(DM_LOG_INFO, "Receive funcId:%d", funcId);
+    LOGI("Receive funcId:%d", funcId);
     (void)origin;
     return IpcCmdRegister::GetInstance().OnIpcServerCmd(funcId, *req, *reply);
 }
@@ -196,10 +196,10 @@ static void HOS_SystemInit(void)
     return;
 }
 
-int32_t IpcServerStubInit(void)
+static int32_t IpcServerStubInit(void)
 {
     HOS_SystemInit();
-    return DEVICEMANAGER_OK;
+    return DM_OK;
 }
 
 static void DevMgrSvcInit(void)
@@ -216,13 +216,14 @@ static void DevMgrSvcInit(void)
     };
 
     if (!SAMGR_GetInstance()->RegisterService((Service *)&service)) {
-        DMLOG(DM_LOG_ERROR, "%s, RegisterService failed", DEVICE_MANAGER_SERVICE_NAME);
+        LOGE("%s, RegisterService failed", DEVICE_MANAGER_SERVICE_NAME);
         return;
     }
     if (!SAMGR_GetInstance()->RegisterDefaultFeatureApi(DEVICE_MANAGER_SERVICE_NAME, GET_IUNKNOWN(service))) {
-        DMLOG(DM_LOG_ERROR, "%s, RegisterDefaultFeatureApi failed", DEVICE_MANAGER_SERVICE_NAME);
+        LOGE("%s, RegisterDefaultFeatureApi failed", DEVICE_MANAGER_SERVICE_NAME);
         return;
     }
-    DMLOG(DM_LOG_INFO, "%s, init success", DEVICE_MANAGER_SERVICE_NAME);
+    LOGI("%s, init success", DEVICE_MANAGER_SERVICE_NAME);
 }
+
 SYSEX_SERVICE_INIT(DevMgrSvcInit);

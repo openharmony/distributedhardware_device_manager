@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_APP_IMAGE_INFO_H
-#define OHOS_DEVICE_MANAGER_APP_IMAGE_INFO_H
+#ifndef OHOS_DM_APP_IMAGE_INFO_H
+#define OHOS_DM_APP_IMAGE_INFO_H
 
 #include <cstdint>
 
@@ -48,7 +48,7 @@ public:
             return;
         }
 
-        appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] {0};
+        appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
         if (appThumbnail != nullptr) {
             appThumbnailLen = appThumbnailLen_;
         }
@@ -56,7 +56,7 @@ public:
 
     int32_t SetThumbnailData(uint8_t *srcBuffer, int32_t srcBufferLen, int32_t copyIndex, int32_t copyLen)
     {
-        if (srcBuffer == nullptr ||  srcBufferLen <= 0 || copyLen > srcBufferLen || copyIndex < 0) {
+        if (srcBuffer == nullptr || srcBufferLen <= 0 || copyLen > srcBufferLen || copyIndex < 0) {
             return -1;
         }
 
@@ -94,7 +94,7 @@ public:
         }
     }
 
-    DmAppImageInfo& operator=(const DmAppImageInfo &other)
+    DmAppImageInfo &operator=(const DmAppImageInfo &other)
     {
         if (this != &other) {
             SaveData(other.GetAppIcon(), other.GetAppIconLen(), other.GetAppThumbnail(), other.GetAppThumbnailLen());
@@ -102,8 +102,8 @@ public:
         return *this;
     }
 
-    DmAppImageInfo(DmAppImageInfo&&) = delete;
-    DmAppImageInfo& operator=(DmAppImageInfo&&) = delete;
+    DmAppImageInfo(DmAppImageInfo &&) = delete;
+    DmAppImageInfo &operator=(DmAppImageInfo &&) = delete;
 
     int32_t GetAppIconLen() const
     {
@@ -124,6 +124,7 @@ public:
     {
         return appThumbnail;
     }
+
 private:
     void SaveData(const uint8_t *appIcon_, int32_t appIconLen_, const uint8_t *appThumbnail_, int32_t appThumbnailLen_)
     {
@@ -140,7 +141,7 @@ private:
                     appIcon = nullptr;
                     appIconLen = 0;
                 }
-                appIcon = new (std::nothrow) uint8_t[appIconLen_] {0};
+                appIcon = new (std::nothrow) uint8_t[appIconLen_] { 0 };
             }
             if (appIcon != nullptr) {
                 appIconLen = appIconLen_;
@@ -160,7 +161,7 @@ private:
                     appThumbnail = nullptr;
                     appThumbnailLen = 0;
                 }
-                appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] {0};
+                appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
             }
             if (appThumbnail != nullptr) {
                 appThumbnailLen = appThumbnailLen_;
@@ -170,14 +171,15 @@ private:
             }
         }
     }
+
 private:
-    int32_t appIconLen {0};
-    uint8_t *appIcon {nullptr};
-    int32_t appThumbnailLen {0};
-    uint8_t *appThumbnail {nullptr};
+    int32_t appIconLen { 0 };
+    uint8_t *appIcon { nullptr };
+    int32_t appThumbnailLen { 0 };
+    uint8_t *appThumbnail { nullptr } ;
     const int32_t ICON_MAX_LEN = 32 * 1024;
     const int32_t THUMB_MAX_LEN = 153 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_APP_IMAGE_INFO_H
+#endif // OHOS_DM_APP_IMAGE_INFO_H

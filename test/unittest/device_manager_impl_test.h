@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_IMPL_TEST_H
-#define OHOS_DEVICE_MANAGER_IMPL_TEST_H
+#ifndef OHOS_DM_IMPL_TEST_H
+#define OHOS_DM_IMPL_TEST_H
 
 #include <gtest/gtest.h>
 #include <refbase.h>
 
-#include "mock/mock_ipc_client_proxy.h"
-#include "device_manager_impl.h"
-#include "device_manager_callback.h"
 #include "device_manager.h"
+#include "device_manager_callback.h"
+#include "device_manager_impl.h"
+#include "mock/mock_ipc_client_proxy.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,19 +32,24 @@ public:
     static void TearDownTestCase();
     virtual void SetUp() override;
     virtual void TearDown() override;
+
 private:
-    std::shared_ptr<DiscoverCallback> test_callback_ = nullptr;
+    std::shared_ptr<DiscoveryCallback> test_callback_ = nullptr;
 };
 
-class DeviceDiscoverCallback : public DiscoverCallback {
+class DeviceDiscoveryCallback : public DiscoveryCallback {
 public:
-    DeviceDiscoverCallback() : DiscoverCallback() {}
-    virtual ~DeviceDiscoverCallback() override {}
+    DeviceDiscoveryCallback() : DiscoveryCallback()
+    {
+    }
+    virtual ~DeviceDiscoveryCallback() override
+    {
+    }
     virtual void OnDiscoverySuccess(uint16_t subscribeId) override;
-    virtual void OnDiscoverFailed(uint16_t subscribeId, int32_t failedReason) override;
+    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
 };
-} // namespace Vsync
+} // namespace DistributedHardware
 } // namespace OHOS
 
-#endif // OHOS_DEVICE_MANAGER_IMPL_TEST_H
+#endif // OHOS_DM_IMPL_TEST_H

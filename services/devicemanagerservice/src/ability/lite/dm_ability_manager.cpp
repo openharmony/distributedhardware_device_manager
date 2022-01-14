@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +15,10 @@
 
 #include "dm_ability_manager.h"
 
-#include "semaphore.h"
-
-#include "constants.h"
-#include "device_manager_log.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DmAbilityManager);
-
 AbilityRole DmAbilityManager::GetAbilityRole()
 {
     return mAbilityStatus_;
@@ -39,7 +34,7 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
 
 void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
 {
-    struct  timespec ts;
+    struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += timeout_s;
     sem_timedwait(&mSem_, &ts);
@@ -50,5 +45,5 @@ void DmAbilityManager::StartAbilityDone()
     mStatus_ = AbilityStatus::ABILITY_STATUS_SUCCESS;
     sem_post(&mSem_);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS
