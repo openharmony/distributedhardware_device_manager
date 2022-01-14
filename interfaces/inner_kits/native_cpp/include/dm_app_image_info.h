@@ -161,7 +161,7 @@ private:
                     appThumbnail = nullptr;
                     appThumbnailLen = 0;
                 }
-                appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_]{0};
+                appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
             }
             if (appThumbnail != nullptr) {
                 appThumbnailLen = appThumbnailLen_;

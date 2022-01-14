@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 const std::string DISCOVERY_TIMEOUT_TASK = "discoveryTimeout";
 const int32_t DISCOVERY_TIMEOUT = 120;
 const int32_t SESSION_CANCEL_TIMEOUT = 0;

@@ -29,7 +29,7 @@ int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, co
 {
     LOGI("ProfileConnector::RegisterProfileCallback");
     profileEventCallback_->RegisterProfileCallback(pkgName, callback);
-    SubscribeProfileEvents({"system", "device", "fakeStorage", "fakeSystem"}, deviceId);
+    SubscribeProfileEvents({ "system", "device", "fakeStorage", "fakeSystem" }, deviceId);
     return DM_OK;
 }
 

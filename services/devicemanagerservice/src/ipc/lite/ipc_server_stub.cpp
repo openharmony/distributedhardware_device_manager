@@ -27,10 +27,12 @@
 #include "samgr_lite.h"
 #include "securec.h"
 
+namespace {
 const int32_t WAIT_FOR_SERVER = 2;
 const int32_t STACK_SIZE = 0x1000;
 const int32_t QUEUE_SIZE = 32;
 const int32_t MALLOC_MAX_LEN = 2 * 1024 * 1024;
+} // namespace
 
 using namespace OHOS::DistributedHardware;
 

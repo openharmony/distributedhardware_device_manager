@@ -45,7 +45,7 @@ public:
         void OnReceiveEvent(const EventFwk::CommonEventData &data);
         void TestCommonEvent(const std::string &event);
     private:
-        CommomEventCallback callback_;  
+        CommomEventCallback callback_;
         std::string event_;
     };
 private:
