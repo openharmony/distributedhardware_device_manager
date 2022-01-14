@@ -15,6 +15,7 @@
 
 #include "dm_auth_manager.h"
 
+#include "auth_message_processor.h"
 #include "auth_ui.h"
 #include "dm_ability_manager.h"
 #include "dm_config_manager.h"

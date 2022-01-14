@@ -19,7 +19,6 @@
 #include <map>
 #include <string>
 
-#include "auth_message_processor.h"
 #include "auth_request_state.h"
 #include "auth_response_state.h"
 #include "auth_ui.h"
