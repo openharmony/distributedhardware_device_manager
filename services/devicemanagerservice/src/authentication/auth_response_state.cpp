@@ -92,8 +92,8 @@ int32_t AuthResponseConfirmState::GetStateType()
 
 void AuthResponseConfirmState::Enter()
 {
-    //委托授权UI模块进行用户交互
-    //如果交互成功
+    // 委托授权UI模块进行用户交互
+    // 如果交互成功
     LOGI("AuthResponse:: AuthResponseConfirmState  Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {

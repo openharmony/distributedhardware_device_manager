@@ -36,7 +36,7 @@ public:
 
 private:
     std::mutex lock_;
-    bool bInit{false};
+    bool bInit{ false };
     SvcIdentity clientIdentity_;
 };
 } // namespace DistributedHardware

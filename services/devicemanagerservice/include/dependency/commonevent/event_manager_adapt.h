@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 using CommomEventCallback = void (*)(void);
 
 class DmCommonEventManager {

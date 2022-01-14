@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceProfileAdapter : public IProfileAdapter, public IProfileConnectorCallback {
-
 public:
     DeviceProfileAdapter();
     ~DeviceProfileAdapter();

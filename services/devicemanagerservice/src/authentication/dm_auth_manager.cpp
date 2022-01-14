@@ -65,7 +65,6 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     : softbusConnector_(softbusConnector), listener_(listener)
 {
     LOGI("DmAuthManager constructor");
-    // TODO: load library so for different auth type
     hiChainConnector_ = std::make_shared<HiChainConnector>();
 
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
@@ -327,8 +326,8 @@ void DmAuthManager::OnDataReceived(const std::string &pkgName, int32_t sessionId
 
 void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId)
 {
-    //创建群组成功
-    //发送认证响应消息给请求端
+    // 创建群组成功
+    // 发送认证响应消息给请求端
     LOGI("DmAuthManager::OnGroupCreated start");
     if (authResponseState_ == nullptr) {
         LOGI("DmAuthManager::AuthenticateDevice end");
@@ -542,7 +541,6 @@ std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 
 void DmAuthManager::JoinNetwork()
 {
-    // TODO:
     LOGE("DmAuthManager JoinNetwork start");
     timerMap_[AUTHENTICATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     authResponseContext_->reply = AuthState::AUTH_REQUEST_FINISH;
@@ -573,7 +571,6 @@ void DmAuthManager::AuthenticateFinish()
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
-
 
         if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_INPUT) {
             CancelDisplay();
@@ -719,8 +716,7 @@ int32_t DmAuthManager::RegisterSessionCallback()
 
 int32_t DmAuthManager::OnUserOperation(int32_t action)
 {
-    switch (action)
-    {
+    switch (action) {
     case USER_OPERATION_TYPE_ALLOW_AUTH:
     case USER_OPERATION_TYPE_CANCEL_AUTH:
         StartAuthProcess(action);

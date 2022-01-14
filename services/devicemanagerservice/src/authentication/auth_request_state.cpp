@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 void AuthRequestState::Leave()
 {
 }

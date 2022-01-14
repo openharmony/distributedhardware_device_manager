@@ -173,10 +173,10 @@ private:
     }
 
 private:
-    int32_t appIconLen{0};
-    uint8_t *appIcon{nullptr};
-    int32_t appThumbnailLen{0};
-    uint8_t *appThumbnail{nullptr};
+    int32_t appIconLen{ 0 };
+    uint8_t *appIcon{ nullptr };
+    int32_t appThumbnailLen{ 0 };
+    uint8_t *appThumbnail{ nullptr } ;
     const int32_t ICON_MAX_LEN = 32 * 1024;
     const int32_t THUMB_MAX_LEN = 153 * 1024;
 };

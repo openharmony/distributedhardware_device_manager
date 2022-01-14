@@ -29,8 +29,6 @@ public:
 };
 
 using CreateICryptoAdapterFuncPtr = ICryptoAdapter *(*)(void);
-
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_DM_CRYPTO_ADAPTER_H

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 AuthMessageProcessor::AuthMessageProcessor(std::shared_ptr<DmAuthManager> authMgr) : authMgr_(authMgr)
 {
     LOGI("AuthMessageProcessor constructor");

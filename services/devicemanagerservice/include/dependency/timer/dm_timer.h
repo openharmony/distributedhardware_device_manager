@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 typedef void (*TimeoutHandle)(void *data);
 
 #define MAXEVENTS 255

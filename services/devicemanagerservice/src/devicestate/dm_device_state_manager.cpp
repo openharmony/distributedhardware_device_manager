@@ -20,7 +20,6 @@
 #include "dm_log.h"
 namespace OHOS {
 namespace DistributedHardware {
-
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                                            std::shared_ptr<DeviceManagerServiceListener> listener)
     : softbusConnector_(softbusConnector), listener_(listener)
@@ -100,6 +99,7 @@ void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDev
 
 void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std::string deviceId)
 {
+    // deviceId is uuid;
     DmDeviceInfo saveInfo;
     auto iter = remoteDeviceInfos_.find(deviceId);
     if (iter == remoteDeviceInfos_.end()) {

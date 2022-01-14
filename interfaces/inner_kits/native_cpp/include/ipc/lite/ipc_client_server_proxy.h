@@ -39,7 +39,7 @@ private:
 
 private:
     std::mutex lock_;
-    IClientProxy *serviceProxy_{nullptr};
+    IClientProxy *serviceProxy_{ nullptr };
 };
 } // namespace DistributedHardware
 } // namespace OHOS

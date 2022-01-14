@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class DmAuthManager;
 struct DmAuthResponseContext;
 class AuthResponseState : public std::enable_shared_from_this<AuthResponseState> {

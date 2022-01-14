@@ -23,7 +23,6 @@
 #include "softbus_connector.h"
 namespace OHOS {
 namespace DistributedHardware {
-
 typedef struct DmDiscoveryContext {
     std::string pkgName;
     std::string extra;

@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 typedef enum {
     DM_LOG_DEBUG,
     DM_LOG_INFO,

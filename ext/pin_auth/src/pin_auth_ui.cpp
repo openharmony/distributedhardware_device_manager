@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 PinAuthUi::PinAuthUi()
 {
     LOGI("AuthUi constructor");

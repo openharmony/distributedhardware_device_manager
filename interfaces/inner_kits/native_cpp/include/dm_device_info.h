@@ -63,7 +63,6 @@ typedef struct DmAuthParam {
     int32_t pinToken;
     DmAppImageInfo imageinfo;
 } DmAuthParam;
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

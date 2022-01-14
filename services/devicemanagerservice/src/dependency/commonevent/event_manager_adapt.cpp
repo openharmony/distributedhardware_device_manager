@@ -146,6 +146,5 @@ void DmCommonEventManager::EventSubscriber::deleteEventCallback(const std::strin
         LOGI("delete event failed: %s", event.c_str());
     }
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

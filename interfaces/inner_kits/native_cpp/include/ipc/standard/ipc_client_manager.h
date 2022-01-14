@@ -52,8 +52,8 @@ private:
 private:
     std::mutex lock_;
     std::map<std::string, sptr<IpcClientStub>> dmListener_;
-    sptr<IpcRemoteBroker> dmInterface_{nullptr};
-    sptr<DmDeathRecipient> dmRecipient_{nullptr};
+    sptr<IpcRemoteBroker> dmInterface_{ nullptr };
+    sptr<DmDeathRecipient> dmRecipient_{ nullptr } ;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

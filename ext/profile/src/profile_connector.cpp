@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 std::map<std::string, std::shared_ptr<IProfileConnectorCallback>> ProfileEventCallback::profileConnectorCallback_ = {};
 std::shared_ptr<ProfileEventCallback> ProfileConnector::profileEventCallback_ =
     std::make_shared<ProfileEventCallback>();

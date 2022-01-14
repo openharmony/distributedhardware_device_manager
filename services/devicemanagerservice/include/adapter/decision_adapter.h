@@ -33,8 +33,6 @@ public:
 };
 
 using CreateIDecisionAdapterFuncPtr = IDecisionAdapter *(*)(void);
-
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_DM_DECISION_ADAPTER_H

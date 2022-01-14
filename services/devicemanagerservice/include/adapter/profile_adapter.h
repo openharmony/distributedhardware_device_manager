@@ -30,8 +30,6 @@ public:
 };
 
 using CreateIProfileAdapterFuncPtr = IProfileAdapter *(*)(void);
-
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_DM_PROFILE_ADAPTER_H

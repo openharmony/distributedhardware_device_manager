@@ -36,7 +36,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 typedef enum AuthState {
     AUTH_REQUEST_INIT = 1,
     AUTH_REQUEST_NEGOTIATE,

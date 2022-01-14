@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 int32_t DeviceManagerService::Init()

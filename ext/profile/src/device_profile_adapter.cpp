@@ -51,7 +51,7 @@ int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &pkgNa
 int32_t DeviceProfileAdapter::OnProfileClientDeviceReady(const std::string &pkgName, const std::string &deviceId)
 {
     LOGI("DeviceProfileAdapter::OnProfileClientDeviceReady");
-    if (nullptr != deviceProfileAdapterCallback_) {
+    if (deviceProfileAdapterCallback_ != nullptr) {
         deviceProfileAdapterCallback_->OnProfileReady(pkgName, deviceId);
     } else {
         LOGI("deviceProfileAdapterCallback_ is nullptr");

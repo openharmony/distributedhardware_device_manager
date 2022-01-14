@@ -37,7 +37,7 @@ public:
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
 
 private:
-    std::shared_ptr<IpcClient> ipcClientManager_{nullptr};
+    std::shared_ptr<IpcClient> ipcClientManager_{ nullptr };
 };
 } // namespace DistributedHardware
 } // namespace OHOS
