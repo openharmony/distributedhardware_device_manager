@@ -15,11 +15,11 @@
 
 #include "dm_log.h"
 #include "dm_constants.h"
-#include "UTTest_device_message.h"
 #include "auth_message_processor.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
 #include "dm_auth_manager.h"
+#include "UTTest_device_message.h"
 
 namespace OHOS {
 namespace DistributedHardware {
