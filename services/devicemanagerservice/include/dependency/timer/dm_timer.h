@@ -31,7 +31,7 @@ namespace OHOS {
 namespace DistributedHardware {
 typedef void (*TimeoutHandle)(void *data);
 
-#define MAXEVENTS 255
+#define MAX_EVENTS 255
 
 enum DmTimerStatus : int32_t {
     DM_STATUS_INIT = 0,
@@ -43,7 +43,7 @@ enum DmTimerStatus : int32_t {
 
 class DmTimer {
 public:
-    DmTimer(std::string &name);
+    DmTimer(const std::string &name);
     ~DmTimer();
     DmTimerStatus Start(uint32_t timeOut, TimeoutHandle handle, void *data);
     void Stop(int32_t code);
@@ -60,7 +60,7 @@ private:
     void *mHandleData_;
     int32_t mTimeFd_[2];
     struct epoll_event mEv_;
-    struct epoll_event mEvents_[MAXEVENTS];
+    struct epoll_event mEvents_[MAX_EVENTS];
     int32_t mEpFd_;
     std::thread mThread_;
     std::string mTimerName_;

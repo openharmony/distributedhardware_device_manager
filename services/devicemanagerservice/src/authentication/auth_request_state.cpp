@@ -76,7 +76,6 @@ int32_t AuthRequestNegotiateState::GetStateType()
 
 void AuthRequestNegotiateState::Enter()
 {
-    //    //1. 检查加解密模块是否存在并获取加解密的名称和版本信息
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -107,11 +106,6 @@ int32_t AuthRequestReplyState::GetStateType()
 
 void AuthRequestReplyState::Enter()
 {
-    // 1. 收到请求响应，判断用户响应结果
-
-    // 2. 用户授权同意
-
-    // 3. 回调给认证实现模块，启动认证
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -127,9 +121,6 @@ int32_t AuthRequestInputState::GetStateType()
 
 void AuthRequestInputState::Enter()
 {
-    //    //1. 获取用户输入
-    //
-    //    //2. 验证认证信息
     LOGE("DmAuthManager::AuthRequestInputState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
@@ -146,7 +137,6 @@ int32_t AuthRequestJoinState::GetStateType()
 
 void AuthRequestJoinState::Enter()
 {
-    // 1. 加入群组
     LOGE("DmAuthManager::AuthRequestJoinState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
@@ -163,7 +153,6 @@ int32_t AuthRequestNetworkState::GetStateType()
 
 void AuthRequestNetworkState::Enter()
 {
-    // 1. 进行组网
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

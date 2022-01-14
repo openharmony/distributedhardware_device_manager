@@ -87,7 +87,7 @@ public:
     explicit DmNapiDeviceStateCallback(std::string &bundleName) : bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceStateCallback(){};
+    virtual ~DmNapiDeviceStateCallback() {};
     void OnDeviceOnline(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDeviceReady(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDeviceOffline(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
@@ -102,7 +102,7 @@ public:
     explicit DmNapiDiscoveryCallback(std::string &bundleName) : refCount_(0), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDiscoveryCallback(){};
+    virtual ~DmNapiDiscoveryCallback() {};
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     void OnDiscoverySuccess(uint16_t subscribeId) override;
@@ -120,7 +120,7 @@ public:
     explicit DmNapiDeviceManagerFaCallback(std::string &bundleName) : bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceManagerFaCallback(){};
+    virtual ~DmNapiDeviceManagerFaCallback() {};
     void OnCall(const std::string &paramJson) override;
 
 private:
@@ -132,7 +132,7 @@ public:
     explicit DmNapiAuthenticateCallback(std::string &bundleName) : bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiAuthenticateCallback(){};
+    virtual ~DmNapiAuthenticateCallback() {};
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason) override;
 
 private:
@@ -144,7 +144,7 @@ public:
     explicit DmNapiVerifyAuthCallback(std::string &bundleName) : bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiVerifyAuthCallback(){};
+    virtual ~DmNapiVerifyAuthCallback() {};
     void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override;
 
 private:

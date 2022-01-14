@@ -23,8 +23,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class IpcServerClientProxy : public IRemoteProxy<IpcRemoteBroker> {
 public:
-    explicit IpcServerClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IpcRemoteBroker>(impl){};
-    ~IpcServerClientProxy(){};
+    explicit IpcServerClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IpcRemoteBroker>(impl) {};
+    ~IpcServerClientProxy() {};
     int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 
 private:

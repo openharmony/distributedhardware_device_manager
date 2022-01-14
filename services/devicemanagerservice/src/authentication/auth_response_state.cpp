@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 void AuthResponseState::Leave()
 {
 }
@@ -64,7 +63,6 @@ int32_t AuthResponseInitState::GetStateType()
 void AuthResponseInitState::Enter()
 {
     LOGI("AuthResponse:: AuthResponseInitState  Enter");
-    // 1.认证通道建立后，进入该状态
 }
 
 int32_t AuthResponseNegotiateState::GetStateType()
@@ -74,9 +72,6 @@ int32_t AuthResponseNegotiateState::GetStateType()
 
 void AuthResponseNegotiateState::Enter()
 {
-    // 1.收到协商消息后进入
-
-    // 2. 获取本地加解密模块信息，并回复消
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -92,8 +87,6 @@ int32_t AuthResponseConfirmState::GetStateType()
 
 void AuthResponseConfirmState::Enter()
 {
-    // 委托授权UI模块进行用户交互
-    // 如果交互成功
     LOGI("AuthResponse:: AuthResponseConfirmState  Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
@@ -110,7 +103,6 @@ int32_t AuthResponseGroupState::GetStateType()
 
 void AuthResponseGroupState::Enter()
 {
-    //    //1.创建群组,
     LOGI("AuthResponse:: AuthResponseGroupState  Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
@@ -127,7 +119,6 @@ int32_t AuthResponseShowState::GetStateType()
 
 void AuthResponseShowState::Enter()
 {
-    // 1.委托认证实现模块进行用户交互
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -143,9 +134,6 @@ int32_t AuthResponseFinishState::GetStateType()
 
 void AuthResponseFinishState::Enter()
 {
-    // 1.结束UI显示
-
-    // 2.清理资源，结束状态机
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

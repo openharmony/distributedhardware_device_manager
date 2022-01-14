@@ -56,12 +56,12 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     IpcIo io;
     uint8_t data[MAX_DM_IPC_LEN] = {0};
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
-        LOGD("SetRequest failed cmdCode:%d", cmdCode);
+        LOGE("SetRequest failed cmdCode:%d", cmdCode);
         return DM_FAILED;
     }
 
     if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
-        LOGD("SendRequest failed cmdCode:%d", cmdCode);
+        LOGI("SendRequest failed cmdCode:%d", cmdCode);
     }
     return DM_OK;
 }
@@ -77,13 +77,13 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
 
         req->SetPkgName(pkgName);
         if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
-            LOGD("SetRequest failed cmdCode:%d", cmdCode);
+            LOGE("SetRequest failed cmdCode:%d", cmdCode);
             continue;
         }
         CommonSvcId svcId = kv.second;
         CommonSvcToIdentity(&svcId, &svc);
         if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
-            LOGD("SendRequest failed cmdCode:%d", cmdCode);
+            LOGI("SendRequest failed cmdCode:%d", cmdCode);
         }
     }
     return DM_OK;

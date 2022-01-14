@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    uint16_t subscribeId_{ 0 };
+    uint16_t subscribeId_ { 0 };
     DmDeviceInfo dmDeviceInfo_;
 };
 } // namespace DistributedHardware

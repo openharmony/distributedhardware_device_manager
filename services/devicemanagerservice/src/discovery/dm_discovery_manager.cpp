@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-std::string DISCOVERY_TIMEOUT_TASK = "discoveryTimeout";
-int32_t DISCOVERY_TIMEOUT = 120;
-int32_t SESSION_CANCEL_TIMEOUT = 0;
-} // namespace
+
+const std::string DISCOVERY_TIMEOUT_TASK = "discoveryTimeout";
+const int32_t DISCOVERY_TIMEOUT = 120;
+const int32_t SESSION_CANCEL_TIMEOUT = 0;
+
 static void TimeOut(void *data)
 {
     LOGE("time out ");
@@ -57,7 +57,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
             LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
             return DM_DISCOVERY_REPEATED;
         } else {
-            LOGD("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
+            LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
                  discoveryQueue_.front().c_str());
             StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
         }

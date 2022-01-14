@@ -23,21 +23,21 @@ typedef enum {
     DM_LOG_INFO,
     DM_LOG_WARN,
     DM_LOG_ERROR,
-} DMLogLevel;
+} DmLogLevel;
 
-void DMLog(DMLogLevel logLevel, const char *fmt, ...);
+void DmLog(DmLogLevel logLevel, const char *fmt, ...);
 
 #define LOGD(fmt, ...) \
-    DMLog(DM_LOG_DEBUG, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+    DmLog(DM_LOG_DEBUG, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 
 #define LOGI(fmt, ...) \
-    DMLog(DM_LOG_INFO, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+    DmLog(DM_LOG_INFO, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 
 #define LOGW(fmt, ...) \
-    DMLog(DM_LOG_WARN, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+    DmLog(DM_LOG_WARN, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 
 #define LOGE(fmt, ...) \
-    DMLog(DM_LOG_ERROR, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+    DmLog(DM_LOG_ERROR, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_LOG_H

@@ -27,27 +27,25 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
-std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
-std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";
-std::string SHOW_TIMEOUT_TASK = "showTimeoutTask";
-std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
-std::string ADD_TIMEOUT_TASK = "addTimeoutTask";
-std::string WAIT_NEGOTIATE_TIMEOUT_TASK = "waitNegotiateTimeoutTask";
-std::string WAIT_REQUEST_TIMEOUT_TASK = "waitRequestTimeoutTask";
+const std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
+const std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
+const std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";
+const std::string SHOW_TIMEOUT_TASK = "showTimeoutTask";
+const std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
+const std::string ADD_TIMEOUT_TASK = "addTimeoutTask";
+const std::string WAIT_NEGOTIATE_TIMEOUT_TASK = "waitNegotiateTimeoutTask";
+const std::string WAIT_REQUEST_TIMEOUT_TASK = "waitRequestTimeoutTask";
 
-int32_t SESSION_CANCEL_TIMEOUT = 0;
-int32_t AUTHENTICATE_TIMEOUT = 120;
-int32_t CONFIRM_TIMEOUT = 60;
-int32_t NEGOTIATE_TIMEOUT = 10;
-int32_t INPUT_TIMEOUT = 60;
-int32_t ADD_TIMEOUT = 10;
-int32_t WAIT_NEGOTIATE_TIMEOUT = 10;
-int32_t WAIT_REQUEST_TIMEOUT = 10;
-int32_t CANCEL_PICODE_DISPLAY = 1;
-int32_t DEVICE_ID_HALF = 2;
-} // namespace
+const int32_t SESSION_CANCEL_TIMEOUT = 0;
+const int32_t AUTHENTICATE_TIMEOUT = 120;
+const int32_t CONFIRM_TIMEOUT = 60;
+const int32_t NEGOTIATE_TIMEOUT = 10;
+const int32_t INPUT_TIMEOUT = 60;
+const int32_t ADD_TIMEOUT = 10;
+const int32_t WAIT_NEGOTIATE_TIMEOUT = 10;
+const int32_t WAIT_REQUEST_TIMEOUT = 10;
+const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
+const int32_t DEVICE_ID_HALF = 2;
 
 static void TimeOut(void *data)
 {
@@ -150,8 +148,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGI(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
         return DM_FAILED;
     }
-
-    /* Get UDID by NetworkID */
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(deviceId.c_str(), NodeDeivceInfoKey::NODE_KEY_UDID, udid,
                                                               sizeof(udid));
@@ -185,30 +181,22 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
     if (authenticationMap_.find(1) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return DM_FAILED;
-    } 
+    }
     ptr = authenticationMap_[1];
-
     int32_t ret = ptr->VerifyAuthentication(authRequestContext_->token, authResponseContext_->code, authParam);
     switch (ret) {
         case DM_OK:
-        {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
-        }
-        break;
+            break;
         case DM_AUTH_INPUT_FAILED:
-        {
-            std::string flag = "";
             listener_->OnVerifyAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-                                          DM_AUTH_INPUT_FAILED, flag);
-        }
-        break;
+                                          DM_AUTH_INPUT_FAILED, "");
+            break;
         default:
-        {
             CancelDisplay();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        }
+            break;
     }
-
     LOGI("DmAuthManager::VerifyAuthentication complete");
     return DM_OK;
 }
@@ -326,8 +314,6 @@ void DmAuthManager::OnDataReceived(const std::string &pkgName, int32_t sessionId
 
 void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId)
 {
-    // 创建群组成功
-    // 发送认证响应消息给请求端
     LOGI("DmAuthManager::OnGroupCreated start");
     if (authResponseState_ == nullptr) {
         LOGI("DmAuthManager::AuthenticateDevice end");
@@ -351,7 +337,6 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
     LOGI("DmAuthManager OnMemberJoin start");
     CancelDisplay();
-
     LOGE("DmAuthManager OnMemberJoin start");
     if (authRequestState_ != nullptr) {
         timerMap_[ADD_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
@@ -369,7 +354,6 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 
 void DmAuthManager::HandleAuthenticateTimeout()
 {
-    // 1. 状态机走到结束状态，并清理资源
     LOGI("DmAuthManager::HandleAuthenticateTimeout start");
     if (authRequestState_ != nullptr && authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
         if (authResponseContext_ == nullptr) {
@@ -384,8 +368,6 @@ void DmAuthManager::HandleAuthenticateTimeout()
 
 void DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 {
-    // TODO:检查crypto模块是否适配
-    // TODO：兼容性处理，兼容与手机的认证
     int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
     if (sessionId < 0) {
         LOGE("OpenAuthSession failed, stop the authentication");
@@ -417,7 +399,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
-    if (ret != true){
+    if (ret != true) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = DM_AUTH_PEER_REJECT;
     } else {
@@ -453,12 +435,10 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     if (authResponseContext_->cryptoSupport == true) {
         isCryptoSupport_ = true;
     }
-
     if (authResponseContext_->reply == DM_AUTH_PEER_REJECT) {
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
-
     std::vector<std::string> messageList = authMessageProcessor_->CreateAuthRequestMessage();
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
@@ -470,9 +450,6 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 
 void DmAuthManager::StartAuthProcess(const int32_t &action)
 {
-    // 1. 收到请求响应，判断用户响应结果
-    // 2. 用户授权同意
-    // 3. 回调给认证实现模块，启动认证
     LOGI("DmAuthManager:: StartAuthProcess");
     authResponseContext_->reply = action;
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
@@ -600,7 +577,7 @@ void DmAuthManager::CancelDisplay()
 {
     LOGI("DmAuthManager::CancelDisplay start");
     nlohmann::json jsonObj;
-    jsonObj[CANCEL_DISPLAY_KEY] = CANCEL_PICODE_DISPLAY;
+    jsonObj[CANCEL_DISPLAY_KEY] = CANCEL_PIN_CODE_DISPLAY;
     std::string paramJson = jsonObj.dump();
     std::string pkgName = "com.ohos.devicemanagerui";
     listener_->OnFaCall(pkgName, paramJson);
@@ -679,7 +656,7 @@ void DmAuthManager::ShowStartAuthDialog()
     if (authenticationMap_.find(1) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return;
-    } 
+    }
     ptr = authenticationMap_[1];
     ptr->StartAuth(dmAbilityMgr_);
 }
@@ -689,19 +666,15 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
     dmAbilityMgr_->StartAbilityDone();
     AbilityRole role = dmAbilityMgr_->GetAbilityRole();
     authParam.direction = (int32_t)role;
-    // Currently, only Support PinCode, authType not save.
     authParam.authType = AUTH_TYPE_PIN;
     authParam.authToken = authResponseContext_->token;
 
     if (role == AbilityRole::ABILITY_ROLE_PASSIVE) {
-        // 生成pincode
         authResponseContext_->code = GeneratePincode();
         authParam.packageName = authResponseContext_->targetPkgName;
         authParam.appName = authResponseContext_->appName;
         authParam.appDescription = authResponseContext_->appDesc;
-        // currently, only support BUSINESS_FA_MIRGRATION
         authParam.business = BUSINESS_FA_MIRGRATION;
-        // 获取生成的pincode
         authParam.pincode = authResponseContext_->code;
     }
     return DM_OK;
@@ -709,7 +682,6 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 
 int32_t DmAuthManager::RegisterSessionCallback()
 {
-    LOGI("DmAuthManager constructor111");
     softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(DM_PKG_NAME, shared_from_this());
     return DM_OK;
 }
@@ -717,22 +689,22 @@ int32_t DmAuthManager::RegisterSessionCallback()
 int32_t DmAuthManager::OnUserOperation(int32_t action)
 {
     switch (action) {
-    case USER_OPERATION_TYPE_ALLOW_AUTH:
-    case USER_OPERATION_TYPE_CANCEL_AUTH:
-        StartAuthProcess(action);
-        break;
-    case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
-        AuthenticateFinish();
-        break;
-    case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
-        CancelDisplay();
-        break;
-    case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
-        AuthenticateFinish();
-        break;
-    default:
-        LOGE("this action id not support");
-        break;
+        case USER_OPERATION_TYPE_ALLOW_AUTH:
+        case USER_OPERATION_TYPE_CANCEL_AUTH:
+            StartAuthProcess(action);
+            break;
+        case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
+            AuthenticateFinish();
+            break;
+        case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
+            CancelDisplay();
+            break;
+        case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
+            AuthenticateFinish();
+            break;
+        default:
+            LOGE("this action id not support");
+            break;
     }
     return DM_OK;
 }

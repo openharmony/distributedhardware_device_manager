@@ -26,7 +26,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-static void DMLogOut(DMLogLevel logLevel, const char *logBuf)
+const int32_t LOG_MAX_LEN = 512;
+
+static void DmLogOut(DmLogLevel logLevel, const char *logBuf)
 {
 #ifdef HI_LOG_ENABLE
     LogLevel hiLogLevel = LOG_INFO;
@@ -67,7 +69,7 @@ static void DMLogOut(DMLogLevel logLevel, const char *logBuf)
 #endif
 }
 
-void DMLog(DMLogLevel logLevel, const char *fmt, ...)
+void DmLog(DmLogLevel logLevel, const char *fmt, ...)
 {
     char logBuf[LOG_MAX_LEN] = {0};
     va_list arg;
@@ -78,10 +80,10 @@ void DMLog(DMLogLevel logLevel, const char *fmt, ...)
     ret = vsprintf_s(logBuf, sizeof(logBuf), fmt, arg);
     va_end(arg);
     if (ret < 0) {
-        DMLogOut(logLevel, "DM log length error.");
+        DmLogOut(logLevel, "DM log length error.");
         return;
     }
-    DMLogOut(logLevel, logBuf);
+    DmLogOut(logLevel, logBuf);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

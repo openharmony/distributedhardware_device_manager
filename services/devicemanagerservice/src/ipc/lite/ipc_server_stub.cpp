@@ -27,11 +27,10 @@
 #include "samgr_lite.h"
 #include "securec.h"
 
-namespace {
 const int32_t WAIT_FOR_SERVER = 2;
 const int32_t STACK_SIZE = 0x1000;
 const int32_t QUEUE_SIZE = 32;
-} // namespace
+const int32_t MALLOC_MAX_LEN = 2 * 1024 * 1024;
 
 using namespace OHOS::DistributedHardware;
 
@@ -99,6 +98,10 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     free(svc);
     svc = NULL;
 #endif
+    if (len == 0 || len > MALLOC_MAX_LEN) {
+        LOGE("malloc length invalid!");
+        return DM_MALLOC_ERROR;
+    }
     char *pkgName = (char *)malloc(len + 1);
     if (pkgName == NULL) {
         LOGE("malloc failed!");
@@ -191,7 +194,7 @@ static void HOS_SystemInit(void)
     return;
 }
 
-int32_t IpcServerStubInit(void)
+static int32_t IpcServerStubInit(void)
 {
     HOS_SystemInit();
     return DM_OK;
@@ -220,4 +223,5 @@ static void DevMgrSvcInit(void)
     }
     LOGI("%s, init success", DEVICE_MANAGER_SERVICE_NAME);
 }
+
 SYSEX_SERVICE_INIT(DevMgrSvcInit);

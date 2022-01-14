@@ -48,7 +48,7 @@ public:
             return;
         }
 
-        appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_]{0};
+        appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
         if (appThumbnail != nullptr) {
             appThumbnailLen = appThumbnailLen_;
         }
@@ -141,7 +141,7 @@ private:
                     appIcon = nullptr;
                     appIconLen = 0;
                 }
-                appIcon = new (std::nothrow) uint8_t[appIconLen_]{0};
+                appIcon = new (std::nothrow) uint8_t[appIconLen_] { 0 };
             }
             if (appIcon != nullptr) {
                 appIconLen = appIconLen_;
@@ -173,10 +173,10 @@ private:
     }
 
 private:
-    int32_t appIconLen{ 0 };
-    uint8_t *appIcon{ nullptr };
-    int32_t appThumbnailLen{ 0 };
-    uint8_t *appThumbnail{ nullptr } ;
+    int32_t appIconLen { 0 };
+    uint8_t *appIcon { nullptr };
+    int32_t appThumbnailLen { 0 };
+    uint8_t *appThumbnail { nullptr } ;
     const int32_t ICON_MAX_LEN = 32 * 1024;
     const int32_t THUMB_MAX_LEN = 153 * 1024;
 };

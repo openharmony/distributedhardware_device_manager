@@ -29,8 +29,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class IpcClientStub : public IRemoteStub<IpcRemoteBroker> {
 public:
-    IpcClientStub(){};
-    ~IpcClientStub(){};
+    IpcClientStub() {};
+    ~IpcClientStub() {};
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 };

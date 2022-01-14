@@ -136,7 +136,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
 {
     std::string pkgName = "com.ohos.helloworld";
     uint16_t aaa = 11;
-    DmDiscoveryContext context{pkgName, "121110", aaa};
+    DmDiscoveryContext context { pkgName, "121110", aaa };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     sleep(1);
     DmDeviceInfo info;

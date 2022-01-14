@@ -87,14 +87,13 @@ bool MbedtlsGenRandomStr(char *szOut, int32_t szOutLen, bool numberOnly)
         return false;
     }
     szOut[--szOutLen] = 0;
-    GetRandomData((uint8_t *)szOut, szOutLen);
+    GetRandomData(reinterpret_cast<uint8_t *>(szOut), szOutLen);
     const int32_t NUMBER_COUNT = 10;
     const int32_t ALPHA_COUNT = 26;
     const int32_t ALPHA_BYTE_COUNT = 2;
     int32_t M = numberOnly ? NUMBER_COUNT : (NUMBER_COUNT + ALPHA_BYTE_COUNT * ALPHA_COUNT);
     for (int32_t i = 0; i < szOutLen; i++) {
-        // 0~9,A~Z,a~z
-        uint32_t idx = ((uint32_t)szOut[i] % M);
+        uint32_t idx = (static_cast<uint32_t>(szOut[i]) % M);
         char base;
         if (idx < NUMBER_COUNT) {
             base = '0';

@@ -23,12 +23,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-const int32_t INVALID_CB_ID = 0xFF;
-}
 static uint32_t g_deathCbId = INVALID_CB_ID;
 static SvcIdentity g_svcIdentity;
 static std::shared_ptr<IpcRsp> pCurRsp;
+const int32_t INVALID_CB_ID = 0xFF;
 
 void __attribute__((weak)) HOS_SystemInit(void)
 {
@@ -36,7 +34,7 @@ void __attribute__((weak)) HOS_SystemInit(void)
     return;
 }
 
-int32_t DMDeathCallback(const IpcContext *ctx, void *ipcMsg, IpcIo *data, void *arg)
+int32_t DmDeathCallback(const IpcContext *ctx, void *ipcMsg, IpcIo *data, void *arg)
 {
     (void)ctx;
     (void)ipcMsg;
@@ -82,7 +80,7 @@ int IpcClientServerProxy::RegisterServerDeathCb(void)
 {
     g_svcIdentity = SAMGR_GetRemoteIdentity(DEVICE_MANAGER_SERVICE_NAME, nullptr);
     g_deathCbId = INVALID_CB_ID;
-    if (RegisterDeathCallback(nullptr, g_svcIdentity, DMDeathCallback, nullptr, &g_deathCbId) != EC_SUCCESS) {
+    if (RegisterDeathCallback(nullptr, g_svcIdentity, DmDeathCallback, nullptr, &g_deathCbId) != EC_SUCCESS) {
         LOGE("reg death callback failed");
         return DM_FAILED;
     }

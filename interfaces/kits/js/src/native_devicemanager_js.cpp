@@ -1671,7 +1671,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
     };
 
-    LOGD("DeviceManagerNapi::Init() is called!");
+    LOGI("DeviceManagerNapi::Init() is called!");
     NAPI_CALL(env, napi_define_class(env, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), NAPI_AUTO_LENGTH, Constructor,
                                      nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
     NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));

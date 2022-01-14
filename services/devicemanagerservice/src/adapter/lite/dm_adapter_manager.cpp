@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 DmAdapterManager &DmAdapterManager::GetInstance()
 {
     static DmAdapterManager instance;
@@ -51,6 +50,5 @@ std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter()
 {
     return cryptoAdapterPtr_;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

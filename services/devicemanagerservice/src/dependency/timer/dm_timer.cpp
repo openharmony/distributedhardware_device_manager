@@ -24,7 +24,7 @@ namespace DistributedHardware {
 namespace {
 const int32_t MILL_SECONDS_PER_SECOND = 1000;
 }
-DmTimer::DmTimer(std::string &name)
+DmTimer::DmTimer(const std::string &name)
 {
     mStatus_ = DmTimerStatus::DM_STATUS_INIT;
     mTimeOutSec_ = 0;
@@ -39,7 +39,7 @@ DmTimer::DmTimer(std::string &name)
 
 DmTimer::~DmTimer()
 {
-    LOGI("DmTimer %s Destory in", mTimerName_.c_str());
+    LOGI("DmTimer %s Destroy in", mTimerName_.c_str());
     Release();
 }
 
@@ -84,7 +84,7 @@ void DmTimer::WaitForTimeout()
 {
     LOGI("DmTimer %s start timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
 
-    int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAXEVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
+    int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
     if (nfds < 0) {
         LOGE("DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
     }
@@ -123,7 +123,7 @@ int32_t DmTimer::CreateTimeFd()
 
     mEv_.data.fd = mTimeFd_[0];
     mEv_.events = EPOLLIN | EPOLLET;
-    mEpFd_ = epoll_create(MAXEVENTS);
+    mEpFd_ = epoll_create(MAX_EVENTS);
     ret = epoll_ctl(mEpFd_, EPOLL_CTL_ADD, mTimeFd_[0], &mEv_);
     if (ret != 0) {
         Release();

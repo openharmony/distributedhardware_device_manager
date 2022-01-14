@@ -41,6 +41,7 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
+#include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::Constants;
@@ -61,9 +62,7 @@ bool DeviceManagerImpl::isSystemAppCalling(void)
         LOGE("failed to get system ability mgr.");
         return false;
     }
-
-    sptr<IRemoteObject> remoteObject = 
-        systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (remoteObject == nullptr) {
         LOGE("failed to get bundle manager proxy.");
         return false;
@@ -354,7 +353,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     }
 
     DmDeviceInfo deviceInfo;
-    strcpy(deviceInfo.deviceId, deviceId.c_str());
+    strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);

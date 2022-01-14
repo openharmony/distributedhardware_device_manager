@@ -69,7 +69,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
-        LOGD("TAG_APP_THUMBNAIL encode, idx %d, sliceLen %d, thumbnailSize %d", idx, sliceLen, thumbnailSize);
+        LOGI("TAG_APP_THUMBNAIL encode, idx %d, sliceLen %d, thumbnailSize %d", idx, sliceLen, thumbnailSize);
         jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
         jsonStrVec.push_back(jsonThumbnailObj.dump());
     }

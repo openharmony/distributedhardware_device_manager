@@ -69,8 +69,8 @@ public:
 private:
     std::string deviceId_;
     std::string token_;
-    int32_t status_{ 0 };
-    int32_t reason_{ 0 };
+    int32_t status_ { 0 };
+    int32_t reason_ { 0 };
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 std::map<std::string, std::shared_ptr<ISoftbusSessionCallback>> SoftbusSession::sessionCallbackMap_ = {};
 
 SoftbusSession::SoftbusSession()
@@ -35,7 +34,7 @@ SoftbusSession::SoftbusSession()
                                         .OnStreamReceived = nullptr};
     int32_t ret = CreateSessionServer(DM_PKG_NAME.c_str(), DM_SESSION_NAME.c_str(), &sessionListener);
     if (ret != DM_OK) {
-        LOGD("CreateSessionServer failed");
+        LOGE("CreateSessionServer failed");
     } else {
         LOGI("CreateSessionServer ok");
     }
@@ -160,6 +159,5 @@ void SoftbusSession::OnBytesReceived(int32_t sessionId, const void *data, uint32
     }
     LOGI("OnBytesReceived completed");
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

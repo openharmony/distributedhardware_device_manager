@@ -202,7 +202,7 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: GetConnectionIpAddress_001
- * @tc.desc: set deviceId null,adb return DM_FAILED
+ * @tc.desc: set deviceId null,and return DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

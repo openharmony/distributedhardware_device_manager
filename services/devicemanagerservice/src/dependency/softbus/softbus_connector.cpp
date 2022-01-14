@@ -139,7 +139,7 @@ int32_t SoftbusConnector::UnRegisterSoftbusStateCallback(const std::string &pkgN
 
 int32_t SoftbusConnector::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    LOGD("SoftbusConnector::GetTrustDevices start");
+    LOGI("SoftbusConnector::GetTrustDevices start");
     int32_t infoNum = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeInfo, &infoNum);
@@ -161,13 +161,13 @@ int32_t SoftbusConnector::GetTrustedDeviceList(std::vector<DmDeviceInfo> &device
     }
     FreeNodeInfo(nodeInfo);
     free(info);
-    LOGD("SoftbusConnector::GetTrustDevices success, deviceCount %d", infoNum);
+    LOGI("SoftbusConnector::GetTrustDevices success, deviceCount %d", infoNum);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
-    LOGD("SoftbusConnector::GetLocalDeviceInfo start");
+    LOGI("SoftbusConnector::GetLocalDeviceInfo start");
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeBasicInfo);
     if (ret != 0) {
@@ -175,7 +175,7 @@ int32_t SoftbusConnector::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
         return DM_FAILED;
     }
     CovertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
-    LOGD("SoftbusConnector::GetLocalDeviceInfo success");
+    LOGI("SoftbusConnector::GetLocalDeviceInfo success");
     return DM_OK;
 }
 

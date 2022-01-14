@@ -54,8 +54,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
             SoftbusConnector::GetUuidByNetworkId(info.deviceId, uuid);
             remoteDeviceInfos_[uuid] = saveInfo;
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
-                  info.deviceId, deviceUdid.c_str(), uuid.c_str());
-            //set networkId or udid;
+                 info.deviceId, deviceUdid.c_str(), uuid.c_str());
             profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
             LOGI("RegisterProfileListener out");
         }
@@ -99,7 +98,6 @@ void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDev
 
 void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std::string deviceId)
 {
-    // deviceId is uuid;
     DmDeviceInfo saveInfo;
     auto iter = remoteDeviceInfos_.find(deviceId);
     if (iter == remoteDeviceInfos_.end()) {

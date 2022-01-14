@@ -46,7 +46,7 @@ void IpcServerStub::OnStart()
 {
     LOGI("IpcServerStub::OnStart start");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
-        LOGD("IpcServerStub has already started.");
+        LOGI("IpcServerStub has already started.");
         return;
     }
     if (!Init()) {
@@ -67,7 +67,7 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
     }
-    std::thread{[] { DeviceManagerService::GetInstance().Init(); }}.detach();
+    std::thread {[] { DeviceManagerService::GetInstance().Init(); }}.detach();
     return true;
 }
 

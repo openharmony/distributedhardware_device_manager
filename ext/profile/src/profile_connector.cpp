@@ -53,9 +53,8 @@ int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &s
     subscribeInfos.emplace_back(eventSync);
 
     std::list<ProfileEvent> failedEvents;
-    u_int32_t errCode;
-    errCode = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(subscribeInfos,
-                                                                                   profileEventCallback_, failedEvents);
+    u_int32_t errCode = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
+        subscribeInfos, profileEventCallback_, failedEvents);
     LOGI("ProfileConnector::SubscribeProfileEvents result=%d", errCode);
     return DM_OK;
 }
@@ -66,8 +65,7 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
     profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
     profileEvents.emplace_back(ProfileEvent::EVENT_SYNC_COMPLETED);
     std::list<ProfileEvent> failedEvents;
-    u_int32_t errCode;
-    errCode = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
+    u_int32_t errCode = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
         profileEvents, profileEventCallback_, failedEvents);
     LOGI("ProfileConnector::UnSubscribeProfileEvents result=%d", errCode);
     return DM_OK;
