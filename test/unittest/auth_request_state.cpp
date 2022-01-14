@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 int32_t AuthRequestState::Leave()
 {
     return DM_OK;
