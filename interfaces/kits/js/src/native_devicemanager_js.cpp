@@ -908,12 +908,13 @@ void DeviceManagerNapi::CallGetLocalDeviceInfoSync(napi_env env, napi_status &st
 {
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
 
-    LOGI("DeviceManager::GetTrustedDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
+    LOGI("DeviceManager::CallGetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ",
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceId, deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceTypeId);
 
     if (deviceInfoAsyncCallbackInfo->status == 0) {
         DmDeviceInfotoJsDeviceInfo(env, deviceInfoAsyncCallbackInfo->deviceInfo, result[1]);
+        napi_resolve_deferred(env, deviceInfoAsyncCallbackInfo->deferred, result[1]);
     } else {
         napi_create_object(env, &result[0]);
         SetValueInt32(env, "code", status, result[0]);
@@ -925,7 +926,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
                                                DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo)
 {
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
-    LOGI("DeviceManager::GetTrustedDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
+    LOGI("DeviceManager::CallGetLocalDeviceInfo deviceId:%s deviceName:%s deviceTypeId:%d ",
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceId, deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceTypeId);
     napi_value callResult = nullptr;
@@ -966,13 +967,13 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackI
                                                                       deviceInfoAsyncCallbackInfo->deviceInfo);
             }
             if (ret != 0) {
-                LOGE("GetTrustedDeviceList for bunderName %s failed, ret %d",
+                LOGE("CallAsyncWorkSync for bunderName %s failed, ret %d",
                      deviceInfoAsyncCallbackInfo->bundleName.c_str(), ret);
                 deviceInfoAsyncCallbackInfo->status = -1;
                 return;
             }
             deviceInfoAsyncCallbackInfo->status = 0;
-            LOGE("GetTrustedDeviceList status %d", deviceInfoAsyncCallbackInfo->status);
+            LOGE("CallAsyncWorkSync status %d", deviceInfoAsyncCallbackInfo->status);
         },
         [](napi_env env, napi_status status, void *data) {
             (void)status;
