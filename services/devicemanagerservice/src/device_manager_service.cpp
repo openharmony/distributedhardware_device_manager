@@ -72,7 +72,7 @@ int32_t DeviceManagerService::Init()
             LOGE("Init failed, authMgr_ apply for failure");
             return DM_MAKE_SHARED_FAIL;
         }
-        authMgr_->RegisterSessionCallback();
+        authMgr_->RegisterCallback();
     }
     LOGI("Init success, singleton initialized");
     intFlag_ = true;

@@ -110,8 +110,9 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
         json[TAG_CRYPTO_SUPPORT] = true;
         json[TAG_CRYPTO_NAME] = cryptoAdapter_->GetName();
         json[TAG_CRYPTO_VERSION] = cryptoAdapter_->GetVersion();
-        json[TAG_DEVICE_ID] = authRequestContext_->deviceId;
+        json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     }
+    json[TAG_AUTH_TYPE] = authResponseContext_->authType;
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
 }
@@ -261,6 +262,7 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     if (json.contains(TAG_DEVICE_ID)) {
         authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     }
+    authResponseContext_->authType = json[TAG_AUTH_TYPE];
     authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
     authResponseContext_->reply = json[TAG_REPLY];
 }

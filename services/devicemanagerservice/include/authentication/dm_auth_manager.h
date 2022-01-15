@@ -128,9 +128,9 @@ public:
                                const std::string &extra);
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
     int32_t VerifyAuthentication(const std::string &authParam);
-    void OnSessionOpened(const std::string &pkgName, int32_t sessionId, int32_t sessionSide, int32_t result);
-    void OnSessionClosed(const std::string &pkgName, int32_t sessionId);
-    void OnDataReceived(const std::string &pkgName, int32_t sessionId, std::string message);
+    void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
+    void OnSessionClosed(int32_t sessionId);
+    void OnDataReceived(int32_t sessionId, std::string message);
     void OnGroupCreated(int64_t requestId, const std::string &groupId);
     void OnMemberJoin(int64_t requestId, int32_t status);
 
@@ -146,7 +146,7 @@ public:
     std::string GetConnectAddr(std::string deviceId);
     void JoinNetwork();
     void AuthenticateFinish();
-    void GetIsCryptoSupport(bool &isCryptoSupport);
+    bool GetIsCryptoSupport();
     void SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState);
     void SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState);
     int32_t GetPinCode();
@@ -158,7 +158,7 @@ public:
     void ShowAuthInfoDialog();
     void ShowStartAuthDialog();
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
-    int32_t RegisterSessionCallback();
+    int32_t RegisterCallback();
     int32_t OnUserOperation(int32_t action);
 
 private:

@@ -256,15 +256,12 @@ HWTEST_F(HichainConnectorTest, HiChainConnector_002, testing::ext::TestSize.Leve
  */
 HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.softbus.test";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret =
-        hichainConnector->RegisterHiChainCallback(pkgName, std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
-    int ret1 = HiChainConnector::hiChainConnectorCallbackMap_.count(pkgName);
-    EXPECT_EQ(ret1, 1);
+        hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -355,12 +352,11 @@ HWTEST_F(HichainConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(HichainConnectorTest, GetConnectPara_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "softbus";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(pkgName, std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
+    hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
     std::string deviceId = "23445";
     std::string reqDeviceId = "234566";
     std::string p;
@@ -378,12 +374,11 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0
 {
     std::string deviceId;
     std::string reqDeviceId = "234566";
-    std::string pkgName = "softbus";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(pkgName, std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
+    hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
     std::string ret = hichainConnector->GetConnectPara(deviceId, reqDeviceId);
     EXPECT_EQ(ret, "");
 }

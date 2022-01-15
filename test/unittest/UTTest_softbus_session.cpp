@@ -172,7 +172,7 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "softbus";
-    int ret = softbusSession->UnRegisterSessionCallback(pkgName);
+    int ret = softbusSession->UnRegisterSessionCallback();
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace

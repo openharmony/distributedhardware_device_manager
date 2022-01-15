@@ -37,15 +37,15 @@ public:
 public:
     SoftbusSession();
     ~SoftbusSession();
-    int32_t RegisterSessionCallback(const std::string &pkgName, std::shared_ptr<ISoftbusSessionCallback> callback);
-    int32_t UnRegisterSessionCallback(const std::string &pkgName);
+    int32_t RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback);
+    int32_t UnRegisterSessionCallback();
     int32_t OpenAuthSession(const std::string &deviceId);
     int32_t CloseAuthSession(int32_t sessionId);
     int32_t SendData(int32_t sessionId, std::string &message);
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
 
 private:
-    static std::map<std::string, std::shared_ptr<ISoftbusSessionCallback>> sessionCallbackMap_;
+    static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

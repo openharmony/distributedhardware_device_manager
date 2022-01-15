@@ -53,8 +53,8 @@ public:
 public:
     HiChainConnector();
     ~HiChainConnector();
-    int32_t RegisterHiChainCallback(const std::string &pkgName, std::shared_ptr<IHiChainConnectorCallback> callback);
-    int32_t UnRegisterHiChainCallback(const std::string &pkgName);
+    int32_t RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback);
+    int32_t UnRegisterHiChainCallback();
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
     int32_t AddMember(std::string deviceId, std::string &connectInfo);
     int32_t DelMemberFromGroup(std::string groupId, std::string deviceId);
@@ -74,7 +74,7 @@ private:
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;
-    static std::map<std::string, std::shared_ptr<IHiChainConnectorCallback>> hiChainConnectorCallbackMap_;
+    static std::shared_ptr<IHiChainConnectorCallback> hiChainConnectorCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
