@@ -13,21 +13,24 @@
 
 import("//build/test.gni")
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
-module_out_path = "deviceManager_stander/inner_kits"
+module_out_path = "device_manager_base/component_loader_test"
 
 group("unittest") {
   testonly = true
 
   deps = [
+    ":UTTest_auth_message_processor",
+    ":UTTest_auth_request_state",
+    ":UTTest_auth_response_state",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_listener",
+    ":UTTest_dm_auth_manager",
     ":UTTest_dm_device_info_manager",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_discovery_manager",
     ":UTTest_hichain_connector",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_session",
-    ":device_manager_impl_test",
   ]
 }
 
@@ -135,6 +138,49 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 
 ## UnitTest UTTest_device_manager_service_listener }}}
 
+## UnitTest UTTest_auth_message_processor {{{
+ohos_unittest("UTTest_auth_message_processor") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_auth_message_processor.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UTTest_auth_message_processor }}}
+
+## UnitTest UTTest_auth_response_state {{{
+ohos_unittest("UTTest_auth_response_state") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_auth_response_state.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UTTest_auth_response_state }}}
+
+## UnitTest UTTest_auth_request_state {{{
+ohos_unittest("UTTest_auth_request_state") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_auth_request_state.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UTTest_auth_request_state }}}
+
+## UnitTest UTTest_dm_auth_manager {{{
+ohos_unittest("UTTest_dm_auth_manager") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_auth_manager.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UTTest_dm_auth_manager }}}
 ## UnitTest UTTest_dm_discovery_manager {{{
 ohos_unittest("UTTest_dm_discovery_manager") {
   module_out_path = module_out_path

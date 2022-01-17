@@ -222,7 +222,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
-    std::string deviceId = " 2345";
+    std::string deviceId = "2345";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, DM_NOT_INIT);
 }
@@ -246,7 +246,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSiz
 
 /**
  * @tc.name: AuthenticateDevice_003
- * @tc.desc: Set intFlag for GAuthenticateDevice to true and pkgName to com.ohos.test; The return value is DM_OK
+ * @tc.desc: Set intFlag for GAuthenticateDevice to True and deviceId to null; The return value is DM_INPUT_PARA_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -256,9 +256,25 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
+    std::string deviceId;
+    int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
+    EXPECT_EQ(ret, DM_INPUT_PARA_EMPTY);
+}
+/**
+ * @tc.name: AuthenticateDevice_004
+ * @tc.desc: Set intFlag for GAuthenticateDevice to true and pkgName to com.ohos.test
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = true;
+    std::string pkgName = "com.ohos.test";
+    std::string extra = "jdddd";
+    int32_t authType = 0;
     std::string deviceId = "123456";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, DM_AUTH_NOT_SUPPORT);
 }
 
 /**

@@ -53,20 +53,19 @@ public:
 public:
     HiChainConnector();
     ~HiChainConnector();
-    int32_t RegisterHiChainCallback(const std::string &pkgName, std::shared_ptr<IHiChainConnectorCallback> callback);
-    int32_t UnRegisterHiChainCallback(const std::string &pkgName);
+    int32_t RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback);
+    int32_t UnRegisterHiChainCallback();
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
     int32_t AddMember(std::string deviceId, std::string &connectInfo);
     int32_t DelMemberFromGroup(std::string groupId, std::string deviceId);
     int32_t DeleteGroup(std::string &groupId);
     bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
     int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
-
+    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
     int32_t GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList);
-    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
     std::string GetConnectPara(std::string deviceId, std::string reqDeviceId);
     bool IsGroupCreated(std::string groupName, GroupInfo &groupInfo);
     bool IsGroupInfoInvalid(GroupInfo &group);
@@ -74,7 +73,7 @@ private:
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;
-    static std::map<std::string, std::shared_ptr<IHiChainConnectorCallback>> hiChainConnectorCallbackMap_;
+    static std::shared_ptr<IHiChainConnectorCallback> hiChainConnectorCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

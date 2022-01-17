@@ -38,11 +38,11 @@ typedef enum DmDeviceType {
 } DmDeviceType;
 
 typedef enum DmDeviceState {
-    DEVICE_STATE_UNKNOWN = 0,
-    DEVICE_STATE_ONLINE = 1,
+    DEVICE_STATE_UNKNOWN = -1,
+    DEVICE_STATE_ONLINE = 0,
+    DEVICE_INFO_READY = 1,
     DEVICE_STATE_OFFLINE = 2,
     DEVICE_INFO_CHANGED = 3,
-    DEVICE_INFO_READY = 4,
 } DmDeviceState;
 
 typedef struct DmDeviceInfo {

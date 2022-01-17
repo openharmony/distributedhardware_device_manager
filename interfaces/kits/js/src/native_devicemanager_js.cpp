@@ -1075,9 +1075,8 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     if (isArray == false) {
         LOGE("napi_create_array fail");
     }
-
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, argc == 0, "Wrong number of arguments");
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     std::string extra = "";

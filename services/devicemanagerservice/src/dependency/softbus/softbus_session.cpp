@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-std::map<std::string, std::shared_ptr<ISoftbusSessionCallback>> SoftbusSession::sessionCallbackMap_ = {};
+std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 
 SoftbusSession::SoftbusSession()
 {
@@ -45,16 +45,15 @@ SoftbusSession::~SoftbusSession()
     RemoveSessionServer(DM_PKG_NAME.c_str(), DM_SESSION_NAME.c_str());
 }
 
-int32_t SoftbusSession::RegisterSessionCallback(const std::string &pkgName,
-                                                std::shared_ptr<ISoftbusSessionCallback> callback)
+int32_t SoftbusSession::RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback)
 {
-    sessionCallbackMap_[pkgName] = callback;
+    sessionCallback_ = callback;
     return DM_OK;
 }
 
-int32_t SoftbusSession::UnRegisterSessionCallback(const std::string &pkgName)
+int32_t SoftbusSession::UnRegisterSessionCallback()
 {
-    sessionCallbackMap_.erase(pkgName);
+    sessionCallback_ = nullptr;
     return DM_OK;
 }
 
@@ -108,11 +107,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     }
     int32_t msgType = jsonObject[TAG_TYPE];
     LOGI("AuthMessageProcessor::ParseAuthRequestMessage  msgType = %d", msgType);
-    bool isCryptoSupport = false;
-    for (auto &iter : sessionCallbackMap_) {
-        iter.second->GetIsCryptoSupport(isCryptoSupport);
-    }
-    if (isCryptoSupport) {
+    if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SoftbusSession::SendData Start encryption");
     }
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
@@ -127,9 +122,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 int32_t SoftbusSession::OnSessionOpened(int32_t sessionId, int32_t result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
-    for (auto &iter : sessionCallbackMap_) {
-        iter.second->OnSessionOpened(iter.first, sessionId, sessionSide, result);
-    }
+    sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
     LOGI("OnSessionOpened, success:");
     return DM_OK;
 }
@@ -146,18 +139,11 @@ void SoftbusSession::OnBytesReceived(int32_t sessionId, const void *data, uint32
         LOGI("OnBytesReceived param check failed");
         return;
     }
-    bool isCryptoSupport = false;
-    for (auto &iter : sessionCallbackMap_) {
-        iter.second->GetIsCryptoSupport(isCryptoSupport);
-    }
-    if (isCryptoSupport) {
+    if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SoftbusSession::OnBytesReceived Start decryption");
     }
     std::string message = std::string((const char *)data, dataLen);
-    for (auto &iter : sessionCallbackMap_) {
-        iter.second->OnDataReceived(iter.first, sessionId, message);
-        return;
-    }
+    sessionCallback_->OnDataReceived(sessionId, message);
     LOGI("OnBytesReceived completed");
 }
 } // namespace DistributedHardware

@@ -19,7 +19,7 @@
 #include "softbus_connector.h"
 #include "softbus_session.h"
 #include "dm_auth_manager.h"
-#include "UTTest_device_message.h"
+#include "UTTest_auth_message_processor.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -51,17 +51,25 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> data = std::make_shared<DmAuthManager>(softbusConnector, listener);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_TYPE] = msgType;
+    jsonObj[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
+    authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = jsonObj.dump();
+
     nlohmann::json jsonObject;
     jsonObject[TAG_VER] = DM_ITF_VER;
     jsonObject[TAG_TYPE] = msgType;
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
+    jsonObject[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
+    jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
+    jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
     std::string str2 = jsonObject.dump();
     ASSERT_EQ(str1, str2);
     sleep(15);
@@ -112,6 +120,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     nlohmann::json jsonObj;
     authMessageProcessor->authResponseContext_->reply = 0;
     authMessageProcessor->authResponseContext_->deviceId = "132416546";
+    authMessageProcessor->authResponseContext_->token = "11";
     nlohmann::json jsonb;
     jsonb[TAG_GROUP_ID] = "123456";
     authMessageProcessor->authResponseContext_->groupId = jsonb.dump();
@@ -119,6 +128,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     authMessageProcessor->authResponseContext_->networkId = "11112222";
     authMessageProcessor->authResponseContext_->requestId = 222222;
     authMessageProcessor->authResponseContext_->groupName = "333333";
+    jsona[TAG_TOKEN] = authMessageProcessor->authResponseContext_->token;
     jsona[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsona[TAG_DEVICE_ID] = authMessageProcessor->authResponseContext_->deviceId;
     jsona[PIN_CODE_KEY] = authMessageProcessor->authResponseContext_->code;
@@ -201,6 +211,8 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
     authResponseContext->requestId = 2;
     authResponseContext->groupId = "23456";
     authResponseContext->groupName = "34567";
+    authResponseContext->token = "11123";
+    jsona[TAG_TOKEN] = authResponseContext->token;
     jsona[TAG_REPLY] = authResponseContext->reply;
     jsona[TAG_DEVICE_ID] = authResponseContext->deviceId;
     jsona[PIN_CODE_KEY] = authResponseContext->code;
@@ -303,6 +315,12 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::Test
     nlohmann::json jsonObj;
     jsonObj[TAG_CRYPTO_SUPPORT] = "CRYPTOSUPPORT";
     jsonObj[TAG_CRYPTO_SUPPORT] = authMessageProcessor->authResponseContext_->cryptoSupport;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -324,8 +342,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::Test
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
     jsonObj[TAG_CRYPTO_NAME] = "CRYPTONAME";
     jsonObj[TAG_CRYPTO_NAME] = authResponseContext->cryptoSupport;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -347,8 +371,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::Test
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
     jsonObj[TAG_CRYPTO_VERSION] = "CRYPTOVERSION";
     jsonObj[TAG_CRYPTO_VERSION] = authResponseContext->cryptoSupport;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -370,8 +400,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::Test
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
     jsonObj[TAG_DEVICE_ID] = "DEVICEID";
     jsonObj[TAG_DEVICE_ID] = authResponseContext->deviceId;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -393,8 +429,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
     jsonObj[TAG_LOCAL_DEVICE_ID] = "LOCALDEVICEID";
     jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);

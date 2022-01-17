@@ -128,38 +128,39 @@ public:
                                const std::string &extra);
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
     int32_t VerifyAuthentication(const std::string &authParam);
-    void OnSessionOpened(const std::string &pkgName, int32_t sessionId, int32_t sessionSide, int32_t result);
-    void OnSessionClosed(const std::string &pkgName, int32_t sessionId);
-    void OnDataReceived(const std::string &pkgName, int32_t sessionId, std::string message);
+    void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
+    void OnSessionClosed(int32_t sessionId);
+    void OnDataReceived(int32_t sessionId, std::string message);
     void OnGroupCreated(int64_t requestId, const std::string &groupId);
     void OnMemberJoin(int64_t requestId, int32_t status);
 
     // auth state machine
-    void EstablishAuthChannel(const std::string &deviceId);
+    int32_t EstablishAuthChannel(const std::string &deviceId);
     void StartNegotiate(const int32_t &sessionId);
     void RespNegotiate(const int32_t &sessionId);
     void SendAuthRequest(const int32_t &sessionId);
-    void StartAuthProcess(const int32_t &authType);
+    int32_t StartAuthProcess(const int32_t &authType);
     void StartRespAuthProcess();
-    void CreateGroup();
-    void AddMember(const std::string &deviceId);
+    int32_t CreateGroup();
+    int32_t AddMember(const std::string &deviceId);
     std::string GetConnectAddr(std::string deviceId);
-    void JoinNetwork();
+    int32_t JoinNetwork();
     void AuthenticateFinish();
-    void GetIsCryptoSupport(bool &isCryptoSupport);
-    void SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState);
-    void SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState);
+    bool GetIsCryptoSupport();
+    int32_t SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState);
+    int32_t SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState);
     int32_t GetPinCode();
     std::string GenerateGroupName();
-    void HandleAuthenticateTimeout();
+    int32_t HandleAuthenticateTimeout();
     void CancelDisplay();
     int32_t GeneratePincode();
     void ShowConfigDialog();
     void ShowAuthInfoDialog();
     void ShowStartAuthDialog();
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
-    int32_t RegisterSessionCallback();
+    int32_t RegisterCallback();
     int32_t OnUserOperation(int32_t action);
+    void UserSwitchEventCallback(void);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

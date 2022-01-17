@@ -20,18 +20,21 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void AuthRequestState::Leave()
+int32_t AuthRequestState::Leave()
 {
+    return DM_OK;
 }
 
-void AuthRequestState::SetAuthManager(std::shared_ptr<DmAuthManager> authManager)
+int32_t AuthRequestState::SetAuthManager(std::shared_ptr<DmAuthManager> authManager)
 {
     authManager_ = std::move(authManager);
+    return DM_OK;
 }
 
-void AuthRequestState::SetAuthContext(std::shared_ptr<DmAuthRequestContext> context)
+int32_t AuthRequestState::SetAuthContext(std::shared_ptr<DmAuthRequestContext> context)
 {
     context_ = std::move(context);
+    return DM_OK;
 }
 
 std::shared_ptr<DmAuthRequestContext> AuthRequestState::GetAuthContext()
@@ -39,19 +42,20 @@ std::shared_ptr<DmAuthRequestContext> AuthRequestState::GetAuthContext()
     return context_;
 }
 
-void AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
+int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
 {
     LOGE("AuthRequestState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthRequestState(state);
     state->SetAuthContext(context_);
     this->Leave();
     state->Enter();
+    return DM_OK;
 }
 
 int32_t AuthRequestInitState::GetStateType()
@@ -59,14 +63,15 @@ int32_t AuthRequestInitState::GetStateType()
     return AuthState::AUTH_REQUEST_INIT;
 }
 
-void AuthRequestInitState::Enter()
+int32_t AuthRequestInitState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->EstablishAuthChannel(context_->deviceId);
+    return DM_OK;
 }
 
 int32_t AuthRequestNegotiateState::GetStateType()
@@ -74,14 +79,15 @@ int32_t AuthRequestNegotiateState::GetStateType()
     return AuthState::AUTH_REQUEST_NEGOTIATE;
 }
 
-void AuthRequestNegotiateState::Enter()
+int32_t AuthRequestNegotiateState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->StartNegotiate(context_->sessionId);
+    return DM_OK;
 }
 
 int32_t AuthRequestNegotiateDoneState::GetStateType()
@@ -89,14 +95,15 @@ int32_t AuthRequestNegotiateDoneState::GetStateType()
     return AuthState::AUTH_REQUEST_NEGOTIATE_DONE;
 }
 
-void AuthRequestNegotiateDoneState::Enter()
+int32_t AuthRequestNegotiateDoneState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->SendAuthRequest(context_->sessionId);
+    return DM_OK;
 }
 
 int32_t AuthRequestReplyState::GetStateType()
@@ -104,14 +111,15 @@ int32_t AuthRequestReplyState::GetStateType()
     return AuthState::AUTH_REQUEST_REPLY;
 }
 
-void AuthRequestReplyState::Enter()
+int32_t AuthRequestReplyState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->StartRespAuthProcess();
+    return DM_OK;
 }
 
 int32_t AuthRequestInputState::GetStateType()
@@ -119,15 +127,16 @@ int32_t AuthRequestInputState::GetStateType()
     return AuthState::AUTH_REQUEST_INPUT;
 }
 
-void AuthRequestInputState::Enter()
+int32_t AuthRequestInputState::Enter()
 {
     LOGE("DmAuthManager::AuthRequestInputState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->ShowStartAuthDialog();
+    return DM_OK;
 }
 
 int32_t AuthRequestJoinState::GetStateType()
@@ -135,15 +144,16 @@ int32_t AuthRequestJoinState::GetStateType()
     return AuthState::AUTH_REQUEST_JOIN;
 }
 
-void AuthRequestJoinState::Enter()
+int32_t AuthRequestJoinState::Enter()
 {
     LOGE("DmAuthManager::AuthRequestJoinState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->AddMember(context_->deviceId);
+    return DM_OK;
 }
 
 int32_t AuthRequestNetworkState::GetStateType()
@@ -151,14 +161,15 @@ int32_t AuthRequestNetworkState::GetStateType()
     return AuthState::AUTH_REQUEST_NETWORK;
 }
 
-void AuthRequestNetworkState::Enter()
+int32_t AuthRequestNetworkState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->JoinNetwork();
+    return DM_OK;
 }
 
 int32_t AuthRequestFinishState::GetStateType()
@@ -166,16 +177,15 @@ int32_t AuthRequestFinishState::GetStateType()
     return AuthState::AUTH_REQUEST_FINISH;
 }
 
-void AuthRequestFinishState::Enter()
+int32_t AuthRequestFinishState::Enter()
 {
-    // 1. 清理资源
-    // 2. 通知对端认证结束，并关闭认证通道
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return;
+        return DM_FAILED;
     }
     stateAuthManager->AuthenticateFinish();
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

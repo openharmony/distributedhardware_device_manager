@@ -78,7 +78,7 @@ void DeviceManagerServiceListener::OnDiscoverySuccess(const std::string &pkgName
 }
 
 void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
-                                                const std::string &token, int32_t status, const std::string &reason)
+                                                const std::string &token, int32_t status, int32_t reason)
 {
     LOGI("%s, package: %s, deviceId: %s", __FUNCTION__, pkgName.c_str(), GetAnonyString(deviceId).c_str());
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::make_shared<IpcNotifyAuthResultReq>();
@@ -88,6 +88,7 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
     pReq->SetDeviceId(deviceId);
     pReq->SetToken(token);
     pReq->SetStatus(status);
+    pReq->SetReason(reason);
     ipcServerListener_.SendRequest(SERVER_AUTH_RESULT, pReq, pRsp);
 }
 

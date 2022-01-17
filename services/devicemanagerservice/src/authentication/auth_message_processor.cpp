@@ -110,8 +110,9 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
         json[TAG_CRYPTO_SUPPORT] = true;
         json[TAG_CRYPTO_NAME] = cryptoAdapter_->GetName();
         json[TAG_CRYPTO_VERSION] = cryptoAdapter_->GetVersion();
-        json[TAG_DEVICE_ID] = authRequestContext_->deviceId;
+        json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     }
+    json[TAG_AUTH_TYPE] = authResponseContext_->authType;
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
 }
@@ -230,7 +231,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
 }
 
-void AuthMessageProcessor::ParseAuthRequestMessage()
+int32_t AuthMessageProcessor::ParseAuthRequestMessage()
 {
     nlohmann::json jsonObject = authSplitJsonList_.front();
     authResponseContext_->deviceId = jsonObject[TAG_DEVICE_ID];
@@ -243,8 +244,10 @@ void AuthMessageProcessor::ParseAuthRequestMessage()
         authResponseContext_->groupId = jsonObject[TAG_GROUP_ID];
         authResponseContext_->groupName = jsonObject[TAG_GROUP_NAME];
         authResponseContext_->requestId = jsonObject[TAG_REQUEST_ID];
+        return DM_FAILED;
     }
     authSplitJsonList_.clear();
+    return DM_OK;
 }
 
 void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
@@ -261,6 +264,7 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     if (json.contains(TAG_DEVICE_ID)) {
         authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     }
+    authResponseContext_->authType = json[TAG_AUTH_TYPE];
     authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
     authResponseContext_->reply = json[TAG_REPLY];
 }

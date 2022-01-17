@@ -315,6 +315,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
         return DM_INVALID_VALUE;
     }
 
+    std::string strDeviceId = deviceInfo.deviceId;
+    DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
     std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -333,8 +335,6 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
         return DM_IPC_RESPOND_ERROR;
     }
 
-    std::string strDeviceId = deviceInfo.deviceId;
-    DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
     LOGI("DeviceManager::AuthenticateDevice completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -370,7 +370,6 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
         return DM_IPC_RESPOND_ERROR;
     }
 
-    DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
     LOGI("UnAuthenticateDevice completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }

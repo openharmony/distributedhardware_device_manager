@@ -54,7 +54,7 @@ void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
     }
 }
 
-std::map<std::string, std::shared_ptr<IHiChainConnectorCallback>> HiChainConnector::hiChainConnectorCallbackMap_ = {};
+std::shared_ptr<IHiChainConnectorCallback> HiChainConnector::hiChainConnectorCallback_ = nullptr;
 
 HiChainConnector::HiChainConnector()
 {
@@ -78,16 +78,15 @@ HiChainConnector::~HiChainConnector()
     LOGI("HiChainConnector::destructor.");
 }
 
-int32_t HiChainConnector::RegisterHiChainCallback(const std::string &pkgName,
-                                                  std::shared_ptr<IHiChainConnectorCallback> callback)
+int32_t HiChainConnector::RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback)
 {
-    hiChainConnectorCallbackMap_.emplace(pkgName, callback);
+    hiChainConnectorCallback_ = callback;
     return DM_OK;
 }
 
-int32_t HiChainConnector::UnRegisterHiChainCallback(const std::string &pkgName)
+int32_t HiChainConnector::UnRegisterHiChainCallback()
 {
-    hiChainConnectorCallbackMap_.erase(pkgName);
+    hiChainConnectorCallback_ = nullptr;
     return DM_OK;
 }
 
@@ -210,15 +209,11 @@ void HiChainConnector::onFinish(int64_t requestId, int32_t operationCode, const 
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
-        for (auto &iter : hiChainConnectorCallbackMap_) {
-            iter.second->OnMemberJoin(requestId, DM_OK);
-        }
+        hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
-        for (auto &iter : hiChainConnectorCallbackMap_) {
-            iter.second->OnGroupCreated(requestId, data);
-        }
+        hiChainConnectorCallback_->OnGroupCreated(requestId, data);
     }
     if (operationCode == GroupOperationCode::MEMBER_DELETE) {
         LOGI("Delete Member from group success");
@@ -234,15 +229,11 @@ void HiChainConnector::onError(int64_t requestId, int32_t operationCode, int32_t
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
-        for (auto &iter : hiChainConnectorCallbackMap_) {
-            iter.second->OnMemberJoin(requestId, DM_FAILED);
-        }
+        hiChainConnectorCallback_->OnMemberJoin(requestId, DM_FAILED);
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
-        for (auto &iter : hiChainConnectorCallbackMap_) {
-            iter.second->OnGroupCreated(requestId, "{}");
-        }
+        hiChainConnectorCallback_->OnGroupCreated(requestId, "{}");
     }
     if (operationCode == GroupOperationCode::MEMBER_DELETE) {
         LOGE("Delete Member from group failed");
@@ -259,9 +250,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int32_t operationCode, cons
         return nullptr;
     }
     int32_t pinCode = 0;
-    for (auto &iter : hiChainConnectorCallbackMap_) {
-        pinCode = iter.second->GetPinCode();
-    }
+    pinCode = hiChainConnectorCallback_->GetPinCode();
     nlohmann::json jsonObj;
     if (pinCode == DM_FAILED) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
@@ -286,9 +275,7 @@ int64_t HiChainConnector::GenRequestId()
 std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string reqDeviceId)
 {
     std::string connectAddr = "";
-    for (auto &iter : hiChainConnectorCallbackMap_) {
-        connectAddr = iter.second->GetConnectAddr(deviceId);
-    }
+    connectAddr = hiChainConnectorCallback_->GetConnectAddr(deviceId);
     LOGE("HiChainConnector::GetConnectPara get addrInfo");
     nlohmann::json jsonObject = nlohmann::json::parse(connectAddr, nullptr, false);
     if (jsonObject.is_discarded()) {

@@ -29,14 +29,13 @@ public:
     virtual ~AuthRequestState()
     {
         authManager_.reset();
-        LOGE("~AuthRequestState");
     };
     virtual int32_t GetStateType() = 0;
-    virtual void Enter() = 0;
-    void Leave();
-    void TransitionTo(std::shared_ptr<AuthRequestState> state);
-    void SetAuthManager(std::shared_ptr<DmAuthManager> authManager);
-    void SetAuthContext(std::shared_ptr<DmAuthRequestContext> context);
+    virtual int32_t Enter() = 0;
+    int32_t Leave();
+    int32_t TransitionTo(std::shared_ptr<AuthRequestState> state);
+    int32_t SetAuthManager(std::shared_ptr<DmAuthManager> authManager);
+    int32_t SetAuthContext(std::shared_ptr<DmAuthRequestContext> context);
     std::shared_ptr<DmAuthRequestContext> GetAuthContext();
 
 protected:
@@ -47,48 +46,48 @@ protected:
 class AuthRequestInitState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestNegotiateState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 class AuthRequestNegotiateDoneState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestReplyState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestInputState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestJoinState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestNetworkState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 
 class AuthRequestFinishState : public AuthRequestState {
 public:
     int32_t GetStateType() override;
-    void Enter() override;
+    int32_t Enter() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

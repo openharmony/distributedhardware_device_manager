@@ -31,6 +31,8 @@
 #include "session.h"
 #include "softbus_session.h"
 #include "softbus_session_callback.h"
+#include "dm_auth_manager.h"
+#include "auth_response_state.h"
 
 namespace OHOS {
 namespace DistributedHardware {

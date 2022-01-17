@@ -16,6 +16,7 @@
 #ifndef OHOS_EVENT_MANAGER_ADAPT_H
 #define OHOS_EVENT_MANAGER_ADAPT_H
 
+#include <functional>
 #include <map>
 #include <mutex>
 
@@ -30,18 +31,19 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using CommomEventCallback = void (*)(void);
+using CommomEventCallback = std::function<void(void)>;
 
 class DmCommonEventManager {
 DECLARE_SINGLE_INSTANCE_BASE(DmCommonEventManager);
 public:
-    bool SubscribeServiceEvent(const std::string &event, CommomEventCallback callback);
+    bool SubscribeServiceEvent(const std::string &event, const CommomEventCallback &callback);
     bool UnsubscribeServiceEvent(const std::string &event);
     void Test(const std::string &event);
     class EventSubscriber : public EventFwk::CommonEventSubscriber {
     public:
-        EventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, CommomEventCallback callback,
-            std::string event) : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback), event_(event) {}
+        EventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, const CommomEventCallback &callback,
+            const std::string &event) : EventFwk::CommonEventSubscriber(subscribeInfo),
+            callback_(callback), event_(event) {}
         void OnReceiveEvent(const EventFwk::CommonEventData &data);
         void TestCommonEvent(const std::string &event);
     private:

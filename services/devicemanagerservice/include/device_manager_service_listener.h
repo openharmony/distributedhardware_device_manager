@@ -32,7 +32,7 @@ public:
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
-                      const std::string &reason);
+                      int32_t reason);
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
                             const std::string &flag);
     void OnFaCall(std::string &pkgName, std::string &paramJson);

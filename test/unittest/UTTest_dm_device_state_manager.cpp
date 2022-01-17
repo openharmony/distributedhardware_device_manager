@@ -147,7 +147,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnProfileReady_001, testing::ext::TestSize.Le
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_GE(result, 0);
+    ASSERT_NE(result, 0);
 }
 
 /**
@@ -166,7 +166,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Lev
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_GE(result, 0);
+    ASSERT_NE(result, 0);
 }
 
 /**
@@ -185,7 +185,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_GE(result, 0);
+    ASSERT_NE(result, 0);
 }
 
 /**

@@ -47,7 +47,7 @@ private:
     void CreateSyncGroupMessage(nlohmann::json &json);
     void CreateResponseAuthMessage(nlohmann::json &json);
     void ParseAuthResponseMessage(nlohmann::json &json);
-    void ParseAuthRequestMessage();
+    int32_t ParseAuthRequestMessage();
     void ParseNegotiateMessage(const nlohmann::json &json);
     void CreateResponseFinishMessage(nlohmann::json &json);
     void ParseResponseFinishMessage(nlohmann::json &json);

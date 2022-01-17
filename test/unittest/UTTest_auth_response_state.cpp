@@ -15,6 +15,7 @@
 
 #include "UTTest_auth_response_state.h"
 
+#include "auth_message_processor.h"
 #include "auth_response_state.h"
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
@@ -89,7 +90,7 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager = nullptr;
     authResponseState->authManager_ = authManager;
-    int32_t ret = authResponseState->TransitionTo(std::make_shared<AuthResponseNegotiateState>(););
+    int32_t ret = authResponseState->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
     ASSERT_EQ(ret, DM_FAILED);
     sleep(15);
 }
@@ -107,15 +108,15 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    std::shared_ptr<DmAuthResponseContext> context = std::make_shared<DmAuthResponseContext>();
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
+    authManager->authResponseState_ = std::make_shared<AuthResponseInitState>();
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     context->sessionId = 123456;
-    authRequestState->SetAuthContext(context);
-    authRequestState->SetAuthManager(authManager);
-    int32_t ret = authRequestState->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
+    authResponseState->SetAuthContext(context);
+    authResponseState->SetAuthManager(authManager);
+    int32_t ret = authResponseState->TransitionTo(std::make_shared<AuthResponseInitState>());
     ASSERT_EQ(ret, DM_OK);
     sleep(20);
 }
@@ -208,6 +209,9 @@ HWTEST_F(AuthResponseStateTest, Enter_003, testing::ext::TestSize.Level0)
     authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     authManager->authResponseContext_->deviceId = "111";
     authManager->authResponseContext_->localDeviceId = "222";
+    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
+    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
+    authManager->RegisterCallback();
     authResponseState->SetAuthManager(authManager);
     std::shared_ptr<DmAuthResponseContext> context = std::make_shared<DmAuthResponseContext>();
     context->deviceId = "123456";
@@ -317,14 +321,16 @@ HWTEST_F(AuthResponseStateTest, Enter_006, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthResponseStateTest, Enter_007, testing::ext::TestSize.Level0)
 {
+    printf("1\n");
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseGroupState>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseState_ = std::make_shared<AuthResponseGroupState>();
+    printf("2\n");
     authResponseState->SetAuthManager(authManager);
+    printf("3\n");
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);
     sleep(15);

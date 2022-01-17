@@ -79,7 +79,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
     std::string deviceId = "dkdkd";
     std::string token = "kdkddk";
     int32_t status = 3;
-    std::string reason = "kddk";
+    int32_t reason = 2006;
     listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
     std::shared_ptr<IpcNotifyAuthResultReq> pReq =
         std::static_pointer_cast<IpcNotifyAuthResultReq>(listener_->ipcServerListener_.req_);
