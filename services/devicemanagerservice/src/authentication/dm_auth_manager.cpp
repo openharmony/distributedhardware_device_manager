@@ -728,5 +728,25 @@ int32_t DmAuthManager::OnUserOperation(int32_t action)
     }
     return DM_OK;
 }
+
+void DmAuthManager::UserSwitchEventCallback (void) 
+{
+    LOGI("all groups from this device will be deleted");
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    std::string queryParams = jsonObj.dump();
+    std::vector<GroupInfo> groupList;
+    int32_t ret = hiChainConnector_->GetGroupInfo(queryParams, groupList); 
+    if (ret != DM_OK) {
+        LOGE("failed to get device join groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        ret = hiChainConnector_->DeleteGroup(iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("fail to delete group");
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

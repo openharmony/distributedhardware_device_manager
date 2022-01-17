@@ -31,10 +31,10 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerService {
-    DECLARE_SINGLE_INSTANCE(DeviceManagerService);
-
+DECLARE_SINGLE_INSTANCE_BASE(DeviceManagerService);
 public:
     int32_t Init();
+    ~DeviceManagerService();
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
@@ -49,8 +49,9 @@ public:
     int32_t VerifyAuthentication(const std::string &authParam);
     int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
     int32_t SetUserOperation(std::string &pkgName, int32_t action);
-
 private:
+    DeviceManagerService() = default;
+private: 
     bool intFlag_ = false;
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceInfoManager> deviceInfoMgr_;
