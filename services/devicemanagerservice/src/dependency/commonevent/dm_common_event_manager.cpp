@@ -61,7 +61,7 @@ void DmCommonEventManager::DealCallback(void)
     }
 }
 
-bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, CommomEventCallback callback)
+bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, const CommomEventCallback &callback)
 {
     LOGI("Subscribe event: %s", event.c_str());
     if (dmEventSubscriber_.find(event) != dmEventSubscriber_.end() || callback == nullptr) {

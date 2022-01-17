@@ -61,12 +61,11 @@ public:
     int32_t DeleteGroup(std::string &groupId);
     bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
     int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
-
+    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
     int32_t GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList);
-    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
     std::string GetConnectPara(std::string deviceId, std::string reqDeviceId);
     bool IsGroupCreated(std::string groupName, GroupInfo &groupInfo);
     bool IsGroupInfoInvalid(GroupInfo &group);

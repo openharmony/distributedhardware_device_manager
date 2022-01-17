@@ -160,6 +160,7 @@ public:
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
     int32_t RegisterCallback();
     int32_t OnUserOperation(int32_t action);
+    void UserSwitchEventCallback(void);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

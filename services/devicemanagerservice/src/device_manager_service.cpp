@@ -15,14 +15,29 @@
 
 #include "device_manager_service.h"
 
+#include <functional>
+
 #include "device_manager_service_listener.h"
 #include "dm_constants.h"
 #include "dm_device_info_manager.h"
 #include "dm_log.h"
+#include "common_event_support.h"
+#include "dm_common_event_manager.h"
+
+using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
+
+DeviceManagerService::~DeviceManagerService()
+{
+    LOGI("DeviceManagerService destructor");
+    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
+    if (dmCommonEventManager.UnsubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_STOPPED)) {
+        LOGI("subscribe service event success");
+    }
+}
 
 int32_t DeviceManagerService::Init()
 {
@@ -74,6 +89,13 @@ int32_t DeviceManagerService::Init()
         }
         authMgr_->RegisterCallback();
     }
+
+    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
+    CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get());
+    if (dmCommonEventManager.SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
+        LOGI("subscribe service event success");
+    } 
+
     LOGI("Init success, singleton initialized");
     intFlag_ = true;
     return DM_OK;
