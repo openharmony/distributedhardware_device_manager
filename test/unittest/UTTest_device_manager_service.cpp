@@ -350,7 +350,7 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_002, testing::ext::TestS
     std::string authParam = "jdjjjj";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().authMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_);
+    DeviceManagerService::GetInstance().authMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_, nullptr);
     std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(INPUT_TIMEOUT_TASK);
     DeviceManagerService::GetInstance().authMgr_->timerMap_[INPUT_TIMEOUT_TASK] = inputStartTimer;
     int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
