@@ -122,7 +122,7 @@ class DmAuthManager final : public ISoftbusSessionCallback,
                             public std::enable_shared_from_this<DmAuthManager> {
 public:
     DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                  std::shared_ptr<DeviceManagerServiceListener> listener, 
+                  std::shared_ptr<DeviceManagerServiceListener> listener,
                   std::shared_ptr<HiChainConnector> hiChainConnector_);
     ~DmAuthManager();
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
