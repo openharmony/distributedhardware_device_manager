@@ -37,6 +37,8 @@ DeviceManagerService::~DeviceManagerService()
     if (dmCommonEventManager.UnsubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_STOPPED)) {
         LOGI("subscribe service event success");
     }
+    softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
+    hiChainConnector_->UnRegisterHiChainCallback();
 }
 
 int32_t DeviceManagerService::Init()
@@ -56,6 +58,13 @@ int32_t DeviceManagerService::Init()
         listener_ = std::make_shared<DeviceManagerServiceListener>();
         if (softbusConnector_ == nullptr) {
             LOGE("Init failed, listener_ apply for failure");
+            return DM_MAKE_SHARED_FAIL;
+        }
+    }
+    if (hiChainConnector_ == nullptr) {
+        hiChainConnector_ = std::make_shared<HiChainConnector>();
+        if (hiChainConnector_ == nullptr) {
+            LOGE("Init failed, hiChainConnector_ apply for failure");
             return DM_MAKE_SHARED_FAIL;
         }
     }
@@ -82,12 +91,13 @@ int32_t DeviceManagerService::Init()
         }
     }
     if (authMgr_ == nullptr) {
-        authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, listener_);
+        authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, listener_, hiChainConnector_);
         if (authMgr_ == nullptr) {
             LOGE("Init failed, authMgr_ apply for failure");
             return DM_MAKE_SHARED_FAIL;
         }
-        authMgr_->RegisterCallback();
+        softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
+        hiChainConnector_->RegisterHiChainCallback(authMgr_);
     }
     DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
     CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get());

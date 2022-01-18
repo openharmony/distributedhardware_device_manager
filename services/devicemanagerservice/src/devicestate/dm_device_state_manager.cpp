@@ -31,7 +31,7 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
 DmDeviceStateManager::~DmDeviceStateManager()
 {
     LOGI("DmDeviceStateManager destructor");
-    softbusConnector_->UnRegisterSoftbusStateCallback("");
+    softbusConnector_->UnRegisterSoftbusStateCallback("DM_PKG_NAME");
 }
 
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)

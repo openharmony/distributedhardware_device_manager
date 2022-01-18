@@ -59,20 +59,17 @@ static void TimeOut(void *data)
 }
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                             std::shared_ptr<DeviceManagerServiceListener> listener)
-    : softbusConnector_(softbusConnector), listener_(listener)
+                             std::shared_ptr<DeviceManagerServiceListener> listener,
+                             std::shared_ptr<HiChainConnector> hiChainConnector)
+    : softbusConnector_(softbusConnector), hiChainConnector_(hiChainConnector), listener_(listener)
 {
     LOGI("DmAuthManager constructor");
-    hiChainConnector_ = std::make_shared<HiChainConnector>();
-
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
     dmConfigManager.GetAuthAdapter(authenticationMap_);
 }
 
 DmAuthManager::~DmAuthManager()
 {
-    softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
-    hiChainConnector_->UnRegisterHiChainCallback();
     LOGI("DmAuthManager destructor");
 }
 
@@ -694,13 +691,6 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
         authParam.business = BUSINESS_FA_MIRGRATION;
         authParam.pincode = authResponseContext_->code;
     }
-    return DM_OK;
-}
-
-int32_t DmAuthManager::RegisterCallback()
-{
-    softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(shared_from_this());
-    hiChainConnector_->RegisterHiChainCallback(shared_from_this());
     return DM_OK;
 }
 

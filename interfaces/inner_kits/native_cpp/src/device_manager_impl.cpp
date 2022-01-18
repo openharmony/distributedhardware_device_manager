@@ -258,7 +258,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("StartDeviceDiscovery error: Failed with ret %d", ret);
-        return DM_IPC_RESPOND_ERROR;
+        return ret;
     }
 
     LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
@@ -292,7 +292,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("StopDeviceDiscovery error: Failed with ret %d", ret);
-        return DM_IPC_RESPOND_ERROR;
+        return ret;
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);

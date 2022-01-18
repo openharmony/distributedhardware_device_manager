@@ -59,6 +59,7 @@ private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
