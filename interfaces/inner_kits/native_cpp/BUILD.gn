@@ -64,6 +64,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_runtime:app_manager",
       "appexecfwk_standard:appexecfwk_base",
       "appexecfwk_standard:appexecfwk_core",
       "hiviewdfx_hilog_native:libhilog",
