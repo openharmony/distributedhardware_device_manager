@@ -70,6 +70,11 @@ bool DeviceManagerImpl::isSystemAppCalling(void)
 
     LOGI("get bundle manager proxy success.");
     sptr<IBundleMgr> iBundleMgr = iface_cast<IBundleMgr>(remoteObject);
+    if (iBundleMgr == nullptr) {
+        LOGI("iBundleMgr is nullptr, caller may be a process");
+        return true;
+    }
+
     return iBundleMgr->CheckIsSystemAppByUid(uid);
 }
 
