@@ -69,6 +69,7 @@ if (defined(ohos_lite)) {
       "appexecfwk_standard:appexecfwk_core",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "resmgr_standard:global_resmgr",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
     ]
