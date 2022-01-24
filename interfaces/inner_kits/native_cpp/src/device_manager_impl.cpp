@@ -60,12 +60,12 @@ bool DeviceManagerImpl::isSystemAppCalling(void)
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
         LOGE("failed to get system ability mgr.");
-        return false;
+        return true;
     }
     sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (remoteObject == nullptr) {
         LOGE("failed to get bundle manager proxy.");
-        return false;
+        return true;
     }
 
     LOGI("get bundle manager proxy success.");
