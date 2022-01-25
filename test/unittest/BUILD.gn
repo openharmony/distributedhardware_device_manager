@@ -358,12 +358,12 @@ ohos_static_library("device_manager_test") {
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_core",
     "ces_standard:cesfwk_innerkits",
     "dsoftbus_standard:softbus_client",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
