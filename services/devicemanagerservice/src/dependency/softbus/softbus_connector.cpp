@@ -443,13 +443,14 @@ void SoftbusConnector::OnSoftBusDeviceOnline(NodeBasicInfo *info)
         return;
     }
 
-    if (discoveryDeviceInfoMap_.empty()) {
-        return;
-    }
     DmDeviceInfo dmDeviceInfo;
     CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     for (auto &iter : stateCallbackMap_) {
         iter.second->OnDeviceOnline(iter.first, dmDeviceInfo);
+    }
+
+    if (discoveryDeviceInfoMap_.empty()) {
+        return;
     }
     // remove the discovery node map
     uint8_t udid[UDID_BUF_LEN] = {0};

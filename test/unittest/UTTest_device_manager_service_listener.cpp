@@ -63,7 +63,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     int32_t dmState = pReq->GetDeviceState();
-    EXPECT_EQ(1, dmState);
+    EXPECT_EQ(0, dmState);
 }
 
 /**
@@ -83,7 +83,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
     listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
     std::shared_ptr<IpcNotifyAuthResultReq> pReq =
         std::static_pointer_cast<IpcNotifyAuthResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -104,7 +104,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnVerifyAuthResult_001, testing::ext:
     listener_->OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
     std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
         std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetDeviceId();
+    std::string ret = pReq->GetDeviceId();
     EXPECT_EQ(ret, deviceId);
 }
 } // namespace

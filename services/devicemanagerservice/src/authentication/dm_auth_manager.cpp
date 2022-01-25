@@ -97,7 +97,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     if (extra.empty()) {
         LOGE("AuthenticateDevice failed, extra is empty");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_BUSINESS_BUSY);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_INPUT_PARA_EMPTY);
         return DM_INPUT_PARA_EMPTY;
     }
 

@@ -337,26 +337,6 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestS
     int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
     EXPECT_EQ(ret, DM_NOT_INIT);
 }
-
-/**
- * @tc.name: VerifyAuthentication_002
- * @tc.desc:Set intFlag for VerifyAuthentication to true and  set authParam = "jdjjjj"，The return value is  DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_002, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().intFlag_ = true;
-    std::string authParam = "jdjjjj";
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, listener_, nullptr);
-    std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(INPUT_TIMEOUT_TASK);
-    DeviceManagerService::GetInstance().authMgr_->timerMap_[INPUT_TIMEOUT_TASK] = inputStartTimer;
-    int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
-    EXPECT_EQ(ret, DM_FAILED);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

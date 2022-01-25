@@ -40,7 +40,8 @@ namespace {
 std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_, nullptr);
+std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_, hiChainConnector);
 
 /**
  * @tc.name: OpenAuthSession_001
