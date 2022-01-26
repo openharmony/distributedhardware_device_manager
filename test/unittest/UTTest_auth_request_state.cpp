@@ -54,7 +54,8 @@ std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainCon
  */
 HWTEST_F(AuthRequestStateTest, SetAuthManager_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authRequestState->SetAuthManager(authManager);
     int32_t ret = authRequestState->authManager_.use_count();
@@ -89,7 +90,8 @@ HWTEST_F(AuthRequestStateTest, SetAuthManager_002, testing::ext::TestSize.Level0
  */
 HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authManager = nullptr;
     authRequestState->authManager_ = authManager;
@@ -107,7 +109,8 @@ HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
     std::shared_ptr<DmTimer> negotiateStartTimer = std::make_shared<DmTimer>(NEGOTIATE_TIMEOUT_TASK);
@@ -151,7 +154,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authManager = nullptr;
     authRequestState->SetAuthManager(authManager);
@@ -169,7 +173,8 @@ HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -206,7 +211,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -223,7 +229,8 @@ HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_004, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateState>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -265,7 +272,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_003, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -282,7 +290,8 @@ HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_006, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
     std::shared_ptr<DmTimer> negotiateStartTimer = std::make_shared<DmTimer>(NEGOTIATE_TIMEOUT_TASK);
     authManager->timerMap_[NEGOTIATE_TIMEOUT_TASK] = negotiateStartTimer;
@@ -325,7 +334,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_004, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReplyState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -342,7 +352,8 @@ HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReplyState>();
     std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(CONFIRM_TIMEOUT_TASK);
     authManager->timerMap_[CONFIRM_TIMEOUT_TASK] = inputStartTimer;
@@ -386,7 +397,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInputState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -403,7 +415,8 @@ HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInputState>();
     authRequestState->SetAuthManager(authManager);
     int32_t ret = authRequestState->Enter();
@@ -434,7 +447,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_006, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestJoinState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -451,7 +465,8 @@ HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestJoinState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
@@ -497,7 +512,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_007, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -514,7 +530,8 @@ HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     std::shared_ptr<DmTimer> authenticateStartTimer = std::make_shared<DmTimer>(AUTHENTICATE_TIMEOUT_TASK);
     authManager->timerMap_[AUTHENTICATE_TIMEOUT_TASK] = authenticateStartTimer;
@@ -555,7 +572,8 @@ HWTEST_F(AuthRequestStateTest, GetStateType_008, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
@@ -572,7 +590,8 @@ HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level0)
  */
 HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> authManager = std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(CONFIRM_TIMEOUT_TASK);
     authManager->timerMap_[CONFIRM_TIMEOUT_TASK] = inputStartTimer;

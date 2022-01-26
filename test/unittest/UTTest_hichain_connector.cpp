@@ -44,7 +44,8 @@ namespace {
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-std::shared_ptr<DmAuthManager> discoveryMgr_ = std::make_shared<DmAuthManager>(softbusConnector, listener_,hiChainConnector_);
+std::shared_ptr<DmAuthManager> discoveryMgr_ =
+    std::make_shared<DmAuthManager>(softbusConnector, listener_, hiChainConnector_);
 
 /**
  * @tc.name: CreateGroup_001
@@ -262,8 +263,7 @@ HWTEST_F(HichainConnectorTest, HiChainConnector_002, testing::ext::TestSize.Leve
 HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    int ret =
-        hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
+    int ret = hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr_));
     EXPECT_EQ(ret, DM_OK);
 }
 
