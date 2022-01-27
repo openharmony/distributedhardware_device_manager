@@ -13,7 +13,7 @@
     "component": {
         "name": "device_manager_base",
         "subsystem": "distributedhardware",
-        "syscap":[ "systemcapbility.distributedhardware.devicemanager" ],
+        "syscap":[ "SystemCapability.DistributedHardware.DeviceManager" ],
         "features":[],
         "adapted_system_type": [ "standard", "small" ],
         "rom": "2M",
