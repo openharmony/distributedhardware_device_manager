@@ -73,8 +73,9 @@ struct DmNapiStateJsCallback {
     int32_t reason_;
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo_;
 
-    DmNapiStateJsCallback(std::string bundleName, uint16_t subscribeId, int32_t reason, OHOS::DistributedHardware::DmDeviceInfo deviceInfo)
-    : bundleName_(bundleName), subscribeId_(subscribeId), reason_(reason), deviceInfo_(deviceInfo) {}
+    DmNapiStateJsCallback(std::string bundleName, uint16_t subscribeId, int32_t reason,
+        OHOS::DistributedHardware::DmDeviceInfo deviceInfo)
+        : bundleName_(bundleName), subscribeId_(subscribeId), reason_(reason), deviceInfo_(deviceInfo) {}
 };
 
 struct DmNapiAuthJsCallback {
@@ -84,8 +85,9 @@ struct DmNapiAuthJsCallback {
     int32_t status_;
     int32_t reason_;
 
-    DmNapiAuthJsCallback(std::string bundleName, std::string deviceId, std::string token, int32_t status, int32_t reason)
-    : bundleName_(bundleName), deviceId_(deviceId), token_(token), status_(status), reason_(reason) {}
+    DmNapiAuthJsCallback(std::string bundleName, std::string deviceId, std::string token, int32_t status,
+        int32_t reason)
+        : bundleName_(bundleName), deviceId_(deviceId), token_(token), status_(status), reason_(reason) {}
 };
 
 struct DmNapiVerifyJsCallback {
@@ -95,7 +97,7 @@ struct DmNapiVerifyJsCallback {
     int32_t flag_;
 
     DmNapiVerifyJsCallback(std::string bundleName, std::string deviceId, int32_t resultCode, int32_t flag)
-    : bundleName_(bundleName), deviceId_(deviceId), resultCode_(resultCode), flag_(flag) {}
+        : bundleName_(bundleName),deviceId_(deviceId), resultCode_(resultCode), flag_(flag) {}
 };
 
 enum DmNapiDevStateChangeAction { ONLINE = 0, READY = 1, OFFLINE = 2, CHANGE = 3 };
@@ -133,7 +135,8 @@ private:
 
 class DmNapiDiscoveryCallback : public OHOS::DistributedHardware::DiscoveryCallback {
 public:
-    explicit DmNapiDiscoveryCallback(napi_env env, std::string &bundleName) : env_(env), refCount_(0), bundleName_(bundleName)
+    explicit DmNapiDiscoveryCallback(napi_env env, std::string &bundleName)
+         : env_(env), refCount_(0), bundleName_(bundleName)
     {
     }
     virtual ~DmNapiDiscoveryCallback() {};
