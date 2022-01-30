@@ -329,7 +329,6 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
         return;
     }
-    DmDeviceInfo info;
     std::unique_ptr<DmNapiAuthJsCallback> jsCallback =
         std::make_unique<DmNapiAuthJsCallback>(bundleName_, deviceId, token, status, reason);
     work->data = reinterpret_cast<void *>(jsCallback.get());
@@ -362,7 +361,6 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
         LOGE("DmNapiVerifyAuthCallback: OnVerifyAuthResult, No memory");
         return;
     }
-    DmDeviceInfo info;
     std::unique_ptr<DmNapiVerifyJsCallback> jsCallback =
         std::make_unique<DmNapiVerifyJsCallback>(bundleName_, deviceId, resultCode, flag);
     work->data = reinterpret_cast<void *>(jsCallback.get());
@@ -1618,7 +1616,7 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
     LOGI("JsOn for bunderName %s, eventType %s ", deviceManagerWrapper->bundleName_.c_str(), eventType.c_str());
     deviceManagerWrapper->On(eventType, argv[num + 1]);
 
-    CreateDmCallback(deviceManagerWrapper->bundleName_, eventType);
+    CreateDmCallback(env, deviceManagerWrapper->bundleName_, eventType);
 
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
