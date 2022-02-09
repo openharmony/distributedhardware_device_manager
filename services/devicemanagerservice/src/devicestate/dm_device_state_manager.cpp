@@ -55,7 +55,6 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
             remoteDeviceInfos_[uuid] = saveInfo;
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
                  info.deviceId, deviceUdid.c_str(), uuid.c_str());
-            profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
             LOGI("RegisterProfileListener out");
         }
     }
@@ -72,7 +71,6 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
     if (profileAdapter == nullptr) {
         LOGE("OnDeviceOffline profile adapter is null");
     } else {
-        profileAdapter->UnRegisterProfileListener(pkgName);
         std::string uuid;
         SoftbusConnector::GetUuidByNetworkId(info.deviceId, uuid);
         auto iter = remoteDeviceInfos_.find(std::string(info.deviceId));
