@@ -148,7 +148,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         return DM_FAILED;
     }
     uint8_t udid[UDID_BUF_LEN] = {0};
-    int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(deviceId.c_str(), NodeDeivceInfoKey::NODE_KEY_UDID, udid,
+    int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(deviceId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid,
                                                               sizeof(udid));
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");

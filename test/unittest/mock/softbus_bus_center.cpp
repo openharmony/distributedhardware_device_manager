@@ -15,7 +15,7 @@
 
 #include "softbus_connector.h"
 
-int32_t GetNodeKeyInfo(const char *pkgName, const char *networkId, NodeDeivceInfoKey key, uint8_t *info,
+int32_t GetNodeKeyInfo(const char *pkgName, const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
                        int32_t infoLen)
 {
     return 0;

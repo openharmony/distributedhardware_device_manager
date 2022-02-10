@@ -211,7 +211,7 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     return DM_OK;
 }
 
-int32_t SoftbusConnector::GetNodeKeyInfoByNetworkId(const char *networkId, NodeDeivceInfoKey key, uint8_t *info,
+int32_t SoftbusConnector::GetNodeKeyInfoByNetworkId(const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
                                                     int32_t infoLen)
 {
     LOGI("GetNodeKeyInfoByNetworkId begin");
@@ -231,7 +231,7 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
     LOGI("GetUdidByNetworkId begin");
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeivceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
+        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId GetNodeKeyInfo failed");
         return DM_FAILED;
@@ -246,7 +246,7 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
     LOGI("GetUuidByNetworkId begin");
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeivceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
+        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
         return DM_FAILED;
@@ -278,7 +278,7 @@ bool SoftbusConnector::IsDeviceOnLine(const std::string &deviceId)
             break;
         }
         uint8_t udid[UDID_BUF_LEN] = {0};
-        int32_t ret = GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId.c_str(), NodeDeivceInfoKey::NODE_KEY_UDID, udid,
+        int32_t ret = GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid,
                                      sizeof(udid));
         if (ret != DM_OK) {
             LOGE("DM_IsDeviceOnLine GetNodeKeyInfo failed");
@@ -455,7 +455,7 @@ void SoftbusConnector::OnSoftBusDeviceOnline(NodeBasicInfo *info)
     // remove the discovery node map
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME.c_str(), info->networkId, NodeDeivceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
+        GetNodeKeyInfo(DM_PKG_NAME.c_str(), info->networkId, NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
     if (ret != DM_OK) {
         LOGE("GetNodeKeyInfo failed");
         return;
