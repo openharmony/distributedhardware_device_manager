@@ -92,6 +92,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    LOGI("SendCmd cmdCode: %d", cmdCode);
     return DM_OK;
 }
 

@@ -133,6 +133,8 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
         LOGE("IpcClientManager::SendRequest DM_SERVICE_NOT_READY");
         return DM_SERVICE_NOT_READY;
     }
+
+    LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
     return dmInterface_->SendCmd(cmdCode, req, rsp);
 }
 
