@@ -23,20 +23,17 @@ if (defined(ohos_lite)) {
   shared_library("devicemanagerutils") {
   }
 } else {
-  ohos_shared_library("devicemanagerutils") {
+  config("devicemanagerutils_config") {
     include_dirs = [
+      "include",
+      "include/ipc/standard",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "include",
-      "include/ipc/standard",
-      "//utils/native/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/security/deviceauth/interfaces/innerkits",
-      "//base/startup/syspara_lite/adapter/native/syspara/include",
-      "//third_party/json/include",
     ]
+  }
 
+  ohos_shared_library("devicemanagerutils") {
     sources = [
       "src/dm_anonymous.cpp",
       "src/dm_log.cpp",
@@ -44,10 +41,7 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_cmd_register.cpp",
     ]
 
-    deps = [
-      "//third_party/mbedtls:mbedtls_shared",
-      "//utils/native/base:utils",
-    ]
+    public_configs = [ ":devicemanagerutils_config" ]
 
     defines = [
       "HI_LOG_ENABLE",
@@ -55,9 +49,12 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
+    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
+
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"

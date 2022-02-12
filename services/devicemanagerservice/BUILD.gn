@@ -24,7 +24,7 @@ if (defined(ohos_lite)) {
     sources = [ "src/ipc/lite/ipc_server_main.cpp" ]
   }
 } else {
-  ohos_shared_library("devicemanagerservice") {
+  config("devicemanagerservice_config") {
     include_dirs = [
       "include",
       "include/config",
@@ -44,22 +44,12 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${utils_path}/include",
-      "${utils_path}/include/ipc/standard",
-      "${innerkits_path}/native_cpp/include",
-      "${innerkits_path}/native_cpp/include/ipc",
-      "${innerkits_path}/native_cpp/include/ipc/standard",
-      "//utils/native/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/notification/ces_standard/frameworks/core/include",
-      "//base/notification/ces_standard/interfaces/innerkits/native/include",
       "//base/security/deviceauth/interfaces/innerkits",
-      "//base/startup/syspara_lite/interfaces/kits",
-      "//base/startup/syspara_lite/adapter/native/syspara/include",
       "//third_party/json/include",
-      "//third_party/flutter/skia",
     ]
+  }
 
+  ohos_shared_library("devicemanagerservice") {
     sources = [
       "src/ability/standard/dm_ability_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",
@@ -85,6 +75,14 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_server_stub.cpp",
     ]
 
+    public_configs = [ ":devicemanagerservice_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerservice\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
+
     deps = [
       "${common_path}/include/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
@@ -95,16 +93,10 @@ if (defined(ohos_lite)) {
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
       "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
       "//foundation/windowmanager/wm:libwm",
-      "//utils/native/base:utils",
-    ]
-
-    defines = [
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagerservice\"",
-      "LOG_DOMAIN=0xD004100",
     ]
 
     external_deps = [
+      "ability_runtime:app_manager",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "ces_standard:cesfwk_core",
@@ -117,6 +109,7 @@ if (defined(ohos_lite)) {
       "samgr_standard:samgr_proxy",
       "startup_l2:syspara",
       "startup_l2:syspara_watchagent",
+      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"

@@ -22,7 +22,7 @@ if (defined(ohos_lite)) {
   shared_library("devicemanagersdk") {
   }
 } else {
-  ohos_shared_library("devicemanagersdk") {
+  config("devicemanagersdk_config") {
     include_dirs = [
       "include",
       "include/ipc",
@@ -31,15 +31,10 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${utils_path}/include",
-      "${utils_path}/include/ipc/standard",
-      "//third_party/json/include",
-      "//utils/native/base/include",
-      "//utils/system/safwk/native/include",
-      "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
-      "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     ]
+  }
 
+  ohos_shared_library("devicemanagersdk") {
     sources = [
       "src/device_manager.cpp",
       "src/device_manager_impl.cpp",
@@ -51,11 +46,7 @@ if (defined(ohos_lite)) {
       "src/notify/device_manager_notify.cpp",
     ]
 
-    deps = [
-      "${utils_path}:devicemanagerutils",
-      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-      "//utils/native/base:utils",
-    ]
+    public_configs = [ ":devicemanagersdk_config" ]
 
     defines = [
       "HI_LOG_ENABLE",
@@ -63,14 +54,18 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
+    deps = [
+      "${utils_path}:devicemanagerutils",
+      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    ]
+
     external_deps = [
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
-      "resmgr_standard:global_resmgr",
-      "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
+      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"
