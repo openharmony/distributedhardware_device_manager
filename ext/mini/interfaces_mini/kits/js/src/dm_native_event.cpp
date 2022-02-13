@@ -88,11 +88,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, uint8_t argsSize, cons
          DMLOG(DM_LOG_INFO, "OnEvent for %s handlerRef is null", eventType.c_str());
          return;
     }
-    if (listener->thisVarRef_ == nullptr || listener->thisVarRef_ == JSI::CreateUndefined() || listener->thisVarRef_ == JSI::CreateNull()){
-        DMLOG(DM_LOG_INFO, "OnEvent for %s thisVarRef_ is null", eventType.c_str());
-        return;
-    }
-   
+    
     FuncParams* params = new FuncParams();
     params->handlerRef = listener->handlerRef;
     params->thisVarRef_ = listener->thisVarRef_; 

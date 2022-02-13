@@ -21,6 +21,7 @@
 #include "device_manager_log.h"
 #include "constants.h"
 #include "jsi_types.h"
+#include "js_async_work.h"
 
 using namespace OHOS::DistributedHardware;
 using namespace std;
@@ -96,8 +97,6 @@ void DeviceManagerModule::OnRemoteDied()
 {
    OnEvent("serviceDie", 0, nullptr);
 }
-
-
 
 
 void DmJSIDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
@@ -229,9 +228,8 @@ void DeviceManagerModule::OnDeviceStateChange(DmJSIDevStateChangeAction action, 
    JSI::SetStringProperty(device, "deviceName", deviceInfo.deviceName);
    JSI::SetNumberProperty(device, "deviceTypeId", (double)deviceInfo.deviceTypeId);
 
-   JSI::SetNamedProperty(result, "device", device);
-   
-   //OnEvent("deviceStateChange", DM_JSI_ARGS_ONE, &result);
+   JSIValue param[2] = {result, device};
+   OnEvent("deviceStateChange", DM_JSI_ARGS_TWO, param);
    JSI::ReleaseValueList(result, device, ARGS_END);
 }
 
@@ -249,9 +247,8 @@ void DeviceManagerModule::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo
     DMLOG(DM_LOG_INFO, "OnDeviceFound deviceId %s ", deviceInfo.deviceId);    
     DMLOG(DM_LOG_INFO, "OnDeviceFound deviceName %s ", deviceInfo.deviceName);    
     DMLOG(DM_LOG_INFO, "OnDeviceFound deviceTypeId %x ", deviceInfo.deviceTypeId);    
-    //JSI::SetNamedProperty(result, "device", device);
+   
     JSIValue param[2] = {result, device};
-    
     OnEvent("deviceFound", DM_JSI_ARGS_TWO, param);
     JSI::ReleaseValueList(result, device, ARGS_END);
 }
@@ -261,9 +258,12 @@ void DeviceManagerModule::OnDiscoverFailed(uint16_t subscribeId, int32_t failedR
     DMLOG(DM_LOG_INFO, "OnDiscoverFailed for subscribeId %d", (int32_t)subscribeId);
     JSIValue result = JSI::CreateObject();
     JSI::SetNumberProperty(result, "subscribeId", (double)subscribeId);
-    JSI::SetNumberProperty(result, "reason", (double)failedReason);
-   // OnEvent("discoverFail", DM_JSI_ARGS_ONE, result);
-    JSI::ReleaseValue(result);
+    JSIValue reason = JSI::CreateObject();
+    JSI::SetNumberProperty(reason, "reason", (double)failedReason);
+
+    JSIValue param[2] = {result, reason};
+    OnEvent("discoverFail", DM_JSI_ARGS_TWO, param);
+    JSI::ReleaseValueList(result, reason, ARGS_END);
 }
 
 void DeviceManagerModule::OnDmfaCall(const std::string &paramJson)
@@ -271,68 +271,93 @@ void DeviceManagerModule::OnDmfaCall(const std::string &paramJson)
     DMLOG(DM_LOG_INFO, "OnCall for paramJson");
     JSIValue result = JSI::CreateObject();
     JSI::SetStringProperty(result, "param", paramJson.c_str());
-  //  OnEvent("dmFaCallback", DM_JSI_ARGS_ONE, result);
-    JSI::ReleaseValue(result);
+
+    JSIValue param[1] = {result};
+    OnEvent("dmFaCallback", DM_JSI_ARGS_ONE, param);
+    JSI::ReleaseValueList(result, ARGS_END);
 }
 
 void DeviceManagerModule::OnAuthResult(const std::string &deviceId, int32_t pinToken, int32_t status, int32_t reason)
 {
     DMLOG(DM_LOG_INFO, "OnAuthResult for status: %d, reason: %d", status, reason);
     JSIValue thisVar = authAsyncCallbackInfo_.thisVal_;
-    JSIValue result[DM_JSI_ARGS_TWO] = { 0 };
+    JSIValue success = JSI::GetNamedProperty(authAsyncCallbackInfo_.callback, CB_SUCCESS);
+    JSIValue fail = JSI::GetNamedProperty(authAsyncCallbackInfo_.callback, CB_FAIL);
+
+    JSIValue errOne = JSI::CreateObject();
+    JSIValue errTwo = JSI::CreateObject();
+    JSIValue successOne = JSI::CreateObject();
+    JSIValue successTwo = JSI::CreateObject();
+
     if (status == 0) {
         DMLOG(DM_LOG_INFO, "OnAuthResult success");
-        result[0] = JSI::CreateUndefined();
-        result[1] = JSI::CreateObject();
-        JSI::SetStringProperty(result[1], "deviceId", deviceId.c_str());
-
-        if (authAsyncCallbackInfo_.authType == DM_AUTH_TYPE_PINCODE) {
-            JSI::SetNumberProperty(result[1], "pinTone", (double)pinToken);
-        }
+        JSI::SetStringProperty(successOne, "deviceId", deviceId.c_str());
+        JSI::SetNumberProperty(successTwo, "pinTone", (double)pinToken);
+        JSIValue param[2] = {successOne, successTwo};
+        AuthFuncParams* params =new AuthFuncParams();
+        params->handlerRef = success;
+        params->thisVarRef_ = thisVar; 
+        params->args = param;
+        params->argsSize = DM_JSI_ARGS_TWO;
+        DMLOG(DM_LOG_INFO, "OnAuthResult SuccessCallBack in.");
+        JsAsyncWork::DispatchAsyncWork(AuthRsultVerifyInfoAsyncWorkFunc, reinterpret_cast<void *>(params));
     } else {
         DMLOG(DM_LOG_INFO, "OnAuthResult failed");
-        result[0] = JSI::CreateObject();
-        JSI::SetNumberProperty(result[0], "code", (double)status);
-        JSI::SetNumberProperty(result[0], "reason", (double)reason);
-        result[1] = JSI::CreateUndefined();
-    }
-
-    JSIValue handler = authAsyncCallbackInfo_.callback;  
-    if (JSI::ValueIsFunction(handler)) {
-        JSI::CallFunction(handler, thisVar, &result[0], DM_JSI_ARGS_TWO);      
-    } else {
-        DMLOG(DM_LOG_ERROR, "handler is nullptr");
+        JSI::SetNumberProperty(errOne, "code", (double)status);
+        JSI::SetNumberProperty(errTwo, "reason", (double)reason);
+        JSIValue param[2] = {errOne, errTwo};
+        AuthFuncParams* params =new AuthFuncParams();
+        params->handlerRef = fail;
+        params->thisVarRef_ = thisVar; 
+        params->args = param;
+        params->argsSize = DM_JSI_ARGS_TWO;
+        DMLOG(DM_LOG_INFO, "OnAuthResult FailCallBack in.");
+        JsAsyncWork::DispatchAsyncWork(AuthRsultVerifyInfoAsyncWorkFunc, reinterpret_cast<void *>(params));
+        
     }
     g_authCallbackMap.erase(bundleName_);
-    JSI::ReleaseValueList(thisVar, handler, authAsyncCallbackInfo_.thisVal_, authAsyncCallbackInfo_.callback, ARGS_END);
+    JSI::ReleaseValueList(thisVar, success, fail, errOne, errTwo, successOne, successTwo, authAsyncCallbackInfo_.thisVal_, authAsyncCallbackInfo_.callback, ARGS_END);
 }
 
 void DeviceManagerModule::OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
 {
     DMLOG(DM_LOG_INFO, "OnVerifyResult for resultCode: %d, flag: %d", resultCode, flag);
-    JSIValue thisVar = verifyAsyncCallbackInfo_.thisVal_;//1111111
+    JSIValue thisVar = verifyAsyncCallbackInfo_.thisVal_;
+    JSIValue success = JSI::GetNamedProperty(verifyAsyncCallbackInfo_.callback, CB_SUCCESS);
+    JSIValue fail = JSI::GetNamedProperty(verifyAsyncCallbackInfo_.callback, CB_FAIL);
 
-    JSIValue result[DM_JSI_ARGS_TWO] = { 0 };
+    JSIValue successOne = JSI::CreateObject();
+    JSIValue successTwo = JSI::CreateObject();
+    JSIValue errOne = JSI::CreateObject();
+
     if (resultCode == 0) {
-        result[0] = JSI::CreateUndefined();
-        result[1] = JSI::CreateObject();
-        JSI::SetStringProperty(result[1], "deviceId", deviceId.c_str());
-        JSI::SetNumberProperty(result[1], "level", (double)flag);
+        DMLOG(DM_LOG_INFO, "OnVerifyResult success");
+        JSI::SetStringProperty(successOne, "deviceId", deviceId.c_str());
+        JSI::SetNumberProperty(successTwo, "level", (double)flag);
+        JSIValue param[2] = {successOne, successTwo};
+        AuthFuncParams* params =new AuthFuncParams();
+        params->handlerRef = success;
+        params->thisVarRef_ = thisVar; 
+        params->args = param;
+        params->argsSize = DM_JSI_ARGS_TWO;
+        DMLOG(DM_LOG_INFO, "OnVerifyResult SuccessCallBack in.");
+        JsAsyncWork::DispatchAsyncWork(AuthRsultVerifyInfoAsyncWorkFunc, reinterpret_cast<void *>(params));
+
     } else {
-        result[0] = JSI::CreateObject();
-        JSI::SetNumberProperty(result[0], "code", (double)resultCode);
-        result[1] = JSI::CreateUndefined();
+        DMLOG(DM_LOG_INFO, "OnVerifyResult failed");
+        JSI::SetNumberProperty(errOne, "code", (double)resultCode);
+        JSIValue param[1] = {errOne};
+        AuthFuncParams* params =new AuthFuncParams();
+        params->handlerRef = fail;
+        params->thisVarRef_ = thisVar; 
+        params->args = param;
+        params->argsSize = DM_JSI_ARGS_ONE;
+        DMLOG(DM_LOG_INFO, "OnVerifyResult FailCallBack in.");
+        JsAsyncWork::DispatchAsyncWork(AuthRsultVerifyInfoAsyncWorkFunc, reinterpret_cast<void *>(params));    
     }
 
-    JSIValue handler = verifyAsyncCallbackInfo_.callback;
-
-    if (JSI::ValueIsFunction(handler)) {
-        JSI::CallFunction(handler, thisVar, &result[0], DM_JSI_ARGS_TWO);
-    } else {
-        DMLOG(DM_LOG_ERROR, "handler is nullptr");
-    }
     g_checkAuthCallbackMap.erase(bundleName_);
-    JSI::ReleaseValueList(thisVar, handler, authAsyncCallbackInfo_.thisVal_, authAsyncCallbackInfo_.callback, ARGS_END);
+    JSI::ReleaseValueList(thisVar, success, fail, successOne, successTwo, errOne, verifyAsyncCallbackInfo_.thisVal_, verifyAsyncCallbackInfo_.callback, ARGS_END);
 }
 
 void DeviceManagerModule::DeviceInfoToJsArray(const std::vector<DmDeviceInfo> &vecDevInfo, const int32_t idx,  JSIValue &arrayResult)
@@ -699,7 +724,14 @@ void DeviceManagerModule::ReleaseDmCallback(std::string &bundleName, std::string
     }
 }
 
-//..............接口函数...................................//
+void DeviceManagerModule::AuthRsultVerifyInfoAsyncWorkFunc(void *data)
+{
+    DMLOG(DM_LOG_INFO, "AuthRsultVerifyInfoAsyncWorkFunc in ............");
+    AuthFuncParams* params = reinterpret_cast<AuthFuncParams *>(data);
+    JSI::CallFunction(params->handlerRef, params->thisVarRef_, params->args, params->argsSize);	
+}
+
+
 JSIValue DeviceManagerModule::SetUserOperationSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsSize)
 {
     DMLOG(DM_LOG_INFO, "SetUserOperationSync in");
@@ -874,11 +906,7 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
         return JSI::CreateNull();
     }
     
-    if (!JSI::ValueIsFunction(args[2])) {
-        DMLOG(DM_LOG_ERROR,"a function is required.");
-        return JSI::CreateNull();
-    }
- 
+    
     authAsyncCallbackInfo_.thisVal_ = JSI::AcquireValue(thisVal);
     authAsyncCallbackInfo_.callback = JSI::AcquireValue(args[2]);
    
@@ -923,11 +951,6 @@ JSIValue DeviceManagerModule::VerifyAuthInfo(const JSIValue thisVal, const JSIVa
     
     if (!JSI::ValueIsObject(args[0])){
         DMLOG(DM_LOG_ERROR, "a object is required.");
-        return JSI::CreateNull();
-    }
-    
-    if (!JSI::ValueIsFunction(args[1])) {
-        DMLOG(DM_LOG_ERROR,"a function is required.");
         return JSI::CreateNull();
     }
     

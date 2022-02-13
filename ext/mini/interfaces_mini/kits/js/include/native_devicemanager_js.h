@@ -31,6 +31,12 @@ namespace ACELite {
 
 #define DM_JSI_BUF_LENGTH (256)
 
+struct AuthFuncParams {
+    JSIValue handlerRef = JSI::CreateUndefined();
+    JSIValue thisVarRef_ = JSI::CreateUndefined();
+    const JSIValue *args = nullptr;
+    uint8_t argsSize = 0;
+};
 
 struct AuthAsyncCallbackInfo {
     JSIValue thisVal_ = JSI::CreateUndefined();
@@ -149,7 +155,7 @@ public:
     static JSIValue SetUserOperationSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsSize);
     static JSIValue GetAuthenticationParamSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsSize);
     static DeviceManagerModule *GetDeviceManagerJSI(std::string &bundleName);
-    /**********工具函数************/
+    static void AuthRsultVerifyInfoAsyncWorkFunc(void *data);
     static void DmAuthParamToJsAuthParamy(const OHOS::DistributedHardware::DmAuthParam &authParam, JSIValue &paramResult);
     void OnDmfaCall(const std::string &paramJson);
     void OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag);
