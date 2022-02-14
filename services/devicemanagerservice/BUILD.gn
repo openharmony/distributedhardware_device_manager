@@ -35,6 +35,7 @@ if (defined(ohos_lite)) {
       "include/devicestate",
       "include/discovery",
       "include/dependency/commonevent",
+      "include/dependency/multipleuser",
       "include/dependency/hichain",
       "include/dependency/softbus",
       "include/dependency/timer",
@@ -46,6 +47,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "//base/security/deviceauth/interfaces/innerkits",
       "//third_party/json/include",
+      "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
     ]
   }
 
@@ -59,6 +61,7 @@ if (defined(ohos_lite)) {
       "src/authentication/auth_ui.cpp",
       "src/authentication/dm_auth_manager.cpp",
       "src/config/dm_config_manager.cpp",
+      "src/dependency/multipleuser/multiple_user_connector.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
       "src/dependency/softbus/softbus_connector.cpp",
@@ -93,6 +96,7 @@ if (defined(ohos_lite)) {
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
       "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
       "//foundation/windowmanager/wm:libwm",
+      "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     ]
 
     external_deps = [

@@ -17,12 +17,13 @@
 
 #include <functional>
 
+#include "common_event_support.h"
 #include "device_manager_service_listener.h"
+#include "dm_common_event_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info_manager.h"
 #include "dm_log.h"
-#include "common_event_support.h"
-#include "dm_common_event_manager.h"
+#include "multiple_user_connector.h"
 
 using namespace OHOS::EventFwk;
 
@@ -99,11 +100,20 @@ int32_t DeviceManagerService::Init()
         softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
         hiChainConnector_->RegisterHiChainCallback(authMgr_);
     }
-    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
-    CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get());
-    if (dmCommonEventManager.SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
-        LOGI("subscribe service event success");
+
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId > 0) {
+        LOGI("get current account user id success");
+        MultipleUserConnector::SetSwitchOldUserId(userId);
     }
+
+    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
+    CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get(),
+        std::placeholders::_1);
+    if (dmCommonEventManager.SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
+        LOGI("subscribe service user switch common event success");
+    }
+
     LOGI("Init success, singleton initialized");
     intFlag_ = true;
     return DM_OK;
