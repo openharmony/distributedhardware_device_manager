@@ -15,7 +15,7 @@
 .title-list {
     font-size: 60px;
     line-height: 100px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .title-pin {
@@ -26,6 +26,6 @@
 
 .but {
     width: 30%;
-    font-size: 50px;
+    font-size: 40px;
     height: 80px;
 }

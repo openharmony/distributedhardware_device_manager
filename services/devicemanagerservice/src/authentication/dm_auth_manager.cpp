@@ -335,8 +335,6 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
-    LOGI("DmAuthManager OnMemberJoin start");
-    CancelDisplay();
     LOGE("DmAuthManager OnMemberJoin start");
     if (authRequestState_ != nullptr) {
         timerMap_[ADD_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
@@ -570,7 +568,7 @@ void DmAuthManager::AuthenticateFinish()
         }
 
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
-            CancelDisplay();
+            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->aceId);
         }
 
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,

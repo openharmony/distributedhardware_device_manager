@@ -6,11 +6,14 @@
         请输入另一个设备显示的PIN码进行验证
     </text>
     <input class="title-pin" id="input" type="number" onchange="onChange"></input>
+    <text class="title-error" id="error" show="{{isShow}}">
+        PIN码输入错误，请重新输入(3次：还有{{isTimes}}次机会)
+    </text>
     <div class="but">
-        <button class="but1" onclick="onCancel">
+        <button class="but1" onclick="onCancel" type="text">
             取消
         </button>
-        <button class="but2" onclick="onConfirm">
+        <button class="but2" onclick="onConfirm" type="capsule">
             确定
         </button>
     </div>

@@ -7,35 +7,34 @@
 }
 
 .title {
-    font-size: 80px;
+    font-size: 70px;
     line-height: 150px;
     font-weight: 800;
 }
 
 .but {
-    width: 85%;
+    width: 90%;
     margin-top: 10%;
     text-align: center;
     height: 100px;
 }
 
 .but1 {
-    width: 30%;
+    width: 70%;
     height: 80px;
-    font-size: 50px;
-    margin-left: 10%;
+    font-size: 40px;
 }
 
 .but2 {
     width: 30%;
     height: 80px;
-    font-size: 50px;
-    margin-left: 55%;
+    font-size: 40px;
+    margin-left: 10%;
 }
 
 
 .title-list {
-    font-size: 70px;
+    font-size: 60px;
     line-height: 100px;
-    font-weight: 800;
+    font-weight: 500;
 }
