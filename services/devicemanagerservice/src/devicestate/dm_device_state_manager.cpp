@@ -43,7 +43,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOnline profile adapter is null");
     } else {
         uint8_t udid[UDID_BUF_LEN] = {0};
-        int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(info.deviceId, NodeDeivceInfoKey::NODE_KEY_UDID, udid,
+        int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(info.deviceId, NodeDeviceInfoKey::NODE_KEY_UDID, udid,
                                                                   sizeof(udid));
         if (ret != DM_OK) {
             LOGE("DmDeviceStateManager::OnDeviceOnline GetNodeKeyInfo failed");

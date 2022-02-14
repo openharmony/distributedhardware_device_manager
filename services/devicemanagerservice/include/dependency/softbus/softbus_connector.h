@@ -48,7 +48,7 @@ public:
     static bool IsDeviceOnLine(const std::string &deviceId);
     static int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
-    static int32_t GetNodeKeyInfoByNetworkId(const char *networkId, NodeDeivceInfoKey key, uint8_t *info,
+    static int32_t GetNodeKeyInfoByNetworkId(const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
                                              int32_t infoLen);
 
 public:
