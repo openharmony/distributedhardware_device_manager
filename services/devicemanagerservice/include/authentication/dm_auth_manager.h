@@ -163,7 +163,7 @@ public:
     void ShowStartAuthDialog();
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
     int32_t OnUserOperation(int32_t action);
-    void UserSwitchEventCallback(void);
+    void UserSwitchEventCallback(int32_t userId);
     void ClosePage(const int32_t &id);
 
 private:

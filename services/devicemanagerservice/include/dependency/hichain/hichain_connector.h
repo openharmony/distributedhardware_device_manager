@@ -59,9 +59,11 @@ public:
     int32_t AddMember(std::string deviceId, std::string &connectInfo);
     int32_t DelMemberFromGroup(std::string groupId, std::string deviceId);
     int32_t DeleteGroup(std::string &groupId);
+    int32_t DeleteGroup(const int32_t userId, std::string &groupId);
     bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
     int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
     int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
+    int32_t GetGroupInfo(const int32_t userId, std::string queryParams, std::vector<GroupInfo> &groupList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);

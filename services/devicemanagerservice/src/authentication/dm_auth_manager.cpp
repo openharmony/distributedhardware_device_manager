@@ -22,6 +22,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_random.h"
+#include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "ui_service_mgr_client.h"
@@ -750,19 +751,33 @@ int32_t DmAuthManager::OnUserOperation(int32_t action)
     return DM_OK;
 }
 
-void DmAuthManager::UserSwitchEventCallback (void)
+void DmAuthManager::UserSwitchEventCallback (int32_t userId)
 {
-    LOGI("all groups from this device will be deleted");
+    LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
     std::string queryParams = jsonObj.dump();
     std::vector<GroupInfo> groupList;
-    if (!hiChainConnector_->GetGroupInfo(queryParams, groupList)) {
+
+    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
+    MultipleUserConnector::SetSwitchOldUserId(userId);
+    if (!hiChainConnector_->GetGroupInfo(oldUserId, queryParams, groupList)) {
         LOGE("failed to get device join groups");
         return;
     }
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = hiChainConnector_->DeleteGroup(iter->groupId);
+        int32_t ret = hiChainConnector_->DeleteGroup(oldUserId, iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("fail to delete group");
+        }
+    }
+
+    if (!hiChainConnector_->GetGroupInfo(userId, queryParams, groupList)) {
+        LOGE("failed to get device join groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        int32_t ret = hiChainConnector_->DeleteGroup(userId, iter->groupId);
         if (ret != DM_OK) {
             LOGE("fail to delete group");
         }

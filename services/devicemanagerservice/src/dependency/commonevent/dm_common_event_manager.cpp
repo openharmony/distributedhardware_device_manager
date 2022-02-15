@@ -26,7 +26,7 @@ namespace DistributedHardware {
 std::mutex DmCommonEventManager::callbackQueueMutex_;
 std::mutex DmCommonEventManager::eventSubscriberMutex_;
 std::condition_variable DmCommonEventManager::notEmpty_;
-std::list<CommomEventCallback> DmCommonEventManager::callbackQueue_;
+std::list<CommomEventCallbackNode> DmCommonEventManager::callbackQueue_;
 
 DmCommonEventManager &DmCommonEventManager::GetInstance()
 {
@@ -55,13 +55,15 @@ void DmCommonEventManager::DealCallback(void)
     while (1) {
         std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
         notEmpty_.wait(callbackQueueMutexLock, [] { return !callbackQueue_.empty(); });
-        CommomEventCallback funcPrt = callbackQueue_.front();
-        funcPrt();
+        CommomEventCallbackNode node = callbackQueue_.front();
+        int32_t input = node.input_;
+        CommomEventCallback funcPrt = node.callback_;
+        funcPrt(input);
         callbackQueue_.pop_front();
     }
 }
 
-bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, const CommomEventCallback &callback)
+bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, const CommomEventCallback callback)
 {
     LOGI("Subscribe event: %s", event.c_str());
     if (dmEventSubscriber_.find(event) != dmEventSubscriber_.end() || callback == nullptr) {
@@ -107,30 +109,6 @@ bool DmCommonEventManager::UnsubscribeServiceEvent(const std::string &event)
     return true;
 }
 
-void DmCommonEventManager::Test(const std::string &event)
-{
-    std::unique_lock<std::mutex> mutexLock(eventSubscriberMutex_);
-    if (dmEventSubscriber_.find(event) != dmEventSubscriber_.end()) {
-        dmEventSubscriber_[event]->TestCommonEvent(event);
-    }
-}
-
-void DmCommonEventManager::EventSubscriber::TestCommonEvent(const std::string &event)
-{
-    if (event != event_) {
-        LOGE("Received event is error");
-        return;
-    }
-
-    std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
-    if (callbackQueue_.size() > COMMON_CALLBACK_MAX_SIZE) {
-        LOGE("event callback Queue is too long");
-        return;
-    }
-    callbackQueue_.push_back(callback_);
-    notEmpty_.notify_one();
-}
-
 void DmCommonEventManager::EventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
@@ -140,12 +118,20 @@ void DmCommonEventManager::EventSubscriber::OnReceiveEvent(const CommonEventData
         return;
     }
 
+    int32_t userId = data.GetCode();
+    if (userId <= 0) {
+        LOGE("userId is less zero");
+        return;
+    }
+    
     std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
     if (callbackQueue_.size() > COMMON_CALLBACK_MAX_SIZE) {
         LOGE("event callback Queue is too long");
         return;
     }
-    callbackQueue_.push_back(callback_);
+
+    CommomEventCallbackNode node {userId, callback_};
+    callbackQueue_.push_back(node);
     notEmpty_.notify_one();
 }
 } // namespace DistributedHardware
