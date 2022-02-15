@@ -45,10 +45,14 @@ int32_t EncryptUtils::MbedtlsBase64Decode(uint8_t *dst, size_t dlen, size_t *ole
 
 int32_t EncryptUtils::GenRandInt(int32_t randMin, int32_t randMax)
 {
+#if (defined(__LINUX__) || defined(__LITEOS_A__))
     std::random_device randDevice;
     std::mt19937 genRand(randDevice());
     std::uniform_int_distribution<int> disRand(randMin, randMax);
     return disRand(genRand);
+#else
+    return (randMin + random() % (randMax - randMin));
+#endif
 }
 
 int64_t EncryptUtils::GenRandLongLong(int64_t randMin, int64_t randMax)

@@ -46,10 +46,7 @@ RequestSession::RequestSession(std::string &hostPkgName, std::string &targetPkgN
 #if (defined(__LINUX__) || defined(__LITEOS_A__))
     mPinToken_ = IpcServerAdapter::GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN);
 #else
-    std::random_device randDevice;
-    std::mt19937 genRand(randDevice());
-    std::uniform_int_distribution<int> disRand(MIN_PIN_TOKEN, MAX_PIN_TOKEN);
-    mPinToken_ =  disRand(genRand);
+    mPinToken_ = MIN_PIN_TOKEN + random() % (MAX_PIN_TOKEN - MIN_PIN_TOKEN);
 #endif
     char randStr[TOKEN_LEN] = {0};
     bool res = EncryptUtils::MbedtlsGenRandomStr(randStr, sizeof(randStr), false);

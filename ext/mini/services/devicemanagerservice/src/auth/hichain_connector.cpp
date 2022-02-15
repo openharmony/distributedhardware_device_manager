@@ -37,6 +37,7 @@
 #include "softbus_session.h"
 #include "auth_manager.h"
 #include "dm_ability_manager.h"
+#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -109,6 +110,7 @@ int64_t HichainConnector::GenRequestId()
 
 int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &groupName)
 {
+    int32_t ret;
     if (deviceGroupManager_ == nullptr) {
         DMLOG(DM_LOG_ERROR, "HichainConnector::CreateGroup group manager is null, requestId %lld.", requestId);
         return FAIL;
@@ -131,7 +133,13 @@ int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &grou
     jsonObj[FIELD_USER_TYPE] = 0;
     jsonObj[FIELD_GROUP_VISIBILITY] = GROUP_VISIBILITY_PUBLIC;
     jsonObj[FIELD_EXPIRE_TIME] = FIELD_EXPIRE_TIME_VALUE;
-    int32_t ret =  deviceGroupManager_->createGroup(requestId, DEVICE_MANAGER_APP.c_str(), jsonObj.dump().c_str());
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return FAIL;
+    }
+
+    ret = deviceGroupManager_->createGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(), jsonObj.dump().c_str());
     if (ret != 0) {
         DMLOG(DM_LOG_ERROR, "Faild to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
         return ret;
@@ -157,10 +165,16 @@ int32_t HichainConnector::IsGroupCreated(std::string groupName, GroupInfo &group
 
 int32_t HichainConnector::GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList)
 {
+    int32_t ret;
     char *groupVec = nullptr;
     uint32_t num = 0;
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return false;
+    }
 
-    int32_t ret = deviceGroupManager_->getGroupInfo(DEVICE_MANAGER_APP.c_str(), queryParams.c_str(), &groupVec, &num);
+    ret = deviceGroupManager_->getGroupInfo(userId, DEVICE_MANAGER_APP.c_str(), queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
         DMLOG(DM_LOG_ERROR, "HichainConnector::GetGroupInfo faild , ret: %d.", ret);
         return false;
@@ -263,9 +277,13 @@ int32_t HichainConnector::AddMemeber(std::string deviceId, std::shared_ptr<MsgRe
     jsonObj[FIELD_GROUP_NAME] = msgResponseAuth->GetGroupName();
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfo.c_str();
     std::string tmpStr = jsonObj.dump();
-
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return -1;
+    }
     DMLOG(DM_LOG_INFO, "HichainConnector::AddMemeber completed");
-    return deviceGroupManager_->addMemberToGroup(msgResponseAuth->GetRequestId(), DEVICE_MANAGER_APP.c_str(),
+    return deviceGroupManager_->addMemberToGroup(userId, msgResponseAuth->GetRequestId(), DEVICE_MANAGER_APP.c_str(),
         tmpStr.c_str());
 }
 
@@ -306,7 +324,13 @@ void HichainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupI
     DMLOG(DM_LOG_INFO, "HichainConnector::GetRelatedGroups Start to get local related groups.");
     uint32_t groupNum = 0;
     char *returnGroups = nullptr;
-    int32_t ret = deviceGroupManager_->getRelatedGroups(DEVICE_MANAGER_APP.c_str(), deviceId.c_str(),
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return;
+    }
+
+    int32_t ret = deviceGroupManager_->getRelatedGroups(userId, DEVICE_MANAGER_APP.c_str(), deviceId.c_str(),
         &returnGroups, &groupNum);
     if (ret != 0) {
         DMLOG(DM_LOG_ERROR, "HichainConnector::GetRelatedGroups faild , ret: %d.", ret);
@@ -389,8 +413,13 @@ int32_t HichainConnector::DelMemberFromGroup(std::string groupId, std::string de
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_DELETE_ID] = deviceId;
     std::string deleteParams = jsonObj.dump();
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return userId;
+    }
 
-    int32_t ret = deviceGroupManager_->deleteMemberFromGroup(requestId, DEVICE_MANAGER_APP.c_str(),
+    int32_t ret = deviceGroupManager_->deleteMemberFromGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(),
         deleteParams.c_str());
     if (ret != 0) {
         DMLOG(DM_LOG_ERROR, "HichainConnector::DelMemberFromGroup faild , ret: %d.", ret);
@@ -401,12 +430,18 @@ int32_t HichainConnector::DelMemberFromGroup(std::string groupId, std::string de
 
 void HichainConnector::DeleteGroup(std::string &groupId)
 {
+    int32_t ret;
     int64_t requestId = GenRequestId();
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = jsonObj.dump();
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        DMLOG(DM_LOG_ERROR, "get current process account user id failed, userId: %ld", userId);
+        return;
+    }
 
-    int32_t ret = deviceGroupManager_->deleteGroup(requestId, DEVICE_MANAGER_APP.c_str(), disbandParams.c_str());
+    ret = deviceGroupManager_->deleteGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(), disbandParams.c_str());
     if (ret != 0) {
         DMLOG(DM_LOG_ERROR, "HichainConnector::DeleteGroup faild , ret: %d.", ret);
     }

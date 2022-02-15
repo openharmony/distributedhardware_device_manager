@@ -124,7 +124,7 @@ void SoftbusAdapter::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 #endif
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DEVICE_MANAGER_PACKAGE_NAME.c_str(), info->networkId,
-        NodeDeivceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
+        NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
     if (ret != DEVICEMANAGER_OK) {
         DMLOG(DM_LOG_ERROR, "GetNodeKeyInfo failed");
         return;
@@ -428,7 +428,7 @@ bool SoftbusAdapter::IsDeviceOnLine(std::string &deviceId)
         }
         uint8_t udid[UDID_BUF_LEN] = {0};
         int32_t ret = GetNodeKeyInfo(DEVICE_MANAGER_PACKAGE_NAME.c_str(), networkId.c_str(),
-            NodeDeivceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
+            NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
         if (ret != DEVICEMANAGER_OK) {
             DMLOG(DM_LOG_ERROR, "DM_IsDeviceOnLine GetNodeKeyInfo failed");
             break;
