@@ -2,7 +2,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 0.8;
     background-color: azure;
 }
 
@@ -28,4 +27,6 @@
     width: 30%;
     font-size: 40px;
     height: 80px;
+    border: 1px solid #e7e7e7;
+    border-radius: 50px;
 }
