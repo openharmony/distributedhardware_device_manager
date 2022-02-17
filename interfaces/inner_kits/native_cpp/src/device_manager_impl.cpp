@@ -15,10 +15,12 @@
 
 #include "device_manager_impl.h"
 
+#ifdef SUPPORT_CALLING_ABILITY
 #include "bundle_constants.h"
 #include "bundle_info.h"
 #include "bundle_mgr_client.h"
 #include "bundle_mgr_interface.h"
+#endif
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -43,13 +45,16 @@
 #include "ipc_verify_authenticate_req.h"
 #include "securec.h"
 
+#ifdef SUPPORT_CALLING_ABILITY
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::Constants;
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
 bool DeviceManagerImpl::isSystemAppCalling(void)
 {
+#ifdef SUPPORT_CALLING_ABILITY
     int32_t uid = IPCSkeleton::GetCallingUid();
     if (uid < 0) {
         LOGI("app caller uid is: %d,", uid);
@@ -76,6 +81,10 @@ bool DeviceManagerImpl::isSystemAppCalling(void)
     }
 
     return iBundleMgr->CheckIsSystemAppByUid(uid);
+#else
+    // Minimum system only native services will call
+    return true;
+#endif
 }
 
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()

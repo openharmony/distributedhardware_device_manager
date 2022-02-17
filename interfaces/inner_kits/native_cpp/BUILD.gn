@@ -54,19 +54,23 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [
-      "${utils_path}:devicemanagerutils",
-      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    ]
+    deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
-      "bundle_framework:appexecfwk_base",
-      "bundle_framework:appexecfwk_core",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "samgr_standard:samgr_proxy",
       "utils_base:utils",
     ]
+
+    if (support_jsapi) {
+      deps += [ "//foundation/aafwk/standard/interfaces/innerkits/want:want" ]
+      external_deps += [
+        "bundle_framework:appexecfwk_base",
+        "bundle_framework:appexecfwk_core",
+      ]
+      defines += [ "SUPPORT_CALLING_ABILITY" ]
+    }
 
     subsystem_name = "distributedhardware"
 

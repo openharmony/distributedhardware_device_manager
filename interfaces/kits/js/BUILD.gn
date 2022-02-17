@@ -61,7 +61,3 @@ ohos_shared_library("devicemanager") {
   relative_install_dir = "module/distributedhardware"
   part_name = "device_manager_base"
 }
-
-group("devicemanager_native_js") {
-  deps = [ ":devicemanager" ]
-}

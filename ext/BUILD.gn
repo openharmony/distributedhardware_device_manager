@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,11 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
-  testonly = true
+import("//build/ohos.gni")
 
+group("ext_modules") {
   deps = []
   if (support_jsapi) {
-    deps += [ "unittest:unittest" ]
+    deps += [
+      "./pin_auth:devicemanagerext_pin_auth",
+      "./profile:devicemanagerext_profile",
+    ]
   }
 }

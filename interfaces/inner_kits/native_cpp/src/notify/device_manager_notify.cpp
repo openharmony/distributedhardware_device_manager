@@ -18,7 +18,6 @@
 #include "device_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {

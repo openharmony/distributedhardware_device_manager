@@ -23,6 +23,10 @@ if (defined(ohos_lite)) {
   executable("devicemanagerservice") {
     sources = [ "src/ipc/lite/ipc_server_main.cpp" ]
   }
+} else if (!support_jsapi) {
+  group("devicemanagerservice") {
+    deps = []
+  }
 } else {
   config("devicemanagerservice_config") {
     include_dirs = [
