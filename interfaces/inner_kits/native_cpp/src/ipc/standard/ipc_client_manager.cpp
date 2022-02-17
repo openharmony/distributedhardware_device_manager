@@ -18,6 +18,7 @@
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "ipc_client_server_proxy.h"
 #include "ipc_client_stub.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_remote_broker.h"
