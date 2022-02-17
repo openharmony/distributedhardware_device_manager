@@ -67,7 +67,7 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
     }
-    std::thread {[] { DeviceManagerService::GetInstance().Init(); }}.detach();
+    DeviceManagerService::GetInstance().Init();
     return true;
 }
 
@@ -93,7 +93,20 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     LOGI("SendCmd cmdCode: %d", cmdCode);
-    return DM_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
+        LOGE("set request cmd failed");
+        return DM_IPC_FAILED;
+    }
+    
+    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
+    if (ret == DM_IPC_NOT_REGISTER_FUNC) {
+        LOGW("unsupport code: %d", cmdCode);
+        return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
+    }
+    return ret;
 }
 
 ServiceRunningState IpcServerStub::QueryServiceState() const

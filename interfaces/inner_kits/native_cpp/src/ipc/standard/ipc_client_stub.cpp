@@ -27,6 +27,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 {
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
     if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DM_OK) {
+        LOGE("on ipc cmd success");
         return DM_OK;
     }
     LOGW("unsupport code: %d", code);
@@ -35,8 +36,21 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    LOGE("error");
-    return DM_OK;
+    LOGI("SendCmd cmdCode: %d", cmdCode);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
+        LOGE("set request cmd failed");
+        return DM_IPC_FAILED;
+    }
+    
+    LOGI("cmdCode = %d, flags= %d.", cmdCode, option.GetFlags());
+    if (IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply) == DM_OK) {
+        LOGE("on ipc cmd success");
+        return DM_OK;
+    }
+    return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
