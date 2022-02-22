@@ -104,9 +104,9 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
         LOGW("unsupport code: %d", cmdCode);
-        return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
+        return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
-    return ret;
+    return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
 }
 
 ServiceRunningState IpcServerStub::QueryServiceState() const
