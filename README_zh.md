@@ -103,29 +103,19 @@ foundation/distributedhardware/devicemanager
 | release(): void;                                             | 释放DeviceManager实例           |
 
 
-
-- 开放能力接口：
-
-  提供可信设备列表获取、可信设备状态监听等接口能力，所有应用均可进行接口调用。
-
-| 原型                                                                                                                          | 描述       |
-| -------                                                                                                                                   | ---------- |
-| getTrustedDeviceListSync(): Array<DeviceInfo>;                                                                                            | 获取信任设备列表 |
-| on(type: 'deviceStateChange', callback: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                         | 设备状态变更回调 |
-| off(type: 'deviceStateChange', callback?: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                       | 取消设备状态变更回调 |
-| on(type: 'serviceDie', callback: () => void): void;                                                                                       | 服务错误回调 |
-| off(type: 'serviceDie', callback?: () => void): void;                                                                                     | 取消服务错误回调 |
-
-
-
 - 系统能力接口：
 
-  提供周边设备发现、设备认证等相关接口，该部分作为系统能力接口，仅供系统应用调用。
+  提供可信设备列表获取、可信设备状态监听、周边设备发现、设备认证等相关接口，该部分作为系统能力接口，仅供系统应用调用。
 
   开始设备发现、停止发现设备接口要配对使用，使用同一个subscribeId。
 
 | 原型                                                         | 描述                 |
 | ------------------------------------------------------------ | -------------------- |
+| getTrustedDeviceListSync(): Array<DeviceInfo>;                                                                                            | 获取信任设备列表 |
+| on(type: 'deviceStateChange', callback: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                         | 设备状态变更回调 |
+| off(type: 'deviceStateChange', callback?: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                       | 取消设备状态变更回调 |
+| on(type: 'serviceDie', callback: () => void): void;                                                                                       | 服务错误回调 |
+| off(type: 'serviceDie', callback?: () => void): void;                                                                                     | 取消服务错误回调 |
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;    | 开始设备发现         |
 | stopDeviceDiscovery(subscribeId: number): void;              | 停止发现设备         |
 | authenticateDevice(deviceInfo: DeviceInfo, authparam: AuthParam, callback: AsyncCallback<{deviceId: string, pinTone ?: number}>): void; | 设备认证接口         |
@@ -152,6 +142,9 @@ dmClass.off('deviceStateChange')
 
 // 查询可信设备列表
 var array = dmClass.getTrustedDeviceListSync();
+
+// 获取本地设备信息
+var localDeviceInfo = dmClass.getLocalDeviceInfoSync();
 
 // 开始设备发现（发现周边不可信设备）
 var subscribeId = 0;
@@ -187,16 +180,15 @@ var deviceInfo ={
     deviceType: 0
 }；
 let extraInfo = {
-    "targetPkgName": 'xxxxxxxx', // FA流转目标设备包名
+    "appIcon": new Uint8Array(), // app图标，可选参数，可不填
+    "appThumbnail": new Uint8Array(), // app缩略图，可选参数，可不填
     "appName": "xxxxxxxx", // 对端设备应用名称
     "appDescription": "xxxxxxxx", // app描述
     "business": '0',
-    "displayOwner": 0
+    "displayOwner": 0,
 }
 let authParam = {
     "authType": 1,
-    "appIcon": new Uint8Array(), // app图标，可选参数，可不填
-    "appThumbnail": new Uint8Array(), // app缩略图，可选参数，可不填
     "extraInfo": extraInfo
 }
 dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
@@ -209,6 +201,9 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
     console.info(TAG + "authenticateDevice result:" + JSON.stringify(data));
     token = data.pinToken;
 });
+
+// 设备取消认证
+dmClass.unAuthenticateDevice(this.deviceInfo);
 ```
 ## 系统弹框FA
 
@@ -240,4 +235,3 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
 [**interface_sdk-js**](https://gitee.com/openharmony/interface_sdk-js/)
 [**applications_hap**](https://gitee.com/openharmony/applications_hap)
 **device_manager**
-
