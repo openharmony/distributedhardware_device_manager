@@ -63,7 +63,6 @@ if (defined(ohos_lite)) {
       "utils_base:utils",
     ]
 
-
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager_base"
