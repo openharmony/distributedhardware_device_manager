@@ -19,14 +19,17 @@
 #include "device_manager_service_listener.h"
 #include "dm_adapter_manager.h"
 #include "softbus_connector.h"
-
+#include "dm_timer.h"
+#include "hichain_connector.h"
 namespace OHOS {
 namespace DistributedHardware {
+#define OFFLINE_TIMEOUT 300
 class DmDeviceStateManager final : public ISoftbusStateCallback,
                                    public std::enable_shared_from_this<DmDeviceStateManager> {
 public:
     DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                         std::shared_ptr<DeviceManagerServiceListener> listener);
+                         std::shared_ptr<DeviceManagerServiceListener> listener,
+                         std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDeviceStateManager();
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
     void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
@@ -34,6 +37,9 @@ public:
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info);
     void OnProfileReady(const std::string &pkgName, const std::string deviceId);
     int32_t RegisterSoftbusStateCallback();
+    void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
+    void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
+    void DeleteTimeOutGroup(std::string deviceId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -41,6 +47,8 @@ private:
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceState> deviceStateMap_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
+    std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string profileSoName_;
 };
 } // namespace DistributedHardware

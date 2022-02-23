@@ -77,7 +77,7 @@ int32_t DeviceManagerService::Init()
         }
     }
     if (deviceStateMgr_ == nullptr) {
-        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener_);
+        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener_, hiChainConnector_);
         if (deviceStateMgr_ == nullptr) {
             LOGE("Init failed, deviceStateMgr_ apply for failure");
             return DM_MAKE_SHARED_FAIL;

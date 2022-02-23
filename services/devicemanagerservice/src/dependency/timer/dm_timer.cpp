@@ -107,6 +107,10 @@ void DmTimer::WaitForTimeout()
     int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
     if (nfds < 0) {
         LOGE("DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
+        if (errno == EINTR) {
+            LOGI("DmTimer is stop");
+            return;
+        }
     }
 
     char event = 0;
@@ -123,7 +127,7 @@ void DmTimer::WaitForTimeout()
         return;
     }
 
-    mHandle_(mHandleData_);
+    mHandle_(mHandleData_, *this);
     Release();
 
     LOGE("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
@@ -176,6 +180,11 @@ void DmTimer::Release()
     mTimeFd_[0] = 0;
     mTimeFd_[1] = 0;
     mEpFd_ = 0;
+}
+
+std::string DmTimer::GetTimerName()
+{
+    return mTimerName_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

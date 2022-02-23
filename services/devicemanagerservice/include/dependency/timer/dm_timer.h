@@ -29,7 +29,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-typedef void (*TimeoutHandle)(void *data);
+class DmTimer;
+typedef void (*TimeoutHandle)(void *data, DmTimer& timer);
 
 #define MAX_EVENTS 255
 
@@ -48,7 +49,7 @@ public:
     DmTimerStatus Start(uint32_t timeOut, TimeoutHandle handle, void *data);
     void Stop(int32_t code);
     void WaitForTimeout();
-
+    std::string GetTimerName();
 private:
     int32_t CreateTimeFd();
     void Release();

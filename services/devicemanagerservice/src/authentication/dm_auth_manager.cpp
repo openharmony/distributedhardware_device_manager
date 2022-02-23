@@ -51,7 +51,7 @@ const int32_t WAIT_REQUEST_TIMEOUT = 10;
 const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
 const int32_t DEVICE_ID_HALF = 2;
 
-static void TimeOut(void *data)
+static void TimeOut(void *data, DmTimer& timer)
 {
     LOGE("time out ");
     DmAuthManager *authMgr = (DmAuthManager *)data;

@@ -490,5 +490,26 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
     }
     return DM_OK;
 }
+
+int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
+{
+    LOGE("HiChainConnector::DeleteTimeOutGroup start");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        LOGE("get current process account user id failed");
+        return DM_FAILED;
+    }
+    std::vector<GroupInfo> peerGroupInfoList;
+    GetRelatedGroups(deviceId, peerGroupInfoList);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    for (auto &group : peerGroupInfoList) {
+        if (deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME.c_str(), group.groupId.c_str(), localDeviceId)) {
+            DeleteGroup(group.groupId);
+            return DM_OK;
+        }
+    }
+    return DM_FAILED;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

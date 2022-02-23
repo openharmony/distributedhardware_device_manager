@@ -64,6 +64,7 @@ public:
     int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
     int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
     int32_t GetGroupInfo(const int32_t userId, std::string queryParams, std::vector<GroupInfo> &groupList);
+    int32_t DeleteTimeOutGroup(const char* deviceId);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);

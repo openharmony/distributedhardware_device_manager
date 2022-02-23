@@ -29,6 +29,7 @@ int SetParameter(const char *key, const char *value);
 typedef void (*ParameterChgPtr)(const char *key, const char *value, void *context);
 int WatchParameter(const char *keyprefix, ParameterChgPtr callback, void *context);
 
+int GetDevUdid(char *udid, int size);
 #ifdef __cplusplus
 #if __cplusplus
 }
