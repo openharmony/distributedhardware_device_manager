@@ -51,20 +51,20 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [ 
-      "//third_party/mbedtls:mbedtls_shared",
+    deps = [
       "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+      "//third_party/mbedtls:mbedtls_shared",
     ]
 
     external_deps = [
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
-      "utils_base:utils",
+      "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
-      "access_token:libaccesstoken_sdk",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
+      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"
