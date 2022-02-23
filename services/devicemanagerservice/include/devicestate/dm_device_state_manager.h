@@ -23,18 +23,6 @@
 #include "hichain_connector.h"
 namespace OHOS {
 namespace DistributedHardware {
-class HmDevice {
-public:
-    HmDevice(std::string deviceId, std::shared_ptr<DmDeviceStateManager> stateMgr);
-    ~HmDevice();
-
-public:
-    std::string mDeviceId;
-    std::map<std::string, std::string> mGroupMap;
-    std::shared_ptr<DmTimer> mOfflineTimerPtr;
-    std::shared_ptr<DmDeviceStateManager> deviceStateMgr;
-};
-
 #define OFFLINE_TIMEOUT 300
 class DmDeviceStateManager final : public ISoftbusStateCallback,
                                    public std::enable_shared_from_this<DmDeviceStateManager> {
@@ -51,7 +39,7 @@ public:
     int32_t RegisterSoftbusStateCallback();
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
-    void DeleteTimeOutGroup(HmDevice *hmDevice);
+    void DeleteTimeOutGroup(std::string deviceId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -62,7 +50,6 @@ private:
     std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string profileSoName_;
-    std::map<std::string, HmDevice*> mHmDeviceMap_ = {};
 };
 } // namespace DistributedHardware
 } // namespace OHOS

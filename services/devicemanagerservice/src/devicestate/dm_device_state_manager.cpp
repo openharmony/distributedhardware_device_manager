@@ -20,15 +20,17 @@
 #include "dm_log.h"
 namespace OHOS {
 namespace DistributedHardware {
-static void TimeOut(void *data)
+const int32_t SESSION_CANCEL_TIMEOUT = 0;
+
+static void TimeOut(void *data, DmTimer& timer)
 {
     LOGE("time out ");
-    std::shared_ptr<DmDeviceStateManager> deviceStateMgr = ((HmDevice *)data)->deviceStateMgr;
+    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
     if (deviceStateMgr == nullptr) {
-        LOGE("OnDeviceOfflineTimeOut hmDevice owner = nullptr");
+        LOGE("OnDeviceOfflineTimeOut deviceStateMgr = nullptr");
         return;
     }
-    deviceStateMgr->DeleteTimeOutGroup((HmDevice *)data);
+    deviceStateMgr->DeleteTimeOutGroup(timer.GetTimerName());
 }
 
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -133,14 +135,13 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     std::string deviceId;
     softbusConnector_->GetUdidByNetworkId(deviceInfo.deviceId, deviceId);
     LOGI("Device<%s>Online", deviceId.c_str());
-    auto iter = mHmDeviceMap_.find(deviceId);
-    if (iter != mHmDeviceMap_.end()) {
-        iter->second->mOfflineTimerPtr->Stop(0);
+    auto iter = timerMap_.find(deviceId);
+    if (iter != timerMap_.end()) {
+        iter->second->Stop(SESSION_CANCEL_TIMEOUT);
         return;
     }
-
-    HmDevice *hmDevice = new HmDevice(deviceId, shared_from_this());
-    mHmDeviceMap_[hmDevice->mDeviceId] = hmDevice;
+    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(deviceId);
+    timerMap_[deviceId] = offLineTimer;
 }
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
@@ -148,30 +149,17 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
     std::string deviceId;
     softbusConnector_->GetUdidByNetworkId(deviceInfo.deviceId, deviceId);
     LOGI("Device<%s>Offline", deviceId.c_str());
-    for (auto &iter : mHmDeviceMap_) {
-        if (iter.second->mDeviceId.compare(deviceId) == 0) {
-            iter.second->mOfflineTimerPtr->Start(OFFLINE_TIMEOUT, TimeOut, iter.second);
+    for (auto &iter : timerMap_) {
+        if (iter.first.compare(deviceId) == 0) {
+            iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
 }
 
-void DmDeviceStateManager::DeleteTimeOutGroup(HmDevice *hmDevice)
+void DmDeviceStateManager::DeleteTimeOutGroup(std::string deviceId)
 {
-    LOGI("Remove DmDevice<%s> Hichain Group", hmDevice->mDeviceId.c_str());
-    hiChainConnector_->DeleteTimeOutGroup(hmDevice->mDeviceId.c_str());
-}
-
-HmDevice::HmDevice(std::string deviceId, std::shared_ptr<DmDeviceStateManager> stateMgr)
-{
-    mDeviceId = deviceId;
-    std::string timerName = "HmDeviceTimer";
-    mOfflineTimerPtr = std::make_shared<DmTimer>(timerName);
-    deviceStateMgr = stateMgr;
-}
-
-HmDevice::~HmDevice()
-{
-    mOfflineTimerPtr = nullptr;
+    LOGI("Remove DmDevice<%s> Hichain Group", deviceId.c_str());
+    hiChainConnector_->DeleteTimeOutGroup(deviceId.c_str());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
