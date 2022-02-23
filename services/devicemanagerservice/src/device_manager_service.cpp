@@ -44,10 +44,25 @@ DeviceManagerService::~DeviceManagerService()
 
 int32_t DeviceManagerService::Init()
 {
+    LOGI("Enter DeviceManagerService::isSystemAppCalling 111111");
     if (intFlag_) {
         LOGE("Init failed, singleton cannot be initialized multiple times");
         return DM_INT_MULTIPLE;
     }
+
+    if (permissionToken_ == nullptr) {
+        permissionToken_ = std::make_shared<PermissionToken>();
+        if (permissionToken_ == nullptr) {
+            LOGE("Init failed, permissionToken_ apply for failure");
+            return DM_MAKE_SHARED_FAIL;
+        }
+    }
+
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
+
     if (softbusConnector_ == nullptr) {
         softbusConnector_ = std::make_shared<SoftbusConnector>();
         if (softbusConnector_ == nullptr) {
@@ -122,6 +137,10 @@ int32_t DeviceManagerService::Init()
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("GetTrustedDeviceList failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -135,6 +154,10 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("GetLocalDeviceInfo failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -177,6 +200,10 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                    const std::string &extra)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("StartDeviceDiscovery failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -190,6 +217,10 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("StopDeviceDiscovery failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -204,6 +235,10 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("AuthenticateDevice failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -221,6 +256,10 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("UnAuthenticateDevice failed, singleton not init or init fail");
         return DM_NOT_INIT;
@@ -238,6 +277,10 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
 
 int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 {
+    if (!permissionToken_->isSystemAppCalling()) {
+        LOGI("the caller is not a system app");
+        return DM_NOT_SYSTEM_APP;
+    }
     if (!intFlag_) {
         LOGE("VerifyAuthentication failed, singleton not init or init fail");
         return DM_NOT_INIT;

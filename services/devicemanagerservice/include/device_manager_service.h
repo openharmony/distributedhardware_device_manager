@@ -27,6 +27,7 @@
 #include "dm_discovery_manager.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
+#include "permission_token.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -60,6 +61,7 @@ private:
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<PermissionToken> permissionToken_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

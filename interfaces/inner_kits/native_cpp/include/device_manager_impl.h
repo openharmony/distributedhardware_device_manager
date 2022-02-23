@@ -64,8 +64,6 @@ private:
     DeviceManagerImpl(DeviceManagerImpl &&) = delete;
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
 
-private:
-    bool isSystemAppCalling(void);
 
 private:
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
