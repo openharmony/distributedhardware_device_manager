@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PERMISSION_TOKEN_H
-#define OHOS_DM_PERMISSION_TOKEN_H
+#ifndef OHOS_DM_PERMISSION_MANAGER_H
+#define OHOS_DM_PERMISSION_MANAGER_H
 
 #include "single_instance.h"
 
@@ -24,8 +24,8 @@ class PermissionManager {
     DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    bool checkPermission(void);
+    bool CheckPermission(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PERMISSION_TOKEN_H
+#endif // OHOS_DM_PERMISSION_MANAGER_H

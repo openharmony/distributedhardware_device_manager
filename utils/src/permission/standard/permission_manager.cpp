@@ -37,9 +37,9 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
-bool PermissionManager::checkPermission(void)
+bool PermissionManager::CheckPermission(void)
 {
-    LOGI("Enter PermissionManager::checkPermission");
+    LOGI("Enter PermissionManager::CheckPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
         LOGI("PermissionManager::tokenCaller == 0");
