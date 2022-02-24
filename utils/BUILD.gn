@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
+      "include/permission/standard",
     ]
   }
 
@@ -39,6 +40,7 @@ if (defined(ohos_lite)) {
       "src/dm_log.cpp",
       "src/dm_random.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",
+      "src/permission/standard/permission_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerutils_config" ]
@@ -49,11 +51,19 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
+    deps = [
+      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+      "//third_party/mbedtls:mbedtls_shared",
+    ]
 
     external_deps = [
+      "access_token:libaccesstoken_sdk",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "safwk:system_ability_fwk",
+      "samgr_standard:samgr_proxy",
       "utils_base:utils",
     ]
 

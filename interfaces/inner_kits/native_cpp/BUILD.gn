@@ -63,15 +63,6 @@ if (defined(ohos_lite)) {
       "utils_base:utils",
     ]
 
-    if (support_jsapi) {
-      deps += [ "//foundation/aafwk/standard/interfaces/innerkits/want:want" ]
-      external_deps += [
-        "bundle_framework:appexecfwk_base",
-        "bundle_framework:appexecfwk_core",
-      ]
-      defines += [ "SUPPORT_CALLING_ABILITY" ]
-    }
-
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager_base"

@@ -14,17 +14,6 @@
  */
 
 #include "device_manager_impl.h"
-
-#ifdef SUPPORT_CALLING_ABILITY
-#include "bundle_constants.h"
-#include "bundle_info.h"
-#include "bundle_mgr_client.h"
-#include "bundle_mgr_interface.h"
-#endif
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -45,48 +34,8 @@
 #include "ipc_verify_authenticate_req.h"
 #include "securec.h"
 
-#ifdef SUPPORT_CALLING_ABILITY
-using namespace OHOS::AppExecFwk;
-using namespace OHOS::AppExecFwk::Constants;
-#endif
-
 namespace OHOS {
 namespace DistributedHardware {
-bool DeviceManagerImpl::isSystemAppCalling(void)
-{
-#ifdef SUPPORT_CALLING_ABILITY
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    if (uid < 0) {
-        LOGI("app caller uid is: %d,", uid);
-        return false;
-    }
-    
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        LOGE("failed to get system ability mgr.");
-        return true;
-    }
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (remoteObject == nullptr) {
-        LOGE("failed to get bundle manager proxy.");
-        return true;
-    }
-
-    LOGI("get bundle manager proxy success.");
-    sptr<IBundleMgr> iBundleMgr = iface_cast<IBundleMgr>(remoteObject);
-    if (iBundleMgr == nullptr) {
-        LOGI("iBundleMgr is nullptr, caller may be a process");
-        return true;
-    }
-
-    return iBundleMgr->CheckIsSystemAppByUid(uid);
-#else
-    // Minimum system only native services will call
-    return true;
-#endif
-}
-
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
     static DeviceManagerImpl instance;
@@ -96,11 +45,6 @@ DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback)
 {
     LOGI("DeviceManager::InitDeviceManager start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty() || dmInitCallback == nullptr) {
         LOGE("InitDeviceManager error: Invalid parameter");
         return DM_INVALID_VALUE;
@@ -120,11 +64,6 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
 int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
 {
     LOGI("DeviceManager::UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty()) {
         LOGE("UnInitDeviceManager error: Invalid parameter");
         return DM_INVALID_VALUE;
@@ -145,11 +84,6 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
                                                 std::vector<DmDeviceInfo> &deviceList)
 {
     LOGI("DeviceManager::GetTrustedDeviceList start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty()) {
         LOGE("GetTrustedDeviceList error: Invalid para");
         return DM_INVALID_VALUE;
@@ -179,11 +113,6 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
 int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DeviceManager::GetLocalDeviceInfo start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> rsp = std::make_shared<IpcGetLocalDeviceInfoRsp>();
     req->SetPkgName(pkgName);
@@ -208,11 +137,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
                                                     std::shared_ptr<DeviceStateCallback> callback)
 {
     LOGI("DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDevStateCallback error: Invalid para");
         return DM_INVALID_VALUE;
@@ -226,11 +150,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
 int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName)
 {
     LOGI("DeviceManager::UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty()) {
         LOGE("UnRegisterDevStateCallback error: Invalid para");
         return DM_INVALID_VALUE;
@@ -245,11 +164,6 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
                                                 const std::string &extra, std::shared_ptr<DiscoveryCallback> callback)
 {
     LOGI("DeviceManager::StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty() || callback == nullptr) {
         LOGE("StartDeviceDiscovery error: Invalid para");
         return DM_INVALID_VALUE;
@@ -282,11 +196,6 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
 int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
     LOGI("DeviceManager::StopDeviceDiscovery start , pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty()) {
         LOGE("StopDeviceDiscovery error: Invalid para");
         return DM_INVALID_VALUE;
@@ -319,11 +228,6 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
     LOGI("DeviceManager::AuthenticateDevice start , pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
-
     if (pkgName.empty()) {
         LOGE("AuthenticateDevice error: Invalid para");
         return DM_INVALID_VALUE;
@@ -356,10 +260,6 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
     LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(), deviceId.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
 
     if (deviceId.empty()) {
         LOGE("UnAuthenticateDevice error: Invalid para");
@@ -417,10 +317,6 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
                                                 std::shared_ptr<VerifyAuthCallback> callback)
 {
     LOGI("DeviceManager::VerifyAuthentication start, pkgName: %s", pkgName.c_str());
-    if (!isSystemAppCalling()) {
-        LOGI("the caller is not a system app");
-        return DM_NOT_SYSTEM_APP;
-    }
     if (pkgName.empty()) {
         LOGE("VerifyAuthentication error: Invalid para");
         return DM_INVALID_VALUE;
