@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "permission_token.h"
+#include "permission_manager.h"
 
 #include "bundle_constants.h"
 #include "bundle_info.h"
@@ -35,15 +35,17 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
-bool PermissionToken::isSystemAppCalling(void)
+IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
+
+bool PermissionManager::checkPermission(void)
 {
-    LOGI("Enter DeviceManagerService::isSystemAppCalling 111111");
+    LOGI("Enter PermissionManager::checkPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGI("DeviceManagerService::tokenCaller == 0");
+        LOGI("PermissionManager::tokenCaller == 0");
         return false;
     }
-    LOGI("DeviceManagerService::tokenCaller ID == %d", tokenCaller);
+    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
@@ -71,13 +73,13 @@ bool PermissionToken::isSystemAppCalling(void)
             LOGI("iBundleMgr is nullptr, caller may be a process");
             return true;
         }
-        LOGI("DeviceManagerService::tokenTypeFlag is hap process");
+        LOGI("PermissionManager::tokenTypeFlag is hap process");
         return iBundleMgr->CheckIsSystemAppByUid(uid);
     } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        LOGI("DeviceManagerService::tokenTypeFlag is native process");
+        LOGI("PermissionManager::tokenTypeFlag is native process");
         return true;
     } else {
-        LOGI("DeviceManagerService::invalid tokenTypeFlag");
+        LOGI("PermissionManager::invalid tokenTypeFlag");
         return false;
     }
 }

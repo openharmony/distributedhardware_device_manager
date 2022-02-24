@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
       "src/dm_log.cpp",
       "src/dm_random.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",
-      "src/permission/standard/permission_token.cpp",
+      "src/permission/standard/permission_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerutils_config" ]
