@@ -23,6 +23,7 @@
 #include "dm_device_state_manager.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "hichain_connector.h"
 #include "UTTest_dm_device_state_manager.h"
 
 namespace OHOS {
@@ -43,10 +44,11 @@ void DmDeviceStateManagerTest::TearDownTestCase()
 {
 }
 namespace {
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
-    std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
+    std::make_shared<DmDeviceStateManager>(softbusConnector, listener_, hiChainConnector_);
 
 /**
  * @tc.name: DmDeviceStateManager_001
@@ -56,7 +58,8 @@ std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
  */
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
+    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_,
+        hiChainConnector_);
     ASSERT_NE(p, nullptr);
 }
 
@@ -68,7 +71,8 @@ HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestS
  */
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_);
+    std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_,
+        hiChainConnector_);
     p.reset();
     EXPECT_EQ(p, nullptr);
 }

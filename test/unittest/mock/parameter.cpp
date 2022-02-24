@@ -29,3 +29,8 @@ int WatchParameter(const char *keyprefix, ParameterChgPtr callback, void *contex
 {
     return 0;
 }
+
+int GetDevUdid(char *udid, int size)
+{
+    return 0;
+}

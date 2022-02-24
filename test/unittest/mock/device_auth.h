@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,11 @@
 #ifndef DEVICE_AUTH_H
 #define DEVICE_AUTH_H
 
-#include <cstdint>
+#include <stdint.h>
+#include <stdbool.h>
 
 #if defined(__LINUX__) || defined(_UNIX)
-#define DEVICE_AUTH_API_PUBLIC __attribute__((visibility("default")))
+#define DEVICE_AUTH_API_PUBLIC __attribute__ ((visibility("default")))
 #else
 #define DEVICE_AUTH_API_PUBLIC
 #endif
@@ -65,51 +66,68 @@
 #define FIELD_GROUP_VISIBILITY "groupVisibility"
 #define FIELD_EXPIRE_TIME "expireTime"
 #define FIELD_IS_DELETE_ALL "isDeleteAll"
+#define FIELD_BLE_CHALLENGE "bleChallenge"
+#define FIELD_OS_ACCOUNT_ID "osAccountId"
 
-enum GroupType {
+typedef enum {
+    DEFAULT_OS_ACCOUNT = 0,
+    INVALID_OS_ACCOUNT = -1,
+    ANY_OS_ACCOUNT = -2,
+} OsAccountEnum;
+
+typedef enum {
     ALL_GROUP = 0,
     IDENTICAL_ACCOUNT_GROUP = 1,
     PEER_TO_PEER_GROUP = 256,
     COMPATIBLE_GROUP = 512,
     ACROSS_ACCOUNT_AUTHORIZE_GROUP = 1282
-};
+} GroupType;
 
-enum GroupOperationCode {
+typedef enum {
     GROUP_CREATE = 0,
     GROUP_DISBAND = 1,
     MEMBER_INVITE = 2,
     MEMBER_JOIN = 3,
     MEMBER_DELETE = 4,
     ACCOUNT_BIND = 5
-};
+} GroupOperationCode;
 
-enum GroupAuthForm {
+typedef enum {
     AUTH_FORM_INVALID_TYPE = -1,
     AUTH_FORM_ACCOUNT_UNRELATED = 0,
     AUTH_FORM_IDENTICAL_ACCOUNT = 1,
     AUTH_FORM_ACROSS_ACCOUNT = 2,
-};
+} GroupAuthForm;
 
-enum CredentialCode {
-    CREDENTIAL_SAVE = 0,
-    CREDENTIAL_CLEAR = 1,
-    CREDENTIAL_UPDATE = 2,
-    CREDENTIAL_QUERY = 3,
-};
+typedef enum {
+    IMPORT_SELF_CREDENTIAL = 0,
+    DELETE_SELF_CREDENTIAL = 1,
+    QUERY_SELF_CREDENTIAL_INFO = 2,
+    IMPORT_TRUSTED_CREDENTIALS = 3,
+    DELETE_TRUSTED_CREDENTIALS = 4,
+    QUERY_TRUSTED_CREDENTIALS = 5,
+    REQUEST_SIGNATURE = 6,
+} CredentialCode;
 
-enum UserType {
+typedef enum {
     DEVICE_TYPE_ACCESSORY = 0,
     DEVICE_TYPE_CONTROLLER = 1,
     DEVICE_TYPE_PROXY = 2
-};
+} UserType;
 
-enum RequestResponse {
+typedef enum {
+    EXPIRE_TIME_INDEFINITE = -1,
+    EXPIRE_TIME_MIN = 1,
+    EXPIRE_TIME_MAX = 90,
+} ExpireTime;
+
+typedef enum {
     REQUEST_REJECTED = 0x80000005,
     REQUEST_ACCEPTED = 0x80000006,
     REQUEST_WAITING = 0x80000007
-};
+} RequestResponse;
 
-struct DataChangeListener {
+typedef struct {
     void (*onGroupCreated)(const char *groupInfo);
     void (*onGroupDeleted)(const char *groupInfo);
     void (*onDeviceBound)(const char *peerUdid, const char *groupInfo);
@@ -117,38 +135,40 @@ struct DataChangeListener {
     void (*onDeviceNotTrusted)(const char *peerUdid);
     void (*onLastGroupDeleted)(const char *peerUdid, int groupType);
     void (*onTrustedDeviceNumChanged)(int curTrustedDeviceNum);
-};
+} DataChangeListener;
 
-struct DeviceAuthCallback {
+typedef struct {
     bool (*onTransmit)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void (*onSessionKeyReturned)(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     void (*onFinish)(int64_t requestId, int operationCode, const char *returnData);
     void (*onError)(int64_t requestId, int operationCode, int errorCode, const char *errorReturn);
     char *(*onRequest)(int64_t requestId, int operationCode, const char *reqParams);
-};
+} DeviceAuthCallback;
 
-struct GroupAuthManager {
+typedef struct {
     int32_t (*processData)(int64_t authReqId, const uint8_t *data, uint32_t dataLen,
-                           const DeviceAuthCallback *gaCallback);
+        const DeviceAuthCallback *gaCallback);
     int32_t (*queryTrustedDeviceNum)(void);
     bool (*isTrustedDevice)(const char *udid);
-    int32_t (*getAuthState)(int64_t authReqId, const char *groupId, const char *peerUdid, uint8_t *out,
-                            uint32_t *outLen);
-    int32_t (*authDevice)(int64_t authReqId, const char *authParams, const DeviceAuthCallback *gaCallback);
+    int32_t (*getAuthState)(int64_t authReqId, const char *groupId, const char *peerUdid,
+        uint8_t *out, uint32_t *outLen);
+    int32_t (*authDevice)(int32_t osAccountId, int64_t authReqId, const char *authParams,
+        const DeviceAuthCallback *gaCallback);
     void (*informDeviceDisconnection)(const char *udid);
-};
+} GroupAuthManager;
 
-struct DeviceGroupManager {
+typedef struct {
     int32_t (*regCallback)(const char *appId, const DeviceAuthCallback *callback);
     int32_t (*unRegCallback)(const char *appId);
     int32_t (*regDataChangeListener)(const char *appId, const DataChangeListener *listener);
     int32_t (*unRegDataChangeListener)(const char *appId);
-    int32_t (*createGroup)(int64_t requestId, const char *appId, const char *createParams);
-    int32_t (*deleteGroup)(int64_t requestId, const char *appId, const char *disbandParams);
-    int32_t (*addMemberToGroup)(int64_t requestId, const char *appId, const char *addParams);
-    int32_t (*deleteMemberFromGroup)(int64_t requestId, const char *appId, const char *deleteParams);
+    int32_t (*createGroup)(int32_t osAccountId, int64_t requestId, const char *appId, const char *createParams);
+    int32_t (*deleteGroup)(int32_t osAccountId, int64_t requestId, const char *appId, const char *disbandParams);
+    int32_t (*addMemberToGroup)(int32_t osAccountId, int64_t requestId, const char *appId, const char *addParams);
+    int32_t (*deleteMemberFromGroup)(int32_t osAccountId, int64_t requestId, const char *appId,
+        const char *deleteParams);
     int32_t (*processData)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
-    int32_t (*confirmRequest)(int64_t requestId, const char *appId, const char *confirmParams);
+    int32_t (*confirmRequest)(int32_t osAccountId, int64_t requestId, const char *appId, const char *confirmParams);
     int32_t (*bindPeer)(int64_t requestId, const char *appId, const char *bindParams);
     int32_t (*unbindPeer)(int64_t requestId, const char *appId, const char *unbindParams);
     int32_t (*processLiteData)(int64_t requestId, const char *appId, const uint8_t *data, uint32_t dataLen);
@@ -157,24 +177,32 @@ struct DeviceGroupManager {
     int32_t (*processCredential)(int operationCode, const char *reqJsonStr, char **returnJsonStr);
     int32_t (*getRegisterInfo)(char **returnRegisterInfo);
     int32_t (*getLocalConnectInfo)(char *returnInfo, int32_t bufLen);
-    int32_t (*checkAccessToGroup)(const char *appId, const char *groupId);
-    int32_t (*getPkInfoList)(const char *appId, const char *queryParams, char **returnInfoList,
-                             uint32_t *returnInfoNum);
-    int32_t (*addGroupManager)(const char *appId, const char *groupId, const char *managerAppId);
-    int32_t (*addGroupFriend)(const char *appId, const char *groupId, const char *friendAppId);
-    int32_t (*deleteGroupManager)(const char *appId, const char *groupId, const char *managerAppId);
-    int32_t (*deleteGroupFriend)(const char *appId, const char *groupId, const char *friendAppId);
-    int32_t (*getGroupManagers)(const char *appId, const char *groupId, char **returnManagers, uint32_t *returnSize);
-    int32_t (*getGroupFriends)(const char *appId, const char *groupId, char **returnFriends, uint32_t *returnSize);
-    int32_t (*getGroupInfoById)(const char *appId, const char *groupId, char **returnGroupInfo);
-    int32_t (*getGroupInfo)(const char *appId, const char *queryParams, char **returnGroupVec, uint32_t *groupNum);
-    int32_t (*getJoinedGroups)(const char *appId, int groupType, char **returnGroupVec, uint32_t *groupNum);
-    int32_t (*getRelatedGroups)(const char *appId, const char *peerDeviceId, char **returnGroupVec, uint32_t *groupNum);
-    int32_t (*getDeviceInfoById)(const char *appId, const char *deviceId, const char *groupId, char **returnDeviceInfo);
-    int32_t (*getTrustedDevices)(const char *appId, const char *groupId, char **returnDevInfoVec, uint32_t *deviceNum);
-    bool (*isDeviceInGroup)(const char *appId, const char *groupId, const char *deviceId);
+    int32_t (*checkAccessToGroup)(int32_t osAccountId, const char *appId, const char *groupId);
+    int32_t (*getPkInfoList)(int32_t osAccountId, const char *appId, const char *queryParams, char **returnInfoList,
+        uint32_t *returnInfoNum);
+    int32_t (*addGroupManager)(int32_t osAccountId, const char *appId, const char *groupId, const char *managerAppId);
+    int32_t (*addGroupFriend)(int32_t osAccountId, const char *appId, const char *groupId, const char *friendAppId);
+    int32_t (*deleteGroupManager)(int32_t osAccountId, const char *appId, const char *groupId,
+        const char *managerAppId);
+    int32_t (*deleteGroupFriend)(int32_t osAccountId, const char *appId, const char *groupId, const char *friendAppId);
+    int32_t (*getGroupManagers)(int32_t osAccountId, const char *appId, const char *groupId, char **returnManagers,
+        uint32_t *returnSize);
+    int32_t (*getGroupFriends)(int32_t osAccountId, const char *appId, const char *groupId,
+        char **returnFriends, uint32_t *returnSize);
+    int32_t (*getGroupInfoById)(int32_t osAccountId, const char *appId, const char *groupId, char **returnGroupInfo);
+    int32_t (*getGroupInfo)(int32_t osAccountId, const char *appId, const char *queryParams,
+        char **returnGroupVec, uint32_t *groupNum);
+    int32_t (*getJoinedGroups)(int32_t osAccountId, const char *appId, int groupType,
+        char **returnGroupVec, uint32_t *groupNum);
+    int32_t (*getRelatedGroups)(int32_t osAccountId, const char *appId, const char *peerDeviceId,
+        char **returnGroupVec, uint32_t *groupNum);
+    int32_t (*getDeviceInfoById)(int32_t osAccountId, const char *appId, const char *deviceId, const char *groupId,
+        char **returnDeviceInfo);
+    int32_t (*getTrustedDevices)(int32_t osAccountId, const char *appId, const char *groupId,
+        char **returnDevInfoVec, uint32_t *deviceNum);
+    bool (*isDeviceInGroup)(int32_t osAccountId, const char *appId, const char *groupId, const char *deviceId);
     void (*destroyInfo)(char **returnInfo);
-};
+} DeviceGroupManager;
 
 #ifdef __cplusplus
 extern "C" {
