@@ -175,13 +175,13 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
 int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 {
     LOGI("DmAuthManager::VerifyAuthentication");
+    timerMap_[INPUT_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
+
     std::shared_ptr<IAuthentication> ptr;
-    if (authenticationMap_.find(1) == authenticationMap_.end() && timerMap_[INPUT_TIMEOUT_TASK] == nullptr) {
+    if (authenticationMap_.find(1) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return DM_FAILED;
     }
-    timerMap_[INPUT_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-
     ptr = authenticationMap_[1];
     int32_t ret = ptr->VerifyAuthentication(authRequestContext_->token, authResponseContext_->code, authParam);
     switch (ret) {
@@ -269,8 +269,7 @@ void DmAuthManager::OnDataReceived(int32_t sessionId, std::string message)
     }
     switch (authResponseContext_->msgType) {
         case MSG_TYPE_NEGOTIATE:
-            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT
-                && timerMap_[WAIT_NEGOTIATE_TIMEOUT_TASK] != nullptr) {
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
                 timerMap_[WAIT_NEGOTIATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
             } else {
@@ -278,8 +277,7 @@ void DmAuthManager::OnDataReceived(int32_t sessionId, std::string message)
             }
             break;
         case MSG_TYPE_REQ_AUTH:
-            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE
-                && timerMap_[WAIT_REQUEST_TIMEOUT_TASK] != nullptr) {
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
                 timerMap_[WAIT_REQUEST_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
             } else {
@@ -339,7 +337,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
     LOGE("DmAuthManager OnMemberJoin start");
-    if (authRequestState_ != nullptr && timerMap_[ADD_TIMEOUT_TASK] != nullptr) {
+    if (authRequestState_ != nullptr) {
         timerMap_[ADD_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr) {
@@ -446,9 +444,6 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 {
     LOGE("DmAuthManager::EstablishAuthChannel session id");
-    if (timerMap_[NEGOTIATE_TIMEOUT_TASK] == nullptr) {
-        return;
-    }
     timerMap_[NEGOTIATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     if (authResponseContext_->cryptoSupport == true) {
         isCryptoSupport_ = true;
@@ -484,9 +479,6 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
 void DmAuthManager::StartRespAuthProcess()
 {
     LOGI("DmAuthManager::StartRespAuthProcess StartRespAuthProcess", authResponseContext_->sessionId);
-    if (timerMap_[CONFIRM_TIMEOUT_TASK] == nullptr) {
-        return;
-    }
     timerMap_[CONFIRM_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
         std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(INPUT_TIMEOUT_TASK);
@@ -543,9 +535,6 @@ std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 int32_t DmAuthManager::JoinNetwork()
 {
     LOGE("DmAuthManager JoinNetwork start");
-    if (timerMap_[AUTHENTICATE_TIMEOUT_TASK] == nullptr) {
-        return DM_FAILED;
-    }
     timerMap_[AUTHENTICATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
@@ -798,9 +787,6 @@ void DmAuthManager::UserSwitchEventCallback (int32_t userId)
 void DmAuthManager::VerifyPinAuthAuthentication(const std::string &action)
 {
     LOGI("DmAuthManager::VerifyPinAuthAuthentication");
-    if (timerMap_[INPUT_TIMEOUT_TASK] == nullptr) {
-        return;
-    }
     timerMap_[INPUT_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     if (action == "0") {
         authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
