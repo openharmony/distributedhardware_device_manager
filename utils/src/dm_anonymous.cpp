@@ -46,7 +46,7 @@ std::string GetAnonyString(const std::string &value)
 std::string GetAnonyInt32(const int32_t value)
 {
     std::string tempString = std::to_string(value);
-    int32_t length =(int32_t)(tempString.length());
+    int32_t length = (int32_t)(tempString.length());
     if (length == 0x01) {
         tempString[0] = '*';
         return tempString;

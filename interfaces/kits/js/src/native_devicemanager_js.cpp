@@ -1046,7 +1046,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
             }
 
             for (size_t i = 0; i != deviceInfoAsyncCallbackInfo->devList.size(); ++i) {
-                DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, (int32_t)i, array[1]);
+                 DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, (int32_t)i, array[1]);
             }
             LOGE("devList is OK");
         } else {

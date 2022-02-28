@@ -35,7 +35,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 {
     LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
     std::vector<std::string> jsonStrVec;
-    int32_t thumbnailSize =(int32_t)(authRequestContext_->appThumbnail.size());
+    int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
     int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
