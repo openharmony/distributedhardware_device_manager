@@ -164,7 +164,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Lev
 {
     std::string pkgName;
     DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
+    strncpy_s(info.deviceId, "123", sizeof(info.deviceId));
     dmDeviceStateManager->OnDeviceReady(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);

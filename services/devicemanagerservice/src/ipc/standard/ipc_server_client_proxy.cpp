@@ -36,7 +36,7 @@ int32_t IpcServerClientProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         return DM_IPC_FAILED;
     }
-    if (remote->SendRequest(cmdCode, data, reply, option) != DM_OK) {
+    if (remote->SendRequest((uint32_t)cmdCode, data, reply, option) != DM_OK) {
         LOGE("SendRequest fail, cmd:%d", cmdCode);
         return DM_IPC_FAILED;
     }

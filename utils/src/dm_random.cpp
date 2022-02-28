@@ -87,7 +87,7 @@ bool MbedtlsGenRandomStr(char *szOut, int32_t szOutLen, bool numberOnly)
         return false;
     }
     szOut[--szOutLen] = 0;
-    GetRandomData((uint8_t *)szOut, szOutLen);
+    GetRandomData((uint8_t *)szOut, (uint32_t)szOutLen);
     const int32_t NUMBER_COUNT = 10;
     const int32_t ALPHA_COUNT = 26;
     const int32_t ALPHA_BYTE_COUNT = 2;

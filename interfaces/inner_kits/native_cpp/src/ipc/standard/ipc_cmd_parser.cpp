@@ -101,7 +101,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
         DmDeviceInfo *pDmDeviceinfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
             pDmDeviceinfo = nullptr;
-            pDmDeviceinfo = (DmDeviceInfo *)reply.ReadRawData((int32_t)sizeof(DmDeviceInfo));
+            pDmDeviceinfo = (DmDeviceInfo *)reply.ReadRawData((uint32_t)sizeof(DmDeviceInfo));
             if (pDmDeviceinfo == nullptr) {
                 LOGE("GetTrustedDeviceList read node info failed!");
                 pRsp->SetErrCode(DM_IPC_TRANSACTION_FAILED);
@@ -212,7 +212,7 @@ ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, Messa
         LOGE("write pkgName failed");
         return DM_IPC_FLATTEN_OBJECT;
     }
-    if (!data.WriteInt16(subscribeId)) {
+    if (!data.WriteInt16((int16_t)subscribeId)) {
         LOGE("write subscribeId failed");
         return DM_IPC_FLATTEN_OBJECT;
     }
@@ -384,7 +384,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
 ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId = data.ReadInt16();
+    int16_t subscribeId = (int16_t)(data.ReadInt16());
     DmDeviceInfo dmDeviceInfo;
     size_t deviceSize = sizeof(DmDeviceInfo);
     void *deviceInfo = (void *)data.ReadRawData(deviceSize);
@@ -400,7 +400,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(SERVER_DISCOVER_FINISH, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId = data.ReadInt16();
+    uint16_t subscribeId =(uint16_t)(data.ReadInt16());
     int32_t failedReason = data.ReadInt32();
 
     if (failedReason == DM_OK) {
@@ -419,7 +419,7 @@ ON_IPC_CMD(SERVER_AUTH_RESULT, MessageParcel &data, MessageParcel &reply)
     std::string token = data.ReadString();
     int32_t status = data.ReadInt32();
     int32_t reason = data.ReadInt32();
-    DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
+    DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, (uint32_t)status, reason);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
