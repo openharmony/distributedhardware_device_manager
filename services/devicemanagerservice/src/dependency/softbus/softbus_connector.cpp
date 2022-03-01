@@ -50,7 +50,7 @@ INodeStateCb SoftbusConnector::softbusNodeStateCb_ = {
     .onNodeBasicInfoChanged = SoftbusConnector::OnSoftbusDeviceInfoChanged};
 
 void DeviceOnLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
-                  DmDeviceInfo deviceInfo)
+                 DmDeviceInfo deviceInfo)
 {
     LOGI("Device on line start");
     std::mutex lockDeviceOnLine;
@@ -62,7 +62,7 @@ void DeviceOnLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> 
 }
 
 void DeviceOffLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
-                  DmDeviceInfo deviceInfo)
+                 DmDeviceInfo deviceInfo)
 {
     LOGI("Device off line start");
     std::mutex lockDeviceOffLine;
