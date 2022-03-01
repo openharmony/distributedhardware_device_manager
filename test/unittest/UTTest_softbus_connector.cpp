@@ -87,7 +87,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 {
     std::string pkgName = "com.ohos.helloworld";
     int ret = softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
-    int ret1 = (int)(SoftbusConnector::discoveryCallbackMap_.count(pkgName));
+    uint32_t ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -170,7 +170,7 @@ HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0
 {
     std::string deviceId = "145677";
     NodeBasicInfo Info;
-    strncpy_s(Info.networkId, "145677", sizeof(Info.networkId));
+    strncpy(Info.networkId, "145677", sizeof(Info.networkId));
     bool ret = softbusConnector->IsDeviceOnLine(deviceId);
     EXPECT_EQ(ret, false);
 }

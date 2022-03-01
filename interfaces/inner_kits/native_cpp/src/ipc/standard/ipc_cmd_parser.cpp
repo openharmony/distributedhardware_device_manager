@@ -101,7 +101,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
         DmDeviceInfo *pDmDeviceinfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
             pDmDeviceinfo = nullptr;
-            pDmDeviceinfo = (DmDeviceInfo *)reply.ReadRawData((uint32_t)sizeof(DmDeviceInfo));
+            pDmDeviceinfo = (DmDeviceInfo *)reply.ReadRawData(sizeof(DmDeviceInfo));
             if (pDmDeviceinfo == nullptr) {
                 LOGE("GetTrustedDeviceList read node info failed!");
                 pRsp->SetErrCode(DM_IPC_TRANSACTION_FAILED);
@@ -384,7 +384,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
 ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    int16_t subscribeId = (int16_t)(data.ReadInt16());
+    int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
     size_t deviceSize = sizeof(DmDeviceInfo);
     void *deviceInfo = (void *)data.ReadRawData(deviceSize);
@@ -400,7 +400,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(SERVER_DISCOVER_FINISH, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId =(uint16_t)(data.ReadInt16());
+    int16_t subscribeId = data.ReadInt16();
     int32_t failedReason = data.ReadInt32();
 
     if (failedReason == DM_OK) {
