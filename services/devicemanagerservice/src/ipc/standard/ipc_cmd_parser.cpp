@@ -68,7 +68,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
         LOGE("write pkgName failed");
         return DM_FLATTEN_OBJECT;
     }
-    if (!data.WriteInt16(subscribeId)) {
+    if (!data.WriteInt16((int16_t)subscribeId)) {
         LOGE("write subscribeId failed");
         return DM_FLATTEN_OBJECT;
     }
@@ -95,7 +95,7 @@ ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mes
         LOGE("write pkgName failed");
         return DM_FLATTEN_OBJECT;
     }
-    if (!data.WriteInt16(subscribeId)) {
+    if (!data.WriteInt16((int16_t)subscribeId)) {
         LOGE("write subscribeId failed");
         return DM_FLATTEN_OBJECT;
     }
@@ -211,7 +211,7 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     LOGI("pkgName:%s, extra:%s", pkgName.c_str(), extra.c_str());
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    int32_t infoNum = deviceList.size();
+    int32_t infoNum =(int32_t)(deviceList.size());
     DmDeviceInfo deviceInfo;
     if (!reply.WriteInt32(infoNum)) {
         LOGE("write infoNum failed");
@@ -280,7 +280,7 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId = data.ReadInt32();
+    uint16_t subscribeId = (uint16_t)(data.ReadInt32());
     LOGI("pkgName:%s, subscribeId: %d", pkgName.c_str(), subscribeId);
     int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     if (!reply.WriteInt32(result)) {
@@ -394,7 +394,7 @@ ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
     int32_t ret = DM_OK;
     ret = DeviceManagerService::GetInstance().GetFaParam(packName, authParam);
     int32_t appIconLen = authParam.imageinfo.GetAppIconLen();
-    int32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
+    uint32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
 
     if (!reply.WriteInt32(authParam.direction) || !reply.WriteInt32(authParam.authType) ||
         !reply.WriteString(authParam.authToken) || !reply.WriteString(authParam.packageName) ||

@@ -72,7 +72,7 @@ void DeviceManagerServiceListener::OnDiscoverySuccess(const std::string &pkgName
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
     pReq->SetPkgName(pkgName);
-    pReq->SetSubscribeId(subscribeId);
+    pReq->SetSubscribeId((uint16_t)subscribeId);
     pReq->SetResult(DM_OK);
     ipcServerListener_.SendRequest(SERVER_DISCOVER_FINISH, pReq, pRsp);
 }

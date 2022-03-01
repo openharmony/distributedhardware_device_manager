@@ -725,7 +725,7 @@ void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &obje
         *bufferPtr = nullptr;
         return;
     }
-    bufferLen = length;
+    bufferLen = (int32_t)length;
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
@@ -971,7 +971,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
                 LOGE("napi_create_array fail");
             }
             for (unsigned int i = 0; i != deviceInfoAsyncCallbackInfo->devList.size(); ++i) {
-                DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, i, array[1]);
+                DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, (int32_t)i, array[1]);
             }
             napi_resolve_deferred(env, deviceInfoAsyncCallbackInfo->deferred, array[1]);
             LOGE("devList is OK");
@@ -1045,7 +1045,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
                 LOGE("napi_create_array fail");
             }
 
-            for (size_t i = 0; i != deviceInfoAsyncCallbackInfo->devList.size(); ++i) {
+            for (int32_t i = 0; i != deviceInfoAsyncCallbackInfo->devList.size(); ++i) {
                 DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, i, array[1]);
             }
             LOGE("devList is OK");
@@ -1252,7 +1252,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     LOGI("DeviceManager::GetTrustedDeviceListSync");
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
-            DeviceInfoToJsArray(env, devList, i, result);
+            DeviceInfoToJsArray(env, devList, (int32_t)i, result);
         }
     }
     return result;
@@ -1685,7 +1685,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     int32_t ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bunderName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        napi_create_uint32(env, ret, &result);
+        napi_create_uint32(env, (uint32_t)ret, &result);
         return result;
     }
 

@@ -236,7 +236,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
     std::string pkgName;
     int32_t subscribeId = 1;
     discoveryMgr_->OnDiscoverySuccess(pkgName, subscribeId);
-    int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
+    uint32_t ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret1, 1);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
@@ -254,7 +254,7 @@ HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestS
 {
     std::string pkgName = "com.ohos.helloworld";
     discoveryMgr_->HandleDiscoveryTimeout();
-    int ret = discoveryMgr_->discoveryContextMap_.count(pkgName);
+    uint32_t ret = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret, 1);
 }
 } // namespace

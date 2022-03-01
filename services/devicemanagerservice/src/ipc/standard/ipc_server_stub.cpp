@@ -82,7 +82,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 {
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
     int32_t ret = DM_OK;
-    ret = IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply);
+    ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
         LOGW("unsupport code: %d", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

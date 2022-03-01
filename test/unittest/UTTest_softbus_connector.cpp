@@ -87,7 +87,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 {
     std::string pkgName = "com.ohos.helloworld";
     int ret = softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
-    int ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
+    uint32_t ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
     EXPECT_EQ(ret, DM_OK);
 }
