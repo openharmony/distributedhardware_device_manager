@@ -971,7 +971,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
                 LOGE("napi_create_array fail");
             }
             for (unsigned int i = 0; i != deviceInfoAsyncCallbackInfo->devList.size(); ++i) {
-                DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList,(int32_t)i, array[1]);
+                DeviceInfoToJsArray(env, deviceInfoAsyncCallbackInfo->devList, (int32_t)i, array[1]);
             }
             napi_resolve_deferred(env, deviceInfoAsyncCallbackInfo->deferred, array[1]);
             LOGE("devList is OK");
