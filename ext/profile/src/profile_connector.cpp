@@ -18,75 +18,92 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 
+using namespace OHOS::DeviceProfile;
+
 namespace OHOS {
 namespace DistributedHardware {
-std::map<std::string, std::shared_ptr<IProfileConnectorCallback>> ProfileEventCallback::profileConnectorCallback_ = {};
-std::shared_ptr<ProfileEventCallback> ProfileConnector::profileEventCallback_ =
-    std::make_shared<ProfileEventCallback>();
+ProfileConnector::ProfileConnector()
+{
+    LOGI("ProfileConnector construct");
+}
+
+ProfileConnector::~ProfileConnector()
+{
+    LOGI("ProfileConnector Destructor");
+}
 
 int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, const std::string &deviceId,
-                                                  std::shared_ptr<IProfileConnectorCallback> callback)
+                                                  IProfileConnectorCallback* callback)
 {
-    LOGI("ProfileConnector::RegisterProfileCallback");
-    profileEventCallback_->RegisterProfileCallback(pkgName, callback);
-    SubscribeProfileEvents({ "system", "device", "fakeStorage", "fakeSystem" }, deviceId);
-    return DM_OK;
+    if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
+        LOGE("Not a reasonable function argument");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("register profile callback with pkgName: %s", pkgName.c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
+        if (callbackMap_.find(pkgName) != callbackMap_.end()) {
+            LOGE("pkgName: %s already exists in the map", pkgName.c_str());
+            return ERR_DM_KEY_ALREADY_EXISTS;
+        }
+        LOGI("register profile callback pkgName: %s", pkgName.c_str());
+        callbackMap_[pkgName] = callback;
+    }
+    std::list<std::string> serviceIds = { "system", "device", "fakeStorage", "fakeSystem" };
+    int32_t ret = SubscribeProfileEvents(serviceIds, deviceId);
+    if (ret != DM_OK) {
+        LOGE("fail to subscribe profile events");
+    }
+    return ret;
 }
 
 int32_t ProfileConnector::UnRegisterProfileCallback(const std::string &pkgName)
 {
-    LOGI("ProfileConnector::UnRegisterProfileCallback");
-    profileEventCallback_->UnRegisterProfileCallback(pkgName);
+    if (pkgName.empty()) {
+        LOGE("Not a reasonable function argument");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("unregister profile callback with pkgName: %s", pkgName.c_str());
+    std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
+    if (callbackMap_.find(pkgName) != callbackMap_.end()) {
+        callbackMap_.erase(pkgName);
+    }
     return DM_OK;
 }
 
 int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &serviceIds, const std::string &deviceId)
 {
-    ExtraInfo extraInfo;
-    extraInfo["deviceId"] = deviceId;
-    extraInfo["serviceIds"] = serviceIds;
-
-    std::list<SubscribeInfo> subscribeInfos;
-
     SubscribeInfo eventSync;
+    std::list<ProfileEvent> failedEvents;
+    std::list<SubscribeInfo> subscribeInfos;
     eventSync.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
     subscribeInfos.emplace_back(eventSync);
-
-    std::list<ProfileEvent> failedEvents;
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
-        subscribeInfos, profileEventCallback_, failedEvents);
-    LOGI("ProfileConnector::SubscribeProfileEvents result=%d", errCode);
+        subscribeInfos, shared_from_this(), failedEvents);
+    if (errCode != ERR_OK) {
+        LOGI("subscribe profile events result: %ud", errCode);
+        return ERR_DM_UNSUBSCRIBE_DP_EVENTS;
+    }
     return DM_OK;
 }
 
 int32_t ProfileConnector::UnSubscribeProfileEvents()
 {
     std::list<ProfileEvent> profileEvents;
-    profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
-    profileEvents.emplace_back(ProfileEvent::EVENT_SYNC_COMPLETED);
     std::list<ProfileEvent> failedEvents;
+    profileEvents.emplace_back(ProfileEvent::EVENT_SYNC_COMPLETED);
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
-        profileEvents, profileEventCallback_, failedEvents);
-    LOGI("ProfileConnector::UnSubscribeProfileEvents result=%d", errCode);
+        profileEvents, shared_from_this(), failedEvents);
+    if (errCode != ERR_OK) {
+        LOGI("unSubscribe profile events result:%ud", errCode);
+        return ERR_DM_UNSUBSCRIBE_DP_EVENTS;
+    }
     return DM_OK;
 }
 
-int32_t ProfileEventCallback::RegisterProfileCallback(const std::string &pkgName,
-                                                      std::shared_ptr<IProfileConnectorCallback> callback)
-{
-    LOGI("ProfileEventCallback::RegisterProfileCallback");
-    profileConnectorCallback_.emplace(pkgName, callback);
-    return DM_OK;
-}
-
-int32_t ProfileEventCallback::UnRegisterProfileCallback(const std::string &pkgName)
-{
-    LOGI("ProfileEventCallback::UnRegisterProfileCallback");
-    profileConnectorCallback_.erase(pkgName);
-    return DM_OK;
-}
-
-void ProfileEventCallback::OnSyncCompleted(const SyncResult &syncResults)
+void ProfileConnector::OnSyncCompleted(const SyncResult &syncResults)
 {
     std::string deviceId;
     u_int32_t SyncStatus;
@@ -95,7 +112,8 @@ void ProfileEventCallback::OnSyncCompleted(const SyncResult &syncResults)
         SyncStatus = iterResult.second;
     }
     LOGI("ProfileEventCallback::OnSyncCompleted, deviceId = %s", deviceId.c_str());
-    for (auto &iter : profileConnectorCallback_) {
+    std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
+    for (auto &iter : callbackMap_) {
         iter.second->OnProfileComplete(iter.first, deviceId);
     }
 }

@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -28,28 +29,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::DeviceProfile;
-
-class ProfileEventCallback : public IProfileEventCallback {
+class ProfileConnector final : public OHOS::DeviceProfile::IProfileEventCallback,
+    public std::enable_shared_from_this<ProfileConnector> {
 public:
-    void OnSyncCompleted(const SyncResult &syncResults);
-    int32_t RegisterProfileCallback(const std::string &pkgName, std::shared_ptr<IProfileConnectorCallback> callback);
-    int32_t UnRegisterProfileCallback(const std::string &pkgName);
-
-public:
-    static std::map<std::string, std::shared_ptr<IProfileConnectorCallback>> profileConnectorCallback_;
-};
-
-class ProfileConnector : public IProfileEventCallback {
-public:
+    ProfileConnector();
+    virtual ~ProfileConnector();
     int32_t RegisterProfileCallback(const std::string &pkgName, const std::string &deviceId,
-                                    std::shared_ptr<IProfileConnectorCallback> callback);
+                                    IProfileConnectorCallback* callback);
     int32_t UnRegisterProfileCallback(const std::string &pkgName);
     int32_t SubscribeProfileEvents(const std::list<std::string> &serviceIds, const std::string &deviceId);
     int32_t UnSubscribeProfileEvents();
-
+    void OnSyncCompleted(const OHOS::DeviceProfile::SyncResult &syncResults) override;
 private:
-    static std::shared_ptr<ProfileEventCallback> profileEventCallback_;
+    std::mutex callbackMapMutex_;
+    std::map<std::string, IProfileConnectorCallback*> callbackMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

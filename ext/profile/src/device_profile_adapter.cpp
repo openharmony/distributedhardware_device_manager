@@ -21,52 +21,70 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-std::shared_ptr<ProfileConnector> DeviceProfileAdapter::profileConnector_ = std::make_shared<ProfileConnector>();
-
 DeviceProfileAdapter::DeviceProfileAdapter()
 {
+    LOGI("DeviceProfileAdapter construct");
 }
 
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
+    LOGI("DeviceProfileAdapter Destructor");
 }
 
 int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &pkgName, const std::string &deviceId,
                                                       std::shared_ptr<DmDeviceStateManager> callback)
 {
-    LOGI("DeviceProfileAdapter::RegisterProfileListener");
-    deviceProfileAdapterCallback_ = callback;
-    profileConnector_->RegisterProfileCallback(pkgName, deviceId, std::shared_ptr<DeviceProfileAdapter>(this));
+    if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
+        LOGE("Not a reasonable function argument");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("register profile listener with pkgName: %s", pkgName.c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);
+    deviceStateManager_ = callback;
+    if (profileConnector_ == nullptr) {
+        profileConnector_ = std::make_shared<ProfileConnector>();
+    }
+    if (profileConnector_ != nullptr) {
+        profileConnector_->RegisterProfileCallback(pkgName, deviceId, this);
+    }
     return DM_OK;
 }
 
 int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &pkgName)
 {
-    LOGI("DeviceProfileAdapter::RegisterProfileListener");
-    deviceProfileAdapterCallback_ = nullptr;
-    profileConnector_->UnRegisterProfileCallback(pkgName);
-    return DM_OK;
-}
-
-int32_t DeviceProfileAdapter::OnProfileClientDeviceReady(const std::string &pkgName, const std::string &deviceId)
-{
-    LOGI("DeviceProfileAdapter::OnProfileClientDeviceReady");
-    if (deviceProfileAdapterCallback_ != nullptr) {
-        deviceProfileAdapterCallback_->OnProfileReady(pkgName, deviceId);
-    } else {
-        LOGI("deviceProfileAdapterCallback_ is nullptr");
+    if (pkgName.empty()) {
+        LOGE("not a reasonable function argument");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("unregister profile listener with pkgName: %s", pkgName.c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);
+    deviceStateManager_ = nullptr;
+    if (profileConnector_ != nullptr) {
+        profileConnector_->UnRegisterProfileCallback(pkgName);
     }
     return DM_OK;
 }
 
 void DeviceProfileAdapter::OnProfileChanged(const std::string &pkgName, const std::string &deviceId)
 {
-    OnProfileClientDeviceReady(pkgName, deviceId);
+    LOGI("on profile changed with pkgName: %s", pkgName.c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);
+    if (deviceStateManager_ == nullptr) {
+        LOGE("deviceStateManager_ is nullptr");
+        return;
+    }
+    deviceStateManager_->OnProfileReady(pkgName, deviceId);
 }
 
 void DeviceProfileAdapter::OnProfileComplete(const std::string &pkgName, const std::string &deviceId)
 {
-    OnProfileClientDeviceReady(pkgName, deviceId);
+    LOGI("on profile complete with pkgName: %s", pkgName.c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);
+    if (deviceStateManager_ == nullptr) {
+        LOGE("deviceStateManager_ is nullptr");
+        return;
+    }
+    deviceStateManager_->OnProfileReady(pkgName, deviceId);
 }
 
 extern "C" IProfileAdapter *CreateDeviceProfileObject(void)

@@ -17,6 +17,7 @@
 #define OHOS_DM_ADAPTER_DEVICE_PROFILE_H
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include "profile_adapter.h"
@@ -24,20 +25,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceProfileAdapter : public IProfileAdapter, public IProfileConnectorCallback {
+class DeviceProfileAdapter final : public IProfileAdapter, public IProfileConnectorCallback,
+    public std::enable_shared_from_this<DeviceProfileAdapter> {
 public:
     DeviceProfileAdapter();
-    ~DeviceProfileAdapter();
+    virtual ~DeviceProfileAdapter();
     int32_t RegisterProfileListener(const std::string &pkgName, const std::string &deviceId,
-                                    std::shared_ptr<DmDeviceStateManager> callback);
-    int32_t UnRegisterProfileListener(const std::string &pkgName);
-    int32_t OnProfileClientDeviceReady(const std::string &pkgName, const std::string &deviceId);
-    void OnProfileChanged(const std::string &pkgName, const std::string &deviceId);
-    void OnProfileComplete(const std::string &pkgName, const std::string &deviceId);
-
+                                    std::shared_ptr<DmDeviceStateManager> callback) override;
+    int32_t UnRegisterProfileListener(const std::string &pkgName) override;
+    void OnProfileChanged(const std::string &pkgName, const std::string &deviceId) override;
+    void OnProfileComplete(const std::string &pkgName, const std::string &deviceId) override;
 private:
-    std::shared_ptr<DmDeviceStateManager> deviceProfileAdapterCallback_;
-    static std::shared_ptr<ProfileConnector> profileConnector_;
+    std::mutex deviceProfileAdapterMutex_;
+    std::shared_ptr<DmDeviceStateManager> deviceStateManager_;
+    std::shared_ptr<ProfileConnector> profileConnector_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
