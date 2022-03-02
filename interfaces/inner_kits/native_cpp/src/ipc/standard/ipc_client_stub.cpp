@@ -26,7 +26,7 @@ namespace DistributedHardware {
 int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
-    if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DM_OK) {
+    if (IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply) == DM_OK) {
         LOGE("on ipc cmd success");
         return DM_OK;
     }

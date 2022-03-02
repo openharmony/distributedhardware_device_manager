@@ -17,6 +17,8 @@
 
 #include <securec.h>
 #include <unistd.h>
+#include <thread>
+#include <mutex>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -46,6 +48,30 @@ INodeStateCb SoftbusConnector::softbusNodeStateCb_ = {
     .onNodeOnline = SoftbusConnector::OnSoftBusDeviceOnline,
     .onNodeOffline = SoftbusConnector::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusConnector::OnSoftbusDeviceInfoChanged};
+
+void DeviceOnLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
+    DmDeviceInfo deviceInfo)
+{
+    LOGI("Device on line start");
+    std::mutex lockDeviceOnLine;
+    std::lock_guard<std::mutex> lock(lockDeviceOnLine);
+    for (auto &iter : stateCallbackMap) {
+        iter.second->OnDeviceOnline(iter.first, deviceInfo);
+    }
+    LOGI("Device on line end");
+}
+
+void DeviceOffLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
+    DmDeviceInfo deviceInfo)
+{
+    LOGI("Device off line start");
+    std::mutex lockDeviceOffLine;
+    std::lock_guard<std::mutex> lock(lockDeviceOffLine);
+    for (auto &iter : stateCallbackMap) {
+        iter.second->OnDeviceOffline(iter.first, deviceInfo);
+    }
+    LOGI("Device off line end");
+}
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -445,9 +471,8 @@ void SoftbusConnector::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 
     DmDeviceInfo dmDeviceInfo;
     CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    for (auto &iter : stateCallbackMap_) {
-        iter.second->OnDeviceOnline(iter.first, dmDeviceInfo);
-    }
+    std::thread deviceOnLine(DeviceOnLine, stateCallbackMap_, dmDeviceInfo);
+    deviceOnLine.detach();
 
     if (discoveryDeviceInfoMap_.empty()) {
         return;
@@ -473,9 +498,8 @@ void SoftbusConnector::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    for (auto &iter : stateCallbackMap_) {
-        iter.second->OnDeviceOffline(iter.first, dmDeviceInfo);
-    }
+    std::thread deviceOffLine(DeviceOffLine, stateCallbackMap_, dmDeviceInfo);
+    deviceOffLine.detach();
 }
 
 void SoftbusConnector::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)

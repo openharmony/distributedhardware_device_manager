@@ -92,7 +92,6 @@ void DmTimer::Stop(int32_t code)
         }
         LOGI("DmTimer %s Stop success", mTimerName_.c_str());
     }
-
     return;
 }
 
@@ -107,14 +106,8 @@ void DmTimer::WaitForTimeout()
     int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
     if (nfds < 0) {
         LOGE("DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
-        if (errno == EINTR) {
-            LOGI("DmTimer is stop");
-            return;
-        }
-    }
-
-    char event = 0;
-    if (nfds > 0) {
+    } else if (nfds > 0) {
+        char event = 0;
         if (mEvents_[0].events & EPOLLIN) {
             int num = read(mTimeFd_[0], &event, 1);
             if (num > 0) {
@@ -124,13 +117,11 @@ void DmTimer::WaitForTimeout()
             }
         }
         Release();
-        return;
+    } else {
+        mHandle_(mHandleData_, *this);
+        Release();
+        LOGE("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
     }
-
-    mHandle_(mHandleData_, *this);
-    Release();
-
-    LOGE("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
     return;
 }
 

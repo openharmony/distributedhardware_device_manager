@@ -98,14 +98,14 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)
 {
     LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId=%d reason=%d", subscribeId, failedReason);
-    StopDeviceDiscovery(pkgName, subscribeId);
-    listener_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
+    StopDeviceDiscovery(pkgName, (uint32_t)subscribeId);
+    listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, failedReason);
 }
 
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
     LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId=%d", subscribeId);
-    discoveryContextMap_[pkgName].subscribeId = subscribeId;
+    discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
 
