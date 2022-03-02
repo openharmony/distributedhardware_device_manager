@@ -83,7 +83,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
-        LOGI("ReadInterfaceToken fail");      
+        LOGI("ReadInterfaceToken fail");
         return ERR_INVALID_STATE;
     }
     LOGI("ReadInterfaceToken success");
