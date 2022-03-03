@@ -429,6 +429,12 @@ int32_t SoftbusConnector::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
         LOGE("copy data failed");
     }
+
+    if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
+                 std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
+        LOGE("copy data failed");
+    }
+
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
         LOGE("copy data failed");
@@ -444,6 +450,12 @@ void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, 
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
         LOGE("copy data failed");
     }
+
+    if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), 0,
+                 sizeof(dmDeviceInfo.networkId)) != DM_OK) {
+        LOGE("copy data failed");
+    }
+
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
         LOGE("copy data failed");

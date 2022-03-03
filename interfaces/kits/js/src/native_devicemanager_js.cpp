@@ -398,6 +398,7 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
     napi_value device = nullptr;
     napi_create_object(env_, &device);
     SetValueUtf8String(env_, "deviceId", deviceInfo.deviceId, device);
+    SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
 
@@ -415,6 +416,7 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &
     napi_value device = nullptr;
     napi_create_object(env_, &device);
     SetValueUtf8String(env_, "deviceId", deviceInfo.deviceId, device);
+    SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
 
