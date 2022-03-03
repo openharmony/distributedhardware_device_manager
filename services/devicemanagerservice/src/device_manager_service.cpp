@@ -299,5 +299,17 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     authMgr_->OnUserOperation(action);
     return DM_OK;
 }
+
+int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    deviceStateMgr_->RegisterDevStateCallback(pkgName, extra);
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

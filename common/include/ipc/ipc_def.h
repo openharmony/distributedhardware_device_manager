@@ -54,6 +54,8 @@ enum IpcCmdID {
     SERVER_GET_DMFA_INFO,
     SERVER_USER_AUTH_OPERATION,
     SERVER_DEVICE_FA_NOTIFY,
+    REGISTER_DEV_STATE_CALLBACK,
+    UNREGISTER_DEV_STATE_CALLBACK,
 };
 } // namespace DistributedHardware
 } // namespace OHOS

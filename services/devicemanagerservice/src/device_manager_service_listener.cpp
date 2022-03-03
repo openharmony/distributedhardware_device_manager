@@ -33,9 +33,14 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
+    pReq->SetPkgName(pkgName);
     pReq->SetDeviceState(state);
     pReq->SetDeviceInfo(info);
-    ipcServerListener_.SendAll(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    if (pkgName == DM_PKG_NAME) {
+        ipcServerListener_.SendAll(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    } else {
+        ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
 }
 
 void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,

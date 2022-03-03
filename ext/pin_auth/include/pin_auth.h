@@ -30,10 +30,9 @@ class PinAuth : public IAuthentication {
 public:
     PinAuth();
     ~PinAuth();
-    int32_t ShowAuthInfo(int32_t code, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t StartAuth(int32_t code, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t VerifyAuthentication(std::string pinToken, int32_t code, const std::string &authParam) override;
-
+    int32_t ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
+    int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
+    int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) override;
 private:
     int32_t times_ = 0;
     std::shared_ptr<PinAuthUi> pinAuthUi_;
