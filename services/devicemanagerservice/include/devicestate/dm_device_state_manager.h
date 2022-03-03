@@ -36,6 +36,10 @@ public:
                          std::shared_ptr<DeviceManagerServiceListener> listener,
                          std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDeviceStateManager();
+    int32_t RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
+    int32_t UnRegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
+    void PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
+    void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
     void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
     void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info);
@@ -45,6 +49,9 @@ public:
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
     void DeleteTimeOutGroup(std::string deviceId);
+    void RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+    void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+
 private:
     std::string profileSoName_;
     std::mutex timerMapMutex_;
@@ -52,8 +59,10 @@ private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
+    std::map<std::string, std::string> decisionInfos_;
     std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::string decisionSoName_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

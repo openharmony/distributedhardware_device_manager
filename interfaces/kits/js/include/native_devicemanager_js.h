@@ -47,6 +47,20 @@ struct DeviceInfoAsyncCallbackInfo {
     std::string bundleName;
     size_t bundleNameLen = 0;
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
+    std::string extra;
+    // OHOS::DistributedHardware::DmFilterOptions filter;
+    napi_ref callback = nullptr;
+    napi_value thisVar = nullptr;
+    napi_deferred deferred = nullptr;
+    int32_t status = -1;
+};
+
+struct DeviceInfoListAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+
+    std::string bundleName;
+    size_t bundleNameLen = 0;
     std::vector<OHOS::DistributedHardware::DmDeviceInfo> devList;
     std::string extra;
     // OHOS::DistributedHardware::DmFilterOptions filter;
@@ -54,7 +68,6 @@ struct DeviceInfoAsyncCallbackInfo {
     napi_value thisVar = nullptr;
     napi_deferred deferred = nullptr;
     int32_t status = -1;
-    int32_t isList = 0;
 };
 
 struct AuthAsyncCallbackInfo {
@@ -183,6 +196,7 @@ public:
     static void HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &buldleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
+    static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);
     static void DeviceInfoToJsArray(const napi_env &env,
                                     const std::vector<OHOS::DistributedHardware::DmDeviceInfo> &vecDevInfo,
@@ -229,12 +243,14 @@ private:
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static void CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
     static void CallAsyncWork(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
+    static void CallAsyncWorkSync(napi_env env, DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+    static void CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void CallGetTrustedDeviceListStatusSync(napi_env env, napi_status &status,
-                                                   DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
+                                                   DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void CallGetTrustedDeviceListStatus(napi_env env, napi_status &status,
-                                               DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
+                                               DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static napi_value CallDeviceList(napi_env env, napi_callback_info info,
-                                     DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
+                                     DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void CallGetLocalDeviceInfoSync(napi_env env, napi_status &status,
                                            DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
     static void CallGetLocalDeviceInfo(napi_env env, napi_status &status,

@@ -431,5 +431,29 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
     }
     return result;
 }
+
+ON_IPC_CMD(REGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    std::string extra = data.ReadString();
+    int result = DeviceManagerService::GetInstance().RegisterDevStateCallback(packageName, extra);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return DM_WRITE_FAILED;
+    }
+    return result;
+}
+
+ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    std::string extra = data.ReadString();
+    int result = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(packageName, extra);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return DM_WRITE_FAILED;
+    }
+    return result;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

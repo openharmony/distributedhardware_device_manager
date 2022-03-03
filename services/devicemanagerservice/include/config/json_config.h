@@ -38,6 +38,14 @@ const std::string adapterJsonConfigString =
             "funcName": "CreateDeviceProfileObject",
             "soName": "libdevicemanagerext_profile.z.so",
             "soPath": "/system/lib/"
+        },
+        {
+            "name": "device_decision",
+            "type": "DECISION",
+            "version": "1.0",
+            "funcName": "CreateDeviceDecisionObject",
+            "soName": "libdevicemanagerext_decision.z.so",
+            "soPath": "/system/lib/"
         }
     ]
 })";

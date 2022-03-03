@@ -34,6 +34,7 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
+#include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -344,6 +345,56 @@ ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq,
 }
 
 ON_IPC_READ_RESPONSE(SERVER_USER_AUTH_OPERATION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcRegisterDevStateCallbackReq> pReq =
+    std::static_pointer_cast<IpcRegisterDevStateCallbackReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string extra = pReq->GetExtra();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return DM_IPC_TRANSACTION_FAILED;
+    }
+    if (!data.WriteString(extra)) {
+        LOGE("write extra failed");
+        return DM_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UNREGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcRegisterDevStateCallbackReq> pReq =
+    std::static_pointer_cast<IpcRegisterDevStateCallbackReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string extra = pReq->GetExtra();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return DM_IPC_TRANSACTION_FAILED;
+    }
+    if (!data.WriteString(extra)) {
+        LOGE("write extra failed");
+        return DM_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;

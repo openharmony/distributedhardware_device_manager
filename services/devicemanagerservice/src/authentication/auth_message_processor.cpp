@@ -128,9 +128,6 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     json[TAG_TOKEN] = authResponseContext_->token;
-    // json[TAG_GROUPIDS] = authResponseContext_->deviceId;  //?
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %d,%d", authResponseContext_->reply,
-         authResponseContext_->code);
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
@@ -141,11 +138,11 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
             return;
         }
         groupId = jsonObject[TAG_GROUP_ID];
-        json[PIN_CODE_KEY] = authResponseContext_->code;
         json[TAG_NET_ID] = authResponseContext_->networkId;
         json[TAG_REQUEST_ID] = authResponseContext_->requestId;
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
+        json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", groupId.c_str(),
              authResponseContext_->groupName.c_str());
     }
@@ -220,11 +217,11 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
     authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     authResponseContext_->token = json[TAG_TOKEN];
     if (authResponseContext_->reply == 0) {
-        authResponseContext_->code = json[PIN_CODE_KEY];
         authResponseContext_->networkId = json[TAG_NET_ID];
         authResponseContext_->requestId = json[TAG_REQUEST_ID];
         authResponseContext_->groupId = json[TAG_GROUP_ID];
         authResponseContext_->groupName = json[TAG_GROUP_NAME];
+        authResponseContext_->authToken = json[TAG_AUTH_TOKEN];
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", authResponseContext_->groupId.c_str(),
              authResponseContext_->groupName.c_str());
     }

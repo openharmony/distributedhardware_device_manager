@@ -55,6 +55,8 @@ public:
                                        std::string &udid) override;
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        std::string &uuid) override;
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) override;
+    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) override;
 
 private:
     DeviceManagerImpl() = default;

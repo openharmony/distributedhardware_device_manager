@@ -43,7 +43,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
             if (strcmp(params.c_str(), "0") == 0) {
-                authManager->ClosePage(id);
+                authManager->SetPageId(id);
             }
             if (strcmp(params.c_str(), "1") == 0) {
                 LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
@@ -69,12 +69,12 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
             if (strcmp(params.c_str(), "2") == 0) {
-                authManager->ClosePage(id);
+                authManager->SetPageId(id);
             }
             if (strcmp(params.c_str(), "0") == 0 || strcmp(params.c_str(), "1") == 0) {
                 Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
                 LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-                authManager->VerifyPinAuthAuthentication(params.c_str());
+                authManager->VerifyAuthentication(params.c_str());
             }
         });
     LOGI("ShowConfigDialog end");

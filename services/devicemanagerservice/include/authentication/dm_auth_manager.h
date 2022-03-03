@@ -86,7 +86,6 @@ typedef struct DmAuthRequestContext {
     std::string appThumbnail;
     std::string token;
     int32_t reason;
-    int32_t aceId;
     std::vector<std::string> syncGroupList;
 } DmAuthRequestContext;
 
@@ -110,10 +109,11 @@ typedef struct DmAuthResponseContext {
     std::string appIcon;
     std::string appThumbnail;
     std::string token;
+    std::string authToken;
+    int32_t pageId;
     int64_t requestId;
     int32_t code;
     int32_t state;
-    int32_t aceId;
     std::vector<std::string> syncGroupList;
 } DmAuthResponseContext;
 
@@ -131,7 +131,6 @@ public:
                                const std::string &extra);
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
     int32_t VerifyAuthentication(const std::string &authParam);
-    void VerifyPinAuthAuthentication(const std::string &action);
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);
     void OnDataReceived(int32_t sessionId, std::string message);
@@ -164,7 +163,7 @@ public:
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
     int32_t OnUserOperation(int32_t action);
     void UserSwitchEventCallback(int32_t userId);
-    void ClosePage(const int32_t &id);
+    int32_t SetPageId(int32_t pageId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

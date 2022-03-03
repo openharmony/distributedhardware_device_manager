@@ -49,6 +49,8 @@ public:
     int32_t VerifyAuthentication(const std::string &authParam);
     int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
     int32_t SetUserOperation(std::string &pkgName, int32_t action);
+    int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+    int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 private:
     DeviceManagerService() = default;
     bool intFlag_ = false;
