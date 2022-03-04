@@ -38,10 +38,10 @@ if (defined(ohos_lite)) {
   ohos_shared_library("devicemanagerutils") {
     sources = [
       "src/dm_anonymous.cpp",
+      "src/dm_hash.cpp",
       "src/dm_log.cpp",
       "src/dm_random.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",
-      "src/dm_hash.cpp",
     ]
     if (support_jsapi) {
       sources += [ "src/permission/standard/permission_manager.cpp" ]
