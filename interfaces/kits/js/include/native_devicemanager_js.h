@@ -128,6 +128,7 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiDeviceStateCallback : public OHOS::DistributedHardware::DeviceStateCallback {
@@ -144,6 +145,7 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiDiscoveryCallback : public OHOS::DistributedHardware::DiscoveryCallback {
@@ -164,6 +166,7 @@ private:
     napi_env env_;
     std::atomic<int32_t> refCount_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerFaCallback {
@@ -177,6 +180,7 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiAuthJsCallback> jsCallback_;
 };
 
 class DmNapiAuthenticateCallback : public OHOS::DistributedHardware::AuthenticateCallback {
@@ -190,6 +194,7 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiAuthJsCallback> jsCallback_;
 };
 
 class DmNapiVerifyAuthCallback : public OHOS::DistributedHardware::VerifyAuthCallback {
@@ -203,6 +208,7 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
+    std::unique_ptr<DmNapiVerifyJsCallback> jsCallback_;
 };
 
 class DeviceManagerNapi : public DmNativeEvent {
