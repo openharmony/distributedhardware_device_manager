@@ -80,6 +80,39 @@ struct AuthAsyncCallbackInfo {
     int32_t authType = -1;
 };
 
+struct DmNapiStateJsCallback {
+    std::string bundleName_;
+    uint16_t subscribeId_;
+    int32_t reason_;
+    OHOS::DistributedHardware::DmDeviceInfo deviceInfo_;
+
+    DmNapiStateJsCallback(std::string bundleName, uint16_t subscribeId, int32_t reason,
+        OHOS::DistributedHardware::DmDeviceInfo deviceInfo)
+        : bundleName_(bundleName), subscribeId_(subscribeId), reason_(reason), deviceInfo_(deviceInfo) {}
+};
+
+struct DmNapiAuthJsCallback {
+    std::string bundleName_;
+    std::string deviceId_;
+    std::string token_;
+    int32_t status_;
+    int32_t reason_;
+
+    DmNapiAuthJsCallback(std::string bundleName, std::string deviceId, std::string token, int32_t status,
+        int32_t reason)
+        : bundleName_(bundleName), deviceId_(deviceId), token_(token), status_(status), reason_(reason) {}
+};
+
+struct DmNapiVerifyJsCallback {
+    std::string bundleName_;
+    std::string deviceId_;
+    int32_t resultCode_;
+    int32_t flag_;
+
+    DmNapiVerifyJsCallback(std::string bundleName, std::string deviceId, int32_t resultCode, int32_t flag)
+        : bundleName_(bundleName), deviceId_(deviceId), resultCode_(resultCode), flag_(flag) {}
+};
+
 enum DmNapiDevStateChangeAction { ONLINE = 0, READY = 1, OFFLINE = 2, CHANGE = 3 };
 
 class DmNapiInitCallback : public OHOS::DistributedHardware::DmInitCallback {

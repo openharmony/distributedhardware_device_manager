@@ -68,16 +68,21 @@ void DmNapiInitCallback::OnRemoteDied()
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiInitCallback: OnRemoteDied, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
+    DmDeviceInfo info;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, info);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnRemoteDied, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnRemoteDied, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
         deviceManagerNapi->OnEvent("serviceDie", 0, nullptr);
@@ -97,20 +102,23 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDeviceStateCallback: OnDeviceOnline, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static DmDeviceInfo staticDeviceInfo = deviceInfo;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDeviceOnline, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDeviceOnline, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::ONLINE, staticDeviceInfo);
+        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::ONLINE, callback->deviceInfo_);
         delete work;
     });
     if (ret != 0) {
@@ -127,20 +135,23 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDeviceStateCallback: OnDeviceReady, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static DmDeviceInfo staticDeviceInfo = deviceInfo;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDeviceReady, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDeviceReady, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::READY, staticDeviceInfo);
+        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::READY, callback->deviceInfo_);
         delete work;
     });
     if (ret != 0) {
@@ -157,20 +168,23 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDeviceStateCallback: OnDeviceOffline, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static DmDeviceInfo staticDeviceInfo = deviceInfo;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDeviceOffline, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDeviceOffline, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::OFFLINE, staticDeviceInfo);
+        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::OFFLINE, callback->deviceInfo_);
         delete work;
     });
     if (ret != 0) {
@@ -192,15 +206,18 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static DmDeviceInfo staticDeviceInfo = deviceInfo;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDeviceChanged, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDeviceChanged, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::CHANGE, staticDeviceInfo);
+        deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::CHANGE, callback->deviceInfo_);
         delete work;
     });
     if (ret != 0) {
@@ -219,21 +236,23 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static uint16_t staticSubscribeId = subscribeId;
-    static DmDeviceInfo staticDeviceInfo = deviceInfo;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDeviceFound, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDeviceFound, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDeviceFound(staticSubscribeId, staticDeviceInfo);
+        deviceManagerNapi->OnDeviceFound(callback->subscribeId_, callback->deviceInfo_);
         delete work;
     });
     if (ret != 0) {
@@ -252,21 +271,24 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDiscoveryCallback: OnDiscoveryFailed, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static uint16_t staticSubscribeId = subscribeId;
-    static int32_t staticReason = failedReason;
+    DmDeviceInfo info;
+    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
+        std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, failedReason, info);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnDiscoveryFailed, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnDiscoveryFailed, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDiscoveryFailed(staticSubscribeId, staticReason);
+        deviceManagerNapi->OnDiscoveryFailed(callback->subscribeId_, callback->reason_);
         delete work;
     });
     if (ret != 0) {
@@ -309,23 +331,23 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static std::string staticDeviceId = deviceId;
-    static std::string staticToken = token;
-    static int32_t staticStatus = status;
-    static int32_t staticReason = reason;
+    std::unique_ptr<DmNapiAuthJsCallback> jsCallback =
+        std::make_unique<DmNapiAuthJsCallback>(bundleName_, deviceId, token, status, reason);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnAuthResult, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnAuthResult, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnAuthResult(staticDeviceId, staticToken, staticStatus, staticReason);
+        deviceManagerNapi->OnAuthResult(callback->deviceId_, callback->token_, callback->status_, callback->reason_);
         delete work;
     });
     if (ret != 0) {
@@ -342,22 +364,23 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiVerifyAuthCallback: OnVerifyAuthResult, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static std::string staticDeviceId = deviceId;
-    static int32_t staticCode = resultCode;
-    static int32_t staticFlag = flag;
+    std::unique_ptr<DmNapiVerifyJsCallback> jsCallback =
+        std::make_unique<DmNapiVerifyJsCallback>(bundleName_, deviceId, resultCode, flag);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi =  DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiVerifyJsCallback *callback = reinterpret_cast<DmNapiVerifyJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi =  DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnVerifyAuthResult, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnVerifyAuthResult, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnVerifyResult(staticDeviceId, staticCode, staticFlag);
+        deviceManagerNapi->OnVerifyResult(callback->deviceId_, callback->resultCode_, callback->flag_);
         delete work;
     });
     if (ret != 0) {
@@ -1013,20 +1036,23 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (loop == nullptr) {
+    if (work == nullptr) {
         LOGE("DmNapiDeviceManagerFaCallback: OnCall, No memory");
         return;
     }
 
-    static std::string staticBundleName = bundleName_;
-    static std::string staticParamJson = paramJson;
+    std::unique_ptr<DmNapiAuthJsCallback> jsCallback =
+        std::make_unique<DmNapiAuthJsCallback>(bundleName_, "", paramJson, 0, 0);
+    work->data = reinterpret_cast<void *>(jsCallback.get());
+
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(staticBundleName);
+        DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnCall, deviceManagerNapi not find for bunderName %s", staticBundleName.c_str());
+            LOGE("OnCall, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDmfaCall(staticParamJson);
+        deviceManagerNapi->OnDmfaCall(callback->token_);
         delete work;
     });
     if (ret != 0) {
