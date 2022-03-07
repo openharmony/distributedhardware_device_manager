@@ -83,10 +83,10 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
-        LOGI("ReadInterfaceToken fail");
+        LOGI("ReadInterfaceToken fail!");
         return ERR_INVALID_STATE;
     }
-    LOGI("ReadInterfaceToken success");
+
     int32_t ret = DM_OK;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
