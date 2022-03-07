@@ -74,9 +74,8 @@ void DmNapiInitCallback::OnRemoteDied()
     }
 
     DmDeviceInfo info;
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, info);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, info);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -107,9 +106,8 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
         return;
     }
 
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -140,9 +138,8 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
         return;
     }
 
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -173,9 +170,8 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
         return;
     }
 
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -206,9 +202,8 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
         return;
     }
 
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -241,9 +236,8 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         return;
     }
 
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -277,9 +271,8 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
     }
 
     DmDeviceInfo info;
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback =
-        std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, failedReason, info);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, failedReason, info);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
@@ -336,9 +329,8 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         return;
     }
 
-    std::unique_ptr<DmNapiAuthJsCallback> jsCallback =
-        std::make_unique<DmNapiAuthJsCallback>(bundleName_, deviceId, token, status, reason);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiAuthJsCallback>(bundleName_, deviceId, token, status, reason);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
@@ -369,9 +361,8 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
         return;
     }
 
-    std::unique_ptr<DmNapiVerifyJsCallback> jsCallback =
-        std::make_unique<DmNapiVerifyJsCallback>(bundleName_, deviceId, resultCode, flag);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiVerifyJsCallback>(bundleName_, deviceId, resultCode, flag);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiVerifyJsCallback *callback = reinterpret_cast<DmNapiVerifyJsCallback *>(work->data);
@@ -1041,9 +1032,8 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
         return;
     }
 
-    std::unique_ptr<DmNapiAuthJsCallback> jsCallback =
-        std::make_unique<DmNapiAuthJsCallback>(bundleName_, "", paramJson, 0, 0);
-    work->data = reinterpret_cast<void *>(jsCallback.get());
+    jsCallback_ = std::make_unique<DmNapiAuthJsCallback>(bundleName_, "", paramJson, 0, 0);
+    work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
