@@ -61,6 +61,7 @@ private:
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
     std::map<std::string, std::string> decisionInfos_;
     std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
+    std::map<std::string, std::string> deviceinfoMap_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string decisionSoName_;
 };

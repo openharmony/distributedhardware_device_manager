@@ -148,14 +148,12 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGI(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
         return DM_FAILED;
     }
-    uint8_t udid[UDID_BUF_LEN] = {0};
-    int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(deviceId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid,
-                                                              sizeof(udid));
+    std::string deviceUdid;
+    int32_t ret = SoftbusConnector::GetUdidByNetworkId(deviceId.c_str(), deviceUdid);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
         return DM_FAILED;
     }
-    std::string deviceUdid = (char *)udid;
 
     std::string groupId = "";
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
@@ -302,9 +300,11 @@ void DmAuthManager::OnDataReceived(int32_t sessionId, std::string message)
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             if (authResponseState_ != nullptr &&
                 authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
+                isFinishOfLocal_ = false;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             } else if (authRequestState_ != nullptr &&
                        authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
+                isFinishOfLocal_ = false;
                 authResponseContext_->state = authRequestState_->GetStateType();
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
@@ -572,8 +572,7 @@ void DmAuthManager::AuthenticateFinish()
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
-        if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW
-            && authResponseContext_->authType != 1) {
+        if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -584,17 +583,17 @@ void DmAuthManager::AuthenticateFinish()
             }
             timerMap_.clear();
         }
+        isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
         authResponseState_ = nullptr;
         authMessageProcessor_ = nullptr;
     } else if (authRequestState_ != nullptr) {
-        if (authResponseContext_->reply != DM_AUTH_BUSINESS_BUSY) {
+        if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         } else {
-            authRequestContext_->reason = DM_AUTH_BUSINESS_BUSY;
-            authResponseContext_->state = AuthState::AUTH_REQUEST_INIT;
+            authRequestContext_->reason = authResponseContext_->reply;
         }
 
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
@@ -612,6 +611,7 @@ void DmAuthManager::AuthenticateFinish()
             }
             timerMap_.clear();
         }
+        isFinishOfLocal_ = true;
         authRequestContext_ = nullptr;
         authResponseContext_ = nullptr;
         authRequestState_ = nullptr;
@@ -821,6 +821,16 @@ void DmAuthManager::UserSwitchEventCallback (int32_t userId)
 int32_t DmAuthManager::SetPageId(int32_t pageId)
 {
     authResponseContext_->pageId = pageId;
+    return DM_OK;
+}
+
+int32_t DmAuthManager::SetReason(int32_t reason, int32_t state)
+{
+    if (state < AuthState::AUTH_REQUEST_FINISH) {
+        authRequestContext_->reason = reason;
+    }
+    authResponseContext_->state = state;
+    authResponseContext_->reply = reason;
     return DM_OK;
 }
 } // namespace DistributedHardware
