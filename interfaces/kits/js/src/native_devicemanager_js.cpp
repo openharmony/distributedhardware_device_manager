@@ -1078,11 +1078,10 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
             bool isArray = false;
             napi_create_array(env, &array[1]);
             napi_is_array(env, array[1], &isArray);
-            if (isArray == false) {
+            if (!isArray) {
                 LOGE("napi_create_array fail");
             }
-
-            for (int32_t i = 0; i != deviceInfoListAsyncCallbackInfo->devList.size(); ++i) {
+            for (size_t i = 0; i != deviceInfoListAsyncCallbackInfo->devList.size(); ++i) {
                 DeviceInfoToJsArray(env, deviceInfoListAsyncCallbackInfo->devList, i, array[1]);
             }
             LOGE("devList is OK");

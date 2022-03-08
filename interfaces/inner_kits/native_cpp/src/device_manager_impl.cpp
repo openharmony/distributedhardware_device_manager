@@ -273,17 +273,20 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     }
 
     DmDeviceInfo deviceInfo;
-    strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
+    int32_t ret = strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
+    if (ret != DM_OK) {
+        LOGE("UnAuthenticateDevice error: copy deviceId failed");
+        return DM_INVALID_VALUE;
+    }
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
-    int32_t ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
+    ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Send Request failed ret: %d", ret);
         return DM_IPC_SEND_REQUEST_FAILED;
     }
-
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Failed with ret %d", ret);

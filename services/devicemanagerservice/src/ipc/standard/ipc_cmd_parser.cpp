@@ -394,7 +394,7 @@ ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
     int32_t ret = DM_OK;
     ret = DeviceManagerService::GetInstance().GetFaParam(packName, authParam);
     int32_t appIconLen = authParam.imageinfo.GetAppIconLen();
-    uint32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
+    int32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
 
     if (!reply.WriteInt32(authParam.direction) || !reply.WriteInt32(authParam.authType) ||
         !reply.WriteString(authParam.authToken) || !reply.WriteString(authParam.packageName) ||
