@@ -40,7 +40,7 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     profileSoName_ = "libdevicemanagerext_profile.z.so";
-	decisionSoName_ = "libdevicemanagerext_decision.z.so";
+    decisionSoName_ = "libdevicemanagerext_decision.z.so";
     LOGI("DmDeviceStateManager constructor");
 }
 
