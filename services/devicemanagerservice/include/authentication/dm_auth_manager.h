@@ -164,6 +164,7 @@ public:
     int32_t OnUserOperation(int32_t action);
     void UserSwitchEventCallback(int32_t userId);
     int32_t SetPageId(int32_t pageId);
+    int32_t SetReason(int32_t reason, int32_t state);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -179,6 +180,7 @@ private:
     std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     bool isCryptoSupport_ = false;
+    bool isFinishOfLocal_ = true;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

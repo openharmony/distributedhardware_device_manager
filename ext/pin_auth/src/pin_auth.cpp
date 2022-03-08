@@ -66,18 +66,19 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
     times_ += 1;
     nlohmann::json authParamJson = nlohmann::json::parse(authParam, nullptr, false);
     if (authParamJson.is_discarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
-    }
-    nlohmann::json authTokenJson = nlohmann::json::parse(authToken, nullptr, false);
-    if (authParamJson.is_discarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
-    }
-    if (!authParamJson.contains(PIN_CODE_KEY) && !authParamJson.contains(PIN_TOKEN)) {
         if (authParam == "0") {
             return DM_OK;
         }
+        LOGE("Peer rejection");
+        return DM_FAILED;
+    }
+    nlohmann::json authTokenJson = nlohmann::json::parse(authToken, nullptr, false);
+    if (authTokenJson.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    if (!authParamJson.contains(PIN_CODE_KEY) || !authParamJson.contains(PIN_TOKEN)
+        || !authTokenJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_TOKEN)) {
         LOGE("err json string, first time");
         return DM_FAILED;
     }

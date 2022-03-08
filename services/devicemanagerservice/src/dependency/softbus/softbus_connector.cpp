@@ -237,21 +237,6 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     return DM_OK;
 }
 
-int32_t SoftbusConnector::GetNodeKeyInfoByNetworkId(const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
-                                                    int32_t infoLen)
-{
-    LOGI("GetNodeKeyInfoByNetworkId begin");
-
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, key, info, infoLen);
-    if (ret != DM_OK) {
-        LOGE("GetNodeKeyInfoByNetworkId GetNodeKeyInfo failed");
-        return DM_FAILED;
-    }
-
-    LOGI("SoftbusConnector::GetNodeKeyInfoByNetworkId completed");
-    return DM_OK;
-}
-
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("GetUdidByNetworkId begin");

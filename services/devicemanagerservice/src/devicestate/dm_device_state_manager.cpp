@@ -40,6 +40,7 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     profileSoName_ = "libdevicemanagerext_profile.z.so";
+	decisionSoName_ = "libdevicemanagerext_decision.z.so";
     LOGI("DmDeviceStateManager constructor");
 }
 
@@ -56,9 +57,8 @@ int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IProfileAdapter> profileAdapter = adapterMgrPtr.GetProfileAdapter(profileSoName_);
     if (profileAdapter != nullptr) {
-        uint8_t udid[UDID_BUF_LEN + 1] = {0};
-        int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(info.deviceId,
-            NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
+        std::string deviceUdid;
+        int32_t ret = SoftbusConnector::GetUdidByNetworkId(info.deviceId, deviceUdid);
         if (ret == DM_OK) {
             std::string uuid;
             DmDeviceInfo saveInfo = info;
@@ -67,7 +67,6 @@ int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName
                 std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
                 remoteDeviceInfos_[uuid] = saveInfo;
             }
-            std::string deviceUdid = (char *)udid;
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
                  info.deviceId, deviceUdid.c_str(), uuid.c_str());
             profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
@@ -245,6 +244,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
 
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+    deviceinfoMap_[deviceInfo.deviceId] = deviceId;
     auto iter = timerMap_.find(deviceId);
     if (iter != timerMap_.end()) {
         iter->second->Stop(SESSION_CANCEL_TIMEOUT);
@@ -258,20 +258,19 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    std::string deviceId;
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(deviceInfo.deviceId, deviceId);
-    if (ret != DM_OK) {
+    if (deviceinfoMap_.find(deviceInfo.deviceId) == deviceinfoMap_.end()) {
         LOGE("fail to get udid by networkId");
         return;
     }
 
-    LOGI("start offline timer with device: %s", GetAnonyString(deviceId).c_str());
+    LOGI("start offline timer with device: %s", GetAnonyString(deviceinfoMap_[deviceInfo.deviceId]).c_str());
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto &iter : timerMap_) {
-        if (iter.first == deviceId) {
+        if (iter.first == deviceinfoMap_[deviceInfo.deviceId]) {
             iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
+    deviceinfoMap_.erase(deviceInfo.deviceId);
 }
 
 void DmDeviceStateManager::DeleteTimeOutGroup(std::string deviceId)
