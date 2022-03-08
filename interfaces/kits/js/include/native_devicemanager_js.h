@@ -217,6 +217,13 @@ public:
     virtual ~DeviceManagerNapi();
     static napi_value Init(napi_env env, napi_value exports);
     static napi_value Constructor(napi_env env, napi_callback_info info);
+    static napi_value EnumTypeConstructor(napi_env env, napi_callback_info info);
+    static napi_value InitDeviceTypeEnum(napi_env env, napi_value exports);
+    static napi_value InitDeviceStateChangeActionEnum(napi_env env, napi_value exports);
+    static napi_value InitDiscoverModeEnum(napi_env env, napi_value exports);
+    static napi_value InitExchangeMediumEnum(napi_env env, napi_value exports);
+    static napi_value InitExchangeFreqEnum(napi_env env, napi_value exports);
+    static napi_value InitSubscribeCapEnum(napi_env env, napi_value exports);
     static napi_value CreateDeviceManager(napi_env env, napi_callback_info info);
     static napi_value ReleaseDeviceManager(napi_env env, napi_callback_info info);
     static napi_value SetUserOperationSync(napi_env env, napi_callback_info info);
