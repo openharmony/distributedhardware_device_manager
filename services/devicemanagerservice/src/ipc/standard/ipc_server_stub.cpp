@@ -133,12 +133,17 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         LOGI("RegisterDeviceManagerListener: listener already exists");
         return DM_OK;
     }
-    sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
-    if (!listener->AddDeathRecipient(appRecipient)) {
-        LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
+    try {
+        sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+        if (!listener->AddDeathRecipient(appRecipient)) {
+            LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
+        }
+        dmListener_[pkgName] = listener;
+        appRecipient_[pkgName] = appRecipient;
+    } catch (const std::bad_alloc &e) {
+        LOGE("new AppDeathRecipient failed");
+        return DM_MALLOC_ERROR;
     }
-    dmListener_[pkgName] = listener;
-    appRecipient_[pkgName] = appRecipient;
     return DM_OK;
 }
 

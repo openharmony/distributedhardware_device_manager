@@ -73,7 +73,6 @@ DmTimerStatus DmTimer::Start(uint32_t timeOut, TimeoutHandle handle, void *data)
     mStatus_ = DmTimerStatus::DM_STATUS_RUNNING;
     mThread_ = std::thread(&DmTimer::WaitForTimeout, this);
     mThread_.detach();
-
     return mStatus_;
 }
 
@@ -87,12 +86,9 @@ void DmTimer::Stop(int32_t code)
     if (mTimeFd_[1]) {
         char event = 'S';
         if (write(mTimeFd_[1], &event, 1) < 0) {
-            LOGE("DmTimer %s Stop timer failed, errno %d", mTimerName_.c_str(), errno);
             return;
         }
-        LOGI("DmTimer %s Stop success", mTimerName_.c_str());
     }
-    return;
 }
 
 void DmTimer::WaitForTimeout()
@@ -122,7 +118,6 @@ void DmTimer::WaitForTimeout()
         Release();
         LOGE("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
     }
-    return;
 }
 
 int32_t DmTimer::CreateTimeFd()

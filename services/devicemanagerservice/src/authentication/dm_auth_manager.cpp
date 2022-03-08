@@ -414,7 +414,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
-    if (ret != true) {
+    if (!ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = DM_AUTH_PEER_REJECT;
     } else {
