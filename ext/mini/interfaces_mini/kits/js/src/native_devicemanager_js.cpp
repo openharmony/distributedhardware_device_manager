@@ -1102,9 +1102,5 @@ void InitDeviceManagerModule(JSIValue exports)
     JSI::SetModuleAPI(exports, "on", DeviceManagerModule::JsOn);
     JSI::SetModuleAPI(exports, "off", DeviceManagerModule::JsOff);
 }
-
 }
 }
-
-
-
