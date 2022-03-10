@@ -394,7 +394,7 @@ ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
     int32_t ret = DM_OK;
     ret = DeviceManagerService::GetInstance().GetFaParam(packName, authParam);
     int32_t appIconLen = authParam.imageinfo.GetAppIconLen();
-    uint32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
+    int32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
 
     if (!reply.WriteInt32(authParam.direction) || !reply.WriteInt32(authParam.authType) ||
         !reply.WriteString(authParam.authToken) || !reply.WriteString(authParam.packageName) ||
@@ -426,6 +426,30 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
     int32_t action = data.ReadInt32();
     int result = DeviceManagerService::GetInstance().SetUserOperation(packageName, action);
     if (!reply.WriteInt32(action)) {
+        LOGE("write result failed");
+        return DM_WRITE_FAILED;
+    }
+    return result;
+}
+
+ON_IPC_CMD(REGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    std::string extra = data.ReadString();
+    int result = DeviceManagerService::GetInstance().RegisterDevStateCallback(packageName, extra);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return DM_WRITE_FAILED;
+    }
+    return result;
+}
+
+ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    std::string extra = data.ReadString();
+    int result = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(packageName, extra);
+    if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return DM_WRITE_FAILED;
     }

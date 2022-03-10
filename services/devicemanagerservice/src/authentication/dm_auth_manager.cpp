@@ -80,7 +80,7 @@ DmAuthManager::~DmAuthManager()
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                           const std::string &extra)
 {
-    LOGE("DmAuthManager::AuthenticateDevice start");
+    LOGE("DmAuthManager::AuthenticateDevice start auth type %d", authType);
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
@@ -148,14 +148,12 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGI(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
         return DM_FAILED;
     }
-    uint8_t udid[UDID_BUF_LEN] = {0};
-    int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(deviceId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid,
-                                                              sizeof(udid));
+    std::string deviceUdid;
+    int32_t ret = SoftbusConnector::GetUdidByNetworkId(deviceId.c_str(), deviceUdid);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
         return DM_FAILED;
     }
-    std::string deviceUdid = (char *)udid;
 
     std::string groupId = "";
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
@@ -175,16 +173,19 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
 int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 {
     LOGI("DmAuthManager::VerifyAuthentication");
+    if (authResponseContext_ == nullptr) {
+        LOGI("authResponseContext_ is not init");
+        return DM_FAILED;
+    }
     std::shared_ptr<IAuthentication> ptr;
-    if (authenticationMap_.find(1) == authenticationMap_.end()
+    if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()
         || timerMap_.find(INPUT_TIMEOUT_TASK) == timerMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return DM_FAILED;
     }
     timerMap_[INPUT_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-
-    ptr = authenticationMap_[1];
-    int32_t ret = ptr->VerifyAuthentication(authRequestContext_->token, authResponseContext_->code, authParam);
+    ptr = authenticationMap_[authResponseContext_->authType];
+    int32_t ret = ptr->VerifyAuthentication(authResponseContext_->authToken, authParam);
     switch (ret) {
         case DM_OK:
             authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
@@ -194,7 +195,6 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
                                           DM_AUTH_INPUT_FAILED, "");
             break;
         default:
-            CancelDisplay();
             authRequestContext_->reason = DM_AUTH_INPUT_FAILED;
             authResponseContext_->state = authRequestState_->GetStateType();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
@@ -304,9 +304,12 @@ void DmAuthManager::OnDataReceived(int32_t sessionId, std::string message)
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             if (authResponseState_ != nullptr &&
                 authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
+                isFinishOfLocal_ = false;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             } else if (authRequestState_ != nullptr &&
                        authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
+                isFinishOfLocal_ = false;
+                authResponseContext_->state = authRequestState_->GetStateType();
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
             break;
@@ -329,7 +332,13 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
-    authResponseContext_->code = GeneratePincode();
+    nlohmann::json jsonObj;
+    jsonObj[PIN_CODE_KEY] = GeneratePincode();
+    jsonObj[PIN_TOKEN] = authResponseContext_->token;
+    jsonObj[QR_CODE_KEY] = GenerateGroupName();
+    jsonObj[NFC_CODE_KEY] = GenerateGroupName();
+    authResponseContext_->authToken = jsonObj.dump();
+    LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     authResponseContext_->groupId = groupId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
@@ -409,7 +418,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
-    if (ret != true) {
+    if (!ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = DM_AUTH_PEER_REJECT;
     } else {
@@ -514,10 +523,16 @@ int32_t DmAuthManager::CreateGroup()
 int32_t DmAuthManager::AddMember(const std::string &deviceId)
 {
     LOGI("DmAuthManager::AddMember start");
+    nlohmann::json jsonObj = nlohmann::json::parse(authResponseContext_->authToken, nullptr, false);
+    if (jsonObj.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     nlohmann::json jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;
     jsonObject[TAG_GROUP_NAME] = authResponseContext_->groupName;
-    jsonObject[PIN_CODE_KEY] = authResponseContext_->code;
+    jsonObject[PIN_CODE_KEY] = jsonObj[PIN_CODE_KEY];
     jsonObject[TAG_REQUEST_ID] = authResponseContext_->requestId;
     jsonObject[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     std::string connectInfo = jsonObject.dump();
@@ -529,7 +544,7 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         return DM_FAILED;
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
-    Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->aceId);
+    Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
     return DM_OK;
 }
 
@@ -559,7 +574,12 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->aceId);
+            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+        }
+        if (isFinishOfLocal_) {
+            authMessageProcessor_->SetResponseContext(authResponseContext_);
+            std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
+            softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
         if (!timerMap_.empty()) {
             for (auto &iter : timerMap_) {
@@ -567,21 +587,21 @@ void DmAuthManager::AuthenticateFinish()
             }
             timerMap_.clear();
         }
+        isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
         authResponseState_ = nullptr;
         authMessageProcessor_ = nullptr;
     } else if (authRequestState_ != nullptr) {
-        if (authResponseContext_->reply != DM_AUTH_BUSINESS_BUSY) {
+        if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         } else {
-            authRequestContext_->reason = DM_AUTH_BUSINESS_BUSY;
-            authResponseContext_->state = AuthState::AUTH_REQUEST_INIT;
+            authRequestContext_->reason = authResponseContext_->reply;
         }
 
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->aceId);
+            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
 
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
@@ -595,6 +615,7 @@ void DmAuthManager::AuthenticateFinish()
             }
             timerMap_.clear();
         }
+        isFinishOfLocal_ = true;
         authRequestContext_ = nullptr;
         authResponseContext_ = nullptr;
         authRequestState_ = nullptr;
@@ -662,7 +683,12 @@ int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> a
 
 int32_t DmAuthManager::GetPinCode()
 {
-    return authResponseContext_->code;
+    nlohmann::json jsonObj = nlohmann::json::parse(authResponseContext_->authToken, nullptr, false);
+    if (jsonObj.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    return jsonObj[PIN_CODE_KEY];
 }
 
 void DmAuthManager::ShowConfigDialog()
@@ -693,25 +719,25 @@ void DmAuthManager::ShowAuthInfoDialog()
 {
     LOGI("DmAuthManager::ShowAuthInfoDialog start");
     std::shared_ptr<IAuthentication> ptr;
-    if (authenticationMap_.find(1) == authenticationMap_.end()) {
+    if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return;
     }
-    ptr = authenticationMap_[1];
-    LOGI("ShowAuthInfoDialog code:%d", authResponseContext_->code);
-    ptr->ShowAuthInfo(authResponseContext_->code, shared_from_this());
+    ptr = authenticationMap_[authResponseContext_->authType];
+    LOGI("ShowAuthInfoDialog authToken:%s", authResponseContext_->authToken.c_str());
+    ptr->ShowAuthInfo(authResponseContext_->authToken, shared_from_this());
 }
 
 void DmAuthManager::ShowStartAuthDialog()
 {
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     std::shared_ptr<IAuthentication> ptr;
-    if (authenticationMap_.find(1) == authenticationMap_.end()) {
+    if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
         return;
     }
-    ptr = authenticationMap_[1];
-    ptr->StartAuth(authResponseContext_->code, shared_from_this());
+    ptr = authenticationMap_[authResponseContext_->authType];
+    ptr->StartAuth(authResponseContext_->authToken, shared_from_this());
 }
 
 int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
@@ -719,6 +745,11 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
     if (dmAbilityMgr_ == nullptr) {
         LOGI("dmAbilityMgr_ is nullptr");
         return DM_POINT_NULL;
+    }
+
+    if (authResponseContext_ == nullptr) {
+        LOGI("authResponseContext_ is not init");
+        return DM_FAILED;
     }
     
     dmAbilityMgr_->StartAbilityDone();
@@ -740,6 +771,11 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 
 int32_t DmAuthManager::OnUserOperation(int32_t action)
 {
+    if (authResponseContext_ == nullptr) {
+        LOGI("authResponseContext_ is not init");
+        return DM_FAILED;
+    }
+
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
         case USER_OPERATION_TYPE_CANCEL_AUTH:
@@ -796,27 +832,20 @@ void DmAuthManager::UserSwitchEventCallback (int32_t userId)
     }
 }
 
-void DmAuthManager::VerifyPinAuthAuthentication(const std::string &action)
+int32_t DmAuthManager::SetPageId(int32_t pageId)
 {
-    LOGI("DmAuthManager::VerifyPinAuthAuthentication");
-    if (timerMap_.find(INPUT_TIMEOUT_TASK) == timerMap_.end()) {
-        return;
-    }
-    timerMap_[INPUT_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-    if (action == "0") {
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
-    }
-    if (action == "1") {
-        authRequestContext_->reason = DM_AUTH_INPUT_FAILED;
-        authResponseContext_->state = authRequestState_->GetStateType();
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-    }
-    LOGI("DmAuthManager::VerifyAuthentication complete");
+    authResponseContext_->pageId = pageId;
+    return DM_OK;
 }
 
-void DmAuthManager::ClosePage(const int32_t &id)
+int32_t DmAuthManager::SetReason(int32_t reason, int32_t state)
 {
-    authResponseContext_->aceId = id;
+    if (state < AuthState::AUTH_REQUEST_FINISH) {
+        authRequestContext_->reason = reason;
+    }
+    authResponseContext_->state = state;
+    authResponseContext_->reply = reason;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

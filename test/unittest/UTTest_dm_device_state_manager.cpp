@@ -44,7 +44,7 @@ void DmDeviceStateManagerTest::TearDownTestCase()
 {
 }
 namespace {
-    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
@@ -151,7 +151,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnProfileReady_001, testing::ext::TestSize.Le
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_NE(result, 0);
+    EXPECT_EQ(result, 0);
 }
 
 /**
@@ -170,7 +170,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Lev
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_NE(result, 0);
+    EXPECT_EQ(result, 0);
 }
 
 /**
@@ -189,7 +189,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo ret = pReq->GetDeviceInfo();
     int result = strcmp(info.deviceId, ret.deviceId);
-    ASSERT_NE(result, 0);
+    EXPECT_EQ(result, 0);
 }
 
 /**

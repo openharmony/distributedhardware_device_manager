@@ -32,6 +32,7 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
+#include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -143,6 +144,9 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     }
 
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    if (!extra.empty()) {
+        RegisterDevStateCallback(pkgName, extra);
+    }
     LOGI("RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -156,6 +160,8 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
+    std::string extra = "";
+    UnRegisterDevStateCallback(pkgName, extra);
     LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -267,17 +273,20 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     }
 
     DmDeviceInfo deviceInfo;
-    strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
+    int32_t ret = strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
+    if (ret != DM_OK) {
+        LOGE("UnAuthenticateDevice error: copy deviceId failed");
+        return DM_INVALID_VALUE;
+    }
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
-    int32_t ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
+    ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Send Request failed ret: %d", ret);
         return DM_IPC_SEND_REQUEST_FAILED;
     }
-
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Failed with ret %d", ret);
@@ -437,6 +446,52 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
         return ret;
     }
     uuid = rsp->GetUuid();
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    if (pkgName.empty()) {
+        LOGE("RegisterDevStateCallback failed, pkgName is empty");
+        return DM_INVALID_VALUE;
+    }
+
+    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetExtra(extra);
+
+    if (ipcClientProxy_->SendRequest(REGISTER_DEV_STATE_CALLBACK, req, rsp) != DM_OK) {
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("RegisterDevStateCallback Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    if (pkgName.empty()) {
+        LOGE("UnRegisterDevStateCallback failed, pkgName is empty");
+        return DM_INVALID_VALUE;
+    }
+
+    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetExtra(extra);
+
+    if (ipcClientProxy_->SendRequest(UNREGISTER_DEV_STATE_CALLBACK, req, rsp) != DM_OK) {
+        return DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnRegisterDevStateCallback Failed with ret %d", ret);
+        return ret;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

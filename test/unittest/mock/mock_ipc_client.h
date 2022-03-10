@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_AUTH_RESPONSE_STATE_TEST_H
-#define OHOS_AUTH_RESPONSE_STATE_TEST_H
+#ifndef OHOS_MOCK_IPC_CLIENTMANAGER_H
+#define OHOS_MOCK_IPC_CLIENTMANAGER_H
 
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <refbase.h>
 
-#include <memory>
-
-#include "device_manager_impl.h"
-#include "mock/mock_ipc_client_proxy.h"
-#include "auth_response_state.h"
+#include "ipc_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthResponseStateTest : public testing::Test {
+class MockIpcClient : public IpcClient {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    MOCK_METHOD1(Init, int32_t(const std::string &pkgName));
+    MOCK_METHOD1(UnInit, int32_t(const std::string &pkgName));
+    MOCK_METHOD3(SendRequest, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+
+#endif // OHOS_MOCK_IPC_CLIENTMANAGER_H

@@ -124,14 +124,14 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     nlohmann::json jsonb;
     jsonb[TAG_GROUP_ID] = "123456";
     authMessageProcessor->authResponseContext_->groupId = jsonb.dump();
-    authMessageProcessor->authResponseContext_->code = 1;
+    authMessageProcessor->authResponseContext_->authToken = "123456";
     authMessageProcessor->authResponseContext_->networkId = "11112222";
     authMessageProcessor->authResponseContext_->requestId = 222222;
     authMessageProcessor->authResponseContext_->groupName = "333333";
     jsona[TAG_TOKEN] = authMessageProcessor->authResponseContext_->token;
     jsona[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsona[TAG_DEVICE_ID] = authMessageProcessor->authResponseContext_->deviceId;
-    jsona[PIN_CODE_KEY] = authMessageProcessor->authResponseContext_->code;
+    jsona[TAG_AUTH_TOKEN] = authMessageProcessor->authResponseContext_->authToken;
     jsona[TAG_NET_ID] = authMessageProcessor->authResponseContext_->networkId;
     jsona[TAG_REQUEST_ID] = authMessageProcessor->authResponseContext_->requestId;
     jsona[TAG_GROUP_ID] = "123456";
@@ -203,7 +203,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
     nlohmann::json jsona;
     authResponseContext->reply = 0;
     authResponseContext->deviceId = "11111";
-    authResponseContext->code = 1;
+    authResponseContext->authToken = "123456";
     authResponseContext->networkId = "12345";
     authResponseContext->requestId = 2;
     authResponseContext->groupId = "23456";
@@ -212,7 +212,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
     jsona[TAG_TOKEN] = authResponseContext->token;
     jsona[TAG_REPLY] = authResponseContext->reply;
     jsona[TAG_DEVICE_ID] = authResponseContext->deviceId;
-    jsona[PIN_CODE_KEY] = authResponseContext->code;
+    jsona[TAG_AUTH_TOKEN] = authResponseContext->authToken;
     jsona[TAG_NET_ID] = authResponseContext->networkId;
     jsona[TAG_REQUEST_ID] = authResponseContext->requestId;
     jsona[TAG_GROUP_ID] = authResponseContext->groupId;

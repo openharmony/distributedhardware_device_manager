@@ -13,26 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_AUTH_RESPONSE_STATE_TEST_H
-#define OHOS_AUTH_RESPONSE_STATE_TEST_H
+#ifndef OHOS_DM_IPC_REGISTER_DEV_STATE_CALLBACK_REQ_H
+#define OHOS_DM_IPC_REGISTER_DEV_STATE_CALLBACK_REQ_H
 
-#include <gtest/gtest.h>
+#include <cstdint>
 
-#include <memory>
-
-#include "device_manager_impl.h"
-#include "mock/mock_ipc_client_proxy.h"
-#include "auth_response_state.h"
+#include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthResponseStateTest : public testing::Test {
+class IpcRegisterDevStateCallbackReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcRegisterDevStateCallbackReq);
+
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    const std::string &GetExtra() const
+    {
+        return extra_;
+    }
+
+    void SetExtra(const std::string &extra)
+    {
+        extra_ = extra;
+    }
+
+private:
+    std::string extra_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_DM_IPC_REGISTER_DEV_STATE_CALLBACK_REQ_H

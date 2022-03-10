@@ -81,6 +81,12 @@ void IpcServerStub::OnStop()
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     LOGI("code = %d, flags= %d.", code, option.GetFlags());
+    auto remoteDescriptor = data.ReadInterfaceToken();
+    if (GetDescriptor() != remoteDescriptor) {
+        LOGI("ReadInterfaceToken fail!");
+        return ERR_INVALID_STATE;
+    }
+
     int32_t ret = DM_OK;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
@@ -127,12 +133,17 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         LOGI("RegisterDeviceManagerListener: listener already exists");
         return DM_OK;
     }
-    sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
-    if (!listener->AddDeathRecipient(appRecipient)) {
-        LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
+    try {
+        sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+        if (!listener->AddDeathRecipient(appRecipient)) {
+            LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
+        }
+        dmListener_[pkgName] = listener;
+        appRecipient_[pkgName] = appRecipient;
+    } catch (const std::bad_alloc &e) {
+        LOGE("new AppDeathRecipient failed");
+        return DM_MALLOC_ERROR;
     }
-    dmListener_[pkgName] = listener;
-    appRecipient_[pkgName] = appRecipient;
     return DM_OK;
 }
 

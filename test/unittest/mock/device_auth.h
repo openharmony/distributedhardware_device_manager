@@ -16,8 +16,7 @@
 #ifndef DEVICE_AUTH_H
 #define DEVICE_AUTH_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <cstdint>
 
 #if defined(__LINUX__) || defined(_UNIX)
 #define DEVICE_AUTH_API_PUBLIC __attribute__ ((visibility("default")))
@@ -69,37 +68,37 @@
 #define FIELD_BLE_CHALLENGE "bleChallenge"
 #define FIELD_OS_ACCOUNT_ID "osAccountId"
 
-typedef enum {
+using OsAccountEnum = enum _OsAccountEnum : int32_t {
     DEFAULT_OS_ACCOUNT = 0,
     INVALID_OS_ACCOUNT = -1,
     ANY_OS_ACCOUNT = -2,
-} OsAccountEnum;
+};
 
-typedef enum {
+using GroupType = enum _GroupType : int32_t {
     ALL_GROUP = 0,
     IDENTICAL_ACCOUNT_GROUP = 1,
     PEER_TO_PEER_GROUP = 256,
     COMPATIBLE_GROUP = 512,
     ACROSS_ACCOUNT_AUTHORIZE_GROUP = 1282
-} GroupType;
+};
 
-typedef enum {
+using GroupOperationCode = enum _GroupOperationCode : int32_t {
     GROUP_CREATE = 0,
     GROUP_DISBAND = 1,
     MEMBER_INVITE = 2,
     MEMBER_JOIN = 3,
     MEMBER_DELETE = 4,
     ACCOUNT_BIND = 5
-} GroupOperationCode;
+};
 
-typedef enum {
+using GroupAuthForm = enum _GroupAuthForm : int32_t {
     AUTH_FORM_INVALID_TYPE = -1,
     AUTH_FORM_ACCOUNT_UNRELATED = 0,
     AUTH_FORM_IDENTICAL_ACCOUNT = 1,
     AUTH_FORM_ACROSS_ACCOUNT = 2,
-} GroupAuthForm;
+};
 
-typedef enum {
+using CredentialCode = enum _CredentialCode : int32_t {
     IMPORT_SELF_CREDENTIAL = 0,
     DELETE_SELF_CREDENTIAL = 1,
     QUERY_SELF_CREDENTIAL_INFO = 2,
@@ -107,27 +106,27 @@ typedef enum {
     DELETE_TRUSTED_CREDENTIALS = 4,
     QUERY_TRUSTED_CREDENTIALS = 5,
     REQUEST_SIGNATURE = 6,
-} CredentialCode;
+};
 
-typedef enum {
+using UserType = enum _UserType : int32_t {
     DEVICE_TYPE_ACCESSORY = 0,
     DEVICE_TYPE_CONTROLLER = 1,
     DEVICE_TYPE_PROXY = 2
-} UserType;
+};
 
-typedef enum {
+using ExpireTime = enum _ExpireTime : int32_t {
     EXPIRE_TIME_INDEFINITE = -1,
     EXPIRE_TIME_MIN = 1,
     EXPIRE_TIME_MAX = 90,
-} ExpireTime;
+};
 
-typedef enum {
+using RequestResponse = enum _RequestResponse : int32_t {
     REQUEST_REJECTED = 0x80000005,
     REQUEST_ACCEPTED = 0x80000006,
     REQUEST_WAITING = 0x80000007
-} RequestResponse;
+};
 
-typedef struct {
+using DataChangeListener = struct _DataChangeListener {
     void (*onGroupCreated)(const char *groupInfo);
     void (*onGroupDeleted)(const char *groupInfo);
     void (*onDeviceBound)(const char *peerUdid, const char *groupInfo);
@@ -135,17 +134,17 @@ typedef struct {
     void (*onDeviceNotTrusted)(const char *peerUdid);
     void (*onLastGroupDeleted)(const char *peerUdid, int groupType);
     void (*onTrustedDeviceNumChanged)(int curTrustedDeviceNum);
-} DataChangeListener;
+};
 
-typedef struct {
+using DeviceAuthCallback = struct _DeviceAuthCallback {
     bool (*onTransmit)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void (*onSessionKeyReturned)(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     void (*onFinish)(int64_t requestId, int operationCode, const char *returnData);
     void (*onError)(int64_t requestId, int operationCode, int errorCode, const char *errorReturn);
     char *(*onRequest)(int64_t requestId, int operationCode, const char *reqParams);
-} DeviceAuthCallback;
+};
 
-typedef struct {
+using GroupAuthManager = struct _GroupAuthManager {
     int32_t (*processData)(int64_t authReqId, const uint8_t *data, uint32_t dataLen,
         const DeviceAuthCallback *gaCallback);
     int32_t (*queryTrustedDeviceNum)(void);
@@ -155,9 +154,9 @@ typedef struct {
     int32_t (*authDevice)(int32_t osAccountId, int64_t authReqId, const char *authParams,
         const DeviceAuthCallback *gaCallback);
     void (*informDeviceDisconnection)(const char *udid);
-} GroupAuthManager;
+};
 
-typedef struct {
+using DeviceGroupManager = struct _DeviceGroupManager {
     int32_t (*regCallback)(const char *appId, const DeviceAuthCallback *callback);
     int32_t (*unRegCallback)(const char *appId);
     int32_t (*regDataChangeListener)(const char *appId, const DataChangeListener *listener);
@@ -202,7 +201,7 @@ typedef struct {
         char **returnDevInfoVec, uint32_t *deviceNum);
     bool (*isDeviceInGroup)(int32_t osAccountId, const char *appId, const char *groupId, const char *deviceId);
     void (*destroyInfo)(char **returnInfo);
-} DeviceGroupManager;
+};
 
 #ifdef __cplusplus
 extern "C" {

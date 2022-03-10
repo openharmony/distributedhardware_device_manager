@@ -73,14 +73,14 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
 
 int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    if (discoveryQueue_.empty()) {
-        LOGE("discovery is not start");
-        return DM_FAILED;
+    if (!discoveryQueue_.empty()) {
+        discoveryQueue_.pop();
     }
-    discoveryQueue_.pop();
-    discoveryContextMap_.erase(pkgName);
-    softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-    discoveryTimer_->Stop(SESSION_CANCEL_TIMEOUT);
+    if (!discoveryContextMap_.empty()) {
+        discoveryContextMap_.erase(pkgName);
+        softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
+        discoveryTimer_->Stop(SESSION_CANCEL_TIMEOUT);
+    }
     return softbusConnector_->StopDiscovery(subscribeId);
 }
 

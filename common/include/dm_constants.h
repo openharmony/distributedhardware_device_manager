@@ -73,6 +73,7 @@ enum {
     DM_IPC_SEND_REQUEST_FAILED,
     DM_IPC_NOT_REGISTER_FUNC,
     DM_IPC_RESPOND_ERROR,
+    DM_IPC_WRITE_TOKEN_ERROR,
     DM_DISCOVERY_REPEATED,
     DM_AUTH_NOT_SUPPORT,
     DM_AUTH_BUSINESS_BUSY,
@@ -144,6 +145,9 @@ const std::string AUTH_TYPE = "authType";
 const std::string TOKEN = "token";
 const std::string PIN_TOKEN = "pinToken";
 const std::string PIN_CODE_KEY = "pinCode";
+const std::string NFC_CODE_KEY = "nfcCode";
+const std::string QR_CODE_KEY = "qrCode";
+const std::string TAG_AUTH_TOKEN = "authToken";
 const int32_t AUTH_TYPE_PIN = 1;
 const int32_t AUTH_TYPE_SCAN = 2;
 const int32_t AUTH_TYPE_TOUCH = 3;

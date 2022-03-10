@@ -16,6 +16,7 @@
 #include "pin_auth.h"
 
 #include <memory>
+#include <cstring>
 
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -26,6 +27,7 @@ namespace DistributedHardware {
 const int32_t MAX_VERIFY_TIMES = 3;
 PinAuth::PinAuth()
 {
+    pinAuthUi_ = std::make_shared<PinAuthUi>();
     LOGI("PinAuth constructor");
 }
 
@@ -33,31 +35,64 @@ PinAuth::~PinAuth()
 {
 }
 
-int32_t PinAuth::ShowAuthInfo(int32_t code, std::shared_ptr<DmAuthManager> authManager)
+int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
 {
-    return pinAuthUi_->ShowPinDialog(code, authManager);
-}
-
-int32_t PinAuth::StartAuth(int32_t code, std::shared_ptr<DmAuthManager> authManager)
-{
-    return pinAuthUi_->InputPinDialog(code, authManager);
-}
-
-int32_t PinAuth::VerifyAuthentication(std::string pinToken, int32_t code, const std::string &authParam)
-{
-    times_ += 1;
-    nlohmann::json jsonObject = nlohmann::json::parse(authParam, nullptr, false);
+    nlohmann::json jsonObject = nlohmann::json::parse(authToken, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return DM_FAILED;
     }
-    if (!jsonObject.contains(PIN_CODE_KEY) && !jsonObject.contains(PIN_TOKEN)) {
+    if (!jsonObject.contains(PIN_CODE_KEY)) {
         LOGE("err json string, first time");
         return DM_FAILED;
     }
-    int32_t inputPinCode = jsonObject[PIN_CODE_KEY];
-    int32_t inputPinToken = jsonObject[PIN_TOKEN];
-    if (code == inputPinCode && stoi(pinToken) == inputPinToken) {
+    return pinAuthUi_->ShowPinDialog(jsonObject[PIN_CODE_KEY], authManager);
+}
+
+int32_t PinAuth::StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(authToken, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    if (!jsonObject.contains(PIN_CODE_KEY)) {
+        LOGE("err json string, first time");
+        return DM_FAILED;
+    }
+    return pinAuthUi_->InputPinDialog(jsonObject[PIN_CODE_KEY], authManager);
+}
+
+int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string &authParam)
+{
+    times_ += 1;
+    if (strlen(authParam.c_str()) == 1) {
+        if (authParam == "0") {
+            return DM_OK;
+        }
+        LOGE("Peer rejection");
+        return DM_FAILED;
+    }
+    nlohmann::json authParamJson = nlohmann::json::parse(authParam, nullptr, false);
+    if (authParamJson.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    nlohmann::json authTokenJson = nlohmann::json::parse(authToken, nullptr, false);
+    if (authTokenJson.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return DM_FAILED;
+    }
+    if (!authParamJson.contains(PIN_CODE_KEY) || !authParamJson.contains(PIN_TOKEN)
+        || !authTokenJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_TOKEN)) {
+        LOGE("err json string, first time");
+        return DM_FAILED;
+    }
+    int32_t code = authTokenJson[PIN_CODE_KEY];
+    int32_t pinToken = authTokenJson[PIN_TOKEN];
+    int32_t inputPinCode = authParamJson[PIN_CODE_KEY];
+    int32_t inputPinToken = authParamJson[PIN_TOKEN];
+    if (code == inputPinCode && pinToken == inputPinToken) {
         return DM_OK;
     } else if (code != inputPinCode && times_ < MAX_VERIFY_TIMES) {
         return DM_AUTH_INPUT_FAILED;

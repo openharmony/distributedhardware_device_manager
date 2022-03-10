@@ -217,8 +217,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
     int32_t ret = authManager->AddMember(deviceId);
-    ASSERT_EQ(ret, DM_OK);
-    sleep(15);
+    ASSERT_EQ(ret, DM_FAILED);
 }
 
 /**
@@ -272,7 +271,7 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t ret = authManager->GetPinCode();
-    ASSERT_EQ(ret, authManager->authResponseContext_->code);
+    ASSERT_EQ(ret, DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

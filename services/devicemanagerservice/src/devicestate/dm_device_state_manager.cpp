@@ -40,6 +40,7 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     profileSoName_ = "libdevicemanagerext_profile.z.so";
+    decisionSoName_ = "libdevicemanagerext_decision.z.so";
     LOGI("DmDeviceStateManager constructor");
 }
 
@@ -51,16 +52,13 @@ DmDeviceStateManager::~DmDeviceStateManager()
     }
 }
 
-void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
+int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("OnDeviceOnline function is called back with pkgName: %s", pkgName.c_str());
-    RegisterOffLineTimer(info);
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IProfileAdapter> profileAdapter = adapterMgrPtr.GetProfileAdapter(profileSoName_);
     if (profileAdapter != nullptr) {
-        uint8_t udid[UDID_BUF_LEN + 1] = {0};
-        int32_t ret = SoftbusConnector::GetNodeKeyInfoByNetworkId(info.deviceId,
-            NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
+        std::string deviceUdid;
+        int32_t ret = SoftbusConnector::GetUdidByNetworkId(info.deviceId, deviceUdid);
         if (ret == DM_OK) {
             std::string uuid;
             DmDeviceInfo saveInfo = info;
@@ -69,22 +67,16 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
                 std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
                 remoteDeviceInfos_[uuid] = saveInfo;
             }
-            std::string deviceUdid = (char *)udid;
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
                  info.deviceId, deviceUdid.c_str(), uuid.c_str());
             profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
         }
     }
-    if (listener_ != nullptr) {
-        DmDeviceState state = DEVICE_STATE_ONLINE;
-        listener_->OnDeviceStateChange(pkgName, state, info);
-    }
+    return DM_OK;
 }
 
-void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
+int32_t DmDeviceStateManager::UnRegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
-    StartOffLineTimer(info);
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IProfileAdapter> profileAdapter = adapterMgrPtr.GetProfileAdapter(profileSoName_);
     if (profileAdapter != nullptr) {
@@ -97,10 +89,89 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
             remoteDeviceInfos_.erase(std::string(info.deviceId));
         }
     }
+    return DM_OK;
+}
+
+void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("DmDeviceStateManager::PostDeviceOnline in");
+    if (listener_ != nullptr) {
+        DmDeviceState state = DEVICE_STATE_ONLINE;
+        listener_->OnDeviceStateChange(pkgName, state, info);
+    }
+    LOGI("DmDeviceStateManager::PostDeviceOnline out");
+}
+
+void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("DmDeviceStateManager::PostDeviceOffline in");
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_STATE_OFFLINE;
         listener_->OnDeviceStateChange(pkgName, state, info);
     }
+    LOGI("DmDeviceStateManager::PostDeviceOffline out");
+}
+
+void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("OnDeviceOnline function is called back with pkgName: %s", pkgName.c_str());
+    RegisterOffLineTimer(info);
+    RegisterProfileListener(pkgName, info);
+
+    DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
+    std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
+    if (decisionAdapter == nullptr) {
+        LOGE("OnDeviceOnline decision adapter is null");
+        PostDeviceOnline(pkgName, info);
+    } else if (decisionInfos_.size() == 0) {
+        PostDeviceOnline(pkgName, info);
+    } else {
+        std::string extra;
+        std::vector<DmDeviceInfo> infoList;
+        LOGI("OnDeviceOnline decision decisionInfos_ size: %d", decisionInfos_.size());
+        for (auto iter : decisionInfos_) {
+            std::string listenerPkgName = iter.first;
+            std::string extra = iter.second;
+            infoList.clear();
+            infoList.push_back(info);
+            decisionAdapter->FilterDeviceList(infoList, extra);
+            if (infoList.size() == 1) {
+                PostDeviceOnline(listenerPkgName, info);
+            }
+        }
+    }
+    LOGI("DmDeviceStateManager::OnDeviceOnline out");
+}
+
+void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
+    StartOffLineTimer(info);
+    UnRegisterProfileListener(pkgName, info);
+
+    DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
+    std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
+    if (decisionAdapter == nullptr) {
+        LOGE("OnDeviceOnline decision adapter is null");
+        PostDeviceOffline(pkgName, info);
+    } else if (decisionInfos_.size() == 0) {
+        PostDeviceOffline(pkgName, info);
+    } else {
+        std::string extra;
+        std::vector<DmDeviceInfo> infoList;
+        LOGI("OnDeviceOnline decision decisionInfos_ size: %d", decisionInfos_.size());
+        for (auto iter : decisionInfos_) {
+            std::string listenerPkgName = iter.first;
+            std::string extra = iter.second;
+            infoList.clear();
+            infoList.push_back(info);
+            decisionAdapter->FilterDeviceList(infoList, extra);
+            if (infoList.size() == 1) {
+                PostDeviceOffline(listenerPkgName, info);
+            }
+        }
+    }
+    LOGI("DmDeviceStateManager::OnDeviceOffline out");
 }
 
 void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
@@ -144,6 +215,24 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
     return DM_OK;
 }
 
+void DmDeviceStateManager::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
+    if (pkgName != "") {
+        decisionInfos_[pkgName] = extra;
+    }
+}
+
+void DmDeviceStateManager::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+{
+    LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
+    auto iter = decisionInfos_.find(pkgName);
+    if (iter == decisionInfos_.end()) {
+    } else {
+        decisionInfos_.erase(pkgName);
+    }
+}
+
 void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
     std::string deviceId;
@@ -155,6 +244,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
 
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+    deviceinfoMap_[deviceInfo.deviceId] = deviceId;
     auto iter = timerMap_.find(deviceId);
     if (iter != timerMap_.end()) {
         iter->second->Stop(SESSION_CANCEL_TIMEOUT);
@@ -168,20 +258,19 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    std::string deviceId;
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(deviceInfo.deviceId, deviceId);
-    if (ret != DM_OK) {
+    if (deviceinfoMap_.find(deviceInfo.deviceId) == deviceinfoMap_.end()) {
         LOGE("fail to get udid by networkId");
         return;
     }
 
-    LOGI("start offline timer with device: %s", GetAnonyString(deviceId).c_str());
+    LOGI("start offline timer with device: %s", GetAnonyString(deviceinfoMap_[deviceInfo.deviceId]).c_str());
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto &iter : timerMap_) {
-        if (iter.first == deviceId) {
+        if (iter.first == deviceinfoMap_[deviceInfo.deviceId]) {
             iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
+    deviceinfoMap_.erase(deviceInfo.deviceId);
 }
 
 void DmDeviceStateManager::DeleteTimeOutGroup(std::string deviceId)

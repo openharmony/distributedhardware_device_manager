@@ -87,7 +87,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 {
     std::string pkgName = "com.ohos.helloworld";
     int ret = softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
-    uint32_t ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
+    int ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -316,17 +316,6 @@ HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::
     DmDeviceInfo dmDeviceInfo;
     int ret = softbusConnector->CovertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnParameterChgCallback_001
- * @tc.desc: set some corrort para  and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnParameterChgCallback_001, testing::ext::TestSize.Level0)
-{
-    EXPECT_EQ(DM_OK, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -33,6 +33,10 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOGE("WriteInterfaceToken fail!");
+        return DM_IPC_WRITE_TOKEN_ERROR;
+    }
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         return DM_IPC_SEND_REQUEST_FAILED;
     }

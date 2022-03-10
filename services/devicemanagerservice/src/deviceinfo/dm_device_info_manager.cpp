@@ -24,6 +24,7 @@ DmDeviceInfoManager::DmDeviceInfoManager(std::shared_ptr<SoftbusConnector> &soft
     : softbusConnector_(softbusConnectorPtr)
 {
     LOGI("DmDeviceInfoManager constructor");
+    decisionSoName_ = "libdevicemanagerext_decision.z.so";
 }
 
 int32_t DmDeviceInfoManager::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -36,9 +37,8 @@ int32_t DmDeviceInfoManager::GetTrustedDeviceList(const std::string &pkgName, co
     }
 
     if (!extra.empty() && !deviceList.empty()) {
-        std::string soName;
         DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
-        std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(soName);
+        std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
         if (decisionAdapter != nullptr) {
             decisionAdapter->FilterDeviceList(deviceList, extra);
         } else {

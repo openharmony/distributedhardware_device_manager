@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_AUTH_RESPONSE_STATE_TEST_H
-#define OHOS_AUTH_RESPONSE_STATE_TEST_H
+#ifndef OHOS_IPC_CLIENT_MANAGER_TEST_H
+#define OHOS_IPC_CLIENT_MANAGER_TEST_H
 
 #include <gtest/gtest.h>
+#include <refbase.h>
 
-#include <memory>
-
-#include "device_manager_impl.h"
-#include "mock/mock_ipc_client_proxy.h"
-#include "auth_response_state.h"
-
+#include "mock/mock_ipc_client_manager.h"
+#include "ipc_client_manager.h"
 namespace OHOS {
 namespace DistributedHardware {
-class AuthResponseStateTest : public testing::Test {
+class IpcClientManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -35,4 +32,5 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+
+#endif // OHOS_IPC_CLIENT_MANAGER_TEST_H

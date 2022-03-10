@@ -24,7 +24,7 @@ std::string GetAnonyString(const std::string &value)
     const int32_t INT32_MIN_ID_LENGTH = 3;
 
     std::string tmpStr("******");
-    int32_t strLen = value.length();
+    size_t strLen = value.length();
     if (strLen < INT32_MIN_ID_LENGTH) {
         return tmpStr;
     }
@@ -46,7 +46,7 @@ std::string GetAnonyString(const std::string &value)
 std::string GetAnonyInt32(const int32_t value)
 {
     std::string tempString = std::to_string(value);
-    int32_t length = tempString.length();
+    size_t length = tempString.length();
     if (length == 0x01) {
         tempString[0] = '*';
         return tempString;

@@ -54,6 +54,8 @@ public:
     virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) = 0;
     virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid) = 0;
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
+    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
