@@ -93,7 +93,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${common_path}/include/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
@@ -101,10 +100,16 @@ if (defined(ohos_lite)) {
       "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
       "//foundation/aafwk/standard/interfaces/innerkits/want:want",
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-      "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
-      "//foundation/windowmanager/wm:libwm",
     ]
 
+    if (!device_manager_base_no_interaction_auth) {
+      deps += [
+        "${common_path}/include/dialog_ui/js:dialog_js_files_etc",
+        "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
+        "//foundation/windowmanager/wm:libwm",
+      ]
+      defines += [ "SUPPORT_GRAPHICS" ]
+    }
     external_deps = [
       "ability_runtime:app_manager",
       "bundle_framework:appexecfwk_base",

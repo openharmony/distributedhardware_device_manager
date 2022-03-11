@@ -79,6 +79,15 @@ const std::string authJsonConfigString =
             "funcName": "CreateNfcAuthObject",
             "soName": "libdevicemanager_nfcauth.z.so",
             "soPath": "/system/lib/"
+        },
+        {
+            "name": "no_interaction_auth",
+            "type": "AUTHENTICATE",
+            "version": "1.0",
+            "authType": 4,
+            "funcName": "CreatePinAuthObject",
+            "soName": "libdevicemanagerext_no_interaction_auth.z.so",
+            "soPath": "/system/lib/"
         }
     ]
 })";
