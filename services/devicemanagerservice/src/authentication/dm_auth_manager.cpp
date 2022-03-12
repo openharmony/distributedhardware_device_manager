@@ -25,9 +25,11 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
+#ifdef SUPPORT_GRAPHICS
 #include "ui_service_mgr_client.h"
 #include "dialog_callback_stub.h"
 #include "dialog_callback.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -544,7 +546,9 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         return DM_FAILED;
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
+#ifdef SUPPORT_GRAPHICS
     Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+#endif
     return DM_OK;
 }
 
@@ -572,6 +576,7 @@ int32_t DmAuthManager::JoinNetwork()
 void DmAuthManager::AuthenticateFinish()
 {
     LOGI("DmAuthManager::AuthenticateFinish start");
+#ifdef SUPPORT_GRAPHICS
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
@@ -621,6 +626,7 @@ void DmAuthManager::AuthenticateFinish()
         authRequestState_ = nullptr;
         authMessageProcessor_ = nullptr;
     }
+#endif
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -693,6 +699,7 @@ int32_t DmAuthManager::GetPinCode()
 
 void DmAuthManager::ShowConfigDialog()
 {
+#ifdef SUPPORT_GRAPHICS
     LOGI("ShowConfigDialog start");
     nlohmann::json jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
@@ -713,7 +720,8 @@ void DmAuthManager::ShowConfigDialog()
             authMgr_->StartAuthProcess(atoi(params.c_str()));
         });
     LOGI("ShowConfigDialog end");
-}
+#endif
+    }
 
 void DmAuthManager::ShowAuthInfoDialog()
 {

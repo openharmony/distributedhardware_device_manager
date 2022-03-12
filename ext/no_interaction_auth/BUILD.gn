@@ -16,11 +16,12 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
 }
+
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
 } else {
-  ohos_shared_library("devicemanagerext_pin_auth") {
+  ohos_shared_library("devicemanagerext_no_interaction_auth") {
     include_dirs = [
       "include",
       "${common_path}/include",
@@ -60,22 +61,17 @@ if (defined(ohos_lite)) {
 
     sources = [
       "src/ability/standard/dm_ability_manager.cpp",
-      "src/pin_auth.cpp",
-      "src/pin_auth_ui.cpp",
+      "src/no_interaction_auth.cpp",
     ]
 
     deps = [
-      "${ext_path}/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
-      "${ext_path}/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/security/deviceauth/services:deviceauth_sdk",
       "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
       "//foundation/aafwk/standard/interfaces/innerkits/want:want",
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-      "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
       "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
-      "//foundation/windowmanager/wm:libwm",
       "//utils/native/base:utils",
     ]
 
