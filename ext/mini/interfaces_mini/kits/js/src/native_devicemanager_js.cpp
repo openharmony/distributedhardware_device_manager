@@ -483,10 +483,8 @@ int32_t DeviceManagerModule::JsToDmSubscribeInfo(const JSIValue &object,DmSubscr
 void DeviceManagerModule::JsToDmDeviceInfo( const JSIValue &object,
     DmDeviceInfo &info)
 {   
-    std::strcpy(info.deviceId, JsObjectToString(object, "deviceId"));
-    std::strcpy(info.deviceName, JsObjectToString(object, "deviceName"));
-    //info.deviceId = JsObjectToString(object, "deviceId");
-    //info.deviceName = JsObjectToString(object, "deviceName");
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, JsObjectToString(object, "deviceId"));
+    strcpy_s(info.deviceName, DM_MAX_DEVICE_NAME_LEN, JsObjectToString(object, "deviceName"));
     int32_t deviceTypeId = -1;
     deviceTypeId = (int32_t)JsObjectToInt(object, "deviceTypeId");
     info.deviceTypeId = (DMDeviceType)deviceTypeId;
@@ -1104,9 +1102,5 @@ void InitDeviceManagerModule(JSIValue exports)
     JSI::SetModuleAPI(exports, "on", DeviceManagerModule::JsOn);
     JSI::SetModuleAPI(exports, "off", DeviceManagerModule::JsOff);
 }
-
 }
 }
-
-
-

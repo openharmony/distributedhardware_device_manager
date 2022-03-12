@@ -17,10 +17,8 @@
 #define TIMER_H
 #include <string>
 #include <errno.h>
-//#include <sys/epoll.h>
 #include <stdint.h>
 #include <stdio.h>
-// #include <thread>
 #include <unistd.h>
 #include <cstdio>
 
@@ -59,10 +57,7 @@ private:
     TimeoutHandle mHandle_;
     void *mHandleData_;
     int32_t mTimeFd_[2];
-    // struct epoll_event mEv_;
-    // struct epoll_event mEvents_[MAXEVENTS];
     int32_t mEpFd_;
-    // std::thread mThread_;
     std::string mTimerName_;
 };
 }

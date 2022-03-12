@@ -30,7 +30,6 @@
 #include "device_manager_errno.h"
 #include "device_manager_log.h"
 #include "softbus_session.h"
-// #include "system_ability_definition.h"
 #if (defined(__LINUX__) || defined(__LITEOS_A__))
 #include "ipc_server_listener_adapter.h"
 #endif

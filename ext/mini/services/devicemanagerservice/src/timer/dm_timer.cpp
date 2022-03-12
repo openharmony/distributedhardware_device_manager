@@ -14,9 +14,6 @@
  */
 
 #include "dm_timer.h"
-
-//#include <thread>
-
 #include "securec.h"
 
 namespace OHOS {
@@ -31,8 +28,6 @@ DmTimer::DmTimer(std::string &name)
     mHandle_ = nullptr;
     mHandleData_ = nullptr;
     (void)memset_s(mTimeFd_, sizeof(mTimeFd_), 0, sizeof(mTimeFd_));
-    // (void)memset_s(&mEv_, sizeof(mEv_), 0, sizeof(mEv_));
-    // (void)memset_s(mEvents_, sizeof(mEvents_), 0, sizeof(mEvents_));
     mEpFd_ = 0;
     mTimerName_ = name;
 }
@@ -59,8 +54,6 @@ DmTimerStatus DmTimer::Start(uint32_t timeOut, TimeoutHandle handle, void *data)
     }
 
     mStatus_ = DmTimerStatus::DM_STATUS_RUNNING;
-    // mThread_ = std::thread(&DmTimer::WiteforTimeout, this);
-    // mThread_.detach();
 
     return mStatus_;
 }
@@ -83,26 +76,6 @@ void DmTimer::Stop(int32_t code)
 void DmTimer::WiteforTimeout()
 {
     DMLOG(DM_LOG_INFO, "DmTimer %s start timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
-
-    // int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAXEVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
-    // if (nfds < 0) {
-    //     DMLOG(DM_LOG_ERROR, "DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
-    // }
-
-    char event = 0;
-    // if (nfds > 0) {
-    //     if (mEvents_[0].events & EPOLLIN) {
-    //         int num = read(mTimeFd_[0], &event, 1);
-    //         if (num > 0) {
-    //             DMLOG(DM_LOG_INFO, "DmTimer %s exit with event %d", mTimerName_.c_str(), event);
-    //         } else {
-    //             DMLOG(DM_LOG_ERROR, "DmTimer %s exit with errno %d", mTimerName_.c_str(), errno);
-    //         }
-    //     }
-    //     Release();
-    //     return;
-    // }
-
     mHandle_(mHandleData_);
     Release();
 
@@ -113,23 +86,7 @@ void DmTimer::WiteforTimeout()
 int32_t DmTimer::CreateTimeFd()
 {
     DMLOG(DM_LOG_INFO, "DmTimer %s creatTimeFd", mTimerName_.c_str());
-    int ret = 0;
-
-    // ret = pipe(mTimeFd_);
-    // if (ret < 0) {
-    //     DMLOG(DM_LOG_ERROR, "DmTimer %s CreateTimeFd fail:(%d) errno(%d)", mTimerName_.c_str(), ret, errno);
-    //     return ret;
-    // }
-
-    // mEv_.data.fd = mTimeFd_[0];
-    // mEv_.events = EPOLLIN | EPOLLET;
-    // mEpFd_ = epoll_create(MAXEVENTS);
-    // ret = epoll_ctl(mEpFd_, EPOLL_CTL_ADD, mTimeFd_[0], &mEv_);
-    // if (ret != 0) {
-    //     Release();
-    // }
-
-    return ret;
+    return 0;
 }
 
 void DmTimer::Release()

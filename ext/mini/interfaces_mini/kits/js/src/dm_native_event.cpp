@@ -26,37 +26,30 @@ namespace ACELite {
 std::map<std::string, std::shared_ptr<DmEventListener>> DmNativeEvent::eventMap_;
 
 DmNativeEvent::DmNativeEvent()
-{   
-   DMLOG(DM_LOG_INFO, "DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");    
+{
+   DMLOG(DM_LOG_INFO, "DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
 DmNativeEvent::DmNativeEvent(JSIValue thisVar)
-{   
-   DMLOG(DM_LOG_INFO, "DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");    
+{
+   DMLOG(DM_LOG_INFO, "DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
 DmNativeEvent::~DmNativeEvent()
 {
-    // for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
-    //     auto listener = iter->second;
-    //     JSI::ReleaseValue(listener->handlerRef);
-    // }
-    // eventMap_.clear();
-    // JSI::ReleaseValue(thisVarRef_);
-    DMLOG(DM_LOG_INFO, "~DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"); 
+    DMLOG(DM_LOG_INFO, "~DmNativeEvent ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
-
 
 void DmNativeEvent::On(std::string &eventType, JSIValue handle, JSIValue thisVal)
 {
-    DMLOG(DM_LOG_INFO, "DmNativeEvent On in for event: %s", eventType.c_str());                 
+    DMLOG(DM_LOG_INFO, "DmNativeEvent On in for event: %s", eventType.c_str());          
     auto listener= std::make_shared<DmEventListener>();
     
     listener->eventType = eventType;
     listener->handlerRef = JSI::AcquireValue(handle);
     
     listener->thisVarRef_ = JSI::AcquireValue(thisVal);
-    eventMap_[eventType] = listener;	
+    eventMap_[eventType] = listener;
 }
 
 void DmNativeEvent::Off(std::string &eventType)

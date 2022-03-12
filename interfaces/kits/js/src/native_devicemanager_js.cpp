@@ -91,11 +91,15 @@ void DmNapiInitCallback::OnRemoteDied()
             return;
         }
         deviceManagerNapi->OnEvent("serviceDie", 0, nullptr);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnRemoteDied work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -123,11 +127,15 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::ONLINE, callback->deviceInfo_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOnline work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -155,11 +163,15 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::READY, callback->deviceInfo_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceReady work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -187,11 +199,15 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::OFFLINE, callback->deviceInfo_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOffline work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -219,11 +235,15 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::CHANGE, callback->deviceInfo_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceChanged work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -253,11 +273,15 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
             return;
         }
         deviceManagerNapi->OnDeviceFound(callback->subscribeId_, callback->deviceInfo_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -288,11 +312,15 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
             return;
         }
         deviceManagerNapi->OnDiscoveryFailed(callback->subscribeId_, callback->reason_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDiscoveryFailed work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -346,11 +374,15 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
             return;
         }
         deviceManagerNapi->OnAuthResult(callback->deviceId_, callback->token_, callback->status_, callback->reason_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnAuthResult work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -378,11 +410,15 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
             return;
         }
         deviceManagerNapi->OnVerifyResult(callback->deviceId_, callback->resultCode_, callback->flag_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnVerifyAuthResult work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 
@@ -1047,11 +1083,15 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
             return;
         }
         deviceManagerNapi->OnDmfaCall(callback->token_);
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     });
     if (ret != 0) {
         LOGE("Failed to execute OnCall work queue");
-        delete work;
+        if (work != nullptr) {
+            delete work;
+        }
     }
 }
 

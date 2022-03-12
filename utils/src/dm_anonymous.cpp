@@ -51,8 +51,7 @@ std::string GetAnonyInt32(const int32_t value)
         tempString[0] = '*';
         return tempString;
     }
-
-    for (int32_t i = 1; i < length - 1; i++) {
+    for (size_t i = 1; i < length - 1; i++) {
         tempString[i] = '*';
     }
     return tempString;

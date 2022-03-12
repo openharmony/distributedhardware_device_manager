@@ -169,7 +169,7 @@ HWTEST_F(IpcServerStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
     // 2. Call IpcServerStub OnRemoteRequest with param
     ret = IpcServerStub::GetInstance().OnRemoteRequest(code, data, reply, option);
     // 3. check ret not DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_OK);
 }
 
 /**

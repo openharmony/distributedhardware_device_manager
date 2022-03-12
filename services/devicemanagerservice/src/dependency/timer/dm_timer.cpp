@@ -82,7 +82,6 @@ void DmTimer::Stop(int32_t code)
         LOGI("DmTimer is not init");
         return;
     }
-    LOGI("DmTimer %s Stop code (%d)", mTimerName_.c_str(), code);
     if (mTimeFd_[1]) {
         char event = 'S';
         if (write(mTimeFd_[1], &event, 1) < 0) {

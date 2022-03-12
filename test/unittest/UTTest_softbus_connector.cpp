@@ -169,8 +169,6 @@ HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_001, testing::ext::TestSize.Level0
 HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "145677";
-    NodeBasicInfo Info;
-    strncpy(Info.networkId, "145677", sizeof(Info.networkId));
     bool ret = softbusConnector->IsDeviceOnLine(deviceId);
     EXPECT_EQ(ret, false);
 }

@@ -49,7 +49,7 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
     AAFwk::AbilityManagerClient::GetInstance()->Connect();
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (result != OHOS::ERR_OK) {
-        LOGE("Start Ability faild");
+        LOGE("Start Ability failed");
         mStatus_ = ABILITY_STATUS_FAILED;
         return mStatus_;
     }

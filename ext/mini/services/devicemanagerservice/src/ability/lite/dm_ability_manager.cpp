@@ -39,9 +39,9 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
 
 void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
 {
-    struct  timespec ts;
+    struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += timeout_s;
+    ts.tv_sec += (int32_t)timeout_s;
     sem_timedwait(&mSem_, &ts);
 }
 

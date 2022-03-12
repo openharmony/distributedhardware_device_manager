@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <string>
-//#include "liteipc_adapter.h"
 #include <unistd.h>
 
 #endif // OHOS_DEVICE_MANAGER_IPC_SERVER_STUB_H
