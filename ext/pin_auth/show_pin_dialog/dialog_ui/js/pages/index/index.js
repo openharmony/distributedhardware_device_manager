@@ -5,7 +5,6 @@ export default {
         pincode: router.getParams().pinCode,
     },
     onInit() {
-        console.info('getParams: ' + router.getParams());
         callNativeHandler("EVENT_CONFIRM", "0");
     },
     onConfirm() {

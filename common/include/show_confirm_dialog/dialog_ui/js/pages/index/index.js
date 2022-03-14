@@ -3,7 +3,6 @@ import router from '@ohos.router'
 var timel = null;
 export default {
     data: {
-        message: router.getParams().targetPkgName,
         seconds:60,
     },
     onInit() {

@@ -19,22 +19,21 @@ export default {
     onConfirm() {
         numbs = numbs + 1;
         if(numbs <= 3){
-            console.info('click cancel numbs < 3 ');
-            console.info('code: ' + code);
-            console.info('inputVal: ' + inputVal);
+            console.info('click confirm numbs < 3 ');
             if(code == inputVal){
-                console.info('click cancel code == inputVal');
+                console.info('click confirm code == inputVal');
                 callNativeHandler("EVENT_INPUT", "0");
             }else{
                 if(numbs == 3){
+                    console.info('click confirm code != inputVal and numbs == 3');
                     callNativeHandler("EVENT_CONFIRM", "1");
                 }
-                console.info('click cancel code != inputVal');
+                console.info('click confirm code != inputVal');
                 this.isShow = true;
                 this.isTimes = 3 - numbs;
             }
         }else{
-            console.info('click cancel numbs > 3 ');
+            console.info('click confirm numbs > 3 ');
             callNativeHandler("EVENT_CONFIRM", "1");
         }       
     },
