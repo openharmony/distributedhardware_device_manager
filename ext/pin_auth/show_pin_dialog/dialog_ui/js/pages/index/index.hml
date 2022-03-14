@@ -8,7 +8,7 @@
     <text class="title-pin">
         {{ pincode }}
     </text>
-    <button class="but" onclick="onConfirm">
+    <button class="but-confirm" onclick="onConfirm">
         取消
     </button>
 </div>

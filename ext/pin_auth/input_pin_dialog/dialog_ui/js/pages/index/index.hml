@@ -10,10 +10,10 @@
         PIN码输入错误，请重新输入(3次：还有{{isTimes}}次机会)
     </text>
     <div class="but">
-        <button class="but1" onclick="onCancel" type="text">
+        <button class="but-cancel" onclick="onCancel" type="text">
             取消
         </button>
-        <button class="but2" onclick="onConfirm" type="capsule">
+        <button class="but-confirm" onclick="onConfirm" type="capsule">
             确定
         </button>
     </div>
