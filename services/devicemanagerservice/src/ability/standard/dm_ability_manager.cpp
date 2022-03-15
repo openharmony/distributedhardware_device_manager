@@ -54,11 +54,11 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
         mStatus_ = AbilityStatus::ABILITY_STATUS_FAILED;
         return mStatus_;
     }
-    waitForTimeout(ABILITY_START_TIMEOUT);
+    WaitForTimeout(ABILITY_START_TIMEOUT);
     return mStatus_;
 }
 
-void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
+void DmAbilityManager::WaitForTimeout(uint32_t timeout_s)
 {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
