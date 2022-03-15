@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t MAX_VERIFY_TIMES = 3;
 NoInteractionAuth::NoInteractionAuth()
 {
     LOGI("NoInteractionAuth constructor");
