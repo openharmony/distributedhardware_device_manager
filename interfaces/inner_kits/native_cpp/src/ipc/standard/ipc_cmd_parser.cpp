@@ -130,10 +130,9 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
 {
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo *localDeviceInfo = (DmDeviceInfo *)reply.ReadRawData(sizeof(DmDeviceInfo));
-    if (localDeviceInfo == nullptr) {
-        LOGE("write subscribe info failed");
+    if (localDeviceInfo != nullptr) {
+        pRsp->SetLocalDeviceInfo(*localDeviceInfo);
     }
-    pRsp->SetLocalDeviceInfo(*localDeviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
