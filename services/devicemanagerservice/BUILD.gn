@@ -93,7 +93,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${common_path}/include/dialog_ui/js:dialog_js_files_etc",
+      "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
