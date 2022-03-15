@@ -31,12 +31,14 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "include/permission/standard",
+      "//third_party/mbedtls/include/mbedtls",
     ]
   }
 
   ohos_shared_library("devicemanagerutils") {
     sources = [
       "src/dm_anonymous.cpp",
+      "src/dm_hash.cpp",
       "src/dm_log.cpp",
       "src/dm_random.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",

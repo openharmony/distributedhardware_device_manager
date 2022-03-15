@@ -72,7 +72,7 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
     if (result == OHOS::ERR_OK) {
         DMLOG(DM_LOG_INFO, "Start Ability succeed");
     } else {
-        DMLOG(DM_LOG_INFO, "Start Ability faild");
+        DMLOG(DM_LOG_INFO, "Start Ability failed");
         mStatus_ = AbilityStatus::ABILITY_STATUS_FAILED;
         return mStatus_;
     }

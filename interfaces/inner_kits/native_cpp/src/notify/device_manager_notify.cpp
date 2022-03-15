@@ -238,7 +238,7 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
 void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
                                        const std::string &token, uint32_t status, uint32_t reason)
 {
-    LOGI("DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%d", pkgName.c_str(), status, reason);
+    LOGI("DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%u", pkgName.c_str(), status, reason);
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
         LOGE("DeviceManager OnAuthResult: no register authCallback for this package");

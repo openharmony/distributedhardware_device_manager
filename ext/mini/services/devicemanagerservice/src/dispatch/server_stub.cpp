@@ -57,7 +57,7 @@ static const char *GetName(Service *service)
 
 static BOOL Initialize(Service *service, Identity identity)
 {
-    if (service == NULL) {
+    if (service == nullptr) {
         DMLOG(DM_LOG_WARN, "invalid param");
         return FALSE;
     }
@@ -71,7 +71,7 @@ static BOOL Initialize(Service *service, Identity identity)
 
 static BOOL MessageHandle(Service *service, Request *request)
 {
-    if ((service == NULL) || (request == NULL)) {
+    if ((service == nullptr) || (request == nullptr)) {
         DMLOG(DM_LOG_WARN, "invalid param");
         return FALSE;
     }
@@ -85,9 +85,6 @@ static TaskConfig GetTaskConfig(Service *service)
     return config;
 }
 
-
-
-
 static void DevMgrSvcInit(void)
 {
     sleep(WAIT_FOR_SERVER);
@@ -96,9 +93,6 @@ static void DevMgrSvcInit(void)
         .Initialize = Initialize,
         .MessageHandle = MessageHandle,
         .GetTaskConfig = GetTaskConfig,
-        // SERVER_IPROXY_IMPL_BEGIN,
-        // .Invoke = OnRemoteRequest,
-        // IPROXY_END,
     };
 
     if (!SAMGR_GetInstance()->RegisterService((Service *)&service)) {

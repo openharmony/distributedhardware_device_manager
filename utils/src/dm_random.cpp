@@ -70,7 +70,7 @@ int32_t GetRandomData(uint8_t *randStr, uint32_t len)
             break;
         }
         ret = DM_OK;
-    } while (0);
+    } while (false);
     if (entropy != nullptr) {
         free(entropy);
     }
@@ -91,9 +91,9 @@ bool MbedtlsGenRandomStr(char *szOut, int32_t szOutLen, bool numberOnly)
     const int32_t NUMBER_COUNT = 10;
     const int32_t ALPHA_COUNT = 26;
     const int32_t ALPHA_BYTE_COUNT = 2;
-    int32_t M = numberOnly ? NUMBER_COUNT : (NUMBER_COUNT + ALPHA_BYTE_COUNT * ALPHA_COUNT);
+    int32_t tmpNum = numberOnly ? NUMBER_COUNT : (NUMBER_COUNT + ALPHA_BYTE_COUNT * ALPHA_COUNT);
     for (int32_t i = 0; i < szOutLen; i++) {
-        uint32_t idx = ((uint32_t)szOut[i] % M);
+        uint32_t idx = ((uint32_t)szOut[i] % tmpNum);
         char base;
         if (idx < NUMBER_COUNT) {
             base = '0';

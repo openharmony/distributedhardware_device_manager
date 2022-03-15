@@ -16,7 +16,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
 }
-
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
@@ -66,8 +65,8 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${ext_path}/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
-      "${ext_path}/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
+      "${ext_path}/pin_auth/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
+      "${ext_path}/pin_auth/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/security/deviceauth/services:deviceauth_sdk",

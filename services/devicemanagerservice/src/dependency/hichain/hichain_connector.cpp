@@ -161,7 +161,7 @@ int32_t HiChainConnector::GetGroupInfo(std::string queryParams, std::vector<Grou
         LOGE("HiChainConnector::GetGroupInfo group failed, groupNum is 0.");
         return false;
     }
-    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%d)", groupVec, num);
+    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%u)", groupVec, num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
@@ -188,7 +188,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, std::string queryPa
         return false;
     }
     if (groupVec == nullptr) {
-        LOGE("HiChainConnector::GetGroupInfo failed , returnGroups is nullptr");
+        LOGE("HiChainConnector::GetGroupInfo failed , returnGroups is nullptr.");
         return false;
     }
     if (num == 0) {

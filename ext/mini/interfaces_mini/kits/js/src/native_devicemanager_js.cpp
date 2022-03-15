@@ -549,7 +549,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
     }
     *bufferPtr = (uint8_t*)calloc(sizeof(uint8_t), length);
     if (*bufferPtr == nullptr) {
-        DMLOG(DM_LOG_ERROR, "low memory, calloc return nullptr, length is %d,  filed %s", length, fieldStr.c_str());
+        DMLOG(DM_LOG_ERROR, "low memory, calloc return nullptr, length is %zu,  filed %s", length, fieldStr.c_str());
         return;
     }
     if (memcpy_s(*bufferPtr, length, data, length) != 0) {

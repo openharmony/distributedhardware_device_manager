@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//
+
 #ifndef OHOS_DEVICE_MANAGER_NATIVE_EVENT_H
 #define OHOS_DEVICE_MANAGER_NATIVE_EVENT_H
 
