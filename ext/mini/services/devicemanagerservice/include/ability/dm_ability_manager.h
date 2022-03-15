@@ -53,7 +53,7 @@ public:
     void StartAbilityDone();
 
 private:
-    void waitForTimeout(uint32_t timeout_s);
+    void WaitForTimeout(uint32_t timeout_s);
 
 private:
     sem_t mSem_;
