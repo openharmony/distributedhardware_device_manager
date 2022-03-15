@@ -37,7 +37,7 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
     return mStatus_;
 }
 
-void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
+void DmAbilityManager::WaitForTimeout(uint32_t timeout_s)
 {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
