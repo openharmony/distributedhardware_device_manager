@@ -576,11 +576,12 @@ int32_t DmAuthManager::JoinNetwork()
 void DmAuthManager::AuthenticateFinish()
 {
     LOGI("DmAuthManager::AuthenticateFinish start");
-#ifdef SUPPORT_GRAPHICS
     if (authResponseState_ != nullptr) {
+#ifdef SUPPORT_GRAPHICS
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
+#endif
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
@@ -604,11 +605,11 @@ void DmAuthManager::AuthenticateFinish()
         } else {
             authRequestContext_->reason = authResponseContext_->reply;
         }
-
+#ifdef SUPPORT_GRAPHICS
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
-
+#endif
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
 
@@ -626,7 +627,6 @@ void DmAuthManager::AuthenticateFinish()
         authRequestState_ = nullptr;
         authMessageProcessor_ = nullptr;
     }
-#endif
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 

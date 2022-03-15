@@ -34,14 +34,14 @@ namespace OHOS {
 namespace DistributedHardware {
 class SoftbusConnector {
 public:
-    static void OnPublishSuccess(int32_t publishId);
-    static void OnPublishFail(int32_t publishId, PublishFailReason reason);
+    static void OnPublishSuccess(int publishId);
+    static void OnPublishFail(int publishId, PublishFailReason reason);
     static void OnSoftBusDeviceOnline(NodeBasicInfo *info);
     static void OnSoftbusDeviceOffline(NodeBasicInfo *info);
     static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
     static void OnSoftbusDeviceFound(const DeviceInfo *device);
-    static void OnSoftbusDiscoveryFailed(int32_t subscribeId, DiscoveryFailReason failReason);
-    static void OnSoftbusDiscoverySuccess(int32_t subscribeId);
+    static void OnSoftbusDiscoveryFailed(int subscribeId, DiscoveryFailReason failReason);
+    static void OnSoftbusDiscoverySuccess(int subscribeId);
     static void OnParameterChgCallback(const char *key, const char *value, void *context);
     static int32_t GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress);
     static ConnectionAddr *GetConnectAddr(const std::string &deviceId, std::string &connectAddr);

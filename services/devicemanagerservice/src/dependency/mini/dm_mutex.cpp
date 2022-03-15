@@ -13,41 +13,29 @@
  * limitations under the License.
  */
 
-#include "multiple_user_connector.h"
+#include <string>
 
-#include "dm_constants.h"
 #include "dm_log.h"
-#if !defined(__LITEOS_M__)
-#include "os_account_manager.h"
-using namespace OHOS::AccountSA;
-#endif
+#include "dm_mutex.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t MultipleUserConnector::oldUserId_ = -1;
-
-int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
+DmMutex::DmMutex()
 {
-#if defined(__LITEOS_M__)
-    return 0;
-#else
-    std::vector<int> ids;
-    ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
-    if (ret != ERR_OK || ids.empty()) {
-        return -1;
+    uint32_t ret = pthread_mutex_init(&lock_, NULL);
+    if (ret != 0) {
+        LOGE("init mutex lock failed: %d.", ret);
     }
-    return ids[0];
-#endif
+    pthread_mutex_lock(&lock_);
 }
 
-void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
+DmMutex::~DmMutex()
 {
-    oldUserId_ = userId;
-}
-
-int32_t MultipleUserConnector::GetSwitchOldUserId(void)
-{
-    return oldUserId_;
+    pthread_mutex_unlock(&lock_);
+    uint32_t ret = pthread_mutex_destroy(&lock_);
+    if (ret != 0) {
+        LOGI("destroy mutex lock failed: %d.", ret);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -17,8 +17,13 @@
 
 #include <securec.h>
 #include <unistd.h>
+#if defined(__LITEOS_M__)
+#include "dm_mutex.h"
+#include "dm_thread.h"
+#else
 #include <thread>
 #include <mutex>
+#endif
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -49,12 +54,17 @@ INodeStateCb SoftbusConnector::softbusNodeStateCb_ = {
     .onNodeOffline = SoftbusConnector::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusConnector::OnSoftbusDeviceInfoChanged};
 
+
 void DeviceOnLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
     DmDeviceInfo deviceInfo)
 {
     LOGI("Device on line start");
+#if defined(__LITEOS_M__)
+    DmMutex lockDeviceOnLine;
+#else
     std::mutex lockDeviceOnLine;
     std::lock_guard<std::mutex> lock(lockDeviceOnLine);
+#endif
     for (auto &iter : stateCallbackMap) {
         iter.second->OnDeviceOnline(iter.first, deviceInfo);
     }
@@ -65,8 +75,12 @@ void DeviceOffLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>>
     DmDeviceInfo deviceInfo)
 {
     LOGI("Device off line start");
+#if defined(__LITEOS_M__)
+    DmMutex lockDeviceOffLine;
+#else
     std::mutex lockDeviceOffLine;
     std::lock_guard<std::mutex> lock(lockDeviceOffLine);
+#endif
     for (auto &iter : stateCallbackMap) {
         iter.second->OnDeviceOffline(iter.first, deviceInfo);
     }
@@ -106,7 +120,10 @@ int32_t SoftbusConnector::Init()
     dmPublishInfo.capability = DM_CAPABILITY_OSD;
     dmPublishInfo.capabilityData = nullptr;
     dmPublishInfo.dataLen = 0;
-
+#if defined(__LITEOS_M__)
+    ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+    LOGI("service publish result is : %d", ret);
+#else
     char discoverStatus[DISCOVER_STATUS_LEN + 1] = {0};
     ret = GetParameter(DISCOVER_STATUS_KEY.c_str(), "not exist", discoverStatus, DISCOVER_STATUS_LEN);
     if (strcmp(discoverStatus, "not exist") == 0) {
@@ -133,7 +150,8 @@ int32_t SoftbusConnector::Init()
     }
 
     ret = WatchParameter(DISCOVER_STATUS_KEY.c_str(), &SoftbusConnector::OnParameterChgCallback, nullptr);
-    LOGI("register Watch Parameter result is : %d");
+    LOGI("register Watch Parameter result is : %d", ret);
+#endif
     return ret;
 }
 
@@ -448,12 +466,12 @@ void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, 
     dmDeviceInfo.deviceTypeId = deviceInfo.devType;
 }
 
-void SoftbusConnector::OnPublishSuccess(int32_t publishId)
+void SoftbusConnector::OnPublishSuccess(int publishId)
 {
     LOGI("SoftbusConnector::OnPublishSuccess, publishId: %d", publishId);
 }
 
-void SoftbusConnector::OnPublishFail(int32_t publishId, PublishFailReason reason)
+void SoftbusConnector::OnPublishFail(int publishId, PublishFailReason reason)
 {
     LOGI("SoftbusConnector::OnPublishFail failed, publishId: %d, reason: %d", publishId, reason);
 }
@@ -468,8 +486,13 @@ void SoftbusConnector::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 
     DmDeviceInfo dmDeviceInfo;
     CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+#if defined(__LITEOS_M__)
+    DmThread deviceOnLine(DeviceOnLine, stateCallbackMap_, dmDeviceInfo);
+    deviceOnLine.DmCreatThread();
+#else
     std::thread deviceOnLine(DeviceOnLine, stateCallbackMap_, dmDeviceInfo);
     deviceOnLine.detach();
+#endif
 
     if (discoveryDeviceInfoMap_.empty()) {
         return;
@@ -495,8 +518,13 @@ void SoftbusConnector::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+#if defined(__LITEOS_M__)
+    DmThread deviceOffLine(DeviceOffLine, stateCallbackMap_, dmDeviceInfo);
+    deviceOffLine.DmCreatThread();
+#else
     std::thread deviceOffLine(DeviceOffLine, stateCallbackMap_, dmDeviceInfo);
     deviceOffLine.detach();
+#endif
 }
 
 void SoftbusConnector::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
@@ -534,7 +562,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 }
 
-void SoftbusConnector::OnSoftbusDiscoveryFailed(int32_t subscribeId, DiscoveryFailReason failReason)
+void SoftbusConnector::OnSoftbusDiscoveryFailed(int subscribeId, DiscoveryFailReason failReason)
 {
     LOGI("In, subscribeId %d, failReason %d", subscribeId, (int32_t)failReason);
     uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
@@ -543,7 +571,7 @@ void SoftbusConnector::OnSoftbusDiscoveryFailed(int32_t subscribeId, DiscoveryFa
     }
 }
 
-void SoftbusConnector::OnSoftbusDiscoverySuccess(int32_t subscribeId)
+void SoftbusConnector::OnSoftbusDiscoverySuccess(int subscribeId)
 {
     LOGI("In, subscribeId %d", subscribeId);
     uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);

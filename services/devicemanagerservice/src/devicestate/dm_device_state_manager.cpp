@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,12 +26,18 @@ const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 static void TimeOut(void *data, DmTimer& timer)
 {
-    LOGE("time out ");
-    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
-    if (deviceStateMgr == nullptr) {
-        LOGE("OnDeviceOfflineTimeOut deviceStateMgr = nullptr");
+    LOGI("time out %s", timer.GetTimerName().c_str());
+    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) != TIMER_DEFAULT) {
+        LOGE("time out is not our timer");
         return;
     }
+
+    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
+    if (deviceStateMgr == nullptr) {
+        LOGE("deviceStateMgr is nullptr");
+        return;
+    }
+
     deviceStateMgr->DeleteTimeOutGroup(timer.GetTimerName());
 }
 
@@ -64,7 +70,11 @@ int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName
             DmDeviceInfo saveInfo = info;
             SoftbusConnector::GetUuidByNetworkId(info.deviceId, uuid);
             {
+#if defined(__LITEOS_M__)
+                DmMutex mutexLock;
+#else
                 std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
                 remoteDeviceInfos_[uuid] = saveInfo;
             }
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
@@ -84,7 +94,11 @@ int32_t DmDeviceStateManager::UnRegisterProfileListener(const std::string &pkgNa
         profileAdapter->UnRegisterProfileListener(pkgName);
     }
     {
+#if defined(__LITEOS_M__)
+        DmMutex mutexLock;
+#else
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
         if (remoteDeviceInfos_.find(std::string(info.deviceId)) != remoteDeviceInfos_.end()) {
             remoteDeviceInfos_.erase(std::string(info.deviceId));
         }
@@ -193,7 +207,11 @@ void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std:
     }
     DmDeviceInfo saveInfo;
     {
+#if defined(__LITEOS_M__)
+        DmMutex mutexLock;
+#else
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
         auto iter = remoteDeviceInfos_.find(deviceId);
         if (iter == remoteDeviceInfos_.end()) {
             LOGE("OnProfileReady complete not find deviceId: %s", GetAnonyString(deviceId).c_str());
@@ -242,43 +260,53 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         return;
     }
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
-
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    deviceinfoMap_[deviceInfo.deviceId] = deviceId;
-    auto iter = timerMap_.find(deviceId);
-    if (iter != timerMap_.end()) {
-        iter->second->Stop(SESSION_CANCEL_TIMEOUT);
-        return;
+#endif
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Stop(SESSION_CANCEL_TIMEOUT);
+            return;
+        }
     }
-    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(deviceId);
+
+    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(stateTimerInfoMap_.size());
+    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
     if (offLineTimer != nullptr) {
-        timerMap_[deviceId] = offLineTimer;
+        StateTimerInfo stateTimer = {
+            .timerName = timerName,
+            .netWorkId = deviceInfo.deviceId,
+            .deviceId = deviceId,
+            .timer = offLineTimer
+        };
+        stateTimerInfoMap_[timerName] = stateTimer;
     }
 }
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    if (deviceinfoMap_.find(deviceInfo.deviceId) == deviceinfoMap_.end()) {
-        LOGE("fail to get udid by networkId");
-        return;
-    }
-
-    LOGI("start offline timer with device: %s", GetAnonyString(deviceinfoMap_[deviceInfo.deviceId]).c_str());
-    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    for (auto &iter : timerMap_) {
-        if (iter.first == deviceinfoMap_[deviceInfo.deviceId]) {
-            iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
+    LOGI("start offline timer");
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
-    deviceinfoMap_.erase(deviceInfo.deviceId);
 }
 
-void DmDeviceStateManager::DeleteTimeOutGroup(std::string deviceId)
+void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
 {
-    LOGI("remove hichain group with device: %s", GetAnonyString(deviceId).c_str());
+    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     if (hiChainConnector_ != nullptr) {
-        hiChainConnector_->DeleteTimeOutGroup(deviceId.c_str());
+        auto iter = stateTimerInfoMap_.find(stateTimer);
+        if (iter != stateTimerInfoMap_.end()) {
+            LOGI("remove hichain group with device: %s",
+                GetAnonyString(stateTimerInfoMap_[stateTimer].deviceId).c_str());
+            hiChainConnector_->DeleteTimeOutGroup(stateTimerInfoMap_[stateTimer].deviceId.c_str());
+        }
     }
+    stateTimerInfoMap_.erase(stateTimer);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

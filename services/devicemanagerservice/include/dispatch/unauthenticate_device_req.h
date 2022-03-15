@@ -13,26 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DEVICE_MANAGER_UNAUTHENTICATE_DEVICE_REQ_H
+#define OHOS_DEVICE_MANAGER_UNAUTHENTICATE_DEVICE_REQ_H
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "dm_device_info.h"
+#include "message_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class UnAuthenticateDeviceReq : public MessageReq {
+    DECLARE_MESSAGE_MODEL(UnAuthenticateDeviceReq);
+
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    const DmDeviceInfo &GetDeviceInfo() const
+    {
+        return deviceInfo_;
+    }
+
+    void SetDeviceInfo(const DmDeviceInfo &deviceInfo)
+    {
+        deviceInfo_ = deviceInfo;
+    }
 
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    DmDeviceInfo deviceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DEVICE_MANAGER_UNAUTHENTICATE_DEVICE_REQ_H
