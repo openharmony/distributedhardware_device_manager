@@ -126,9 +126,8 @@ int32_t DmTimer::CreateTimeFd()
         return DM_STATUS_FINISH;
     }
     LOGI("DmTimer %s creatTimeFd", mTimerName_.c_str());
-    int ret = 0;
 
-    ret = pipe(mTimeFd_);
+    int ret = pipe(mTimeFd_);
     if (ret < 0) {
         LOGE("DmTimer %s CreateTimeFd fail:(%d) errno(%d)", mTimerName_.c_str(), ret, errno);
         return ret;

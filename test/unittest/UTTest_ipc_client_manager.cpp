@@ -67,7 +67,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
     // 3. call ClientInit
     int ret = instance->ClientInit();
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
 /**
@@ -85,7 +85,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
     // 3. call ClientInit
     int ret = instance->ClientInit();
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
 /**
@@ -110,7 +110,7 @@ HWTEST_F(IpcClientManagerTest, Init_001, testing::ext::TestSize.Level0)
     // 4. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
     // 5. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
 /**

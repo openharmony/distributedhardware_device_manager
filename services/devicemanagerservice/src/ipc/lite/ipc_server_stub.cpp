@@ -51,7 +51,7 @@ static int32_t DeathCb(const IpcContext *context, void *ipcMsg, IpcIo *data, voi
     (void)context;
     (void)ipcMsg;
     (void)data;
-    if (arg == NULL) {
+    if (arg == nullptr) {
         LOGE("package name is NULL.");
         return DM_INVALID_VALUE;
     }
@@ -60,12 +60,12 @@ static int32_t DeathCb(const IpcContext *context, void *ipcMsg, IpcIo *data, voi
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found client by package name.");
         free(arg);
-        arg = NULL;
+        arg = nullptr;
         return DM_FAILED;
     }
     IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     free(arg);
-    arg = NULL;
+    arg = nullptr;
 #ifdef __LINUX__
     BinderRelease(svcId.ipcCtx, svcId.handle);
 #endif
@@ -83,7 +83,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     size_t len = 0;
     uint8_t *name = IpcIoPopString(req, &len);
     SvcIdentity *svc = IpcIoPopSvc(req);
-    if (name == NULL || svc == NULL || len == 0) {
+    if (name == nullptr || svc == nullptr || len == 0) {
         LOGE("get para failed");
         return DM_INVALID_VALUE;
     }
@@ -98,7 +98,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     svcId.ipcCtx = svc->ipcContext;
     BinderAcquire(svcId.ipcCtx, svcId.handle);
     free(svc);
-    svc = NULL;
+    svc = nullptr;
 #endif
     if (len == 0 || len > MALLOC_MAX_LEN) {
         LOGE("malloc length invalid!");
@@ -157,7 +157,7 @@ static const char *GetName(Service *service)
 
 static BOOL Initialize(Service *service, Identity identity)
 {
-    if (service == NULL) {
+    if (service == nullptr) {
         LOGW("invalid param");
         return FALSE;
     }
@@ -169,7 +169,7 @@ static BOOL Initialize(Service *service, Identity identity)
 
 static BOOL MessageHandle(Service *service, Request *request)
 {
-    if ((service == NULL) || (request == NULL)) {
+    if ((service == nullptr) || (request == nullptr)) {
         LOGW("invalid param");
         return FALSE;
     }

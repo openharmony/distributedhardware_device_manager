@@ -141,7 +141,7 @@ int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &grou
 
     ret = deviceGroupManager_->createGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(), jsonObj.dump().c_str());
     if (ret != 0) {
-        DMLOG(DM_LOG_ERROR, "Faild to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
+        DMLOG(DM_LOG_ERROR, "Failed  to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
         return ret;
     }
 
@@ -176,12 +176,12 @@ int32_t HichainConnector::GetGroupInfo(std::string queryParams, std::vector<Grou
 
     ret = deviceGroupManager_->getGroupInfo(userId, DEVICE_MANAGER_APP.c_str(), queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::GetGroupInfo faild , ret: %d.", ret);
+        DMLOG(DM_LOG_ERROR, "HichainConnector::GetGroupInfo failed  , ret: %d.", ret);
         return false;
     }
 
     if (groupVec == nullptr) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::GetGroupInfo faild , returnGroups is nullptr");
+        DMLOG(DM_LOG_ERROR, "HichainConnector::GetGroupInfo failed , returnGroups is nullptr");
         return false;
     }
 
@@ -333,12 +333,12 @@ void HichainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupI
     int32_t ret = deviceGroupManager_->getRelatedGroups(userId, DEVICE_MANAGER_APP.c_str(), deviceId.c_str(),
         &returnGroups, &groupNum);
     if (ret != 0) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::GetRelatedGroups faild , ret: %d.", ret);
+        DMLOG(DM_LOG_ERROR, "HichainConnector::GetRelatedGroups failed , ret: %d.", ret);
         return;
     }
 
     if (returnGroups == nullptr) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::GetRelatedGroups faild , returnGroups is nullptr");
+        DMLOG(DM_LOG_ERROR, "HichainConnector::GetRelatedGroups failed , returnGroups is nullptr");
         return;
     }
 
@@ -422,7 +422,7 @@ int32_t HichainConnector::DelMemberFromGroup(std::string groupId, std::string de
     int32_t ret = deviceGroupManager_->deleteMemberFromGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(),
         deleteParams.c_str());
     if (ret != 0) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::DelMemberFromGroup faild , ret: %d.", ret);
+        DMLOG(DM_LOG_ERROR, "HichainConnector::DelMemberFromGroup failed , ret: %d.", ret);
         return ret;
     }
     return 0;
@@ -443,7 +443,7 @@ void HichainConnector::DeleteGroup(std::string &groupId)
 
     ret = deviceGroupManager_->deleteGroup(userId, requestId, DEVICE_MANAGER_APP.c_str(), disbandParams.c_str());
     if (ret != 0) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::DeleteGroup faild , ret: %d.", ret);
+        DMLOG(DM_LOG_ERROR, "HichainConnector::DeleteGroup failed , ret: %d.", ret);
     }
 }
 

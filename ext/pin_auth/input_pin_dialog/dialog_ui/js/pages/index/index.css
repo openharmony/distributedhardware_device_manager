@@ -37,7 +37,7 @@
     height: 100px;
 }
 
-.but1 {
+.but-cancel {
     width: 30%;
     height: 80px;
     font-size: 40px;
@@ -46,7 +46,7 @@
     border-radius: 50px;
 }
 
-.but2 {
+.but-confirm {
     width: 30%;
     height: 80px;
     font-size: 40px;

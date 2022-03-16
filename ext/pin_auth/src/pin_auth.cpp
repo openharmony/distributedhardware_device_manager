@@ -16,7 +16,7 @@
 #include "pin_auth.h"
 
 #include <memory>
-#include <cstring>
+#include <string>
 
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -66,7 +66,7 @@ int32_t PinAuth::StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager
 int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string &authParam)
 {
     times_ += 1;
-    if (strlen(authParam.c_str()) == 1) {
+    if (authParam.length() == 1) {
         if (authParam == "0") {
             return DM_OK;
         }

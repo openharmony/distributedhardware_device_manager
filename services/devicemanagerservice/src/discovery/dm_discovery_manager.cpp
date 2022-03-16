@@ -27,7 +27,7 @@ const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 static void TimeOut(void *data, DmTimer& timer)
 {
-    LOGE("time out ");
+    LOGE("time out");
     DmDiscoveryManager *discoveryMgr = (DmDiscoveryManager *)data;
     if (discoveryMgr == nullptr) {
         LOGE("time out error");

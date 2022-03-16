@@ -46,7 +46,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
 void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                                  const DmDeviceInfo &info)
 {
-    LOGI("call OnDeviceFound for %s, originId %d, deviceId %s", pkgName.c_str(), subscribeId,
+    LOGI("call OnDeviceFound for %s, originId %hu, deviceId %s", pkgName.c_str(), subscribeId,
          GetAnonyString(std::string(info.deviceId)).c_str());
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::make_shared<IpcNotifyDeviceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();

@@ -229,7 +229,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply)
     DmDeviceState deviceState = static_cast<DmDeviceState>(IpcIoPopInt32(&reply));
     uint32_t size;
     const DmDeviceInfo *deviceInfo = (const DmDeviceInfo *)IpcIoPopFlatObj(&reply, &size);
-    if (pkgName == "" || len == 0 || deviceInfo == NULL) {
+    if (pkgName == "" || len == 0 || deviceInfo == nullptr) {
         LOGE("OnDeviceOnline, get para failed");
         return;
     }
@@ -256,7 +256,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, IpcIo &reply)
     uint16_t subscribeId = IpcIoPopUint16(&reply);
     uint32_t size;
     const DmDeviceInfo *deviceInfo = (const DmDeviceInfo *)IpcIoPopFlatObj(&reply, &size);
-    if (pkgName == "" || len == 0 || deviceInfo == NULL) {
+    if (pkgName == "" || len == 0 || deviceInfo == nullptr) {
         LOGE("OnDeviceChanged, get para failed");
         return;
     }

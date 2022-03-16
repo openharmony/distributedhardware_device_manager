@@ -49,6 +49,7 @@ typedef struct DmDeviceInfo {
     char deviceId[DM_MAX_DEVICE_ID_LEN];
     char deviceName[DM_MAX_DEVICE_NAME_LEN];
     uint16_t deviceTypeId;
+    char networkId[DM_MAX_DEVICE_ID_LEN];
 } DmDeviceInfo;
 
 typedef struct DmAuthParam {

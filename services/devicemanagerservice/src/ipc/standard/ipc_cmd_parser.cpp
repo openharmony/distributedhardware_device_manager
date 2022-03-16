@@ -108,6 +108,10 @@ ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mes
 
 ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }

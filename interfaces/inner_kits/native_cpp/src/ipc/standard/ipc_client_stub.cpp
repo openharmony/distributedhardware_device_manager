@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOGI("code = %d, flags= %d.", code, option.GetFlags());
+    LOGI("code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
@@ -36,7 +36,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         LOGE("on ipc cmd success");
         return DM_OK;
     }
-    LOGW("unsupport code: %d", code);
+    LOGW("unsupport code: %u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 

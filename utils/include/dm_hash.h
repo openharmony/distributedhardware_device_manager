@@ -13,15 +13,20 @@
  * limitations under the License.
  */
 
-#include <cstdint>
-#include <unistd.h>
+#ifndef OHOS_DM_HASH_H
+#define OHOS_DM_HASH_H
 
-int32_t main(int32_t argc, char *argv[])
-{
-    (void)argc;
-    (void)argv;
-    while (true) {
-        pause();
-    }
-    return 0;
-}
+#include <iostream>
+#include "base64.h"
+#include "ctr_drbg.h"
+#include "entropy.h"
+#include "gcm.h"
+#include "md.h"
+#include "platform.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+int32_t GetUdidHash(uint8_t *udid, int32_t udiddataLen, uint8_t outudiddData[32]);
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DM_HASH_H
