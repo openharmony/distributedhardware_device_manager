@@ -20,7 +20,7 @@ int GetParameter(const char *key, const char *def, char *value, unsigned int len
     (void)key;
     (void)def;
     (void)value;
-    (void)len;	
+    (void)len;
     return 0;
 }
 
