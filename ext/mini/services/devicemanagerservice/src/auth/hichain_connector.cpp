@@ -217,7 +217,7 @@ void HichainConnector::RegisterConnectorCallback(std::shared_ptr<HichainConnecto
 void HichainConnector::OnGroupCreated(int64_t requestId, const std::string &returnData)
 {
     if (hichainConnectorCallback_ == nullptr) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::OnGroupCreated hichainConnectorCallback_ not registe.");
+        DMLOG(DM_LOG_ERROR, "HichainConnector::OnGroupCreated hichainConnectorCallback_ not register.");
         return;
     }
 

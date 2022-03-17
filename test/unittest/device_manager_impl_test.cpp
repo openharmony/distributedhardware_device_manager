@@ -187,6 +187,7 @@ void DeviceDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
 void DeviceDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
 {
     (void)subscribeId;
+    (void)deviceInfo;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

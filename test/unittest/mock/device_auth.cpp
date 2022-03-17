@@ -27,6 +27,10 @@ int32_t (*deleteGroup)(int64_t requestId, const char *appId, const char *disband
 
 int32_t (*getRelatedGroups)(const char *appId, const char *peerDeviceId, char **returnGroupVec, uint32_t *groupNum)
 {
+    (void)appId;
+    (void)peerDeviceId;
+    (void)returnGroupVec;
+    (void)groupNum;
     return 0;
 }
 
@@ -35,6 +39,8 @@ int32_t (*createGroup)(int64_t requestId, const char *appId, const char *createP
     if (requestId == 0) {
         return DM_FAILED;
     }
+    (void)appId;
+    (void)createParams;
     return 0;
 }
 

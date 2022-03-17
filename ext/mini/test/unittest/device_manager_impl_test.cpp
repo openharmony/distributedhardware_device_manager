@@ -180,6 +180,7 @@ void DeviceDiscoverCallback::OnDiscoverFailed(uint16_t subscribeId, int32_t fail
 void DeviceDiscoverCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
 {
     (void)subscribeId;
+    (void)deviceInfo;
 }
 } // namespace Vsync
 } // namespace OHOS

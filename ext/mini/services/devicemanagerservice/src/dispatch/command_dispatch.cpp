@@ -63,6 +63,10 @@ int32_t CommandDispatch::CmdProcessing(int32_t cmdCode, std::shared_ptr<MessageR
             DmDeviceInfo *info = nullptr;
             int32_t infoNum = 0;
             ret = MessageProcessing::GetInstance().GetTrustedDeviceList(pkgName, extra, &info, &infoNum, prsp);
+            if (prsp == nullptr) {
+                DMLOG(DM_LOG_INFO, "Message rsp is null.");
+                return DEVICEMANAGER_NULLPTR;
+            }
             prsp->SetErrCode(ret);
             break;
         }

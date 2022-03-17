@@ -17,20 +17,30 @@
 
 int GetParameter(const char *key, const char *def, char *value, unsigned int len)
 {
+    (void)key;
+    (void)def;
+    (void)value;
+    (void)len;
     return 0;
 }
 
 int SetParameter(const char *key, const char *value)
 {
+    (void)key;
+    (void)value;
     return 0;
 }
 
 int WatchParameter(const char *keyprefix, ParameterChgPtr callback, void *context)
 {
+    (void)keyprefix;
+    (void)context;
     return 0;
 }
 
 int GetDevUdid(char *udid, int size)
 {
+    (void)udid;
+    (void)size;
     return 0;
 }

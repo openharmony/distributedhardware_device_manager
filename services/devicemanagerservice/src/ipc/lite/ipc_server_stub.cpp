@@ -104,14 +104,14 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         LOGE("malloc length invalid!");
         return DM_MALLOC_ERROR;
     }
-    char *pkgName = (char *)malloc(len + 1);
-    if (pkgName == NULL) {
+    char *pkgName = new char[len+1];
+    if (pkgName == nullptr) {
         LOGE("malloc failed!");
         return DM_MALLOC_ERROR;
     }
     if (strcpy_s(pkgName, len + 1, (const char *)name) != DM_OK) {
         LOGE("strcpy_s failed!");
-        free(pkgName);
+        delete[] pkgName;
         return DM_COPY_FAILED;
     }
     uint32_t cbId = 0;

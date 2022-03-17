@@ -623,7 +623,11 @@ std::string DeviceManagerNapi::JsObjectToString(const napi_env &env, const napi_
     if (buf == nullptr) {
         return "";
     }
-    memset_s(buf, (size + 1), 0, (size + 1));
+    int32_t ret = memset_s(buf, (size + 1), 0, (size + 1));
+    if (ret != 0) {
+        LOGE("devicemanager memset_s error.");
+        return "";
+    }
     bool rev = napi_get_value_string_utf8(env, param, buf, size + 1, &size) == napi_ok;
 
     std::string value;
@@ -769,7 +773,7 @@ void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &obje
     uint8_t *data = nullptr;
     napi_get_typedarray_info(env, field, &type, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
     if (type != napi_uint8_array || length == 0 || data == nullptr) {
-        LOGE("Invaild AppIconInfo");
+        LOGE("Invalid AppIconInfo");
         return;
     }
     *bufferPtr = (uint8_t *)calloc(sizeof(uint8_t), length);

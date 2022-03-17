@@ -18,12 +18,14 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    (void)cmdCode;
     req_ = req;
     return 0;
 }
 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    (void)cmdCode;
     req_ = req;
     std::cout << req_->GetPkgName() << "\n";
     return 0;

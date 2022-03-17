@@ -34,7 +34,7 @@ DmTimer::DmTimer(std::string &name)
 
 DmTimer::~DmTimer()
 {
-    DMLOG(DM_LOG_INFO, "DmTimer %s Destory in", mTimerName_.c_str());
+    DMLOG(DM_LOG_INFO, "DmTimer %s Destroy in", mTimerName_.c_str());
     Release();
 }
 
@@ -91,7 +91,6 @@ int32_t DmTimer::CreateTimeFd()
 
 void DmTimer::Release()
 {
-    DMLOG(DM_LOG_INFO, "DmTimer %s Release in", mTimerName_.c_str());
     if (mStatus_ == DmTimerStatus::DM_STATUS_INIT) {
         DMLOG(DM_LOG_INFO, "DmTimer %s already Release", mTimerName_.c_str());
         return;

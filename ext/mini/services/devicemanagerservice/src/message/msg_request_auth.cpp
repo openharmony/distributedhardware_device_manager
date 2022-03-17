@@ -115,7 +115,7 @@ void MsgRequestAuth::GetDecodeAppInfo(const std::string appString, uint8_t **out
     int32_t ret = EncryptUtils::MbedtlsBase64Decode(buffer, tempBufLen, &outLen,
         (const uint8_t*)appString.c_str(), appString.length());
     if (ret != 0 || static_cast<int32_t>(outLen) > tempBufLen) {
-        DMLOG(DM_LOG_ERROR, "MbedtlsBase64Decode failed, ret %d, outLen %d, tempBufLen %d",
+        DMLOG(DM_LOG_ERROR, "MbedtlsBase64Decode failed, ret %d, outLen %zu, tempBufLen %d",
             ret, outLen, tempBufLen);
         outBufferLen = 0;
         *outBuffer = nullptr;
@@ -351,6 +351,10 @@ void MsgRequestAuth::SetAuthType(nlohmann::json &json, std::shared_ptr<MsgReques
     int32_t authType = json.contains(TAG_AUTH_TYPE) ? (int32_t)json[TAG_AUTH_TYPE] : AUTH_TYPE_QR;
     if (authType != AUTH_TYPE_QR && authType != AUTH_TYPE_PIN) {
         authType = AUTH_TYPE_QR;
+    }
+    if (msg == nullptr) {
+        LOGE("msg is null");
+        return;
     }
     msg->mAuthType_ = authType;
 }
