@@ -74,7 +74,7 @@ void DMLog(DMLogLevel logLevel, const char *fmt, ...)
     char logBuf[LOG_MAX_LEN] = {0};
     va_list arg;
 
-    int32_t ret = (void)memset_s(&arg, sizeof(va_list), 0, sizeof(va_list));
+    int32_t ret = memset_s(&arg, sizeof(va_list), 0, sizeof(va_list));
     if (ret != 0) {
         DMLogOut(logLevel, "DM log memset_s error.");
         return;

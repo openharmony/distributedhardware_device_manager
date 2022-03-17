@@ -818,7 +818,7 @@ JSIValue DeviceManagerModule::StartDeviceDiscoverSync(const JSIValue thisVal, co
     }
 
     if (!JSI::ValueIsObject(args[0])){
-        DMLOG(DM_LOG_ERROR, "a object is required.");
+        DMLOG(DM_LOG_ERROR, "an object is required.");
         return JSI::CreateNull();
     }
     
@@ -895,12 +895,12 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
     }
     
     if (!JSI::ValueIsObject(args[0])){
-        DMLOG(DM_LOG_ERROR, "a object is required.");
+        DMLOG(DM_LOG_ERROR, "an object is required.");
         return JSI::CreateNull();
     }
 
     if (!JSI::ValueIsObject(args[1])){
-        DMLOG(DM_LOG_ERROR, "a object is required.");
+        DMLOG(DM_LOG_ERROR, "an object is required.");
         return JSI::CreateNull();
     }
     
@@ -948,7 +948,7 @@ JSIValue DeviceManagerModule::VerifyAuthInfo(const JSIValue thisVal, const JSIVa
     }
     
     if (!JSI::ValueIsObject(args[0])){
-        DMLOG(DM_LOG_ERROR, "a object is required.");
+        DMLOG(DM_LOG_ERROR, "an object is required.");
         return JSI::CreateNull();
     }
     

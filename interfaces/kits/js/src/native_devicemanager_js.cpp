@@ -623,7 +623,11 @@ std::string DeviceManagerNapi::JsObjectToString(const napi_env &env, const napi_
     if (buf == nullptr) {
         return "";
     }
-    (void)memset_s(buf, (size + 1), 0, (size + 1));
+    int32_t ret = memset_s(buf, (size + 1), 0, (size + 1));
+    if (ret != 0) {
+        LOGE( "devicemanager memset_s error.");
+        return "";
+    }
     bool rev = napi_get_value_string_utf8(env, param, buf, size + 1, &size) == napi_ok;
 
     std::string value;

@@ -250,6 +250,10 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
         LOGE("DeviceManager OnAuthResult: no register authCallback for deviceID ");
         return;
     }
+    if(iter->second == nullptr){
+        LOGE("DeviceManager OnAuthResult: no register authCallback for OnAuthResult ");
+        return;
+    }
     iter->second->OnAuthResult(deviceId, token, status, (int32_t)reason);
     authenticateCallback_[pkgName].erase(deviceId);
     if (authenticateCallback_[pkgName].empty()) {

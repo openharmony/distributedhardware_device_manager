@@ -34,7 +34,7 @@ DmTimer::DmTimer(std::string &name)
 
 DmTimer::~DmTimer()
 {
-    DMLOG(DM_LOG_INFO, "DmTimer %s Destory in", mTimerName_.c_str());
+    DMLOG(DM_LOG_INFO, "DmTimer %s Destroy in", mTimerName_.c_str());
     Release();
 }
 

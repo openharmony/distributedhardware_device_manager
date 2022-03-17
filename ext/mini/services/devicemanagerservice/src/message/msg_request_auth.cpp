@@ -352,6 +352,10 @@ void MsgRequestAuth::SetAuthType(nlohmann::json &json, std::shared_ptr<MsgReques
     if (authType != AUTH_TYPE_QR && authType != AUTH_TYPE_PIN) {
         authType = AUTH_TYPE_QR;
     }
+    if (msg == nullptr) {
+        LOGE("msg is null");
+        return;
+    }
     msg->mAuthType_ = authType;
 }
 

@@ -350,7 +350,7 @@ int32_t HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<Gro
     int32_t ret =
         deviceGroupManager_->getRelatedGroups(userId, DM_PKG_NAME.c_str(), deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
-        LOGE("HiChainConnector::GetRelatedGroups faild , ret: %d.", ret);
+        LOGE("HiChainConnector::GetRelatedGroups failed , ret: %d.", ret);
         return DM_FAILED;
     }
     if (returnGroups == nullptr) {

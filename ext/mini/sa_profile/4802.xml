@@ -15,7 +15,7 @@
  -->
 <info>
     <process>foundation</process>
-    <systemability> <!-- Declare a sytem ability and its profile -->
+    <systemability> <!-- Declare a system ability and its profile -->
         <name>4802</name> <!-- Declare the name of system ability -->
         <libpath>libdevicemanagerservice.z.so</libpath> <!-- Declare the path of .so file which includes the system ability; Note: 1 .so file can have 1 to N system abilities. -->
         <!--<depend></depend> --> <!-- Declare the name of system abilities which the system ability depends on, using ";" as separator among names. If there are dependencies, it needs to check if all those dependencies are avliable in service manager before starting the system ability. -->

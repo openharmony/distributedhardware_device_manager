@@ -40,6 +40,10 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         auto remote = iter.second;
         req->SetPkgName(pkgName);
         sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
+        if (listener == nullptr) {
+            LOGI("cannot get listener for package:%s.", pkgName.c_str());
+            return DM_FAILED;
+        }
         listener->SendCmd(cmdCode, req, rsp);
     }
     return DM_OK;
