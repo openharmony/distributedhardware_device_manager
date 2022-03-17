@@ -17,8 +17,10 @@
 #define OHOS_DEVICE_MANAGER_IMPL_H
 
 #include "device_manager.h"
+#if !defined(__LITEOS_M__)
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -67,8 +69,10 @@ private:
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
 
 private:
+#if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

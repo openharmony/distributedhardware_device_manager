@@ -19,7 +19,47 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
-  shared_library("devicemanagersdk") {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagersdk_mini") {
+      include_dirs = [
+        "${innerkits_path}/native_cpp/include",
+        "${innerkits_path}/native_cpp/include/notify",
+        "${utils_path}/include",
+        "${common_path}/include",
+        "${services_path}/include/dispatch",
+      ]
+      include_dirs += [
+        "//utils/native/lite/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//third_party/json/include",
+      ]
+
+      sources = [
+        "${innerkits_path}/native_cpp/src/mini/device_manager.cpp",
+        "${innerkits_path}/native_cpp/src/mini/device_manager_impl.cpp",
+        "${innerkits_path}/native_cpp/src/mini/device_manager_notify.cpp",
+      ]
+
+      defines = [
+        "LITE_DEVICE",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerkit\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
+
+      deps = [
+        "${utils_path}:devicemanagerutils_mini",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//third_party/bounds_checking_function:libsec_static",
+        "//utils/native/lite:utils",
+      ]
+    }
+  } else {
+    shared_library("devicemanagersdk") {
+    }
   }
 } else {
   config("devicemanagersdk_config") {

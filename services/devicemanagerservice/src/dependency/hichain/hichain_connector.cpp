@@ -250,7 +250,7 @@ int32_t HiChainConnector::AddMember(std::string deviceId, std::string &connectIn
     return ret;
 }
 
-void HiChainConnector::onFinish(int64_t requestId, int32_t operationCode, const char *returnData)
+void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
 {
     std::string data = "";
     if (returnData != nullptr) {
@@ -273,7 +273,7 @@ void HiChainConnector::onFinish(int64_t requestId, int32_t operationCode, const 
     }
 }
 
-void HiChainConnector::onError(int64_t requestId, int32_t operationCode, int32_t errorCode, const char *errorReturn)
+void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
 {
     (void)errorReturn;
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
@@ -293,7 +293,7 @@ void HiChainConnector::onError(int64_t requestId, int32_t operationCode, int32_t
     }
 }
 
-char *HiChainConnector::onRequest(int64_t requestId, int32_t operationCode, const char *reqParams)
+char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
     if (operationCode != GroupOperationCode::MEMBER_JOIN) {
         LOGE("HiChainAuthCallBack::onRequest operationCode %d", operationCode);

@@ -25,9 +25,11 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
+#if !defined(__LITEOS_M__)
 #include "ui_service_mgr_client.h"
 #include "dialog_callback_stub.h"
 #include "dialog_callback.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -555,7 +557,9 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         return DM_FAILED;
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
+#if !defined(__LITEOS_M__)
     Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+#endif
     return DM_OK;
 }
 
@@ -584,9 +588,11 @@ void DmAuthManager::AuthenticateFinish()
 {
     LOGI("DmAuthManager::AuthenticateFinish start");
     if (authResponseState_ != nullptr) {
+#if !defined(__LITEOS_M__)
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
+#endif
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
@@ -610,11 +616,11 @@ void DmAuthManager::AuthenticateFinish()
         } else {
             authRequestContext_->reason = authResponseContext_->reply;
         }
-
+#if !defined(__LITEOS_M__)
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
             Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
         }
-
+#endif
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
 
@@ -704,6 +710,7 @@ int32_t DmAuthManager::GetPinCode()
 
 void DmAuthManager::ShowConfigDialog()
 {
+#if !defined(__LITEOS_M__)
     LOGI("ShowConfigDialog start");
     nlohmann::json jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
@@ -724,6 +731,7 @@ void DmAuthManager::ShowConfigDialog()
             authMgr_->StartAuthProcess(atoi(params.c_str()));
         });
     LOGI("ShowConfigDialog end");
+#endif
 }
 
 void DmAuthManager::ShowAuthInfoDialog()

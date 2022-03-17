@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
-
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#ifndef OHOS_DEVICE_MANAGER_GET_USER_OPERATION_REQ_H
+#define OHOS_DEVICE_MANAGER_GET_USER_OPERATION_REQ_H
+#include "message_req.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class GetUserOperationReq : public MessageReq {
+DECLARE_MESSAGE_MODEL(GetUserOperationReq);
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    int32_t GetOperation() const
+    {
+        return action_;
+    }
+
+    void SetOperation(int32_t action)
+    {
+        action_ = action;
+    }
 
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    int32_t action_ {0};
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DEVICE_MANAGER_GET_USER_OPERATION_REQ_H

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DEVICE_MANAGER_MESSAGE_RSP_H
+#define OHOS_DEVICE_MANAGER_MESSAGE_RSP_H
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "message_def.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class MessageRsp {
+DECLARE_MESSAGE_MODEL(MessageRsp);
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    int32_t GetErrCode() const
+    {
+        return errCode_;
+    }
 
+    void SetErrCode(int32_t errCode)
+    {
+        errCode_ = errCode;
+    }
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    int32_t errCode_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DEVICE_MANAGER_MESSAGE_RSP_H

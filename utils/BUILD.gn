@@ -20,7 +20,51 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
-  shared_library("devicemanagerutils") {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagerutils_mini") {
+      include_dirs = [
+        "${utils_path}/include",
+        "${utils_path}/include/permission/lite",
+        "${common_path}/include",
+      ]
+
+      include_dirs += [
+        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//utils/native/lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+      ]
+
+      sources = [
+        "${utils_path}/src/dm_anonymous.cpp",
+        "${utils_path}/src/dm_log.cpp",
+        "${utils_path}/src/dm_random.cpp",
+        "${utils_path}/src/permission/lite/permission_manager.cpp",
+      ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerutils\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
+
+      deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//third_party/bounds_checking_function:libsec_static",
+        "//third_party/mbedtls",
+        "//third_party/mbedtls:mbedtls_shared",
+        "//utils/native/lite:utils",
+      ]
+    }
+  } else {
+    shared_library("devicemanagerutils") {
+    }
   }
 } else {
   config("devicemanagerutils_config") {

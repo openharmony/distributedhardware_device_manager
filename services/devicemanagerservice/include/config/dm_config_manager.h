@@ -19,7 +19,9 @@
 #include <cstdlib>
 #include <map>
 #include <memory>
+#if !defined(__LITEOS_M__)
 #include <mutex>
+#endif
 #include <set>
 #include <string>
 #include <vector>
@@ -66,10 +68,12 @@ private:
     DmConfigManager();
 
 private:
+#if !defined(__LITEOS_M__)
     std::mutex authAdapterMutex_;
     std::mutex cryptoAdapterMutex_;
     std::mutex decisionAdapterMutex_;
     std::mutex profileAdapterMutex_;
+#endif
     std::map<int32_t, AuthSoLoadInfo> soAuthLoadInfo_;
     std::map<std::string, AdapterSoLoadInfo> soAdapterLoadInfo_;
     std::map<std::string, std::shared_ptr<IDecisionAdapter>> decisionAdapterPtr_;

@@ -18,8 +18,11 @@
 
 #include <string>
 #include <memory>
+#if defined(__LITEOS_M__)
+#include "dm_mutex.h"
+#else
 #include <mutex>
-
+#endif
 #include "device_manager_service_listener.h"
 #include "dm_adapter_manager.h"
 #include "softbus_connector.h"
@@ -54,8 +57,10 @@ public:
 
 private:
     std::string profileSoName_;
+#if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;
+#endif
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
