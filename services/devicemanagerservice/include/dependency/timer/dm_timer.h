@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include <cstdio>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -55,6 +56,7 @@ private:
     void Release();
 
 private:
+    std::mutex mTimerLock_;
     DmTimerStatus mStatus_;
     uint32_t mTimeOutSec_;
     TimeoutHandle mHandle_;

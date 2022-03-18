@@ -8,10 +8,16 @@ export default {
         pincode: router.getParams().pinCode,
         isShow:false,
         isTimes:3,
+        EVENT_CONFIRM:"EVENT_CONFIRM",
+        EVENT_CANCEL:"EVENT_CANCEL",
+        EVENT_INIT:"EVENT_INIT",
+        EVENT_CONFIRM_CODE:"0",
+        EVENT_CANCEL_CODE:"1",
+        EVENT_INIT_CODE:"2",
     },
     onInit() {
         code = router.getParams().pinCode;
-        callNativeHandler("EVENT_CONFIRM", "2");
+        callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
     },
     onChange(e){ 
         inputVal = e.value; 
@@ -22,11 +28,11 @@ export default {
             console.info('click confirm numbs < 3 ');
             if(code == inputVal){
                 console.info('click confirm code == inputVal');
-                callNativeHandler("EVENT_INPUT", "0");
+                callNativeHandler(EVENT_CONFIRM, EVENT_CONFIRM_CODE);
             }else{
                 if(numbs == 3){
                     console.info('click confirm code != inputVal and numbs == 3');
-                    callNativeHandler("EVENT_CONFIRM", "1");
+                    callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
                 }
                 console.info('click confirm code != inputVal');
                 this.isShow = true;
@@ -34,11 +40,11 @@ export default {
             }
         }else{
             console.info('click confirm numbs > 3 ');
-            callNativeHandler("EVENT_CONFIRM", "1");
+            callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
         }       
     },
     onCancel() {
         console.info('click cancel');
-        callNativeHandler("EVENT_CONFIRM", "1");
+        callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
     }
 }

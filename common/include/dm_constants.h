@@ -187,6 +187,18 @@ const int32_t ACE_X = 50;
 const int32_t ACE_Y = 300;
 const int32_t ACE_WIDTH = 600;
 const int32_t ACE_HEIGHT = 400;
+const std::string EVENT_CONFIRM = "EVENT_CONFIRM";
+const std::string EVENT_CANCEL = "EVENT_CANCEL";
+const std::string EVENT_INIT = "EVENT_INIT";
+const std::string EVENT_CONFIRM_CODE = "0";
+const std::string EVENT_CANCEL_CODE = "1";
+const std::string EVENT_INIT_CODE = "2";
+
+//timer
+const std::string TIMER_PREFIX = "deviceManagerTimer:";
+const std::string STATE_TIMER_PREFIX = "stateTimer_";
+const int32_t TIMER_PREFIX_LENGTH = 19;
+const int32_t TIMER_DEFAULT = 0;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif
