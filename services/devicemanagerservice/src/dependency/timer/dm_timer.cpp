@@ -126,8 +126,10 @@ void DmTimer::WaitForTimeout()
     if (nfds == 0 && mHandleData_ != nullptr) {
         mHandle_(mHandleData_, *this);
         LOGI("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
-    } else {
+    } else if (nfds < 0) {
         LOGE("DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
+    } else {
+        LOGI("DmTimer %s end timer", mTimerName_.c_str());
     }
     Release();
 }
