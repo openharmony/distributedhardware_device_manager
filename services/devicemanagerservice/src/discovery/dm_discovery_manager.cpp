@@ -21,18 +21,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string DISCOVERY_TIMEOUT_TASK = "discoveryTimeout";
+const std::string DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
 const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 static void TimeOut(void *data, DmTimer& timer)
 {
-    LOGE("time out");
-    DmDiscoveryManager *discoveryMgr = (DmDiscoveryManager *)data;
-    if (discoveryMgr == nullptr) {
-        LOGE("time out error");
+    LOGI("time out %s", timer.GetTimerName().c_str());
+    if (data == nullptr || timer.GetTimerName() != DISCOVERY_TIMEOUT_TASK) {
+        LOGE("time out is not our timer");
         return;
     }
+
+    DmDiscoveryManager *discoveryMgr = (DmDiscoveryManager *)data;
+    if (discoveryMgr == nullptr) {
+        LOGE("discoveryMgr is nullptr");
+        return;
+    }
+
     discoveryMgr->HandleDiscoveryTimeout();
 }
 

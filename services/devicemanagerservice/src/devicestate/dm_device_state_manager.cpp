@@ -26,12 +26,18 @@ const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 static void TimeOut(void *data, DmTimer& timer)
 {
-    LOGE("time out ");
-    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
-    if (deviceStateMgr == nullptr) {
-        LOGE("OnDeviceOfflineTimeOut deviceStateMgr = nullptr");
+    LOGI("time out %s", timer.GetTimerName().c_str());
+    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) != TIMER_DEFAULT) {
+        LOGE("time out is not our timer");
         return;
     }
+
+    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
+    if (deviceStateMgr == nullptr) {
+        LOGE("deviceStateMgr is nullptr");
+        return;
+    }
+
     deviceStateMgr->DeleteTimeOutGroup(timer.GetTimerName());
 }
 
@@ -244,41 +250,48 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
 
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    deviceinfoMap_[deviceInfo.deviceId] = deviceId;
-    auto iter = timerMap_.find(deviceId);
-    if (iter != timerMap_.end()) {
-        iter->second->Stop(SESSION_CANCEL_TIMEOUT);
-        return;
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Stop(SESSION_CANCEL_TIMEOUT);
+            return;
+        }
     }
-    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(deviceId);
+
+    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(stateTimerInfoMap_.size());
+    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
     if (offLineTimer != nullptr) {
-        timerMap_[deviceId] = offLineTimer;
+        StateTimerInfo stateTimer = {
+            .timerName = timerName,
+            .netWorkId = deviceInfo.deviceId,
+            .deviceId = deviceId,
+            .timer = offLineTimer
+        };
+        stateTimerInfoMap_[timerName] = stateTimer;
     }
 }
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    if (deviceinfoMap_.find(deviceInfo.deviceId) == deviceinfoMap_.end()) {
-        LOGE("fail to get udid by networkId");
-        return;
-    }
-
-    LOGI("start offline timer with device: %s", GetAnonyString(deviceinfoMap_[deviceInfo.deviceId]).c_str());
-    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    for (auto &iter : timerMap_) {
-        if (iter.first == deviceinfoMap_[deviceInfo.deviceId]) {
-            iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
+    LOGI("start offline timer");
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
-    deviceinfoMap_.erase(deviceInfo.deviceId);
 }
 
-void DmDeviceStateManager::DeleteTimeOutGroup(std::string deviceId)
+void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
 {
-    LOGI("remove hichain group with device: %s", GetAnonyString(deviceId).c_str());
+    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     if (hiChainConnector_ != nullptr) {
-        hiChainConnector_->DeleteTimeOutGroup(deviceId.c_str());
+        auto iter = stateTimerInfoMap_.find(stateTimer);
+        if (iter != stateTimerInfoMap_.end()) {
+            LOGI("remove hichain group with device: %s",
+                GetAnonyString(stateTimerInfoMap_[stateTimer].deviceId).c_str());
+            hiChainConnector_->DeleteTimeOutGroup(stateTimerInfoMap_[stateTimer].deviceId.c_str());
+        }
     }
+    stateTimerInfoMap_.erase(stateTimer);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

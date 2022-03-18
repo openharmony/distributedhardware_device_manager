@@ -15,6 +15,8 @@
 
 #include "dm_auth_manager.h"
 
+#include <string>
+
 #include "auth_message_processor.h"
 #include "auth_ui.h"
 #include "dm_ability_manager.h"
@@ -33,14 +35,14 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
-const std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
-const std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";
-const std::string SHOW_TIMEOUT_TASK = "showTimeoutTask";
-const std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
-const std::string ADD_TIMEOUT_TASK = "addTimeoutTask";
-const std::string WAIT_NEGOTIATE_TIMEOUT_TASK = "waitNegotiateTimeoutTask";
-const std::string WAIT_REQUEST_TIMEOUT_TASK = "waitRequestTimeoutTask";
+const std::string AUTHENTICATE_TIMEOUT_TASK = TIMER_PREFIX + "authenticate";
+const std::string NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "negotiate";
+const std::string CONFIRM_TIMEOUT_TASK = TIMER_PREFIX + "confirm";
+const std::string SHOW_TIMEOUT_TASK = TIMER_PREFIX + "show";
+const std::string INPUT_TIMEOUT_TASK = TIMER_PREFIX + "input";
+const std::string ADD_TIMEOUT_TASK = TIMER_PREFIX + "add";
+const std::string WAIT_NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "waitNegotiate";
+const std::string WAIT_REQUEST_TIMEOUT_TASK = TIMER_PREFIX + "waitRequest";
 
 const int32_t SESSION_CANCEL_TIMEOUT = 0;
 const int32_t AUTHENTICATE_TIMEOUT = 120;
@@ -55,12 +57,18 @@ const int32_t DEVICE_ID_HALF = 2;
 
 static void TimeOut(void *data, DmTimer& timer)
 {
-    LOGE("time out ");
-    DmAuthManager *authMgr = (DmAuthManager *)data;
-    if (authMgr == nullptr) {
-        LOGE("time out error");
+    LOGI("time out %s", timer.GetTimerName().c_str());
+    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) != TIMER_DEFAULT) {
+        LOGE("time out is not our timer");
         return;
     }
+
+    DmAuthManager *authMgr = (DmAuthManager *)data;
+    if (authMgr == nullptr) {
+        LOGE("authMgr is nullptr");
+        return;
+    }
+
     authMgr->HandleAuthenticateTimeout();
 }
 
@@ -147,7 +155,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
     if (pkgName.empty()) {
-        LOGI(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
+        LOGE(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
         return DM_FAILED;
     }
     std::string deviceUdid;
@@ -176,8 +184,8 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 {
     LOGI("DmAuthManager::VerifyAuthentication");
     if (authResponseContext_ == nullptr) {
-        LOGI("authResponseContext_ is not init");
-        return DM_FAILED;
+        LOGE("authResponseContext_ is not init");
+        return DM_AUTH_NOT_START;
     }
     std::shared_ptr<IAuthentication> ptr;
     if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()
@@ -335,7 +343,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 {
     LOGI("DmAuthManager::OnGroupCreated start");
     if (authResponseState_ == nullptr) {
-        LOGI("DmAuthManager::AuthenticateDevice end");
+        LOGE("DmAuthManager::AuthenticateDevice end");
         return;
     }
     if (groupId == "{}") {
@@ -389,6 +397,8 @@ int32_t DmAuthManager::HandleAuthenticateTimeout()
     }
 
     if (authResponseState_ != nullptr && authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
+        authResponseContext_->state = authResponseState_->GetStateType();
+        authResponseContext_->reply = DM_TIME_OUT;
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
     LOGI("DmAuthManager::HandleAuthenticateTimeout start complete");
@@ -492,6 +502,11 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
 {
     LOGI("DmAuthManager:: StartAuthProcess");
+    if (authResponseContext_ == nullptr) {
+        LOGI("Authenticate is not start");
+        return DM_AUTH_NOT_START;
+    }
+
     authResponseContext_->reply = action;
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
@@ -510,6 +525,7 @@ void DmAuthManager::StartRespAuthProcess()
     if (timerMap_.find(CONFIRM_TIMEOUT_TASK) == timerMap_.end()) {
         return;
     }
+
     timerMap_[CONFIRM_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
         std::shared_ptr<DmTimer> inputStartTimer = std::make_shared<DmTimer>(INPUT_TIMEOUT_TASK);
@@ -541,6 +557,7 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         LOGE("DecodeRequestAuth jsonStr error");
         return DM_FAILED;
     }
+
     LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     nlohmann::json jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;
@@ -726,9 +743,14 @@ void DmAuthManager::ShowConfigDialog()
         OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authMgr_](int32_t id, const std::string& event, const std::string& params) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-            LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-            authMgr_->StartAuthProcess(atoi(params.c_str()));
+            if (params == EVENT_INIT_CODE) {
+                LOGI("Dialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                authMgr_->SetPageId(id);
+            } else {
+                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
+                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                authMgr_->StartAuthProcess(atoi(params.c_str()));
+            }
         });
     LOGI("ShowConfigDialog end");
 #endif
@@ -762,13 +784,13 @@ void DmAuthManager::ShowStartAuthDialog()
 int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 {
     if (dmAbilityMgr_ == nullptr) {
-        LOGI("dmAbilityMgr_ is nullptr");
+        LOGE("dmAbilityMgr_ is nullptr");
         return DM_POINT_NULL;
     }
 
     if (authResponseContext_ == nullptr) {
-        LOGI("authResponseContext_ is not init");
-        return DM_FAILED;
+        LOGE("Authenticate is not start");
+        return DM_AUTH_NOT_START;
     }
     
     dmAbilityMgr_->StartAbilityDone();
@@ -791,8 +813,8 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 int32_t DmAuthManager::OnUserOperation(int32_t action)
 {
     if (authResponseContext_ == nullptr) {
-        LOGI("authResponseContext_ is not init");
-        return DM_FAILED;
+        LOGE("Authenticate is not start");
+        return DM_AUTH_NOT_START;
     }
 
     switch (action) {
@@ -853,12 +875,20 @@ void DmAuthManager::UserSwitchEventCallback (int32_t userId)
 
 int32_t DmAuthManager::SetPageId(int32_t pageId)
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("Authenticate is not start");
+        return DM_AUTH_NOT_START;
+    }
     authResponseContext_->pageId = pageId;
     return DM_OK;
 }
 
 int32_t DmAuthManager::SetReason(int32_t reason, int32_t state)
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("Authenticate is not start");
+        return DM_AUTH_NOT_START;
+    }
     if (state < AuthState::AUTH_REQUEST_FINISH) {
         authRequestContext_->reason = reason;
     }
