@@ -3,17 +3,17 @@ import router from '@ohos.router';
 var numbs = 0;
 var code = 0;
 var inputVal = 0;
+var EVENT_CONFIRM = "EVENT_CONFIRM";
+var EVENT_CANCEL = "EVENT_CANCEL";
+var EVENT_INIT = "EVENT_INIT";
+var EVENT_CONFIRM_CODE = "0";
+var EVENT_CANCEL_CODE = "1";
+var EVENT_INIT_CODE = "2";
 export default {
     data: {
         pincode: router.getParams().pinCode,
         isShow:false,
         isTimes:3,
-        EVENT_CONFIRM:"EVENT_CONFIRM",
-        EVENT_CANCEL:"EVENT_CANCEL",
-        EVENT_INIT:"EVENT_INIT",
-        EVENT_CONFIRM_CODE:"0",
-        EVENT_CANCEL_CODE:"1",
-        EVENT_INIT_CODE:"2",
     },
     onInit() {
         code = router.getParams().pinCode;

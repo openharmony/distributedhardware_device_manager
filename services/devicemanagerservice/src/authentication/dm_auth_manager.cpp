@@ -56,7 +56,7 @@ const int32_t DEVICE_ID_HALF = 2;
 static void TimeOut(void *data, DmTimer& timer)
 {
     LOGI("time out %s", timer.GetTimerName().c_str());
-    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) == TIMER_DEFAULT) {
+    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) != TIMER_DEFAULT) {
         LOGE("time out is not our timer");
         return;
     }
