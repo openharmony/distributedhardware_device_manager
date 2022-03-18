@@ -194,7 +194,7 @@ const std::string EVENT_CONFIRM_CODE = "0";
 const std::string EVENT_CANCEL_CODE = "1";
 const std::string EVENT_INIT_CODE = "2";
 
-//timer
+// timer
 const std::string TIMER_PREFIX = "deviceManagerTimer:";
 const std::string STATE_TIMER_PREFIX = "stateTimer_";
 const int32_t TIMER_PREFIX_LENGTH = 19;
