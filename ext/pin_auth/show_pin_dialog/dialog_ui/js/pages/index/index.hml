@@ -25,7 +25,7 @@
     <text class="title-pin">
         {{ pincode }}
     </text>
-    <button class="but-confirm" onclick="onConfirm">
+    <button class="but-confirm" onclick="onCancel">
         取消
     </button>
 </div>

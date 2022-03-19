@@ -18,6 +18,12 @@ import router from '@ohos.router';
 var numbs = 0;
 var code = 0;
 var inputVal = 0;
+var EVENT_CONFIRM = "EVENT_CONFIRM";
+var EVENT_CANCEL = "EVENT_CANCEL";
+var EVENT_INIT = "EVENT_INIT";
+var EVENT_CONFIRM_CODE = "0";
+var EVENT_CANCEL_CODE = "1";
+var EVENT_INIT_CODE = "2";
 export default {
     data: {
         pincode: router.getParams().pinCode,
@@ -26,7 +32,7 @@ export default {
     },
     onInit() {
         code = router.getParams().pinCode;
-        callNativeHandler("EVENT_CONFIRM", "2");
+        callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
     },
     onChange(e){ 
         inputVal = e.value; 
@@ -37,11 +43,11 @@ export default {
             console.info('click confirm numbs < 3 ');
             if(code == inputVal){
                 console.info('click confirm code == inputVal');
-                callNativeHandler("EVENT_INPUT", "0");
+                callNativeHandler(EVENT_CONFIRM, EVENT_CONFIRM_CODE);
             }else{
                 if(numbs == 3){
                     console.info('click confirm code != inputVal and numbs == 3');
-                    callNativeHandler("EVENT_CONFIRM", "1");
+                    callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
                 }
                 console.info('click confirm code != inputVal');
                 this.isShow = true;
@@ -49,11 +55,11 @@ export default {
             }
         }else{
             console.info('click confirm numbs > 3 ');
-            callNativeHandler("EVENT_CONFIRM", "1");
+            callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
         }       
     },
     onCancel() {
         console.info('click cancel');
-        callNativeHandler("EVENT_CONFIRM", "1");
+        callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
     }
 }
