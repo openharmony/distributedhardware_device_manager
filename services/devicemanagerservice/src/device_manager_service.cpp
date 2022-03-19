@@ -14,19 +14,18 @@
  */
 
 #include "device_manager_service.h"
-
 #include <functional>
-
-#include "common_event_support.h"
 #include "device_manager_service_listener.h"
-#include "dm_common_event_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info_manager.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
-
+#if !defined(__LITEOS_M__)
+#include "dm_common_event_manager.h"
+#include "common_event_support.h"
 using namespace OHOS::EventFwk;
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,10 +34,12 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
+#if !defined(__LITEOS_M__)
     DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
     if (dmCommonEventManager.UnsubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_STOPPED)) {
         LOGI("subscribe service event success");
     }
+#endif
     softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
     hiChainConnector_->UnRegisterHiChainCallback();
 }
@@ -113,14 +114,14 @@ int32_t DeviceManagerService::Init()
         LOGI("get current account user id success");
         MultipleUserConnector::SetSwitchOldUserId(userId);
     }
-
+#if !defined(__LITEOS_M__)
     DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
     CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get(),
         std::placeholders::_1);
     if (dmCommonEventManager.SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
         LOGI("subscribe service user switch common event success");
     }
-
+#endif
     LOGI("Init success, singleton initialized");
     intFlag_ = true;
     return DM_OK;

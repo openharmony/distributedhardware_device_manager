@@ -13,26 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DEVICE_MANAGER_GET_LOCAL_DEVICE_INFO_RSP_H
+#define OHOS_DEVICE_MANAGER_GET_LOCAL_DEVICE_INFO_RSP_H
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "dm_device_info.h"
+#include "message_rsp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class GetLocalDeviceInfoRsp : public MessageRsp {
+    DECLARE_MESSAGE_MODEL(GetLocalDeviceInfoRsp);
+
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    const DmDeviceInfo &GetLocalDeviceInfo() const
+    {
+        return localDeviceInfo_;
+    }
+
+    void SetLocalDeviceInfo(DmDeviceInfo &localDeviceInfo)
+    {
+        localDeviceInfo_ = localDeviceInfo;
+    }
 
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    DmDeviceInfo localDeviceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DEVICE_MANAGER_GET_LOCAL_DEVICE_INFO_RSP_H

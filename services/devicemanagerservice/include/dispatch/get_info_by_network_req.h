@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DEVICE_MANAGER_GET_INFO_BY_NETWORK_REQ_H
+#define OHOS_DEVICE_MANAGER_GET_INFO_BY_NETWORK_REQ_H
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "message_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class GetInfoByNetWorkReq : public MessageReq {
+    DECLARE_MESSAGE_MODEL(GetInfoByNetWorkReq);
+
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    const std::string GetNetWorkId() const
+    {
+        return netWorkId_;
+    }
+
+    void SetNetWorkId(const std::string &netWorkId)
+    {
+        netWorkId_ = netWorkId;
+    }
 
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    std::string netWorkId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DEVICE_MANAGER_GET_INFO_BY_NETWORK_REQ_H

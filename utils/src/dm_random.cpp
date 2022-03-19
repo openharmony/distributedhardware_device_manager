@@ -28,10 +28,15 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t GenRandInt(int32_t randMin, int32_t randMax)
 {
+#if defined(__LITEOS_M__)
+    srandom(time(NULL));
+    return (randMin + random() % (randMax - randMin));
+#else
     std::random_device randDevice;
     std::mt19937 genRand(randDevice());
     std::uniform_int_distribution<int> disRand(randMin, randMax);
     return disRand(genRand);
+#endif
 }
 
 int64_t GenRandLongLong(int64_t randMin, int64_t randMax)

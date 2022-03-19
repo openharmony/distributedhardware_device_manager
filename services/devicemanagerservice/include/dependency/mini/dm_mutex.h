@@ -13,26 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DM_MUTEX_H
+#define OHOS_DM_MUTEX_H
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include <pthread.h>
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class DmMutex {
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
-
+    DmMutex();
+    ~DmMutex();
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+pthread_mutex_t lock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DM_MUTEX_H

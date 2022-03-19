@@ -65,7 +65,9 @@ public:
     void OnFaCall(std::string &pkgName, std::string &paramJson);
 
 private:
+#if !defined(__LITEOS_M__)
     std::mutex lock_;
+#endif
     std::map<std::string, std::shared_ptr<DeviceStateCallback>> deviceStateCallback_;
     std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;

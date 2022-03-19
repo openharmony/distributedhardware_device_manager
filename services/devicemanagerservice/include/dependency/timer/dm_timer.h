@@ -18,13 +18,14 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#if !defined(__LITEOS_M__)
 #include <sys/epoll.h>
+#include <thread>
 #include <unistd.h>
-
+#endif
 #include <cstdio>
 #include <mutex>
 #include <string>
-#include <thread>
 
 #include "dm_log.h"
 
@@ -62,10 +63,15 @@ private:
     TimeoutHandle mHandle_;
     void *mHandleData_;
     int32_t mTimeFd_[2];
+#if defined(__LITEOS_M__)
+    void *timerId = NULL;
+#else
     struct epoll_event mEv_;
     struct epoll_event mEvents_[MAX_EVENTS];
     int32_t mEpFd_;
     std::thread mThread_;
+#endif
+
     std::string mTimerName_;
 };
 } // namespace DistributedHardware
