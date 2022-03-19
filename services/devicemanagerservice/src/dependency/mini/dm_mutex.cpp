@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#include <string>
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "dm_log.h"
+#include "dm_mutex.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
-public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+DmMutex::DmMutex()
+{
+    uint32_t ret = pthread_mutex_init(&lock_, NULL);
+    if (ret != 0) {
+        LOGE("init mutex lock failed: %d.", ret);
+    }
+    pthread_mutex_lock(&lock_);
+}
 
-private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
-};
+DmMutex::~DmMutex()
+{
+    pthread_mutex_unlock(&lock_);
+    uint32_t ret = pthread_mutex_destroy(&lock_);
+    if (ret != 0) {
+        LOGI("destroy mutex lock failed: %d.", ret);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H

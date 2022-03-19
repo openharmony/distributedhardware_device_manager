@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#include "device_manager.h"
 
-#include <cstdint>
-#include <memory>
-#include "dm_ability_manager.h"
+#include "device_manager_impl.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
-public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
-
-private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
-};
+DeviceManager &DeviceManager::GetInstance()
+{
+    return DeviceManagerImpl::GetInstance();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H

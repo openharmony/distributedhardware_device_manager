@@ -119,7 +119,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     return DM_OK;
 }
 
-int32_t SoftbusSession::OnSessionOpened(int32_t sessionId, int32_t result)
+int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
     sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
@@ -127,12 +127,12 @@ int32_t SoftbusSession::OnSessionOpened(int32_t sessionId, int32_t result)
     return DM_OK;
 }
 
-void SoftbusSession::OnSessionClosed(int32_t sessionId)
+void SoftbusSession::OnSessionClosed(int sessionId)
 {
     LOGI("OnSessionClosed, sessionId:%d", sessionId);
 }
 
-void SoftbusSession::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     LOGI("OnBytesReceived, sessionId:%d, dataLen:%d", sessionId, dataLen);
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {

@@ -17,9 +17,10 @@
 
 #include "dm_constants.h"
 #include "dm_log.h"
+#if !defined(__LITEOS_M__)
 #include "os_account_manager.h"
-
 using namespace OHOS::AccountSA;
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -27,12 +28,16 @@ int32_t MultipleUserConnector::oldUserId_ = -1;
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
+#if defined(__LITEOS_M__)
+    return 0;
+#else
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != ERR_OK || ids.empty()) {
         return -1;
     }
     return ids[0];
+#endif
 }
 
 void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)

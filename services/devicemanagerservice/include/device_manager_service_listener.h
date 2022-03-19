@@ -20,8 +20,11 @@
 #include <string>
 
 #include "dm_device_info.h"
+#if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
+#endif
+
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,7 +41,9 @@ public:
     void OnFaCall(std::string &pkgName, std::string &paramJson);
 
 private:
+#if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

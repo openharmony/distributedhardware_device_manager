@@ -46,9 +46,9 @@ void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
 class HiChainConnector {
 public:
     static bool onTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen);
-    static void onFinish(int64_t requestId, int32_t operationCode, const char *returnData);
-    static void onError(int64_t requestId, int32_t operationCode, int32_t errorCode, const char *errorReturn);
-    static char *onRequest(int64_t requestId, int32_t operationCode, const char *reqParams);
+    static void onFinish(int64_t requestId, int operationCode, const char *returnData);
+    static void onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn);
+    static char *onRequest(int64_t requestId, int operationCode, const char *reqParams);
 
 public:
     HiChainConnector();

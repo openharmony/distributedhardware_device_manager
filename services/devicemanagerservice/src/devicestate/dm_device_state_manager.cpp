@@ -70,7 +70,11 @@ int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName
             DmDeviceInfo saveInfo = info;
             SoftbusConnector::GetUuidByNetworkId(info.deviceId, uuid);
             {
+#if defined(__LITEOS_M__)
+                DmMutex mutexLock;
+#else
                 std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
                 remoteDeviceInfos_[uuid] = saveInfo;
             }
             LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
@@ -90,7 +94,11 @@ int32_t DmDeviceStateManager::UnRegisterProfileListener(const std::string &pkgNa
         profileAdapter->UnRegisterProfileListener(pkgName);
     }
     {
+#if defined(__LITEOS_M__)
+        DmMutex mutexLock;
+#else
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
         if (remoteDeviceInfos_.find(std::string(info.deviceId)) != remoteDeviceInfos_.end()) {
             remoteDeviceInfos_.erase(std::string(info.deviceId));
         }
@@ -199,7 +207,11 @@ void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std:
     }
     DmDeviceInfo saveInfo;
     {
+#if defined(__LITEOS_M__)
+        DmMutex mutexLock;
+#else
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
         auto iter = remoteDeviceInfos_.find(deviceId);
         if (iter == remoteDeviceInfos_.end()) {
             LOGE("OnProfileReady complete not find deviceId: %s", GetAnonyString(deviceId).c_str());
@@ -248,8 +260,11 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         return;
     }
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
-
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+#endif
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
             iter.second.timer->Stop(SESSION_CANCEL_TIMEOUT);
@@ -282,7 +297,11 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
 {
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+#endif
     if (hiChainConnector_ != nullptr) {
         auto iter = stateTimerInfoMap_.find(stateTimer);
         if (iter != stateTimerInfoMap_.end()) {

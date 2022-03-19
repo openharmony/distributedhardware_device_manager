@@ -30,9 +30,9 @@ namespace OHOS {
 namespace DistributedHardware {
 class SoftbusSession {
 public:
-    static int32_t OnSessionOpened(int32_t sessionId, int32_t result);
-    static void OnSessionClosed(int32_t sessionId);
-    static void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+    static int OnSessionOpened(int sessionId, int result);
+    static void OnSessionClosed(int sessionId);
+    static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
 public:
     SoftbusSession();
