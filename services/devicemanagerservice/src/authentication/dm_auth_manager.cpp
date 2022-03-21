@@ -35,15 +35,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string AUTHENTICATE_TIMEOUT_TASK = TIMER_PREFIX + "authenticate";
-const std::string NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "negotiate";
-const std::string CONFIRM_TIMEOUT_TASK = TIMER_PREFIX + "confirm";
-const std::string SHOW_TIMEOUT_TASK = TIMER_PREFIX + "show";
-const std::string INPUT_TIMEOUT_TASK = TIMER_PREFIX + "input";
-const std::string ADD_TIMEOUT_TASK = TIMER_PREFIX + "add";
-const std::string WAIT_NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "waitNegotiate";
-const std::string WAIT_REQUEST_TIMEOUT_TASK = TIMER_PREFIX + "waitRequest";
-
 const int32_t SESSION_CANCEL_TIMEOUT = 0;
 const int32_t AUTHENTICATE_TIMEOUT = 120;
 const int32_t CONFIRM_TIMEOUT = 60;

@@ -196,6 +196,14 @@ const std::string EVENT_INIT_CODE = "2";
 
 // timer
 const std::string TIMER_PREFIX = "deviceManagerTimer:";
+const std::string AUTHENTICATE_TIMEOUT_TASK = TIMER_PREFIX + "authenticate";
+const std::string NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "negotiate";
+const std::string CONFIRM_TIMEOUT_TASK = TIMER_PREFIX + "confirm";
+const std::string SHOW_TIMEOUT_TASK = TIMER_PREFIX + "show";
+const std::string INPUT_TIMEOUT_TASK = TIMER_PREFIX + "input";
+const std::string ADD_TIMEOUT_TASK = TIMER_PREFIX + "add";
+const std::string WAIT_NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "waitNegotiate";
+const std::string WAIT_REQUEST_TIMEOUT_TASK = TIMER_PREFIX + "waitRequest";
 const std::string STATE_TIMER_PREFIX = "stateTimer_";
 const int32_t TIMER_PREFIX_LENGTH = 19;
 const int32_t TIMER_DEFAULT = 0;

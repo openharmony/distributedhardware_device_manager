@@ -40,8 +40,6 @@ void DeviceManagerServiceTest::TearDownTestCase()
 }
 
 namespace {
-std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
-
 /**
  * @tc.name: StartDeviceDiscovery_001
  * @tc.desc: Set StartDeviceDiscovery's flag bit intFlag_ to False and return DM_NOT_INIT
