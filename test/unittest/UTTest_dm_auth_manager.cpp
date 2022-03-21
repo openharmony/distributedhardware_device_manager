@@ -38,12 +38,6 @@ void DmAuthManagerTest::TearDownTestCase()
 }
 
 namespace {
-std::string AUTHENTICATE_TIMEOUT_TASK = "authenticateTimeoutTask";
-std::string NEGOTIATE_TIMEOUT_TASK = "negotiateTimeoutTask";
-std::string CONFIRM_TIMEOUT_TASK = "confirmTimeoutTask";
-std::string INPUT_TIMEOUT_TASK = "inputTimeoutTask";
-std::string ADD_TIMEOUT_TASK = "addTimeoutTask";
-
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
