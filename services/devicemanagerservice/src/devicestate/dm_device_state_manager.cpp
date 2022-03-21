@@ -260,16 +260,17 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         return;
     }
     LOGI("Register OffLine Timer with device: %s", GetAnonyString(deviceId).c_str());
+
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
 #else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
 #endif
-    deviceinfoMap_[deviceInfo.deviceId] = deviceId;
-    auto iter = timerMap_.find(deviceId);
-    if (iter != timerMap_.end()) {
-        iter->second->Stop(SESSION_CANCEL_TIMEOUT);
-        return;
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Stop(SESSION_CANCEL_TIMEOUT);
+            return;
+        }
     }
 
     std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(mCumulativeQuantity_++);
@@ -287,26 +288,26 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    if (deviceinfoMap_.find(deviceInfo.deviceId) == deviceinfoMap_.end()) {
-        LOGE("fail to get udid by networkId");
-        return;
-    }
-    LOGI("start offline timer with device: %s", GetAnonyString(deviceinfoMap_[deviceInfo.deviceId]).c_str());
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
 #else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
 #endif
-    for (auto &iter : timerMap_) {
-        if (iter.first == deviceinfoMap_[deviceInfo.deviceId]) {
-            iter.second->Start(OFFLINE_TIMEOUT, TimeOut, this);
+    LOGI("start offline timer");
+    for (auto &iter : stateTimerInfoMap_) {
+        if (iter.second.netWorkId == deviceInfo.deviceId) {
+            iter.second.timer->Start(OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
 }
 
 void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
 {
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+#endif
     if (hiChainConnector_ != nullptr) {
         auto iter = stateTimerInfoMap_.find(stateTimer);
         if (iter != stateTimerInfoMap_.end()) {

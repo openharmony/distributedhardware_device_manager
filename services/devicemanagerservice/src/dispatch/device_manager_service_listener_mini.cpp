@@ -84,8 +84,10 @@ void DeviceManagerServiceListener::OnVerifyAuthResult(const std::string &pkgName
 {
     LOGI("call OnVerifyAuthResult");
     std::list<std::string> pkgNameList = CommandDispatch::GetInstance().GetPkgNameList();
+    int32_t num = 0;
+    ((resultCode == 0) && (!flag.empty())) ? (num = std::stoi(flag)) : (num = 0);
     for (auto pkgName : pkgNameList) {
-        DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, stoi(flag));
+        DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, num);
     }
 }
 

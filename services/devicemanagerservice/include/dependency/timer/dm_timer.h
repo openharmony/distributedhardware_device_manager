@@ -57,7 +57,6 @@ private:
     void Release();
 
 private:
-    std::mutex mTimerLock_;
     DmTimerStatus mStatus_;
     uint32_t mTimeOutSec_;
     TimeoutHandle mHandle_;
@@ -70,6 +69,7 @@ private:
     struct epoll_event mEvents_[MAX_EVENTS];
     int32_t mEpFd_;
     std::thread mThread_;
+    std::mutex mTimerLock_;
 #endif
 
     std::string mTimerName_;
