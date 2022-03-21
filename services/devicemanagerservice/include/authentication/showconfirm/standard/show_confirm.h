@@ -13,37 +13,25 @@
  * limitations under the License.
  */
 
-#include "auth_ui.h"
+#ifndef OHOS_DM_SHOW_CONFIRM_H
+#define OHOS_DM_SHOW_CONFIRM_H
 
+#include <cstring>
+#include <string>
+#include <memory>
+
+#include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-AuthUi::AuthUi()
-{
-    LOGI("AuthUi constructor");
-}
-
-int32_t AuthUi::ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager)
-{
-    if (dmAbilityManager == nullptr) {
-        LOGE("AuthUi::dmAbilityManager is null");
-        return DM_FAILED;
-    }
-    dmAbilityMgr_ = dmAbilityManager;
-    return StartFaService();
-}
-
-int32_t AuthUi::StartFaService()
-{
-    AbilityStatus status = dmAbilityMgr_->StartAbility(AbilityRole::ABILITY_ROLE_PASSIVE);
-    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("AuthUi::StartFaService timeout");
-        return DM_FAILED;
-    }
-    return DM_OK;
-}
+class ShowConfirm {
+public:
+    ShowConfirm();
+    ~ShowConfirm();
+    void ShowConfirmDialog(const std::string &params,
+        std::shared_ptr<DmAuthManager> authManager, std::shared_ptr<DmAbilityManager> dmAbilityMgr);
+};
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_DM_SHOW_CONFIRM_H

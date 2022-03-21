@@ -13,31 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PIN_AUTH_H
-#define OHOS_DM_PIN_AUTH_H
+#ifndef OHOS_DM_PIN_AUTH_UI_H
+#define OHOS_DM_PIN_AUTH_UI_H
 
 #include <cstdint>
-#include <memory>
 
-#include "authentication.h"
 #include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
-#include "pin_auth_ui.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class PinAuth : public IAuthentication {
+class PinAuthUi {
 public:
-    PinAuth();
-    ~PinAuth();
-    int32_t ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) override;
-    int32_t CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager) override;
+    PinAuthUi();
+    int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
+
 private:
-    int32_t times_ = 0;
-    std::shared_ptr<PinAuthUi> pinAuthUi_;
+    int32_t StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PIN_AUTH_H
+#endif // OHOS_DM_PIN_AUTH_UI_H

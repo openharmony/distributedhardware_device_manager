@@ -45,6 +45,7 @@ const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_NAPI_SUB_ID_MAX = 65535;
+const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 
 napi_ref deviceTypeEnumConstructor_ = nullptr;
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
@@ -587,6 +588,51 @@ void DeviceManagerNapi::DeviceInfoToJsArray(const napi_env &env, const std::vect
 void DeviceManagerNapi::DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
                                                  napi_value &paramResult)
 {
+    napi_value extraInfo = nullptr;
+    napi_create_object(env, &extraInfo);
+    SetValueInt32(env, "direction", authParam.direction, extraInfo);
+    SetValueInt32(env, "authType", authParam.authType, paramResult);
+    SetValueInt32(env, "pinToken", stoi(authParam.authToken), extraInfo);
+
+    if (authParam.direction == DM_AUTH_DIRECTION_CLIENT) {
+        napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
+        return;
+    }
+
+    SetValueUtf8String(env, "packageName", authParam.packageName, extraInfo);
+    SetValueUtf8String(env, "appName", authParam.appName, extraInfo);
+    SetValueUtf8String(env, "appDescription", authParam.appDescription, extraInfo);
+    SetValueInt32(env, "business", authParam.business, extraInfo);
+    SetValueInt32(env, "pinCode", authParam.pincode, extraInfo);
+    napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
+
+    size_t appIconLen = (size_t)authParam.imageinfo.GetAppIconLen();
+    if (appIconLen > 0) {
+        void *appIcon = nullptr;
+        napi_value appIconBuffer = nullptr;
+        napi_create_arraybuffer(env, appIconLen, &appIcon, &appIconBuffer);
+        if (appIcon != nullptr &&
+            memcpy_s(appIcon, appIconLen, reinterpret_cast<const void *>(authParam.imageinfo.GetAppIcon()),
+                     appIconLen) == 0) {
+            napi_value appIconArray = nullptr;
+            napi_create_typedarray(env, napi_uint8_array, appIconLen, appIconBuffer, 0, &appIconArray);
+            napi_set_named_property(env, paramResult, "appIcon", appIconArray);
+        }
+    }
+
+    size_t appThumbnailLen = (size_t)authParam.imageinfo.GetAppThumbnailLen();
+    if (appThumbnailLen > 0) {
+        void *appThumbnail = nullptr;
+        napi_value appThumbnailBuffer = nullptr;
+        napi_create_arraybuffer(env, appThumbnailLen, &appThumbnail, &appThumbnailBuffer);
+        if (appThumbnail != nullptr &&
+            memcpy_s(appThumbnail, appThumbnailLen,
+                     reinterpret_cast<const void *>(authParam.imageinfo.GetAppThumbnail()), appThumbnailLen) == 0) {
+            napi_value appThumbnailArray = nullptr;
+            napi_create_typedarray(env, napi_uint8_array, appThumbnailLen, appThumbnailBuffer, 0, &appThumbnailArray);
+            napi_set_named_property(env, paramResult, "appThumbnail", appThumbnailArray);
+        }
+    }
     return;
 }
 

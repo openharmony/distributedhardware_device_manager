@@ -27,6 +27,7 @@ public:
     virtual int32_t ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) = 0;
     virtual int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) = 0;
     virtual int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) = 0;
+    virtual int32_t CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager) = 0;
 };
 
 using CreateIAuthAdapterFuncPtr = IAuthentication *(*)(void);

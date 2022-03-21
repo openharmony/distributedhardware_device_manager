@@ -16,7 +16,6 @@
 #include "dm_auth_manager.h"
 
 #include "auth_message_processor.h"
-#include "auth_ui.h"
 #include "dm_ability_manager.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
@@ -26,9 +25,7 @@
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #if !defined(__LITEOS_M__)
-#include "ui_service_mgr_client.h"
-#include "dialog_callback_stub.h"
-#include "dialog_callback.h"
+#include "show_confirm.h"
 #endif
 
 namespace OHOS {
@@ -558,7 +555,13 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
 #if !defined(__LITEOS_M__)
-    Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+    std::shared_ptr<IAuthentication> ptr;
+    if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
+        LOGE("DmAuthManager::authenticationMap_ is null");
+        return DM_FAILED;
+    }
+    ptr = authenticationMap_[authResponseContext_->authType];
+    ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
 #endif
     return DM_OK;
 }
@@ -590,7 +593,13 @@ void DmAuthManager::AuthenticateFinish()
     if (authResponseState_ != nullptr) {
 #if !defined(__LITEOS_M__)
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+            std::shared_ptr<IAuthentication> ptr;
+            if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
+                LOGE("DmAuthManager::authenticationMap_ is null");
+                return ;
+            }
+            ptr = authenticationMap_[authResponseContext_->authType];
+            ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
         }
 #endif
         if (isFinishOfLocal_) {
@@ -618,7 +627,13 @@ void DmAuthManager::AuthenticateFinish()
         }
 #if !defined(__LITEOS_M__)
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(authResponseContext_->pageId);
+            std::shared_ptr<IAuthentication> ptr;
+            if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
+                LOGE("DmAuthManager::authenticationMap_ is null");
+                return ;
+            }
+            ptr = authenticationMap_[authResponseContext_->authType];
+            ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
         }
 #endif
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
@@ -712,24 +727,15 @@ void DmAuthManager::ShowConfigDialog()
 {
 #if !defined(__LITEOS_M__)
     LOGI("ShowConfigDialog start");
+    dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
     jsonObj[TAG_TOKEN] = authResponseContext_->token;
     jsonObj[TARGET_PKG_NAME_KEY] = authResponseContext_->targetPkgName;
     jsonObj.dump();
     const std::string params = jsonObj.dump();
-    std::shared_ptr<DmAuthManager> authMgr_ = shared_from_this();
-
-    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
-        "config_dialog_service",
-        params,
-        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
-        ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
-        [authMgr_](int32_t id, const std::string& event, const std::string& params) {
-            Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-            LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-            authMgr_->StartAuthProcess(atoi(params.c_str()));
-        });
+    std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
+    showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
     LOGI("ShowConfigDialog end");
 #endif
 }

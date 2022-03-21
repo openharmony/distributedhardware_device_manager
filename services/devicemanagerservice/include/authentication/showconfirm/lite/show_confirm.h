@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PIN_AUTH_UI_H
-#define OHOS_DM_PIN_AUTH_UI_H
+#ifndef OHOS_DM_SHOW_CONFIRM_H
+#define OHOS_DM_SHOW_CONFIRM_H
 
-#include <cstdint>
+#include <cstring>
+#include <string>
+#include <memory>
 
 #include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class PinAuthUi {
+class ShowConfirm {
 public:
-    PinAuthUi();
-    int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
-    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
-
-private:
-    int32_t StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    ShowConfirm();
+    ~ShowConfirm();
+    void ShowConfirmDialog(const std::string &params,
+        std::shared_ptr<DmAuthManager> authManager, std::shared_ptr<DmAbilityManager> dmAbilityMgr);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PIN_AUTH_UI_H
+#endif // OHOS_DM_SHOW_CONFIRM_H

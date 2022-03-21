@@ -13,31 +13,37 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PIN_AUTH_H
-#define OHOS_DM_PIN_AUTH_H
+#include "show_confirm.h"
 
-#include <cstdint>
-#include <memory>
-
-#include "authentication.h"
 #include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
-#include "pin_auth_ui.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class PinAuth : public IAuthentication {
-public:
-    PinAuth();
-    ~PinAuth();
-    int32_t ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) override;
-    int32_t CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager) override;
-private:
-    int32_t times_ = 0;
-    std::shared_ptr<PinAuthUi> pinAuthUi_;
+ShowConfirm::ShowConfirm()
+{
+}
+
+ShowConfirm::~ShowConfirm()
+{
+}
+
+void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
+                                    std::shared_ptr<DmAbilityManager> dmAbilityMgr)
+{
+    LOGI("ShowConfirm hap start");
+    if (dmAbilityMgr == nullptr) {
+        LOGE("ShowConfirm::dmAbilityManager is null");
+        return;
+    }
+    AbilityStatus status = dmAbilityMgr->StartAbility(AbilityRole::ABILITY_ROLE_PASSIVE);
+    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
+        LOGE("ShowConfirm::startFaservice timeout");
+        return;
+    }
+    LOGI("ShowConfirm hap end");
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PIN_AUTH_H
