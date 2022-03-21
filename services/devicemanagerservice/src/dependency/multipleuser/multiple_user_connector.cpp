@@ -15,9 +15,8 @@
 
 #include "multiple_user_connector.h"
 
-#include "dm_constants.h"
 #include "dm_log.h"
-#if !defined(__LITEOS_M__)
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "os_account_manager.h"
 
 using namespace OHOS::AccountSA;
@@ -29,7 +28,7 @@ int32_t MultipleUserConnector::oldUserId_ = -1;
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
-#if defined(__LITEOS_M__)
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return 0;
 #else
     std::vector<int> ids;

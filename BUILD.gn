@@ -24,11 +24,14 @@ if (defined(ohos_lite)) {
       ]
     }
   } else {
+    import("//build/lite/config/component/lite_component.gni")
     lite_component("devicemanager_lite") {
-      if (ohos_kernel_type == "liteos_m") {
-      } else {
-        features = []
-      }
+      features = [
+        "utils:devicemanagerutils",
+        "services/devicemanagerservice:devicemanagerservice",
+        "interfaces/inner_kits/native_cpp:devicemanagersdk",
+        "ext/pin_auth:devicemanagerext_pin_auth",
+      ]
     }
   }
 }

@@ -27,7 +27,6 @@
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_skeleton.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
@@ -258,7 +257,6 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
         LOGE("AuthenticateDevice error: Failed with ret %d", ret);
         return DM_IPC_RESPOND_ERROR;
     }
-
     LOGI("DeviceManager::AuthenticateDevice completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }

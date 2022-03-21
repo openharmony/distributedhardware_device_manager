@@ -638,9 +638,7 @@ void DmAuthManager::AuthenticateFinish()
 #endif
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
-
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
-
         if (!timerMap_.empty()) {
             for (auto &iter : timerMap_) {
                 iter.second->Stop(SESSION_CANCEL_TIMEOUT);

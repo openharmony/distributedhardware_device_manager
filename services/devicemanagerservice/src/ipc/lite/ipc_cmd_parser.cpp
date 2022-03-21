@@ -220,10 +220,8 @@ ON_IPC_SERVER_CMD(UNAUTHENTICATE_DEVICE, IpcIo &req, IpcIo &reply)
 ON_IPC_SERVER_CMD(VERIFY_AUTHENTICATION, IpcIo &req, IpcIo &reply)
 {
     LOGI("VerifyAuthentication service listener.");
-    std::string pkgName = (const char *)IpcIoPopString(&req, nullptr);
     std::string authParam = (const char *)IpcIoPopString(&req, nullptr);
-
-    int32_t ret = DeviceManagerService::GetInstance().VerifyAuthentication(pkgName, authParam);
+    int32_t ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
     IpcIoPushInt32(&reply, ret);
 }
 
@@ -244,12 +242,6 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, Ip
     std::string paramJson = pReq->GetJsonParam();
     IpcIoPushString(&request, packagname.c_str());
     IpcIoPushString(&request, paramJson.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(SERVER_DEVICE_FA_NOTIFY, IpcIo &request, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

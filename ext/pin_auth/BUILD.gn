@@ -19,6 +19,73 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 if (defined(ohos_lite)) {
+  shared_library("devicemanagerext_pin_auth") {
+    include_dirs = [
+      "include",
+      "include/lite",
+      "${common_path}/include",
+      "${ext_path}/pin_auth/include/ability",
+      "${services_path}/include/dependency/timer",
+      "${services_path}/include/config",
+      "${services_path}/include/adapter",
+      "${services_path}/include/authentication",
+      "${services_path}/include/authentication/showconfirm/lite",
+      "${services_path}/include/ability",
+      "${services_path}/include/deviceinfo",
+      "${services_path}/include/devicestate",
+      "${services_path}/include/discovery",
+      "${services_path}/include/dependency/commonevent",
+      "${services_path}/include/dependency/hichain",
+      "${services_path}/include/dependency/softbus",
+      "${services_path}/include/dependency/timer",
+      "${services_path}/include/ipc",
+      "${services_path}/include/ipc/lite",
+      "${utils_path}/include",
+      "${utils_path}/include/ipc/lite",
+      "${services_path}/include",
+      "${innerkits_path}/native_cpp/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/model",
+      "${innerkits_path}/native_cpp/include",
+      "${innerkits_path}/native_cpp/include/ipc",
+      "${innerkits_path}/native_cpp/include/ipc/lite",
+      "//third_party/json/include",
+      "//utils/native/base/include",
+      "//utils/system/safwk/native/include",
+      "//base/notification/ces_lite/frameworks/core/include",
+      "//base/notification/ces_lite/interfaces/innerkits/native/include",
+      "//base/security/deviceauth/interfaces/innerkits",
+      "//base/startup/syspara_lite/interfaces/kits",
+      "//base/startup/syspara_lite/adapter/native/syspara/include",
+    ]
+
+    sources = [
+      "src/ability/lite/dm_ability_manager.cpp",
+      "src/lite/pin_auth_ui.cpp",
+      "src/pin_auth.cpp",
+    ]
+
+    deps = [
+      "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${utils_path}:devicemanagerutils",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//base/security/deviceauth/services:deviceauth_sdk",
+      "//foundation/communication/dsoftbus/sdk:softbus_client",
+      "//foundation/communication/ipc_lite:liteipc_adapter",
+      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/mbedtls:mbedtls_shared",
+      "//utils/native/lite:utils",
+    ]
+
+    defines = [
+      "LITE_DEVICE",
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerext\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
+  }
 } else {
   ohos_shared_library("devicemanagerext_pin_auth") {
     include_dirs = [

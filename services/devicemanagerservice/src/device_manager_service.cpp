@@ -21,7 +21,7 @@
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
-#if !defined(__LITEOS_M__)
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "common_event_support.h"
 using namespace OHOS::EventFwk;
@@ -34,7 +34,7 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
-#if !defined(__LITEOS_M__)
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
     if (dmCommonEventManager.UnsubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_STOPPED)) {
         LOGI("subscribe service event success");
@@ -114,7 +114,7 @@ int32_t DeviceManagerService::Init()
         LOGI("get current account user id success");
         MultipleUserConnector::SetSwitchOldUserId(userId);
     }
-#if !defined(__LITEOS_M__)
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
     CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get(),
         std::placeholders::_1);

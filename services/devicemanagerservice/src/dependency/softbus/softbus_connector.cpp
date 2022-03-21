@@ -119,8 +119,11 @@ int32_t SoftbusConnector::Init()
     dmPublishInfo.capability = DM_CAPABILITY_OSD;
     dmPublishInfo.capabilityData = nullptr;
     dmPublishInfo.dataLen = 0;
-#if defined(__LITEOS_M__)
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+    if (ret == DM_OK) {
+        publishStatus = ALLOW_BE_DISCOVERY;
+    }
     LOGI("service publish result is : %d", ret);
 #else
     char discoverStatus[DISCOVER_STATUS_LEN + 1] = {0};
@@ -429,17 +432,17 @@ int32_t SoftbusConnector::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), nodeBasicInfo.networkId,
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertNodeBasicInfoToDmDevice copy deviceId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
                  std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertNodeBasicInfoToDmDevice copy networkId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertNodeBasicInfoToDmDevice copy deviceName data failed");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     return DM_OK;
@@ -450,17 +453,17 @@ void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, 
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertDeviceInfoToDmDevice copy deviceId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), 0,
                  sizeof(dmDeviceInfo.networkId)) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertDeviceInfoToDmDevice copy networkId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
-        LOGE("copy data failed");
+        LOGE("CovertDeviceInfoToDmDevice copy deviceName data failed");
     }
     dmDeviceInfo.deviceTypeId = deviceInfo.devType;
 }

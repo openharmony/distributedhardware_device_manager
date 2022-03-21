@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t INVALID_CB_ID = 0xFF;
 static uint32_t g_deathCbId = INVALID_CB_ID;
 static SvcIdentity g_svcIdentity;
 static std::shared_ptr<IpcRsp> pCurRsp;
-const int32_t INVALID_CB_ID = 0xFF;
 
 void __attribute__((weak)) HOS_SystemInit(void)
 {
@@ -89,7 +89,7 @@ int IpcClientServerProxy::RegisterServerDeathCb(void)
 
 int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    LOGI("SendCmd:%d", cmdCode);
+    LOGI("IpcClientServerProxy::SendCmd:%d", cmdCode);
     uint8_t data[MAX_DM_IPC_LEN] = {0};
     IpcIo request;
 
@@ -105,7 +105,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
             return DM_FAILED;
         }
     }
-    LOGI("SendCmd:%d end", cmdCode);
+    LOGI("IpcClientServerProxy::SendCmd:%d, end", cmdCode);
     return DM_OK;
 }
 

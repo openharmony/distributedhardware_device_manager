@@ -64,6 +64,52 @@ if (defined(ohos_lite)) {
     }
   } else {
     shared_library("devicemanagerutils") {
+      include_dirs = [
+        "${common_path}/include",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/model",
+        "include",
+        "include/ipc/lite",
+        "include/permission/lite",
+      ]
+      include_dirs += [
+        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//utils/native/lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/communication/ipc_lite/interfaces/kits",
+        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+        "//foundation/communication/dsoftbus/interfaces/kits/transport",
+        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+      ]
+      sources = [
+        "src/dm_anonymous.cpp",
+        "src/dm_log.cpp",
+        "src/dm_random.cpp",
+        "src/ipc/lite/ipc_cmd_register.cpp",
+        "src/permission/lite/permission_manager.cpp",
+      ]
+      defines = [
+        "hI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerutils\"",
+        "lOG_DOMAIN=0xD004100",
+      ]
+      deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//foundation/communication/ipc_lite:liteipc_adapter",
+        "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/mbedtls:mbedtls_shared",
+        "//utils/native/lite:utils",
+      ]
     }
   }
 } else {

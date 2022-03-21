@@ -26,29 +26,19 @@ DmAdapterManager &DmAdapterManager::GetInstance()
     return instance;
 }
 
-DmAdapterManager::DmAdapterManager()
+std::shared_ptr<IDecisionAdapter> DmAdapterManager::GetDecisionAdapter(const std::string &soName)
 {
-    LOGI("DmAdapterManager constructor");
+    return nullptr;
 }
 
-DmAdapterManager::~DmAdapterManager()
+std::shared_ptr<IProfileAdapter> DmAdapterManager::GetProfileAdapter(const std::string &soName)
 {
-    LOGI("DmAdapterManager destructor");
+    return nullptr;
 }
 
-std::shared_ptr<IDecisionAdapter> DmAdapterManager::GetDecisionAdapter()
+std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter(const std::string &soName)
 {
-    return decisionAdapterPtr_;
-}
-
-std::shared_ptr<IProfileAdapter> DmAdapterManager::GetProfileAdapter()
-{
-    return profileAdapterPtr_;
-}
-
-std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter()
-{
-    return cryptoAdapterPtr_;
+    return nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -28,6 +28,7 @@
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_verify_authenticate_req.h"
+#include "ipc_set_useroperation_req.h"
 #include "securec.h"
 
 namespace OHOS {
