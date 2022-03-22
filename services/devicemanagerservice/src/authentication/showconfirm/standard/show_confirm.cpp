@@ -18,7 +18,9 @@
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#ifdef SUPPORT_GRAPHICS
 #include "ui_service_mgr_client.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,6 +36,7 @@ ShowConfirm::~ShowConfirm()
 void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
                                     std::shared_ptr<DmAbilityManager> dmAbilityMgr)
 {
+    #ifdef SUPPORT_GRAPHICS
     LOGI("ShowConfirm ace start");
     if (authManager == nullptr) {
         LOGE("ShowConfirm::dmAbilityManager is null");
@@ -55,6 +58,7 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
             }
         });
     LOGI("ShowConfirm ace end");
+    #endif
 }
 } // namespace DistributedHardware
 } // namespace OHOS
