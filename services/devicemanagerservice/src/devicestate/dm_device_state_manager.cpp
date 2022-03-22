@@ -272,7 +272,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         }
     }
 
-    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(stateTimerInfoMap_.size());
+    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(cumulativeQuantity_++);
     std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
     if (offLineTimer != nullptr) {
         StateTimerInfo stateTimer = {
@@ -287,6 +287,11 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+#endif
     LOGI("start offline timer");
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
