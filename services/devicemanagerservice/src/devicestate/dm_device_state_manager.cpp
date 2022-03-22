@@ -272,7 +272,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         }
     }
 
-    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(mCumulativeQuantity_++);
+    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(CumulativeQuantity_++);
     std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
     if (offLineTimer != nullptr) {
         StateTimerInfo stateTimer = {

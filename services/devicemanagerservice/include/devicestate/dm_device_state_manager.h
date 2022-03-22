@@ -63,7 +63,7 @@ public:
     void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
 private:
-    int32_t mCumulativeQuantity_ = 0;
+    int32_t CumulativeQuantity_ = 0;
     std::string profileSoName_;
 #if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
