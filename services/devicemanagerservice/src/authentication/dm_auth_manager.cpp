@@ -241,7 +241,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
     }
 }
 
-void DmAuthManager::OnSessionClosed(int32_t sessionId)
+void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionOpened sessionId=%d", sessionId);
 }
