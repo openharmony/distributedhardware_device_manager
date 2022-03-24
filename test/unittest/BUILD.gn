@@ -27,6 +27,7 @@ group("unittest") {
     ":UTTest_dm_auth_manager",
     ":UTTest_dm_device_info_manager",
     ":UTTest_dm_device_state_manager",
+    ":UTTest_dm_discovery_manager",
     ":UTTest_ipc_client_manager",
     ":UTTest_ipc_client_proxy",
     ":UTTest_ipc_client_stub",
@@ -308,6 +309,25 @@ ohos_unittest("UTTest_dm_auth_manager") {
 }
 
 ## UTTest_dm_auth_manager }}}
+## UnitTest UTTest_dm_discovery_manager {{{
+ohos_unittest("UTTest_dm_discovery_manager") {
+  module_out_path = module_out_path
+
+  sources = [
+    "${services_path}/src/dependency/softbus/softbus_connector.cpp",
+    "${services_path}/src/dependency/softbus/softbus_session.cpp",
+    "${services_path}/src/dependency/timer/dm_timer.cpp",
+    "${services_path}/src/device_manager_service_listener.cpp",
+    "${services_path}/src/discovery/dm_discovery_manager.cpp",
+    "//foundation/distributedhardware/devicemanager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/devicemanager/test/unittest/mock/parameter.cpp",
+    "UTTest_dm_discovery_manager.cpp",
+  ]
+
+  deps = [ ":device_manager_test" ]
+}
+
+## UnitTest UTTest_dm_discovery_manager }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {

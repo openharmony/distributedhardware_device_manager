@@ -109,24 +109,6 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
 }
 
 /**
- * @tc.name:StopDeviceDiscovery_001
- * @tc.desc: Assign the correct value
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-// doing
-HWTEST_F(DmDiscoveryManagerTest, StopDeviceDiscovery_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.helloworld";
-    const std::string extra;
-    DmSubscribeInfo subscribeInfo;
-    uint16_t subscribeId = 1;
-    discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    int ret = discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
-    ASSERT_NE(ret, DM_OK);
-}
-
-/**
  * @tc.name: OnDeviceFound_001
  * @tc.desc: The OnDeviceFound function does the correct case and assigns pkgName
  * @tc.type: FUNC
