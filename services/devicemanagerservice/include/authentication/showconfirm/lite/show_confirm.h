@@ -13,27 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_NO_INTERACTION_AUTH_H
-#define OHOS_DM_NO_INTERACTION_AUTH_H
+#ifndef OHOS_DM_SHOW_CONFIRM_H
+#define OHOS_DM_SHOW_CONFIRM_H
 
-#include <cstdint>
+#include <cstring>
+#include <string>
 #include <memory>
 
-#include "authentication.h"
 #include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class NoInteractionAuth : public IAuthentication {
+class ShowConfirm {
 public:
-    NoInteractionAuth();
-    ~NoInteractionAuth();
-    int32_t ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
-    int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) override;
-    int32_t CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager) override;
+    ShowConfirm();
+    ~ShowConfirm();
+    void ShowConfirmDialog(const std::string &params,
+        std::shared_ptr<DmAuthManager> authManager, std::shared_ptr<DmAbilityManager> dmAbilityMgr);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_NO_INTERACTION_AUTH_H
+#endif // OHOS_DM_SHOW_CONFIRM_H

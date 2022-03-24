@@ -27,10 +27,14 @@ PinAuthUi::PinAuthUi()
 {
     LOGI("AuthUi constructor");
 }
-
+ 
 int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("ShowPinDialog start");
+    if (authManager == nullptr) {
+        LOGE("ShowPinDialog authManager is null");
+        return DM_FAILED;
+    }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = code;
     jsonObj.dump();
@@ -53,10 +57,14 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     LOGI("ShowConfigDialog end");
     return DM_OK;
 }
-
+ 
 int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("InputPinDialog start");
+    if (authManager == nullptr) {
+        LOGE("ShowPinDialog InputPinDialog is null");
+        return DM_FAILED;
+    }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = code;
     jsonObj.dump();
@@ -78,6 +86,14 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
             }
         });
     LOGI("ShowConfigDialog end");
+    return DM_OK;
+}
+
+int32_t PinAuthUi::ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager)
+{
+    LOGI("PinAuthUi start");
+    Ace::UIServiceMgrClient::GetInstance()->CancelDialog(pageId);
+    LOGI("PinAuthUi end");
     return DM_OK;
 }
 

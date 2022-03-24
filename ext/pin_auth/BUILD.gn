@@ -23,12 +23,14 @@ if (defined(ohos_lite)) {
   ohos_shared_library("devicemanagerext_pin_auth") {
     include_dirs = [
       "include",
+      "include/standard",
       "${common_path}/include",
       "${ext_path}/pin_auth/include/ability",
       "${services_path}/include/dependency/timer",
       "${services_path}/include/config",
       "${services_path}/include/adapter",
       "${services_path}/include/authentication",
+      "${services_path}/include/authentication/showconfirm/standard",
       "${services_path}/include/ability",
       "${services_path}/include/deviceinfo",
       "${services_path}/include/devicestate",
@@ -61,7 +63,7 @@ if (defined(ohos_lite)) {
     sources = [
       "src/ability/standard/dm_ability_manager.cpp",
       "src/pin_auth.cpp",
-      "src/pin_auth_ui.cpp",
+      "src/standard/pin_auth_ui.cpp",
     ]
 
     deps = [

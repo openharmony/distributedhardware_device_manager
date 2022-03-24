@@ -13,37 +13,37 @@
  * limitations under the License.
  */
 
-#include "auth_ui.h"
+#include "show_confirm.h"
 
+#include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-AuthUi::AuthUi()
+ShowConfirm::ShowConfirm()
 {
-    LOGI("AuthUi constructor");
 }
 
-int32_t AuthUi::ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager)
+ShowConfirm::~ShowConfirm()
 {
-    if (dmAbilityManager == nullptr) {
-        LOGE("AuthUi::dmAbilityManager is null");
-        return DM_FAILED;
+}
+
+void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
+                                    std::shared_ptr<DmAbilityManager> dmAbilityMgr)
+{
+    LOGI("ShowConfirm hap start");
+    if (dmAbilityMgr == nullptr) {
+        LOGE("ShowConfirm::dmAbilityManager is null");
+        return;
     }
-    dmAbilityMgr_ = dmAbilityManager;
-    return StartFaService();
-}
-
-int32_t AuthUi::StartFaService()
-{
-    AbilityStatus status = dmAbilityMgr_->StartAbility(AbilityRole::ABILITY_ROLE_PASSIVE);
+    AbilityStatus status = dmAbilityMgr->StartAbility(AbilityRole::ABILITY_ROLE_PASSIVE);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("AuthUi::StartFaService timeout");
-        return DM_FAILED;
+        LOGE("ShowConfirm::startFaservice timeout");
+        return;
     }
-    return DM_OK;
-}
+    LOGI("ShowConfirm hap end");
+};
 } // namespace DistributedHardware
 } // namespace OHOS

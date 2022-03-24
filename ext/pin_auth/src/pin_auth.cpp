@@ -101,6 +101,11 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
     }
 }
 
+int32_t PinAuth::CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager)
+{
+    return pinAuthUi_->ClosePage(pageId, authManager);
+}
+
 extern "C" IAuthentication *CreatePinAuthObject(void)
 {
     return new PinAuth;

@@ -21,7 +21,6 @@
 
 #include "auth_request_state.h"
 #include "auth_response_state.h"
-#include "auth_ui.h"
 #include "authentication.h"
 #include "device_manager_service_listener.h"
 #include "dm_ability_manager.h"

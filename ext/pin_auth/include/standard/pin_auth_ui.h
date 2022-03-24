@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_UI_H
-#define OHOS_DM_AUTH_UI_H
+#ifndef OHOS_DM_PIN_AUTH_UI_H
+#define OHOS_DM_PIN_AUTH_UI_H
 
 #include <cstdint>
-#include <memory>
+
+#include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthUi {
+class PinAuthUi {
 public:
-    AuthUi();
-    int32_t ShowConfirmDialog(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    PinAuthUi();
+    int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
 
 private:
-    int32_t StartFaService();
-
-private:
-    std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    int32_t StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_UI_H
+#endif // OHOS_DM_PIN_AUTH_UI_H
