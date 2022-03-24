@@ -56,14 +56,14 @@ public:
     int32_t RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback);
     int32_t UnRegisterHiChainCallback();
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
-    int32_t AddMember(std::string deviceId, std::string &connectInfo);
-    int32_t DelMemberFromGroup(std::string groupId, std::string deviceId);
+    int32_t AddMember(const std::string &deviceId, const std::string &connectInfo);
+    int32_t DelMemberFromGroup(const std::string &groupId, const std::string &deviceId);
     int32_t DeleteGroup(std::string &groupId);
     int32_t DeleteGroup(const int32_t userId, std::string &groupId);
-    bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
-    int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
-    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
-    int32_t GetGroupInfo(const int32_t userId, std::string queryParams, std::vector<GroupInfo> &groupList);
+    bool IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice);
+    int32_t GetRelatedGroups(const std::string &DeviceId, std::vector<GroupInfo> &groupList);
+    int32_t GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
+    int32_t GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
     int32_t DeleteTimeOutGroup(const char* deviceId);
 private:
     int64_t GenRequestId();

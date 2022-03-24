@@ -139,7 +139,7 @@ bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInf
     return false;
 }
 
-int32_t HiChainConnector::GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList)
+int32_t HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
@@ -178,7 +178,8 @@ int32_t HiChainConnector::GetGroupInfo(std::string queryParams, std::vector<Grou
     return true;
 }
 
-int32_t HiChainConnector::GetGroupInfo(const int32_t userId, std::string queryParams, std::vector<GroupInfo> &groupList)
+int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &queryParams,
+    std::vector<GroupInfo> &groupList)
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
@@ -212,7 +213,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, std::string queryPa
     return true;
 }
 
-int32_t HiChainConnector::AddMember(std::string deviceId, std::string &connectInfo)
+int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::string &connectInfo)
 {
     LOGI("HiChainConnector::AddMember");
     if (deviceGroupManager_ == nullptr) {
@@ -299,8 +300,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         LOGE("HiChainAuthCallBack::onRequest operationCode %d", operationCode);
         return nullptr;
     }
-    int32_t pinCode = 0;
-    pinCode = hiChainConnectorCallback_->GetPinCode();
+    int32_t pinCode = hiChainConnectorCallback_->GetPinCode();
     nlohmann::json jsonObj;
     if (pinCode == DM_FAILED) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
@@ -324,8 +324,7 @@ int64_t HiChainConnector::GenRequestId()
 
 std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string reqDeviceId)
 {
-    std::string connectAddr = "";
-    connectAddr = hiChainConnectorCallback_->GetConnectAddr(deviceId);
+    std::string connectAddr = hiChainConnectorCallback_->GetConnectAddr(deviceId);
     LOGE("HiChainConnector::GetConnectPara get addrInfo");
     nlohmann::json jsonObject = nlohmann::json::parse(connectAddr, nullptr, false);
     if (jsonObject.is_discarded()) {
@@ -337,7 +336,7 @@ std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string r
     return jsonObject.dump();
 }
 
-int32_t HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<GroupInfo> &groupList)
+int32_t HiChainConnector::GetRelatedGroups(const std::string &deviceId, std::vector<GroupInfo> &groupList)
 {
     LOGI("HiChainConnector::GetRelatedGroups Start to get local related groups.");
     uint32_t groupNum = 0;
@@ -368,7 +367,7 @@ int32_t HiChainConnector::GetRelatedGroups(std::string deviceId, std::vector<Gro
         return DM_FAILED;
     }
     std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
-    if (groupInfos.size() == 0) {
+    if (groupInfos.empty()) {
         LOGE("HiChainConnector::GetRelatedGroups group failed, groupInfos is empty.");
         return DM_FAILED;
     }
@@ -391,7 +390,7 @@ int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, st
     return DM_OK;
 }
 
-bool HiChainConnector::IsDevicesInGroup(std::string hostDevice, std::string peerDevice)
+bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice)
 {
     LOGE("HiChainConnector::IsDevicesInGroup");
     std::vector<GroupInfo> hostGroupInfoList;
@@ -434,7 +433,7 @@ int32_t HiChainConnector::SyncGroups(std::string deviceId, std::vector<std::stri
     return DM_OK;
 }
 
-int32_t HiChainConnector::DelMemberFromGroup(std::string groupId, std::string deviceId)
+int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const std::string &deviceId)
 {
     int64_t requestId = GenRequestId();
     LOGI("Start to delete memeber from group, requestId %lld, deviceId %s, groupId %s", requestId,
