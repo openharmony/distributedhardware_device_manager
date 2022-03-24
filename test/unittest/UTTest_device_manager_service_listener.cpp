@@ -107,6 +107,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnVerifyAuthResult_001, testing::ext:
     std::string ret = pReq->GetDeviceId();
     EXPECT_EQ(ret, deviceId);
 }
-} // namespace
+}
 } // namespace DistributedHardware
 } // namespace OHOS

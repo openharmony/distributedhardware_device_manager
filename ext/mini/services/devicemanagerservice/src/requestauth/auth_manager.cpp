@@ -19,7 +19,6 @@
 #include "constants.h"
 #include "msg_codec.h"
 #include "device_manager_log.h"
-#include "msg_codec.h"
 #include "device_manager_errno.h"
 #include "softbus_session.h"
 #include "encrypt_utils.h"

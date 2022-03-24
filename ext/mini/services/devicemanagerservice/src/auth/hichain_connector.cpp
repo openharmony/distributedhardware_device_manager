@@ -250,7 +250,7 @@ void HichainConnector::OnMemberJoin(int64_t requestId, int32_t status)
     }
 
     if (hichainConnectorCallback_ == nullptr) {
-        DMLOG(DM_LOG_ERROR, "HichainConnector::OnMemberJoin hichainConnectorCallback_ not registe.");
+        DMLOG(DM_LOG_ERROR, "HichainConnector::OnMemberJoin hichainConnectorCallback_ not register.");
         return;
     }
     hichainConnectorCallback_->OnMemberJoin(requestId, status);

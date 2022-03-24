@@ -42,5 +42,4 @@ private:                                    \
     }
 }; // namespace DistributedHardware
 }; // namespace OHOS
-
 #endif // OHOS_DM_SINGLE_INSTANCE_H

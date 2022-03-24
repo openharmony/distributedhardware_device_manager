@@ -203,6 +203,6 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterSoftbusStateCallback_001, testing::ex
     int ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
     EXPECT_EQ(ret, DM_OK);
 }
-} // namespace
+}
 } // namespace DistributedHardware
 } // namespace OHOS

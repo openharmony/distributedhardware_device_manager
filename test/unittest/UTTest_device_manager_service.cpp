@@ -194,7 +194,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestS
 
 /**
  * @tc.name: GetTrustedDeviceList_002
- * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null ; The return value is DM_INPUT_PARA_EMPTY
+ * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; The return value is DM_INPUT_PARA_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

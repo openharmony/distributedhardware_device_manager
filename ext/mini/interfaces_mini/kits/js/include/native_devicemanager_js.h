@@ -23,7 +23,6 @@
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
 #include "nlohmann/json.hpp"
-#include "dm_device_info.h"
 #include "jsi.h"
 
 namespace OHOS {

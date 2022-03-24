@@ -89,7 +89,7 @@ private:
 private:
     std::shared_ptr<HichainConnectorCallback> hichainConnectorCallback_ = nullptr;
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
-    DeviceAuthCallback deviceAuthCallback_ ;
+    DeviceAuthCallback deviceAuthCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

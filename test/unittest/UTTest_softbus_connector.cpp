@@ -315,6 +315,6 @@ HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::
     int ret = softbusConnector->CovertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(ret, DM_OK);
 }
-} // namespace
+}
 } // namespace DistributedHardware
 } // namespace OHOS

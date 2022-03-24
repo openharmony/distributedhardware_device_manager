@@ -217,8 +217,6 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 
   将devicemanager/display工程导入DevEco Studio 2.2 Beta1，复制display目录下的@ohos.distributedHardware.deviceManager.d.ts文件到Sdk\js\2.2.0.1\api\common目录下，进行编译构建及运行调试.
 
-  DevEco Studio使用方法请参考[DevEco Studio使用说明](https://developer.harmonyos.com/cn/docs/documentation/doc-guides/tools_overview-0000001053582387)。
-
 - 编译环境依赖：IDE 2.2 SDK6
 
 - DeviceManager_UI.hap存放位置：[applications_hap仓库](https://gitee.com/openharmony/applications_hap)

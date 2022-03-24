@@ -41,5 +41,4 @@ protected:
     napi_ref thisVarRef_;
     std::map<std::string, std::shared_ptr<DmEventListener>> eventMap_;
 };
-
-#endif /* OHOS_DM_NATIVE_EVENT_H */
+#endif // OHOS_DM_NATIVE_EVENT_H

@@ -54,6 +54,6 @@ HWTEST_F(DeviceManagerImplTest, DmDeviceInfoManager_001, testing::ext::TestSize.
     std::shared_ptr<DmDeviceInfoManager> p = std::make_shared<DmDeviceInfoManager>(softbusConnector);
     ASSERT_NE(p, nullptr);
 }
-} // namespace
+}
 } // namespace DistributedHardware
 } // namespace OHOS

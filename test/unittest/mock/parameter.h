@@ -35,5 +35,4 @@ int GetDevUdid(char *udid, int size);
 }
 #endif
 #endif /* __cplusplus */
-
 #endif

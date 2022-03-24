@@ -18,7 +18,6 @@
 #include "msg_head.h"
 
 #include "constants.h"
-#include "device_manager_log.h"
 #include "device_manager_errno.h"
 
 namespace OHOS {

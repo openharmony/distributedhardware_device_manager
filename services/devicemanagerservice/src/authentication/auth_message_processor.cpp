@@ -128,7 +128,6 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     json[TAG_TOKEN] = authResponseContext_->token;
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
         LOGI("AuthMessageProcessor::CreateSimpleMessage groupId %d", groupId.c_str());

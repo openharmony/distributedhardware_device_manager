@@ -80,7 +80,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, const
         LOGE("subscriber is nullptr %s", event.c_str());
         return false;
     }
-    
+
     if (!CommonEventManager::SubscribeCommonEvent(subscriber)) {
         LOGE("Subscribe service event failed: %s", event.c_str());
         return false;
@@ -123,7 +123,7 @@ void DmCommonEventManager::EventSubscriber::OnReceiveEvent(const CommonEventData
         LOGE("userId is less zero");
         return;
     }
-    
+
     std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
     if (callbackQueue_.size() > COMMON_CALLBACK_MAX_SIZE) {
         LOGE("event callback Queue is too long");
