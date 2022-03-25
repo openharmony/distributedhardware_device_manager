@@ -196,7 +196,7 @@ static void HOS_SystemInit(void)
     return;
 }
 
-static int32_t IpcServerStubInit(void)
+int32_t IpcServerStubInit(void)
 {
     HOS_SystemInit();
     return DM_OK;
