@@ -61,7 +61,7 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
         usleep(SLEEP_TIME_MS);
         retryNum++;
         if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
-            LOGE("Wait for device manager service starting timeout.");
+            LOGE("InitDeviceManager error: wait for device manager service starting timeout.");
             return DM_NOT_INIT;
         }
     }
