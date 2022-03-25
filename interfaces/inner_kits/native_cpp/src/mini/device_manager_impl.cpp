@@ -16,19 +16,19 @@
 #include "dm_log.h"
 #include "device_manager_notify.h"
 #include "dm_constants.h"
-#include "message_def.h"
-#include "get_trustdevice_req.h"
-#include "get_trustdevice_rsp.h"
-#include "start_discovery_req.h"
-#include "stop_discovery_req.h"
-#include "get_useroperation_req.h"
-#include "authenticate_device_req.h"
-#include "verify_authenticate_req.h"
-#include "get_local_device_info_rsp.h"
-#include "get_info_by_network_rsp.h"
-#include "get_info_by_network_req.h"
-#include "unauthenticate_device_req.h"
-#include "get_dmfaparam_rsp.h"
+#include "ipc_def.h"
+#include "ipc_get_trustdevice_req.h"
+#include "ipc_get_trustdevice_rsp.h"
+#include "ipc_start_discovery_req.h"
+#include "ipc_stop_discovery_req.h"
+#include "ipc_set_useroperation_req.h"
+#include "ipc_authenticate_device_req.h"
+#include "ipc_verify_authenticate_req.h"
+#include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_info_by_network_rsp.h"
+#include "ipc_get_info_by_network_req.h"
+#include "ipc_unauthenticate_device_req.h"
+#include "ipc_get_dmfaparam_rsp.h"
 #include "device_manager_impl.h"
 
 namespace OHOS {
@@ -76,8 +76,8 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<GetTrustDeviceReq> req = std::make_shared<GetTrustDeviceReq>();
-    std::shared_ptr<GetTrustDeviceRsp> rsp = std::make_shared<GetTrustDeviceRsp>();
+    std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
+    std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
 
@@ -104,8 +104,8 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<MessageReq> req = std::make_shared<MessageReq>();
-    std::shared_ptr<GetLocalDeviceInfoRsp> rsp = std::make_shared<GetLocalDeviceInfoRsp>();
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceInfoRsp> rsp = std::make_shared<IpcGetLocalDeviceInfoRsp>();
     req->SetPkgName(pkgName);
 
     if (CommandDispatch::GetInstance().MessageSendCmd(GET_LOCAL_DEVICE_INFO, req, rsp) != DM_OK) {
@@ -160,8 +160,8 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     LOGI("DeviceManager StartDeviceDiscovery in, pkgName %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
 
-    std::shared_ptr<StartDiscoveryReq> req = std::make_shared<StartDiscoveryReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
+    std::shared_ptr<IpcStartDiscoveryReq> req = std::make_shared<IpcStartDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
     req->SetSubscribeInfo(subscribeInfo);
@@ -186,8 +186,8 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
     }
 
     LOGI("StopDeviceDiscovery in, pkgName %s", pkgName.c_str());
-    std::shared_ptr<StopDiscoveryReq> req = std::make_shared<StopDiscoveryReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
+    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetSubscribeId(subscribeId);
 
@@ -217,8 +217,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
     std::string strDeviceId = deviceInfo.deviceId;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
-    std::shared_ptr<AuthenticateDeviceReq> req = std::make_shared<AuthenticateDeviceReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
+    std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
     req->SetAuthType(authType);
@@ -248,8 +248,8 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
 
     DmDeviceInfo deviceInfo;
     strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
-    std::shared_ptr<UnAuthenticateDeviceReq> req = std::make_shared<UnAuthenticateDeviceReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
+    std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
 
@@ -304,8 +304,8 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
 
     DeviceManagerNotify::GetInstance().RegisterVerifyAuthenticationCallback(pkgName, authPara, callback);
 
-    std::shared_ptr<VerifyAuthenticateReq> req = std::make_shared<VerifyAuthenticateReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
+    std::shared_ptr<IpcVerifyAuthenticateReq> req = std::make_shared<IpcVerifyAuthenticateReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetAuthPara(authPara);
 
@@ -331,8 +331,8 @@ int32_t DeviceManagerImpl::GetFaParam(const std::string &pkgName, DmAuthParam &d
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<MessageReq> req = std::make_shared<MessageReq>();
-    std::shared_ptr<GetDmFaParamRsp> rsp = std::make_shared<GetDmFaParamRsp>();
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetDmFaParamRsp> rsp = std::make_shared<IpcGetDmFaParamRsp>();
     req->SetPkgName(pkgName);
 
     if (CommandDispatch::GetInstance().MessageSendCmd(SERVER_GET_DMFA_INFO, req, rsp) != DM_OK) {
@@ -353,9 +353,8 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<GetUserOperationReq> req = std::make_shared<GetUserOperationReq>();
-    std::shared_ptr<MessageRsp> rsp = std::make_shared<MessageRsp>();
-
+    std::shared_ptr<IpcGetOperationReq> req = std::make_shared<IpcGetOperationReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetOperation(action);
 
@@ -380,8 +379,8 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<GetInfoByNetWorkReq> req = std::make_shared<GetInfoByNetWorkReq>();
-    std::shared_ptr<GetInfoByNetWorkRsp> rsp = std::make_shared<GetInfoByNetWorkRsp>();
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
 
@@ -407,8 +406,8 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
         return DM_INVALID_VALUE;
     }
 
-    std::shared_ptr<GetInfoByNetWorkReq> req = std::make_shared<GetInfoByNetWorkReq>();
-    std::shared_ptr<GetInfoByNetWorkRsp> rsp = std::make_shared<GetInfoByNetWorkRsp>();
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
 

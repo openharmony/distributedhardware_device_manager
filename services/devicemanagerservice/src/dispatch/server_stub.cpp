@@ -20,8 +20,7 @@
 #include "iproxy_server.h"
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
-
-#include "message_def.h"
+#include "ipc_def.h"
 #include "device_manager_service.h"
 
 namespace {

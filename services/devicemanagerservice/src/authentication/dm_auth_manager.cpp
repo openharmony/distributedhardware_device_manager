@@ -26,10 +26,7 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
-#ifdef SUPPORT_GRAPHICS
 #include "show_confirm.h"
-
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -342,14 +339,17 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
+
+    int32_t pinCode = GeneratePincode();
     nlohmann::json jsonObj;
-    jsonObj[PIN_CODE_KEY] = GeneratePincode();
+    jsonObj[PIN_CODE_KEY] = pinCode;
     jsonObj[PIN_TOKEN] = authResponseContext_->token;
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
     jsonObj[NFC_CODE_KEY] = GenerateGroupName();
     authResponseContext_->authToken = jsonObj.dump();
     LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     authResponseContext_->groupId = groupId;
+    authResponseContext_->code = pinCode;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -563,7 +563,6 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         return DM_FAILED;
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
-#ifdef SUPPORT_GRAPHICS
     std::shared_ptr<IAuthentication> ptr;
     if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
@@ -571,7 +570,6 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
     }
     ptr = authenticationMap_[authResponseContext_->authType];
     ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
-#endif
     return DM_OK;
 }
 
@@ -600,7 +598,6 @@ void DmAuthManager::AuthenticateFinish()
 {
     LOGI("DmAuthManager::AuthenticateFinish start");
     if (authResponseState_ != nullptr) {
-#ifdef SUPPORT_GRAPHICS
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH) {
             std::shared_ptr<IAuthentication> ptr;
             if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
@@ -610,7 +607,6 @@ void DmAuthManager::AuthenticateFinish()
             ptr = authenticationMap_[authResponseContext_->authType];
             ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
         }
-#endif
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
@@ -634,7 +630,6 @@ void DmAuthManager::AuthenticateFinish()
         } else {
             authRequestContext_->reason = authResponseContext_->reply;
         }
-#ifdef SUPPORT_GRAPHICS
         if (authResponseContext_->state == AuthState::AUTH_REQUEST_INPUT) {
             std::shared_ptr<IAuthentication> ptr;
             if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
@@ -644,7 +639,6 @@ void DmAuthManager::AuthenticateFinish()
             ptr = authenticationMap_[authResponseContext_->authType];
             ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
         }
-#endif
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
 
@@ -734,7 +728,6 @@ int32_t DmAuthManager::GetPinCode()
 
 void DmAuthManager::ShowConfigDialog()
 {
-#ifdef SUPPORT_GRAPHICS
     LOGI("ShowConfigDialog start");
     dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
@@ -746,8 +739,7 @@ void DmAuthManager::ShowConfigDialog()
     std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
     showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
     LOGI("ShowConfigDialog end");
-#endif
-    }
+}
 
 void DmAuthManager::ShowAuthInfoDialog()
 {
@@ -793,7 +785,6 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
     authParam.authToken = authResponseContext_->token;
 
     if (role == AbilityRole::ABILITY_ROLE_PASSIVE) {
-        authResponseContext_->code = GeneratePincode();
         authParam.packageName = authResponseContext_->targetPkgName;
         authParam.appName = authResponseContext_->appName;
         authParam.appDescription = authResponseContext_->appDesc;
