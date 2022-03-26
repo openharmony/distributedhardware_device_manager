@@ -21,27 +21,27 @@
 #include <memory>
 #include <list>
 #include "single_instance.h"
-#include "message_req.h"
-#include "message_rsp.h"
+#include "ipc_req.h"
+#include "ipc_rsp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 #define DEVICEMANAGER_MESSAGE_FAILED (-1)
-static int32_t GetTrustedDeviceList(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t GetLocalDeviceInfo(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t GetUdidByNetworkId(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t GetUuidByNetworkId(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t StartDeviceDiscovery(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t StopDeviceDiscovery(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t SetUserOperation(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t GetFaParam(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t AuthenticateDevice(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t UnAuthenticateDevice(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
-static int32_t VerifyAuthentication(const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
+static int32_t GetTrustedDeviceList(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t GetLocalDeviceInfo(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t GetUdidByNetworkId(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t GetUuidByNetworkId(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t StartDeviceDiscovery(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t StopDeviceDiscovery(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t SetUserOperation(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t GetFaParam(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t AuthenticateDevice(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t UnAuthenticateDevice(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
+static int32_t VerifyAuthentication(const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
 
 typedef struct {
     int32_t cmdCode;
-    int32_t (*MsgProcess) (const std::shared_ptr<MessageReq> &req, const std::shared_ptr<MessageRsp> &rsp);
+    int32_t (*MsgProcess) (const std::shared_ptr<IpcReq> &req, const std::shared_ptr<IpcRsp> &rsp);
 } CmdMap;
 
 static const CmdMap g_cmdMap[] = {
@@ -61,8 +61,8 @@ static const CmdMap g_cmdMap[] = {
 class CommandDispatch {
 DECLARE_SINGLE_INSTANCE(CommandDispatch);
 public:
-    int32_t MessageSendCmd(int32_t cmdCode, const std::shared_ptr<MessageReq> &req,
-                           const std::shared_ptr<MessageRsp> &rsp);
+    int32_t MessageSendCmd(int32_t cmdCode, const std::shared_ptr<IpcReq> &req,
+                           const std::shared_ptr<IpcRsp> &rsp);
     void AddPkgName(const std::string &pkgName);
     void DeletePkgName(const std::string &pkgName);
     const std::list<std::string>& GetPkgNameList() const;
