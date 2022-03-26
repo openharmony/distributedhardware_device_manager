@@ -21,6 +21,7 @@
 
 #include "mock/mock_ipc_client_manager.h"
 #include "ipc_client_manager.h"
+#include "device_manager_callback.h"
 namespace OHOS {
 namespace DistributedHardware {
 class IpcClientManagerTest : public testing::Test {
@@ -29,6 +30,15 @@ public:
     static void TearDownTestCase();
     virtual void SetUp() override;
     virtual void TearDown() override;
+};
+
+class DmInitCallbackTest : public DmInitCallback {
+public:
+    explicit DmInitCallbackTest(int &count);
+    virtual ~DmInitCallbackTest() override {}
+    virtual void OnRemoteDied() override;
+private:
+    int *count_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

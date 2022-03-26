@@ -95,8 +95,8 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp
             return DM_IPC_TRANSACTION_FAILED;
         }
         for (int32_t i = 0; i < deviceNum; ++i) {
-            pDmDeviceinfo = pDmDeviceinfo + i;
             deviceInfoVec.emplace_back(*pDmDeviceinfo);
+            pDmDeviceinfo = ++pDmDeviceinfo;
         }
         pRsp->SetDeviceVec(deviceInfoVec);
     }

@@ -41,6 +41,43 @@ std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusCon
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
 /**
+ * @tc.name: AuthResponseInitState::Leave_001
+ * @tc.desc: 1 set authManager not null
+ *           2 call AuthResponseInitState::Leave with authManager ！= null
+ *           3 check ret is authResponseState->authManager_.use_count()
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthResponseStateTest, Leave_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
+    int32_t ret = authResponseState->Leave();
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthRequestInitState::GetAuthContext_001
+ * @tc.desc: 1 set authManager not null
+ *           2 call AuthRequestInitState::GetAuthContext with authManager ！= null
+ *           3 check ret is authResponseState->authManager_.use_count()
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthResponseStateTest, GetAuthContext_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
+    std::shared_ptr<DmAuthResponseContext> context =  std::make_shared<DmAuthResponseContext>();
+    authResponseState->GetAuthContext();
+    int32_t ret = authResponseState->context_.use_count();
+    authResponseState->context_.reset();
+    ASSERT_EQ(ret, 0);
+}
+
+/**
  * @tc.name: AuthResponseInitState::SetAuthManager_001
  * @tc.desc: 1 set authManager not null
  *           2 call AuthResponseInitState::SetAuthManager with authManager ！= null

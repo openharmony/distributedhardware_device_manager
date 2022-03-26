@@ -46,12 +46,42 @@ void IpcClientManagerTest::TearDownTestCase()
 }
 
 namespace {
+    /**
+ * @tc.name: OnRemoteDied_001
+ * @tc.desc: 1. new a dmInterface
+ *           2. set IpcClientManager dmInterface_ not null
+ *           3. call ClientInit
+ *           4. check ret is DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcClientManagerTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
+{
+    // 1. set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
+    // 2. set checkMap null
+    std::shared_ptr<DmInitCallback> checkMap = nullptr;
+    // 3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
+    DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
+    // 4. Get checkMap from DeviceManagerNotify
+    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
+    // 5. check checkMap not null
+    ASSERT_NE(checkMap, nullptr);
+    // 6. call DeviceManagerNotify OnRemoteDied
+    DeviceManagerNotify::GetInstance().OnRemoteDied();
+    // 7. check if dmInitCallback OnRemoteDied called
+    ASSERT_EQ(count, 1);
+}
+
 /**
  * @tc.name: ClientInit_001
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is DM_OK
+ *           4. check ret is not DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -66,8 +96,8 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
     instance->dmInterface_ = dmInterface;
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is DM_OK
-    ASSERT_NE(ret, DM_INIT_FAILED);
+    // 4. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 
 /**
@@ -75,7 +105,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is DM_OK
+ *           4. check ret is not DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -84,8 +114,8 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is DM_OK
-    ASSERT_NE(ret, DM_INIT_FAILED);
+    // 4. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 
 /**
@@ -94,7 +124,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
  *           2. set a pkgName not null
  *           3. add listener and pkgName in dmListener_ Map
  *           4. call Init with pkgName
- *           5. check ret is DM_OK
+ *           5. check ret is not DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -109,8 +139,8 @@ HWTEST_F(IpcClientManagerTest, Init_001, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 4. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
-    // 5. check ret is DM_OK
-    ASSERT_NE(ret, DM_INIT_FAILED);
+    // 5. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 
 /**
@@ -579,5 +609,15 @@ HWTEST_F(IpcClientManagerTest, IsInit_002, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, false);
 }
 } // namespace
+
+DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()
+{
+    count_ = &count;
+}
+
+void DmInitCallbackTest::OnRemoteDied()
+{
+     *count_ = *count_ + 1;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

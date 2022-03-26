@@ -105,8 +105,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_002, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 4. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 
 /**
@@ -145,8 +145,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_003, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 4. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 
 /**
@@ -185,8 +185,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_004, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 4. check ret is not DM_FAILED
+    ASSERT_NE(ret, DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

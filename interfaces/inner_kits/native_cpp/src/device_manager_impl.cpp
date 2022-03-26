@@ -14,6 +14,7 @@
  */
 
 #include "device_manager_impl.h"
+#include <unistd.h>
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -51,7 +52,20 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
         return DM_INVALID_VALUE;
     }
 
-    int32_t ret = ipcClientProxy_->Init(pkgName);
+    int32_t ret = DM_OK;
+    int32_t retryNum = 0;
+    while (retryNum < SERVICE_INIT_TRY_MAX_NUM) {
+        ret = ipcClientProxy_->Init(pkgName);
+        if (ret != DM_NOT_INIT) {
+            break;
+        }
+        usleep(SLEEP_TIME_MS);
+        retryNum++;
+        if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
+            LOGE("InitDeviceManager error: wait for device manager service starting timeout.");
+            return DM_NOT_INIT;
+        }
+    }
     if (ret != DM_OK) {
         LOGE("InitDeviceManager error: proxy init failed ret: %d", ret);
         return DM_INIT_FAILED;

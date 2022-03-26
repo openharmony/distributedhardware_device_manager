@@ -41,6 +41,37 @@ std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusCon
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
 /**
+ * @tc.name: AuthMessageProcessor::AuthMessageProcessor_001
+ * @tc.desc: 1 set cryptoAdapter_ to null
+ *           2 call AuthMessageProcessor::AuthMessageProcessor_001 with cryptoAdapter_ = nullptr
+ *           3 check ret is authMessageProcessor->CreateNegotiateMessage(jsonObj);
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> Test =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    ASSERT_NE(Test, nullptr);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::AuthMessageProcessor_001
+ * @tc.desc: 1 set cryptoAdapter_ to null
+ *           2 call AuthMessageProcessor::AuthMessageProcessor_001 with cryptoAdapter_ = nullptr
+ *           3 check ret is authMessageProcessor->CreateNegotiateMessage(jsonObj);
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> Test =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    Test.reset();
+    EXPECT_EQ(Test, nullptr);
+}
+
+/**
  * @tc.name: AuthMessageProcessor::CreateNegotiateMessage_001
  * @tc.desc: 1 set cryptoAdapter_ to null
  *           2 call AuthMessageProcessor::CreateNegotiateMessage_001 with cryptoAdapter_ = nullptr

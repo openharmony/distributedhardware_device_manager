@@ -87,7 +87,7 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_001, testing::ext::TestSize.Level0)
  *              set MessageParcel not null
  *           2. set set code is SERVER_DEVICE_FA_NOTIFY
  *           3. call IpcClientStub OnRemoteRequest with parameter
- *           4. check result is DM_OK
+ *           4. check result is ERR_INVALID_STATE
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -104,8 +104,8 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> instance = new IpcClientStub();
     // 3. call IpcClientStub OnRemoteRequest with parameter
     int ret = instance->OnRemoteRequest(code, data, reply, option);
-    // 4. check result is DM_OK
-    ASSERT_NE(ret, DM_OK);
+    // 4. check result is ERR_INVALID_STATE
+    ASSERT_EQ(ret, ERR_INVALID_STATE);
 }
 
 /**

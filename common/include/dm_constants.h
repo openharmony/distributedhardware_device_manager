@@ -134,6 +134,8 @@ const std::string CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t AUTH_REPLY_ACCEPT = 0;
 const int32_t ENCRYPT_TAG_LEN = 32;
+const int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
+const int32_t SLEEP_TIME_MS = 50000; // 50ms
 
 // pin
 const int32_t DISPLAY_OWNER_SYSTEM = 0;

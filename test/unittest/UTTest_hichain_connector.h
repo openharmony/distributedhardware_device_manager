@@ -12,24 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_UTTEST_HICHAIN_CONNECTOR_H
+#define OHOS_UTTEST_HICHAIN_CONNECTOR_H
 
-#ifndef OHOS_MOCK_IPC_CLIENT_PROXY_H
-#define OHOS_MOCK_IPC_CLIENT_PROXY_H
-
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <refbase.h>
+#include <string>
+#include <memory>
+#include <cstdint>
+#include <map>
+#include <vector>
 
-#include "ipc_client_proxy.h"
+#include "nlohmann/json.hpp"
+#include "device_auth.h"
+#include "single_instance.h"
+#include "hichain_connector_callback.h"
+#include "device_manager_service_listener.h"
+#include "dm_auth_manager.h"
+#include "dm_device_state_manager.h"
+#include "hichain_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class MockIpcClientProxy : public IpcClientProxy, public RefBase {
+class HichainConnectorTest : public testing::Test {
 public:
-    MOCK_METHOD1(Init, int32_t(const std::string &pkgName));
-    MOCK_METHOD1(UnInit, int32_t(const std::string &pkgName));
-    MOCK_METHOD3(SendRequest, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    virtual void SetUp() override;
+    virtual void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif // OHOS_MOCK_IPC_CLIENT_PROXY_H
+#endif // OHOS_HICHAIN_CONNECTOR_H
