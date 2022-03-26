@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,23 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MOCK_IPC_CLIENT_PROXY_H
-#define OHOS_MOCK_IPC_CLIENT_PROXY_H
+#ifndef OHOS_IPC_CMD_REGISTER_TEST_H
+#define OHOS_IPC_CMD_REGISTER_TEST_H
 
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <refbase.h>
 
-#include "ipc_client_proxy.h"
+#include <cstdint>
+#include <unordered_map>
+#include <memory>
 
+#include "ipc_cmd_register.h"
+#include "iremote_broker.h"
+#include "single_instance.h"
+
+#include "ipc_types.h"
+#include "ipc_req.h"
+#include "ipc_rsp.h"
 namespace OHOS {
 namespace DistributedHardware {
-class MockIpcClientProxy : public IpcClientProxy, public RefBase {
+class IpcCmdRegisterTest : public testing::Test {
 public:
-    MOCK_METHOD1(Init, int32_t(const std::string &pkgName));
-    MOCK_METHOD1(UnInit, int32_t(const std::string &pkgName));
-    MOCK_METHOD3(SendRequest, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    virtual void SetUp() override;
+    virtual void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
 
-#endif // OHOS_MOCK_IPC_CLIENT_PROXY_H
+#endif //  OHOS_IPC_CMD_REGISTER_TEST_H

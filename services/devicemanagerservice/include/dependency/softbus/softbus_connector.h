@@ -32,6 +32,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+void DeviceOnLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
+    DmDeviceInfo deviceInfo);
+void DeviceOffLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap,
+    DmDeviceInfo deviceInfo);
 class SoftbusConnector {
 public:
     static void OnPublishSuccess(int publishId);

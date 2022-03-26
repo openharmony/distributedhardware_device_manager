@@ -335,6 +335,198 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestS
     int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
     EXPECT_EQ(ret, DM_NOT_INIT);
 }
+
+/**
+ * @tc.name: GetUdidByNetworkId_001
+ * @tc.desc: Make success for GetUdidByNetworkId，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = true;
+    std::string pkgName = "com.ohos.test";
+    std::string netWorkId = "";
+    std::string udid = "";
+    int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetUdidByNetworkId_002
+ * @tc.desc: Make not init for GetUdidByNetworkId，The return value is
+ * DM_NOT_INIT
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = false;
+    std::string pkgName = "com.ohos.test";
+    std::string netWorkId = "";
+    std::string udid = "";
+    int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
+    EXPECT_EQ(ret, DM_NOT_INIT);
+}
+
+/**
+ * @tc.name: GetUdidByNetworkId_003
+ * @tc.desc: Make pkgName empty for GetUdidByNetworkId，The return value is
+ * DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = true;
+    std::string pkgName = "";
+    std::string netWorkId = "";
+    std::string udid = "";
+    int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
+    EXPECT_EQ(ret, DM_INPUT_PARA_EMPTY);
+}
+
+/**
+ * @tc.name: GetUuidByNetworkId_001
+ * @tc.desc: Make success for GetUuidByNetworkId，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = true;
+    std::string pkgName = "com.ohos.test";
+    std::string netWorkId = "";
+    std::string uuid = "";
+    int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetUuidByNetworkId_002
+ * @tc.desc: Make not init for GetUuidByNetworkId，The return value is
+ * DM_NOT_INIT
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = false;
+    std::string pkgName = "com.ohos.test";
+    std::string netWorkId = "";
+    std::string uuid = "";
+    int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
+    EXPECT_EQ(ret, DM_NOT_INIT);
+}
+
+/**
+ * @tc.name: GetUuidByNetworkId_003
+ * @tc.desc: Make pkgName empty for GetUuidByNetworkId，The return value is
+ * DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().intFlag_ = true;
+    std::string pkgName = "";
+    std::string netWorkId = "";
+    std::string uuid = "";
+    int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
+    EXPECT_EQ(ret, DM_INPUT_PARA_EMPTY);
+}
+
+/**
+ * @tc.name: GetFaParam_001
+ * @tc.desc: Make success for GetFaParam，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetFaParam_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    DmAuthParam authParam;
+    int ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetFaParam_002
+ * @tc.desc: Make pkgName empty for GetFaParam, The return value is
+ * DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetFaParam_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    DmAuthParam authParam;
+    int ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
+    EXPECT_EQ(ret, DM_INPUT_PARA_EMPTY);
+}
+
+/**
+ * @tc.name: SetUserOperation_001
+ * @tc.desc: Make success for SetUserOperation，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t action = 0;
+    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: SetUserOperation_002
+ * @tc.desc: Make pkgName empty for SetUserOperation，The return value is
+ * DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    int32_t action = 0;
+    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action);
+    EXPECT_EQ(ret, DM_INPUT_PARA_EMPTY);
+}
+
+/**
+ * @tc.name: RegisterDevStateCallback_001
+ * @tc.desc: Make success for RegisterDevStateCallback，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, RegisterDevStateCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string extra = "extra";
+    int ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UnRegisterDevStateCallback_001
+ * @tc.desc: Make success for UnRegisterDevStateCallback，The return value is
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, UnRegisterDevStateCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string extra = "extra";
+    int ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

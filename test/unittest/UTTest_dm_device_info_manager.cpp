@@ -51,8 +51,44 @@ std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager = std::make_shared<DmD
  */
 HWTEST_F(DeviceManagerImplTest, DmDeviceInfoManager_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDeviceInfoManager> p = std::make_shared<DmDeviceInfoManager>(softbusConnector);
-    ASSERT_NE(p, nullptr);
+    std::shared_ptr<DmDeviceInfoManager> deviceInfoManager = std::make_shared<DmDeviceInfoManager>(softbusConnector);
+    ASSERT_NE(deviceInfoManager, nullptr);
+}
+
+/**
+ * @tc.name: GetTrustedDeviceList_001
+ * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * to construct an environment where the device has been discovered, and stop discovering
+ * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DM_OK;
+    std::string pkgName = "";
+    std::string extra = "";
+    std::vector<DmDeviceInfo> deviceList;
+    std::shared_ptr<DmDeviceInfoManager> deviceInfoManager = std::make_shared<DmDeviceInfoManager>(softbusConnector);
+    ret = deviceInfoManager->GetTrustedDeviceList(pkgName, extra, deviceList);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceInfo_001
+ * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * to construct an environment where the device has been discovered, and stop discovering
+ * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo deviceInfo;
+    int32_t ret = DM_OK;
+    std::shared_ptr<DmDeviceInfoManager> deviceInfoManager = std::make_shared<DmDeviceInfoManager>(softbusConnector);
+    ret = deviceInfoManager->GetLocalDeviceInfo(deviceInfo);
+    ASSERT_EQ(ret, DM_OK);
 }
 }
 } // namespace DistributedHardware

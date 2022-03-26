@@ -107,6 +107,69 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnVerifyAuthResult_001, testing::ext:
     std::string ret = pReq->GetDeviceId();
     EXPECT_EQ(ret, deviceId);
 }
+/**
+ * @tc.name: OnDeviceFound_001
+ * @tc.desc: OnDeviceFound,construct a dummy listener, pass in pkgName, subscribeId, info
+ * deviceId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    DmDeviceInfo info = {
+        .deviceId = "dkdkd",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    uint16_t subscribeId = 1;
+    listener_->OnDeviceFound(pkgName, subscribeId, info);
 }
+
+/**
+ * @tc.name: OnDiscoveryFailed_001
+ * @tc.desc: OnDeviceFound,construct a dummy listener, pass in pkgName, subscribeId, failedReason
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string deviceId = "dkdkd";
+    uint16_t subscribeId = 1;
+    int32_t failedReason = 1;
+    listener_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
+}
+
+/**
+ * @tc.name: OnDiscoverySuccess_001
+ * @tc.desc: OnDeviceFound,construct a dummy listener, pass in pkgName, subscribeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    uint16_t subscribeId = 1;
+    listener_->OnDiscoverySuccess(pkgName, subscribeId);
+}
+
+/**
+ * @tc.name: OnFaCall_001
+ * @tc.desc: OnFaCall, construct a dummy listener, pass in pkgName, paramJson
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnFaCall_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string paramJson = "ahaha";
+    listener_->OnFaCall(pkgName, paramJson);
+}
+} // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
