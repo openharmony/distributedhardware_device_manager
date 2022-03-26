@@ -38,11 +38,11 @@ void SoftbusSessionTest::TearDownTestCase()
 
 namespace {
 std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
-std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-std::shared_ptr<DmAuthManager> discoveryMgr_ =
-    std::make_shared<DmAuthManager>(softbusConnector, listener_, hiChainConnector);
+std::shared_ptr<DmAuthManager> discoveryMgr =
+    std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
 
 /**
  * @tc.name: OpenAuthSession_001
@@ -98,7 +98,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
     jsonObj[TAG_TYPE] = msgType;
     std::string message = jsonObj.dump();
     int32_t sessionId = 0;
-    softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr_));
+    softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr));
     int ret = softbusSession->SendData(sessionId, message);
     EXPECT_EQ(ret, DM_FAILED);
 }
