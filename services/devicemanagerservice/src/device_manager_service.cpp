@@ -315,5 +315,10 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
     deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
     return DM_OK;
 }
+
+bool DeviceManagerService::IsServiceInitialized()
+{
+    return intFlag_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

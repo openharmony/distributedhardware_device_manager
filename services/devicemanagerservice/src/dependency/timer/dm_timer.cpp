@@ -30,6 +30,7 @@ DmTimer::DmTimer(const std::string &name)
 {
     if (name.empty() || name.find(TIMER_PREFIX) != TIMER_DEFAULT) {
         LOGE("DmTimer name is null");
+        mTimerName_ = "";
         return;
     }
 
@@ -50,15 +51,17 @@ DmTimer::~DmTimer()
         LOGE("DmTimer is not init");
         return;
     }
+    LOGI("DmTimer %s destroy in", mTimerName_.c_str());
+    Stop(0);
 
-    LOGI("DmTimer %s Destroy in", mTimerName_.c_str());
+    std::lock_guard<std::mutex> lock(mTimerLock_);
     Release();
 }
 
 DmTimerStatus DmTimer::Start(uint32_t timeOut, TimeoutHandle handle, void *data)
 {
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT
-        || handle == nullptr || data == nullptr) {
+    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT || handle == nullptr ||
+        data == nullptr) {
         LOGE("DmTimer is not init or param empty");
         return DmTimerStatus::DM_STATUS_FINISH;
     }
@@ -84,8 +87,7 @@ DmTimerStatus DmTimer::Start(uint32_t timeOut, TimeoutHandle handle, void *data)
 
 void DmTimer::Stop(int32_t code)
 {
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT
-            || mHandleData_ == nullptr) {
+    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT || mHandleData_ == nullptr) {
         LOGE("DmTimer is not init");
         return;
     }
@@ -106,31 +108,22 @@ void DmTimer::WaitForTimeout()
     }
     LOGI("DmTimer %s start timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
 
-    int32_t nfds = -1;
-    {
-        std::lock_guard<std::mutex> lock(mTimerLock_);
-        nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
-        LOGI("DmTimer is triggering");
-        if (nfds > 0) {
-            char event = 0;
-            if (mEvents_[0].events & EPOLLIN) {
-                int num = read(mTimeFd_[0], &event, 1);
-                if (num > 0) {
-                    LOGI("DmTimer %s exit with event %d", mTimerName_.c_str(), event);
-                } else {
-                    LOGE("DmTimer %s exit with errno %d", mTimerName_.c_str(), errno);
-                }
-            }
+    std::lock_guard<std::mutex> lock(mTimerLock_);
+    int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
+    LOGI("DmTimer is triggering");
+    if (nfds > 0) {
+        char event = 0;
+        if (mEvents_[0].events & EPOLLIN) {
+            int num = read(mTimeFd_[0], &event, 1);
+            LOGD("DmTimer %s exit with num=%d, event=%d, errno=%d", mTimerName_.c_str(), num, event, errno);
         }
-    }
-
-    if (nfds == 0 && mHandleData_ != nullptr) {
-        mHandle_(mHandleData_, *this);
-        LOGI("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
-    } else if (nfds < 0) {
-        LOGE("DmTimer %s epoll_wait returned n=%d, error: %d", mTimerName_.c_str(), nfds, errno);
+    } else if (nfds == 0) {
+        if (mHandleData_ != nullptr) {
+            mHandle_(mHandleData_, *this);
+            LOGI("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
+        }
     } else {
-        LOGI("DmTimer %s end timer", mTimerName_.c_str());
+        LOGI("DmTimer %s epoll_wait return nfds=%d, errno=%d", mTimerName_.c_str(), nfds, errno);
     }
     Release();
 }
@@ -141,14 +134,15 @@ int32_t DmTimer::CreateTimeFd()
         LOGE("DmTimer is not init");
         return DM_STATUS_FINISH;
     }
-
     LOGI("DmTimer %s creatTimeFd", mTimerName_.c_str());
+
     int ret = pipe(mTimeFd_);
     if (ret < 0) {
         LOGE("DmTimer %s CreateTimeFd fail:(%d) errno(%d)", mTimerName_.c_str(), ret, errno);
         return ret;
     }
 
+    std::lock_guard<std::mutex> lock(mTimerLock_);
     mEv_.data.fd = mTimeFd_[0];
     mEv_.events = EPOLLIN | EPOLLET;
     mEpFd_ = epoll_create(MAX_EVENTS);
@@ -156,7 +150,6 @@ int32_t DmTimer::CreateTimeFd()
     if (ret != 0) {
         Release();
     }
-
     return ret;
 }
 
@@ -166,11 +159,10 @@ void DmTimer::Release()
         LOGE("DmTimer is not init");
         return;
     }
+    LOGI("DmTimer %s release in", mTimerName_.c_str());
 
-    std::lock_guard<std::mutex> lock(mTimerLock_);
-    LOGI("DmTimer %s Release in", mTimerName_.c_str());
     if (mStatus_ == DmTimerStatus::DM_STATUS_INIT) {
-        LOGE("DmTimer %s already Release", mTimerName_.c_str());
+        LOGE("DmTimer %s already release", mTimerName_.c_str());
         return;
     }
 
@@ -180,6 +172,7 @@ void DmTimer::Release()
     if (mEpFd_ >= 0) {
         close(mEpFd_);
     }
+    mTimerName_ = "";
     mTimeOutSec_ = 0;
     mHandle_ = nullptr;
     mHandleData_ = nullptr;

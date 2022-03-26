@@ -922,47 +922,36 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 {
     LOGE("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
-        auto iter = g_deviceStateCallbackMap.find(bundleName);
-        if (iter == g_deviceStateCallbackMap.end()) {
-            auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
-            std::string extra = "";
-            int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra, callback);
-            if (ret != 0) {
-                LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
-                return;
-            }
-            g_deviceStateCallbackMap[bundleName] = callback;
+        auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
+        std::string extra = "";
+        int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra, callback);
+        if (ret != 0) {
+            LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+            return;
         }
+        g_deviceStateCallbackMap.erase(bundleName);
+        g_deviceStateCallbackMap[bundleName] = callback;
         return;
     }
 
     if (eventType == DM_NAPI_EVENT_DEVICE_FOUND || eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL) {
-        std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
-        auto iter = g_DiscoveryCallbackMap.find(bundleName);
-        if (iter == g_DiscoveryCallbackMap.end()) {
-            auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
-            g_DiscoveryCallbackMap[bundleName] = callback;
-            DiscoveryCallback = callback;
-        } else {
-            DiscoveryCallback = iter->second;
-        }
-
-        DiscoveryCallback->IncreaseRefCount();
+        auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
+        g_DiscoveryCallbackMap.erase(bundleName);
+        g_DiscoveryCallbackMap[bundleName] = callback;
+        std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = callback;
+        discoveryCallback->IncreaseRefCount();
         return;
     }
 
     if (eventType == DM_NAPI_EVENT_DMFA_CALLBACK) {
-        auto iter = g_dmfaCallbackMap.find(bundleName);
-        if (iter == g_dmfaCallbackMap.end()) {
-            auto callback = std::make_shared<DmNapiDeviceManagerFaCallback>(env, bundleName);
-            int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName, callback);
-            if (ret != 0) {
-                LOGE("RegisterDeviceManagerFaCallback failed for bunderName %s", bundleName.c_str());
-                return;
-            }
-            g_dmfaCallbackMap[bundleName] = callback;
+        auto callback = std::make_shared<DmNapiDeviceManagerFaCallback>(env, bundleName);
+        int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName, callback);
+        if (ret != 0) {
+            LOGE("RegisterDeviceManagerFaCallback failed for bunderName %s", bundleName.c_str());
+            return;
         }
-        return;
+        g_dmfaCallbackMap.erase(bundleName);
+        g_dmfaCallbackMap[bundleName] = callback;
     }
 }
 
@@ -972,16 +961,14 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
     LOGE("CreateDmCallback for bundleName %s eventType %s extra=%s",
          bundleName.c_str(), eventType.c_str(), extra.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
-        auto iter = g_deviceStateCallbackMap.find(bundleName);
-        if (iter == g_deviceStateCallbackMap.end()) {
-            auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
-            int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra, callback);
-            if (ret != 0) {
-                LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
-                return;
-            }
-            g_deviceStateCallbackMap[bundleName] = callback;
+        auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
+        int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra, callback);
+        if (ret != 0) {
+            LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+            return;
         }
+        g_deviceStateCallbackMap.erase(bundleName);
+        g_deviceStateCallbackMap[bundleName] = callback;
     }
 }
 

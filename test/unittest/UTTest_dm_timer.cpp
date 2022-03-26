@@ -17,6 +17,7 @@
 #include <string>
 #include <unistd.h>
 
+#include "dm_constants.h"
 #include "dm_timer.h"
 #include "UTTest_dm_timer.h"
 
@@ -59,7 +60,7 @@ HWTEST_F(DmTimerTest, DmTimer_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, DmTimer_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "123";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "123";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     EXPECT_EQ(DmTimerStatus::DM_STATUS_INIT, Timer_->mStatus_);
     EXPECT_EQ(0, Timer_->mTimeOutSec_);
@@ -69,33 +70,7 @@ HWTEST_F(DmTimerTest, DmTimer_002, testing::ext::TestSize.Level0)
     EXPECT_EQ(0, Timer_->mEv_.events);
     EXPECT_EQ(0, Timer_->mEvents_[0].events);
     EXPECT_EQ(0, Timer_->mEpFd_);
-    EXPECT_EQ("123", Timer_->mTimerName_);
-}
-
-/**
- * @tc.name: DmTimerTest::DisStructDmTimer_001
- * @tc.desc: to check when mTimerName_ is empty
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmTimerTest, DisStructDmTimer_001, testing::ext::TestSize.Level0)
-{
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->~DmTimer();
-}
-
-/**
- * @tc.name: DmTimerTest::DisStructDmTimer_002
- * @tc.desc: to check when mTimerName_ is not empty
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmTimerTest, DisStructDmTimer_002, testing::ext::TestSize.Level0)
-{
-    const std::string DM_TIMER_TASK = "123";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->~DmTimer();
+    EXPECT_EQ(DM_TIMER_TASK, Timer_->mTimerName_);
 }
 
 /**
@@ -129,7 +104,7 @@ static void TimeOutTest(void *data, DmTimer& timer)
 
 HWTEST_F(DmTimerTest, Start_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "1234";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "1234";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     uint32_t timeOut = 10;
     int idx = 1;
@@ -161,7 +136,7 @@ HWTEST_F(DmTimerTest, Stop_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, Stop_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "111";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     int32_t code = 1;
     Timer_->Stop(code);
@@ -203,7 +178,7 @@ HWTEST_F(DmTimerTest, WaitForTimeout_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, WaitForTimeout_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "111";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     Timer_->WaitForTimeout();
 }
@@ -230,7 +205,7 @@ HWTEST_F(DmTimerTest, CreateTimeFd_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, CreateTimeFd_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "123";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "123";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     Timer_->CreateTimeFd();
 }
@@ -256,7 +231,7 @@ HWTEST_F(DmTimerTest, Release_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, Release_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "111";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     Timer_->mStatus_ = DmTimerStatus::DM_STATUS_INIT;
     Timer_->Release();
@@ -270,10 +245,10 @@ HWTEST_F(DmTimerTest, Release_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmTimerTest, GetTimerName_001, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "111";
+    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
     std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
     std::string strTimer = Timer_->GetTimerName();
-    EXPECT_EQ("111", strTimer);
+    EXPECT_EQ(DM_TIMER_TASK, strTimer);
 }
 }
 }

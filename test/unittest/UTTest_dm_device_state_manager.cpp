@@ -108,25 +108,6 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: OnDeviceOffline_001
- * @tc.desc: set info.deviceId to some para, and return it
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, OnDeviceOffline_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
-    dmDeviceStateManager->OnDeviceOffline(pkgName, info);
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
-        std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
-    EXPECT_EQ(result, 0);
-}
-
-/**
  * @tc.name: OnDeviceChanged_001
  * @tc.desc: set info.deviceId to some para, and return it
  * @tc.type: FUNC
@@ -234,25 +215,6 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterProfileListener_001, testing::ext::Te
 }
 
 /**
- * @tc.name: UnRegisterProfileListener_001
- * @tc.desc: call UnRegisterProfileListener and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, UnRegisterProfileListener_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "123";
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->RegisterOffLineTimer(info);
-    int ret = dmDeviceStateManager->UnRegisterProfileListener(pkgName, info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: PostDeviceOnline_001
  * @tc.desc: call PostDeviceOnline
  * @tc.type: FUNC
@@ -326,33 +288,6 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterOffLineTimer_001, testing::ext::TestS
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->RegisterOffLineTimer(info);
-}
-
-/**
- * @tc.name: StartOffLineTimer_001
- * @tc.desc: call StartOffLineTimer
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, StartOffLineTimer_001, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->StartOffLineTimer(info);
-}
-
-/**
- * @tc.name: DeleteTimeOutGroup_001
- * @tc.desc: call DeleteTimeOutGroup
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level0)
-{
-    dmDeviceStateManager->DeleteTimeOutGroup("123");
 }
 } // namespace
 } // namespace DistributedHardware

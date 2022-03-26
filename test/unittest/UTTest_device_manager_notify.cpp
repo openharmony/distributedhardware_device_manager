@@ -15,7 +15,6 @@
 
 #include "UTTest_device_manager_notify.h"
 #include "device_manager_notify.h"
-#include "device_manager_errno.h"
 #include "dm_device_info.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"

@@ -51,6 +51,7 @@ public:
     int32_t SetUserOperation(std::string &pkgName, int32_t action);
     int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
     int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+    bool IsServiceInitialized();
 private:
     DeviceManagerService() = default;
     bool intFlag_ = false;
