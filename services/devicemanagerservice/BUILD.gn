@@ -29,6 +29,7 @@ if (defined(ohos_lite)) {
         "${services_path}/include/config",
         "${services_path}/include/adapter",
         "${services_path}/include/authentication",
+        "${services_path}/include/authentication/showconfirm/lite",
         "${services_path}/include/ability",
         "${services_path}/include/deviceinfo",
         "${services_path}/include/devicestate",
@@ -49,6 +50,7 @@ if (defined(ohos_lite)) {
         "foundation/multimedia/image_standard/mock/native/include",
         "${services_path}/include/dispatch",
         "${ext_path}/pin_auth/include",
+        "${ext_path}/pin_auth/include/lite",
       ]
 
       include_dirs += [
@@ -77,6 +79,7 @@ if (defined(ohos_lite)) {
         "${services_path}/src/authentication/auth_request_state.cpp",
         "${services_path}/src/authentication/auth_response_state.cpp",
         "${services_path}/src/authentication/dm_auth_manager.cpp",
+        "${services_path}/src/authentication/showconfirm/lite/show_confirm.cpp",
         "${services_path}/src/config/mini/dm_config_manager.cpp",
         "${services_path}/src/config/mini/pin_auth.cpp",
         "${services_path}/src/dependency/hichain/hichain_connector.cpp",

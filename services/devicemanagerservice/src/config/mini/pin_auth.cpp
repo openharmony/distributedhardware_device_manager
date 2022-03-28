@@ -33,6 +33,18 @@ PinAuth::~PinAuth()
 {
 }
 
+int32_t PinAuth::CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager)
+{
+    LOGI("ClosePage hap start");
+    if (authManager == nullptr) {
+        LOGE("PinAuthUi::authManager is null");
+        return DM_FAILED;
+    }
+    LOGI("ClosePage hap end");
+    authManager->CancelDisplay();
+    return DM_OK;
+}
+
 int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("ShowConfigDialog end");
