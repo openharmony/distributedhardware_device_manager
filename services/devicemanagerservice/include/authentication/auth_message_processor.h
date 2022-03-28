@@ -31,7 +31,7 @@ struct DmAuthResponseContext;
 class ICryptoAdapter;
 class AuthMessageProcessor {
 public:
-    AuthMessageProcessor(std::shared_ptr<DmAuthManager> authMgr);
+    explicit AuthMessageProcessor(std::shared_ptr<DmAuthManager> authMgr);
     ~AuthMessageProcessor();
     std::vector<std::string> CreateAuthRequestMessage();
     std::string CreateSimpleMessage(int32_t msgType);
