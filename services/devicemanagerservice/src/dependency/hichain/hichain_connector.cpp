@@ -196,7 +196,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
         LOGE("HiChainConnector::GetGroupInfo group failed, groupNum is 0.");
         return false;
     }
-    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%d)", groupVec, num);
+    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%ud)", groupVec, num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
@@ -297,11 +297,11 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
 char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
     if (operationCode != GroupOperationCode::MEMBER_JOIN) {
-        LOGE("HiChainAuthCallBack::onRequest operationCode %d", operationCode);
+        LOGE("HiChainConnector::onRequest operationCode %d", operationCode);
         return nullptr;
     }
-    int32_t pinCode = hiChainConnectorCallback_->GetPinCode();
     nlohmann::json jsonObj;
+    int32_t pinCode = hiChainConnectorCallback_->GetPinCode();
     if (pinCode == DM_FAILED) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
@@ -324,8 +324,8 @@ int64_t HiChainConnector::GenRequestId()
 
 std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string reqDeviceId)
 {
+    LOGI("HiChainConnector::GetConnectPara get addrInfo");
     std::string connectAddr = hiChainConnectorCallback_->GetConnectAddr(deviceId);
-    LOGE("HiChainConnector::GetConnectPara get addrInfo");
     nlohmann::json jsonObject = nlohmann::json::parse(connectAddr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
@@ -436,7 +436,7 @@ int32_t HiChainConnector::SyncGroups(std::string deviceId, std::vector<std::stri
 int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const std::string &deviceId)
 {
     int64_t requestId = GenRequestId();
-    LOGI("Start to delete memeber from group, requestId %lld, deviceId %s, groupId %s", requestId,
+    LOGI("Start to delete member from group, requestId %lld, deviceId %s, groupId %s", requestId,member
          GetAnonyString(deviceId).c_str(), GetAnonyString(groupId).c_str());
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;

@@ -58,7 +58,7 @@ std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
 std::shared_ptr<DmDiscoveryManager> discoveryMgr = std::make_shared<DmDiscoveryManager>(softbusConnector, listener);
 /**
  * @tc.name: DeviceOnLine_001
- * @tc.desc: go tothe corrort case and return DM_OK
+ * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -101,7 +101,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOnLine_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DeviceOffLine_001
- * @tc.desc: go tothe corrort case and return DM_OK
+ * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -169,7 +169,7 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: Init_001
- * @tc.desc: go tothe corrort case and return DM_OK
+ * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

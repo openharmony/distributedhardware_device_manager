@@ -47,6 +47,10 @@ ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBa
 
 ON_IPC_READ_RESPONSE(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(IpcIoPopInt32(&reply));
     return DM_OK;
 }

@@ -61,7 +61,7 @@ int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityM
 {
     AbilityStatus status = dmAbilityManager->StartAbility(AbilityRole::ABILITY_ROLE_INITIATIVE);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("PinAuthUi::StartFaService timeout");
+        LOGE("PinAuthUi::StartFaUiService timeout");
         return DM_FAILED;
     }
     return DM_OK;
