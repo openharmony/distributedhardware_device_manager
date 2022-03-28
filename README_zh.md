@@ -28,13 +28,13 @@ foundation/distributedhardware/devicemanager
 │   │   └── native_cpp            #内部native接口及实现存放目录
 │   │       ├── include
 │   │       │   ├── ipc           #ipc头文件存放目录
-│   │       │   │   ├── lite      #L1
-│   │       │   │   └── standard  #L2
+│   │       │   │   ├── lite      #small
+│   │       │   │   └── standard  #standard
 │   │       │   └── notify        #ipc回调通知头文件目录
 │   │       └── src
 │   │           ├── ipc           #ipc功能代码
-│   │           │   ├── lite      #L1
-│   │           │   └── standard  #L2
+│   │           │   ├── lite      #small
+│   │           │   └── standard  #standard
 │   │           └── notify        ipc回调通知功能代码
 │   └── kits                      #外接口及实现存放目录
 │       └── js                    #外部JS接口及实现存放目录
@@ -47,20 +47,20 @@ foundation/distributedhardware/devicemanager
 │       │   ├── ability           #与PIN码显示FA拉起管理相关头文件
 │       │   ├── auth              #devie_auth交互相关头文件
 │       │   ├── ipc               #进程间通信相关头文件
-│       │   │   ├── lite          #L1
-│       │   │   └── standard      #L2
+│       │   │   ├── lite          #small
+│       │   │   └── standard      #standard
 │       │   ├── message           #消息数据解析相关头文件
 │       │   ├── requestauth       #设备认证功能相关头文件
 │       │   ├── softbus           #软总线相关头文件
 │       │   └── timer             #定时器处理相关头文件
 │       └── src
 │           ├── ability           #与PIN码显示FA拉起管理相关功能代码
-│           │   ├── lite          #L1
-│           │   └── standard      #L2
+│           │   ├── lite          #small
+│           │   └── standard      #standard
 │           ├── auth              #devie_auth交互相关核心代码
 │           ├── ipc               #进程间通信相功能代码
-│           │   ├── lite          #L1
-│           │   └── standard      #L2
+│           │   ├── lite          #small
+│           │   └── standard      #standard
 │           ├── message           #消息数据解析相功能代码
 │           ├── requestauth       #设备认证功能代码
 │           ├── softbus           #通道建立功能核心代码
@@ -69,14 +69,14 @@ foundation/distributedhardware/devicemanager
     ├── include
     │   ├── cipher                #加解密功能相关头文件
     │   ├── ipc                   #ipc公共头文件存放目录
-    │   │   ├── lite              #L1
-    │   │   └── standard          #L2
+    │   │   ├── lite              #small
+    │   │   └── standard          #standard
     │   └── log                   #log相关头文件存放目录
     └── src
         ├── cipher                #加解密功能代码
         ├── ipc                   #ipc公共功能代码
-        │   ├── lite              #L1
-        │   └── standard          #L2
+        │   ├── lite              #small
+        │   └── standard          #standard
         └── log                   #log相关功能代码
 ```
 
