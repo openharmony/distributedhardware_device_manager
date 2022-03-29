@@ -36,7 +36,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         LOGE("on ipc cmd success");
         return DM_OK;
     }
-    LOGW("unsupport code: %u", code);
+    LOGW("unsupported code: %u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 

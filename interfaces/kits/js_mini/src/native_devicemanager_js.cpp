@@ -569,7 +569,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
     uint8_t *data = nullptr;
     data = JSI::GetTypedArrayInfo(field, type, length, buffer, offset);
     if (type != TypedArrayType::JSI_UINT8_ARRAY || length == 0 || data == nullptr) {
-        LOGE("Invaild AppIconInfo");
+        LOGE("Invalid AppIconInfo");
         return;
     }
     *bufferPtr = (uint8_t*)calloc(sizeof(uint8_t), length);

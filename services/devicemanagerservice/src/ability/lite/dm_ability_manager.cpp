@@ -26,7 +26,7 @@ AbilityRole DmAbilityManager::GetAbilityRole()
 
 AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
 {
-    // not support for L1 yet, do nothing. jsut save status and role
+    // not support for L1 yet, do nothing. just save status and role
     mAbilityStatus_ = role;
     mStatus_ = AbilityStatus::ABILITY_STATUS_SUCCESS;
     return mStatus_;

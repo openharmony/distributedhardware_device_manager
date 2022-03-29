@@ -115,7 +115,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         LOGE("SendData Start failed");
         return DM_FAILED;
     }
-    LOGE("SendData Start success");
+    LOGI("SendData Start success");
     return DM_OK;
 }
 

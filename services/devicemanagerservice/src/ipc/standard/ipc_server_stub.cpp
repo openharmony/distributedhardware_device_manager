@@ -87,10 +87,9 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         return ERR_INVALID_STATE;
     }
 
-    int32_t ret = DM_OK;
-    ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
+    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
-        LOGW("unsupport code: %d", code);
+        LOGW("unsupported code: %d", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     return ret;
@@ -109,7 +108,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     if (ret == DM_IPC_NOT_REGISTER_FUNC) {
-        LOGW("unsupport code: %d", cmdCode);
+        LOGW("unsupported code: %d", cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
     return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
