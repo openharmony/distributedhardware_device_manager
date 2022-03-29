@@ -31,12 +31,15 @@ namespace DistributedHardware {
 void DeviceManagerServiceListenerTest::SetUp()
 {
 }
+
 void DeviceManagerServiceListenerTest::TearDown()
 {
 }
+
 void DeviceManagerServiceListenerTest::SetUpTestCase()
 {
 }
+
 void DeviceManagerServiceListenerTest::TearDownTestCase()
 {
 }

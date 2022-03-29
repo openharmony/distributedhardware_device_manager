@@ -59,7 +59,7 @@ int32_t SoftbusSession::UnRegisterSessionCallback()
 
 int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
 {
-    LOGE("SoftbusSession::OpenAuthSession");
+    LOGI("SoftbusSession::OpenAuthSession");
     int32_t sessionId = -1;
     std::string connectAddr;
     ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(deviceId, connectAddr);
@@ -99,7 +99,7 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
-    LOGE("SendData Start");
+    LOGI("SendData Start");
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("extrasJson error");

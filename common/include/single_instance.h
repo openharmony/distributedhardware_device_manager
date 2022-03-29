@@ -30,6 +30,7 @@ private:                                              \
 
 #define DECLARE_SINGLE_INSTANCE(className)  \
     DECLARE_SINGLE_INSTANCE_BASE(className) \
+                                            \
 private:                                    \
     className() = default;                  \
     ~className() = default;

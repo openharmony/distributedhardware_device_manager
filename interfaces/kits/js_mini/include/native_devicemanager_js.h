@@ -90,6 +90,7 @@ public:
     void IncreaseRefCount();
     void DecreaseRefCount();
     int32_t GetRefCount();
+
 private:
     int32_t refCount_ = 0;
     pthread_mutex_t lock_;
@@ -176,6 +177,7 @@ public:
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);
     static void DeviceInfoToJsArray(const std::vector<OHOS::DistributedHardware::DmDeviceInfo> &vecDevInfo,
                                     const int32_t idx, JSIValue &arrayResult);
+
 private:
     std::string bundleName_;
     static AuthAsyncCallbackInfo authAsyncCallbackInfo_;

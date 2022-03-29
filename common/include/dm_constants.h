@@ -211,4 +211,4 @@ const int32_t TIMER_PREFIX_LENGTH = 19;
 const int32_t TIMER_DEFAULT = 0;
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_DM_CONSTANTS_H

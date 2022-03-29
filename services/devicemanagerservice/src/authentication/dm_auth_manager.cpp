@@ -358,7 +358,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
-    LOGE("DmAuthManager OnMemberJoin start");
+    LOGI("DmAuthManager OnMemberJoin start");
     if (authRequestState_ != nullptr && timerMap_.find(ADD_TIMEOUT_TASK) != timerMap_.end()) {
         timerMap_[ADD_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
@@ -409,7 +409,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 
 void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 {
-    LOGE("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->localDeviceId = localDeviceId;
@@ -426,7 +426,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 {
-    LOGE("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
@@ -467,7 +467,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 {
-    LOGE("DmAuthManager::EstablishAuthChannel session id");
+    LOGI("DmAuthManager::EstablishAuthChannel session id");
     if (timerMap_.find(NEGOTIATE_TIMEOUT_TASK) == timerMap_.end()) {
         return;
     }
@@ -583,7 +583,7 @@ std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 
 int32_t DmAuthManager::JoinNetwork()
 {
-    LOGE("DmAuthManager JoinNetwork start");
+    LOGI("DmAuthManager JoinNetwork start");
     if (timerMap_.find(AUTHENTICATE_TIMEOUT_TASK) == timerMap_.end()) {
         return DM_FAILED;
     }

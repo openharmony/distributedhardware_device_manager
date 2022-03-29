@@ -922,7 +922,7 @@ void DeviceManagerNapi::DmDeviceInfotoJsDeviceInfo(const napi_env &env, const Dm
 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
 {
-    LOGE("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
+    LOGI("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
         std::string extra = "";
@@ -960,7 +960,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
                                          std::string &eventType, std::string &extra)
 {
-    LOGE("CreateDmCallback for bundleName %s eventType %s extra=%s",
+    LOGI("CreateDmCallback for bundleName %s eventType %s extra=%s",
          bundleName.c_str(), eventType.c_str(), extra.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);

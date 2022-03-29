@@ -44,7 +44,7 @@ std::shared_ptr<DmAuthRequestContext> AuthRequestState::GetAuthContext()
 
 int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
 {
-    LOGE("AuthRequestState::TransitionTo");
+    LOGI("AuthRequestState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -129,7 +129,7 @@ int32_t AuthRequestInputState::GetStateType()
 
 int32_t AuthRequestInputState::Enter()
 {
-    LOGE("DmAuthManager::AuthRequestInputState");
+    LOGI("DmAuthManager::AuthRequestInputState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -146,7 +146,7 @@ int32_t AuthRequestJoinState::GetStateType()
 
 int32_t AuthRequestJoinState::Enter()
 {
-    LOGE("DmAuthManager::AuthRequestJoinState");
+    LOGI("DmAuthManager::AuthRequestJoinState");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

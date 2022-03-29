@@ -51,6 +51,7 @@ public:
         listener_ = listener;
     }
 #endif
+
 private:
 #ifdef LITE_DEVICE
     SvcIdentity svcIdentity_;

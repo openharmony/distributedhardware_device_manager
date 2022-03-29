@@ -40,6 +40,7 @@ public:
     int32_t SubscribeProfileEvents(const std::list<std::string> &serviceIds, const std::string &deviceId);
     int32_t UnSubscribeProfileEvents();
     void OnSyncCompleted(const OHOS::DeviceProfile::SyncResult &syncResults) override;
+
 private:
     std::mutex callbackMapMutex_;
     std::map<std::string, IProfileConnectorCallback*> callbackMap_;

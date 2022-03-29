@@ -392,7 +392,7 @@ int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, st
 
 bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice)
 {
-    LOGE("HiChainConnector::IsDevicesInGroup");
+    LOGI("HiChainConnector::IsDevicesInGroup");
     std::vector<GroupInfo> hostGroupInfoList;
     GetRelatedGroups(hostDevice, hostGroupInfoList);
     std::vector<GroupInfo> peerGroupInfoList;
@@ -492,7 +492,7 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
 
 int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
 {
-    LOGE("HiChainConnector::DeleteTimeOutGroup start");
+    LOGI("HiChainConnector::DeleteTimeOutGroup start");
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");

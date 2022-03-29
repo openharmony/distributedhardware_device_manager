@@ -47,5 +47,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_DM_SERVICE_LISTENER_H

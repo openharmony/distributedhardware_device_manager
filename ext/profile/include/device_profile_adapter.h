@@ -35,6 +35,7 @@ public:
     int32_t UnRegisterProfileListener(const std::string &pkgName) override;
     void OnProfileChanged(const std::string &pkgName, const std::string &deviceId) override;
     void OnProfileComplete(const std::string &pkgName, const std::string &deviceId) override;
+
 private:
     std::mutex deviceProfileAdapterMutex_;
     std::shared_ptr<DmDeviceStateManager> deviceStateManager_;

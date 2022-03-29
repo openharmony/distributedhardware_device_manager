@@ -649,7 +649,7 @@ void DeviceManagerModule::JsToDmAuthInfo(const JSIValue &object, std::string &ex
 
 void DeviceManagerModule::CreateDmCallback(std::string &bundleName, std::string &eventType)
 {
-    LOGE("CreateDmCallback for bunderName %s eventType %s", bundleName.c_str(), eventType.c_str());
+    LOGI("CreateDmCallback for bunderName %s eventType %s", bundleName.c_str(), eventType.c_str());
     if (eventType == DM_JSI_EVENT_DEVICE_STATE_CHANGE) {
         auto iter = g_deviceStateCallbackMap.find(bundleName);
         if (iter == g_deviceStateCallbackMap.end()) {
