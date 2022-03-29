@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -569,7 +569,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
     uint8_t *data = nullptr;
     data = JSI::GetTypedArrayInfo(field, type, length, buffer, offset);
     if (type != TypedArrayType::JSI_UINT8_ARRAY || length == 0 || data == nullptr) {
-        LOGE("Invaild AppIconInfo");
+        LOGE("Invalid AppIconInfo");
         return;
     }
     *bufferPtr = (uint8_t*)calloc(sizeof(uint8_t), length);

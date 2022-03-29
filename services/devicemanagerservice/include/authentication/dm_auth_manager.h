@@ -132,7 +132,7 @@ public:
     int32_t VerifyAuthentication(const std::string &authParam);
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(const int32_t sessionId);
-    void OnDataReceived(int32_t sessionId, std::string message);
+    void OnDataReceived(const int32_t sessionId, const std::string message);
     void OnGroupCreated(int64_t requestId, const std::string &groupId);
     void OnMemberJoin(int64_t requestId, int32_t status);
 

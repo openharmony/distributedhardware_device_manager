@@ -154,7 +154,7 @@ void AuthMessageProcessor::CreateResponseFinishMessage(nlohmann::json &json)
 
 int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
 {
-    LOGI(" AuthMessageProcessor ParseMessage");
+    LOGI("AuthMessageProcessor ParseMessage");
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
@@ -233,7 +233,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage()
     authResponseContext_->deviceId = jsonObject[TAG_DEVICE_ID];
     authResponseContext_->reply = jsonObject[TAG_REPLY];
     authResponseContext_->authType = jsonObject[TAG_AUTH_TYPE];
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %d,%d", authResponseContext_->reply);
+    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %d", authResponseContext_->reply);
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());
     if (authResponseContext_->reply == AUTH_REPLY_ACCEPT) {
         authResponseContext_->networkId = jsonObject[TAG_NET_ID];

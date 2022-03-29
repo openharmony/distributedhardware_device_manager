@@ -243,7 +243,7 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
     LOGI("DmAuthManager::OnSessionOpened sessionId=%d", sessionId);
 }
 
-void DmAuthManager::OnDataReceived(int32_t sessionId, std::string message)
+void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string message)
 {
     if (authResponseContext_ == nullptr || authMessageProcessor_ == nullptr) {
         LOGE("OnDataReceived failed, authResponseContext or authMessageProcessor_ is nullptr.");
@@ -510,7 +510,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
 
 void DmAuthManager::StartRespAuthProcess()
 {
-    LOGI("DmAuthManager::StartRespAuthProcess StartRespAuthProcess", authResponseContext_->sessionId);
+    LOGI("DmAuthManager::StartRespAuthProcess", authResponseContext_->sessionId);
     if (timerMap_.find(CONFIRM_TIMEOUT_TASK) == timerMap_.end()) {
         return;
     }
@@ -676,9 +676,9 @@ std::string DmAuthManager::GenerateGroupName()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string sLocalDeviceID = localDeviceId;
+    std::string sLocalDeviceId = localDeviceId;
     std::string groupName = authResponseContext_->targetPkgName + authResponseContext_->hostPkgName +
-                            sLocalDeviceID.substr(0, sLocalDeviceID.size() / DEVICE_ID_HALF);
+                            sLocalDeviceId.substr(0, sLocalDeviceId.size() / DEVICE_ID_HALF);
     return groupName;
 }
 
