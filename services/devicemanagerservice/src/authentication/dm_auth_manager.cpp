@@ -449,7 +449,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
     authResponseContext_ = authResponseState_->GetAuthContext();
-    if (jsonObject[TAG_CRYPTO_SUPPORT] == "true" && authResponseContext_->cryptoSupport == true) {
+    if (jsonObject[TAG_CRYPTO_SUPPORT] == "true" && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
             jsonObject[TAG_CRYPTO_VERSION] == authResponseContext_->cryptoVer) {
             isCryptoSupport_ = true;
@@ -472,7 +472,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     timerMap_[NEGOTIATE_TIMEOUT_TASK]->Stop(SESSION_CANCEL_TIMEOUT);
-    if (authResponseContext_->cryptoSupport == true) {
+    if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
     }
     if (authResponseContext_->reply == DM_AUTH_PEER_REJECT) {

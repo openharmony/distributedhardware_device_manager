@@ -29,7 +29,7 @@ class IpcClientProxy : public IpcClient {
     DECLARE_IPC_INTERFACE(IpcClientProxy);
 
 public:
-    IpcClientProxy(std::shared_ptr<IpcClient> ipcClientManager) : ipcClientManager_(ipcClientManager) {};
+    explicit IpcClientProxy(std::shared_ptr<IpcClient> ipcClientManager) : ipcClientManager_(ipcClientManager) {};
 
 public:
     virtual int32_t Init(const std::string &pkgName);

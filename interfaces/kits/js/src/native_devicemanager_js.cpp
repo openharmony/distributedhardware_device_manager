@@ -1082,7 +1082,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
             bool isArray = false;
             napi_create_array(env, &array[1]);
             napi_is_array(env, array[1], &isArray);
-            if (isArray == false) {
+            if (!isArray) {
                 LOGE("napi_create_array fail");
             }
             for (unsigned int i = 0; i != deviceInfoListAsyncCallbackInfo->devList.size(); ++i) {
@@ -1406,7 +1406,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     bool isArray = false;
     napi_create_array(env, &result);
     napi_is_array(env, result, &isArray);
-    if (isArray == false) {
+    if (!isArray) {
         LOGE("napi_create_array fail");
     }
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));

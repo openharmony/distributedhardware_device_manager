@@ -46,7 +46,7 @@ enum DmTimerStatus : int32_t {
 
 class DmTimer {
 public:
-    DmTimer(const std::string &name);
+    explicit DmTimer(const std::string &name);
     ~DmTimer();
     DmTimerStatus Start(uint32_t timeOut, TimeoutHandle handle, void *data);
     void Stop(int32_t code);
