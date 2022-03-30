@@ -17,9 +17,6 @@
     <text class="title">
         是否允许对端连接本机
     </text>
-    <text class="title-list">
-        用于分享图片
-    </text>
     <div class="but">
     <button class="but-cancel" onclick="onCancel" type="text">
         取消({{seconds}}秒)
