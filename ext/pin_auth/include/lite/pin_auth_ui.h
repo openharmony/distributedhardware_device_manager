@@ -25,9 +25,29 @@ namespace OHOS {
 namespace DistributedHardware {
 class PinAuthUi {
 public:
+    /**
+     * @tc.name: PinAuthUi::PinAuthUi
+     * @tc.desc: AuthUi constructor
+     * @tc.type: FUNC
+     */
     PinAuthUi();
+    /**
+     * @tc.name: PinAuthUi::ShowPinDialog
+     * @tc.desc: Show Pin Dialog
+     * @tc.type: FUNC
+     */
     int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    /**
+     * @tc.name: PinAuthUi::InputPinDialog
+     * @tc.desc: Show Input PinDialog
+     * @tc.type: FUNC
+     */
     int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    /**
+     * @tc.name: PinAuthUi::ClosePage
+     * @tc.desc: Close Page
+     * @tc.type: FUNC
+     */
     int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
 
 private:

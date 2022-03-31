@@ -54,7 +54,7 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
             } else {
                 Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
                 LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-                authManager->StartAuthProcess(atoi(params.c_str()));
+                authManager->StartAuthProcess(stoi(params));
             }
         });
     LOGI("ShowConfirm ace end");

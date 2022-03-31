@@ -25,21 +25,38 @@ namespace DistributedHardware {
 class DmAppImageInfo {
 public:
     DmAppImageInfo() = default;
+    /**
+     * @tc.name: DmAppImageInfo::DmAppImageInfo
+     * @tc.desc: Dm App Image Info Save Data
+     * @tc.type: FUNC
+     */
     explicit DmAppImageInfo(uint8_t *appIcon_, int32_t appIconLen_, uint8_t *appThumbnail_, int32_t appThumbnailLen_)
     {
         SaveData(appIcon_, appIconLen_, appThumbnail_, appThumbnailLen_);
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::Reset
+     * @tc.desc: Dm App Image Info Reset
+     * @tc.type: FUNC
+     */
     void Reset(uint8_t *appIcon_, int32_t appIconLen_, uint8_t *appThumbnail_, int32_t appThumbnailLen_)
     {
         SaveData(appIcon_, appIconLen_, appThumbnail_, appThumbnailLen_);
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::ResetIcon
+     * @tc.desc: Dm App Image Info ResetIcon
+     * @tc.type: FUNC
+     */
     void ResetIcon(uint8_t *appIcon_, int32_t appIconLen_)
     {
         SaveIconData(appIcon_, appIconLen_);
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::InitThumbnail
+     * @tc.desc: Dm App Image Info Init Thumbnail
+     * @tc.type: FUNC
+     */
     void InitThumbnail(int32_t appThumbnailLen_)
     {
         if (appThumbnailLen_ <= 0 || appThumbnailLen_ > THUMB_MAX_LEN) {
@@ -53,7 +70,11 @@ public:
             appThumbnailLen = appThumbnailLen_;
         }
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::SetThumbnailData
+     * @tc.desc: Dm App Image Info Init Set Data of Thumbnail
+     * @tc.type: FUNC
+     */
     int32_t SetThumbnailData(uint8_t *srcBuffer, int32_t srcBufferLen, int32_t copyIndex, int32_t copyLen)
     {
         if (srcBuffer == nullptr || srcBufferLen <= 0 || copyLen > srcBufferLen || copyIndex < 0) {
@@ -74,7 +95,11 @@ public:
 
         return 0;
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::~DmAppImageInfo
+     * @tc.desc: Dm App Image Info destructor
+     * @tc.type: FUNC
+     */
     ~DmAppImageInfo()
     {
         if (appIcon != nullptr) {
@@ -86,7 +111,11 @@ public:
             appThumbnail = nullptr;
         }
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::DmAppImageInfo
+     * @tc.desc: Dm App Image Info Constructor
+     * @tc.type: FUNC
+     */
     DmAppImageInfo(const DmAppImageInfo &other)
     {
         if (this != &other) {
@@ -104,7 +133,11 @@ public:
 
     DmAppImageInfo(DmAppImageInfo &&) = delete;
     DmAppImageInfo &operator=(DmAppImageInfo &&) = delete;
-
+    /**
+     * @tc.name: DmAppImageInfo::GetAppIconLen
+     * @tc.desc: Dm App Image Info Get App Icon Len
+     * @tc.type: FUNC
+     */
     int32_t GetAppIconLen() const
     {
         return appIconLen;
@@ -114,12 +147,20 @@ public:
     {
         return appIcon;
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::GetAppThumbnailLen
+     * @tc.desc: Dm App Image Info Get App ThumbnailLen
+     * @tc.type: FUNC
+     */
     int32_t GetAppThumbnailLen() const
     {
         return appThumbnailLen;
     }
-
+    /**
+     * @tc.name: DmAppImageInfo::GetAppThumbnail
+     * @tc.desc: Dm App Image Info Get App Thumbnail
+     * @tc.type: FUNC
+     */
     const uint8_t *GetAppThumbnail() const
     {
         return appThumbnail;

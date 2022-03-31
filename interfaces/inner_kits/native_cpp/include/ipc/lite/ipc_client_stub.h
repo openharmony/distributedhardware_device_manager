@@ -28,6 +28,11 @@ class IpcClientStub {
     DECLARE_SINGLE_INSTANCE(IpcClientStub);
 
 public:
+    /**
+     * @tc.name: IpcClientStub::Init
+     * @tc.desc: Ipc client stub initialization
+     * @tc.type: FUNC
+     */
     int32_t Init();
     SvcIdentity GetSvcIdentity() const
     {

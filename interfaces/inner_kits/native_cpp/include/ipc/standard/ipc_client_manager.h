@@ -31,6 +31,11 @@ namespace OHOS {
 namespace DistributedHardware {
 class DmDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
+    /**
+     * @tc.name: DmDeathRecipient::OnRemoteDied
+     * @tc.desc: ipc client initialization
+     * @tc.type: FUNC
+     */
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     DmDeathRecipient() = default;
     ~DmDeathRecipient() = default;
@@ -41,8 +46,23 @@ class IpcClientManager : public IpcClient {
     DECLARE_IPC_INTERFACE(IpcClientManager);
 
 public:
+    /**
+     * @tc.name: IpcClientManager::Init
+     * @tc.desc: ipc client Manager initialization
+     * @tc.type: FUNC
+     */
     virtual int32_t Init(const std::string &pkgName) override;
+    /**
+     * @tc.name: IpcClientManager::UnInit
+     * @tc.desc: ipc client Manager Uninitialization
+     * @tc.type: FUNC
+     */
     virtual int32_t UnInit(const std::string &pkgName) override;
+    /**
+     * @tc.name: IpcClientManager::SendRequest
+     * @tc.desc: ipc client Manager Send Request
+     * @tc.type: FUNC
+     */
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 
 private:

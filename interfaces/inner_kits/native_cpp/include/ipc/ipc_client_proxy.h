@@ -32,8 +32,23 @@ public:
     IpcClientProxy(std::shared_ptr<IpcClient> ipcClientManager) : ipcClientManager_(ipcClientManager) {};
 
 public:
+    /**
+     * @tc.name: IpcClientProxy::Init
+     * @tc.desc: ipc client initialization
+     * @tc.type: FUNC
+     */
     virtual int32_t Init(const std::string &pkgName);
+    /**
+     * @tc.name: IpcClientProxy::UnInit
+     * @tc.desc: ipc client deinitialization
+     * @tc.type: FUNC
+     */
     virtual int32_t UnInit(const std::string &pkgName);
+    /**
+     * @tc.name: IpcClientProxy::SendRequest
+     * @tc.desc: ipc client Send Request
+     * @tc.type: FUNC
+     */
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
 
 private:
