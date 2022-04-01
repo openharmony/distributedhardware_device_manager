@@ -30,10 +30,40 @@ public:
     };
     virtual int32_t GetStateType() = 0;
     virtual int32_t Enter() = 0;
+
+    /**
+     * @tc.name: AuthResponseState::Leave
+     * @tc.desc: Leave of the Auth Response State
+     * @tc.type: FUNC
+     */
     int32_t Leave();
+
+    /**
+     * @tc.name: AuthResponseState::TransitionTo
+     * @tc.desc: Transition of the Auth Response State
+     * @tc.type: FUNC
+     */
     int32_t TransitionTo(std::shared_ptr<AuthResponseState> state);
+
+    /**
+     * @tc.name: AuthResponseState::SetAuthManager
+     * @tc.desc: Set Auth Manager of the Auth Response State
+     * @tc.type: FUNC
+     */
     int32_t SetAuthManager(std::shared_ptr<DmAuthManager> authManager);
+
+    /**
+     * @tc.name: AuthResponseState::SetAuthContext
+     * @tc.desc: Set Auth Context of the Auth Response State
+     * @tc.type: FUNC
+     */
     int32_t SetAuthContext(std::shared_ptr<DmAuthResponseContext> context);
+
+    /**
+     * @tc.name: AuthResponseState::GetAuthContext
+     * @tc.desc: Get Auth Context of the Auth Response State
+     * @tc.type: FUNC
+     */
     std::shared_ptr<DmAuthResponseContext> GetAuthContext();
 
 protected:

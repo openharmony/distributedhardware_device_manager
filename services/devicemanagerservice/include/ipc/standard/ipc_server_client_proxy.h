@@ -25,6 +25,12 @@ class IpcServerClientProxy : public IRemoteProxy<IpcRemoteBroker> {
 public:
     explicit IpcServerClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IpcRemoteBroker>(impl) {};
     ~IpcServerClientProxy() {};
+
+    /**
+     * @tc.name: IpcServerClientProxy::SendCmd
+     * @tc.desc: Send Cmd of the Ipc Server Client Proxy
+     * @tc.type: FUNC
+     */
     int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 
 private:

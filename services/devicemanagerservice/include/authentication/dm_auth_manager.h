@@ -126,43 +126,252 @@ public:
                   std::shared_ptr<DeviceManagerServiceListener> listener,
                   std::shared_ptr<HiChainConnector> hiChainConnector_);
     ~DmAuthManager();
+
+    /**
+     * @tc.name: DmAuthManager::AuthenticateDevice
+     * @tc.desc: Authenticate Device of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
+
+    /**
+     * @tc.name: DmAuthManager::UnAuthenticateDevice
+     * @tc.desc: UnAuthenticate Device of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+
+    /**
+     * @tc.name: DmAuthManager::VerifyAuthentication
+     * @tc.desc: Verify Authentication of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t VerifyAuthentication(const std::string &authParam);
+
+    /**
+     * @tc.name: DmAuthManager::OnSessionOpened
+     * @tc.desc: Opened Session of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
+
+    /**
+     * @tc.name: DmAuthManager::OnSessionClosed
+     * @tc.desc: Closed Session of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void OnSessionClosed(const int32_t sessionId);
+
+    /**
+     * @tc.name: DmAuthManager::OnDataReceived
+     * @tc.desc: Received Data of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void OnDataReceived(const int32_t sessionId, const std::string message);
+
+
+    /**
+     * @tc.name: DmAuthManager::OnGroupCreated
+     * @tc.desc: Created Group of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void OnGroupCreated(int64_t requestId, const std::string &groupId);
+
+    /**
+     * @tc.name: DmAuthManager::OnMemberJoin
+     * @tc.desc: Join Member of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void OnMemberJoin(int64_t requestId, int32_t status);
 
-    // auth state machine
+    /**
+     * @tc.name: DmAuthManager::EstablishAuthChannel
+     * @tc.desc: Establish Auth Channel of the DeviceManager Authenticate Manager,auth state machine
+     * @tc.type: FUNC
+     */
     int32_t EstablishAuthChannel(const std::string &deviceId);
+
+    /**
+     * @tc.name: DmAuthManager::StartNegotiate
+     * @tc.desc: Start Negotiate of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void StartNegotiate(const int32_t &sessionId);
+
+    /**
+     * @tc.name: DmAuthManager::RespNegotiate
+     * @tc.desc: Resp Negotiate of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void RespNegotiate(const int32_t &sessionId);
+
+    /**
+     * @tc.name: DmAuthManager::SendAuthRequest
+     * @tc.desc: Send Auth Request of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void SendAuthRequest(const int32_t &sessionId);
+
+    /**
+     * @tc.name: DmAuthManager::StartAuthProcess
+     * @tc.desc: Start Auth Process of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t StartAuthProcess(const int32_t &authType);
+
+    /**
+     * @tc.name: DmAuthManager::StartRespAuthProcess
+     * @tc.desc: Start Resp Auth Process of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void StartRespAuthProcess();
+
+    /**
+     * @tc.name: DmAuthManager::CreateGroup
+     * @tc.desc: Create Group of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t CreateGroup();
+
+    /**
+     * @tc.name: DmAuthManager::AddMember
+     * @tc.desc: Add Member of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t AddMember(const std::string &deviceId);
+
+    /**
+     * @tc.name: DmAuthManager::GetConnectAddr
+     * @tc.desc: Get Connect Addr of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     std::string GetConnectAddr(std::string deviceId);
+
+    /**
+     * @tc.name: DmAuthManager::JoinNetwork
+     * @tc.desc: Join Net work of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t JoinNetwork();
+
+    /**
+     * @tc.name: DmAuthManager::AuthenticateFinish
+     * @tc.desc: Finish Authenticate of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void AuthenticateFinish();
+
+    /**
+     * @tc.name: DmAuthManager::GetIsCryptoSupport
+     * @tc.desc: Get Cryp to Support of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     bool GetIsCryptoSupport();
+
+    /**
+     * @tc.name: DmAuthManager::SetAuthRequestState
+     * @tc.desc: Set Auth Request State of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState);
+
+    /**
+     * @tc.name: DmAuthManager::SetAuthResponseState
+     * @tc.desc: Set Auth Response State of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState);
+
+    /**
+     * @tc.name: DmAuthManager::GetPinCode
+     * @tc.desc: Get Pin Code of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t GetPinCode();
+
+    /**
+     * @tc.name: DmAuthManager::GenerateGroupName
+     * @tc.desc: Generate Group Name of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     std::string GenerateGroupName();
+
+    /**
+     * @tc.name: DmAuthManager::HandleAuthenticateTimeout
+     * @tc.desc: Handle Authenticate Timeout of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t HandleAuthenticateTimeout();
+
+    /**
+     * @tc.name: DmAuthManager::CancelDisplay
+     * @tc.desc: Cancel Display of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void CancelDisplay();
+
+    /**
+     * @tc.name: DmAuthManager::GeneratePincode
+     * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t GeneratePincode();
+
+    /**
+     * @tc.name: DmAuthManager::ShowConfigDialog
+     * @tc.desc: Show Config Dialog of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void ShowConfigDialog();
+
+    /**
+     * @tc.name: DmAuthManager::ShowAuthInfoDialog
+     * @tc.desc: Show AuthInfo Dialog of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void ShowAuthInfoDialog();
+
+    /**
+     * @tc.name: DmAuthManager::ShowStartAuthDialog
+     * @tc.desc: Show Start Auth Dialog of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void ShowStartAuthDialog();
+
+    /**
+     * @tc.name: DmAuthManager::GetAuthenticationParam
+     * @tc.desc: Get Authentication Param of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
+
+    /**
+     * @tc.name: DmAuthManager::OnUserOperation
+     * @tc.desc: User Operation of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t OnUserOperation(int32_t action);
+
+    /**
+     * @tc.name: DmAuthManager::UserSwitchEventCallback
+     * @tc.desc: User Switch Event Callback of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     void UserSwitchEventCallback(int32_t userId);
+
+    /**
+     * @tc.name: DmAuthManager::SetPageId
+     * @tc.desc: Set PageId of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t SetPageId(int32_t pageId);
+
+    /**
+     * @tc.name: DmAuthManager::SetReason
+     * @tc.desc: Set Reason of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t SetReason(int32_t reason, int32_t state);
 
 private:

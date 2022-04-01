@@ -28,8 +28,20 @@ namespace DistributedHardware {
 class DmDeviceInfoManager {
 public:
     explicit DmDeviceInfoManager(std::shared_ptr<SoftbusConnector> &softbusConnectorPtr);
+
+    /**
+     * @tc.name: DmDeviceInfoManager::GetTrustedDeviceList
+     * @tc.desc: Get TrustedDevice List of the DeviceManager DeviceInfo Manager
+     * @tc.type: FUNC
+     */
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                 std::vector<DmDeviceInfo> &deviceList);
+
+    /**
+     * @tc.name: DmDeviceInfoManager::GetLocalDeviceInfo
+     * @tc.desc: Get Local DeviceInfo of the DeviceManager DeviceInfo Manager
+     * @tc.type: FUNC
+     */
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
 
 private:
@@ -38,5 +50,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
 #endif // OHOS_DM_DEVICEINFO_MANAGER_H

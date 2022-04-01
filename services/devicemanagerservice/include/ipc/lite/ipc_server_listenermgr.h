@@ -38,9 +38,32 @@ class IpcServerListenermgr {
     DECLARE_SINGLE_INSTANCE(IpcServerListenermgr);
 
 public:
+    /**
+     * @tc.name: IpcServerListener::RegisterListener
+     * @tc.desc: Register Listener of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     int32_t RegisterListener(std::string &pkgName, const CommonSvcId *svcId);
+
+    /**
+     * @tc.name: IpcServerListener::GetListenerByPkgName
+     * @tc.desc: Get Listener By package Name of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     int32_t GetListenerByPkgName(std::string &pkgName, CommonSvcId *svcId);
+
+    /**
+     * @tc.name: IpcServerListener::UnregisterListener
+     * @tc.desc: Unregister Listener of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     int32_t UnregisterListener(std::string &pkgName);
+
+    /**
+     * @tc.name: IpcServerListener::GetAllListeners
+     * @tc.desc: Get All Listeners of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     const std::map<std::string, CommonSvcId> &GetAllListeners();
 
 private:

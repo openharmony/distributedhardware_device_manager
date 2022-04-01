@@ -30,7 +30,18 @@ public:
     virtual ~IpcServerListener() = default;
 
 public:
+    /**
+     * @tc.name: IpcServerListener::SendRequest
+     * @tc.desc: SendRequest of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
+
+    /**
+     * @tc.name: IpcServerListener::SendAll
+     * @tc.desc: Send All of the Ipc Server Listener
+     * @tc.type: FUNC
+     */
     int32_t SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
 
 private:

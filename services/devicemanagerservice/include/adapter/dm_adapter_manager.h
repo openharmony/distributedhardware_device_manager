@@ -28,10 +28,26 @@ namespace DistributedHardware {
 class IProfileAdapter;
 class DmAdapterManager {
     DECLARE_SINGLE_INSTANCE(DmAdapterManager);
-
 public:
+    /**
+     * @tc.name: DmAdapterManager::GetDecisionAdapter
+     * @tc.desc: Get Decision Adapter of the DeviceManager Adapter Manager
+     * @tc.type: FUNC
+     */
     std::shared_ptr<IDecisionAdapter> GetDecisionAdapter(const std::string &soName);
+
+    /**
+     * @tc.name: DmAdapterManager::GetProfileAdapter
+     * @tc.desc: Get Profile Adapter of the DeviceManager Adapter Manager
+     * @tc.type: FUNC
+     */
     std::shared_ptr<IProfileAdapter> GetProfileAdapter(const std::string &soName);
+
+    /**
+     * @tc.name: DmAdapterManager::GetCryptoAdapter
+     * @tc.desc: Get Cryp to Adapter of the DeviceManager Adapter Manager
+     * @tc.type: FUNC
+     */
     std::shared_ptr<ICryptoAdapter> GetCryptoAdapter(const std::string &soName);
 };
 } // namespace DistributedHardware

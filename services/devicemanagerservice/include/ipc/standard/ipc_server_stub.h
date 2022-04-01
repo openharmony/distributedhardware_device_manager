@@ -36,6 +36,11 @@ enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
 
 class AppDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
+    /**
+     * @tc.name: AppDeathRecipient::OnRemoteDied
+     * @tc.desc: OnRemoteDied function of the App DeathRecipient
+     * @tc.type: FUNC
+     */
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     AppDeathRecipient() = default;
     ~AppDeathRecipient() = default;
@@ -46,14 +51,67 @@ class IpcServerStub : public SystemAbility, public IRemoteStub<IpcRemoteBroker> 
     DECLARE_SINGLE_INSTANCE_BASE(IpcServerStub);
 
 public:
+    /**
+     * @tc.name: IpcServerStub::OnStart
+     * @tc.desc: OnStart of the IpcServerStub
+     * @tc.type: FUNC
+     */
     void OnStart() override;
+
+    /**
+     * @tc.name: IpcServerStub::OnStop
+     * @tc.desc: OnStop of the IpcServerStub
+     * @tc.type: FUNC
+     */
     void OnStop() override;
+
+    /**
+     * @tc.name: IpcServerStub::OnRemoteRequest
+     * @tc.desc: On Remote Request of the IpcServerStub
+     * @tc.type: FUNC
+     */
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
+    /**
+     * @tc.name: IpcServerStub::SendCmd
+     * @tc.desc: Send Cmd of the IpcServerStub
+     * @tc.type: FUNC
+     */
     int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
+
+    /**
+     * @tc.name: IpcServerStub::RegisterDeviceManagerListener
+     * @tc.desc: Register DeviceManager Listener of the IpcServerStub
+     * @tc.type: FUNC
+     */
     int32_t RegisterDeviceManagerListener(std::string &pkgName, sptr<IRemoteObject> listener);
+
+    /**
+     * @tc.name: IpcServerStub::UnRegisterDeviceManagerListener
+     * @tc.desc: UnRegister DeviceManager Listener of the IpcServerStub
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterDeviceManagerListener(std::string &pkgName);
+
+    /**
+     * @tc.name: IpcServerStub::QueryServiceState
+     * @tc.desc: Query Service State of the IpcServerStub
+     * @tc.type: FUNC
+     */
     ServiceRunningState QueryServiceState() const;
+
+    /**
+     * @tc.name: IpcServerStub::GetDmListener
+     * @tc.desc: GetDmListener of the IpcServerStub
+     * @tc.type: FUNC
+     */
     const std::map<std::string, sptr<IRemoteObject>> &GetDmListener();
+
+    /**
+     * @tc.name: IpcServerStub::GetDmListener
+     * @tc.desc: Get DmListener of the IpcServerStub
+     * @tc.type: FUNC
+     */
     const sptr<IpcRemoteBroker> GetDmListener(std::string pkgName) const;
 
 private:
