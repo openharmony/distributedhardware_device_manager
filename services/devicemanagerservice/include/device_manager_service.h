@@ -35,22 +35,106 @@ DECLARE_SINGLE_INSTANCE_BASE(DeviceManagerService);
 public:
     int32_t Init();
     ~DeviceManagerService();
+
+    /**
+     * @tc.name: DeviceManagerService::GetTrustedDeviceList
+     * @tc.desc: Get Trusted DeviceList of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
+
+    /**
+     * @tc.name: DeviceManagerService::GetLocalDeviceInfo
+     * @tc.desc: Get Local DeviceInfo of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DeviceManagerService::GetUdidByNetworkId
+     * @tc.desc: Get Udid By NetworkId of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid);
+
+    /**
+     * @tc.name: DeviceManagerService::GetUuidByNetworkId
+     * @tc.desc: Get Uuid By NetworkId of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid);
+
+    /**
+     * @tc.name: DeviceManagerService::StartDeviceDiscovery
+     * @tc.desc: Start Device Discovery of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
+
+    /**
+     * @tc.name: DeviceManagerService::StopDeviceDiscovery
+     * @tc.desc: Stop Device Discovery of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
+
+    /**
+     * @tc.name: DeviceManagerService::AuthenticateDevice
+     * @tc.desc: Authenticate Device of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
+
+    /**
+     * @tc.name: DeviceManagerService::UnAuthenticateDevice
+     * @tc.desc: UnAuthenticate Device of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+
+    /**
+     * @tc.name: DeviceManagerService::VerifyAuthentication
+     * @tc.desc: Verify Authentication of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t VerifyAuthentication(const std::string &authParam);
+
+    /**
+     * @tc.name: DeviceManagerService::GetFaParam
+     * @tc.desc: Get FaParam of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
+
+    /**
+     * @tc.name: DeviceManagerService::SetUserOperation
+     * @tc.desc: Se tUser Operation of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t SetUserOperation(std::string &pkgName, int32_t action);
+
+    /**
+     * @tc.name: DeviceManagerService::RegisterDevStateCallback
+     * @tc.desc: Register DevState Callback of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+
+    /**
+     * @tc.name: DeviceManagerService::UnRegisterDevStateCallback
+     * @tc.desc: UnRegister DevState Callback of the Device Manager Service
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+
+    /**
+     * @tc.name: DeviceManagerService::IsServiceInitialized
+     * @tc.desc: IsServiceInitialized of the Device Manager Service
+     * @tc.type: FUNC
+     */
     bool IsServiceInitialized();
 
 private:

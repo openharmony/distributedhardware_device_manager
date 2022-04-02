@@ -46,20 +46,110 @@ public:
                          std::shared_ptr<DeviceManagerServiceListener> listener,
                          std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDeviceStateManager();
+
+    /**
+     * @tc.name: DmDeviceStateManager::RegisterProfileListener
+     * @tc.desc: Register Profile Listener of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     int32_t RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::UnRegisterProfileListener
+     * @tc.desc: UnRegister Profile Listener of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::PostDeviceOnline
+     * @tc.desc: Post Device Online of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::PostDeviceOffline
+     * @tc.desc: Post Device Offline of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::OnDeviceOnline
+     * @tc.desc: OnDevice Online of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::OnDeviceOffline
+     * @tc.desc: OnDevice Offline of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::OnDeviceChanged
+     * @tc.desc: OnDevice Changed of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::OnDeviceReady
+     * @tc.desc: OnDevice Ready of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::OnProfileReady
+     * @tc.desc: OnProfile Ready of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void OnProfileReady(const std::string &pkgName, const std::string &deviceId);
+
+    /**
+     * @tc.name: DmDeviceStateManager::RegisterSoftbusStateCallback
+     * @tc.desc: Register Softbus State Callback of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     int32_t RegisterSoftbusStateCallback();
+
+    /**
+     * @tc.name: DmDeviceStateManager::RegisterOffLineTimer
+     * @tc.desc: Register OffLine Timerof the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
+
+    /**
+     * @tc.name: DmDeviceStateManager::StartOffLineTimer
+     * @tc.desc: Start OffLine Timer of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
+
+    /**
+     * @tc.name: DmDeviceStateManager::DeleteTimeOutGroup
+     * @tc.desc: Delete TimeOut Group of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void DeleteTimeOutGroup(std::string stateTimer);
+
+    /**
+     * @tc.name: DmDeviceStateManager::RegisterDevStateCallback
+     * @tc.desc: Register DevState Callback of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+
+    /**
+     * @tc.name: DmDeviceStateManager::UnRegisterDevStateCallback
+     * @tc.desc: UnRegister DevState Callback of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
     void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
 private:

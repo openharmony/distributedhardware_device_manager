@@ -22,8 +22,25 @@ namespace OHOS {
 namespace DistributedHardware {
 class MultipleUserConnector {
 public:
+    /**
+     * @tc.name: MultipleUserConnector::GetCurrentAccountUserID
+     * @tc.desc: Get Current Account UserID of the Multiple User Connector
+     * @tc.type: FUNC
+     */
     static int32_t GetCurrentAccountUserID(void);
+
+    /**
+     * @tc.name: MultipleUserConnector::SetSwitchOldUserId
+     * @tc.desc: Set Switch Old UserId of the Multiple User Connector
+     * @tc.type: FUNC
+     */
     static void SetSwitchOldUserId(int32_t userId);
+
+    /**
+     * @tc.name: MultipleUserConnector::GetSwitchOldUserId
+     * @tc.desc: Get Switc hOld UserId of the Multiple User Connector
+     * @tc.type: FUNC
+     */
     static int32_t GetSwitchOldUserId(void);
 private:
     static int32_t oldUserId_;

@@ -53,17 +53,89 @@ public:
 public:
     HiChainConnector();
     ~HiChainConnector();
+
+    /**
+     * @tc.name: HiChainConnector::RegisterHiChainCallback
+     * @tc.desc: Register HiChain Callback of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback);
+
+    /**
+     * @tc.name: HiChainConnector::UnRegisterHiChainCallback
+     * @tc.desc: Un Register HiChain Callback of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterHiChainCallback();
+
+    /**
+     * @tc.name: HiChainConnector::CreateGroup
+     * @tc.desc: Create Group of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
+
+    /**
+     * @tc.name: HiChainConnector::AddMember
+     * @tc.desc: Add Member of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t AddMember(const std::string &deviceId, const std::string &connectInfo);
+
+    /**
+     * @tc.name: HiChainConnector::DelMemberFromGroup
+     * @tc.desc: Delete Member From Group of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t DelMemberFromGroup(const std::string &groupId, const std::string &deviceId);
+
+    /**
+     * @tc.name: HiChainConnector::DeleteGroup
+     * @tc.desc: Delete Group of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t DeleteGroup(std::string &groupId);
+
+    /**
+     * @tc.name: HiChainConnector::DeleteGroup
+     * @tc.desc: DeleteGroup of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t DeleteGroup(const int32_t userId, std::string &groupId);
+
+    /**
+     * @tc.name: HiChainConnector::IsDevicesInGroup
+     * @tc.desc: IsDevicesInGroup of the HiChain Connector
+     * @tc.type: FUNC
+     */
     bool IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice);
+
+    /**
+     * @tc.name: HiChainConnector::GetRelatedGroups
+     * @tc.desc: Get Related Groups of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t GetRelatedGroups(const std::string &DeviceId, std::vector<GroupInfo> &groupList);
+
+    /**
+     * @tc.name: HiChainConnector::GetGroupInfo
+     * @tc.desc: Get GroupInfo of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
+
+    /**
+     * @tc.name: HiChainConnector::GetGroupInfo
+     * @tc.desc: Get GroupInfo of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
+
+    /**
+     * @tc.name: HiChainConnector::DeleteTimeOutGroup
+     * @tc.desc: Delete TimeOut Group of the HiChain Connector
+     * @tc.type: FUNC
+     */
     int32_t DeleteTimeOutGroup(const char* deviceId);
 private:
     int64_t GenRequestId();

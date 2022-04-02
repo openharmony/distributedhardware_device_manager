@@ -38,19 +38,102 @@ void DeviceOffLine(std::map<std::string, std::shared_ptr<ISoftbusStateCallback>>
     DmDeviceInfo deviceInfo);
 class SoftbusConnector {
 public:
+    /**
+     * @tc.name: SoftbusConnector::OnPublishSuccess
+     * @tc.desc: OnPublishSuccess of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnPublishSuccess(int publishId);
+
+    /**
+     * @tc.name: SoftbusConnector::OnPublishFail
+     * @tc.desc: OnPublishFail of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnPublishFail(int publishId, PublishFailReason reason);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftBusDeviceOnline
+     * @tc.desc: OnSoftBus DeviceOnline of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftBusDeviceOnline(NodeBasicInfo *info);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftbusDeviceOffline
+     * @tc.desc: OnSoftbus DeviceOffline of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftbusDeviceOffline(NodeBasicInfo *info);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftbusDeviceInfoChanged
+     * @tc.desc: OnSoftbus DeviceInfoChanged of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftbusDeviceFound
+     * @tc.desc: OnSoftbus DeviceFound of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftbusDeviceFound(const DeviceInfo *device);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryFailed
+     * @tc.desc: OnSoftbus Discovery Failed of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftbusDiscoveryFailed(int subscribeId, DiscoveryFailReason failReason);
+
+    /**
+     * @tc.name: SoftbusConnector::OnSoftbusDiscoverySuccess
+     * @tc.desc: OnSoftbus Discovery Success of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnSoftbusDiscoverySuccess(int subscribeId);
+
+    /**
+     * @tc.name: SoftbusConnector::OnPublishSuccess
+     * @tc.desc: OnParameter Chg Callback of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static void OnParameterChgCallback(const char *key, const char *value, void *context);
+
+    /**
+     * @tc.name: SoftbusConnector::GetConnectionIpAddress
+     * @tc.desc: Get Connection Ip Address of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static int32_t GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress);
+
+    /**
+     * @tc.name: SoftbusConnector::GetConnectAddr
+     * @tc.desc: Get Connect Addr of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static ConnectionAddr *GetConnectAddr(const std::string &deviceId, std::string &connectAddr);
+
+    /**
+     * @tc.name: SoftbusConnector::IsDeviceOnLine
+     * @tc.desc: Judge Device OnLine of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static bool IsDeviceOnLine(const std::string &deviceId);
+
+    /**
+     * @tc.name: SoftbusConnector::GetUdidByNetworkId
+     * @tc.desc: Get Udid By NetworkId of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
+
+    /**
+     * @tc.name: SoftbusConnector::GetUuidByNetworkId
+     * @tc.desc: Get Uuid By NetworkId of the SoftbusConnector
+     * @tc.type: FUNC
+     */
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
 
 public:

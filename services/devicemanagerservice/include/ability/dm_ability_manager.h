@@ -42,6 +42,12 @@ class DmAbilityManager {
 public:
     AbilityRole GetAbilityRole();
     AbilityStatus StartAbility(AbilityRole role);
+
+    /**
+     * @tc.name: DmAbilityManager::StartAbilityDone
+     * @tc.desc: Start AbilityDone of the DmAbility Manager
+     * @tc.type: FUNC
+     */
     void StartAbilityDone();
 
 private:

@@ -48,9 +48,33 @@ class DmTimer {
 public:
     explicit DmTimer(const std::string &name);
     ~DmTimer();
+
+    /**
+     * @tc.name: DmTimer::Start
+     * @tc.desc: Start of the DmTimer
+     * @tc.type: FUNC
+     */
     DmTimerStatus Start(uint32_t timeOut, TimeoutHandle handle, void *data);
+
+    /**
+     * @tc.name: DmTimer::Stop
+     * @tc.desc: Stop of the DmTimer
+     * @tc.type: FUNC
+     */
     void Stop(int32_t code);
+
+    /**
+     * @tc.name: DmTimer::WaitForTimeout
+     * @tc.desc: WaitFor Timeout of the DmTimer
+     * @tc.type: FUNC
+     */
     void WaitForTimeout();
+
+    /**
+     * @tc.name: DmTimer::GetTimerName
+     * @tc.desc: Get TimerName of the DmTimer
+     * @tc.type: FUNC
+     */
     std::string GetTimerName();
 private:
     int32_t CreateTimeFd();

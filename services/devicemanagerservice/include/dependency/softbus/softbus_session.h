@@ -37,11 +37,47 @@ public:
 public:
     SoftbusSession();
     ~SoftbusSession();
+
+    /**
+     * @tc.name: SoftbusSession::RegisterSessionCallback
+     * @tc.desc: RegisterSessionCallback of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback);
+
+    /**
+     * @tc.name: SoftbusSession::UnRegisterSessionCallback
+     * @tc.desc: UnRegister SessionCallback of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterSessionCallback();
+
+    /**
+     * @tc.name: SoftbusSession::OpenAuthSession
+     * @tc.desc: Open AuthSession of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t OpenAuthSession(const std::string &deviceId);
+
+    /**
+     * @tc.name: SoftbusSession::CloseAuthSession
+     * @tc.desc: Close AuthSession of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t CloseAuthSession(int32_t sessionId);
+
+    /**
+     * @tc.name: SoftbusSession::SendData
+     * @tc.desc: Send Data of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t SendData(int32_t sessionId, std::string &message);
+
+    /**
+     * @tc.name: SoftbusSession::GetPeerDeviceId
+     * @tc.desc: Get Peer DeviceId of the Softbus Session
+     * @tc.type: FUNC
+     */
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
 
 private:

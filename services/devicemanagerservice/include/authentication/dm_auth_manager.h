@@ -170,7 +170,6 @@ public:
      */
     void OnDataReceived(const int32_t sessionId, const std::string message);
 
-
     /**
      * @tc.name: DmAuthManager::OnGroupCreated
      * @tc.desc: Created Group of the DeviceManager Authenticate Manager

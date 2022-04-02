@@ -34,11 +34,41 @@ class ProfileConnector final : public OHOS::DeviceProfile::IProfileEventCallback
 public:
     ProfileConnector();
     virtual ~ProfileConnector();
+
+    /**
+     * @tc.name: ProfileConnector::RegisterProfileCallback
+     * @tc.desc: Register Profile Callback of the ProfileConnector
+     * @tc.type: FUNC
+     */
     int32_t RegisterProfileCallback(const std::string &pkgName, const std::string &deviceId,
                                     IProfileConnectorCallback* callback);
+
+    /**
+     * @tc.name: ProfileConnector::UnRegisterProfileCallback
+     * @tc.desc: UnRegister Profile Callback of the ProfileConnector
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterProfileCallback(const std::string &pkgName);
+
+    /**
+     * @tc.name: ProfileConnector::SubscribeProfileEvents
+     * @tc.desc: Subscribe Profile Events of the ProfileConnector
+     * @tc.type: FUNC
+     */
     int32_t SubscribeProfileEvents(const std::list<std::string> &serviceIds, const std::string &deviceId);
+
+    /**
+     * @tc.name: ProfileConnector::UnSubscribeProfileEvents
+     * @tc.desc: UnSubscribe Profile Events of the ProfileConnector
+     * @tc.type: FUNC
+     */
     int32_t UnSubscribeProfileEvents();
+
+    /**
+     * @tc.name: ProfileConnector::OnSyncCompleted
+     * @tc.desc: OnSync Completed of the ProfileConnector
+     * @tc.type: FUNC
+     */
     void OnSyncCompleted(const OHOS::DeviceProfile::SyncResult &syncResults) override;
 
 private:

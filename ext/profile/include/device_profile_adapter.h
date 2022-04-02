@@ -30,10 +30,34 @@ class DeviceProfileAdapter final : public IProfileAdapter, public IProfileConnec
 public:
     DeviceProfileAdapter();
     virtual ~DeviceProfileAdapter();
+
+    /**
+     * @tc.name: DeviceProfileAdapter::RegisterProfileListener
+     * @tc.desc: Register Profile Listener of the Device Profile Adapter
+     * @tc.type: FUNC
+     */
     int32_t RegisterProfileListener(const std::string &pkgName, const std::string &deviceId,
                                     std::shared_ptr<DmDeviceStateManager> callback) override;
+
+    /**
+     * @tc.name: DeviceProfileAdapter::UnRegisterProfileListener
+     * @tc.desc: UnRegister Profile Listener of the Device Profile Adapter
+     * @tc.type: FUNC
+     */
     int32_t UnRegisterProfileListener(const std::string &pkgName) override;
+
+    /**
+     * @tc.name: DeviceProfileAdapter::OnProfileChanged
+     * @tc.desc: OnProfile Changed of the Device Profile Adapter
+     * @tc.type: FUNC
+     */
     void OnProfileChanged(const std::string &pkgName, const std::string &deviceId) override;
+
+    /**
+     * @tc.name: DeviceProfileAdapter::OnProfileComplete
+     * @tc.desc: OnProfile Complete of the Device Profile Adapter
+     * @tc.type: FUNC
+     */
     void OnProfileComplete(const std::string &pkgName, const std::string &deviceId) override;
 
 private:

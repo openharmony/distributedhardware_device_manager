@@ -32,9 +32,31 @@ public:
     };
     virtual int32_t GetStateType() = 0;
     virtual int32_t Enter() = 0;
+
+    /**
+     * @tc.name: AuthRequestState::Leave
+     * @tc.desc: Leave of the Authenticate Request State
+     * @tc.type: FUNC
+     */
     int32_t Leave();
+
+    /**
+     * @tc.name: AuthRequestState::TransitionTo
+     * @tc.desc: Transition of the Authenticate Request State
+     * @tc.type: FUNC
+     */
     int32_t TransitionTo(std::shared_ptr<AuthRequestState> state);
+    /**
+     * @tc.name: AuthRequestState::SetAuthManager
+     * @tc.desc: Set AuthManager of the Authenticate Request State
+     * @tc.type: FUNC
+     */
     int32_t SetAuthManager(std::shared_ptr<DmAuthManager> authManager);
+    /**
+     * @tc.name: AuthRequestState::SetAuthContext
+     * @tc.desc: Set Auth Context of the Authenticate Request State
+     * @tc.type: FUNC
+     */
     int32_t SetAuthContext(std::shared_ptr<DmAuthRequestContext> context);
     std::shared_ptr<DmAuthRequestContext> GetAuthContext();
 
@@ -45,48 +67,135 @@ protected:
 
 class AuthRequestInitState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestInitState::GetStateType
+     * @tc.desc: Get State Type of the Authenticate Request Init State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+    /**
+     * @tc.name: AuthRequestInitState::Enter
+     * @tc.desc: Enter of the Authenticate Request Init State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestNegotiateState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestNegotiateState::GetStateType
+     * @tc.desc: Get State Type of the Authenticate Request Negotiate State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+    /**
+     * @tc.name: AuthRequestNegotiateState::Enter
+     * @tc.desc: Enter of the Authenticate Request Negotiate State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
+
 class AuthRequestNegotiateDoneState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestNegotiateDoneState::GetStateType
+     * @tc.desc: Get State Type of the Authenticate Request Negotiate Done State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestNegotiateDoneState::Enter
+     * @tc.desc: Enter of the Authenticate Request Negotiate Done State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestReplyState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestReplyState::GetStateType
+     * @tc.desc: Get State Type of the AuthRequest Reply State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestReplyState::Enter
+     * @tc.desc: Enter of the AuthRequest Reply State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestInputState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestInputState::GetStateType
+     * @tc.desc: Get State Type of the AuthRequest Input State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestInputState::Enter
+     * @tc.desc: Enter of the AuthRequest Input State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestJoinState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestJoinState::GetStateType
+     * @tc.desc: Get State Type of the Auth Request Join State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestJoinState::Enter
+     * @tc.desc: Enter of the Auth Request Join State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestNetworkState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestNetworkState::GetStateType
+     * @tc.desc: Get State Type of the AuthRequest Network State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestNetworkState::Enter
+     * @tc.desc: Enter of the AuthRequest Network State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 
 class AuthRequestFinishState : public AuthRequestState {
 public:
+    /**
+     * @tc.name: AuthRequestFinishState::GetStateType
+     * @tc.desc: Get State Type of the Auth Request Finish State
+     * @tc.type: FUNC
+     */
     int32_t GetStateType() override;
+
+    /**
+     * @tc.name: AuthRequestFinishState::Enter
+     * @tc.desc: Enter of the Auth Request Finish State
+     * @tc.type: FUNC
+     */
     int32_t Enter() override;
 };
 } // namespace DistributedHardware

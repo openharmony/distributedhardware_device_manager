@@ -35,12 +35,48 @@ public:
     DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                        std::shared_ptr<DeviceManagerServiceListener> listener);
     ~DmDiscoveryManager();
+
+    /**
+     * @tc.name: DmDiscoveryManager::StartDeviceDiscovery
+     * @tc.desc: Start Device Discovery of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
+
+    /**
+     * @tc.name: DmDiscoveryManager::StopDeviceDiscovery
+     * @tc.desc: Stop Device Discovery of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
+
+    /**
+     * @tc.name: DmDiscoveryManager::OnDeviceFound
+     * @tc.desc: OnDevice Found of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDiscoveryManager::OnDiscoverySuccess
+     * @tc.desc: OnDiscovery Success of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
+
+    /**
+     * @tc.name: DmDiscoveryManager::OnDiscoveryFailed
+     * @tc.desc: OnDiscovery Failed of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason);
+
+    /**
+     * @tc.name: DmDiscoveryManager::HandleDiscoveryTimeout
+     * @tc.desc: Handle Discovery Timeout of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
     void HandleDiscoveryTimeout();
 
 private:
