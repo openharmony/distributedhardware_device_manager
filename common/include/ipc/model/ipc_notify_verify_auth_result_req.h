@@ -26,11 +26,21 @@ class IpcNotifyVerifyAuthResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyVerifyAuthResultReq);
 
 public:
+    /**
+     * @tc.name: IpcStopDiscoveryReq::SetSubscribeId
+     * @tc.desc: Ipc stop discovery request set subscription id
+     * @tc.type: FUNC
+     */
     std::string GetDeviceId() const
     {
         return deviceId_;
     }
 
+    /**
+     * @tc.name: IpcStopDiscoveryReq::SetSubscribeId
+     * @tc.desc: Ipc stop discovery request set subscription id
+     * @tc.type: FUNC
+     */
     void SetDeviceId(const std::string &deviceId)
     {
         deviceId_ = deviceId;

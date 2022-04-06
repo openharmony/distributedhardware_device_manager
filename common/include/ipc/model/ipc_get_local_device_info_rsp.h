@@ -25,11 +25,21 @@ class IpcGetLocalDeviceInfoRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetLocalDeviceInfoRsp);
 
 public:
+    /**
+     * @tc.name: IpcGetLocalDeviceInfoRsp::GetLocalDeviceInfo
+     * @tc.desc: Ipc get local device information reply Get Local DeviceInfo
+     * @tc.type: FUNC
+     */
     const DmDeviceInfo &GetLocalDeviceInfo() const
     {
         return localDeviceInfo_;
     }
 
+    /**
+     * @tc.name: IpcGetLocalDeviceInfoRsp::SetLocalDeviceInfo
+     * @tc.desc: Ipc get local device information reply Set Local DeviceInfo
+     * @tc.type: FUNC
+     */
     void SetLocalDeviceInfo(const DmDeviceInfo &localDeviceInfo)
     {
         localDeviceInfo_ = localDeviceInfo;

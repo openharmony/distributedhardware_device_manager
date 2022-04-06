@@ -25,31 +25,61 @@ class IpcAuthenticateDeviceReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcAuthenticateDeviceReq);
 
 public:
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::GetDeviceInfo
+     * @tc.desc: Ipc Authenticate Device Req Get DeviceInfo
+     * @tc.type: FUNC
+     */
     const DmDeviceInfo &GetDeviceInfo() const
     {
         return deviceInfo_;
     }
 
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::SetDeviceInfo
+     * @tc.desc: Ipc Authenticate Device Req Set DeviceInfo
+     * @tc.type: FUNC
+     */
     void SetDeviceInfo(const DmDeviceInfo &deviceInfo)
     {
         deviceInfo_ = deviceInfo;
     }
 
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::GetAuthType
+     * @tc.desc: Ipc Authenticate Device Req Get AuthType
+     * @tc.type: FUNC
+     */
     int32_t GetAuthType()
     {
         return authType_;
     }
 
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::SetAuthType
+     * @tc.desc: Ipc Authenticate Device Req Set AuthType
+     * @tc.type: FUNC
+     */
     void SetAuthType(int32_t authType)
     {
         authType_ = authType;
     }
 
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::GetExtra
+     * @tc.desc: Ipc Authenticate Device Req Get Extra
+     * @tc.type: FUNC
+     */
     const std::string &GetExtra() const
     {
         return extra_;
     }
 
+    /**
+     * @tc.name: IpcAuthenticateDeviceReq::SetExtra
+     * @tc.desc: Ipc Authenticate Device Req Set Extra
+     * @tc.type: FUNC
+     */
     void SetExtra(const std::string &extra)
     {
         extra_ = extra;

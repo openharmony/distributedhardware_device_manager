@@ -26,41 +26,81 @@ class IpcNotifyAuthResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyAuthResultReq);
 
 public:
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::GetDeviceId
+     * @tc.desc: Get DeviceId of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     std::string GetDeviceId() const
     {
         return deviceId_;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::SetDeviceId
+     * @tc.desc: Set DeviceId of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     void SetDeviceId(const std::string &deviceId)
     {
         deviceId_ = deviceId;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::GetPinToken
+     * @tc.desc: Get Pin Token of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     std::string GetPinToken() const
     {
         return token_;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::SetToken
+     * @tc.desc: Set Token of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     void SetToken(const std::string &token)
     {
         token_ = token;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::GetStatus
+     * @tc.desc: Get Status Token of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     int32_t GetStatus() const
     {
         return status_;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::SetStatus
+     * @tc.desc: Set Status of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     void SetStatus(int32_t status)
     {
         status_ = status;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::GetReason
+     * @tc.desc: Get Reason of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     int32_t GetReason() const
     {
         return reason_;
     }
 
+    /**
+     * @tc.name: IpcNotifyAuthResultReq::SetReason
+     * @tc.desc: Set Reason of the Ipc Notify Auth Result Request
+     * @tc.type: FUNC
+     */
     void SetReason(int32_t reason)
     {
         reason_ = reason;

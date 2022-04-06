@@ -24,11 +24,21 @@ class IpcGetInfoByNetWorkReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetInfoByNetWorkReq);
 
 public:
+    /**
+     * @tc.name: IpcGetInfoByNetWorkReq::GetNetWorkId
+     * @tc.desc: Ipc Get Info By NetWork request Get NetWorkId
+     * @tc.type: FUNC
+     */
     const std::string GetNetWorkId() const
     {
         return netWorkId_;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkReq::SetNetWorkId
+     * @tc.desc: Ipc Get Info By NetWork request Set NetWorkId
+     * @tc.type: FUNC
+     */
     void SetNetWorkId(const std::string &netWorkId)
     {
         netWorkId_ = netWorkId;

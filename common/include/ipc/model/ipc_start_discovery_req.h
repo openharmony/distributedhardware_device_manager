@@ -25,21 +25,41 @@ class IpcStartDiscoveryReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcStartDiscoveryReq);
 
 public:
+    /**
+     * @tc.name: IpcStartDiscoveryReq::GetSubscribeInfo
+     * @tc.desc: Ipc Start Discovery Request Get SubscribeInfo
+     * @tc.type: FUNC
+     */
     const DmSubscribeInfo &GetSubscribeInfo() const
     {
         return subscribeInfo_;
     }
 
+    /**
+     * @tc.name: IpcStartDiscoveryReq::SetSubscribeInfo
+     * @tc.desc: Ipc Start Discovery Request Set SubscribeInfo
+     * @tc.type: FUNC
+     */
     void SetSubscribeInfo(const DmSubscribeInfo &subscribeInfo)
     {
         subscribeInfo_ = subscribeInfo;
     }
 
+    /**
+     * @tc.name: IpcStartDiscoveryReq::GetExtra
+     * @tc.desc: Ipc Start Discovery Request Get Extra
+     * @tc.type: FUNC
+     */
     const std::string &GetExtra() const
     {
         return extra_;
     }
 
+    /**
+     * @tc.name: IpcStartDiscoveryReq::SetExtra
+     * @tc.desc: Ipc Start Discovery Request Set Extra
+     * @tc.type: FUNC
+     */
     void SetExtra(const std::string &extra)
     {
         extra_ = extra;

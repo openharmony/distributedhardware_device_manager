@@ -26,11 +26,21 @@ class IpcStopDiscoveryReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcStopDiscoveryReq);
 
 public:
+    /**
+     * @tc.name: IpcStopDiscoveryReq::GetSubscribeId
+     * @tc.desc: Ipc stop discovery request get subscription id
+     * @tc.type: FUNC
+     */
     uint16_t GetSubscribeId() const
     {
         return subscribeId_;
     }
 
+    /**
+     * @tc.name: IpcStopDiscoveryReq::SetSubscribeId
+     * @tc.desc: Ipc stop discovery request set subscription id
+     * @tc.type: FUNC
+     */
     void SetSubscribeId(uint16_t subscribeId)
     {
         subscribeId_ = subscribeId;

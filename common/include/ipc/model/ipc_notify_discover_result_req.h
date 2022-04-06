@@ -24,21 +24,41 @@ class IpcNotifyDiscoverResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyDiscoverResultReq);
 
 public:
+    /**
+     * @tc.name: IpcNotifyDiscoverResultReq::GetSubscribeId
+     * @tc.desc: Get SubscribeId of the Ipc Notify Discover Result Request
+     * @tc.type: FUNC
+     */
     uint16_t GetSubscribeId() const
     {
         return subscribeId_;
     }
 
+    /**
+     * @tc.name: IpcNotifyDiscoverResultReq::SetSubscribeId
+     * @tc.desc: Set SubscribeId of the Ipc Notify Discover Result Request
+     * @tc.type: FUNC
+     */
     void SetSubscribeId(uint16_t subscribeId)
     {
         subscribeId_ = subscribeId;
     }
 
+    /**
+     * @tc.name: IpcNotifyDiscoverResultReq::GetResult
+     * @tc.desc: Get Result of the Ipc Notify Discover Result Request
+     * @tc.type: FUNC
+     */
     int32_t GetResult() const
     {
         return result_;
     }
 
+    /**
+     * @tc.name: IpcNotifyDiscoverResultReq::SetResult
+     * @tc.desc: Set Result of the Ipc Notify Discover Result Request
+     * @tc.type: FUNC
+     */
     void SetResult(int32_t result)
     {
         result_ = result;

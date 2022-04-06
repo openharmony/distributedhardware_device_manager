@@ -58,10 +58,22 @@ class DmConfigManager final {
 
 public:
     ~DmConfigManager();
+
+    /**
+     * @tc.name: DmConfigManager::GetAllAuthType
+     * @tc.desc: Get All AuthType of the DeviceManager Config Manager
+     * @tc.type: FUNC
+     */
     void GetAllAuthType(std::vector<std::string> &allAuthType);
     std::shared_ptr<IDecisionAdapter> GetDecisionAdapter(const std::string &soName);
     std::shared_ptr<IProfileAdapter> GetProfileAdapter(const std::string &soName);
     std::shared_ptr<ICryptoAdapter> GetCryptoAdapter(const std::string &soName);
+
+    /**
+     * @tc.name: DmConfigManager::GetAuthAdapter
+     * @tc.desc: Get Auth Adapter of the DeviceManager Config Manager
+     * @tc.type: FUNC
+     */
     void GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthentication>> &authAdapter);
 
 private:

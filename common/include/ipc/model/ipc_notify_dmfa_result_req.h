@@ -24,11 +24,21 @@ class IpcNotifyDMFAResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyDMFAResultReq);
 
 public:
+    /**
+     * @tc.name: IpcNotifyDMFAResultReq::GetJsonParam
+     * @tc.desc: IPC notifies device management FA request result to get json parameters
+     * @tc.type: FUNC
+     */
     std::string GetJsonParam() const
     {
         return JsonParam_;
     }
 
+    /**
+     * @tc.name: IpcNotifyDMFAResultReq::SetJsonParam
+     * @tc.desc: IPC notifies device management FA request result to set json parameters
+     * @tc.type: FUNC
+     */
     void SetJsonParam(const std::string &JsonParam)
     {
         JsonParam_ = JsonParam;

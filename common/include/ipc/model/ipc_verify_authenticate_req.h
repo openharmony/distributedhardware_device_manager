@@ -24,11 +24,21 @@ class IpcVerifyAuthenticateReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcVerifyAuthenticateReq);
 
 public:
+    /**
+     * @tc.name: IpcVerifyAuthenticateReq::GetAuthPara
+     * @tc.desc: Ipc verify authentication request get authentication parameters
+     * @tc.type: FUNC
+     */
     const std::string &GetAuthPara() const
     {
         return authPara_;
     }
 
+    /**
+     * @tc.name: IpcVerifyAuthenticateReq::SetAuthPara
+     * @tc.desc: Ipc verify authentication request set authentication parameters
+     * @tc.type: FUNC
+     */
     void SetAuthPara(const std::string &authPara)
     {
         authPara_ = authPara;

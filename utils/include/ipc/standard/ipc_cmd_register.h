@@ -69,20 +69,55 @@ class IpcCmdRegister {
     DECLARE_SINGLE_INSTANCE(IpcCmdRegister);
 
 public:
+    /**
+     * @tc.name: IpcCmdRegister::RegisterSetRequestFunc
+     * @tc.desc: RegisterSetRequestFunc of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterSetRequestFunc(int32_t cmdCode, SetIpcRequestFunc setIpcRequestFunc)
     {
         setIpcRequestFuncMap_.emplace(cmdCode, setIpcRequestFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterReadResponseFunc
+     * @tc.desc: RegisterReadResponseFunc of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterReadResponseFunc(int32_t cmdCode, ReadResponseFunc readResponseFunc)
     {
         readResponseFuncMap_.emplace(cmdCode, readResponseFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterCmdProcessFunc
+     * @tc.desc: RegisterCmdProcessFunc of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterCmdProcessFunc(int32_t cmdCode, OnIpcCmdFunc onIpcCmdFunc)
     {
         onIpcCmdFuncMap_.emplace(cmdCode, onIpcCmdFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterSetRequestFunc
+     * @tc.desc: RegisterSetRequestFunc of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data);
+
+    /**
+     * @tc.name: IpcCmdRegister::ReadResponse
+     * @tc.desc: ReadResponse of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp);
+
+    /**
+     * @tc.name: IpcCmdRegister::OnIpcCmd
+     * @tc.desc: OnIpcCmd of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply);
 
 private:

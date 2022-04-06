@@ -82,26 +82,73 @@ class IpcCmdRegister {
     DECLARE_SINGLE_INSTANCE(IpcCmdRegister);
 
 public:
+    /**
+     * @tc.name: IpcCmdRegister::RegisterSetRequestFunc
+     * @tc.desc: Register Set Request Func of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterSetRequestFunc(int32_t cmdCode, SetIpcRequestFunc setIpcRequestFunc)
     {
         setIpcRequestFuncMap_.emplace(cmdCode, setIpcRequestFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterReadResponseFunc
+     * @tc.desc: Register Read Response Func of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterReadResponseFunc(int32_t cmdCode, ReadResponseFunc readResponseFunc)
     {
         readResponseFuncMap_.emplace(cmdCode, readResponseFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterCmdProcessFunc
+     * @tc.desc: Register Cmd Process Func of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterCmdProcessFunc(int32_t cmdCode, OnIpcCmdFunc onIpcCmdFunc)
     {
         onIpcCmdFuncMap_.emplace(cmdCode, onIpcCmdFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::RegisterServerCmdProcessFunc
+     * @tc.desc: Register Server Cmd Process Func of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     void RegisterServerCmdProcessFunc(int32_t cmdCode, OnIpcServerCmdFunc onIpcServerCmdFunc)
     {
         onIpcServerCmdFuncMap_.emplace(cmdCode, onIpcServerCmdFunc);
     };
+
+    /**
+     * @tc.name: IpcCmdRegister::SetRequest
+     * @tc.desc: Set Request of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                        size_t buffLen);
+
+    /**
+     * @tc.name: IpcCmdRegister::ReadResponse
+     * @tc.desc: Read Response of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t ReadResponse(int32_t cmdCode, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp);
+
+    /**
+     * @tc.name: IpcCmdRegister::OnIpcCmd
+     * @tc.desc: On Ipc Cmd of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t OnIpcCmd(int32_t cmdCode, IpcIo &reply);
+
+    /**
+     * @tc.name: IpcCmdRegister::OnIpcServerCmd
+     * @tc.desc: On Ipc Server Cmd of the Ipc Cmd Register
+     * @tc.type: FUNC
+     */
     int32_t OnIpcServerCmd(int32_t cmdCode, IpcIo &req, IpcIo &reply);
 
 private:

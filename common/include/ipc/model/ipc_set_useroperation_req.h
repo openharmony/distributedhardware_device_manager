@@ -25,11 +25,21 @@ class IpcGetOperationReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetOperationReq);
 
 public:
+    /**
+     * @tc.name: IpcGetOperationReq::GetOperation
+     * @tc.desc: Ipc Get Operation Request Get Operation
+     * @tc.type: FUNC
+     */
     int32_t GetOperation() const
     {
         return action_;
     }
 
+    /**
+     * @tc.name: IpcGetOperationReq::SetOperation
+     * @tc.desc: Ipc Get Operation Request Set Operation
+     * @tc.type: FUNC
+     */
     void SetOperation(int32_t action)
     {
         action_ = action;

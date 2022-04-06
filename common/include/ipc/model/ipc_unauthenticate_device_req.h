@@ -25,11 +25,21 @@ class IpcUnAuthenticateDeviceReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcUnAuthenticateDeviceReq);
 
 public:
+    /**
+     * @tc.name: IpcUnAuthenticateDeviceReq::GetDeviceInfo
+     * @tc.desc: Ipc UnAuthenticate Device Req Get DeviceInfo
+     * @tc.type: FUNC
+     */
     const DmDeviceInfo &GetDeviceInfo() const
     {
         return deviceInfo_;
     }
 
+    /**
+     * @tc.name: IpcUnAuthenticateDeviceReq::SetDeviceInfo
+     * @tc.desc: Ipc UnAuthenticate Device Req Set DeviceInfo
+     * @tc.type: FUNC
+     */
     void SetDeviceInfo(const DmDeviceInfo &deviceInfo)
     {
         deviceInfo_ = deviceInfo;

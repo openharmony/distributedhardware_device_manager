@@ -310,5 +310,4 @@ private:
     static AuthAsyncCallbackInfo authAsyncCallbackInfo_;
     static AuthAsyncCallbackInfo verifyAsyncCallbackInfo_;
 };
-
 #endif // OHOS_DM_NATIVE_DEVICEMANAGER_JS_H

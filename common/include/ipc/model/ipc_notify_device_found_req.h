@@ -25,21 +25,41 @@ class IpcNotifyDeviceFoundReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyDeviceFoundReq);
 
 public:
+    /**
+     * @tc.name: IpcNotifyDeviceFoundReq::GetDeviceInfo
+     * @tc.desc: Get DeviceInfo of the Ipc Notify Device Found Request
+     * @tc.type: FUNC
+     */
     const DmDeviceInfo &GetDeviceInfo() const
     {
         return dmDeviceInfo_;
     }
 
+    /**
+     * @tc.name: IpcNotifyDeviceFoundReq::SetDeviceInfo
+     * @tc.desc: Set DeviceInfo of the Ipc Notify Device Found Request
+     * @tc.type: FUNC
+     */
     void SetDeviceInfo(const DmDeviceInfo &dmDeviceInfo)
     {
         dmDeviceInfo_ = dmDeviceInfo;
     }
 
+    /**
+     * @tc.name: IpcNotifyDeviceFoundReq::GetSubscribeId
+     * @tc.desc: Get SubscribeId of the Ipc Notify Device Found Request
+     * @tc.type: FUNC
+     */
     uint16_t GetSubscribeId() const
     {
         return subscribeId_;
     }
 
+    /**
+     * @tc.name: IpcNotifyDeviceFoundReq::SetSubscribeId
+     * @tc.desc: Set SubscribeId of the Ipc Notify Device Found Request
+     * @tc.type: FUNC
+     */
     void SetSubscribeId(uint16_t subscribeId)
     {
         subscribeId_ = subscribeId;

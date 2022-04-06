@@ -24,11 +24,21 @@ class IpcGetTrustDeviceReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetTrustDeviceReq);
 
 public:
+    /**
+     * @tc.name: IpcGetTrustDeviceReq::GetExtra
+     * @tc.desc: Ipc GetTrust Device Request Get Extra
+     * @tc.type: FUNC
+     */
     const std::string &GetExtra() const
     {
         return extra_;
     }
 
+    /**
+     * @tc.name: IpcGetTrustDeviceReq::SetExtra
+     * @tc.desc: Ipc GetTrust Device Request Set Extra
+     * @tc.type: FUNC
+     */
     void SetExtra(const std::string &extra)
     {
         extra_ = extra;

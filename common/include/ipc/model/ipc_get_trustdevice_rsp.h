@@ -27,11 +27,21 @@ class IpcGetTrustDeviceRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetTrustDeviceRsp);
 
 public:
+    /**
+     * @tc.name: IpcGetTrustDeviceRsp::GetDeviceVec
+     * @tc.desc: Get DeviceVec of the Ipc Get Trust Device Response
+     * @tc.type: FUNC
+     */
     std::vector<DmDeviceInfo> GetDeviceVec() const
     {
         return deviceVec_;
     }
 
+    /**
+     * @tc.name: IpcGetTrustDeviceRsp::SetDeviceVec
+     * @tc.desc: Set DeviceVec of the Ipc Get Trust Device Response
+     * @tc.type: FUNC
+     */
     void SetDeviceVec(std::vector<DmDeviceInfo> &deviceVec)
     {
         deviceVec_ = deviceVec;

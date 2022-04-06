@@ -46,6 +46,11 @@ public:
         return listener_;
     }
 
+    /**
+     * @tc.name: IpcRegisterListenerReq::SetListener
+     * @tc.desc: Ipc registered listener request to set listener
+     * @tc.type: FUNC
+     */
     void SetListener(sptr<IRemoteObject> listener)
     {
         listener_ = listener;

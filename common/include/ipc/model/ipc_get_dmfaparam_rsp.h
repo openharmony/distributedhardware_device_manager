@@ -25,11 +25,21 @@ class IpcGetDmFaParamRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetDmFaParamRsp);
 
 public:
+    /**
+     * @tc.name: IpcGetDmFaParamRsp::GetDmAuthParam
+     * @tc.desc: Ipc Get DeviceManager Fa Param Response Get DeviceManager Auth Param
+     * @tc.type: FUNC
+     */
     const DmAuthParam GetDmAuthParam() const
     {
         return dmFaParam_;
     }
 
+    /**
+     * @tc.name: IpcGetDmFaParamRsp::SetDmAuthParam
+     * @tc.desc: Ipc Get DeviceManager Fa Param Response Set DeviceManager Auth Param
+     * @tc.type: FUNC
+     */
     void SetDmAuthParam(const DmAuthParam &dmFaParam)
     {
         dmFaParam_ = dmFaParam;

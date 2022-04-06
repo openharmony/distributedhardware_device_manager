@@ -26,20 +26,41 @@ class IpcGetInfoByNetWorkRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetInfoByNetWorkRsp);
 
 public:
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::GetUdid
+     * @tc.desc: Get Udid for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
     const std::string GetUdid() const
     {
         return udid_;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetUdid
+     * @tc.desc: Set Udid for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
     void SetUdid(const std::string &udid)
     {
         udid_ = udid;
     }
+
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::GetUuid
+     * @tc.desc: Get Uuid for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
     const std::string GetUuid() const
     {
         return uuid_;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetExtra
+     * @tc.desc: Set Uuid for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
     void SetUuid(const std::string &uuid)
     {
         uuid_ = uuid;

@@ -30,14 +30,55 @@ namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceListener {
 public:
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnDeviceStateChange
+     * @tc.desc: Device State Change of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnDeviceFound
+     * @tc.desc: Device Found of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnDiscoveryFailed
+     * @tc.desc: Discovery Failed of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnDiscoverySuccess
+     * @tc.desc: Discovery Success of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnAuthResult
+     * @tc.desc: Auth Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
                       int32_t reason);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnVerifyAuthResult
+     * @tc.desc: Verify Auth Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
                             const std::string &flag);
+
+    /**
+     * @tc.name: DeviceManagerServiceListener::OnFaCall
+     * @tc.desc: Fa Call of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     void OnFaCall(std::string &pkgName, std::string &paramJson);
 
 private:
