@@ -31,30 +31,125 @@ public:
     static DeviceManager &GetInstance();
 
 public:
+    /**
+     * @tc.name: DeviceManagerImpl::InitDeviceManager
+     * @tc.desc: Initialize DeviceManager
+     * @tc.type: FUNC
+     */
     virtual int32_t InitDeviceManager(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnInitDeviceManager
+     * @tc.desc: UnInitialize DeviceManager
+     * @tc.type: FUNC
+     */
     virtual int32_t UnInitDeviceManager(const std::string &pkgName) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::GetTrustedDeviceList
+     * @tc.desc: Get device list of trusted devices
+     * @tc.type: FUNC
+     */
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                          std::vector<DmDeviceInfo> &deviceList) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
+     * @tc.desc: Get local device information
+     * @tc.type: FUNC
+     */
     virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &deviceInfo) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
+     * @tc.desc: Register device development status callback
+     * @tc.type: FUNC
+     */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
                                              std::shared_ptr<DeviceStateCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterDevStateCallback
+     * @tc.desc: UnRegister device development status callback
+     * @tc.type: FUNC
+     */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::StartDeviceDiscovery
+     * @tc.desc: Initiate device discovery
+     * @tc.type: FUNC
+     */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                          const std::string &extra, std::shared_ptr<DiscoveryCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::StopDeviceDiscovery
+     * @tc.desc: Stop device discovery
+     * @tc.type: FUNC
+     */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::AuthenticateDevice
+     * @tc.desc: Complete verifying the device
+     * @tc.type: FUNC
+     */
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &deviceInfo,
                                        const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnAuthenticateDevice
+     * @tc.desc: Cancel complete verification of device
+     * @tc.type: FUNC
+     */
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::VerifyAuthentication
+     * @tc.desc: Verify device authentication
+     * @tc.type: FUNC
+     */
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                          std::shared_ptr<VerifyAuthCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::RegisterDeviceManagerFaCallback
+     * @tc.desc: Register Fa callback for device manager
+     * @tc.type: FUNC
+     */
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
                                                     std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterDeviceManagerFaCallback
+     * @tc.desc: Unregister Fa callback for device manager
+     * @tc.type: FUNC
+     */
     virtual int32_t UnRegisterDeviceManagerFaCallback(const std::string &pkgName) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::GetFaParam
+     * @tc.desc: Get Fa Param
+     * @tc.type: FUNC
+     */
     virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::SetUserOperation
+     * @tc.desc: Set User Actions
+     * @tc.type: FUNC
+     */
     virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::GetUdidByNetworkId
+     * @tc.desc: Get Udid by NetworkId
+     * @tc.type: FUNC
+     */
     virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::GetUuidByNetworkId
+     * @tc.desc: Get Uuid by NetworkId
+     * @tc.type: FUNC
+     */
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
+     * @tc.desc: Register development status callback
+     * @tc.type: FUNC
+     */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterDevStateCallback
+     * @tc.desc: Unregister development status callback
+     * @tc.type: FUNC
+     */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
 };
 } // namespace DistributedHardware

@@ -25,21 +25,38 @@ class IpcNotifyDeviceStateReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyDeviceStateReq);
 
 public:
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::GetDeviceState
+     * @tc.desc: Ipc notification device status request Get Device State
+     * @tc.type: FUNC
+     */
     int32_t GetDeviceState() const
     {
         return deviceState_;
     }
-
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::SetDeviceState
+     * @tc.desc: Ipc notification device status request Set Device State
+     * @tc.type: FUNC
+     */
     void SetDeviceState(int32_t deviceState)
     {
         deviceState_ = deviceState;
     }
-
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::GetDeviceInfo
+     * @tc.desc: Ipc notification device status request Get Device Info
+     * @tc.type: FUNC
+     */
     const DmDeviceInfo &GetDeviceInfo() const
     {
         return dmDeviceInfo_;
     }
-
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::SetDeviceInfo
+     * @tc.desc: Ipc notification device status request Set Device Info
+     * @tc.type: FUNC
+     */
     void SetDeviceInfo(const DmDeviceInfo &dmDeviceInfo)
     {
         dmDeviceInfo_ = dmDeviceInfo;

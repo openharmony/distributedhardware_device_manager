@@ -31,7 +31,17 @@ class IpcClientStub : public IRemoteStub<IpcRemoteBroker> {
 public:
     IpcClientStub() {};
     ~IpcClientStub() {};
+    /**
+     * @tc.name: IpcClientStub::OnRemoteRequest
+     * @tc.desc: Ipc Client Stub remote request
+     * @tc.type: FUNC
+     */
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    /**
+     * @tc.name: IpcClientStub::SendCmd
+     * @tc.desc: Ipc Client Stub Send command
+     * @tc.type: FUNC
+     */
     int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 };
 } // namespace DistributedHardware
