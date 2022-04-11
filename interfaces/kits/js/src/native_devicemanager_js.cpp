@@ -46,6 +46,7 @@ const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_NAPI_SUB_ID_MAX = 65535;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
+const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 8;
 
 napi_ref deviceTypeEnumConstructor_ = nullptr;
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
@@ -499,7 +500,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
     napi_get_reference_value(env_, thisVarRef_, &thisVar);
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
 
-    if (status == 0) {
+    if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && reason == 0) {
         LOGI("OnAuthResult success");
         napi_get_undefined(env_, &result[0]);
         napi_create_object(env_, &result[1]);

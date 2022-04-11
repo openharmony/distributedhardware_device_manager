@@ -61,6 +61,7 @@ HiChainConnector::HiChainConnector()
 {
     LOGI("HiChainConnector::constructor");
     deviceAuthCallback_ = {.onTransmit = nullptr,
+                           .onSessionKeyReturned = nullptr,
                            .onFinish = HiChainConnector::onFinish,
                            .onError = HiChainConnector::onError,
                            .onRequest = HiChainConnector::onRequest};

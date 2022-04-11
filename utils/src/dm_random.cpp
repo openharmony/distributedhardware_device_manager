@@ -24,6 +24,10 @@
 #include "mbedtls/gcm.h"
 #include "mbedtls/md.h"
 
+#if defined(__LITEOS_M__)
+#include <time.h>
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 int32_t GenRandInt(int32_t randMin, int32_t randMax)
