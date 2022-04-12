@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
+#include "dm_anonymous.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
@@ -247,6 +248,7 @@ public:
     static void DeviceInfoToJsArray(const napi_env &env,
                                     const std::vector<OHOS::DistributedHardware::DmDeviceInfo> &vecDevInfo,
                                     const int32_t idx, napi_value &arrayResult);
+    static bool DmAuthParamDetection(const OHOS::DistributedHardware::DmAuthParam &authParam);
     static void DmAuthParamToJsAuthParam(const napi_env &env, const OHOS::DistributedHardware::DmAuthParam &authParam,
                                          napi_value &paramResult);
     static void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
