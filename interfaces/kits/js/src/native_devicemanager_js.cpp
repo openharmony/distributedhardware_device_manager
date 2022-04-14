@@ -586,9 +586,36 @@ void DeviceManagerNapi::DeviceInfoToJsArray(const napi_env &env, const std::vect
     }
 }
 
+bool DeviceManagerNapi::DmAuthParamDetection(const DmAuthParam &authParam)
+{
+    LOGI("DeviceManagerNapi::DmAuthParamDetection");
+    const uint32_t maxIntValueLen = 10;
+    const std::string maxAuthToken = "2147483647";
+    if (authParam.authToken.length() > maxIntValueLen) {
+        LOGE("The authToken is illegal");
+        return false;
+    } else {
+        if (!IsNumberString(authParam.authToken)) {
+            LOGE("The authToken is Error");
+            return false;
+        } else {
+            if (authParam.authToken > maxAuthToken) {
+                LOGE("The authToken is Cross the border");
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void DeviceManagerNapi::DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
                                                  napi_value &paramResult)
 {
+    LOGI("DeviceManagerNapi::DmAuthParamToJsAuthParam");
+    if (!DmAuthParamDetection(authParam)) {
+        LOGE("The authToken is Error");
+        return;
+    }
     napi_value extraInfo = nullptr;
     napi_create_object(env, &extraInfo);
     SetValueInt32(env, "direction", authParam.direction, extraInfo);
