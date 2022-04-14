@@ -82,6 +82,8 @@ public:
 private:
     std::string GetConnectPara(std::string deviceId, std::shared_ptr<MsgResponseAuth> msgResponseAuth);
     bool IsGroupInfoInvalid(GroupInfo &group);
+    bool IsGroupCreated(std::string groupName, GroupInfo &groupInfo);
+    bool GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
 
 private:
     std::atomic<int32_t> requestIdIndex_ {0};

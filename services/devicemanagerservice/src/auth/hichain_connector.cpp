@@ -105,7 +105,10 @@ int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &grou
         DMLOG(DM_LOG_ERROR, "HichainConnector::CreateGroup group manager is null, requestId %lld.", requestId);
         return FAIL;
     }
-
+    GroupInfo groupInfo;
+    if (IsGroupCreated(groupName, groupInfo)) {
+        DeleteGroup(groupInfo.groupId);
+    }
     DMLOG(DM_LOG_INFO, "HichainConnector::CreateGroup requestId %lld", requestId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -125,6 +128,53 @@ int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &grou
     }
 
     return SUCCESS;
+}
+
+bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInfo)
+{
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_NAME] = groupName.c_str();
+    std::string queryParams = jsonObj.dump();
+    std::vector<GroupInfo> groupList;
+    if (GetGroupInfo(queryParams, groupList)) {
+        groupInfo = groupList[0];
+        return true;
+    }
+    return false;
+}
+
+bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
+{
+    char *groupVec = nullptr;
+    uint32_t num = 0;
+    int32_t ret = deviceGroupManager_->getGroupInfo(DEVICE_MANAGER_APP.c_str(), queryParams.c_str(), &groupVec, &num);
+    if (ret != 0) {
+        DMLOG(DM_LOG_ERROR, "HiChainConnector::GetGroupInfo failed , ret: %d.", ret);
+        return false;
+    }
+    if (groupVec == nullptr) {
+        DMLOG(DM_LOG_ERROR, "HiChainConnector::GetGroupInfo failed , returnGroups is nullptr");
+        return false;
+    }
+    if (num == 0) {
+        DMLOG(DM_LOG_ERROR, "HiChainConnector::GetGroupInfo group failed, groupNum is 0.");
+        return false;
+    }
+    DMLOG(DM_LOG_INFO, "HiChainConnector::GetGroupInfo group(%s), groupNum(%u)", groupVec, num);
+    std::string relatedGroups = std::string(groupVec);
+    deviceGroupManager_->destroyInfo(&groupVec);
+    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
+    if (jsonObject.is_discarded()) {
+        DMLOG(DM_LOG_ERROR, "returnGroups parse error");
+        return false;
+    }
+    std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
+    if (groupInfos.size() == 0) {
+        DMLOG(DM_LOG_ERROR, "HiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
+        return false;
+    }
+    groupList = groupInfos;
+    return true;
 }
 
 void HichainConnector::RegisterConnectorCallback(std::shared_ptr<HichainConnectorCallback> callback)
