@@ -46,7 +46,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "//base/security/deviceauth/interfaces/innerkits",
         "//third_party/json/include",
-        "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
         "${utils_path}/include",
         "${utils_path}/include/permission/lite",
         "foundation/multimedia/image_standard/mock/native/include",
@@ -106,6 +105,11 @@ if (defined(ohos_lite)) {
         "DH_LOG_TAG=\"devicemanagerservice\"",
         "LOG_DOMAIN=0xD004100",
       ]
+
+      if (os_account_part_exists) {
+        defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+        include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+      }
 
       ldflags = dm_ldflags
 
@@ -250,8 +254,11 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/permission/standard",
       "//base/security/deviceauth/interfaces/innerkits",
       "//third_party/json/include",
-      "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
     ]
+
+    if (os_account_part_exists) {
+      include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+    }
   }
 
   ohos_shared_library("devicemanagerservice") {
@@ -292,12 +299,16 @@ if (defined(ohos_lite)) {
     deps = [
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
-      "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
       "//base/security/deviceauth/services:deviceauth_sdk",
       "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
       "//foundation/aafwk/standard/interfaces/innerkits/want:want",
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     ]
+
+    if (os_account_part_exists) {
+      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+      deps += [ "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits" ]
+    }
 
     if (!device_manager_base_no_interaction_auth) {
       deps += [

@@ -17,25 +17,34 @@
 
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
 using namespace OHOS::AccountSA;
+#endif // OS_ACCOUNT_PART_EXISTS
 #endif
 
 namespace OHOS {
 namespace DistributedHardware {
 int32_t MultipleUserConnector::oldUserId_ = -1;
+#ifndef OS_ACCOUNT_PART_EXISTS
+const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
+#endif // OS_ACCOUNT_PART_EXISTS
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return 0;
 #else
+#ifdef OS_ACCOUNT_PART_EXISTS
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != ERR_OK || ids.empty()) {
         return -1;
     }
     return ids[0];
+#else // OS_ACCOUNT_PART_EXISTS
+    return DEFAULT_OS_ACCOUNT_ID;
+#endif // OS_ACCOUNT_PART_EXISTS
 #endif
 }
 
