@@ -130,7 +130,7 @@ int32_t HichainConnector::CreateGroup(int64_t requestId, const std::string &grou
     return SUCCESS;
 }
 
-bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInfo)
+bool HichainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInfo)
 {
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_NAME] = groupName.c_str();
@@ -143,7 +143,7 @@ bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInf
     return false;
 }
 
-bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
+bool HichainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
