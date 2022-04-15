@@ -235,19 +235,30 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 
 void DmDeviceStateManager::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
-    if (pkgName != "") {
-        decisionInfos_[pkgName] = extra;
+    if (pkgName.empty()) {
+        LOGE("DmDeviceStateManager::RegisterDevStateCallback input param is empty");
+        return;
+    }
+    LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName=%s, extra=%s",
+        GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
+    if (decisionInfos_.count(pkgName) == 0) {
+        decisionInfos_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
     }
 }
 
 void DmDeviceStateManager::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
-    auto iter = decisionInfos_.find(pkgName);
-    if (iter == decisionInfos_.end()) {
-    } else {
-        decisionInfos_.erase(pkgName);
+    if (pkgName.empty()) {
+        LOGE("DmDeviceStateManager::UnRegisterDevStateCallback input param is empty");
+        return;
+    }
+    LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName=%s, extra=%s",
+        GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
+    if (decisionInfos_.count(pkgName) > 0) {
+        auto iter = decisionInfos_.find(pkgName);
+        if (iter != decisionInfos_.end()) {
+            decisionInfos_.erase(pkgName);
+        }
     }
 }
 

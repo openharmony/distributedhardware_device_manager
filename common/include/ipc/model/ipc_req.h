@@ -26,7 +26,7 @@ class IpcReq {
     DECLARE_IPC_MODEL(IpcReq);
 
 public:
-    const std::string &GetPkgName() const
+    const std::string GetPkgName() const
     {
         return pkgName_;
     }

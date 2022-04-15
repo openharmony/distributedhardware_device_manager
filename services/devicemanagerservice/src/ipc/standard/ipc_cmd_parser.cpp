@@ -33,6 +33,10 @@ namespace OHOS {
 namespace DistributedHardware {
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
+
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t deviceState = pReq->GetDeviceState();
@@ -54,12 +58,20 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
+
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::static_pointer_cast<IpcNotifyDeviceFoundReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
@@ -81,12 +93,19 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::static_pointer_cast<IpcNotifyDiscoverResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
@@ -118,8 +137,12 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, MessageParcel &reply, std::shared_p
 
 ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::static_pointer_cast<IpcNotifyAuthResultReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::make_shared<IpcNotifyAuthResultReq>();
+
+    std::string pkgName = pBaseReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
     std::string token = pReq->GetPinToken();
     int32_t status = pReq->GetStatus();
@@ -149,15 +172,22 @@ ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
 
 ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq = std::make_shared<IpcNotifyVerifyAuthResultReq>();
+
+    std::string pkgName = pBaseReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
     int32_t result = pReq->GetResult();
     int32_t flag = pReq->GetFlag();
@@ -182,14 +212,23 @@ ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, 
 
 ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::static_pointer_cast<IpcNotifyDMFAResultReq>(pBaseReq);
-    std::string packagname = pReq->GetPkgName();
+    if (pBaseReq == nullptr) {
+        return DM_FAILED;
+    }
+
+    std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::make_shared<IpcNotifyDMFAResultReq>();
+
+    std::string packagname = pBaseReq->GetPkgName();
     std::string paramJson = pReq->GetJsonParam();
     if (!data.WriteString(packagname)) {
         LOGE("write pkgName failed");
@@ -204,6 +243,10 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, Me
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FA_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }

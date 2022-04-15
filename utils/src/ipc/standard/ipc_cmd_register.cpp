@@ -17,6 +17,7 @@
 
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "ipc_def.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -24,12 +25,22 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
-    if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
+    int32_t ret = DM_OK;
+    if (cmdCode < 0 || cmdCode >= UNREGISTER_DEV_STATE_CALLBACK || pBaseReq == nullptr) {
+        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return DM_INVALID_VALUE;
+    }
+
+    if (setIpcRequestFuncMap_.count(cmdCode) == 0) {
         LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
         return DM_IPC_NOT_REGISTER_FUNC;
     }
-    return (setRequestMapIter->second)(pBaseReq, data);
+
+    auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
+    if (setRequestMapIter != setIpcRequestFuncMap_.end()) {
+        ret = (setRequestMapIter->second)(pBaseReq, data);
+    }
+    return ret;
 }
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
@@ -38,6 +49,9 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
     if (readResponseMapIter == readResponseFuncMap_.end()) {
         LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
         return DM_IPC_NOT_REGISTER_FUNC;
+    }
+    if (readResponseMapIter->second == nullptr) {
+        return DM_POINT_NULL;
     }
     return (readResponseMapIter->second)(reply, pBaseRsp);
 }
@@ -48,6 +62,9 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
         LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
         return DM_IPC_NOT_REGISTER_FUNC;
+    }
+    if (onIpcCmdMapIter->second ==  nullptr) {
+        return DM_POINT_NULL;
     }
     return (onIpcCmdMapIter->second)(data, reply);
 }
