@@ -11,14 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
+group("fuzztest") {
   testonly = true
 
-  deps = []
-  if (support_jsapi) {
-    deps += [ 
-      "unittest:unittest",
-      "fuzztest:fuzztest"
-    ]
-  }
+  deps = [ 
+    "devicemanagerimpl_fuzzer:fuzztest",
+    "devicemanagernotify_fuzzer:fuzztest",
+    "devicemanagerservice_fuzzer:fuzztest",
+    "ipcclientmanager_fuzzer:fuzztest",
+    "ipccmdregister_fuzzer:fuzztest",
+    "ipcserverclientproxy_fuzzer:fuzztest",
+    "ipcserverlistener_fuzzer:fuzztest",
+    "ipcserverstub_fuzzer:fuzztest",
+    "nativedevicemanagerjs_fuzzer:fuzztest",
+  ]
 }

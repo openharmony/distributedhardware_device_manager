@@ -1,0 +1,148 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import(
+    "//foundation/distributedhardware/devicemanager/devicemanager.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("IpcCmdRegisterFuzzTest") {
+  module_out_path = "devicemanager/ipccmdregister_fuzzer"
+  fuzz_config_file = "//foundation/distributedhardware/devicemanager/test/fuzztest/ipccmdregister_fuzzer"
+
+  include_dirs = [
+    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
+    "//foundation/distributedhardware/devicemanager/interfaces/kits/js/include",
+    "//third_party/node/src",
+    "//foundation/ace/napi/native_engine",
+    "//foundation/ace/napi/interfaces/kits",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/notify",
+    "//third_party/json/include",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${common_path}/include/ipc/model",
+    "${utils_path}/include",
+    "${utils_path}/include/ipc/standard",
+    "${services_path}/include/dependency/timer",
+    "${services_path}/include/dependency/softbus",
+    "${services_path}/include/authentication",
+    "${services_path}/include/adapter",
+    "${services_path}/include",
+    "${services_path}/include/ipc/standard",
+    "${services_path}/include/discovery",
+    "${services_path}/include/dependency/hichain",
+    "${services_path}/include/deviceinfo",
+    "${services_path}/include/devicestate",
+    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+    "//foundation/communication/softbus_lite/interfaces/kits/transport",
+    "//foundation/communication/dsoftbus/interfaces/kits/common",
+    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+    "//foundation/distributedhardware/devicemanager/test/unittest/mock",
+    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//foundation/distributedhardware/devicemanager/ext/mini/services/devicemanagerservice/include/dispatch",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
+    "//foundation/distributedhardware/devicemanager/ext/profile/include",
+    "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/distributedhardware/devicemanager/ext/mini/common/include",
+    "//base/security/deviceauth/interfaces/innerkits",
+    "${services_path}/include/ability",
+    "${services_path}/include/config",
+    "//utils/native/lite/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+    "//third_party/bounds_checking_function/include",
+    "//foundation/communication/ipc_lite/interfaces/kits",
+    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+    "//third_party/json/include",
+    "//foundation/appexecfwk/appexecfwk_lite/interfaces/kits/bundle_lite",
+    "//foundation/ace/napi/interfaces/innerkits/napi",
+    "//foundation/ace/napi/interfaces/innerkits",
+    "//third_party/jsframework/runtime/main/extend",
+    "//foundation/windowmanager/interfaces/kits",
+    "//third_party/jsframework/runtime/main/extend/systemplugin",
+    "//third_party/node/benchmark",
+    "//foundation/windowmanager/interfaces/kits/napi/screen_runtime",
+    "//third_party/libuv/include",
+    "//foundation/distributedhardware/devicemanager/services/devicemanagerservice/include/ipc/lite",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "ipc_cmd_register_fuzzer.cpp" ]
+
+  deps = [
+    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutils",
+    "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
+    "//base/security/deviceauth/services:deviceauth_sdk",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"IpcCmdRegisterFuzzTest\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+
+  external_deps = [
+    "ipc:ipc_core",
+    "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "ces_standard:cesfwk_core",
+    "ces_standard:cesfwk_innerkits",
+    "dsoftbus_standard:softbus_client",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
+
+   public_deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutils",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//foundation/distributedhardware/devicemanager/interfaces/kits/js:devicemanager",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/googletest:gmock",
+    "//third_party/googletest:gtest",
+    "//utils/native/base:utils",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+
+  deps = [ ":IpcCmdRegisterFuzzTest" ]
+}
+###############################################################################
