@@ -286,33 +286,41 @@ int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 
 int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &authParam)
 {
-    if (pkgName.empty()) {
-        LOGE("GetFaParam failed, pkgName is empty");
-        return DM_INPUT_PARA_EMPTY;
+    if (authMgr_ != nullptr) {
+        authMgr_->GetAuthenticationParam(authParam);
     }
-    authMgr_->GetAuthenticationParam(authParam);
     return DM_OK;
 }
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action)
 {
-    if (pkgName.empty()) {
-        LOGE("SetUserOperation failed, pkgName is empty");
-        return DM_INPUT_PARA_EMPTY;
+    if (authMgr_ != nullptr) {
+        authMgr_->OnUserOperation(action);
     }
-    authMgr_->OnUserOperation(action);
     return DM_OK;
 }
 
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    deviceStateMgr_->RegisterDevStateCallback(pkgName, extra);
+    if (pkgName.empty()) {
+        LOGE("RegisterDevStateCallback failed, pkgName is empty");
+        return DM_INPUT_PARA_EMPTY;
+    }
+    if (deviceStateMgr_ != nullptr) {
+        deviceStateMgr_->RegisterDevStateCallback(pkgName, extra);
+    }
     return DM_OK;
 }
 
 int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
+    if (pkgName.empty()) {
+        LOGE("UnRegisterDevStateCallback failed, pkgName is empty");
+        return DM_INPUT_PARA_EMPTY;
+    }
+    if (deviceStateMgr_!= nullptr) {
+        deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
+    }
     return DM_OK;
 }
 
