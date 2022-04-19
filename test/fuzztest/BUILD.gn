@@ -14,7 +14,7 @@
 group("fuzztest") {
   testonly = true
 
-  deps = [ 
+  deps = [
     "devicemanagerimpl_fuzzer:fuzztest",
     "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
