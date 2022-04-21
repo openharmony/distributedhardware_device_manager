@@ -23,8 +23,7 @@ if (defined(ohos_lite)) {
     }
     group("device_manager_test") {
       testonly = true
-      deps = [
-      ]
+      deps = []
     }
   } else {
     lite_component("device_manager_base") {
@@ -37,25 +36,22 @@ if (defined(ohos_lite)) {
     }
     group("device_manager_test") {
       testonly = true
-      deps = [
-      ]
+      deps = []
     }
   }
 } else {
-    group("device_manager_base") {
-      deps = [
-        "utils:devicemanagerutils",
-        "interfaces/inner_kits/native_cpp:devicemanagersdk",
-        "interfaces/kits:devicemanager_native_js",
-        "services/devicemanagerservice:devicemanagerservice",
-        "sa_profile:dm_sa_profile",
-        "ext:ext_modules",
-      ]
-    }
-    group("device_manager_test") {
-      testonly = true
-      deps = [
-        "test:test",
-      ]
-    }
+  group("device_manager_base") {
+    deps = [
+      "ext:ext_modules",
+      "interfaces/inner_kits/native_cpp:devicemanagersdk",
+      "interfaces/kits:devicemanager_native_js",
+      "sa_profile:dm_sa_profile",
+      "services/devicemanagerservice:devicemanagerservice",
+      "utils:devicemanagerutils",
+    ]
+  }
+  group("device_manager_test") {
+    testonly = true
+    deps = [ "test:test" ]
+  }
 }
