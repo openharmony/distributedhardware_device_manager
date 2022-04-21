@@ -27,7 +27,7 @@
                 "startup_l2",
                 "device_profile_core",
                 "samgr_standard",
-                "ces_standard",
+                "common_event_service",
                 "dsoftbus_standard",
                 "utils_base",
                 "napi",
