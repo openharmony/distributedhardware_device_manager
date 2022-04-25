@@ -267,7 +267,6 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    nlohmann::json json;
     nlohmann::json jsonThumbnail;
     authResponseContext->deviceId = "123";
     authResponseContext->reply = 0;
@@ -283,8 +282,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
     jsonThumbnail[TAG_GROUP_ID] = authResponseContext->groupId;
     jsonThumbnail[TAG_GROUP_NAME] = authResponseContext->groupName;
     jsonThumbnail[TAG_REQUEST_ID] = authResponseContext->requestId;
-    authMessageProcessor->authSplitJsonList_.push_back(jsonThumbnail);
-    int32_t ret = authMessageProcessor->ParseAuthRequestMessage();
+    int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_FAILED);
 }
 
@@ -302,24 +300,16 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    nlohmann::json json;
     nlohmann::json jsonThumbnail;
-    authResponseContext->deviceId = "123";
-    authResponseContext->reply = 1;
-    authResponseContext->authType = 222;
-    authResponseContext->networkId = "234";
-    authResponseContext->groupId = "345";
-    authResponseContext->groupName = "456";
-    authResponseContext->requestId = 2333;
-    jsonThumbnail[TAG_DEVICE_ID] = authResponseContext->deviceId;
-    jsonThumbnail[TAG_REPLY] = authResponseContext->reply;
-    jsonThumbnail[TAG_AUTH_TYPE] = authResponseContext->authType;
-    jsonThumbnail[TAG_NET_ID] = authResponseContext->networkId;
-    jsonThumbnail[TAG_GROUP_ID] = authResponseContext->groupId;
-    jsonThumbnail[TAG_GROUP_NAME] = authResponseContext->groupName;
-    jsonThumbnail[TAG_REQUEST_ID] = authResponseContext->requestId;
-    authMessageProcessor->authSplitJsonList_.push_back(jsonThumbnail);
-    int32_t ret = authMessageProcessor->ParseAuthRequestMessage();
+    jsonThumbnail[TAG_SLICE_NUM] = 1;
+    jsonThumbnail[TAG_INDEX] = 0;
+    jsonThumbnail[TAG_DEVICE_ID] = "123";
+    jsonThumbnail[TAG_AUTH_TYPE] = 1;
+    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_TOKEN] = "1234";
+    jsonThumbnail[TAG_TARGET] = "12345";
+    jsonThumbnail[TAG_APP_NAME] = "123456";
+    int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
 }
 

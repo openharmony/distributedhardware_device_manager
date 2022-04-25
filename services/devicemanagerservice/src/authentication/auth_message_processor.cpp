@@ -164,33 +164,15 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         LOGE("err json string, first time");
         return DM_FAILED;
     }
-    int32_t sliceNum = 0;
     int32_t msgType = jsonObject[TAG_TYPE];
     authResponseContext_->msgType = msgType;
-    LOGI("AuthMessageProcessor::ParseAuthRequestMessage======== %d", authResponseContext_->msgType);
+    LOGI("AuthMessageProcessor::ParseMessage message type %d", authResponseContext_->msgType);
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
             ParseNegotiateMessage(jsonObject);
             break;
         case MSG_TYPE_REQ_AUTH:
-            if (!jsonObject.contains(TAG_INDEX) || !jsonObject.contains(TAG_DEVICE_ID) ||
-                !jsonObject.contains(TAG_SLICE_NUM)) {
-                LOGE("err json string, first time");
-                return DM_FAILED;
-            }
-            authResponseContext_->deviceId = jsonObject[TAG_DEVICE_ID];
-            authResponseContext_->authType = jsonObject[TAG_AUTH_TYPE];
-            authResponseContext_->appDesc = jsonObject[TAG_APP_DESCRIPTION];
-            authResponseContext_->token = jsonObject[TAG_TOKEN];
-            authResponseContext_->targetPkgName = jsonObject[TAG_TARGET];
-            authResponseContext_->appName = jsonObject[TAG_APP_NAME];
-            LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());
-            sliceNum = jsonObject[TAG_SLICE_NUM];
-            if ((int32_t)authSplitJsonList_.size() < sliceNum) {
-                authSplitJsonList_.push_back(message);
-            } else {
-                ParseAuthRequestMessage();
-            }
+            return ParseAuthRequestMessage(jsonObject);
             break;
         case MSG_TYPE_RESP_AUTH:
             ParseAuthResponseMessage(jsonObject);
@@ -209,6 +191,37 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
     authResponseContext_->reply = json[TAG_REPLY];
 }
 
+int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
+{
+    LOGE("start ParseAuthRequestMessage");
+    int32_t sliceNum = 0;
+    int32_t idx = 0;
+    if (!json.contains(TAG_INDEX) || !json.contains(TAG_DEVICE_ID) ||
+        !json.contains(TAG_SLICE_NUM)) {
+        LOGE("err json string, first time");
+        return DM_FAILED;
+    }
+
+    idx = json[TAG_INDEX];
+    sliceNum = json[TAG_SLICE_NUM];
+    if (idx == 0) {
+        authResponseContext_->deviceId = json[TAG_DEVICE_ID];
+        authResponseContext_->authType = json[TAG_AUTH_TYPE];
+        authResponseContext_->appDesc = json[TAG_APP_DESCRIPTION];
+        authResponseContext_->token = json[TAG_TOKEN];
+        authResponseContext_->targetPkgName = json[TAG_TARGET];
+        authResponseContext_->appName = json[TAG_APP_NAME];
+        authResponseContext_->appThumbnail = "";
+    }
+
+    if (idx < sliceNum && json.contains(TAG_APP_THUMBNAIL)) {
+        std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL];
+        authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
+        return DM_MESSAGE_NOT_COMPLETE;
+    }
+    return DM_OK;
+}
+
 void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
 {
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
@@ -225,25 +238,6 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
              authResponseContext_->groupName.c_str());
     }
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
-}
-
-int32_t AuthMessageProcessor::ParseAuthRequestMessage()
-{
-    nlohmann::json jsonObject = authSplitJsonList_.front();
-    authResponseContext_->deviceId = jsonObject[TAG_DEVICE_ID];
-    authResponseContext_->reply = jsonObject[TAG_REPLY];
-    authResponseContext_->authType = jsonObject[TAG_AUTH_TYPE];
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %d", authResponseContext_->reply);
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s", authResponseContext_->deviceId.c_str());
-    if (authResponseContext_->reply == AUTH_REPLY_ACCEPT) {
-        authResponseContext_->networkId = jsonObject[TAG_NET_ID];
-        authResponseContext_->groupId = jsonObject[TAG_GROUP_ID];
-        authResponseContext_->groupName = jsonObject[TAG_GROUP_NAME];
-        authResponseContext_->requestId = jsonObject[TAG_REQUEST_ID];
-        return DM_FAILED;
-    }
-    authSplitJsonList_.clear();
-    return DM_OK;
 }
 
 void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
