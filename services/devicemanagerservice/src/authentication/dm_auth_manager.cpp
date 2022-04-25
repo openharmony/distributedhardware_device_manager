@@ -677,8 +677,9 @@ std::string DmAuthManager::GenerateGroupName()
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
-    std::string groupName = authResponseContext_->targetPkgName + authResponseContext_->hostPkgName +
-                            sLocalDeviceId.substr(0, sLocalDeviceId.size() / DEVICE_ID_HALF);
+    int32_t interceptLength = sLocalDeviceId.size() / DEVICE_ID_HALF;
+    std::string groupName = authResponseContext_->targetPkgName + sLocalDeviceId.substr(0, interceptLength)
+                            + authResponseContext_->localDeviceId.substr(0, interceptLength);
     return groupName;
 }
 
