@@ -116,6 +116,7 @@ if (defined(ohos_lite)) {
   config("devicemanagerutils_config") {
     include_dirs = [
       "include",
+      "include/fwkload",
       "include/ipc/standard",
       "${common_path}/include",
       "${common_path}/include/ipc",
@@ -134,7 +135,11 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_cmd_register.cpp",
     ]
     if (support_jsapi) {
-      sources += [ "src/permission/standard/permission_manager.cpp" ]
+      sources += [
+        "src/fwkload/distributed_hardware_load_callback.cpp",
+        "src/fwkload/dm_loadfwk.cpp",
+        "src/permission/standard/permission_manager.cpp",
+      ]
     }
 
     public_configs = [ ":devicemanagerutils_config" ]

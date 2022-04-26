@@ -251,6 +251,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${utils_path}/include",
+      "${utils_path}/include/fwkload",
       "${utils_path}/include/permission/standard",
       "//base/security/deviceauth/interfaces/innerkits",
       "//third_party/json/include",
