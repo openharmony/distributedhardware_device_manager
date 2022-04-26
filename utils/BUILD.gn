@@ -69,6 +69,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "include",
+        "include/fwkload/lite",
         "include/ipc/lite",
         "include/permission/lite",
       ]
@@ -92,6 +93,7 @@ if (defined(ohos_lite)) {
         "src/dm_anonymous.cpp",
         "src/dm_log.cpp",
         "src/dm_random.cpp",
+        "src/fwkload/lite/dm_loadfwk.cpp",
         "src/ipc/lite/ipc_cmd_register.cpp",
         "src/permission/lite/permission_manager.cpp",
       ]
@@ -116,7 +118,7 @@ if (defined(ohos_lite)) {
   config("devicemanagerutils_config") {
     include_dirs = [
       "include",
-      "include/fwkload",
+      "include/fwkload/standard",
       "include/ipc/standard",
       "${common_path}/include",
       "${common_path}/include/ipc",
@@ -136,8 +138,8 @@ if (defined(ohos_lite)) {
     ]
     if (support_jsapi) {
       sources += [
-        "src/fwkload/distributed_hardware_load_callback.cpp",
-        "src/fwkload/dm_loadfwk.cpp",
+        "src/fwkload/standard/distributed_hardware_load_callback.cpp",
+        "src/fwkload/standard/dm_loadfwk.cpp",
         "src/permission/standard/permission_manager.cpp",
       ]
     }

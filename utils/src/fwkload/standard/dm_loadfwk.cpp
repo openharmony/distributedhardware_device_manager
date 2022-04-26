@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+IMPLEMENT_SINGLE_INSTANCE(DmLoadFwk);
+
 int32_t DmLoadFwk::LoadFwk(void)
 {
     LOGI("enter DmLoadFwk::LoadFwk");
@@ -30,22 +32,24 @@ int32_t DmLoadFwk::LoadFwk(void)
         LOGE("failed to get system ability mgr.");
         return DM_SERVICE_NOT_READY;
     }
-    const uint32_t nLoadCount = 3;
-    int32_t ret = DM_OK;
-    sptr<DistributedHardwareLoadCallback> loadCallback = new DistributedHardwareLoadCallback();
-    for (size_t i = 0; i < nLoadCount; i++) {
-        ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, loadCallback);
-        if (ret == DM_OK) {
-            break;
-        }
+    if (nullptr == loadCallback_) {
+        const uint32_t nLoadCount = 3;
+        loadCallback_ = new DistributedHardwareLoadCallback(nLoadCount);
     }
+    int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, loadCallback_);
     if (ret != DM_OK) {
-        LOGE("Failed to Load systemAbility, systemAbilityId:%d, ret code:%d, nLoadCount:%d",
-            DISTRIBUTED_HARDWARE_SA_ID, ret, nLoadCount);
+        LOGE("Failed to Load systemAbility, systemAbilityId:%d, ret code:%d",
+            DISTRIBUTED_HARDWARE_SA_ID, ret);
         return ERR_DM_LOAD_FWK_SA_FAIL;
     }
     LOGI("leave DmLoadFwk::LoadFwk");
     return DM_OK;
+}
+void DmLoadFwk::ResetLoadCallback(void)
+{
+    if (nullptr != loadCallback_) {
+        loadCallback_ = nullptr;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

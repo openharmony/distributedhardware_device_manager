@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DISTRIBUTED_HARDWARE_LOAD_CALLBACK_H
-#define OHOS_DISTRIBUTED_HARDWARE_LOAD_CALLBACK_H
 
-#include "system_ability_load_callback_stub.h"
+#include "dm_loadfwk.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DistributedHardwareLoadCallback : public SystemAbilityLoadCallbackStub {
-public:
-    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
-    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
-};
+IMPLEMENT_SINGLE_INSTANCE(DmLoadFwk);
+
+int32_t DmLoadFwk::LoadFwk(void)
+{
+    return DM_OK;
 }
+void DmLoadFwk::ResetLoadCallback(void)
+{
+    return;
 }
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS

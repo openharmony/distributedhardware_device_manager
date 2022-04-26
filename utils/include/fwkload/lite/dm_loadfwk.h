@@ -15,14 +15,15 @@
 
 #ifndef OHOS_DM_LOAD_FWK_H
 #define OHOS_DM_LOAD_FWK_H
-
-#include "distributed_hardware_load_callback.h"
-
+#include <cstdint>
+#include "single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DmLoadFwk {
+    DECLARE_SINGLE_INSTANCE(DmLoadFwk);
 public:
     int32_t LoadFwk(void);
+    void ResetLoadCallback(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

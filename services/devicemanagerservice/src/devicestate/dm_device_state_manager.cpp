@@ -129,9 +129,7 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    std::shared_ptr<DmLoadFwk> dmLoadFwkPtr = std::make_shared<DmLoadFwk>();
-    int32_t ret = dmLoadFwkPtr->LoadFwk();
-    if (ret != DM_OK) {
+    if (DmLoadFwk::GetInstance().LoadFwk() != DM_OK) {
         LOGE("load fwk sa failed");
         return;
     }
@@ -166,6 +164,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
 
 void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
 {
+    DmLoadFwk::GetInstance().ResetLoadCallback();
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
     StartOffLineTimer(info);
     UnRegisterProfileListener(pkgName, info);

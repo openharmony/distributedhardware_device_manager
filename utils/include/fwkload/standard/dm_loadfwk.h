@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,24 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef OHOS_DM_LOAD_FWK_H
+#define OHOS_DM_LOAD_FWK_H
 #include "distributed_hardware_load_callback.h"
-#include "dm_log.h"
+#include "single_instance.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
-    int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
-{
-    LOGI("load fwk SA success, systemAbilityId:%d, remoteObject result:%s",
-        systemAbilityId, (remoteObject != nullptr) ? "true":"false");
-    if (remoteObject == nullptr) {
-        LOGE("remoteObject is nullptr");
-        return;
-    }
-}
-
-void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
-{
-    LOGE("load fwk SA failed, systemAbilityId:%d", systemAbilityId);
-}
-}
-}
+class DmLoadFwk {
+    DECLARE_SINGLE_INSTANCE(DmLoadFwk);
+public:
+    int32_t LoadFwk(void);
+    void ResetLoadCallback(void);
+private:
+    sptr<DistributedHardwareLoadCallback> loadCallback_;
+};
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DM_PERMISSION_MANAGER_H
