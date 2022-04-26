@@ -20,11 +20,13 @@
 #include "dm_log.h"
 #include "json_config.h"
 #include "nlohmann/json.hpp"
+namespace {
 #ifdef __LP64__
 const std::string LIB_LOAD_PATH = "/system/lib64/";
 #else
 const std::string LIB_LOAD_PATH = "/system/lib/";
 #endif
+}
 namespace OHOS {
 namespace DistributedHardware {
 void from_json(const nlohmann::json &jsonObject, AdapterSoLoadInfo &soLoadInfo)
