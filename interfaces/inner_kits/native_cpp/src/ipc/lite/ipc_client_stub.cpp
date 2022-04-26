@@ -48,7 +48,7 @@ int32_t IpcClientStub::Init()
     objectStub_.args = nullptr;
     objectStub_.isRemote = false;
     clientIdentity_.handle = IPC_INVALID_HANDLE;
-    clientIdentity_.token = SERVICE_TYPE_ANONYMOUS;
+    clientIdentity_.token = 0;
     clientIdentity_.cookie = (uintptr_t)&objectStub_;
 
     bInit = true;
