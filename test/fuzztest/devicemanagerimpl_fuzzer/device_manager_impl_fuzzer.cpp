@@ -38,7 +38,6 @@ const int nCapabiltyBufferSize = 65;
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
