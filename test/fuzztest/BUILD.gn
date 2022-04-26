@@ -23,6 +23,5 @@ group("fuzztest") {
     "ipcserverclientproxy_fuzzer:fuzztest",
     "ipcserverlistener_fuzzer:fuzztest",
     "ipcserverstub_fuzzer:fuzztest",
-    "nativedevicemanagerjs_fuzzer:fuzztest",
   ]
 }

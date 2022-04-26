@@ -18,7 +18,7 @@ import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DeviceManagerImplFuzzTest") {
-  module_out_path = "devicemanager/devicemanagerimpl_fuzzer"
+  module_out_path = "device_manager_base/devicemanager"
   fuzz_config_file = "//foundation/distributedhardware/devicemanager/test/fuzztest/devicemanagerimpl_fuzzer"
 
   include_dirs = [
@@ -96,8 +96,6 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
     "${utils_path}:devicemanagerutils",
     "//foundation/ace/napi:ace_napi",
     "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/devicemanager/interfaces/kits/js:devicemanager",
     "//utils/native/base:utils",
   ]
 

@@ -30,8 +30,6 @@
 #include "dm_device_info.h"
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 #include "native_devicemanager_js.h"
 #include "device_manager_impl_fuzzer.h"
@@ -40,6 +38,40 @@ const int nCapabiltyBufferSize = 65;
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
+public:
+    DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
+    virtual ~DeviceDiscoveryCallbackTest() {}
+    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
+    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+};
+
+class DmInitCallbackTest : public DmInitCallback {
+public:
+    DmInitCallbackTest() : DmInitCallback() {}
+    virtual ~DmInitCallbackTest() override {}
+    virtual void OnRemoteDied() override {}
+};
+
+class DeviceStateCallbackTest : public DeviceStateCallback {
+public:
+    DeviceStateCallbackTest() : DeviceStateCallback() {}
+    virtual ~DeviceStateCallbackTest() override {}
+    virtual void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
+    virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
+    virtual void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
+    virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
+};
+
+class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
+public:
+    DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}
+    virtual ~DeviceManagerFaCallbackTest() override {}
+    virtual void OnCall(const std::string &paramJson) override {}
+};
+
 void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
@@ -47,10 +79,9 @@ void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)
     }
     std::string packName(reinterpret_cast<const char*>(data), size);
     std::string bundleName(reinterpret_cast<const char*>(data), size);
-    napi_env env;
-    std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
+    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
 
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -84,14 +115,12 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     subInfo.isSameAccount = *(reinterpret_cast<const bool*>(data));
     subInfo.isWakeRemote = *(reinterpret_cast<const bool*>(data));
     strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, nCapabiltyBufferSize);
-    napi_env env;
     std::string extra(reinterpret_cast<const char*>(data), size);
     int16_t subscribeId = *(reinterpret_cast<const int16_t*>(data));
-    std::shared_ptr<DmNapiDiscoveryCallback> discoverCallback =
-        std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
 
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
-        subInfo, extra, discoverCallback);
+        subInfo, extra, callback);
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
 }
 
@@ -105,12 +134,10 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
     DmDeviceInfo deviceInfo;
     std::string extraString(reinterpret_cast<const char*>(data), size);
-    napi_env env;
-    std::shared_ptr<DmNapiAuthenticateCallback> authCallback =
-        std::make_shared<DmNapiAuthenticateCallback>(env, pkgName);
+    std::shared_ptr<AuthenticateCallback> callback = nullptr;
 
     DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-        authType, deviceInfo, extraString, authCallback);
+        authType, deviceInfo, extraString, callback);
 }
 
 void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
@@ -125,21 +152,6 @@ void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceId);
 }
 
-void VerifyAuthenticationFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size <= 0)) {
-        return;
-    }
-
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
-    std::string authParam(reinterpret_cast<const char*>(data), size);
-    napi_env env;
-    std::shared_ptr<DmNapiVerifyAuthCallback> verifyCallback =
-        std::make_shared<DmNapiVerifyAuthCallback>(env, bundleName);
-
-    DeviceManager::GetInstance().VerifyAuthentication(bundleName, authParam, verifyCallback);
-}
-
 void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
@@ -148,8 +160,7 @@ void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
 
     std::string bundleName(reinterpret_cast<const char*>(data), size);
     std::string packageName(reinterpret_cast<const char*>(data), size);
-    napi_env env;
-    auto callback = std::make_shared<DmNapiDeviceManagerFaCallback>(env, bundleName);
+    std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
 
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
 }
@@ -219,12 +230,10 @@ void RegisterDevStateCallbackFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
-    napi_env env;
-    auto callback = std::make_shared<DmNapiDeviceStateCallback>(env,  bundleName);
     std::string extra(reinterpret_cast<const char*>(data), size);
 
     int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName,
-        extra, callback);
+        extra);
     ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
 }
 }
@@ -239,8 +248,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::RegisterDevStateCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::DeviceDiscoveryFuzzTest(data, size);
     OHOS::DistributedHardware::AuthenticateDeviceFuzzTest(data, size);
-    OHOS::DistributedHardware::UnAuthenticateDeviceFuzzTest(data, size);
-    OHOS::DistributedHardware::VerifyAuthenticationFuzzTest(data, size);
     OHOS::DistributedHardware::RegisterDeviceManagerFaCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::UnRegisterDeviceManagerFaCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::GetFaParamFuzzTest(data, size);
