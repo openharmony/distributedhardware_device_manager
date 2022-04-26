@@ -149,6 +149,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "${utils_path}/include",
+        "${utils_path}/include/fwkload",
         "${utils_path}/include/ipc/lite",
         "${utils_path}/include/permission/lite",
         "${innerkits_path}/native_cpp/include",

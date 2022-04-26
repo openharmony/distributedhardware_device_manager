@@ -33,8 +33,7 @@ int32_t DmLoadFwk::LoadFwk(void)
     const uint32_t nLoadCount = 3;
     int32_t ret = DM_OK;
     sptr<DistributedHardwareLoadCallback> loadCallback = new DistributedHardwareLoadCallback();
-    for (size_t i = 0; i < nLoadCount; i++)
-    {
+    for (size_t i = 0; i < nLoadCount; i++) {
         ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, loadCallback);
         if (ret == DM_OK) {
             break;
@@ -42,7 +41,7 @@ int32_t DmLoadFwk::LoadFwk(void)
     }
     if (ret != DM_OK) {
         LOGE("Failed to Load systemAbility, systemAbilityId:%d, ret code:%d, nLoadCount:%d",
-                DISTRIBUTED_HARDWARE_SA_ID, ret, nLoadCount);
+            DISTRIBUTED_HARDWARE_SA_ID, ret, nLoadCount);
         return ERR_DM_LOAD_FWK_SA_FAIL;
     }
     LOGI("leave DmLoadFwk::LoadFwk");
