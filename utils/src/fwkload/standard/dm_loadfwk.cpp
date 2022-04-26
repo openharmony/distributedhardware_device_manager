@@ -32,7 +32,7 @@ int32_t DmLoadFwk::LoadFwk(void)
         LOGE("failed to get system ability mgr.");
         return DM_SERVICE_NOT_READY;
     }
-    if (nullptr == loadCallback_) {
+    if (loadCallback_ == nullptr) {
         const uint32_t nLoadCount = 3;
         loadCallback_ = new DistributedHardwareLoadCallback(nLoadCount);
     }
@@ -47,7 +47,7 @@ int32_t DmLoadFwk::LoadFwk(void)
 }
 void DmLoadFwk::ResetLoadCallback(void)
 {
-    if (nullptr != loadCallback_) {
+    if (loadCallback_ != nullptr) {
         loadCallback_ = nullptr;
     }
 }
