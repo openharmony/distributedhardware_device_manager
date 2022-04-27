@@ -23,8 +23,8 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
 
   include_dirs = [
     "${utils_path}/include",
-    "//foundation/ace/napi/native_engine",
-    "//foundation/ace/napi/interfaces/kits",
+    "//foundation/arkui/napi/native_engine",
+    "//foundation/arkui/napi/interfaces/kits",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp/include",
@@ -70,8 +70,8 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
     "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
     "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
     "//foundation/appexecfwk/appexecfwk_lite/interfaces/kits/bundle_lite",
-    "//foundation/ace/napi/interfaces/innerkits/napi",
-    "//foundation/ace/napi/interfaces/innerkits",
+    "//foundation/arkui/napi/interfaces/inner_api/napi",
+    "//foundation/arkui/napi/interfaces/innerkits",
     "//third_party/jsframework/runtime/main/extend",
     "//foundation/windowmanager/interfaces/kits",
     "//third_party/jsframework/runtime/main/extend/systemplugin",
@@ -80,8 +80,8 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
     "//third_party/libuv/include",
     "//foundation/distributedhardware/devicemanager/interfaces/kits/js/include",
     "//third_party/node/src",
-    "//foundation/ace/napi/native_engine",
-    "//foundation/ace/napi/interfaces/kits",
+    "//foundation/arkui/napi/native_engine",
+    "//foundation/arkui/napi/interfaces/kits",
   ]
 
   cflags = [
@@ -94,7 +94,7 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
 
   deps = [
     "${utils_path}:devicemanagerutils",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//utils/native/base:utils",
   ]

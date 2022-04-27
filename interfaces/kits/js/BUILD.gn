@@ -25,8 +25,8 @@ ohos_shared_library("devicemanager") {
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "//third_party/node/src",
     "//third_party/json/include",
-    "//foundation/ace/napi/native_engine",
-    "//foundation/ace/napi/interfaces/kits",
+    "//foundation/arkui/napi/native_engine",
+    "//foundation/arkui/napi/interfaces/kits",
     "//utils/native/base/include",
   ]
 
@@ -37,7 +37,7 @@ ohos_shared_library("devicemanager") {
 
   deps = [
     "${utils_path}:devicemanagerutils",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//utils/native/base:utils",
   ]

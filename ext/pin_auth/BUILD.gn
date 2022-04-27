@@ -142,7 +142,7 @@ if (defined(ohos_lite)) {
       "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
       "//foundation/aafwk/standard/interfaces/innerkits/want:want",
       "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-      "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
+      "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
       "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
       "//foundation/windowmanager/wm:libwm",
       "//utils/native/base:utils",
