@@ -59,7 +59,7 @@ bool PermissionManager::CheckPermission(void)
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (systemAbilityManager == nullptr) {
             LOGE("failed to get system ability mgr.");
-            return true;
+            return false;
         }
         sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
         if (remoteObject == nullptr) {
