@@ -71,7 +71,7 @@ bool PermissionManager::CheckPermission(void)
         sptr<IBundleMgr> iBundleMgr = iface_cast<IBundleMgr>(remoteObject);
         if (iBundleMgr == nullptr) {
             LOGI("iBundleMgr is nullptr, caller may be a process");
-            return true;
+            return false;
         }
         LOGI("PermissionManager::tokenTypeFlag is hap process");
         return iBundleMgr->CheckIsSystemAppByUid(uid);
