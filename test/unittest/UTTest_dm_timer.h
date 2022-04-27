@@ -14,12 +14,12 @@
  */
 #ifndef OHOS_UTTEST_DM_TIMER_H
 #define OHOS_UTTEST_DM_TIMER_H
-
+#define private public
 #include <gtest/gtest.h>
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmTimerTest : public testing::Test {
+class TimeHeapTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();

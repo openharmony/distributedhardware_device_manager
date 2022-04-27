@@ -92,6 +92,7 @@ enum {
     DM_HICHAIN_GROUP_CREATE_FAILED,
     DM_HICHAIN_MEMBER_ADD_FAILED,
     DM_HICHAIN_CREATE_CHANNEL_FAILED,
+    DM_AUTH_NO_TIMER,
 };
 const std::string TARGET_PKG_NAME_KEY = "targetPkgName";
 const std::string HOST_PKG_NAME_KEY = "hostPackageName";
@@ -210,6 +211,12 @@ const std::string WAIT_REQUEST_TIMEOUT_TASK = TIMER_PREFIX + "waitRequest";
 const std::string STATE_TIMER_PREFIX = "stateTimer_";
 const int32_t TIMER_PREFIX_LENGTH = 19;
 const int32_t TIMER_DEFAULT = 0;
+const int32_t NO_TIMER = -1;
+const int32_t INIT_SIZE = 3;
+const int32_t MAX_EVENT_NUMBER = 10;
+const int32_t EXPAND_TWICE = 2;
+const int32_t SEC_TO_MM = 1000;
+const int32_t MAX_EVENTS = 5;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

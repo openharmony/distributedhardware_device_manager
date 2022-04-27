@@ -22,12 +22,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
-
-static void TimeOut(void *data, DmTimer& timer)
+static void TimeOut(void *data, std::string timerName)
 {
-    LOGI("time out %s", timer.GetTimerName().c_str());
-    if (data == nullptr || timer.GetTimerName().find(TIMER_PREFIX) != TIMER_DEFAULT) {
+    LOGI("time out %s", timerName.c_str());
+    if (data == nullptr || timerName.find(TIMER_PREFIX) != TIMER_DEFAULT) {
         LOGE("time out is not our timer");
         return;
     }
@@ -38,7 +36,7 @@ static void TimeOut(void *data, DmTimer& timer)
         return;
     }
 
-    deviceStateMgr->DeleteTimeOutGroup(timer.GetTimerName());
+    deviceStateMgr->DeleteTimeOutGroup(timerName);
 }
 
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -278,22 +276,21 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 #endif
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
-            iter.second.timer->Stop(SESSION_CANCEL_TIMEOUT);
+            timerHeap_->DelTimer(iter.second.timerName);
             return;
         }
     }
 
-    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(cumulativeQuantity_++);
-    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
-    if (offLineTimer != nullptr) {
-        StateTimerInfo stateTimer = {
-            .timerName = timerName,
-            .netWorkId = deviceInfo.deviceId,
-            .deviceId = deviceId,
-            .timer = offLineTimer
-        };
-        stateTimerInfoMap_[timerName] = stateTimer;
+    if (timerHeap_ == nullptr) {
+        timerHeap_ = std::make_shared<TimeHeap>();
     }
+    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(cumulativeQuantity_++);
+    StateTimerInfo stateTimer = {
+        .timerName = timerName,
+        .netWorkId = deviceInfo.deviceId,
+        .deviceId = deviceId,
+    };
+    stateTimerInfoMap_[timerName] = stateTimer;
 }
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
@@ -306,7 +303,7 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
     LOGI("start offline timer");
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
-            iter.second.timer->Start(OFFLINE_TIMEOUT, TimeOut, this);
+            timerHeap_->AddTimer(iter.second.timerName, OFFLINE_TIMEOUT, TimeOut, this);
         }
     }
 }

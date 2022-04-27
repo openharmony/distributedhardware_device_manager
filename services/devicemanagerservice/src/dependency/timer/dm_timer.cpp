@@ -13,177 +13,186 @@
  * limitations under the License.
  */
 
-#include "dm_timer.h"
-
-#include <thread>
-
 #include "dm_constants.h"
-#include "securec.h"
+#include "dm_log.h"
+#include "dm_timer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-const int32_t MILL_SECONDS_PER_SECOND = 1000;
+int32_t TimeHeap::Tick()
+{
+    LOGI("Tick start");
+    if (hsize_ == 0) {
+        LOGE("Timer count is 0");
+        return DM_AUTH_NO_TIMER;
+    }
+
+    std::shared_ptr<DmTimer> top = minHeap_.front();
+    top->isTrigger = true;
+    do {
+        top->mHandle_(top->userData_, top->timerName_);
+        DelTimer(top->timerName_);
+
+        if (hsize_ > 0) {
+            top = minHeap_.front();
+        } else {
+            break;
+        }
+    } while (top->expire_ <= time(NULL));
+
+    return DM_OK;
 }
 
-DmTimer::DmTimer(const std::string &name)
+int32_t TimeHeap::MoveUp(std::shared_ptr<DmTimer> timer)
+{
+    LOGI("MoveUp timer");
+    if (timer == nullptr) {
+        LOGE("MoveUp timer is null");
+        return DM_INVALID_VALUE;
+    }
+
+    if (hsize_ == 0) {
+        LOGE("Add timer failed");
+        return DM_INVALID_VALUE;
+    }
+
+    for (int32_t i = 1;; i++) {
+        LOGE("MoveUp 1 = %d, h = %d", i, hsize_);
+        if (i == hsize_) {
+            minHeap_.insert(minHeap_.begin() + (i - 1), timer);
+            break;
+        }
+        if (timer->expire_ < minHeap_[i - 1]->expire_) {
+            minHeap_.insert(minHeap_.begin() + (i -1), timer);
+            break;
+        }
+    }
+    return DM_OK;
+}
+
+void TimeHeap::Run()
+{
+    epoll_event event;
+    event.data.fd = pipefd[0];
+    event.events = EPOLLIN | EPOLLET;
+    epoll_ctl(epollFd_, EPOLL_CTL_ADD, pipefd[0], &event);
+    epoll_event events[MAX_EVENT_NUMBER];
+    bool stop = false;
+    int timeout = NO_TIMER;
+
+    while (!stop) {
+        int number = epoll_wait(epollFd_, events, MAX_EVENT_NUMBER, timeout);
+
+        LOGI("RunTimer is doing");
+        if (number < 0) {
+            LOGE("DmTimer %s epoll_wait error: %d", minHeap_.front()->timerName_.c_str(), errno);
+            DelTimer(minHeap_.front()->timerName_);
+        }
+        if (!number) {
+            Tick();
+        } else {
+            int buffer = 0;
+            recv(pipefd[0], (char*)&buffer, sizeof(buffer), 0);
+        }
+
+        if (hsize_ == 0) {
+            break;
+        } else {
+            timeout = (minHeap_.front()->expire_ - time(NULL)) * SEC_TO_MM;
+        }
+    }
+}
+
+TimeHeap::TimeHeap(): epollFd_(epoll_create(MAX_EVENTS))
+{
+    minHeap_.resize(INIT_SIZE);
+
+    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
+    if (ret != 0) {
+        LOGE("open pipe failed");
+    }
+    assert(ret == 0);
+}
+
+TimeHeap::~TimeHeap()
+{
+    DelAll();
+    close(epollFd_);
+}
+
+int32_t TimeHeap::AddTimer(std::string name, int timeout, TimeoutHandle mHandle, void *user)
 {
     if (name.empty() || name.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer name is null");
-        mTimerName_ = "";
-        return;
+        LOGE("DmTimer name is not DM timer");
+        return DM_INVALID_VALUE;
     }
 
-    mStatus_ = DmTimerStatus::DM_STATUS_INIT;
-    mTimeOutSec_ = 0;
-    mHandle_ = nullptr;
-    mHandleData_ = nullptr;
-    (void)memset_s(mTimeFd_, sizeof(mTimeFd_), 0, sizeof(mTimeFd_));
-    (void)memset_s(&mEv_, sizeof(mEv_), 0, sizeof(mEv_));
-    (void)memset_s(mEvents_, sizeof(mEvents_), 0, sizeof(mEvents_));
-    mEpFd_ = 0;
-    mTimerName_ = name;
+    LOGI("AddTimer %s", name.c_str());
+    if (timeout <= 0 || mHandle == nullptr || user == nullptr) {
+        LOGE("DmTimer %s invalid value", name.c_str());
+        return DM_INVALID_VALUE;
+    }
+
+    if (hsize_ == 0) {
+        mThread_ = std::thread(&TimeHeap::Run, this);
+        mThread_.detach();
+    }
+    if (hsize_ == (int32_t)(minHeap_.size() - 1)) {
+        minHeap_.resize(EXPAND_TWICE * minHeap_.size());
+    }
+
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>(name, timeout + time(NULL), user, mHandle);
+    ++hsize_;
+    MoveUp(timer);
+    if (timer == minHeap_.front()) {
+        char msg = 1;
+        send(pipefd[1], (char*)&msg, sizeof(msg), 0);
+    }
+    LOGE("AddTimer %s complete", name.c_str());
+    return DM_OK;
 }
 
-DmTimer::~DmTimer()
+int32_t TimeHeap::DelTimer(std::string name)
 {
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer is not init");
-        return;
-    }
-    LOGI("DmTimer %s destroy in", mTimerName_.c_str());
-    Stop(0);
-
-    std::lock_guard<std::mutex> lock(mTimerLock_);
-    Release();
-}
-
-DmTimerStatus DmTimer::Start(uint32_t timeOut, TimeoutHandle handle, void *data)
-{
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT || handle == nullptr ||
-        data == nullptr) {
-        LOGE("DmTimer is not init or param empty");
-        return DmTimerStatus::DM_STATUS_FINISH;
+    if (name.empty() || name.find(TIMER_PREFIX) != TIMER_DEFAULT) {
+        LOGE("DmTimer name is not DM timer");
+        return DM_INVALID_VALUE;
     }
 
-    LOGI("DmTimer %s start timeout(%d)", mTimerName_.c_str(), timeOut);
-    if (mStatus_ != DmTimerStatus::DM_STATUS_INIT) {
-        return DmTimerStatus::DM_STATUS_BUSY;
-    }
-
-    mTimeOutSec_ = timeOut;
-    mHandle_ = handle;
-    mHandleData_ = data;
-
-    if (CreateTimeFd()) {
-        return DmTimerStatus::DM_STATUS_CREATE_ERROR;
-    }
-
-    mStatus_ = DmTimerStatus::DM_STATUS_RUNNING;
-    mThread_ = std::thread(&DmTimer::WaitForTimeout, this);
-    mThread_.detach();
-    return mStatus_;
-}
-
-void DmTimer::Stop(int32_t code)
-{
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT || mHandleData_ == nullptr) {
-        LOGE("DmTimer is not init");
-        return;
-    }
-
-    if (mTimeFd_[1]) {
-        char event = 'S';
-        if (write(mTimeFd_[1], &event, 1) < 0) {
-            return;
+    LOGI("DelTimer %s", name.c_str());
+    int32_t location = 0;
+    bool have = false;
+    for (int32_t i = 0; i < hsize_; i++) {
+        if (minHeap_[i]->timerName_ == name) {
+            location = i;
+            have = true;
+            break;
         }
     }
+
+    if (!have) {
+        LOGE("heap is not have this %s", name.c_str());
+        return DM_INVALID_VALUE;
+    }
+
+    if (minHeap_[location] == minHeap_.front() && minHeap_[location]->isTrigger == false) {
+        char msg = 1;
+        send(pipefd[1], &msg, sizeof(msg), 0);
+    }
+    minHeap_.erase(minHeap_.begin() + location);
+    hsize_--;
+    LOGI("DelTimer %s complete , timer count %d", name.c_str(), hsize_);
+    return DM_OK;
 }
 
-void DmTimer::WaitForTimeout()
+int32_t TimeHeap::DelAll()
 {
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer is not init");
-        return;
+    LOGI("DelAll start");
+    for (int32_t i = hsize_ ; i > 0; i--) {
+        DelTimer(minHeap_[i - 1]->timerName_);
     }
-    LOGI("DmTimer %s start timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
-
-    std::lock_guard<std::mutex> lock(mTimerLock_);
-    int32_t nfds = epoll_wait(mEpFd_, mEvents_, MAX_EVENTS, mTimeOutSec_ * MILL_SECONDS_PER_SECOND);
-    LOGI("DmTimer is triggering");
-    if (nfds > 0) {
-        char event = 0;
-        if (mEvents_[0].events & EPOLLIN) {
-            int num = read(mTimeFd_[0], &event, 1);
-            LOGD("DmTimer %s exit with num=%d, event=%d, errno=%d", mTimerName_.c_str(), num, event, errno);
-        }
-    } else if (nfds == 0) {
-        if (mHandleData_ != nullptr) {
-            mHandle_(mHandleData_, *this);
-            LOGI("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
-        }
-    } else {
-        LOGI("DmTimer %s epoll_wait return nfds=%d, errno=%d", mTimerName_.c_str(), nfds, errno);
-    }
-    Release();
+    LOGI("DelAll complete");
+    return DM_OK;
 }
-
-int32_t DmTimer::CreateTimeFd()
-{
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer is not init");
-        return DM_STATUS_FINISH;
-    }
-    LOGI("DmTimer %s creatTimeFd", mTimerName_.c_str());
-
-    int ret = pipe(mTimeFd_);
-    if (ret < 0) {
-        LOGE("DmTimer %s CreateTimeFd fail:(%d) errno(%d)", mTimerName_.c_str(), ret, errno);
-        return ret;
-    }
-
-    std::lock_guard<std::mutex> lock(mTimerLock_);
-    mEv_.data.fd = mTimeFd_[0];
-    mEv_.events = EPOLLIN | EPOLLET;
-    mEpFd_ = epoll_create(MAX_EVENTS);
-    ret = epoll_ctl(mEpFd_, EPOLL_CTL_ADD, mTimeFd_[0], &mEv_);
-    if (ret != 0) {
-        Release();
-    }
-    return ret;
 }
-
-void DmTimer::Release()
-{
-    if (mTimerName_.empty() || mTimerName_.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer is not init");
-        return;
-    }
-    LOGI("DmTimer %s release in", mTimerName_.c_str());
-
-    if (mStatus_ == DmTimerStatus::DM_STATUS_INIT) {
-        LOGE("DmTimer %s already release", mTimerName_.c_str());
-        return;
-    }
-
-    mStatus_ = DmTimerStatus::DM_STATUS_INIT;
-    close(mTimeFd_[0]);
-    close(mTimeFd_[1]);
-    if (mEpFd_ >= 0) {
-        close(mEpFd_);
-    }
-    mTimerName_ = "";
-    mTimeOutSec_ = 0;
-    mHandle_ = nullptr;
-    mHandleData_ = nullptr;
-    mTimeFd_[0] = 0;
-    mTimeFd_[1] = 0;
-    mEpFd_ = 0;
 }
-
-std::string DmTimer::GetTimerName()
-{
-    return mTimerName_;
-}
-} // namespace DistributedHardware
-} // namespace OHOS

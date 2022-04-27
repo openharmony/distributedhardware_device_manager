@@ -23,232 +23,316 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DmTimerTest::SetUp()
+void TimeHeapTest::SetUp()
 {
 }
 
-void DmTimerTest::TearDown()
+void TimeHeapTest::TearDown()
 {
 }
 
-void DmTimerTest::SetUpTestCase()
+void TimeHeapTest::SetUpTestCase()
 {
 }
 
-void DmTimerTest::TearDownTestCase()
+void TimeHeapTest::TearDownTestCase()
 {
 }
 
 namespace {
+static void TimeOut(void *data, std::string timerName) {}
+
 /**
- * @tc.name: DmTimerTest::DmTimer_001
- * @tc.desc: to check when name is empty
+ * @tc.name: TimeHeapTest::Tick_001
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, DmTimer_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, Tick_001, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    timerHeap->hsize_ = 0;
+    int32_t ret = timerHeap->Tick();
+    EXPECT_EQ(DM_AUTH_NO_TIMER, ret);
 }
 
 /**
- * @tc.name: DmTimerTest::DmTimer_002
- * @tc.desc: to check when name is not empty
+ * @tc.name: TimeHeapTest::Tick_002
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, DmTimer_002, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, Tick_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "123";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    EXPECT_EQ(DmTimerStatus::DM_STATUS_INIT, Timer_->mStatus_);
-    EXPECT_EQ(0, Timer_->mTimeOutSec_);
-    EXPECT_EQ(nullptr, Timer_->mHandle_);
-    EXPECT_EQ(nullptr, Timer_->mHandleData_);
-    EXPECT_EQ(0, Timer_->mTimeFd_[1]);
-    EXPECT_EQ(0, Timer_->mEv_.events);
-    EXPECT_EQ(0, Timer_->mEvents_[0].events);
-    EXPECT_EQ(0, Timer_->mEpFd_);
-    EXPECT_EQ(DM_TIMER_TASK, Timer_->mTimerName_);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    timerHeap->AddTimer(AUTHENTICATE_TIMEOUT_TASK, 10, TimeOut, timer);
+    int32_t ret = timerHeap->Tick();
+    EXPECT_EQ(DM_OK, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Start_001
- * @tc.desc: to check when mTimerName_ is empty,handle is nullptr,data is nullptr
+ * @tc.name: TimeHeapTest::Tick_003
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Start_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, Tick_003, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    uint32_t timeOut = 10;
-    TimeoutHandle handle = nullptr;
-    void *data = nullptr;
-    DmTimerStatus timerStatus = Timer_->Start(timeOut, handle, data);
-    EXPECT_EQ(DM_STATUS_FINISH, timerStatus);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    timerHeap->AddTimer(AUTHENTICATE_TIMEOUT_TASK, 10, TimeOut, timer);
+    timerHeap->AddTimer(AUTHENTICATE_TIMEOUT_TASK, 20, TimeOut, timer);
+    int32_t ret = timerHeap->Tick();
+    EXPECT_EQ(DM_OK, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Start_002
- * @tc.desc: to check when mTimerName_ is not empty, handle is not nullptr, data is not nullptr,
- * @mStatus_ != DmTimerStatus::DM_STATUS_INIT
+ * @tc.name: TimeHeapTest::MoveUp_001
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-static void TimeOutTest(void *data, DmTimer& timer)
+HWTEST_F(TimeHeapTest, MoveUp_001, testing::ext::TestSize.Level0)
 {
-    LOGE("time out test");
-}
-
-HWTEST_F(DmTimerTest, Start_002, testing::ext::TestSize.Level0)
-{
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "1234";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    uint32_t timeOut = 10;
-    int idx = 1;
-    void *data = &idx;
-    Timer_->mStatus_ = DmTimerStatus::DM_STATUS_RUNNING;
-    DmTimerStatus timerStatus = Timer_->Start(timeOut, TimeOutTest, data);
-    EXPECT_EQ(DmTimerStatus::DM_STATUS_BUSY, timerStatus);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    std::shared_ptr<DmTimer> timer = nullptr;
+    int32_t ret = timerHeap->MoveUp(timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Stop_001
- * @tc.desc: to check when mTimerName_ is empty
+ * @tc.name: TimeHeapTest::MoveUp_002
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Stop_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, MoveUp_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    int32_t code = 1;
-    Timer_->Stop(code);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>(name, timeout + time(NULL), nullptr, TimeOut);
+    timerHeap->hsize_ = 0;
+    int32_t ret = timerHeap->MoveUp(timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Stop_002
- * @tc.desc: to check when mTimerName_ is not empty
+ * @tc.name: TimeHeapTest::MoveUp_003
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Stop_002, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, MoveUp_003, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    int32_t code = 1;
-    Timer_->Stop(code);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>(name, timeout + time(NULL), nullptr, TimeOut);
+    timerHeap->hsize_ = 1;
+    int32_t ret = timerHeap->MoveUp(timer);
+    EXPECT_EQ(DM_OK, ret);
+
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Stop_003
- * @tc.desc: to check when mTimerName_ is not empty,mTimeFd_[1] is not 0
+ * @tc.name: TimeHeapTest::AddTimer_001
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Stop_003, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, AddTimer_001, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    int32_t code = 1;
-    Timer_->mTimeFd_[1] = 1;
-    Timer_->Stop(code);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    int32_t ret = timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    EXPECT_EQ(DM_OK, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::WaitForTimeout_001
- * @tc.desc: to check when mTimerName_ is empty
+ * @tc.name: TimeHeapTest::AddTimer_002
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, WaitForTimeout_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, AddTimer_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->WaitForTimeout();
+    std::string name = "";
+    int32_t timeout = 10;
+
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    int32_t ret = timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::WaitForTimeout_002
- * @tc.desc: to check when mTimerName_ is not empty
+ * @tc.name: TimeHeapTest::AddTimer_003
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, WaitForTimeout_002, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, AddTimer_003, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->WaitForTimeout();
+    std::string name = "timer";
+    int32_t timeout = 10;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    int32_t ret = timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::CreateTimeFd_001
- * @tc.desc: to check when mTimerName_ is empty
+ * @tc.name: TimeHeapTest::AddTimer_004
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, CreateTimeFd_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, AddTimer_004, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    int32_t result = Timer_->CreateTimeFd();
-    EXPECT_EQ(DM_STATUS_FINISH, result);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = -1;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    int32_t ret = timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::CreateTimeFd_002
- * @tc.desc: to check when mTimerName_ is not empty
+ * @tc.name: TimeHeapTest::AddTimer_005
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, CreateTimeFd_002, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, AddTimer_005, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "123";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->CreateTimeFd();
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = -1;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    int32_t ret = timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+    timerHeap->DelAll();
 }
 
 /**
- * @tc.name: DmTimerTest::Release_001
- * @tc.desc: to check when mTimerName_ is empty
+ * @tc.name: TimeHeapTest::DelTimer_001
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Release_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, DelTimer_001, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = "";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->Release();
+    std::string name = "";
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    int32_t ret = timerHeap->DelTimer(name);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
 }
 
 /**
- * @tc.name: DmTimerTest::Release_002
- * @tc.desc: to check when mTimerName_ is not empty,mStatus_ is 0
+ * @tc.name: TimeHeapTest::DelTimer_002
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, Release_002, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, DelTimer_002, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    Timer_->mStatus_ = DmTimerStatus::DM_STATUS_INIT;
-    Timer_->Release();
+    std::string name = "timer";
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    int32_t ret = timerHeap->DelTimer(name);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
 }
 
 /**
- * @tc.name: DmTimerTest::GetTimerName_001
- * @tc.desc: to check whether the return value is the same as mTimerName_
+ * @tc.name: TimeHeapTest::DelTimer_002
+ * @tc.desc: Timeout event trigger
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmTimerTest, GetTimerName_001, testing::ext::TestSize.Level0)
+HWTEST_F(TimeHeapTest, DelTimer_003, testing::ext::TestSize.Level0)
 {
-    const std::string DM_TIMER_TASK = TIMER_PREFIX + "111";
-    std::shared_ptr<DmTimer> Timer_ = std::make_shared<DmTimer>(DM_TIMER_TASK);
-    std::string strTimer = Timer_->GetTimerName();
-    EXPECT_EQ(DM_TIMER_TASK, strTimer);
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    int32_t ret = timerHeap->DelTimer(name);
+    EXPECT_EQ(DM_INVALID_VALUE, ret);
+}
+
+/**
+ * @tc.name: TimeHeapTest::DelTimer_004
+ * @tc.desc: Timeout event trigger
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, DelTimer_004, testing::ext::TestSize.Level0)
+{
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    int32_t ret = timerHeap->DelTimer(name);
+    EXPECT_EQ(DM_OK, ret);
+}
+
+/**
+ * @tc.name: TimeHeapTest::DelAll_001
+ * @tc.desc: Timeout event trigger
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, DelAll_001, testing::ext::TestSize.Level0)
+{
+    std::string name = AUTHENTICATE_TIMEOUT_TASK;
+    int32_t timeout = 10;
+
+    DmTimer *timer = new DmTimer(name, timeout + time(NULL), nullptr, TimeOut);
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    timerHeap->AddTimer(name, timeout, TimeOut, timer);
+    int32_t ret = timerHeap->DelAll();
+    EXPECT_EQ(DM_OK, ret);
+    EXPECT_EQ(timerHeap->hsize_, 0);
+}
+
+/**
+ * @tc.name: TimeHeapTest::DelAll_002
+ * @tc.desc: Timeout event trigger
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, DelAll_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<TimeHeap> timerHeap = std::make_shared<TimeHeap>();
+    int32_t ret = timerHeap->DelAll();
+    EXPECT_EQ(DM_OK, ret);
 }
 }
 }

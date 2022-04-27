@@ -23,12 +23,11 @@ namespace OHOS {
 namespace DistributedHardware {
 const std::string DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
-static void TimeOut(void *data, DmTimer& timer)
+static void TimeOut(void *data, std::string timerName)
 {
-    LOGI("time out %s", timer.GetTimerName().c_str());
-    if (data == nullptr || timer.GetTimerName() != DISCOVERY_TIMEOUT_TASK) {
+    LOGI("time out %s", timerName.c_str());
+    if (data == nullptr || timerName != DISCOVERY_TIMEOUT_TASK) {
         LOGE("time out is not our timer");
         return;
     }
@@ -72,8 +71,10 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     discoveryContextMap_.emplace(pkgName, context);
     softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
                                                         std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
-    discoveryTimer_ = std::make_shared<DmTimer>(DISCOVERY_TIMEOUT_TASK);
-    discoveryTimer_->Start(DISCOVERY_TIMEOUT, TimeOut, this);
+    if (timerHeap_ == nullptr) {
+        timerHeap_ = std::make_shared<TimeHeap>();
+    }
+    timerHeap_->AddTimer(DISCOVERY_TIMEOUT_TASK, DISCOVERY_TIMEOUT, TimeOut, this);
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
@@ -85,7 +86,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
     if (!discoveryContextMap_.empty()) {
         discoveryContextMap_.erase(pkgName);
         softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-        discoveryTimer_->Stop(SESSION_CANCEL_TIMEOUT);
+        timerHeap_->DelTimer(DISCOVERY_TIMEOUT_TASK);
     }
     return softbusConnector_->StopDiscovery(subscribeId);
 }

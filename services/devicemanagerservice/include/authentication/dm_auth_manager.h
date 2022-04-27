@@ -384,7 +384,7 @@ private:
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor_;
-    std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
+    std::shared_ptr<TimeHeap> timerHeap_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;

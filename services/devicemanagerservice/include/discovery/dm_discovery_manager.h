@@ -84,7 +84,7 @@ private:
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
-    std::shared_ptr<DmTimer> discoveryTimer_;
+    std::shared_ptr<TimeHeap> timerHeap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

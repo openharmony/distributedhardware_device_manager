@@ -15,89 +15,84 @@
 
 #ifndef TIMER_H
 #define TIMER_H
+
+#include <assert.h>
 #include <errno.h>
-#include <stdint.h>
-#include <stdio.h>
-#if !defined(__LITEOS_M__)
-#include <sys/epoll.h>
 #include <thread>
+#include <time.h>
+#include <stdio.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <vector>
 #include <unistd.h>
-#include <mutex>
-#endif
-#include <cstdio>
-#include <string>
-
-#include "dm_log.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-class DmTimer;
-typedef void (*TimeoutHandle)(void *data, DmTimer& timer);
-
-#define MAX_EVENTS 255
-
-enum DmTimerStatus : int32_t {
-    DM_STATUS_INIT = 0,
-    DM_STATUS_RUNNING = 1,
-    DM_STATUS_BUSY = 2,
-    DM_STATUS_CREATE_ERROR = 3,
-    DM_STATUS_FINISH = 6,
-};
-
+typedef void (*TimeoutHandle)(void *data, std::string timerName);
 class DmTimer {
 public:
-    explicit DmTimer(const std::string &name);
-    ~DmTimer();
-
-    /**
-     * @tc.name: DmTimer::Start
-     * @tc.desc: Start of the DmTimer
-     * @tc.type: FUNC
-     */
-    DmTimerStatus Start(uint32_t timeOut, TimeoutHandle handle, void *data);
-
-    /**
-     * @tc.name: DmTimer::Stop
-     * @tc.desc: Stop of the DmTimer
-     * @tc.type: FUNC
-     */
-    void Stop(int32_t code);
-
-    /**
-     * @tc.name: DmTimer::WaitForTimeout
-     * @tc.desc: WaitFor Timeout of the DmTimer
-     * @tc.type: FUNC
-     */
-    void WaitForTimeout();
-
-    /**
-     * @tc.name: DmTimer::GetTimerName
-     * @tc.desc: Get TimerName of the DmTimer
-     * @tc.type: FUNC
-     */
-    std::string GetTimerName();
-private:
-    int32_t CreateTimeFd();
-    void Release();
-
-private:
-    DmTimerStatus mStatus_;
-    uint32_t mTimeOutSec_;
-    TimeoutHandle mHandle_;
-    void *mHandleData_;
-    int32_t mTimeFd_[2];
-#if defined(__LITEOS_M__)
-    void *timerId = NULL;
-#else
-    struct epoll_event mEv_;
-    struct epoll_event mEvents_[MAX_EVENTS];
-    int32_t mEpFd_;
-    std::thread mThread_;
-    std::mutex mTimerLock_;
-#endif
-
-    std::string mTimerName_;
+    DmTimer(std::string name, time_t expire, void *user, TimeoutHandle mHandle)
+        :userData_(user), timerName_(name), expire_(expire), mHandle_(mHandle) {};
+public:
+    void *userData_;
+    bool isTrigger = false;
+    std::string timerName_;
+    time_t expire_;
+    TimeoutHandle mHandle_;;
 };
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // TIMER_H
+
+class TimeHeap {
+public:
+    TimeHeap();
+    ~TimeHeap();
+    /**
+     * @tc.name: TimeHeap::AddTimer
+     * @tc.desc: Add timer to time heap
+     * @tc.type: FUNC
+     */
+    int32_t AddTimer(std::string name, int timeout, TimeoutHandle mHandle, void *user);
+
+    /**
+     * @tc.name: TimeHeap::DelTimer
+     * @tc.desc: Delete timer of the time heap
+     * @tc.type: FUNC
+     */
+    int32_t DelTimer(std::string name);
+
+    /**
+     * @tc.name: TimeHeap::DelAll
+     * @tc.desc: Delete all timer of the time heap
+     * @tc.type: FUNC
+     */
+    int32_t DelAll();
+
+private:
+    /**
+     * @tc.name: TimeHeap::Run
+     * @tc.desc: timer wait for timeout
+     * @tc.type: FUNC
+     */
+    void Run();
+
+    /**
+     * @tc.name: TimeHeap::Run
+     * @tc.desc: timerout event triggering
+     * @tc.type: FUNC
+     */
+    int32_t Tick();
+
+    /**
+     * @tc.name: TimeHeap::Run
+     * @tc.desc: sort the time heap
+     * @tc.type: FUNC
+     */
+    int32_t MoveUp(std::shared_ptr<DmTimer> timer);
+private:
+    int32_t hsize_ = 0;
+    int32_t epollFd_;
+    int32_t pipefd[2];
+    std::thread mThread_;
+    std::vector<std::shared_ptr<DmTimer>> minHeap_;
+};
+}
+}
+#endif
