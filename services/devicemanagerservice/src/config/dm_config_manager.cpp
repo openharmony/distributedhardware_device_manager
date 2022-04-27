@@ -20,7 +20,13 @@
 #include "dm_log.h"
 #include "json_config.h"
 #include "nlohmann/json.hpp"
-
+namespace {
+#ifdef __LP64__
+const std::string LIB_LOAD_PATH = "/system/lib64/";
+#else
+const std::string LIB_LOAD_PATH = "/system/lib/";
+#endif
+}
 namespace OHOS {
 namespace DistributedHardware {
 void from_json(const nlohmann::json &jsonObject, AdapterSoLoadInfo &soLoadInfo)
@@ -85,6 +91,7 @@ DmConfigManager::DmConfigManager()
                 LOGE("adapter json config string exist invalid members");
                 continue;
             }
+            soLoadInfo[i].soPath = LIB_LOAD_PATH;
             soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
             LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
             LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
@@ -114,6 +121,7 @@ DmConfigManager::DmConfigManager()
                 LOGE("adapter json config string exist invalid members");
                 continue;
             }
+            soLoadInfo[i].soPath = LIB_LOAD_PATH;
             soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
             LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
             LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
