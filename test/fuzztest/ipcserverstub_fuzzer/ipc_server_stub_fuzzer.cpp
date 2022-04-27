@@ -43,15 +43,17 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    sptr<IRemoteObject> listener = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    sptr<IRemoteObject> listener = data1.ReadRemoteObject();
 
-    int32_t ret = IpcServerStub::GetInstance().OnRemoteRequest(code, data1, reply, option);
-    ret = IpcServerStub::GetInstance().SendCmd(code, req, rsp);
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
-    ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    sptr<IpcRemoteBroker> ipcPtr = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    IpcServerStub::GetInstance().OnStart();
+    IpcServerStub::GetInstance().OnRemoteRequest(code, data1, reply, option);
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    IpcServerStub::GetInstance().GetDmListener(pkgName);
+    IpcServerStub::GetInstance().SendCmd(code, req, rsp);
+    IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    IpcServerStub::GetInstance().OnStop();
 }
 }
 }

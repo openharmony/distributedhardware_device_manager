@@ -18,7 +18,7 @@ import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("IpcServerListenerFuzzTest") {
-  module_out_path = "devicemanager/ipcserverlistener_fuzzer"
+  module_out_path = "device_manager_base/devicemanager"
   fuzz_config_file = "//foundation/distributedhardware/devicemanager/test/fuzztest/ipcserverlistener_fuzzer"
 
   include_dirs = [
