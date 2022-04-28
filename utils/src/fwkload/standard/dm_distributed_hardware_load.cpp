@@ -14,12 +14,11 @@
  */
 
 #include "dm_constants.h"
-#include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#include "dm_distributed_hardware_load.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-
 void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
@@ -30,21 +29,20 @@ void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
         return;
     }
 }
-
 void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
     LOGE("DmDistributedHhardware Load SA failed, systemAbilityId:%d", systemAbilityId);
     uint32_t maxLoadValue = 3;
-    if (DmDistributedHhardwareLoad::GetInstance().getDistributedHardwareLoadCount() < maxLoadValue) {
-        DmDistributedHhardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+    if (DmDistributedHardwareLoad::GetInstance().getDistributedHardwareLoadCount() < maxLoadValue) {
+        DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     }
     return;
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DmDistributedHhardwareLoad);
-void DmDistributedHhardwareLoad::LoadDistributedHardwareFwk(void)
+IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
+void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
-    LOGI("enter DmDistributedHhardwareLoad::LoadDistributedHardwareFwk");
+    LOGI("enter DmDistributedHardwareLoad::LoadDistributedHardwareFwk");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("failed to get system ability mgr.");
@@ -58,11 +56,11 @@ void DmDistributedHhardwareLoad::LoadDistributedHardwareFwk(void)
     }
     return;
 }
-void DmDistributedHhardwareLoad::InitDistributedHardwareLoadCount(void)
+void DmDistributedHardwareLoad::InitDistributedHardwareLoadCount(void)
 {
     nLoadCount_ = 0;
 }
-uint32_t DmDistributedHhardwareLoad::getDistributedHardwareLoadCount()
+uint32_t DmDistributedHardwareLoad::getDistributedHardwareLoadCount()
 {
     return nLoadCount_;
 }

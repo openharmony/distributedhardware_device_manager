@@ -18,16 +18,16 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DmDistributedHhardwareLoad);
-void DmDistributedHhardwareLoad::LoadDistributedHardwareFwk(void)
+IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
+void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
     return;
 }
-void DmDistributedHhardwareLoad::InitDistributedHardwareLoadCount(void)
+void DmDistributedHardwareLoad::InitDistributedHardwareLoadCount(void)
 {
     return;
 }
-uint32_t DmDistributedHhardwareLoad::getDistributedHardwareLoadCount(void)
+uint32_t DmDistributedHardwareLoad::getDistributedHardwareLoadCount(void)
 {
     return 0;
 }

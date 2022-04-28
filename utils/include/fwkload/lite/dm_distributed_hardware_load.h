@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_FWK_H
-#define OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_FWK_H
+#ifndef OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
+#define OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
 #include <cstdint>
 #include "single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
-class DmDistributedHhardwareLoad {
-    DECLARE_SINGLE_INSTANCE(DmDistributedHhardwareLoad);
+class DmDistributedHardwareLoad {
+    DECLARE_SINGLE_INSTANCE(DmDistributedHardwareLoad);
 public:
     void LoadDistributedHardwareFwk(void);
     void InitDistributedHardwareLoadCount(void);
