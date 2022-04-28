@@ -24,9 +24,9 @@ class DmDistributedHardwareLoad {
 public:
     void LoadDistributedHardwareFwk(void);
     void InitDistributedHardwareLoadCount(void);
-    uint32_t getDistributedHardwareLoadCount(void);
+    uint32_t GetDistributedHardwareLoadCount(void);
 private:
-    uint32_t nLoadCount_;
+    uint32_t distributedHardwareLoadCount_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

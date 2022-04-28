@@ -27,7 +27,7 @@ void DmDistributedHardwareLoad::InitDistributedHardwareLoadCount(void)
 {
     return;
 }
-uint32_t DmDistributedHardwareLoad::getDistributedHardwareLoadCount(void)
+uint32_t DmDistributedHardwareLoad::GetDistributedHardwareLoadCount(void)
 {
     return 0;
 }

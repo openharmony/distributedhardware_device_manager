@@ -41,6 +41,7 @@ const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 const int32_t DISCOVER_STATUS_LEN = 20;
 const int32_t COMMON_CALLBACK_MAX_SIZE = 200;
+const uint32_t MAX_LOAD_VAVLUE = 3;
 
 enum {
     DM_OK = 0,

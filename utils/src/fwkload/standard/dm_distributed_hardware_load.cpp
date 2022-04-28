@@ -19,26 +19,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
-    int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
-{
-    LOGI("DmDistributedHhardware Load SA success, systemAbilityId:%d, remoteObject result:%s",
-        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
-    if (remoteObject == nullptr) {
-        LOGE("remoteObject is nullptr");
-        return;
-    }
-}
-void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
-{
-    LOGE("DmDistributedHhardware Load SA failed, systemAbilityId:%d", systemAbilityId);
-    uint32_t maxLoadValue = 3;
-    if (DmDistributedHardwareLoad::GetInstance().getDistributedHardwareLoadCount() < maxLoadValue) {
-        DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
-    }
-    return;
-}
-
 IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
 void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
@@ -47,7 +27,7 @@ void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
     if (samgr == nullptr) {
         LOGE("failed to get system ability mgr.");
     }
-    nLoadCount_++;
+    distributedHardwareLoadCount_++;
     sptr<DistributedHardwareLoadCallback> distributedHardwareLoadCallback_ = new DistributedHardwareLoadCallback();
     int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, distributedHardwareLoadCallback_);
     if (ret != DM_OK) {
@@ -58,11 +38,34 @@ void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 }
 void DmDistributedHardwareLoad::InitDistributedHardwareLoadCount(void)
 {
-    nLoadCount_ = 0;
+    distributedHardwareLoadCount_ = 0;
 }
-uint32_t DmDistributedHardwareLoad::getDistributedHardwareLoadCount()
+uint32_t DmDistributedHardwareLoad::GetDistributedHardwareLoadCount()
 {
-    return nLoadCount_;
+    return distributedHardwareLoadCount_;
+}
+
+void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
+    int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
+{
+    LOGI("DmDistributedHhardware Load SA success, systemAbilityId:%d, remoteObject result:%s",
+        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
+    if (remoteObject == nullptr) {
+        LOGE("remoteObject is nullptr");
+        return;
+    }
+    DmDistributedHardwareLoad::GetInstance().InitDistributedHardwareLoadCount();
+}
+void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    LOGE("DmDistributedHhardware Load SA failed, systemAbilityId:%d", systemAbilityId);
+    
+    if (DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount() < MAX_LOAD_VAVLUE) {
+        DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+    } else {
+        DmDistributedHardwareLoad::GetInstance().InitDistributedHardwareLoadCount();
+    }
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
