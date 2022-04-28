@@ -160,7 +160,7 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_005, testing::ext::TestSize.Le
 {
     // 1. call DeviceManagerImpl::InitDeviceManager with packName not null, dmInitCallback = nullprt
     std::string packName = "";
-    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();;
+    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret= DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     // 2. check ret is DM_INVALID_VALUE
     ASSERT_EQ(ret, DM_INVALID_VALUE);

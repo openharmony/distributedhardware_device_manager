@@ -37,7 +37,7 @@ public:
     bool isTrigger = false;
     std::string timerName_;
     time_t expire_;
-    TimeoutHandle mHandle_;;
+    TimeoutHandle mHandle_;
 };
 
 class TimeHeap {

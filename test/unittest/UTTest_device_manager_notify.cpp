@@ -1738,7 +1738,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_003, testing::ext::T
     // call checkMap2 OnDeviceFound
     checkMap2->OnDeviceFound(subscribeId, deviceInfo);
     // call checkMap3 OnAuthResult
-    std::string token ="1";;
+    std::string token ="1";
     int32_t status = 1;
     int32_t reason = 1;
     checkMap3->OnAuthResult(deviceId, token, status, reason);

@@ -233,7 +233,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);;
+    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -258,7 +258,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_003, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);;
+    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -283,7 +283,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_004, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);;
+    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -312,7 +312,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_005, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);;
+    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     // 3. check ret is DM_IPC_TRANSACTION_FAILED
     ASSERT_EQ(ret, DM_IPC_TRANSACTION_FAILED);
 }
