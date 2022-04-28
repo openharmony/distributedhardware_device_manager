@@ -56,7 +56,7 @@ int32_t TimeHeap::MoveUp(std::shared_ptr<DmTimer> timer)
         return DM_INVALID_VALUE;
     }
 
-    for (int32_t i = 1; i++) {
+    for (int32_t i = 1;; i++) {
         LOGE("MoveUp 1 = %d, h = %d", i, hsize_);
         if (i == hsize_) {
             minHeap_.insert(minHeap_.begin() + (i - 1), timer);
