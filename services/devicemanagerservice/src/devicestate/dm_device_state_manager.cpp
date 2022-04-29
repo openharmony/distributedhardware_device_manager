@@ -18,6 +18,7 @@
 #include "dm_adapter_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -126,6 +127,7 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
 {
+    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     LOGI("OnDeviceOnline function is called back with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
     RegisterProfileListener(pkgName, info);
