@@ -301,7 +301,7 @@ public:
      * @tc.desc: Handle Authenticate Timeout of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t HandleAuthenticateTimeout();
+    void HandleAuthenticateTimeout(std::string name);
 
     /**
      * @tc.name: DmAuthManager::CancelDisplay
@@ -384,7 +384,7 @@ private:
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor_;
-    std::shared_ptr<TimeHeap> timerHeap_;
+    std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;

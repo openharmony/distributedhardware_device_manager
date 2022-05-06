@@ -77,14 +77,14 @@ public:
      * @tc.desc: Handle Discovery Timeout of the Dm Discovery Manager
      * @tc.type: FUNC
      */
-    void HandleDiscoveryTimeout();
+    void HandleDiscoveryTimeout(std::string name);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
-    std::shared_ptr<TimeHeap> timerHeap_;
+    std::shared_ptr<DmTimer> timer_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

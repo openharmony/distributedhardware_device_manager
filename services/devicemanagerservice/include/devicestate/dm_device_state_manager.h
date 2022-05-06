@@ -135,7 +135,7 @@ public:
      * @tc.desc: Delete TimeOut Group of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void DeleteTimeOutGroup(std::string stateTimer);
+    void DeleteTimeOutGroup(std::string name);
 
     /**
      * @tc.name: DmDeviceStateManager::RegisterDevStateCallback
@@ -163,7 +163,7 @@ private:
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
     std::map<std::string, std::string> decisionInfos_;
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
-    std::shared_ptr<TimeHeap> timerHeap_;
+    std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string decisionSoName_;
 };

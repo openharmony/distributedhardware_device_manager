@@ -234,8 +234,9 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
  */
 HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestSize.Level0)
 {
+    std::string name = "test";
     std::string pkgName = "com.ohos.helloworld";
-    discoveryMgr_->HandleDiscoveryTimeout();
+    discoveryMgr_->HandleDiscoveryTimeout(name);
     int ret = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret, 1);
 }

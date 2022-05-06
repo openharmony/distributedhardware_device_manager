@@ -238,7 +238,7 @@ HWTEST_F(AuthResponseStateTest, Enter_003, testing::ext::TestSize.Level0)
     authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
     authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
     authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
-    authManager->timerHeap_ = std::make_shared<TimeHeap>();
+    authManager->timer_ = std::make_shared<DmTimer>();
     authResponseState->SetAuthManager(authManager);
     std::shared_ptr<DmAuthResponseContext> context = std::make_shared<DmAuthResponseContext>();
     context->deviceId = "123456";

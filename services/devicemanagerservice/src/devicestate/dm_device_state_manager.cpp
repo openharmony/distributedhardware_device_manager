@@ -23,23 +23,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-static void TimeOut(void *data, std::string timerName)
-{
-    LOGI("time out %s", timerName.c_str());
-    if (data == nullptr || timerName.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("time out is not our timer");
-        return;
-    }
-
-    DmDeviceStateManager *deviceStateMgr = (DmDeviceStateManager*)data;
-    if (deviceStateMgr == nullptr) {
-        LOGE("deviceStateMgr is nullptr");
-        return;
-    }
-
-    deviceStateMgr->DeleteTimeOutGroup(timerName);
-}
-
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<DeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
@@ -278,13 +261,13 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 #endif
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
-            timerHeap_->DelTimer(iter.second.timerName);
+            timer_->DeleteTimer(iter.second.timerName);
             return;
         }
     }
 
-    if (timerHeap_ == nullptr) {
-        timerHeap_ = std::make_shared<TimeHeap>();
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
     }
     std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(cumulativeQuantity_++);
     StateTimerInfo stateTimer = {
@@ -305,12 +288,15 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
     LOGI("start offline timer");
     for (auto &iter : stateTimerInfoMap_) {
         if (iter.second.netWorkId == deviceInfo.deviceId) {
-            timerHeap_->AddTimer(iter.second.timerName, OFFLINE_TIMEOUT, TimeOut, this);
+            timer_->StartTimer(iter.second.timerName, OFFLINE_TIMEOUT,
+                [this] (std::string name) {
+                    DmDeviceStateManager::DeleteTimeOutGroup(name);
+                });
         }
     }
 }
 
-void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
+void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
 {
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
@@ -318,14 +304,14 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string stateTimer)
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
 #endif
     if (hiChainConnector_ != nullptr) {
-        auto iter = stateTimerInfoMap_.find(stateTimer);
+        auto iter = stateTimerInfoMap_.find(name);
         if (iter != stateTimerInfoMap_.end()) {
             LOGI("remove hichain group with device: %s",
-                GetAnonyString(stateTimerInfoMap_[stateTimer].deviceId).c_str());
-            hiChainConnector_->DeleteTimeOutGroup(stateTimerInfoMap_[stateTimer].deviceId.c_str());
+                GetAnonyString(stateTimerInfoMap_[name].deviceId).c_str());
+            hiChainConnector_->DeleteTimeOutGroup(stateTimerInfoMap_[name].deviceId.c_str());
         }
     }
-    stateTimerInfoMap_.erase(stateTimer);
+    stateTimerInfoMap_.erase(name);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

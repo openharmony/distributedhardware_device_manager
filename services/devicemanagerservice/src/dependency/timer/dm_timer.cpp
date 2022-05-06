@@ -17,181 +17,136 @@
 #include "dm_log.h"
 #include "dm_timer.h"
 
+#include <algorithm>
+#include <thread>
+
 namespace OHOS {
 namespace DistributedHardware {
-int32_t TimeHeap::Tick()
+bool Compare(const Timer &frontTimer, const Timer &timer)
 {
-    LOGI("Tick start");
-    if (hsize_ == 0) {
-        LOGE("Timer count is 0");
-        return DM_AUTH_NO_TIMER;
+    return frontTimer.timeOut < timer.timeOut;
+}
+
+DmTimer::DmTimer()
+{
+    LOGI("DmTimer constructor");
+}
+
+DmTimer::~DmTimer()
+{
+    LOGI("DmTimer destructor");
+    DeleteAll();
+    if (timerState_) {
+        std::unique_lock<std::mutex> locker(timerStateMutex_);
+        stopTimerCondition_.wait(locker, [this] { return static_cast<bool>(!timerState_); });
+    }
+}
+
+int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
+{
+    LOGI("DmTimer StartTimer %s", name.c_str());
+    if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    std::shared_ptr<DmTimer> top = minHeap_.front();
-    top->isTrigger = true;
-    do {
-        top->mHandle_(top->userData_, top->timerName_);
-        DelTimer(top->timerName_);
-
-        if (hsize_ > 0) {
-            top = minHeap_.front();
-        } else {
-            break;
+    Timer timer = {
+        .timerName = name,
+        .expire = steadyClock::now(),
+        .state = true,
+        .timeOut = timeOut,
+        .callback = callback
+    };
+    {
+        std::lock_guard<std::mutex> locker(timerMutex_);
+        for (auto iter : timerHeap_) {
+            iter.timeOut = std::chrono::duration_cast<timerDuration>(steadyClock::now()
+                - timerHeap_.front().expire).count() / MILLISECOND_TO_SECOND;
+            iter.expire = steadyClock::now();
         }
-    } while (top->expire_ <= time(NULL));
+        timerHeap_.push_back(timer);
+        sort(timerHeap_.begin(), timerHeap_.end(), Compare);
+    }
 
+    if (timerState_) {
+        LOGI("DmTimer is running");
+        return DM_OK;
+    }
+
+    TimerRunning();
+    {
+        std::unique_lock<std::mutex> locker(timerStateMutex_);
+        runTimerCondition_.wait(locker, [this] { return static_cast<bool>(timerState_); });
+    }
     return DM_OK;
 }
 
-int32_t TimeHeap::MoveUp(std::shared_ptr<DmTimer> timer)
+int32_t DmTimer::DeleteTimer(std::string name)
 {
-    LOGI("MoveUp timer");
-    if (timer == nullptr) {
-        LOGE("MoveUp timer is null");
-        return DM_INVALID_VALUE;
+    LOGI("DmTimer DeleteTimer size %d", timerHeap_.size());
+    if (name.empty()) {
+        LOGE("DmTimer DeleteTimer timer name is null");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    if (hsize_ == 0) {
-        LOGE("Add timer failed");
-        return DM_INVALID_VALUE;
+    auto iter = std::find(timerHeap_.begin(), timerHeap_.end(), Timer {name, });
+    if (iter == timerHeap_.end()) {
+        LOGE("DmTimer DeleteTimer is not this %s timer,", name.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    for (int32_t i = 1;; i++) {
-        LOGE("MoveUp 1 = %d, h = %d", i, hsize_);
-        if (i == hsize_) {
-            minHeap_.insert(minHeap_.begin() + (i - 1), timer);
-            break;
-        }
-        if (timer->expire_ < minHeap_[i - 1]->expire_) {
-            minHeap_.insert(minHeap_.begin() + (i -1), timer);
-            break;
+    std::lock_guard<std::mutex> locker(timerMutex_);
+    iter->state = false;
+    return DM_OK;
+}
+
+int32_t DmTimer::DeleteAll()
+{
+    LOGI("DmTimer DeleteAll");
+    if (timerHeap_.size() > 0) {
+        std::lock_guard<std::mutex> locker(timerMutex_);
+        for (auto iter : timerHeap_) {
+            iter.state = false;
         }
     }
     return DM_OK;
 }
 
-void TimeHeap::Run()
+int32_t DmTimer::TimerRunning()
 {
-    epoll_event event;
-    event.data.fd = pipefd[0];
-    event.events = EPOLLIN | EPOLLET;
-    epoll_ctl(epollFd_, EPOLL_CTL_ADD, pipefd[0], &event);
-    epoll_event events[MAX_EVENT_NUMBER];
-    bool stop = false;
-    int timeout = NO_TIMER;
-
-    while (!stop) {
-        int number = epoll_wait(epollFd_, events, MAX_EVENT_NUMBER, timeout);
-
-        LOGI("RunTimer is doing");
-        if (number < 0) {
-            LOGE("DmTimer %s epoll_wait error: %d", minHeap_.front()->timerName_.c_str(), errno);
-            DelTimer(minHeap_.front()->timerName_);
+    std::thread([this] () {
+        {
+            timerState_ = true;
+            std::unique_lock<std::mutex> locker(timerStateMutex_);
+            runTimerCondition_.notify_one();
         }
-        if (!number) {
-            Tick();
-        } else {
-            int buffer = 0;
-            recv(pipefd[0], (char*)&buffer, sizeof(buffer), 0);
+        while (timerHeap_.size() != 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TICK_MILLSECONDS));
+            while (std::chrono::duration_cast<timerDuration>(steadyClock::now()
+                   - timerHeap_.front().expire).count() / MILLISECOND_TO_SECOND >= timerHeap_.front().timeOut
+                   || !timerHeap_.front().state) {
+                std::string name = timerHeap_.front().timerName;
+                if (timerHeap_.front().state) {
+                    timerHeap_.front().callback(name);
+                }
+
+                auto iter = std::find(timerHeap_.begin(), timerHeap_.end(), Timer {name, });
+                if (iter != timerHeap_.end()) {
+                    std::lock_guard<std::mutex> locker(timerMutex_);
+                    timerHeap_.erase(timerHeap_.begin(), timerHeap_.begin()+1);
+                    sort(timerHeap_.begin(), timerHeap_.end(), Compare);
+                }
+
+                if (timerHeap_.size() == 0) {
+                    break;
+                }
+            }
         }
-
-        if (hsize_ == 0) {
-            break;
-        } else {
-            timeout = (minHeap_.front()->expire_ - time(NULL)) * SEC_TO_MM;
+        {
+            timerState_ = false;
+            std::unique_lock<std::mutex> locker(timerStateMutex_);
+            stopTimerCondition_.notify_one();
         }
-    }
-}
-
-TimeHeap::TimeHeap(): epollFd_(epoll_create(MAX_EVENTS))
-{
-    minHeap_.resize(INIT_SIZE);
-
-    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
-    if (ret != 0) {
-        LOGE("open pipe failed");
-    }
-    assert(ret == 0);
-}
-
-TimeHeap::~TimeHeap()
-{
-    DelAll();
-    close(epollFd_);
-}
-
-int32_t TimeHeap::AddTimer(std::string name, int timeout, TimeoutHandle mHandle, void *user)
-{
-    if (name.empty() || name.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer name is not DM timer");
-        return DM_INVALID_VALUE;
-    }
-
-    LOGI("AddTimer %s", name.c_str());
-    if (timeout <= 0 || mHandle == nullptr || user == nullptr) {
-        LOGE("DmTimer %s invalid value", name.c_str());
-        return DM_INVALID_VALUE;
-    }
-
-    if (hsize_ == 0) {
-        mThread_ = std::thread(&TimeHeap::Run, this);
-        mThread_.detach();
-    }
-    if (hsize_ == (int32_t)(minHeap_.size() - 1)) {
-        minHeap_.resize(EXPAND_TWICE * minHeap_.size());
-    }
-
-    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>(name, timeout + time(NULL), user, mHandle);
-    ++hsize_;
-    MoveUp(timer);
-    if (timer == minHeap_.front()) {
-        char msg = 1;
-        send(pipefd[1], (char*)&msg, sizeof(msg), 0);
-    }
-    LOGE("AddTimer %s complete", name.c_str());
-    return DM_OK;
-}
-
-int32_t TimeHeap::DelTimer(std::string name)
-{
-    if (name.empty() || name.find(TIMER_PREFIX) != TIMER_DEFAULT) {
-        LOGE("DmTimer name is not DM timer");
-        return DM_INVALID_VALUE;
-    }
-
-    LOGI("DelTimer %s", name.c_str());
-    int32_t location = 0;
-    bool have = false;
-    for (int32_t i = 0; i < hsize_; i++) {
-        if (minHeap_[i]->timerName_ == name) {
-            location = i;
-            have = true;
-            break;
-        }
-    }
-
-    if (!have) {
-        LOGE("heap is not have this %s", name.c_str());
-        return DM_INVALID_VALUE;
-    }
-
-    if (minHeap_[location] == minHeap_.front() && minHeap_[location]->isTrigger == false) {
-        char msg = 1;
-        send(pipefd[1], &msg, sizeof(msg), 0);
-    }
-    minHeap_.erase(minHeap_.begin() + location);
-    hsize_--;
-    LOGI("DelTimer %s complete , timer count %d", name.c_str(), hsize_);
-    return DM_OK;
-}
-
-int32_t TimeHeap::DelAll()
-{
-    LOGI("DelAll start");
-    for (int32_t i = hsize_ ; i > 0; i--) {
-        DelTimer(minHeap_[i - 1]->timerName_);
-    }
-    LOGI("DelAll complete");
+    }).detach();
     return DM_OK;
 }
 }
