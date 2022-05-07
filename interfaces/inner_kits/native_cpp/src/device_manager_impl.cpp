@@ -279,7 +279,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
 {
     LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(),
         deviceInfo.deviceId);
-    if (pkgName.empty()) {
+    if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
         LOGE("UnAuthenticateDevice error: Invalid para");
         return DM_INVALID_VALUE;
     }
