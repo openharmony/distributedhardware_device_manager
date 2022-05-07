@@ -72,13 +72,12 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSiz
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
     authManager->authResponseContext_ = nullptr;
     authManager->SetAuthRequestState(authRequestState);
     authManager->HandleAuthenticateTimeout(name);
-    ASSERT_EQ(authManager->authRequestState_, nullptr);
+    ASSERT_TRUE(authManager->authResponseContext_ != nullptr);
 }
 
 /**
@@ -98,7 +97,7 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_002, testing::ext::TestSiz
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager->SetAuthRequestState(authRequestState);
     authManager->HandleAuthenticateTimeout(name);
-    ASSERT_EQ(authManager->authRequestState_, nullptr);
+    ASSERT_TRUE(authManager->authRequestState_ != nullptr);
 }
 
 /**

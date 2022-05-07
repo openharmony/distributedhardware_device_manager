@@ -140,14 +140,14 @@ bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInf
     return false;
 }
 
-int32_t HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
+bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
-        return DM_FAILED;
+        return false;
     }
     int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME.c_str(), queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {

@@ -135,7 +135,7 @@ HWTEST_F(TimeHeapTest, DeleteAll_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(DM_OK, ret);
 
     timer->StartTimer(name, timeOut, TimeOut);
-    int32_t ret = timer->DeleteAll();
+    ret = timer->DeleteAll();
     EXPECT_EQ(DM_OK, ret);
 }
 
@@ -147,8 +147,6 @@ HWTEST_F(TimeHeapTest, DeleteAll_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(TimeHeapTest, TimerRunning_001, testing::ext::TestSize.Level0)
 {
-    std::string name = AUTHENTICATE_TIMEOUT_TASK;
-    int32_t timeOut = 1;
     std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
     int32_t ret = timer->TimerRunning();
     EXPECT_EQ(DM_OK, ret);

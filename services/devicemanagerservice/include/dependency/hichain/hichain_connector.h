@@ -122,7 +122,7 @@ public:
      * @tc.desc: Get GroupInfo of the HiChain Connector
      * @tc.type: FUNC
      */
-    int32_t GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
+    bool GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
 
     /**
      * @tc.name: HiChainConnector::GetGroupInfo
