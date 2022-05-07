@@ -146,9 +146,9 @@ void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string bundleName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    DmDeviceInfo deviceInfo;
 
-    DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceId);
+    DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceInfo);
 }
 
 void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)

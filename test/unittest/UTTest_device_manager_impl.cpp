@@ -1281,9 +1281,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_001, testing::ext::TestSize
 {
     // 1. set packName = null
     std::string packName = "";
-    std::string deviceId = "";
+    DmDeviceInfo deviceInfo;
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceId);
+    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
     ASSERT_EQ(ret, DM_INVALID_VALUE);
 }
@@ -1306,9 +1306,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_002, testing::ext::TestSize
 {
     // 1. set packName = null
     std::string packName = "com.ohos.helloworld";
-    std::string deviceId = "";
+    DmDeviceInfo deviceInfo;
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceId);
+    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
     ASSERT_EQ(ret, DM_INVALID_VALUE);
 }
@@ -1332,7 +1332,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_003, testing::ext::TestSize
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     // set callback null
-    std::string deviceId = "1";
+    DmDeviceInfo deviceInfo;
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -1340,7 +1340,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_003, testing::ext::TestSize
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceId);
+    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -1365,7 +1365,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_004, testing::ext::TestSize
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     // set dmDeviceInfo null
-    std::string deviceId = "1";
+    DmDeviceInfo deviceInfo;
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return DM_SERVICE_NOT_READY
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -1373,7 +1373,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_004, testing::ext::TestSize
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_SERVICE_NOT_READY));
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceId);
+    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -1398,7 +1398,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_005, testing::ext::TestSize
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     // set dmDeviceInfo null
-    std::string deviceId = "1";
+    DmDeviceInfo deviceInfo;
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return DM_POINT_NULL
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -1406,7 +1406,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_005, testing::ext::TestSize
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_POINT_NULL));
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceId);
+    int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;

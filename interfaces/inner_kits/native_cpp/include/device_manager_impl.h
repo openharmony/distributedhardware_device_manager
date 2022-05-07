@@ -95,7 +95,7 @@ public:
      * @tc.desc: Cancel complete verification of device
      * @tc.type: FUNC
      */
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId) override;
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo) override;
     /**
      * @tc.name: DeviceManagerImpl::VerifyAuthentication
      * @tc.desc: Verify device authentication
