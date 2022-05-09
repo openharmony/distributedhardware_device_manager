@@ -17,7 +17,6 @@
 #include "dm_log.h"
 #include "dm_timer.h"
 
-#include <algorithm>
 #include <thread>
 
 namespace OHOS {
