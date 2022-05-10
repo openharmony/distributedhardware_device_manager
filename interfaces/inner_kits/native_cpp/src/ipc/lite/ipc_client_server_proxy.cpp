@@ -34,20 +34,15 @@ void __attribute__((weak)) HOS_SystemInit(void)
     return;
 }
 
-int32_t DmDeathCallback(const IpcContext *ctx, void *ipcMsg, IpcIo *data, void *arg)
+void DmDeathCallback(void *arg)
 {
-    (void)ctx;
-    (void)ipcMsg;
-    (void)data;
     (void)arg;
-    LOGI("ATTENTION  SERVICE (%s) DEAD !!!\n", DEVICE_MANAGER_SERVICE_NAME);
-    UnregisterDeathCallback(g_svcIdentity, g_deathCbId);
+    LOGI("ATTENTION SERVICE (%s) DEAD !!!\n", DEVICE_MANAGER_SERVICE_NAME);
     g_deathCbId = INVALID_CB_ID;
     g_svcIdentity.handle = 0;
     g_svcIdentity.token = 0;
     g_svcIdentity.cookie = 0;
     DeviceManagerNotify::GetInstance().OnRemoteDied();
-    return DM_OK;
 }
 
 static int32_t SendCmdResultCb(IOwner owner, int32_t code, IpcIo *reply)
@@ -80,7 +75,7 @@ int IpcClientServerProxy::RegisterServerDeathCb(void)
 {
     g_svcIdentity = SAMGR_GetRemoteIdentity(DEVICE_MANAGER_SERVICE_NAME, nullptr);
     g_deathCbId = INVALID_CB_ID;
-    if (RegisterDeathCallback(nullptr, g_svcIdentity, DmDeathCallback, nullptr, &g_deathCbId) != EC_SUCCESS) {
+    if (AddDeathRecipient(g_svcIdentity, DmDeathCallback, nullptr, &g_deathCbId) != EC_SUCCESS) {
         LOGE("reg death callback failed");
         return DM_FAILED;
     }

@@ -22,7 +22,7 @@
 #include "ipc_def.h"
 #include "ipc_server_listenermgr.h"
 #include "iproxy_server.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #include "ohos_init.h"
 #include "samgr_lite.h"
 #include "securec.h"
@@ -46,60 +46,45 @@ struct DeviceManagerSamgrService {
     Identity identity;
 };
 
-static int32_t DeathCb(const IpcContext *context, void *ipcMsg, IpcIo *data, void *arg)
+static void DeathCb(void *arg)
 {
-    (void)context;
-    (void)ipcMsg;
-    (void)data;
     if (arg == nullptr) {
         LOGE("package name is NULL.");
-        return DM_INVALID_VALUE;
+        return;
     }
     CommonSvcId svcId = {0};
     std::string pkgName = (const char *)arg;
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found client by package name.");
         free(arg);
-        arg = nullptr;
-        return DM_FAILED;
+        return;
     }
     IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     free(arg);
-    arg = nullptr;
-#ifdef __LINUX__
-    BinderRelease(svcId.ipcCtx, svcId.handle);
-#endif
     SvcIdentity sid = {0};
     sid.handle = svcId.handle;
     sid.token = svcId.token;
     sid.cookie = svcId.cookie;
-    UnregisterDeathCallback(sid, svcId.cbId);
-    return DM_OK;
+    ReleaseSvc(sid);
 }
 
 int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
     LOGI("register service listener.");
     size_t len = 0;
-    uint8_t *name = IpcIoPopString(req, &len);
-    SvcIdentity *svc = IpcIoPopSvc(req);
-    if (name == nullptr || svc == nullptr || len == 0) {
+    uint8_t *name = ReadString(req, &len);
+    SvcIdentity svc;
+    bool ret = ReadRemoteObject(req, &svc);
+    if (!ret || name == NULL || len == 0) {
         LOGE("get para failed");
         return DM_INVALID_VALUE;
     }
 
     CommonSvcId svcId = {0};
-    svcId.handle = svc->handle;
-    svcId.token = svc->token;
-    svcId.cookie = svc->cookie;
+    svcId.handle = svc.handle;
+    svcId.token = svc.token;
+    svcId.cookie = svc.cookie;
 
-    SvcIdentity sid = *svc;
-#ifdef __LINUX__
-    svcId.ipcCtx = svc->ipcContext;
-    BinderAcquire(svcId.ipcCtx, svcId.handle);
-    free(svc);
-    svc = nullptr;
-#endif
     if (len == 0 || len > MALLOC_MAX_LEN) {
         LOGE("malloc length invalid!");
         return DM_MALLOC_ERROR;
@@ -115,7 +100,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         return DM_COPY_FAILED;
     }
     uint32_t cbId = 0;
-    RegisterDeathCallback(NULL, sid, DeathCb, pkgName, &cbId);
+    AddDeathRecipient(svc, DeathCb, pkgName, &cbId);
     svcId.cbId = cbId;
     std::string strPkgName = (const char *)name;
     return IpcServerListenermgr::GetInstance().RegisterListener(strPkgName, &svcId);
@@ -125,7 +110,7 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
     LOGI("unregister service listener.");
     size_t len = 0;
-    std::string pkgName = (const char *)IpcIoPopString(req, &len);
+    std::string pkgName = (const char *)ReadString(req, &len);
     if (pkgName == "" || len == 0) {
         LOGE("get para failed");
         return DM_FAILED;
@@ -137,14 +122,11 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     }
     int32_t ret = IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     if (ret == DM_OK) {
-#ifdef __LINUX__
-        BinderRelease(svcId.ipcCtx, svcId.handle);
-#endif
         SvcIdentity sid;
         sid.handle = svcId.handle;
         sid.token = svcId.token;
         sid.cookie = svcId.cookie;
-        ret = UnregisterDeathCallback(sid, svcId.cbId);
+        ReleaseSvc(sid);
     }
     return ret;
 }
@@ -183,7 +165,7 @@ static TaskConfig GetTaskConfig(Service *service)
     return config;
 }
 
-static int32_t OnRemoteRequest(IServerProxy *iProxy, int32_t funcId, void *origin, IpcIo *req, IpcIo *reply)
+static int32_t OnRemoteRequestLite(IServerProxy *iProxy, int32_t funcId, void *origin, IpcIo *req, IpcIo *reply)
 {
     LOGI("Receive funcId:%d", funcId);
     (void)origin;
@@ -211,7 +193,7 @@ static void DevMgrSvcInit(void)
         .MessageHandle = MessageHandle,
         .GetTaskConfig = GetTaskConfig,
         SERVER_IPROXY_IMPL_BEGIN,
-        .Invoke = OnRemoteRequest,
+        .Invoke = OnRemoteRequestLite,
         IPROXY_END,
     };
 

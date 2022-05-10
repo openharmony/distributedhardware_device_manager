@@ -23,7 +23,7 @@
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "iproxy_client.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #include "samgr_lite.h"
 
 namespace OHOS {

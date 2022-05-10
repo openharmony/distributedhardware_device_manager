@@ -19,7 +19,7 @@
 #include "ipc_req.h"
 
 #ifdef LITE_DEVICE
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #else
 #include "iremote_stub.h"
 #endif

@@ -22,7 +22,7 @@
 
 #include "ipc_req.h"
 #include "ipc_rsp.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #include "single_instance.h"
 
 namespace OHOS {

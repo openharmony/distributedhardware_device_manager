@@ -39,7 +39,6 @@
 #include "dm_constants.h"
 #include "ipc_def.h"
 #include "dm_log.h"
-#include "ipc_server_listenermgr.h"
 #include "ipc_rsp.h"
 #include "ipc_cmd_register_fuzzer.h"
 

@@ -18,7 +18,7 @@
 
 #include <cstdint>
 
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 
 int32_t IpcServerStubInit(void);
 int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply);

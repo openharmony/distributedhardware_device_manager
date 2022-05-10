@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <mutex>
 
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #include "single_instance.h"
 
 namespace OHOS {
@@ -43,6 +43,7 @@ private:
     std::mutex lock_;
     bool bInit { false };
     SvcIdentity clientIdentity_;
+    IpcObjectStub objectStub_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -76,7 +76,7 @@ if (defined(ohos_lite)) {
         "//utils/native/lite/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
         "//third_party/bounds_checking_function/include",
-        "//foundation/communication/ipc_lite/interfaces/kits",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
         "//third_party/json/include",
@@ -95,7 +95,7 @@ if (defined(ohos_lite)) {
       deps = [
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//foundation/communication/ipc_lite:liteipc_adapter",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
         "//foundation/distributedschedule/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//utils/native/lite:utils",

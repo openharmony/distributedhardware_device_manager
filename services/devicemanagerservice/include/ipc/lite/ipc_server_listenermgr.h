@@ -21,7 +21,7 @@
 #include <mutex>
 #include <string>
 
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
 #include "single_instance.h"
 
 namespace OHOS {
@@ -30,7 +30,6 @@ typedef struct CommonSvcId {
     uint32_t handle;
     uint32_t token;
     uint32_t cookie;
-    IpcContext *ipcCtx;
     uint32_t cbId;
 } CommonSvcId;
 

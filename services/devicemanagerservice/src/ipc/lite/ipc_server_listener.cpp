@@ -28,9 +28,6 @@ void IpcServerListener::CommonSvcToIdentity(CommonSvcId *svcId, SvcIdentity *ide
     identity->handle = svcId->handle;
     identity->token = svcId->token;
     identity->cookie = svcId->cookie;
-#ifdef __LINUX__
-    identity->ipcContext = svcId->ipcCtx;
-#endif
 }
 
 int32_t IpcServerListener::GetIdentityByPkgName(std::string &name, SvcIdentity *svc)
@@ -60,7 +57,10 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
         return DM_FAILED;
     }
 
-    if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
+    MessageOption option;
+    MessageOptionInit(&option);
+    option.flags = TF_OP_ASYNC;
+    if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
         LOGI("SendRequest failed cmdCode:%d", cmdCode);
     }
     return DM_OK;
@@ -82,7 +82,10 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         }
         CommonSvcId svcId = kv.second;
         CommonSvcToIdentity(&svcId, &svc);
-        if (::SendRequest(nullptr, svc, cmdCode, &io, nullptr, LITEIPC_FLAG_ONEWAY, nullptr) != DM_OK) {
+        MessageOption option;
+        MessageOptionInit(&option);
+        option.flags = TF_OP_ASYNC;
+        if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
             LOGI("SendRequest failed cmdCode:%d", cmdCode);
         }
     }

@@ -25,19 +25,15 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(IpcClientStub);
 
-static int32_t ClientIpcInterfaceMsgHandle(const IpcContext *ctx, void *ipcMsg, IpcIo *io, void *arg)
+static int32_t ClientIpcInterfaceMsgHandle(uint32_t code, IpcIo *data, IpcIo *reply, MessageOption option)
 {
-    (void)arg;
-    if (ipcMsg == nullptr || io == nullptr) {
+    if (data== nullptr) {
         LOGE("invalid param");
         return DM_INPUT_PARA_EMPTY;
     }
 
-    uint32_t code = 0;
-    GetCode(ipcMsg, &code);
-    int32_t errCode = IpcCmdRegister::GetInstance().OnIpcCmd(code, *io);
+    int32_t errCode = IpcCmdRegister::GetInstance().OnIpcCmd(code, *data);
     LOGI("receive ipc transact code:%u, retCode=%d", code, errCode);
-    FreeBuffer(ctx, ipcMsg);
     return errCode;
 }
 
@@ -47,10 +43,14 @@ int32_t IpcClientStub::Init()
     if (bInit) {
         return DM_OK;
     }
-    if (RegisterIpcCallback(ClientIpcInterfaceMsgHandle, 0, IPC_WAIT_FOREVER, &clientIdentity_, nullptr) != 0) {
-        LOGE("register ipc cb failed");
-        return DM_FAILED;
-    }
+
+    objectStub_.func = ClientIpcInterfaceMsgHandle;
+    objectStub_.args = nullptr;
+    objectStub_.isRemote = false;
+    clientIdentity_.handle = IPC_INVALID_HANDLE;
+    clientIdentity_.token = 0;
+    clientIdentity_.cookie = (uintptr_t)&objectStub_;
+
     bInit = true;
     return DM_OK;
 }
