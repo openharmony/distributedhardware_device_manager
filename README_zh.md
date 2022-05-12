@@ -231,5 +231,7 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 ****
 
 [**interface_sdk-js**](https://gitee.com/openharmony/interface_sdk-js/)
+
 [**applications_hap**](https://gitee.com/openharmony/applications_hap)
+
 **device_manager**

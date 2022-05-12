@@ -231,5 +231,7 @@ This FA is called **DeviceManager_UI.hap**, which is preset as a system applicat
 ****
 
 [**interface_sdk-js**](https://gitee.com/openharmony/interface_sdk-js/)
+
 [**applications_hap**](https://gitee.com/openharmony/applications_hap)
+
 **device_manager**
