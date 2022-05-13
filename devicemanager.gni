@@ -19,6 +19,8 @@ utils_path = "${devicemanager_path}/utils"
 services_path = "${devicemanager_path}/services/devicemanagerservice"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
 ext_path = "${devicemanager_path}/ext"
+aainnerkits_path = "//foundation/aafwk/standard/interfaces/innerkits"
+aaservices_path = "//foundation/aafwk/standard/services"
 
 #--------------------------softbus----------------------------------#
 

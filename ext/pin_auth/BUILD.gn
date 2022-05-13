@@ -134,14 +134,14 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "${aainnerkits_path}/ability_manager:ability_manager",
+      "${aainnerkits_path}/want:want",
+      "${aaservices_path}/abilitymgr:abilityms",
       "${ext_path}/pin_auth/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${ext_path}/pin_auth/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/security/deviceauth/services:deviceauth_sdk",
-      "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
-      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-      "//foundation/aafwk/standard/services/abilitymgr:abilityms",
       "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
       "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
       "//utils/native/base:utils",

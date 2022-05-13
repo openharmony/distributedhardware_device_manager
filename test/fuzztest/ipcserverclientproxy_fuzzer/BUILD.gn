@@ -87,13 +87,13 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
   sources = [ "ipc_server_client_proxy_fuzzer.cpp" ]
 
   deps = [
+    "${aainnerkits_path}/ability_manager:ability_manager",
+    "${aainnerkits_path}/want:want",
+    "${aaservices_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     "//base/security/deviceauth/services:deviceauth_sdk",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
   ]

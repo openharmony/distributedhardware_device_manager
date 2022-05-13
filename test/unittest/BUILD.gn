@@ -620,12 +620,12 @@ ohos_static_library("device_manager_test") {
   ]
 
   deps = [
+    "${aainnerkits_path}/ability_manager:ability_manager",
+    "${aainnerkits_path}/want:want",
+    "${aaservices_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//base/security/deviceauth/services:deviceauth_sdk",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
   ]
 
   if (os_account_part_exists) {

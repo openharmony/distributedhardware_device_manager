@@ -152,7 +152,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+      "${aainnerkits_path}/want:want",
       "//third_party/mbedtls:mbedtls_shared",
     ]
 
