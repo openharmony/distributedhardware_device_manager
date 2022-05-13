@@ -269,6 +269,7 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
         LOGI("Create group success");
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
+            hiChainConnectorCallback_->OnGroupCreated(requestId, data);
         }
     }
     if (operationCode == GroupOperationCode::MEMBER_DELETE) {
