@@ -44,7 +44,7 @@ public:
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &deviceInfo,
                                        const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo) = 0;
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                          std::shared_ptr<VerifyAuthCallback> callback) = 0;
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,

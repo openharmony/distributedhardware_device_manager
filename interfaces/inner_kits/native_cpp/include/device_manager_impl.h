@@ -45,7 +45,7 @@ public:
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &deviceInfo,
                                        const std::string &extra,
                                        std::shared_ptr<AuthenticateCallback> callback) override;
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId) override;
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo) override;
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                          std::shared_ptr<VerifyAuthCallback> callback) override;
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &packageName,

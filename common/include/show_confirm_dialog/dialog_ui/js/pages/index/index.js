@@ -12,7 +12,6 @@ export default {
         seconds:60,
     },
     onInit() {
-        console.info('getParams: ' + router.getParams());
         callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
     },
     onShow() {

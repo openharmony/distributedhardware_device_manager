@@ -1539,15 +1539,17 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
 {
     LOGI("UnAuthenticateDevice");
     napi_value result = nullptr;
-    napi_valuetype deviceInfoType;
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    napi_valuetype deviceInfoType = napi_undefined;
     napi_typeof(env, argv[0], &deviceInfoType);
-    NAPI_ASSERT(env, deviceInfoType == napi_string, "Wrong argument type. String expected.");
-    std::string deviceId = JsObjectToString(env, argv[0]);
-    LOGI("UnAuthenticateDevice deviceId=%s", deviceId.c_str());
+    NAPI_ASSERT(env, deviceInfoType == napi_object, "Wrong argument type. Object expected.");
+
+    DmDeviceInfo deviceInfo;
+    JsToDmDeviceInfo(env, argv[0], deviceInfo);
+    LOGI("UnAuthenticateDevice deviceId = %s", deviceInfo.deviceId);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
-    int32_t ret = DeviceManager::GetInstance().UnAuthenticateDevice(deviceManagerWrapper->bundleName_, deviceId);
+    int32_t ret = DeviceManager::GetInstance().UnAuthenticateDevice(deviceManagerWrapper->bundleName_, deviceInfo);
     if (ret != 0) {
         LOGE("UnAuthenticateDevice for bunderName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
     }

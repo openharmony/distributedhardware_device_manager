@@ -275,26 +275,20 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
+int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(), deviceId.c_str());
+    LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(), deviceInfo.deviceId);
 
-    if (deviceId.empty()) {
+    if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
         LOGE("UnAuthenticateDevice error: Invalid para");
         return DM_INVALID_VALUE;
     }
 
-    DmDeviceInfo deviceInfo;
-    int32_t ret = strcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str());
-    if (ret != DM_OK) {
-        LOGE("UnAuthenticateDevice error: copy deviceId failed");
-        return DM_INVALID_VALUE;
-    }
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
-    ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
+    int32_t ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Send Request failed ret: %d", ret);
         return DM_IPC_SEND_REQUEST_FAILED;
