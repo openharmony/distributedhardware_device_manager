@@ -55,7 +55,7 @@ int32_t GetRandomData(uint8_t *randStr, uint32_t len)
 {
     mbedtls_entropy_context *entropy = nullptr;
     mbedtls_ctr_drbg_context *ctrDrbg = nullptr;
-    int32_t ret = DM_FAILED;
+    int32_t ret = ERR_DM_FAILED;
     do {
         if (randStr == nullptr || len == 0) {
             break;

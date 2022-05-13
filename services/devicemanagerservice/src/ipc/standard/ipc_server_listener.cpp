@@ -27,7 +27,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
         LOGI("cannot get listener for package:%s.", pkgName.c_str());
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return listener->SendCmd(cmdCode, req, rsp);
 }
@@ -42,7 +42,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
         if (listener == nullptr) {
             LOGI("cannot get listener for package:%s.", pkgName.c_str());
-            return DM_FAILED;
+            return ERR_DM_FAILED;
         }
         listener->SendCmd(cmdCode, req, rsp);
     }

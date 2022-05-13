@@ -48,7 +48,7 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageOption option;
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");
-        return DM_IPC_FAILED;
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     
     LOGI("cmdCode = %d, flags= %d.", cmdCode, option.GetFlags());

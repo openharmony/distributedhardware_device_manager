@@ -37,7 +37,7 @@ int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, co
 {
     if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
         LOGE("Not a reasonable function argument");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     LOGI("register profile callback with pkgName: %s", pkgName.c_str());
@@ -45,7 +45,7 @@ int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, co
         std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
         if (callbackMap_.find(pkgName) != callbackMap_.end()) {
             LOGE("pkgName: %s already exists in the map", pkgName.c_str());
-            return ERR_DM_KEY_ALREADY_EXISTS;
+            return ERR_DM_MAP_KEY_ALREADY_EXISTS;
         }
         LOGI("register profile callback pkgName: %s", pkgName.c_str());
         callbackMap_[pkgName] = callback;
@@ -62,7 +62,7 @@ int32_t ProfileConnector::UnRegisterProfileCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Not a reasonable function argument");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     LOGI("unregister profile callback with pkgName: %s", pkgName.c_str());
@@ -84,7 +84,7 @@ int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &s
         subscribeInfos, shared_from_this(), failedEvents);
     if (errCode != ERR_OK) {
         LOGI("subscribe profile events result: %ud", errCode);
-        return ERR_DM_UNSUBSCRIBE_DP_EVENTS;
+        return DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }
@@ -98,7 +98,7 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
         profileEvents, shared_from_this(), failedEvents);
     if (errCode != ERR_OK) {
         LOGI("unSubscribe profile events result:%ud", errCode);
-        return ERR_DM_UNSUBSCRIBE_DP_EVENTS;
+        return DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }

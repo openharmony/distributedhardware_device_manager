@@ -188,12 +188,12 @@ int32_t SoftbusConnector::GetTrustedDeviceList(std::vector<DmDeviceInfo> &device
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeInfo, &infoNum);
     if (ret != 0) {
         LOGE("GetAllNodeDeviceInfo failed with ret %d", ret);
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     DmDeviceInfo *info = (DmDeviceInfo *)malloc(sizeof(DmDeviceInfo) * (infoNum));
     if (info == nullptr) {
         FreeNodeInfo(nodeInfo);
-        return DM_MALLOC_ERROR;
+        return ERR_DM_MALLOC_FAILED;
     }
     DmDeviceInfo **pInfoList = &info;
     for (int32_t i = 0; i < infoNum; ++i) {
@@ -215,7 +215,7 @@ int32_t SoftbusConnector::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeBasicInfo);
     if (ret != 0) {
         LOGE("GetLocalNodeDeviceInfo failed with ret %d", ret);
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     CovertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
     LOGI("SoftbusConnector::GetLocalDeviceInfo success");
@@ -237,7 +237,7 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     int32_t ret = ::StartDiscovery(DM_PKG_NAME.c_str(), &subscribeInfo, &softbusDiscoveryCallback_);
     if (ret != 0) {
         LOGE("StartDiscovery failed with ret %d.", ret);
-        return DM_DISCOVERY_FAILED;
+        return ERR_DM_DISCOVERY_FAILED;
     }
     return DM_OK;
 }
@@ -262,7 +262,7 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
         GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId GetNodeKeyInfo failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     udid = (char *)mUdid;
     LOGI("SoftbusConnector::GetUdidByNetworkId completed");
@@ -277,7 +277,7 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
         GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     uuid = (char *)mUuid;
     LOGI("SoftbusConnector::GetUuidByNetworkId completed");
@@ -342,12 +342,12 @@ int32_t SoftbusConnector::GetConnectionIpAddress(const std::string &deviceId, st
     auto iter = discoveryDeviceInfoMap_.find(deviceId);
     if (iter == discoveryDeviceInfoMap_.end()) {
         LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     DeviceInfo *deviceInfo = iter->second.get();
     if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
         LOGE("deviceInfo address num not valid, addrNum %d", deviceInfo->addrNum);
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     for (uint32_t i = 0; i < deviceInfo->addrNum; ++i) {
         // currently, only support CONNECT_ADDR_WLAN
@@ -360,7 +360,7 @@ int32_t SoftbusConnector::GetConnectionIpAddress(const std::string &deviceId, st
         return DM_OK;
     }
     LOGE("failed to get ipAddress for deviceId %s", GetAnonyString(deviceId).c_str());
-    return DM_FAILED;
+    return ERR_DM_FAILED;
 }
 
 ConnectionAddr *SoftbusConnector::GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type)

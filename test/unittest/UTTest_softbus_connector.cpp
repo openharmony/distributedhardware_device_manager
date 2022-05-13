@@ -272,7 +272,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Le
 
 /**
  * @tc.name: StartDiscovery_001
- * @tc.desc: get StartDiscovery to wroing master and return DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -280,12 +280,12 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
 {
     DmSubscribeInfo dmSubscribeInfo;
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
-    EXPECT_EQ(ret, DM_DISCOVERY_FAILED);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
  * @tc.name: StopDiscovery_001
- * @tc.desc: get StartDiscovery to wroing master and return DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -298,7 +298,7 @@ HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: GetUdidByNetworkId_001
- * @tc.desc: get StartDiscovery to wroing master and return DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -312,7 +312,7 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
 
 /**
  * @tc.name: GetUuidByNetworkId_001
- * @tc.desc: get StartDiscovery to wroing master and return DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -395,7 +395,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level
 
 /**
  * @tc.name: GetConnectionIpAddress_001
- * @tc.desc: set deviceId null,and return DM_FAILED
+ * @tc.desc: set deviceId null,and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -404,12 +404,12 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_001, testing::ext::TestSiz
     std::string deviceId;
     std::string ipAddress = "123456";
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: GetConnectionIpAddress_002
- * @tc.desc: set some corrort para,and return DM_FAILED
+ * @tc.desc: set some corrort para,and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -418,11 +418,11 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_002, testing::ext::TestSiz
     std::string deviceId = "213456";
     std::string ipAddress = "123456";
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 /**
  * @tc.name: GetConnectionIpAddress_003
- * @tc.desc: set deviceInfo.addrNum = -1;go to second master and return DM_FAILED
+ * @tc.desc: set deviceInfo.addrNum = -1;go to second master and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -433,7 +433,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_003, testing::ext::TestSiz
     std::string ipAddress;
     std::string deviceId = "3338848";
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

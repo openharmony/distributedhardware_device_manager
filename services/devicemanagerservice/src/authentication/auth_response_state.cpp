@@ -49,7 +49,7 @@ int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthResponseState(state);
@@ -80,7 +80,7 @@ int32_t AuthResponseNegotiateState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     stateAuthManager->RespNegotiate(context_->sessionId);
     return DM_OK;
@@ -97,7 +97,7 @@ int32_t AuthResponseConfirmState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     stateAuthManager->ShowConfigDialog();
     return DM_OK;
@@ -114,7 +114,7 @@ int32_t AuthResponseGroupState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     stateAuthManager->CreateGroup();
     return DM_OK;
@@ -130,7 +130,7 @@ int32_t AuthResponseShowState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     stateAuthManager->ShowAuthInfoDialog();
     return DM_OK;
@@ -146,7 +146,7 @@ int32_t AuthResponseFinishState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     stateAuthManager->AuthenticateFinish();
     return DM_OK;

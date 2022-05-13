@@ -33,7 +33,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     LOGI("ShowPinDialog start");
     if (authManager == nullptr) {
         LOGE("ShowPinDialog authManager is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = code;
@@ -63,7 +63,7 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
     LOGI("InputPinDialog start");
     if (authManager == nullptr) {
         LOGE("ShowPinDialog InputPinDialog is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = code;
@@ -102,7 +102,7 @@ int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityM
     AbilityStatus status = dmAbilityManager->StartAbility(AbilityRole::ABILITY_ROLE_INITIATIVE);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
         LOGE("PinAuthUi::StartFaService timeout");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }

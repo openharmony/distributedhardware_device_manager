@@ -62,25 +62,25 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_NOT_SUPPORT);
-        return DM_AUTH_NOT_SUPPORT;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_BUSINESS_BUSY);
-        return DM_AUTH_BUSINESS_BUSY;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
+        return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("AuthenticateDevice failed, the discoveryDeviceInfoMap_ not have this device");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_INPUT_FAILED);
-        return DM_AUTH_INPUT_FAILED;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARAMETER_EMPTY);
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (extra.empty()) {
         LOGE("AuthenticateDevice failed, extra is empty");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_INPUT_PARA_EMPTY);
-        return DM_INPUT_PARA_EMPTY;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARAMETER_EMPTY);
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     if (timer_ == nullptr) {
@@ -128,13 +128,13 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
 {
     if (pkgName.empty()) {
         LOGE(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::string deviceUdid;
     int32_t ret = SoftbusConnector::GetUdidByNetworkId(deviceId.c_str(), deviceUdid);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     std::string groupId = "";
@@ -147,7 +147,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         hiChainConnector_->DeleteGroup(groupId);
     } else {
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -157,12 +157,12 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
     LOGI("DmAuthManager::VerifyAuthentication");
     if (authResponseContext_ == nullptr) {
         LOGE("authResponseContext_ is not init");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
     std::shared_ptr<IAuthentication> ptr;
     if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     timer_->DeleteTimer(INPUT_TIMEOUT_TASK);
     ptr = authenticationMap_[authResponseContext_->authType];
@@ -171,12 +171,12 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
         case DM_OK:
             authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
             break;
-        case DM_AUTH_INPUT_FAILED:
+        case ERR_DM_INPUT_PARAMETER_EMPTY:
             listener_->OnVerifyAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-                                          DM_AUTH_INPUT_FAILED, "");
+                                          ERR_DM_INPUT_PARAMETER_EMPTY, "");
             break;
         default:
-            authRequestContext_->reason = DM_AUTH_INPUT_FAILED;
+            authRequestContext_->reason = ERR_DM_INPUT_PARAMETER_EMPTY;
             authResponseContext_->state = authRequestState_->GetStateType();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             break;
@@ -208,7 +208,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             std::shared_ptr<AuthMessageProcessor> authMessageProcessor =
                 std::make_shared<AuthMessageProcessor>(shared_from_this());
             std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
-            authResponseContext->reply = DM_AUTH_BUSINESS_BUSY;
+            authResponseContext->reply = ERR_DM_AUTH_BUSINESS_BUSY;
             authMessageProcessor->SetResponseContext(authResponseContext);
             std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
@@ -319,7 +319,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         return;
     }
     if (groupId == "{}") {
-        authResponseContext_->reply = DM_HICHAIN_GROUP_CREATE_FAILED;
+        authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -350,7 +350,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr) {
                 authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
-                authRequestContext_->reason = DM_AUTH_INPUT_FAILED;
+                authRequestContext_->reason = ERR_DM_INPUT_PARAMETER_EMPTY;
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
                 return;
             }
@@ -367,13 +367,13 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         }
         authResponseContext_->state = authRequestState_->GetStateType();
-        authRequestContext_->reason = DM_TIME_OUT;
+        authRequestContext_->reason = ERR_DM_TIME_OUT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 
     if (authResponseState_ != nullptr && authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
         authResponseContext_->state = authResponseState_->GetStateType();
-        authResponseContext_->reply = DM_TIME_OUT;
+        authResponseContext_->reply = ERR_DM_TIME_OUT;
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
     LOGI("DmAuthManager::HandleAuthenticateTimeout start complete");
@@ -386,7 +386,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
         LOGE("OpenAuthSession failed, stop the authentication");
         authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
-        authRequestContext_->reason = DM_AUTH_OPEN_SESSION_FAILED;
+        authRequestContext_->reason = ERR_DM_AUTH_OPEN_SESSION_FAILED;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
     return DM_OK;
@@ -398,7 +398,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->localDeviceId = localDeviceId;
-    authResponseContext_->reply = DM_AUTH_NOT_AUTH;
+    authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     authResponseContext_->authType = authRequestContext_->authType;
     authResponseContext_->deviceId = authRequestContext_->deviceId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -418,15 +418,15 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (!ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
-        authResponseContext_->reply = DM_AUTH_PEER_REJECT;
+        authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
     } else {
-        authResponseContext_->reply = DM_AUTH_NOT_AUTH;
+        authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     }
 
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authResponseContext_->authType];
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authResponseContext_->authType);
-        authResponseContext_->reply = DM_AUTH_NOT_SUPPORT;
+        authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
@@ -459,7 +459,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
     }
-    if (authResponseContext_->reply == DM_AUTH_PEER_REJECT) {
+    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
@@ -478,7 +478,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     LOGI("DmAuthManager:: StartAuthProcess");
     if (authResponseContext_ == nullptr) {
         LOGI("Authenticate is not start");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
 
     authResponseContext_->reply = action;
@@ -506,7 +506,7 @@ void DmAuthManager::StartRespAuthProcess()
     } else {
         LOGE("do not accept");
         authResponseContext_->state = AuthState::AUTH_REQUEST_REPLY;
-        authRequestContext_->reason = DM_AUTH_PEER_REJECT;
+        authRequestContext_->reason = ERR_DM_AUTH_PEER_REJECT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 }
@@ -526,7 +526,7 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
     nlohmann::json jsonObj = nlohmann::json::parse(authResponseContext_->authToken, nullptr, false);
     if (jsonObj.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
@@ -543,13 +543,13 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         });
     int32_t ret = hiChainConnector_->AddMember(deviceId, connectInfo);
     if (ret != 0) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("DmAuthManager::authRequestContext CancelDisplay start");
     std::shared_ptr<IAuthentication> ptr;
     if (authenticationMap_.find(authResponseContext_->authType) == authenticationMap_.end()) {
         LOGE("DmAuthManager::authenticationMap_ is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     ptr = authenticationMap_[authResponseContext_->authType];
     ptr->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
@@ -690,7 +690,7 @@ int32_t DmAuthManager::GetPinCode()
     nlohmann::json jsonObj = nlohmann::json::parse(authResponseContext_->authToken, nullptr, false);
     if (jsonObj.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return jsonObj[PIN_CODE_KEY];
 }
@@ -739,12 +739,12 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 {
     if (dmAbilityMgr_ == nullptr) {
         LOGE("dmAbilityMgr_ is nullptr");
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
 
     if (authResponseContext_ == nullptr) {
         LOGE("Authenticate is not start");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
     
     dmAbilityMgr_->StartAbilityDone();
@@ -767,7 +767,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("Authenticate is not start");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
 
     switch (action) {
@@ -782,7 +782,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action)
             CancelDisplay();
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
-            authRequestContext_->reason = DM_AUTH_DONT_AUTH;
+            authRequestContext_->reason = ERR_DM_AUTH_FAILED;
             authResponseContext_->state = authRequestState_->GetStateType();
             AuthenticateFinish();
             break;
@@ -830,7 +830,7 @@ int32_t DmAuthManager::SetPageId(int32_t pageId)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("Authenticate is not start");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
     authResponseContext_->pageId = pageId;
     return DM_OK;
@@ -840,7 +840,7 @@ int32_t DmAuthManager::SetReason(int32_t reason, int32_t state)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("Authenticate is not start");
-        return DM_AUTH_NOT_START;
+        return ERR_DM_AUTH_NOT_START;
     }
     if (state < AuthState::AUTH_REQUEST_FINISH) {
         authRequestContext_->reason = reason;

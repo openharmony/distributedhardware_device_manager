@@ -30,11 +30,11 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     }
     if (serverProxy_.Init() != DM_OK) {
         LOGE("server proxy init failed.");
-        return DM_INIT_FAILED;
+        return ERR_DM_INIT_FAILED;
     }
     if (IpcClientStub::GetInstance().Init() != DM_OK) {
         LOGE("ipcclientstub init failed.");
-        return DM_INIT_FAILED;
+        return ERR_DM_INIT_FAILED;
     }
 
     std::shared_ptr<IpcRegisterListenerReq> req = std::make_shared<IpcRegisterListenerReq>();
@@ -59,13 +59,13 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
     LOGI("UnInitDeviceManager in, pkgName %s", pkgName.c_str());
     if (!IsInit(pkgName)) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     if (req == nullptr) {
         LOGE("req is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     req->SetPkgName(pkgName);
     int32_t ret = serverProxy_.SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
@@ -82,7 +82,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 {
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
-        return DM_SERVICE_NOT_READY;
+        return ERR_DM_INIT_FAILED;
     }
     return serverProxy_.SendCmd(cmdCode, req, rsp);
 }

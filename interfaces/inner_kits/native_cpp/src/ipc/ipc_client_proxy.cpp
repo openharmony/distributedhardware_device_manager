@@ -23,7 +23,7 @@ namespace DistributedHardware {
 int32_t IpcClientProxy::Init(const std::string &pkgName)
 {
     if (ipcClientManager_ == nullptr) {
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return ipcClientManager_->Init(pkgName);
 }
@@ -31,7 +31,7 @@ int32_t IpcClientProxy::Init(const std::string &pkgName)
 int32_t IpcClientProxy::UnInit(const std::string &pkgName)
 {
     if (ipcClientManager_ == nullptr) {
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return ipcClientManager_->UnInit(pkgName);
 }
@@ -40,7 +40,7 @@ int32_t IpcClientProxy::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req
 {
     if (req == nullptr || rsp == nullptr || ipcClientManager_ == nullptr) {
         LOGE("req,rsp or ipc client is null");
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return ipcClientManager_->SendRequest(cmdCode, req, rsp);
 }

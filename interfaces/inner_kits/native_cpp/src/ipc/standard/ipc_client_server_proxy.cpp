@@ -27,7 +27,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         LOGE("remote service null");
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
 
     MessageParcel data;
@@ -35,14 +35,14 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
     MessageOption option;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         LOGE("WriteInterfaceToken fail!");
-        return DM_IPC_WRITE_TOKEN_ERROR;
+        return ERR_DM_IPC_WRITE_TOKEN_FAILED;
     }
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
-        return DM_IPC_SEND_REQUEST_FAILED;
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     if (remote->SendRequest((uint32_t)cmdCode, data, reply, option) != DM_OK) {
         LOGE("SendRequest fail, cmd:%d", cmdCode);
-        return DM_IPC_SEND_REQUEST_FAILED;
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
 }

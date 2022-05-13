@@ -115,7 +115,7 @@ HWTEST_F(AuthResponseStateTest, SetAuthManager_002, testing::ext::TestSize.Level
  * @tc.name: AuthResponseInitState::TransitionTo_001
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseInitState::TransitionTo with authManager = null
- *           4 check ret is DM_FAILED
+ *           4 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -127,7 +127,7 @@ HWTEST_F(AuthResponseStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
     authManager = nullptr;
     authResponseState->authManager_ = authManager;
     int32_t ret = authResponseState->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -200,7 +200,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_002, testing::ext::TestSize.Level0)
  * @tc.name: AuthResponseNegotiateState::Enter_002
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseNegotiateState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -212,7 +212,7 @@ HWTEST_F(AuthResponseStateTest, Enter_002, testing::ext::TestSize.Level0)
     authManager = nullptr;
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -266,7 +266,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_003, testing::ext::TestSize.Level0)
  * @tc.name: AuthResponseConfirmState::Enter_004
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseConfirmState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -277,7 +277,7 @@ HWTEST_F(AuthResponseStateTest, Enter_004, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -317,7 +317,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_004, testing::ext::TestSize.Level0)
  * @tc.name: AuthResponseGroupState::Enter_006
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseGroupState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -328,7 +328,7 @@ HWTEST_F(AuthResponseStateTest, Enter_006, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseGroupState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -369,7 +369,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_005, testing::ext::TestSize.Level0)
  * @tc.name: AuthResponseShowState::Enter_008
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseShowState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -380,7 +380,7 @@ HWTEST_F(AuthResponseStateTest, Enter_008, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -420,7 +420,7 @@ HWTEST_F(AuthResponseStateTest, GetStateType_006, testing::ext::TestSize.Level0)
  * @tc.name: AuthResponseFinishState::Enter_010
  * @tc.desc: 1 set authManager to null
  *           2 call AuthResponseFinishState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -431,7 +431,7 @@ HWTEST_F(AuthResponseStateTest, Enter_010, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

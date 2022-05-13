@@ -38,7 +38,7 @@ int32_t PinAuth::CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthMana
     LOGI("ClosePage hap start");
     if (authManager == nullptr) {
         LOGE("PinAuthUi::authManager is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("ClosePage hap end");
     authManager->CancelDisplay();
@@ -65,30 +65,30 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
             return DM_OK;
         }
         LOGE("Peer rejection");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     nlohmann::json authParamJson = nlohmann::json::parse(authParam, nullptr, false);
     if (authParamJson.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     nlohmann::json authTokenJson = nlohmann::json::parse(authToken, nullptr, false);
     if (authTokenJson.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     if (!authParamJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_CODE_KEY)) {
         LOGE("err json string, first time");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t code = authTokenJson[PIN_CODE_KEY];
     int32_t inputPinCode = authParamJson[PIN_CODE_KEY];
     if (code == inputPinCode) {
         return DM_OK;
     } else if (code != inputPinCode && times_ < MAX_VERIFY_TIMES) {
-        return DM_AUTH_INPUT_FAILED;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     } else {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 }
 } // namespace DistributedHardware

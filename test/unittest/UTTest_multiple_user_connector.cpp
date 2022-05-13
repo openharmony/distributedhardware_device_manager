@@ -37,7 +37,7 @@ namespace {
  * @tc.name: OnDecisionFilterResult_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -52,7 +52,7 @@ HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::T
  * @tc.name: SetSwitchOldUserId_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -69,7 +69,7 @@ HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSi
  * @tc.name: GetSwitchOldUserId_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

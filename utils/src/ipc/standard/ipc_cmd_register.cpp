@@ -28,12 +28,12 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
     int32_t ret = DM_OK;
     if (cmdCode < 0 || cmdCode >= UNREGISTER_DEV_STATE_CALLBACK || pBaseReq == nullptr) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
-        return DM_INVALID_VALUE;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     if (setIpcRequestFuncMap_.count(cmdCode) == 0) {
         LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
-        return DM_IPC_NOT_REGISTER_FUNC;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
 
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
@@ -48,10 +48,10 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
         LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
-        return DM_IPC_NOT_REGISTER_FUNC;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (readResponseMapIter->second == nullptr) {
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return (readResponseMapIter->second)(reply, pBaseRsp);
 }
@@ -61,10 +61,10 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
         LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
-        return DM_IPC_NOT_REGISTER_FUNC;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (onIpcCmdMapIter->second ==  nullptr) {
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     return (onIpcCmdMapIter->second)(data, reply);
 }

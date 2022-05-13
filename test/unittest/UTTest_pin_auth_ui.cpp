@@ -51,7 +51,7 @@ std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
 /**
  * @tc.name: PinAuthUi::ShowPinDialog_001
- * @tc.desc: Call ShowPinDialog to check whether the return value is DM_POINT_NULL
+ * @tc.desc: Call ShowPinDialog to check whether the return value is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -79,7 +79,7 @@ HWTEST_F(PinAuthUiTest, ShowPinDialog_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: PinAuthUi::ShowPinDialog_001
- * @tc.desc: Call InputPinDialog to check whether the return value is DM_POINT_NULL
+ * @tc.desc: Call InputPinDialog to check whether the return value is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

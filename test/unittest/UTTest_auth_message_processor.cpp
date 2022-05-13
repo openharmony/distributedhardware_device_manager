@@ -283,7 +283,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
     jsonThumbnail[TAG_GROUP_NAME] = authResponseContext->groupName;
     jsonThumbnail[TAG_REQUEST_ID] = authResponseContext->requestId;
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

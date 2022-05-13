@@ -34,7 +34,7 @@ namespace DistributedHardware {
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
@@ -43,15 +43,15 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(deviceState)) {
         LOGE("write state failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
         LOGE("write deviceInfo failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -60,7 +60,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &reply, std::shar
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -69,7 +69,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &reply, std::shar
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::static_pointer_cast<IpcNotifyDeviceFoundReq>(pBaseReq);
@@ -78,15 +78,15 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt16((int16_t)subscribeId)) {
         LOGE("write subscribeId failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
         LOGE("write deviceInfo failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -95,7 +95,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, MessageParcel &reply, std::shared_ptr<
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -104,7 +104,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, MessageParcel &reply, std::shared_ptr<
 ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::static_pointer_cast<IpcNotifyDiscoverResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -112,15 +112,15 @@ ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mes
     int32_t result = pReq->GetResult();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt16((int16_t)subscribeId)) {
         LOGE("write subscribeId failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -129,7 +129,7 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, MessageParcel &reply, std::shared_p
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -138,7 +138,7 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, MessageParcel &reply, std::shared_p
 ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::static_pointer_cast<IpcNotifyAuthResultReq>(pBaseReq);
 
@@ -149,23 +149,23 @@ ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
     int32_t reason = pReq->GetReason();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(deviceId)) {
         LOGE("write deviceId failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(token)) {
         LOGE("write token failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(status)) {
         LOGE("write status failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(reason)) {
         LOGE("write reason failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -174,7 +174,7 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<I
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -183,7 +183,7 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<I
 ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
         std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(pBaseReq);
@@ -194,19 +194,19 @@ ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, 
     int32_t flag = pReq->GetFlag();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(deviceId)) {
         LOGE("write deviceId failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(flag)) {
         LOGE("write flag failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -215,7 +215,7 @@ ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, MessageParcel &reply, std::share
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -224,7 +224,7 @@ ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, MessageParcel &reply, std::share
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::static_pointer_cast<IpcNotifyDMFAResultReq>(pBaseReq);
@@ -233,11 +233,11 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, Me
     std::string paramJson = pReq->GetJsonParam();
     if (!data.WriteString(packagname)) {
         LOGE("write pkgName failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(paramJson)) {
         LOGE("write paramJson failed");
-        return DM_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -246,7 +246,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_FA_NOTIFY, MessageParcel &reply, std::shared_
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -263,7 +263,7 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     DmDeviceInfo deviceInfo;
     if (!reply.WriteInt32(infoNum)) {
         LOGE("write infoNum failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!deviceList.empty()) {
         for (; !deviceList.empty();) {
@@ -272,13 +272,13 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 
             if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
                 LOGE("write subscribeInfo failed");
-                return DM_WRITE_FAILED;
+                return ERR_DM_IPC_WRITE_FAILED;
             }
         }
     }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     LOGI("GET_TRUST_DEVICE_LIST ok pkgName:%s, extra:%s", pkgName.c_str(), extra.c_str());
     return DM_OK;
@@ -291,7 +291,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -302,7 +302,7 @@ ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParce
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -312,7 +312,7 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
     DmSubscribeInfo *subscribeInfo = (DmSubscribeInfo *)data.ReadRawData(sizeof(DmSubscribeInfo));
-    int32_t result = DM_POINT_NULL;
+    int32_t result = ERR_DM_POINT_NULL;
 
     if (subscribeInfo != nullptr) {
         LOGI("pkgName:%s, subscribeId: %d", pkgName.c_str(), subscribeInfo->subscribeId);
@@ -320,7 +320,7 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -333,7 +333,7 @@ ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -349,7 +349,7 @@ ON_IPC_CMD(AUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
     LOGE("AuthenticateDevice");
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     LOGE("AuthenticateDevice %d", result);
     return DM_OK;
@@ -364,7 +364,7 @@ ON_IPC_CMD(UNAUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
     result = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -376,7 +376,7 @@ ON_IPC_CMD(VERIFY_AUTHENTICATION, MessageParcel &data, MessageParcel &reply)
     int32_t result = DeviceManagerService::GetInstance().VerifyAuthentication(authPara);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -393,7 +393,7 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
 
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     LOGI("localDeviceInfo: %s", localDeviceInfo.deviceId);
     return DM_OK;
@@ -408,11 +408,11 @@ ON_IPC_CMD(GET_UDID_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
 
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteString(udid)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -426,11 +426,11 @@ ON_IPC_CMD(GET_UUID_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
 
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteString(uuid)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
@@ -450,19 +450,19 @@ ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
         !reply.WriteInt32(authParam.business) || !reply.WriteInt32(authParam.pincode) ||
         !reply.WriteInt32(appIconLen) || !reply.WriteInt32(appThumbnailLen)) {
         LOGE("write reply failed");
-        return DM_IPC_FLATTEN_OBJECT;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
 
     if (appIconLen > 0 && authParam.imageinfo.GetAppIcon() != nullptr) {
         if (!reply.WriteRawData(authParam.imageinfo.GetAppIcon(), appIconLen)) {
             LOGE("write appIcon failed");
-            return DM_IPC_FLATTEN_OBJECT;
+            return ERR_DM_IPC_WRITE_FAILED;
         }
     }
     if (appThumbnailLen > 0 && authParam.imageinfo.GetAppThumbnail() != nullptr) {
         if (!reply.WriteRawData(authParam.imageinfo.GetAppThumbnail(), appThumbnailLen)) {
             LOGE("write appThumbnail failed");
-            return DM_IPC_FLATTEN_OBJECT;
+            return ERR_DM_IPC_WRITE_FAILED;
         }
     }
     return DM_OK;
@@ -475,7 +475,7 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
     int result = DeviceManagerService::GetInstance().SetUserOperation(packageName, action);
     if (!reply.WriteInt32(action)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;
 }
@@ -487,7 +487,7 @@ ON_IPC_CMD(REGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &repl
     int result = DeviceManagerService::GetInstance().RegisterDevStateCallback(packageName, extra);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;
 }
@@ -499,7 +499,7 @@ ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &re
     int result = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(packageName, extra);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        return DM_WRITE_FAILED;
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;
 }

@@ -152,7 +152,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthManager_002, testing::ext::TestSize.Level0
  * @tc.name: AuthRequestNegotiateState::TransitionTo_001
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestInitState::TransitionTo with authManager = null
- *           4 check ret is DM_FAILED
+ *           4 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -164,7 +164,7 @@ HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
     authManager = nullptr;
     authRequestState->authManager_ = authManager;
     int32_t ret = authRequestState->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -215,7 +215,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_001, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestInitState::Enter_001
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestInitState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -227,14 +227,14 @@ HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level0)
     authManager = nullptr;
     authRequestState->SetAuthManager(authManager);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: AuthRequestInitState::Enter_002
  * @tc.desc: 1 set authManager not null
  *           2 call AuthRequestInitState::Enter with authManager != null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -272,7 +272,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_002, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestNegotiateState::Enter_001
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestNegotiateState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -283,7 +283,7 @@ HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -334,7 +334,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_003, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestNegotiateDoneState::Enter_005
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestNegotiateDoneState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -345,7 +345,7 @@ HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -395,7 +395,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_004, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestReplyState::Enter_007
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestReplyState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -406,7 +406,7 @@ HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReplyState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -457,7 +457,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestInputState::Enter_009
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestInputState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -468,7 +468,7 @@ HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInputState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -508,7 +508,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_006, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestJoinState::Enter_011
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestJoinState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -519,7 +519,7 @@ HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestJoinState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -573,7 +573,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_007, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestNetworkState::Enter_013
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestNetworkState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -584,7 +584,7 @@ HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -632,7 +632,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_008, testing::ext::TestSize.Level0)
  * @tc.name: AuthRequestFinishState::Enter_015
  * @tc.desc: 1 set authManager to null
  *           2 call AuthRequestFinishState::Enter with authManager = null
- *           3 check ret is DM_FAILED
+ *           3 check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -643,7 +643,7 @@ HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

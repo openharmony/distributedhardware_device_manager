@@ -44,7 +44,7 @@ ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBa
     WriteString(&request, pkgName.c_str());
     bool ret = WriteRemoteObject(&request, &svcIdentity);
     if (!ret) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -53,7 +53,7 @@ ON_IPC_READ_RESPONSE(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shared
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -75,7 +75,7 @@ ON_IPC_READ_RESPONSE(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shar
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -108,8 +108,8 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp
         DmDeviceInfo *pDmDeviceinfo = (DmDeviceInfo *)ReadRawData(&reply, deviceTotalSize);
         if (pDmDeviceinfo == nullptr) {
             LOGE("GetTrustedDeviceList read node info failed!");
-            pRsp->SetErrCode(DM_IPC_TRANSACTION_FAILED);
-            return DM_IPC_TRANSACTION_FAILED;
+            pRsp->SetErrCode(ERR_DM_IPC_WRITE_FAILED);
+            return ERR_DM_IPC_WRITE_FAILED;
         }
         for (int32_t i = 0; i < deviceNum; ++i) {
             deviceInfoVec.emplace_back(*pDmDeviceinfo);
@@ -158,7 +158,7 @@ ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, IpcI
     WriteString(&request, extra.c_str());
     bool ret = WriteRawData(&request, &dmSubscribeInfo, sizeof(DmSubscribeInfo));
     if (!ret) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -167,7 +167,7 @@ ON_IPC_READ_RESPONSE(START_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -192,7 +192,7 @@ ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp>
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -213,7 +213,7 @@ ON_IPC_SET_REQUEST(AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, IpcIo 
     WriteString(&request, extra.c_str());
     bool ret = WriteRawData(&request, &deviceInfo, sizeof(DmDeviceInfo));
     if (!ret) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     // L1 暂时没有考虑appimage校验（8k限制）
     return DM_OK;
@@ -223,7 +223,7 @@ ON_IPC_READ_RESPONSE(AUTHENTICATE_DEVICE, IpcIo &reply, std::shared_ptr<IpcRsp> 
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -246,7 +246,7 @@ ON_IPC_READ_RESPONSE(VERIFY_AUTHENTICATION, IpcIo &reply, std::shared_ptr<IpcRsp
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -271,7 +271,7 @@ ON_IPC_READ_RESPONSE(SERVER_USER_AUTH_OPERATION, IpcIo &reply, std::shared_ptr<I
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);

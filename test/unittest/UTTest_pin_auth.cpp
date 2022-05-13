@@ -49,7 +49,7 @@ std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
 /**
  * @tc.name: DmAuthManager::ShowAuthInfo_001
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -58,12 +58,12 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_001, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     std::string authToken = "123456";
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: DmAuthManager::ShowAuthInfo_002
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -74,7 +74,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_002, testing::ext::TestSize.Level0)
     jsonObject[PIN_TOKEN] = 123456;
     std::string authToken = jsonObject.dump();
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -110,7 +110,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_004, testing::ext::TestSize.Level0)
 }
 /**
  * @tc.name: DmAuthManager::StartAuth_001
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -119,12 +119,12 @@ HWTEST_F(PinAuthTest, StartAuth_001, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     std::string authToken = "";
     int32_t ret = pinAuth->StartAuth(authToken, nullptr);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: DmAuthManager::StartAuth_002
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -133,12 +133,12 @@ HWTEST_F(PinAuthTest, StartAuth_002, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     std::string authToken = "";
     int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: DmAuthManager::StartAuth_003
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -149,7 +149,7 @@ HWTEST_F(PinAuthTest, StartAuth_003, testing::ext::TestSize.Level0)
     jsonObject[PIN_TOKEN] = 123456;
     std::string authToken = jsonObject.dump();
     int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -170,7 +170,7 @@ HWTEST_F(PinAuthTest, StartAuth_004, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DmAuthManager::VerifyAuthentication_001
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -180,7 +180,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_001, testing::ext::TestSize.Level0)
     std::string authToken;
     std::string authParam = "1";
     int32_t ret = pinAuth->VerifyAuthentication(authToken, authParam);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -195,7 +195,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_002, testing::ext::TestSize.Level0)
     std::string authToken;
     std::string authParam = "0";
     int32_t ret = pinAuth->VerifyAuthentication(authToken, authParam);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 /**
  * @tc.name: DmAuthManager::VerifyAuthentication_003
@@ -220,7 +220,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_003, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DmAuthManager::VerifyAuthentication_004
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_AUTH_INPUT_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -236,12 +236,12 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_004, testing::ext::TestSize.Level0)
     std::string authToken = authTokenJson.dump();
     std::string authParam = authParamJson.dump();
     int32_t ret = pinAuth->VerifyAuthentication(authToken, authParam);
-    ASSERT_EQ(ret, DM_AUTH_INPUT_FAILED);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
 
 /**
  * @tc.name: DmAuthManager::VerifyAuthentication_005
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_FAILED
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -259,7 +259,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_005, testing::ext::TestSize.Level0)
     pinAuth->VerifyAuthentication(authToken, authParam);
     pinAuth->VerifyAuthentication(authToken, authParam);
     int32_t ret = pinAuth->VerifyAuthentication(authToken, authParam);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 }
 } // namespace DistributedHardware

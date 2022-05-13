@@ -90,7 +90,7 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
     if (ret == 0) {
         peerDevId = peerDeviceId;
         LOGI("GetPeerDeviceId success for session:%d, peerDeviceId:%s", sessionId, GetAnonyString(peerDevId).c_str());
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGE("GetPeerDeviceId failed for session:%d", sessionId);
     peerDevId = "";
@@ -103,7 +103,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("extrasJson error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_TYPE];
     LOGI("AuthMessageProcessor::ParseAuthRequestMessage  msgType = %d", msgType);
@@ -113,7 +113,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
         LOGE("SendData Start failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("SendData Start success");
     return DM_OK;

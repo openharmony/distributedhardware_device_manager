@@ -56,7 +56,7 @@ namespace {
  *              set MessageParcel not null
  *           2. set set code is 999
  *           3. call IpcClientStub OnRemoteRequest with parameter
- *           4. check result is DM_FAILED
+ *           4. check result is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -74,10 +74,10 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_001, testing::ext::TestSize.Level0)
     // 3. call IpcClientStub OnRemoteRequest with parameter
     int32_t result = instance->OnRemoteRequest(code, data, reply, option);
     if (result != DM_OK) {
-        result = DM_FAILED;
+        result = ERR_DM_FAILED;
     }
-    // 4. check result is DM_FAILED
-    ASSERT_EQ(result, DM_FAILED);
+    // 4. check result is ERR_DM_FAILED
+    ASSERT_EQ(result, ERR_DM_FAILED);
 }
 
 /**
@@ -114,7 +114,7 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
  *              set req is nullptr
  *              set rsp is nullptr
  *           2. call IpcClientStub SendCmd with parameter
- *           3. check result is DM_IPC_FAILED
+ *           3. check result is ERR_DM_IPC_SEND_REQUEST_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -129,8 +129,8 @@ HWTEST_F(IpcClientStubTest, SendCmd_001, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> instance = new IpcClientStub();
     // 2. call IpcClientStub SendCmd with parameter
     int ret = instance->SendCmd(cmdCode, req, rsp);
-    // 3. check result is DM_IPC_FAILED
-    ASSERT_EQ(ret, DM_IPC_FAILED);
+    // 3. check result is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -81,7 +81,7 @@ HWTEST_F(IpcClientManagerTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is not DM_FAILED
+ *           4. check ret is not ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -96,8 +96,8 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
     instance->dmInterface_ = dmInterface;
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -105,7 +105,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is not DM_FAILED
+ *           4. check ret is not ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -114,8 +114,8 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -124,7 +124,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
  *           2. set a pkgName not null
  *           3. add listener and pkgName in dmListener_ Map
  *           4. call Init with pkgName
- *           5. check ret is not DM_FAILED
+ *           5. check ret is not ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -139,16 +139,16 @@ HWTEST_F(IpcClientManagerTest, Init_001, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 4. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
-    // 5. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 5. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: Init_002
  * @tc.desc: 1. set pkcName not null
- *           2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+ *           2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
  *           3. call Init with pkgName
- *           4. check ret is DM_FAILED
+ *           4. check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -156,17 +156,17 @@ HWTEST_F(IpcClientManagerTest, Init_002, testing::ext::TestSize.Level0)
 {
     // 1. set pkcName not null
     std::string pkgName = "com.ohos.test";
-    // 2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     // 3. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
-    // 4. check ret is DM_FAILED
-    ASSERT_EQ(ret, DM_FAILED);
+    // 4. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -214,7 +214,7 @@ HWTEST_F(IpcClientManagerTest, Init_004, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_SERVICE_NOT_READY));
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     // 3. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
     // 4. check ret is DEVICEMANAGER_OK
@@ -224,9 +224,9 @@ HWTEST_F(IpcClientManagerTest, Init_004, testing::ext::TestSize.Level0)
 /**
  * @tc.name: Init_005
  * @tc.desc:  1. set pkcName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_IPC_FAILED
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_IPC_RESPOND_FAILED
  *            3. call Init with pkgName
- *            4. check ret is DM_IPC_FAILED
+ *            4. check ret is ERR_DM_IPC_RESPOND_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -240,11 +240,11 @@ HWTEST_F(IpcClientManagerTest, Init_005, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_IPC_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_RESPOND_FAILED));
     // 3. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
-    // 4. check ret is DM_IPC_FAILED
-    ASSERT_EQ(ret, DM_IPC_FAILED);
+    // 4. check ret is ERR_DM_IPC_RESPOND_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**
@@ -265,18 +265,18 @@ HWTEST_F(IpcClientManagerTest, UnInit1, testing::ext::TestSize.Level0)
     instance->dmInterface_ = nullptr;
     // 2. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 3. check ret is DM_SERVICE_NOT_READY
-    ASSERT_EQ(ret, DM_SERVICE_NOT_READY);
+    // 3. check ret is ERR_DM_INIT_FAILED
+    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
 }
 
 /**
  * @tc.name: UnInit_002
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call UnInit with pkgName
- *            6. check ret is DM_FAILED
+ *            6. check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -284,11 +284,11 @@ HWTEST_F(IpcClientManagerTest, UnInit_002, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // 2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     // 3. set IpcClientManager dmInterface_ not null
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
@@ -297,8 +297,8 @@ HWTEST_F(IpcClientManagerTest, UnInit_002, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 6. check ret is DM_FAILED
-    ASSERT_EQ(ret, DM_FAILED);
+    // 6. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -336,11 +336,11 @@ HWTEST_F(IpcClientManagerTest, UnInit_003, testing::ext::TestSize.Level0)
 /**
  * @tc.name: UnInit_004
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_SERVICE_NOT_READY
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_INIT_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call UnInit with pkgName
- *            6. check ret is DM_SERVICE_NOT_READY
+ *            6. check ret is ERR_DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -348,11 +348,11 @@ HWTEST_F(IpcClientManagerTest, UnInit_004, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // 2. Mock IpcClientServerProxy SendCmd return DM_SERVICE_NOT_READY
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_INIT_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_SERVICE_NOT_READY));
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     // 3. set IpcClientManager dmInterface_ not null
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
@@ -361,18 +361,18 @@ HWTEST_F(IpcClientManagerTest, UnInit_004, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 6. check ret is DM_SERVICE_NOT_READY
-    ASSERT_EQ(ret, DM_SERVICE_NOT_READY);
+    // 6. check ret is ERR_DM_INIT_FAILED
+    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
 }
 
 /**
  * @tc.name: UnInit_005
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_IPC_FAILED
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_IPC_SEND_REQUEST_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call UnInit with pkgName
- *            6. check ret is DM_IPC_FAILED
+ *            6. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -380,11 +380,11 @@ HWTEST_F(IpcClientManagerTest, UnInit_005, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // 2. Mock IpcClientServerProxy SendCmd return DM_IPC_FAILED
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_IPC_SEND_REQUEST_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_IPC_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
     // 3. set IpcClientManager dmInterface_ not null
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
@@ -393,8 +393,8 @@ HWTEST_F(IpcClientManagerTest, UnInit_005, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 6. check ret is DM_IPC_FAILED
-    ASSERT_EQ(ret, DM_IPC_FAILED);
+    // 6. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**
@@ -402,7 +402,7 @@ HWTEST_F(IpcClientManagerTest, UnInit_005, testing::ext::TestSize.Level0)
  * @tc.desc:  1. set pkgName null
  *            2. set IpcClientManager dmInterface_null
  *            3. call SendRequest with parameter
- *            4. check ret is DM_SERVICE_NOT_READY
+ *            4. check ret is ERR_DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -418,18 +418,18 @@ HWTEST_F(IpcClientManagerTest, SendRequest_001, testing::ext::TestSize.Level0)
     instance->dmInterface_ = nullptr;
     // 3. call SendRequest with parameter
     int ret = instance->SendRequest(0, req, rsp);
-    // 4. check ret is DM_SERVICE_NOT_READY
-    ASSERT_EQ(ret, DM_SERVICE_NOT_READY);
+    // 4. check ret is ERR_DM_INIT_FAILED
+    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
 }
 
 /**
  * @tc.name: SendRequest_002
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call SendRequest with parameter
- *            6. check ret is DM_FAILED
+ *            6. check ret is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -440,11 +440,11 @@ HWTEST_F(IpcClientManagerTest, SendRequest_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    // 2. Mock IpcClientServerProxy SendCmd return DM_FAILED
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. set IpcClientManager dmInterface_ not null
     instance->dmInterface_ = mockInstance;
@@ -453,8 +453,8 @@ HWTEST_F(IpcClientManagerTest, SendRequest_002, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call SendRequest with parameter
     int ret = instance->SendRequest(0, req, rsp);
-    // 6. check ret is DM_FAILED
-    ASSERT_EQ(ret, DM_FAILED);
+    // 6. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -495,11 +495,11 @@ HWTEST_F(IpcClientManagerTest, SendRequest_003, testing::ext::TestSize.Level0)
 /**
  * @tc.name: SendRequest_004
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_SERVICE_NOT_READY
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_INIT_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call SendRequest with parameter
- *            6. check ret is DM_SERVICE_NOT_READY
+ *            6. check ret is ERR_DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -510,11 +510,11 @@ HWTEST_F(IpcClientManagerTest, SendRequest_004, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    // 2. Mock IpcClientServerProxy SendCmd return DM_SERVICE_NOT_READY
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_INIT_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_SERVICE_NOT_READY));
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. set IpcClientManager dmInterface_ not null
     instance->dmInterface_ = mockInstance;
@@ -523,18 +523,18 @@ HWTEST_F(IpcClientManagerTest, SendRequest_004, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call SendRequest with parameter
     int ret = instance->SendRequest(0, req, rsp);
-    // 6. check ret is DM_SERVICE_NOT_READY
-    ASSERT_EQ(ret, DM_SERVICE_NOT_READY);
+    // 6. check ret is ERR_DM_INIT_FAILED
+    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
 }
 
 /**
  * @tc.name: SendRequest_005
  * @tc.desc:  1. set pkgName not null
- *            2. Mock IpcClientServerProxy SendCmd return DM_IPC_FAILED
+ *            2. Mock IpcClientServerProxy SendCmd return ERR_DM_IPC_SEND_REQUEST_FAILED
  *            3. set IpcClientManager dmInterface_ not null
  *            4. set IpcClientManager dmListener_ not null
  *            5. call SendRequest with parameter
- *            6. check ret is DM_IPC_FAILED
+ *            6. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -545,11 +545,11 @@ HWTEST_F(IpcClientManagerTest, SendRequest_005, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    // 2. Mock IpcClientServerProxy SendCmd return DM_IPC_FAILED
+    // 2. Mock IpcClientServerProxy SendCmd return ERR_DM_IPC_SEND_REQUEST_FAILED
     sptr<IRemoteObject> remoteObject = nullptr;
     auto mockInstance = new MockIpcClientManager(remoteObject);
     EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_IPC_FAILED));
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. set IpcClientManager dmInterface_ not null
     instance->dmInterface_ = mockInstance;
@@ -558,8 +558,8 @@ HWTEST_F(IpcClientManagerTest, SendRequest_005, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 5. call SendRequest with parameter
     int ret = instance->SendRequest(0, req, rsp);
-    // 6. check ret is DM_IPC_FAILED
-    ASSERT_EQ(ret, DM_IPC_FAILED);
+    // 6. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**

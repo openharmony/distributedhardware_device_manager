@@ -29,7 +29,7 @@ static int32_t ClientIpcInterfaceMsgHandle(uint32_t code, IpcIo *data, IpcIo *re
 {
     if (data== nullptr) {
         LOGE("invalid param");
-        return DM_INPUT_PARA_EMPTY;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     int32_t errCode = IpcCmdRegister::GetInstance().OnIpcCmd(code, *data);

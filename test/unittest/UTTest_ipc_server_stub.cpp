@@ -219,7 +219,7 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_001, testing::ext::Tes
     int ret = 0;
     sptr<IRemoteObject> listener = nullptr;
     ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -251,7 +251,7 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_003, testing::ext::Tes
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -305,7 +305,7 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_005, testing::ext::Tes
 /**
  * @tc.name: UnRegisterDeviceManagerListener_001
  * @tc.desc:  1. Call IpcServerStub UnRegisterDeviceManagerListener
- *            2. check ret is DM_POINT_NULL
+ *            2. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -314,7 +314,7 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_001, testing::ext::T
     std::string pkgName = "";
     int ret = 0;
     ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -496,7 +496,7 @@ HWTEST_F(IpcServerStubTest, GetDmListener_003, testing::ext::TestSize.Level0)
  * @tc.name: GetDmListener_004
  * @tc.desc: 1. Set pkgName is com.ohos.test
  *           2. Call IpcServerStub GetDmListener
- *           3. check ret is DM_POINT_NULL
+ *           3. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -508,8 +508,8 @@ HWTEST_F(IpcServerStubTest, GetDmListener_004, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
     result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
-    // 3. check ret is DM_POINT_NULL
-    ASSERT_EQ(result, DM_POINT_NULL);
+    // 3. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(result, ERR_DM_POINT_NULL);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
     ret = IpcServerStub::GetInstance().GetDmListener(pkgName);
@@ -521,7 +521,7 @@ HWTEST_F(IpcServerStubTest, GetDmListener_004, testing::ext::TestSize.Level0)
  * @tc.name: GetDmListener_005
  * @tc.desc: 1. Set pkgName is com.ohos.test
  *           2. Call IpcServerStub GetDmListener
- *           3. check ret is DM_POINT_NULL
+ *           3. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -533,8 +533,8 @@ HWTEST_F(IpcServerStubTest, GetDmListener_005, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> listener = nullptr;
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
     result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
-    // 3. check ret is DM_POINT_NULL
-    ASSERT_EQ(result, DM_POINT_NULL);
+    // 3. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(result, ERR_DM_POINT_NULL);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
     ret = IpcServerStub::GetInstance().GetDmListener(pkgName);

@@ -42,7 +42,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     if (!discoveryQueue_.empty()) {
         if (pkgName == discoveryQueue_.front()) {
             LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
-            return DM_DISCOVERY_REPEATED;
+            return ERR_DM_DISCOVERY_REPEATED;
         } else {
             LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
                  discoveryQueue_.front().c_str());

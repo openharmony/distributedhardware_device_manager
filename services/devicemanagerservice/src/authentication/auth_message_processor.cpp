@@ -158,11 +158,11 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     if (!jsonObject.contains(TAG_TYPE)) {
         LOGE("err json string, first time");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_TYPE];
     authResponseContext_->msgType = msgType;
@@ -199,7 +199,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     if (!json.contains(TAG_INDEX) || !json.contains(TAG_DEVICE_ID) ||
         !json.contains(TAG_SLICE_NUM)) {
         LOGE("err json string, first time");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     idx = json[TAG_INDEX];
@@ -217,7 +217,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     if (idx < sliceNum && json.contains(TAG_APP_THUMBNAIL)) {
         std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL];
         authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
-        return DM_MESSAGE_NOT_COMPLETE;
+        return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
     }
     return DM_OK;
 }

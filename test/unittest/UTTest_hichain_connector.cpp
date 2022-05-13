@@ -49,7 +49,7 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
 
 /**
  * @tc.name: CreateGroup_001
- * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return DM_INVALID_VALUE
+ * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -59,7 +59,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level0)
     std::string groupName = "dfggg";
     hiChainConnector->deviceGroupManager_ = nullptr;
     int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, DM_INVALID_VALUE);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
 
 /**
@@ -73,7 +73,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
     int64_t requestId = 123456;
     std::string groupName = "uuiioo";
     int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, DM_INVALID_VALUE);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
 
 /**
@@ -254,7 +254,7 @@ HWTEST_F(HichainConnectorTest, AddMember_002, testing::ext::TestSize.Level0)
     std::string connectInfo;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->AddMember(deviceId, connectInfo);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -336,7 +336,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: GetRelatedGroups_001
- * @tc.desc: set DeviceId 123  groupList null and return DM_FAILED
+ * @tc.desc: set DeviceId 123  groupList null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -346,12 +346,12 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Leve
     std::vector<GroupInfo> groupList;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->GetRelatedGroups(DeviceId, groupList);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: GetRelatedGroups_002
- * @tc.desc: set DeviceId  = 12345,groupList null and return DM_FAILED
+ * @tc.desc: set DeviceId  = 12345,groupList null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -361,7 +361,7 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroups_002, testing::ext::TestSize.Leve
     std::vector<GroupInfo> groupList;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->GetRelatedGroups(DeviceId, groupList);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -381,7 +381,7 @@ HWTEST_F(HichainConnectorTest, SyncGroups_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: GetSyncGroupList_001
- * @tc.desc: set groupList null,and return DM_FAILED
+ * @tc.desc: set groupList null,and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -391,7 +391,7 @@ HWTEST_F(HichainConnectorTest, GetSyncGroupList_001, testing::ext::TestSize.Leve
     std::vector<std::string> syncGroupList;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->GetSyncGroupList(groupList, syncGroupList);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

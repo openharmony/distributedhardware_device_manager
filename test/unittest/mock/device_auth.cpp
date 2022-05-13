@@ -19,7 +19,7 @@
 int32_t (*deleteGroup)(int64_t requestId, const char *appId, const char *disbandParams)
 {
     if (disbandParams == 0) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     return DM_OK;
@@ -37,7 +37,7 @@ int32_t (*getRelatedGroups)(const char *appId, const char *peerDeviceId, char **
 int32_t (*createGroup)(int64_t requestId, const char *appId, const char *createParams)
 {
     if (requestId == 0) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     (void)appId;
     (void)createParams;

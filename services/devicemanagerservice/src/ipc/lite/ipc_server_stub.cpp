@@ -77,7 +77,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     bool ret = ReadRemoteObject(req, &svc);
     if (!ret || name == NULL || len == 0) {
         LOGE("get para failed");
-        return DM_INVALID_VALUE;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
     CommonSvcId svcId = {0};
@@ -87,17 +87,17 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 
     if (len == 0 || len > MALLOC_MAX_LEN) {
         LOGE("malloc length invalid!");
-        return DM_MALLOC_ERROR;
+        return ERR_DM_MALLOC_FAILED;
     }
     char *pkgName = new char[len+1];
     if (pkgName == nullptr) {
         LOGE("malloc failed!");
-        return DM_MALLOC_ERROR;
+        return ERR_DM_MALLOC_FAILED;
     }
     if (strcpy_s(pkgName, len + 1, (const char *)name) != DM_OK) {
         LOGE("strcpy_s failed!");
         delete[] pkgName;
-        return DM_COPY_FAILED;
+        return ERR_DM_IPC_COPY_FAILED;
     }
     uint32_t cbId = 0;
     AddDeathRecipient(svc, DeathCb, pkgName, &cbId);
@@ -113,12 +113,12 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     std::string pkgName = (const char *)ReadString(req, &len);
     if (pkgName == "" || len == 0) {
         LOGE("get para failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     CommonSvcId svcId;
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found listener by package name.");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     if (ret == DM_OK) {

@@ -56,7 +56,7 @@ namespace {
  *              set req not null
  *              set rsp not null
  *           3. call IpcServerListener SendRequest
- *           4. check ret is DM_POINT_NULL
+ *           4. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -76,8 +76,8 @@ HWTEST_F(IpcServerListenerTest, SendRequest_001, testing::ext::TestSize.Level0)
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_POINT_NULL
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    // 4. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -109,8 +109,8 @@ HWTEST_F(IpcServerListenerTest, SendRequest_002, testing::ext::TestSize.Level0)
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -121,7 +121,7 @@ HWTEST_F(IpcServerListenerTest, SendRequest_002, testing::ext::TestSize.Level0)
  *              set req not null
  *              set rsp not null
  *           3. call IpcServerListener SendRequest
- *           4. check ret is DM_IPC_FAILED
+ *           4. check ret is ERR_DM_IPC_RESPOND_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -142,8 +142,8 @@ HWTEST_F(IpcServerListenerTest, SendRequest_003, testing::ext::TestSize.Level0)
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_IPC_RESPOND_FAILED
+    ASSERT_NE(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**
@@ -154,7 +154,7 @@ HWTEST_F(IpcServerListenerTest, SendRequest_003, testing::ext::TestSize.Level0)
  *              set req not null
  *              set rsp not null
  *           3. call IpcServerListener SendRequest
- *           4. check ret is DM_POINT_NULL
+ *           4. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -175,8 +175,8 @@ HWTEST_F(IpcServerListenerTest, SendRequest_004, testing::ext::TestSize.Level0)
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_POINT_NULL
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    // 4. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -187,7 +187,7 @@ HWTEST_F(IpcServerListenerTest, SendRequest_004, testing::ext::TestSize.Level0)
  *              set req not null
  *              set rsp not null
  *           3. call IpcServerListener SendRequest
- *           4. check ret is DM_POINT_NULL
+ *           4. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -208,8 +208,8 @@ HWTEST_F(IpcServerListenerTest, SendRequest_005, testing::ext::TestSize.Level0)
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is DM_POINT_NULL
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    // 4. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**

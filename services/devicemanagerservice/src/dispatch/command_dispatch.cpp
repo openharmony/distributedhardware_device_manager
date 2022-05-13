@@ -42,7 +42,7 @@ int32_t CommandDispatch::MessageSendCmd(int32_t cmdCode, const std::shared_ptr<I
 {
     if (req == nullptr || rsp == nullptr) {
         LOGE("Message req or rsp is null.");
-        return DM_INVALID_VALUE;
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     uint32_t i = 0;
     for (i = 0; i < (sizeof(g_cmdMap) / sizeof(g_cmdMap[0])); i++) {

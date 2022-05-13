@@ -72,7 +72,7 @@ HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SendData_001
- * @tc.desc: set message null and return DM_FAILED
+ * @tc.desc: set message null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -81,12 +81,12 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
     std::string message = "";
     int32_t sessionId = -1;
     int ret = softbusSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: SendData_002
- * @tc.desc: set sessionId = 0 ,go to the SendBytes'smaster and return DM_FAILED
+ * @tc.desc: set sessionId = 0 ,go to the SendBytes'smaster and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -100,7 +100,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
     int32_t sessionId = 0;
     softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr));
     int ret = softbusSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -170,7 +170,7 @@ HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize
 
 /**
  * @tc.name: UnRegisterSessionCallback_001
- * @tc.desc: set  info to null and return DM_FAILED
+ * @tc.desc: set  info to null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

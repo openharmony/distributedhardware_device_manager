@@ -45,7 +45,7 @@ std::shared_ptr<DmDeviceInfoManager> dmDeviceStateManager = std::make_shared<DmD
  * @tc.name: DmDeviceInfoManager_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -59,7 +59,7 @@ HWTEST_F(DeviceManagerImplTest, DmDeviceInfoManager_001, testing::ext::TestSize.
  * @tc.name: GetTrustedDeviceList_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -78,7 +78,7 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_001, testing::ext::TestSize
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

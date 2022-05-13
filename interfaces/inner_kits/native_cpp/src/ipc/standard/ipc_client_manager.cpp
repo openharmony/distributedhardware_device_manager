@@ -46,13 +46,13 @@ int32_t IpcClientManager::ClientInit()
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("Get SystemAbilityManager Failed");
-        return DM_SERVICE_NOT_READY;
+        return ERR_DM_INIT_FAILED;
     }
 
     auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     if (object == nullptr) {
         LOGE("Get DeviceManager SystemAbility Failed");
-        return DM_SERVICE_NOT_READY;
+        return ERR_DM_INIT_FAILED;
     }
 
     if (dmRecipient_ == nullptr) {
@@ -103,7 +103,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     LOGI("in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
-        return DM_SERVICE_NOT_READY;
+        return ERR_DM_INIT_FAILED;
     }
 
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -131,8 +131,8 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     LOGI("IpcClientManager::SendRequest in");
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
-        LOGE("IpcClientManager::SendRequest DM_SERVICE_NOT_READY");
-        return DM_SERVICE_NOT_READY;
+        LOGE("IpcClientManager::SendRequest ERR_DM_INIT_FAILED");
+        return ERR_DM_INIT_FAILED;
     }
 
     LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);

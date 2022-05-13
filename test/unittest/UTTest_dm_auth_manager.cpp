@@ -57,12 +57,12 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Lev
     std::string pkgName = "";
     std::string deviceId = "222";
     int32_t ret = authManager->UnAuthenticateDevice(pkgName, deviceId);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
  * @tc.name: DmAuthManager::HandleAuthenticateTimeout_001
- * @tc.desc: authResponseContext_= nullptr; Call handleauthenticatemeout to check whether the return value is DM_FAILED
+ * @tc.desc: authResponseContext_= nullptr; Call handleauthenticatemeout to check whether return value is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -122,7 +122,7 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_001, testing::ext::TestSize.Lev
 
 /**
  * @tc.name: DmAuthManager::StartAuthProcess_001
- * @tc.desc: Whether the return value of calling startauthprocess is DM_FAILED
+ * @tc.desc: Whether the return value of calling startauthprocess is ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -212,7 +212,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
     int32_t ret = authManager->AddMember(deviceId);
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -265,7 +265,7 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t ret = authManager->GetPinCode();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

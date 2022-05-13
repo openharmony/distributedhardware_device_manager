@@ -40,7 +40,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
     WriteInt32(&request, deviceState);
     bool ret = WriteRawData(&request, &deviceInfo, sizeof(DmDeviceInfo));
     if (!ret) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -49,7 +49,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply, std::shared_ptr<I
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -70,7 +70,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, IpcIo 
     WriteUint16(&request, subscribeId);
     bool ret = WriteRawData(&request, &deviceInfo, sizeof(DmDeviceInfo));
     if (!ret) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -79,7 +79,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, IpcIo &reply, std::shared_ptr<IpcRsp> 
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -106,7 +106,7 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, IpcIo &reply, std::shared_ptr<IpcRs
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -137,7 +137,7 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> p
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -167,7 +167,7 @@ ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, IpcIo &reply, std::shared_ptr<Ip
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     int32_t ret = 0;
     ReadInt32(&reply, &ret);

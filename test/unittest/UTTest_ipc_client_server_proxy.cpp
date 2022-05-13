@@ -63,7 +63,7 @@ HWTEST_F(IpcClientServerProxyTest, SendCmd_001, testing::ext::TestSize.Level0)
     auto instance = new IpcClientServerProxy(remoteObject);
     int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
     // 4. check ret is DEVICEMANAGER_NULLPTR
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 } // namespace
 } // namespace DistributedHardware

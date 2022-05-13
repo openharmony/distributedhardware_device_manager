@@ -77,7 +77,7 @@ int IpcClientServerProxy::RegisterServerDeathCb(void)
     g_deathCbId = INVALID_CB_ID;
     if (AddDeathRecipient(g_svcIdentity, DmDeathCallback, nullptr, &g_deathCbId) != EC_SUCCESS) {
         LOGE("reg death callback failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -89,7 +89,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
     IpcIo request;
 
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, request, data, MAX_DM_IPC_LEN) != DM_OK) {
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -97,7 +97,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
         if (serviceProxy_ != nullptr &&
             serviceProxy_->Invoke(serviceProxy_, cmdCode, &request, &cmdCode, SendCmdResultCb) != 0) {
             LOGE("serviceProxy_ invoke failed.");
-            return DM_FAILED;
+            return ERR_DM_FAILED;
         }
     }
     LOGI("IpcClientServerProxy::SendCmd:%d, end", cmdCode);
@@ -114,11 +114,11 @@ int32_t IpcClientServerProxy::Init(void)
     serviceProxy_ = GetServerProxy();
     if (serviceProxy_ == nullptr) {
         LOGE("get ipc client proxy failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     if (RegisterServerDeathCb() != DM_OK) {
         LOGE("register server death cb failed");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("ServerProxyInit ok");
     return DM_OK;

@@ -39,7 +39,7 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
     std::shared_ptr<DmAbilityManager> dmAbilityManager_ = std::make_shared<DmAbilityManager>();
     if (dmAbilityManager_ == nullptr) {
         LOGE("PinAuthUi::dmAbilityManager is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("InputPinDialog end");
     return StartFaUiService(dmAbilityManager_);
@@ -50,7 +50,7 @@ int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authMana
     LOGI("ClosePage hap start");
     if (authManager == nullptr) {
         LOGE("PinAuthUi::authManager is null");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("ClosePage hap end");
     authManager->CancelDisplay();
@@ -62,7 +62,7 @@ int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityM
     AbilityStatus status = dmAbilityManager->StartAbility(AbilityRole::ABILITY_ROLE_INITIATIVE);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
         LOGE("PinAuthUi::StartFaUiService timeout");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }

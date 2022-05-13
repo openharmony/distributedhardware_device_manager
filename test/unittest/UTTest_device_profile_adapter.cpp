@@ -48,7 +48,7 @@ std::shared_ptr<DmDeviceStateManager> deviceStateMgr = std::make_shared<DmDevice
  * @tc.name: RegisterProfileListener_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -67,7 +67,7 @@ HWTEST_F(DeviceProfileAdapterTest, RegisterProfileListener_001, testing::ext::Te
  * @tc.name: UnRegisterProfileListener_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -85,7 +85,7 @@ HWTEST_F(DeviceProfileAdapterTest, UnRegisterProfileListener_001, testing::ext::
  * @tc.name: OnProfileChanged_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -104,7 +104,7 @@ HWTEST_F(DeviceProfileAdapterTest, OnProfileChanged_001, testing::ext::TestSize.
  * @tc.name: OnProfileComplete_001
  * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_INPUT_PARA_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

@@ -26,7 +26,7 @@ int32_t IpcServerListenermgr::RegisterListener(std::string &pkgName, const Commo
 {
     if (pkgName == "" || svcId == nullptr) {
         LOGE("invalid param");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     LOGI("new listener register:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -38,13 +38,13 @@ int32_t IpcServerListenermgr::GetListenerByPkgName(std::string &pkgName, CommonS
 {
     if (pkgName == "" || svcId == nullptr) {
         LOGE("invalid param");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     std::map<std::string, CommonSvcId>::iterator iter = dmListenerMap_.find(pkgName);
     if (iter == dmListenerMap_.end()) {
         LOGE("listener not found for pkg:%s", pkgName.c_str());
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     *svcId = iter->second;
     return DM_OK;

@@ -66,7 +66,7 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_001, testing::ext::TestSize.Level0)
     auto instance = new IpcServerClientProxy(remoteObject);
     int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
     // 4. check ret is DEVICEMANAGER_NULLPTR
-    ASSERT_EQ(ret, DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -105,8 +105,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_002, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -145,8 +145,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_003, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -185,8 +185,8 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_004, testing::ext::TestSize.Level0)
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is not DM_FAILED
-    ASSERT_NE(ret, DM_FAILED);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

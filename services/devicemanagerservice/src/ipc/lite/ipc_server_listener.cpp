@@ -35,7 +35,7 @@ int32_t IpcServerListener::GetIdentityByPkgName(std::string &name, SvcIdentity *
     CommonSvcId svcId;
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(name, &svcId) != DM_OK) {
         LOGE("get identity failed.");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
     CommonSvcToIdentity(&svcId, svc);
     return DM_OK;
@@ -47,14 +47,14 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     SvcIdentity svc;
     if (GetIdentityByPkgName(pkgName, &svc) != DM_OK) {
         LOGE("OnDeviceFound callback get listener failed.");
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     IpcIo io;
     uint8_t data[MAX_DM_IPC_LEN] = {0};
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
         LOGE("SetRequest failed cmdCode:%d", cmdCode);
-        return DM_FAILED;
+        return ERR_DM_FAILED;
     }
 
     MessageOption option;

@@ -88,7 +88,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     }
 
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
-    if (ret == DM_IPC_NOT_REGISTER_FUNC) {
+    if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
         LOGW("unsupported code: %d", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -103,11 +103,11 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageOption option;
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");
-        return DM_IPC_FAILED;
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    if (ret == DM_IPC_NOT_REGISTER_FUNC) {
+    if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
         LOGW("unsupported code: %d", cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
@@ -123,12 +123,12 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
 {
     if (pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
 
     if (!DeviceManagerService::GetInstance().IsServiceInitialized()) {
         LOGE("Device manager service has not been initialized or initialized failed.");
-        return DM_NOT_INIT;
+        return ERR_DM_NOT_INIT;
     }
 
     LOGI("Register device manager listener for pakage name: %s", pkgName.c_str());
@@ -147,7 +147,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         appRecipient_[pkgName] = appRecipient;
     } catch (const std::bad_alloc &e) {
         LOGE("new AppDeathRecipient failed");
-        return DM_MALLOC_ERROR;
+        return ERR_DM_MALLOC_FAILED;
     }
     return DM_OK;
 }
@@ -156,7 +156,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Error: parameter invalid");
-        return DM_POINT_NULL;
+        return ERR_DM_POINT_NULL;
     }
     LOGI("In, pkgName: %s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
