@@ -319,7 +319,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         return;
     }
     if (groupId == "{}") {
-        authResponseContext_->reply = ERR_DM_HICHAIN_CREATE_GROUP_FAILED;
+        authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -367,13 +367,13 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         }
         authResponseContext_->state = authRequestState_->GetStateType();
-        authRequestContext_->reason = ERR_DM_TIME_OUT_FAILED;
+        authRequestContext_->reason = ERR_DM_TIME_OUT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 
     if (authResponseState_ != nullptr && authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
         authResponseContext_->state = authResponseState_->GetStateType();
-        authResponseContext_->reply = ERR_DM_TIME_OUT_FAILED;
+        authResponseContext_->reply = ERR_DM_TIME_OUT;
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
     LOGI("DmAuthManager::HandleAuthenticateTimeout start complete");

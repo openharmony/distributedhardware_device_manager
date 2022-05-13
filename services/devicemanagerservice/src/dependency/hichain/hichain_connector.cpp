@@ -122,7 +122,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME.c_str(), jsonObj.dump().c_str());
     if (ret != 0) {
         LOGE("Failed to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
-        return ERR_DM_HICHAIN_CREATE_GROUP_FAILED;
+        return ERR_DM_CREATE_GROUP_FAILED;
     }
     return DM_OK;
 }

@@ -84,7 +84,7 @@ int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &s
         subscribeInfos, shared_from_this(), failedEvents);
     if (errCode != ERR_OK) {
         LOGI("subscribe profile events result: %ud", errCode);
-        return ERR_DM_UNSUBSCRIBE_DP_EVENTS_FAILED;
+        return DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }
@@ -98,7 +98,7 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
         profileEvents, shared_from_this(), failedEvents);
     if (errCode != ERR_OK) {
         LOGI("unSubscribe profile events result:%ud", errCode);
-        return ERR_DM_UNSUBSCRIBE_DP_EVENTS_FAILED;
+        return DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }
