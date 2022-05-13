@@ -30,9 +30,9 @@ if (ohos_kernel_type == "liteos_m") {
       "//utils/native/base/include",
       "${kits_path}/js_mini/include",
       "${utils_path}/include",
-      "//foundation/arkui/ace_engine_lite/interfaces/innerkits/builtin/base",
-      "//foundation/arkui/ace_engine_lite/interfaces/innerkits/builtin/jsi",
-      "//foundation/arkui/ace_engine_lite/interfaces/innerkits/builtin/async",
+      "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/base",
+      "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/jsi",
+      "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/async",
       "//foundation/arkui/ace_engine_lite/frameworks/include/context",
       "${innerkits_path_mini}/native_cpp/include",
     ]
