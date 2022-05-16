@@ -239,7 +239,7 @@ HWTEST_F(HichainConnectorTest, AddMember_001, testing::ext::TestSize.Level0)
     std::string deviceId;
     std::string connectInfo;
     int ret = hichainConnector->AddMember(deviceId, connectInfo);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -269,7 +269,7 @@ HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level0)
     std::string connectInfo = "dkdkk";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->AddMember(deviceId, connectInfo);
-    ASSERT_GE(ret, 1);
+    ASSERT_LE(ret, 1);
 }
 
 /**

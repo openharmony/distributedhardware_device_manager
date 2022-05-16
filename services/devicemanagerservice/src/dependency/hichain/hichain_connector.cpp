@@ -219,7 +219,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     LOGI("HiChainConnector::AddMember");
     if (deviceGroupManager_ == nullptr) {
         LOGI("HiChainConnector::AddMember group manager is null.");
-        return -1;
+        return ERR_DM_POINT_NULL;
     }
     nlohmann::json jsonObject = nlohmann::json::parse(connectInfo, nullptr, false);
     if (jsonObject.is_discarded()) {
