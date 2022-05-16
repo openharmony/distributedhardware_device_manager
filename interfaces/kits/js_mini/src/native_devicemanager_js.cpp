@@ -789,7 +789,7 @@ JSIValue DeviceManagerModule::GetLocalDeviceInfoSync(const JSIValue thisVal, con
         LOGE("GetLocalDeviceInfoSync for failed, ret %d", ret);
         return JSI::CreateNull();
     }
-    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ", 
+    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ",
          GetAnonyString(deviceInfo.deviceId), deviceInfo.deviceName, deviceInfo.deviceTypeId);
     JSIValue result = JSI::CreateObject();
     char *deviceId = const_cast<char *>(deviceInfo.deviceId);
