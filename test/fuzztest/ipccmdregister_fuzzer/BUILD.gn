@@ -89,7 +89,6 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
 
   deps = [
     "${aainnerkits_path}/ability_manager:ability_manager",
-    "${aainnerkits_path}/want:want",
     "${aaservices_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
@@ -106,6 +105,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_core",

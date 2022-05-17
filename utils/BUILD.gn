@@ -151,10 +151,7 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [
-      "${aainnerkits_path}/want:want",
-      "//third_party/mbedtls:mbedtls_shared",
-    ]
+    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
@@ -166,6 +163,7 @@ if (defined(ohos_lite)) {
     ]
     if (support_jsapi) {
       external_deps += [
+        "ability_base:want",
         "bundle_framework:appexecfwk_base",
         "bundle_framework:appexecfwk_core",
       ]
