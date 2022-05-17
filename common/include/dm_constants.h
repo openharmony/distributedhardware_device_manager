@@ -199,6 +199,38 @@ const int32_t MAX_EVENT_NUMBER = 10;
 const int32_t EXPAND_TWICE = 2;
 const int32_t SEC_TO_MM = 1000;
 const int32_t MAX_EVENTS = 5;
+
+// error code info
+const std::string DM_FAILED_INFO = "dm process execution failed.";
+const std::string DM_TIME_OUT_INFO = "dm process execution timeout.";
+const std::string DM_NOT_INIT_INFO = "dm service is not initialized, please try again later.";
+const std::string DM_INIT_REPEATED_INFO = "dm service repeated initialization.";
+const std::string DM_INIT_FAILED_INFO = "dm service initialize failed.";
+const std::string DM_UNINIT_FAILED_INFO = "dm Service uninitialization failed.";
+const std::string DM_POINT_NULL_INFO = "dm service null pointer exception occurred.";
+const std::string DM_INPUT_PARAMETER_EMPTY_INFO = "the function call input parameter is empty.";
+const std::string DM_NO_PERMISSION_INFO = "no permission for function call.";
+const std::string DM_MALLOC_FAILED_INFO = "memory allocation failed.";
+const std::string DM_DISCOVERY_FAILED_INFO = "device discovery failed.";
+const std::string DM_MAP_KEY_ALREADY_EXISTS_INFO = "map key already exists.";
+const std::string DM_PROFILE_EVENTS_FAILED_INFO = "process profile events failed.";
+const std::string DM_IPC_WRITE_FAILED_INFO = "ipc write object failed.";
+const std::string DM_IPC_COPY_FAILED_INFO = "ipc copy data failed.";
+const std::string DM_IPC_SEND_REQUEST_FAILED_INFO = "ipc send request failed.";
+const std::string DM_UNSUPPORTED_IPC_COMMAND_INFO = "ipc command not supported.";
+const std::string DM_IPC_RESPOND_FAILED_INFO = "ipc process failed to receive response.";
+const std::string DM_IPC_WRITE_TOKEN_INFO = "ipc write token failed.";
+const std::string DM_DISCOVERY_REPEATED_INFO = "repeat device discovery warning.";
+const std::string DM_UNSUPPORTED_AUTH_TYPE_INFO = "auth type not supported.";
+const std::string DM_AUTH_BUSINESS_BUSY_INFO = "authentication service is busy.";
+const std::string DM_AUTH_OPEN_SESSION_FAILED_INFO = "open auth session failed.";
+const std::string DM_AUTH_PEER_REJECT_INFO = "remote device refused to authorization.";
+const std::string DM_AUTH_REJECT_INFO = "local device refused to authorization.";
+const std::string DM_AUTH_FAILED_INFO = "authentication failed.";
+const std::string DM_AUTH_NOT_START_INFO = "auth process not started.";
+const std::string DM_AUTH_MESSAGE_INCOMPLETE_INFO = "authentication message is incomplete.";
+const std::string DM_CREATE_GROUP_FAILED_INFO = "create group failed.";
+const std::string DM_ERROR_CODE_DEFAULT_INFO = "error code undefined.";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

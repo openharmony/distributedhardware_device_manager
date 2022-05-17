@@ -37,12 +37,14 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//utils/include/errormessage",
       ]
 
       sources = [
         "${utils_path}/src/dm_anonymous.cpp",
         "${utils_path}/src/dm_log.cpp",
         "${utils_path}/src/dm_random.cpp",
+        "${utils_path}/src/errormessage/errormessage.cpp",
         "${utils_path}/src/permission/lite/permission_manager.cpp",
       ]
 
@@ -88,11 +90,13 @@ if (defined(ohos_lite)) {
         "//foundation/communication/dsoftbus/interfaces/kits/transport",
         "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//utils/include/errormessage",
       ]
       sources = [
         "src/dm_anonymous.cpp",
         "src/dm_log.cpp",
         "src/dm_random.cpp",
+        "src/errormessage/errormessage.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
         "src/ipc/lite/ipc_cmd_register.cpp",
         "src/permission/lite/permission_manager.cpp",
@@ -125,6 +129,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "include/permission/standard",
       "//third_party/mbedtls/include/mbedtls",
+      "//utils/include/errormessage",
     ]
   }
 
@@ -134,6 +139,7 @@ if (defined(ohos_lite)) {
       "src/dm_hash.cpp",
       "src/dm_log.cpp",
       "src/dm_random.cpp",
+      "src/errormessage/errormessage.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",
     ]
     if (support_jsapi) {
