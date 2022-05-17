@@ -17,6 +17,7 @@
 
 #include "device_manager_service.h"
 #include "dm_constants.h"
+#include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
@@ -360,7 +361,7 @@ ON_IPC_CMD(UNAUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     std::string deviceId = data.ReadString();
     int32_t result = DM_OK;
-    LOGI("pkgName:%s, trustedDeviceInfo: %d", pkgName.c_str(), deviceId.c_str());
+    LOGI("pkgName:%s, trustedDeviceInfo: %s", pkgName.c_str(), GetAnonyString(deviceId).c_str());
     result = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -395,7 +396,7 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("localDeviceInfo: %s", localDeviceInfo.deviceId);
+    LOGI("localDeviceInfo: %s", GetAnonyString(std::string(localDeviceInfo.deviceId)).c_str());
     return DM_OK;
 }
 

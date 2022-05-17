@@ -19,6 +19,7 @@
 
 #include "auth_message_processor.h"
 #include "dm_ability_manager.h"
+#include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -142,8 +143,8 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     hiChainConnector_->GetRelatedGroups(deviceUdid, groupList);
     if (groupList.size() > 0) {
         groupId = groupList.front().groupId;
-        LOGI(" DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s", groupId.c_str(),
-             deviceId.c_str(), deviceUdid.c_str());
+        LOGI(" DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s",
+             GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
         hiChainConnector_->DeleteGroup(groupId);
     } else {
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
@@ -333,7 +334,6 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
     jsonObj[NFC_CODE_KEY] = GenerateGroupName();
     authResponseContext_->authToken = jsonObj.dump();
-    LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     authResponseContext_->groupId = groupId;
     authResponseContext_->code = pinCode;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -529,7 +529,6 @@ int32_t DmAuthManager::AddMember(const std::string &deviceId)
         return ERR_DM_FAILED;
     }
 
-    LOGI("DmAuthManager::AddMember start %s", authResponseContext_->authToken.c_str());
     nlohmann::json jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;
     jsonObject[TAG_GROUP_NAME] = authResponseContext_->groupName;

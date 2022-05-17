@@ -16,6 +16,7 @@
 #include "device_manager_impl.h"
 #include <unistd.h>
 #include "device_manager_notify.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
@@ -278,7 +279,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
     LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(),
-        deviceInfo.deviceId);
+        GetAnonyString(std::string(deviceInfo.deviceId)).c_str());
     if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
         LOGE("UnAuthenticateDevice error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;

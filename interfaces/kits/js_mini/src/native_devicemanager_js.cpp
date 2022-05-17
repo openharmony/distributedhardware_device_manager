@@ -766,7 +766,7 @@ JSIValue DeviceManagerModule::UnAuthenticateDevice(const JSIValue thisVal, const
     }
     std::string bundleName = GetJSIAppBundleName();
     std::string deviceId = JSI::GetStringProperty(args[0], "deviceId");
-    LOGI("UnAuthenticateDevice deviceId=%s", deviceId.c_str());
+    LOGI("UnAuthenticateDevice deviceId=%s", GetAnonyString(deviceId.c_str()));
     int32_t ret = 0;
     ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceId);
     if (ret != 0) {
@@ -789,8 +789,8 @@ JSIValue DeviceManagerModule::GetLocalDeviceInfoSync(const JSIValue thisVal, con
         LOGE("GetLocalDeviceInfoSync for failed, ret %d", ret);
         return JSI::CreateNull();
     }
-    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ", deviceInfo.deviceId,
-         deviceInfo.deviceName, deviceInfo.deviceTypeId);
+    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ",
+         GetAnonyString(deviceInfo.deviceId), deviceInfo.deviceName, deviceInfo.deviceTypeId);
     JSIValue result = JSI::CreateObject();
     char *deviceId = const_cast<char *>(deviceInfo.deviceId);
     char *deviceName = const_cast<char *>(deviceInfo.deviceName);
@@ -985,7 +985,7 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
     DmDeviceInfo deviceInfo;
     JsToDmDeviceInfo(args[0], deviceInfo);
 
-    LOGI("deviceInfo %s , %s, %d", deviceInfo.deviceId,
+    LOGI("deviceInfo %s , %s, %d", GetAnonyString(deviceInfo.deviceId),
         deviceInfo.deviceName, deviceInfo.deviceTypeId);
     DmAppImageInfo appImageInfo(nullptr, 0, nullptr, 0);
     std::string extra;

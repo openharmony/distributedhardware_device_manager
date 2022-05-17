@@ -1099,7 +1099,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
 {
     for (unsigned int i = 0; i < deviceInfoListAsyncCallbackInfo->devList.size(); i++) {
         LOGI("DeviceManager::GetTrustedDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
-             deviceInfoListAsyncCallbackInfo->devList[i].deviceId,
+             GetAnonyString(deviceInfoListAsyncCallbackInfo->devList[i].deviceId).c_str(),
              deviceInfoListAsyncCallbackInfo->devList[i].deviceName,
              deviceInfoListAsyncCallbackInfo->devList[i].deviceTypeId);
     }
@@ -1178,7 +1178,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
 {
     for (unsigned int i = 0; i < deviceInfoListAsyncCallbackInfo->devList.size(); i++) {
         LOGI("DeviceManager::GetTrustedDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
-             deviceInfoListAsyncCallbackInfo->devList[i].deviceId,
+             GetAnonyString(deviceInfoListAsyncCallbackInfo->devList[i].deviceId).c_str(),
              deviceInfoListAsyncCallbackInfo->devList[i].deviceName,
              deviceInfoListAsyncCallbackInfo->devList[i].deviceTypeId);
     }
@@ -1221,7 +1221,8 @@ void DeviceManagerNapi::CallGetLocalDeviceInfoSync(napi_env env, napi_status &st
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
 
     LOGI("DeviceManager::CallGetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ",
-         deviceInfoAsyncCallbackInfo->deviceInfo.deviceId, deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
+         GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceId).c_str(),
+         deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceTypeId);
 
     if (deviceInfoAsyncCallbackInfo->status == 0) {
@@ -1239,7 +1240,8 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
 {
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
     LOGI("DeviceManager::CallGetLocalDeviceInfo deviceId:%s deviceName:%s deviceTypeId:%d ",
-         deviceInfoAsyncCallbackInfo->deviceInfo.deviceId, deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
+         GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceId).c_str(),
+         deviceInfoAsyncCallbackInfo->deviceInfo.deviceName,
          deviceInfoAsyncCallbackInfo->deviceInfo.deviceTypeId);
     napi_value callResult = nullptr;
     napi_value handler = nullptr;
@@ -1427,9 +1429,6 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     LOGI("GetTrustedDeviceListSync in");
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
-    DmDeviceInfo deviceInfo;
-    LOGI("DeviceManager::GetTrustedDeviceListSync deviceId:%s deviceName:%s deviceTypeId:%d ", deviceInfo.deviceId,
-         deviceInfo.deviceName, deviceInfo.deviceTypeId);
     size_t argc = 0;
     bool isArray = false;
     napi_create_array(env, &result);
@@ -1512,8 +1511,6 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     DmDeviceInfo deviceInfo;
-    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ", deviceInfo.deviceId,
-         deviceInfo.deviceName, deviceInfo.deviceTypeId);
     size_t argc = 0;
 
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
@@ -1525,8 +1522,8 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
         LOGE("GetLocalDeviceInfoSync for failed, ret %d", ret);
         return result;
     }
-    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ", deviceInfo.deviceId,
-         deviceInfo.deviceName, deviceInfo.deviceTypeId);
+    LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%s deviceName:%s deviceTypeId:%d ",
+         GetAnonyString(std::string(deviceInfo.deviceId)).c_str(), deviceInfo.deviceName, deviceInfo.deviceTypeId);
     DmDeviceInfotoJsDeviceInfo(env, deviceInfo, result);
     return result;
 }
@@ -1580,7 +1577,7 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
 
     DmDeviceInfo deviceInfo;
     JsToDmDeviceInfo(env, argv[0], deviceInfo);
-    LOGI("UnAuthenticateDevice deviceId = %s", deviceInfo.deviceId);
+    LOGI("UnAuthenticateDevice deviceId=%s", GetAnonyString(deviceInfo.deviceId).c_str());
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().UnAuthenticateDevice(deviceManagerWrapper->bundleName_, deviceInfo);

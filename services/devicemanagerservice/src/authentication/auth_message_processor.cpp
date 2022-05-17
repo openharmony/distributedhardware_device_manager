@@ -16,6 +16,7 @@
 #include "auth_message_processor.h"
 
 #include "dm_auth_manager.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
@@ -130,7 +131,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
     json[TAG_TOKEN] = authResponseContext_->token;
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
-        LOGI("AuthMessageProcessor::CreateSimpleMessage groupId %d", groupId.c_str());
+        LOGI("AuthMessageProcessor::CreateSimpleMessage groupId %s", GetAnonyString(groupId).c_str());
         nlohmann::json jsonObject = nlohmann::json::parse(groupId, nullptr, false);
         if (jsonObject.is_discarded()) {
             LOGE("DecodeRequestAuth jsonStr error");
@@ -142,8 +143,8 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", groupId.c_str(),
-             authResponseContext_->groupName.c_str());
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", GetAnonyString(groupId).c_str(),
+             GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
 
@@ -234,8 +235,8 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         authResponseContext_->groupId = json[TAG_GROUP_ID];
         authResponseContext_->groupName = json[TAG_GROUP_NAME];
         authResponseContext_->authToken = json[TAG_AUTH_TOKEN];
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", authResponseContext_->groupId.c_str(),
-             authResponseContext_->groupName.c_str());
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s",
+             GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
     }
     LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
 }
