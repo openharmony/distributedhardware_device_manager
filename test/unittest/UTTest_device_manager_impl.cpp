@@ -1307,6 +1307,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_002, testing::ext::TestSize
     // 1. set packName = null
     std::string packName = "com.ohos.helloworld";
     DmDeviceInfo deviceInfo;
+    deviceInfo.deviceId[0] = '\0';
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
