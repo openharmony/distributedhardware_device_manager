@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,14 @@ import router from '@system.router';
 import deviceManager from '@ohos.distributedHardware.deviceManager';
 function uint8ArrayToBase64(array) {
     array = new Uint8Array(array);
-    let table = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'],
+    let table = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+    ,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2'
+    ,'3','4','5','6','7','8','9','+','/'],
         base64Str = '', length = array.byteLength, i = 0;
     for(i = 0; length - i >= 3; i += 3) {
         let num1 = array[i], num2 = array[i + 1], num3 = array[i + 2];
-        base64Str += table[num1 >>> 2] + table[((num1 & 0b11) << 4) | (num2 >>> 4)] + table[((num2 & 0b1111) << 2) | (num3 >>> 6)] + table[num3 & 0b111111];
+        base64Str += table[num1 >>> 2] + table[((num1 & 0b11) << 4) | (num2 >>> 4)] + table[((num2 & 0b1111) << 2) | 
+            (num3 >>> 6)] + table[num3 & 0b111111];
     }
     const lastByte = length - i;
     if(lastByte === 1) {
@@ -30,7 +33,8 @@ function uint8ArrayToBase64(array) {
     } else if(lastByte === 2){
         const lastNum1 = array[i];
         const lastNum2 = array[i + 1];
-        base64Str += table[lastNum1 >>> 2] + table[((lastNum1 & 0b11) << 4) | (lastNum2 >>> 4)] + table[(lastNum2 & 0b1111) << 2] + '=';
+        base64Str += table[lastNum1 >>> 2] + table[((lastNum1 & 0b11) << 4) | (lastNum2 >>> 4)] + table[(lastNum2 & 
+            0b1111) << 2] + '=';
     }
     return 'data:image/png;base64,' + base64Str;
 }
