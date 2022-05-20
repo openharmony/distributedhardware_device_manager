@@ -25,7 +25,7 @@
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
 #include "dm_anonymous.h"
-#include "errormessage/errormessage.h"
+#include "dm_error_message.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
@@ -312,7 +312,5 @@ private:
     std::string bundleName_;
     static AuthAsyncCallbackInfo authAsyncCallbackInfo_;
     static AuthAsyncCallbackInfo verifyAsyncCallbackInfo_;
-    std::shared_ptr<OHOS::DistributedHardware::ErrorMessage> errorMessage_ =
-    std::make_shared<OHOS::DistributedHardware::ErrorMessage>();
 };
 #endif // OHOS_DM_NATIVE_DEVICEMANAGER_JS_H

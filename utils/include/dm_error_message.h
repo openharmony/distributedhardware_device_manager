@@ -16,34 +16,13 @@
 #ifndef OHOS_DM_ERROMSG_H
 #define OHOS_DM_ERROMSG_H
 
-#include <map>
 #include <string>
 #include "dm_log.h"
 #include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class ErrorMessage {
-public:
-    /**
-     * @tc.name: ErrorMessage::ErrorMessage
-     * @tc.desc: Dm Error Message Info Constructor.
-     * @tc.type: FUNC
-     */
-    ErrorMessage();
-    /**
-     * @tc.name: ErrorMessage::~ErrorMessage
-     * @tc.desc: Dm Error Message Info destructor.
-     * @tc.type: FUNC
-     */
-    virtual ~ErrorMessage();
-    /**
-     * @tc.name: ErrorMessage::GetErrorString
-     * @tc.desc: Get Error String.
-     * @tc.type: FUNC
-     */
-    std::string GetErrorString(int);
-};
+std::string GetErrorString(int failedReason);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ERROMSG_H
