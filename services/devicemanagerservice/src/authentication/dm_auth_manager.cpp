@@ -435,7 +435,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
     authResponseContext_ = authResponseState_->GetAuthContext();
-    if (jsonObject[TAG_CRYPTO_SUPPORT] == "true" && authResponseContext_->cryptoSupport) {
+    if ((jsonObject[TAG_CRYPTO_SUPPORT] == true) && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
             jsonObject[TAG_CRYPTO_VERSION] == authResponseContext_->cryptoVer) {
             isCryptoSupport_ = true;
@@ -443,7 +443,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
             return;
         }
     }
-    jsonObject[TAG_CRYPTO_SUPPORT] = "false";
+    jsonObject[TAG_CRYPTO_SUPPORT] = false;
     message = jsonObject.dump();
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     timer_->StartTimer(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT,
@@ -745,7 +745,7 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
         LOGE("Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
-    
+
     dmAbilityMgr_->StartAbilityDone();
     AbilityRole role = dmAbilityMgr_->GetAbilityRole();
     authParam.direction = (int32_t)role;
