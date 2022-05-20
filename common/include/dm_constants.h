@@ -230,7 +230,6 @@ const std::string DM_AUTH_FAILED_INFO = "authentication failed.";
 const std::string DM_AUTH_NOT_START_INFO = "auth process not started.";
 const std::string DM_AUTH_MESSAGE_INCOMPLETE_INFO = "authentication message is incomplete.";
 const std::string DM_CREATE_GROUP_FAILED_INFO = "create group failed.";
-const std::string DM_ERROR_CODE_DEFAULT_INFO = "error code undefined.";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
