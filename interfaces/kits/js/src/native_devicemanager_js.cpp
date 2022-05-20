@@ -93,15 +93,13 @@ void DmNapiInitCallback::OnRemoteDied()
             return;
         }
         deviceManagerNapi->OnEvent("serviceDie", 0, nullptr);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnRemoteDied work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -129,15 +127,13 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::ONLINE, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOnline work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -165,15 +161,13 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::READY, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceReady work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -191,8 +185,9 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
     }
 
     jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, 0, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback_.get());
-
+    if (work != nullptr) {
+        work->data = reinterpret_cast<void *>(jsCallback_.get());
+    }
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -201,15 +196,13 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::OFFLINE, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOffline work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -237,15 +230,13 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
             return;
         }
         deviceManagerNapi->OnDeviceStateChange(DmNapiDevStateChangeAction::CHANGE, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceChanged work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -275,15 +266,13 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
             return;
         }
         deviceManagerNapi->OnDeviceFound(callback->subscribeId_, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -314,15 +303,13 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
             return;
         }
         deviceManagerNapi->OnDiscoveryFailed(callback->subscribeId_, callback->reason_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDiscoveryFailed work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -376,15 +363,13 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
             return;
         }
         deviceManagerNapi->OnAuthResult(callback->deviceId_, callback->token_, callback->status_, callback->reason_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnAuthResult work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -412,15 +397,13 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
             return;
         }
         deviceManagerNapi->OnVerifyResult(callback->deviceId_, callback->resultCode_, callback->flag_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnVerifyAuthResult work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
@@ -1152,15 +1135,13 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
             return;
         }
         deviceManagerNapi->OnDmfaCall(callback->token_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnCall work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
