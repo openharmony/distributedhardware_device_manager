@@ -130,7 +130,7 @@ public:
     {
         DmDeviceInfo deviceInfo;
         std::shared_ptr<AuthenticateCallback> callback = nullptr;
-        DeviceManager::GetInstance().AuthenticateDevice(pkgName, 
+        DeviceManager::GetInstance().AuthenticateDevice(pkgName,
         authType, deviceInfo, extraString, callback);
         usleep(usleepTime);
     }
