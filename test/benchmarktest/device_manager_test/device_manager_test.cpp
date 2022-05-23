@@ -64,8 +64,8 @@ BENCHMARK_F(DeviceManagerTest, InitDeviceManagerTestCase)(benchmark::State &stat
         int32_t ret = DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
         if (ret != DM_OK) {
             state.SkipWithError("InitDeviceManagerTestCase failed.");
-        }    
-    }      
+        }
+    }   
 }
 
 BENCHMARK_REGISTER_F(DeviceManagerTest,InitDeviceManagerTestCase);
@@ -77,8 +77,8 @@ BENCHMARK_F(DeviceManagerTest, GetFaParamTestCase)(benchmark::State &state)
         int32_t ret = DeviceManager::GetInstance().GetFaParam(pkgName, authParam);
         if (ret != DM_OK) {
             state.SkipWithError("GetFaParamTestCase. faild");
-        }    
-    }      
+        }
+    }
 }
 
 // SetUserOperation
@@ -86,11 +86,11 @@ BENCHMARK_F(DeviceManagerTest, SetUserOperationTestCase)(benchmark::State &state
 {
     while (state.KeepRunning()) {
         int32_t action = 0;
-        int32_t ret = DeviceManager::GetInstance().SetUserOperation(pkgName, action); 
+        int32_t ret = DeviceManager::GetInstance().SetUserOperation(pkgName, action);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");
-        }    
-    }      
+        }
+    }
 }
 
 // GetUdidByNetworkId
@@ -102,8 +102,8 @@ BENCHMARK_F(DeviceManagerTest, GetUdidByNetworkIdTestCase)(benchmark::State &sta
         int32_t ret =  DeviceManager::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");
-        }    
-    }      
+        } 
+    } 
 }
 }
 

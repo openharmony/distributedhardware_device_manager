@@ -89,7 +89,7 @@ protected:
     const string bundleName = "";
     const string extraString = "";
     const string packageName = "";
-    const int32_t authType = 0; 
+    const int32_t authType = 0;
 };
 
 class GetTrustedDeviceListTest : public DeviceManagerFaTest {
@@ -174,7 +174,7 @@ BENCHMARK_F(GetTrustedDeviceListTest, GetTrustedDeviceListTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("GetTrustedDeviceListTestCase failed.");
         }
-    }   
+    }
 }
 
 // StartDeviceDiscovery
@@ -189,7 +189,7 @@ BENCHMARK_F(DeviceDiscoveryTest, StartDeviceDiscoveryTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("StartDeviceDiscoveryTestCase faild.");
         }
-    }   
+    }
 }
 
 // StopDeviceDiscovery
@@ -210,7 +210,7 @@ BENCHMARK_F(DeviceDiscoveryTest, StoptDeviceDiscoveryTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("StopDeviceDiscoveryTestCase faild.");
         }
-    }  
+    }
 }
 
 // AuthenticateDevice
@@ -226,7 +226,7 @@ BENCHMARK_F(AuthenticateDeviceTest, AuthenticateDeviceTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("AuthenticateDeviceTestCase faild.");
         }
-    }    
+    }   
 }
 
 // UnAuthenticateDevice
@@ -238,7 +238,7 @@ BENCHMARK_F(UnAuthenticateDeviceTest, UnAuthenticateDeviceTestCase)(
         DmDeviceInfo deviceInfo;
         std::shared_ptr<AuthenticateCallback> callback = nullptr;
         int32_t ret = DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-        authType, deviceInfo, extraString, callback);	
+        authType, deviceInfo, extraString, callback);
         if (ret != DM_OK) {
             state.SkipWithError("UnAuthenticateDeviceTestCase faild.");
         }
@@ -247,7 +247,7 @@ BENCHMARK_F(UnAuthenticateDeviceTest, UnAuthenticateDeviceTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("UnAuthenticateDeviceTestCase faild.");
         }
-    }  
+    }
 }
 
 // RegisterDeviceManagerFaCallback
@@ -260,7 +260,7 @@ BENCHMARK_F(RegisterDeviceManagerFaTest, RegisterDeviceManagerFaCallbackTestCase
         if (ret != DM_OK) {
             state.SkipWithError("AuthenticateDeviceTestCase faild.");
         }
-    }    
+    }
 }
 
 // UnRegisterDeviceManagerFaCallback
@@ -270,16 +270,16 @@ BENCHMARK_F(UnRegisterDeviceManagerFaTest, UnRegisterDeviceManagerFaCallbackTest
     while (state.KeepRunning()) {
         state.PauseTiming();
         std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
-        int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);	
+        int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
         if (ret != DM_OK) {
             state.SkipWithError("AuthenticateDeviceTestCase faild.");
         }
         state.ResumeTiming();
-        ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);	
+        ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
         if (ret != DM_OK) {
             state.SkipWithError("UnRegisterDeviceManagerFaCallbackTestCase faild.");
         }
-    }    
+    }
 }
 
 // RegisterDevStateCallback
@@ -291,7 +291,7 @@ BENCHMARK_F(RegisterDevStateTest, RegisterDevStateCallbackTestCase)(
         if (ret != DM_OK) {
             state.SkipWithError("RegisterDevStateCallbackTestCase faild.");
         }
-    }    
+    }  
 }
 }
 
