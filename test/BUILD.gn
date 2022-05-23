@@ -17,6 +17,7 @@ group("test") {
   deps = []
   if (support_jsapi) {
     deps += [
+      "benchmarktest:benchmarktest",
       "fuzztest:fuzztest",
       "unittest:unittest",
     ]
