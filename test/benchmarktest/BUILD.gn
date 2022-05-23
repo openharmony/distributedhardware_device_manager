@@ -18,7 +18,6 @@ group("benchmarktest") {
 
   deps = [
     "device_manager_fa_test:benchmarktest",
-    "device_manager_test:benchmarktest",  
+    "device_manager_test:benchmarktest",
   ]
 }
-
