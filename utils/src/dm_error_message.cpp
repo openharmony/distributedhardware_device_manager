@@ -56,7 +56,7 @@ static ERROR_INFO g_errorMessages[] = {
 
 std::string GetErrorString(int failedReason)
 {
-    std::string errorMessage = "dm process execution failed.";
+    std::string errorMessage = "undefined error code.";
     for (int32_t i = 0; i < sizeof(g_errorMessages); i++) {
         if (failedReason == g_errorMessages[i].errCode) {
             errorMessage = g_errorMessages[i].errMsg;

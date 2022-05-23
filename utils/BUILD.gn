@@ -128,7 +128,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "include/permission/standard",
       "//third_party/mbedtls/include/mbedtls",
-      "//utils/include/dm_error_message",
     ]
   }
 
