@@ -68,8 +68,6 @@ BENCHMARK_F(DeviceManagerTest, InitDeviceManagerTestCase)(benchmark::State &stat
     }
 }
 
-BENCHMARK_REGISTER_F(DeviceManagerTest,InitDeviceManagerTestCase);
-
 // GetFaParam
 BENCHMARK_F(DeviceManagerTest, GetFaParamTestCase)(benchmark::State &state)
 {
