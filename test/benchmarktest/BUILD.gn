@@ -11,15 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
+import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+
+group("benchmarktest") {
   testonly = true
 
-  deps = []
-  if (support_jsapi) {
-    deps += [
-      "benchmarktest:benchmarktest",
-      "fuzztest:fuzztest",
-      "unittest:unittest",
-    ]
-  }
+  deps = [
+    "device_manager_fa_test:benchmarktest",
+    "device_manager_test:benchmarktest",
+  ]
 }
