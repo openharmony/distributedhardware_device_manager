@@ -37,7 +37,6 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-        "//utils/include/dm_error_message",
       ]
 
       sources = [
