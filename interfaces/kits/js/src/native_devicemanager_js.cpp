@@ -473,6 +473,8 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
     napi_create_object(env_, &result);
     SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
     SetValueInt32(env_, "reason", (int)failedReason, result);
+    std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
+    SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
     OnEvent("discoverFail", DM_NAPI_ARGS_ONE, &result);
 }
 
@@ -494,6 +496,8 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         napi_create_object(env_, &result[0]);
         SetValueInt32(env_, "code", status, result[0]);
         SetValueInt32(env_, "reason", reason, result[0]);
+        std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)reason);
+        SetValueUtf8String(env_, "errInfo", errCodeInfo, result[0]);
         napi_get_undefined(env_, &result[1]);
     }
 

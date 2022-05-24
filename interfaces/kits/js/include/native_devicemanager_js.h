@@ -25,6 +25,7 @@
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
 #include "dm_anonymous.h"
+#include "dm_error_message.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"

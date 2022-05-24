@@ -41,6 +41,7 @@ if (defined(ohos_lite)) {
 
       sources = [
         "${utils_path}/src/dm_anonymous.cpp",
+        "${utils_path}/src/dm_error_message.cpp",
         "${utils_path}/src/dm_log.cpp",
         "${utils_path}/src/dm_random.cpp",
         "${utils_path}/src/permission/lite/permission_manager.cpp",
@@ -91,6 +92,7 @@ if (defined(ohos_lite)) {
       ]
       sources = [
         "src/dm_anonymous.cpp",
+        "src/dm_error_message.cpp",
         "src/dm_log.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
@@ -131,6 +133,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("devicemanagerutils") {
     sources = [
       "src/dm_anonymous.cpp",
+      "src/dm_error_message.cpp",
       "src/dm_hash.cpp",
       "src/dm_log.cpp",
       "src/dm_random.cpp",
