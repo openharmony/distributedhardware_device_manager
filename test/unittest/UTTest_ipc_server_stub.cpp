@@ -168,8 +168,8 @@ HWTEST_F(IpcServerStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
     int ret = 0;
     // 2. Call IpcServerStub OnRemoteRequest with param
     ret = IpcServerStub::GetInstance().OnRemoteRequest(code, data, reply, option);
-    // 3. check ret not ERR_INVALID_STATE
-    ASSERT_EQ(ret, ERR_INVALID_STATE);
+    // 3. check ret not ERR_DM_IPC_READ_TOKEN_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_READ_TOKEN_FAILED);
 }
 
 /**
