@@ -16,17 +16,17 @@
 import router from '@ohos.router';
 
 var inputValue;
-var isShow = false;
-var isTimes = 3;
 var EVENT_CONFIRM = "EVENT_CONFIRM";
 var EVENT_CANCEL = "EVENT_CANCEL";
 var EVENT_INIT = "EVENT_INIT";
 var EVENT_CANCEL_CODE = "1";
 var EVENT_INIT_CODE = "2";
+
 export default {
     data: {
-        isShow:  router.getParams().verifyFailed,
         inputValue: "",
+        isShow: false,
+        isTimes: 3,
     },
     onInit() {
         callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
@@ -38,12 +38,15 @@ export default {
         if ((inputValue == null) || (inputValue == "")) {
             return;
         }
-        isTimes--;
+        this.isTimes--;
         callNativeHandler(EVENT_CONFIRM, inputValue);
         inputValue = "";
     },
     onCancel() {
         console.info('click cancel');
         callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
+    },
+    onDialogUpdatedd(param) {
+        this.isShow = param.verifyFailed;
     }
 }

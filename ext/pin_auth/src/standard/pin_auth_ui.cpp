@@ -79,7 +79,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
             if (event == EVENT_INIT) {
                 authManager->SetPageId(id);
             } else if (event == EVENT_CONFIRM) {
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                LOGI("On confirm event for page id:%d, parms:%s", id, params.c_str());
                 authManager->AddMember(std::stoi(params));
             } else {
                 authManager->SetReasonAndFinish(ERR_DM_AUTH_INPUT_PARAMETER_FAILED, AuthState::AUTH_REQUEST_JOIN);

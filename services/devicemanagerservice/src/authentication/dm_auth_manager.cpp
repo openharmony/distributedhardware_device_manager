@@ -591,7 +591,7 @@ void DmAuthManager::AuthenticateFinish()
         } else {
             authRequestContext_->reason = authResponseContext_->reply;
         }
-        if (authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN || 
+        if (authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
             authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) {
             authPtr_->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
         }
