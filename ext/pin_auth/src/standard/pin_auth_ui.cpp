@@ -76,21 +76,15 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
         OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
-            switch (event) {
-                case EVENT_INIT:
-                    authManager->SetPageId(id);
-                    break;
-                case EVENT_CONFIRM:
-                    LOGI("On confirm event for page id:%d, parms:%s", id, params.c_str());
-                    if (params.length() == DEFAULT_PIN_CODE_LENGTH) {
-                        authManager->AddMember(std::stoi(params));
-                    } else {
-                        UpdatePinDialog(id);
-                    }
-                    break;
-                default:
-                    authManager->SetReasonAndFinish(ERR_DM_AUTH_INPUT_PARAMETER_FAILED, AuthState::AUTH_REQUEST_JOIN);
-                    break;
+            if (event == EVENT_INIT) {
+                authManager->SetPageId(id);
+            } else if (event == EVENT_CONFIRM) {
+                LOGI("On confirm event for page id:%d, parms:%s", id, params.c_str());
+                if (params.length() <= DEFAULT_PIN_CODE_LENGTH) {
+                    authManager->AddMember(std::stoi(params));
+                }
+            } else {
+                authManager->SetReasonAndFinish(ERR_DM_AUTH_INPUT_PARAMETER_FAILED, AuthState::AUTH_REQUEST_JOIN);
             }
         });
     LOGI("ShowConfigDialog end");
