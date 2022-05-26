@@ -52,7 +52,7 @@ public:
 
     /**
      * @tc.name: PinAuth::UpdateAuthInfo
-     * @tc.desc: Update the page information 
+     * @tc.desc: Update the page information
      * @tc.type: FUNC
      */
     int32_t UpdatePinDialog(int32_t pageId);

@@ -527,7 +527,6 @@ int32_t DmAuthManager::CreateGroup()
 
 int32_t DmAuthManager::AddMember(int32_t pinCode)
 {
-    LOGI("DmAuthManager::AddMember start pin code %d", pinCode);
     LOGI("DmAuthManager::AddMember start group id %s", authResponseContext_->groupId.c_str());
     timer_->DeleteTimer(INPUT_TIMEOUT_TASK);
     nlohmann::json jsonObject;

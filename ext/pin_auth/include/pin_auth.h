@@ -65,6 +65,7 @@ public:
      * @tc.type: FUNC
      */
     int32_t UpdateAuthInfo(const int32_t &pageId) override;
+
 private:
     int32_t times_ = 0;
     std::shared_ptr<PinAuthUi> pinAuthUi_;

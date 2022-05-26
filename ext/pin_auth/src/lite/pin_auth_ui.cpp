@@ -67,7 +67,7 @@ int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityM
     return DM_OK;
 }
 
-int32_t PinAuthUi::UpdatePinDialog((int32_t pageId)
+int32_t PinAuthUi::UpdatePinDialog(int32_t pageId)
 {
     return DM_OK;
 }
