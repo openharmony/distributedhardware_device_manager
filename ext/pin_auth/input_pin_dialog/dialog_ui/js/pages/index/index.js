@@ -15,7 +15,6 @@
 
 import router from '@ohos.router';
 
-var inputVal;
 var inputValue;
 var isShow = false;
 var isTimes = 3;
@@ -34,11 +33,11 @@ export default {
         callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
     },
     onChange(e){ 
-        inputVal = e.value;
+        inputValue = e.value;
     }, 
     onConfirm() {
         isTimes--;
-        callNativeHandler(EVENT_CONFIRM, inputVal);
+        callNativeHandler(EVENT_CONFIRM, inputValue);
         inputValue = "";
     },
     onCancel() {
