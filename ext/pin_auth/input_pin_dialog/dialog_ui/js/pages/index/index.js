@@ -45,7 +45,7 @@ export default {
         console.info('click cancel');
         callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
     },
-    onDialogUpdatedd(param) {
+    onDialogUpdated(param) {
         this.isShow = param.verifyFailed;
     }
 }
