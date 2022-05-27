@@ -66,7 +66,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "123";
     DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     deviceStateMgr->RegisterSoftbusStateCallback();
     DeviceOnLine(SoftbusConnector::stateCallbackMap_, info);
     bool ret = false;
@@ -88,7 +88,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOnLine_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "123";
     DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     DeviceOnLine(SoftbusConnector::stateCallbackMap_, info);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -109,7 +109,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "123";
     DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     deviceStateMgr->RegisterSoftbusStateCallback();
     DeviceOffLine(SoftbusConnector::stateCallbackMap_, info);
     bool ret = false;
@@ -131,7 +131,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "123";
     DmDeviceInfo info;
-    strncpy(info.deviceId, "123", sizeof(info.deviceId));
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     DeviceOffLine(SoftbusConnector::stateCallbackMap_, info);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -346,8 +346,8 @@ HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_001, testing::ext::TestSize.Level0
 HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "145677";
-    NodeBasicInfo Info;
-    strncpy(Info.networkId, "145677", sizeof(Info.networkId));
+    NodeBasicInfo info;
+    strcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, "145677");
     bool ret = softbusConnector->IsDeviceOnLine(deviceId);
     EXPECT_EQ(ret, false);
 }

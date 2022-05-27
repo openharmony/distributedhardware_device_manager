@@ -42,13 +42,20 @@ public:
      * @tc.desc: Show Input PinDialog
      * @tc.type: FUNC
      */
-    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t InputPinDialog(std::shared_ptr<DmAuthManager> authManager);
     /**
      * @tc.name: PinAuthUi::ClosePage
      * @tc.desc: Close Page
      * @tc.type: FUNC
      */
     int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
+
+    /**
+     * @tc.name: PinAuth::UpdateAuthInfo
+     * @tc.desc: Update the page information
+     * @tc.type: FUNC
+     */
+    int32_t UpdatePinDialog(int32_t pageId);
 
 private:
     int32_t StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager);

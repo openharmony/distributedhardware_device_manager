@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace ACELite {
 #define DM_JSI_BUF_LENGTH (256)
-#define DM_JSI_AUTH_REQUEST_FINISH (8)
+#define DM_JSI_AUTH_REQUEST_FINISH (7)
 
 struct AuthFuncParams {
     JSIValue handlerRef = JSI::CreateUndefined();

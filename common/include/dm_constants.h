@@ -75,6 +75,7 @@ enum {
     ERR_DM_AUTH_MESSAGE_INCOMPLETE = -20027,
     ERR_DM_CREATE_GROUP_FAILED = -20028,
     ERR_DM_IPC_READ_TOKEN_FAILED = -20029,
+    ERR_DM_AUTH_INPUT_PARAMETER_FAILED = -20030,
 };
 
 const std::string TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -136,11 +137,13 @@ const std::string PIN_CODE_KEY = "pinCode";
 const std::string NFC_CODE_KEY = "nfcCode";
 const std::string QR_CODE_KEY = "qrCode";
 const std::string TAG_AUTH_TOKEN = "authToken";
+const std::string VERIFY_FAILED = "verifyFailed";
 const int32_t AUTH_TYPE_PIN = 1;
 const int32_t AUTH_TYPE_SCAN = 2;
 const int32_t AUTH_TYPE_TOUCH = 3;
 const int32_t DEFAULT_PIN_CODE = 0;
 const int32_t DEFAULT_PIN_TOKEN = 0;
+const int32_t DEFAULT_PIN_CODE_LENGTH = 6;
 
 // Softbus
 const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
@@ -172,8 +175,8 @@ const std::string ETH_PORT = "ETH_PORT";
 // ACE
 const int32_t ACE_X = 50;
 const int32_t ACE_Y = 300;
-const int32_t ACE_WIDTH = 450;
-const int32_t ACE_HEIGHT = 400;
+const int32_t ACE_WIDTH = 580;
+const int32_t ACE_HEIGHT = 520;
 const std::string EVENT_CONFIRM = "EVENT_CONFIRM";
 const std::string EVENT_CANCEL = "EVENT_CANCEL";
 const std::string EVENT_INIT = "EVENT_INIT";

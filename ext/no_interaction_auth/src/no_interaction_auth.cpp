@@ -52,6 +52,11 @@ int32_t NoInteractionAuth::CloseAuthInfo(const int32_t &pageId, std::shared_ptr<
     return DM_OK;
 }
 
+int32_t NoInteractionAuth::UpdateAuthInfo(const int32_t &pageId)
+{
+    return DM_OK;
+}
+
 extern "C" IAuthentication *CreatePinAuthObject(void)
 {
     return new NoInteractionAuth;

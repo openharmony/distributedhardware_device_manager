@@ -22,7 +22,7 @@
     <text class="title-list">
         请输入另一个设备显示的PIN码进行验证
     </text>
-    <input class="title-pin" id="input" type="number" onchange="onChange"></input>
+    <input class="title-pin" id="input" type="text" maxlength="6" onchange="onChange" value="{{inputValue}}"></input>
     <text class="title-error" id="error" show="{{isShow}}">
         PIN码输入错误，请重新输入(3次：还有{{isTimes}}次机会)
     </text>

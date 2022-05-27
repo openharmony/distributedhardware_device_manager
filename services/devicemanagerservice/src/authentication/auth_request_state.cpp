@@ -122,23 +122,6 @@ int32_t AuthRequestReplyState::Enter()
     return DM_OK;
 }
 
-int32_t AuthRequestInputState::GetStateType()
-{
-    return AuthState::AUTH_REQUEST_INPUT;
-}
-
-int32_t AuthRequestInputState::Enter()
-{
-    LOGI("DmAuthManager::AuthRequestInputState");
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->ShowStartAuthDialog();
-    return DM_OK;
-}
-
 int32_t AuthRequestJoinState::GetStateType()
 {
     return AuthState::AUTH_REQUEST_JOIN;
@@ -152,7 +135,7 @@ int32_t AuthRequestJoinState::Enter()
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->AddMember(context_->deviceId);
+    stateAuthManager->ShowStartAuthDialog();
     return DM_OK;
 }
 

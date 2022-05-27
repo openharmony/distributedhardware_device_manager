@@ -46,7 +46,7 @@ const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_NAPI_SUB_ID_MAX = 65535;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
-const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 8;
+const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
 napi_ref deviceTypeEnumConstructor_ = nullptr;
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;

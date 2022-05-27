@@ -208,10 +208,10 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->code = 123;
     authManager->authResponseContext_->requestId = 234;
     authManager->authResponseContext_->deviceId = "234";
-    std::string deviceId = "44444";
+    int32_t pinCode = 444444;
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
-    int32_t ret = authManager->AddMember(deviceId);
+    int32_t ret = authManager->AddMember(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
