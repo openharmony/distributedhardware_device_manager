@@ -86,8 +86,7 @@ HWTEST_F(PinAuthUiTest, ShowPinDialog_002, testing::ext::TestSize.Level0)
 HWTEST_F(PinAuthUiTest, InputPinDialog_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuthUi> pinAuthUi = std::make_shared<PinAuthUi>();
-    int32_t code = 123456;
-    int32_t ret = pinAuthUi->InputPinDialog(code, nullptr);
+    int32_t ret = pinAuthUi->InputPinDialog(nullptr);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -100,8 +99,7 @@ HWTEST_F(PinAuthUiTest, InputPinDialog_001, testing::ext::TestSize.Level0)
 HWTEST_F(PinAuthUiTest, InputPinDialog_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuthUi> pinAuthUi = std::make_shared<PinAuthUi>();
-    int32_t code = 123456;
-    int32_t ret = pinAuthUi->InputPinDialog(code, authManager);
+    int32_t ret = pinAuthUi->InputPinDialog(authManager);
     ASSERT_EQ(ret, DM_OK);
 }
 }

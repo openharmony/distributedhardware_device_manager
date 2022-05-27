@@ -33,7 +33,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     return DM_OK;
 }
 
-int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
+int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("InputPinDialog start");
     std::shared_ptr<DmAbilityManager> dmAbilityManager_ = std::make_shared<DmAbilityManager>();
@@ -64,6 +64,11 @@ int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityM
         LOGE("PinAuthUi::StartFaUiService timeout");
         return ERR_DM_FAILED;
     }
+    return DM_OK;
+}
+
+int32_t PinAuthUi::UpdatePinDialog(int32_t pageId)
+{
     return DM_OK;
 }
 } // namespace DistributedHardware

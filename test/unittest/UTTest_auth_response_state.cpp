@@ -235,6 +235,7 @@ HWTEST_F(AuthResponseStateTest, Enter_003, testing::ext::TestSize.Level0)
     authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     authManager->authResponseContext_->deviceId = "111";
     authManager->authResponseContext_->localDeviceId = "222";
+    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
     authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
     authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
@@ -397,6 +398,8 @@ HWTEST_F(AuthResponseStateTest, Enter_009, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
+    authManager->authPtr_ = authManager->authenticationMap_[1];
+    authManager->authResponseContext_->code = 123456;
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);
@@ -453,6 +456,7 @@ HWTEST_F(AuthResponseStateTest, Enter_011, testing::ext::TestSize.Level0)
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->listener_ = std::make_shared<DeviceManagerServiceListener>();
+    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authResponseContext_->sessionId = 1;
     authManager->authRequestContext_->deviceId = "2";
     authManager->authRequestContext_->hostPkgName = "3";

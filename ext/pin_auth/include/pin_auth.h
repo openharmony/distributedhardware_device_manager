@@ -58,6 +58,14 @@ public:
      * @tc.type: FUNC
      */
     int32_t CloseAuthInfo(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager) override;
+
+    /**
+     * @tc.name: PinAuth::UpdateAuthInfo
+     * @tc.desc: Update Auth Info of the PinAuth
+     * @tc.type: FUNC
+     */
+    int32_t UpdateAuthInfo(const int32_t &pageId) override;
+
 private:
     int32_t times_ = 0;
     std::shared_ptr<PinAuthUi> pinAuthUi_;

@@ -131,23 +131,6 @@ public:
     int32_t Enter() override;
 };
 
-class AuthRequestInputState : public AuthRequestState {
-public:
-    /**
-     * @tc.name: AuthRequestInputState::GetStateType
-     * @tc.desc: Get State Type of the AuthRequest Input State
-     * @tc.type: FUNC
-     */
-    int32_t GetStateType() override;
-
-    /**
-     * @tc.name: AuthRequestInputState::Enter
-     * @tc.desc: Enter of the AuthRequest Input State
-     * @tc.type: FUNC
-     */
-    int32_t Enter() override;
-};
-
 class AuthRequestJoinState : public AuthRequestState {
 public:
     /**

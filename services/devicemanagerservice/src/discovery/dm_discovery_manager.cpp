@@ -39,6 +39,7 @@ DmDiscoveryManager::~DmDiscoveryManager()
 int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                  const std::string &extra)
 {
+    std::lock_guard<std::mutex> autoLock(locks_);
     if (!discoveryQueue_.empty()) {
         if (pkgName == discoveryQueue_.front()) {
             LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
@@ -66,6 +67,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
 
 int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
+    std::lock_guard<std::mutex> autoLock(locks_);
     if (!discoveryQueue_.empty()) {
         discoveryQueue_.pop();
     }
@@ -105,7 +107,18 @@ void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t 
 void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
-    StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
+    if (discoveryQueue_.empty()) {
+        LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
+        return;
+    }
+
+    std::string pkgName = discoveryQueue_.front();
+    auto iter = discoveryContextMap_.find(pkgName);
+    if (iter == discoveryContextMap_.end()) {
+        LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+        return;
+    }
+    StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

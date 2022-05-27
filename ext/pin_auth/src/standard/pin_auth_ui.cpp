@@ -58,7 +58,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     return DM_OK;
 }
  
-int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
+int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("InputPinDialog start");
     if (authManager == nullptr) {
@@ -66,7 +66,7 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
         return ERR_DM_FAILED;
     }
     nlohmann::json jsonObj;
-    jsonObj[PIN_CODE_KEY] = code;
+    jsonObj[VERIFY_FAILED] = false;
     jsonObj.dump();
     const std::string params = jsonObj.dump();
 
@@ -76,13 +76,15 @@ int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> a
         OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
-            if (params == EVENT_INIT_CODE) {
+            if (event == EVENT_INIT) {
                 authManager->SetPageId(id);
-            }
-            if (params == EVENT_CANCEL_CODE || params == EVENT_CONFIRM_CODE) {
-                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-                authManager->VerifyAuthentication(params.c_str());
+            } else if (event == EVENT_CONFIRM) {
+                LOGI("On confirm event for page id:%d, parms:%s", id, params.c_str());
+                if (params.length() <= DEFAULT_PIN_CODE_LENGTH) {
+                    authManager->AddMember(std::stoi(params));
+                }
+            } else {
+                authManager->SetReasonAndFinish(ERR_DM_AUTH_INPUT_PARAMETER_FAILED, AuthState::AUTH_REQUEST_JOIN);
             }
         });
     LOGI("ShowConfigDialog end");
@@ -94,6 +96,18 @@ int32_t PinAuthUi::ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManage
     LOGI("PinAuthUi start");
     Ace::UIServiceMgrClient::GetInstance()->CancelDialog(pageId);
     LOGI("PinAuthUi end");
+    return DM_OK;
+}
+
+int32_t PinAuthUi::UpdatePinDialog(int32_t pageId)
+{
+    LOGI("UpdatePinDialog start");
+    nlohmann::json jsonObj;
+    jsonObj[VERIFY_FAILED] = true;
+    jsonObj.dump();
+    const std::string params = jsonObj.dump();
+    Ace::UIServiceMgrClient::GetInstance()->UpdateDialog(pageId, params);
+    LOGI("UpdatePinDialog end");
     return DM_OK;
 }
 
