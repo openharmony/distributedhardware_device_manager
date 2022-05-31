@@ -464,6 +464,7 @@ HWTEST_F(AuthResponseStateTest, Enter_011, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->reply = 5;
     authManager->authRequestContext_->reason = 6;
     authManager->SetAuthResponseState(authResponseState);
+    authManager->timer_ = std::make_shared<DmTimer>();
     authResponseState->SetAuthManager(authManager);
     std::shared_ptr<DmAuthResponseContext> context = std::make_shared<DmAuthResponseContext>();
     authResponseState->SetAuthContext(context);

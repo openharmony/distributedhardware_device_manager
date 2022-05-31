@@ -52,6 +52,9 @@ static ERROR_INFO g_errorMessages[] = {
     {ERR_DM_AUTH_NOT_START, "auth process not started."},
     {ERR_DM_AUTH_MESSAGE_INCOMPLETE, "authentication message is incomplete."},
     {ERR_DM_CREATE_GROUP_FAILED, "create group failed."},
+    {ERR_DM_IPC_READ_TOKEN_FAILED, "read ipc token failed."},
+    {ERR_DM_AUTH_INPUT_PARAMETER_FAILED, "auth input parameter failed."},
+    {ERR_DM_IPC_READ_FA_FAILED, "ipc read fa parms failed."},
 };
 
 std::string GetErrorString(int failedReason)

@@ -39,7 +39,6 @@ DmDiscoveryManager::~DmDiscoveryManager()
 int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                  const std::string &extra)
 {
-    std::lock_guard<std::mutex> autoLock(locks_);
     if (!discoveryQueue_.empty()) {
         if (pkgName == discoveryQueue_.front()) {
             LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
@@ -50,6 +49,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
             StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
         }
     }
+    std::lock_guard<std::mutex> autoLock(locks_);
     discoveryQueue_.push(pkgName);
     DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId};
     discoveryContextMap_.emplace(pkgName, context);

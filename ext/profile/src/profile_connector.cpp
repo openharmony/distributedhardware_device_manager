@@ -107,10 +107,8 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
 void ProfileConnector::OnSyncCompleted(const SyncResult &syncResults)
 {
     std::string deviceId;
-    u_int32_t SyncStatus;
     for (auto &iterResult : syncResults) {
         deviceId = iterResult.first;
-        SyncStatus = iterResult.second;
     }
     LOGI("ProfileEventCallback::OnSyncCompleted, deviceId = %s", GetAnonyString(deviceId).c_str());
     std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
