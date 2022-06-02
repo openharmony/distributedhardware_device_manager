@@ -83,7 +83,7 @@ int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &s
     subscribeInfos.emplace_back(eventSync);
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, shared_from_this(), failedEvents);
-    if (errCode != OHOS::ERR_OK) {
+    if (errCode != 0) {
         LOGI("subscribe profile events result: %ud", errCode);
         return ERR_DM_PROFILE_EVENTS_FAILED;
     }
@@ -97,7 +97,7 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
     profileEvents.emplace_back(ProfileEvent::EVENT_SYNC_COMPLETED);
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
         profileEvents, shared_from_this(), failedEvents);
-    if (errCode != OHOS::ERR_OK) {
+    if (errCode != 0) {
         LOGI("unSubscribe profile events result:%ud", errCode);
         return ERR_DM_PROFILE_EVENTS_FAILED;
     }
