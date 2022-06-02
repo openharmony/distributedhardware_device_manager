@@ -88,6 +88,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_001, testing::ext::TestSiz
     discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+    discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeInfo.subscribeId);
 }
 
 /**
@@ -106,6 +107,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeInfo.subscribeId);
 }
 
 /**

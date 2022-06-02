@@ -83,9 +83,9 @@ int32_t ProfileConnector::SubscribeProfileEvents(const std::list<std::string> &s
     subscribeInfos.emplace_back(eventSync);
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, shared_from_this(), failedEvents);
-    if (errCode != ERR_OK) {
+    if (errCode != 0) {
         LOGI("subscribe profile events result: %ud", errCode);
-        return DM_PROFILE_EVENTS_FAILED;
+        return ERR_DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }
@@ -97,9 +97,9 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
     profileEvents.emplace_back(ProfileEvent::EVENT_SYNC_COMPLETED);
     int32_t errCode = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
         profileEvents, shared_from_this(), failedEvents);
-    if (errCode != ERR_OK) {
+    if (errCode != 0) {
         LOGI("unSubscribe profile events result:%ud", errCode);
-        return DM_PROFILE_EVENTS_FAILED;
+        return ERR_DM_PROFILE_EVENTS_FAILED;
     }
     return DM_OK;
 }
@@ -107,10 +107,8 @@ int32_t ProfileConnector::UnSubscribeProfileEvents()
 void ProfileConnector::OnSyncCompleted(const SyncResult &syncResults)
 {
     std::string deviceId;
-    u_int32_t SyncStatus;
     for (auto &iterResult : syncResults) {
         deviceId = iterResult.first;
-        SyncStatus = iterResult.second;
     }
     LOGI("ProfileEventCallback::OnSyncCompleted, deviceId = %s", GetAnonyString(deviceId).c_str());
     std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);

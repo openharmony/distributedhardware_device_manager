@@ -48,7 +48,7 @@ AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
     want.SetElement(element);
     AAFwk::AbilityManagerClient::GetInstance()->Connect();
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (result != OHOS::ERR_OK) {
+    if (result != 0) {
         LOGE("Start Ability failed");
         mStatus_ = AbilityStatus::ABILITY_STATUS_FAILED;
         return mStatus_;

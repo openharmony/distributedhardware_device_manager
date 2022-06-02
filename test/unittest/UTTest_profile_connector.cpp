@@ -138,7 +138,7 @@ HWTEST_F(ProfileConnectorTest, UnSubscribeProfileEvents_002, testing::ext::TestS
     profileConnector_ = std::make_shared<ProfileConnector>();
     int32_t ret = DM_OK;
     ret = profileConnector_->UnSubscribeProfileEvents();
-    ASSERT_EQ(ret, DM_PROFILE_EVENTS_FAILED);
+    ASSERT_EQ(ret, ERR_DM_PROFILE_EVENTS_FAILED);
 }
 
 /**

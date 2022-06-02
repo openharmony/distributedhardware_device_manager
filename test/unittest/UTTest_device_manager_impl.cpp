@@ -187,9 +187,9 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_001, testing::ext::TestSize.
 /**
  * @tc.name: UnInitDeviceManager_002
  * @tc.desc: 1. set packName not null
- *           2. MOCK IpcClientProxy UnInit return ERR_DM_UNINIT_FAILED
+ *           2. MOCK IpcClientProxy UnInit return ERR_DM_FAILED
  *           3. call DeviceManagerImpl::UnInitDeviceManager with parameter
- *           4. check ret is ERR_DM_UNINIT_FAILED
+ *           4. check ret is ERR_DM_FAILED
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -201,10 +201,10 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_002, testing::ext::TestSize.
     // 2. call DeviceManagerImpl::InitDeviceManager with parameter
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
-    EXPECT_CALL(*mockInstance, UnInit(testing::_)).Times(1).WillOnce(testing::Return(ERR_DM_UNINIT_FAILED));
+    EXPECT_CALL(*mockInstance, UnInit(testing::_)).Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     int32_t ret= DeviceManager::GetInstance().UnInitDeviceManager(packName);
-    // 3. check ret is ERR_DM_UNINIT_FAILED
-    ASSERT_EQ(ret, ERR_DM_UNINIT_FAILED);
+    // 3. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
 
@@ -237,7 +237,7 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_003, testing::ext::TestSize.
  * @tc.desc: 1. set packName not null
  *           2. MOCK IpcClientProxy UnInit return ERR_DM_INIT_FAILED
  *           3. call DeviceManagerImpl::UnInitDeviceManager with parameter
- *           4. check ret is ERR_DM_UNINIT_FAILED
+ *           4. check ret is ERR_DM_FAILED
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -251,8 +251,8 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_004, testing::ext::TestSize.
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, UnInit(testing::_)).Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     int32_t ret= DeviceManager::GetInstance().UnInitDeviceManager(packName);
-    // 3. check ret is ERR_DM_UNINIT_FAILED
-    ASSERT_EQ(ret, ERR_DM_UNINIT_FAILED);
+    // 3. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
 
@@ -261,7 +261,7 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_004, testing::ext::TestSize.
  * @tc.desc: 1. set packName not null
  *           2. MOCK IpcClientProxy UnInit return ERR_DM_INIT_FAILED
  *           3. call DeviceManagerImpl::UnInitDeviceManager with parameter
- *           4. check ret is ERR_DM_UNINIT_FAILED
+ *           4. check ret is ERR_DM_FAILED
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -275,8 +275,8 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_005, testing::ext::TestSize.
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, UnInit(testing::_)).Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     int32_t ret= DeviceManager::GetInstance().UnInitDeviceManager(packName);
-    // 3. check ret is ERR_DM_UNINIT_FAILED
-    ASSERT_EQ(ret, ERR_DM_UNINIT_FAILED);
+    // 3. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
 

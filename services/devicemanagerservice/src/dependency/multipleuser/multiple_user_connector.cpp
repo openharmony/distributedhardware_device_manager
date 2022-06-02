@@ -38,7 +38,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 #ifdef OS_ACCOUNT_PART_EXISTS
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
-    if (ret != ERR_OK || ids.empty()) {
+    if (ret != 0 || ids.empty()) {
         return -1;
     }
     return ids[0];

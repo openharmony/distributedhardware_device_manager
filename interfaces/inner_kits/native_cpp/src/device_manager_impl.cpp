@@ -87,7 +87,7 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
     if (ret != DM_OK) {
         LOGE("UnInitDeviceManager error: proxy unInit failed ret: %d", ret);
-        return ERR_DM_UNINIT_FAILED;
+        return ERR_DM_FAILED;
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(pkgName);

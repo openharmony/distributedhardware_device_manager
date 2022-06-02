@@ -84,7 +84,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
                     authManager->AddMember(std::stoi(params));
                 }
             } else {
-                authManager->SetReasonAndFinish(ERR_DM_AUTH_INPUT_PARAMETER_FAILED, AuthState::AUTH_REQUEST_JOIN);
+                authManager->SetReasonAndFinish(ERR_DM_INPUT_PARAMETER_EMPTY, AuthState::AUTH_REQUEST_JOIN);
             }
         });
     LOGI("ShowConfigDialog end");
