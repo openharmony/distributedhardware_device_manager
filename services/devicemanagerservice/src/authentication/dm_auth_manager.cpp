@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
 const int32_t AUTHENTICATE_TIMEOUT = 120;
 const int32_t CONFIRM_TIMEOUT = 60;
 const int32_t NEGOTIATE_TIMEOUT = 10;
