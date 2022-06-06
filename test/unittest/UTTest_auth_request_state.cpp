@@ -512,8 +512,7 @@ HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authMessageProcessor_ = std::make_
-	shared<AuthMessageProcessor>(authManager);
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
