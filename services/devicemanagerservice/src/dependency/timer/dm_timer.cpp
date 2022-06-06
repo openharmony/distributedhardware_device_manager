@@ -44,7 +44,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
     LOGI("DmTimer StartTimer %s", name.c_str());
     if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
         LOGI("DmTimer StartTimer input value invalid");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return DM_INPUT_PARA_EMPTY;
     }
 
     std::shared_ptr<Timer> timer = std::make_shared<Timer>(name, timeOut, callback);
@@ -71,7 +71,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
 {
     if (timerName.empty()) {
         LOGE("DmTimer DeleteTimer timer is null");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return DM_INPUT_PARA_EMPTY;
     }
 
     LOGI("DmTimer DeleteTimer name %s", timerName.c_str());
@@ -83,7 +83,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         }
     }
     LOGE("DmTimer DeleteTimer no have this timer");
-    return ERR_DM_INPUT_PARAMETER_EMPTY;
+    return DM_INPUT_PARA_EMPTY;
 }
 
 int32_t DmTimer::DeleteAll()

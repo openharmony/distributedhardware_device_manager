@@ -23,7 +23,6 @@ namespace OHOS {
 namespace DistributedHardware {
 const std::string DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                                        std::shared_ptr<DeviceManagerServiceListener> listener)
