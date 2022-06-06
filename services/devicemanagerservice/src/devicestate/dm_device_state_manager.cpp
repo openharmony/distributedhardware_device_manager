@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
 
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<DeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
@@ -260,16 +259,12 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         timer_ = std::make_shared<DmTimer>();
     }
     std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(mCumulativeQuantity_++);
-    std::shared_ptr<DmTimer> offLineTimer = std::make_shared<DmTimer>(timerName);
-    if (offLineTimer != nullptr) {
-        StateTimerInfo stateTimer = {
-            .timerName = timerName,
-            .netWorkId = deviceInfo.deviceId,
-            .deviceId = deviceId,
-            .timer = offLineTimer
-        };
-        stateTimerInfoMap_[timerName] = stateTimer;
-    }
+    StateTimerInfo stateTimer = {
+        .timerName = timerName,
+        .netWorkId = deviceInfo.deviceId,
+        .deviceId = deviceId
+    };
+    stateTimerInfoMap_[timerName] = stateTimer;
 }
 
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)

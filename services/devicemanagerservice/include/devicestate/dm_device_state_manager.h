@@ -36,7 +36,6 @@ struct StateTimerInfo {
     std::string timerName;
     std::string netWorkId;
     std::string deviceId;
-    std::shared_ptr<DmTimer> timer;
 };
 
 class DmDeviceStateManager final : public ISoftbusStateCallback,

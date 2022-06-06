@@ -84,7 +84,6 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         return DM_INPUT_PARA_EMPTY;
     }
 
-    authPtr_ = authenticationMap_[authType];
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
