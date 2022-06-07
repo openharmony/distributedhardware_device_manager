@@ -20,6 +20,7 @@
 #include "device_manager.h"
 #include "dm_app_image_info.h"
 #include "dm_constants.h"
+#include "system_ability_definition.h"
 
 using namespace std;
 using namespace OHOS;
@@ -45,6 +46,8 @@ public:
 
     void SetUp(const ::benchmark::State &state) override
     {
+        std::shared_ptr<BenchmarkDmInit> callback = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
     }
 
     void TearDown(const ::benchmark::State &state) override
@@ -52,8 +55,8 @@ public:
     }
 protected:
     const string pkgName = "ohos.distributedhardware.devicemanager";
-    const int32_t repetitions = 16;
-    const int32_t iterations = 1;
+    const int32_t repetitions = 3;
+    const int32_t iterations = 1000;
 };
 
 // InitDeviceManager
@@ -96,8 +99,21 @@ BENCHMARK_F(DeviceManagerTest, SetUserOperationTestCase)(benchmark::State &state
 BENCHMARK_F(DeviceManagerTest, GetUdidByNetworkIdTestCase)(benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        std::string netWorkId = "";
-        std::string uuid = "";
+        std::string netWorkId = "netWorkId_";
+        std::string udid = "udid_";
+        int32_t ret =  DeviceManager::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
+        if (ret != DM_OK) {
+            state.SkipWithError("SetUserOperationTestCase failed.");
+        }
+    }
+}
+
+// GetUuidByNetworkId
+BENCHMARK_F(DeviceManagerTest, GetUuidByNetworkIdTestCase)(benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        std::string netWorkId = "netWorkId_";
+        std::string uuid = "uuid_";
         int32_t ret =  DeviceManager::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");

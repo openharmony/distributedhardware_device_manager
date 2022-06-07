@@ -16,12 +16,19 @@
 #include <benchmark/benchmark.h>
 #include <unistd.h>
 #include <vector>
+#include <securec.h>
+#include <cstdlib>
+#include <stdlib.h>
+
 
 #include "device_manager.h"
 #include "dm_app_image_info.h"
 #include "dm_subscribe_info.h"
 #include "device_manager_callback.h"
 #include "dm_constants.h"
+#include "system_ability_definition.h"
+#include "softbus_common.h"
+
 
 using namespace std;
 using namespace OHOS;
@@ -37,10 +44,10 @@ public:
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
-class DmInitCallbackTest : public DmInitCallback {
+class BenchmarkDmInit : public DmInitCallback {
 public:
-    DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
+    BenchmarkDmInit() : DmInitCallback() {}
+    virtual ~BenchmarkDmInit() override {}
     virtual void OnRemoteDied() override {}
 };
 
@@ -74,6 +81,8 @@ public:
 
     void SetUp(const ::benchmark::State &state) override
     {
+        std::shared_ptr<BenchmarkDmInit> callback = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
     }
 
     void TearDown(const ::benchmark::State &state) override
@@ -85,54 +94,36 @@ protected:
     // sleep 1000ms
     const int32_t usleepTime = 1000 * 1000;
     const string pkgName = "com.ohos.devicemanager";
-    const string extra = "";
-    const string bundleName = "";
-    const string extraString = "";
-    const string packageName = "";
-    const int32_t authType = 0;
+    const string extra = "extra_";
+    const string bundleName = "bundleName_";
+    const string extraString = "extraString_";
+    const string packageName = "com.ohos.devicemanager";
+    const int32_t authType = 1;
 };
 
 class GetTrustedDeviceListTest : public DeviceManagerFaTest {
 public:
     void SetUp(const ::benchmark::State &state) override {}
-    void TearDown(const ::benchmark::State &state) override {}
+    void TearDown(const ::benchmark::State &state) override 
+    {
+    }
+};
+
+class GetLocalDeviceInfoTest : public DeviceManagerFaTest {
+public:
+    void SetUp(const ::benchmark::State &state) override {}
+    void TearDown(const ::benchmark::State &state) override 
+    {
+    }
 };
 
 class DeviceDiscoveryTest : public DeviceManagerFaTest {
 public:
     void SetUp(const ::benchmark::State &state) override
     {
-        DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
-        usleep(usleepTime);
     }
     void TearDown(const ::benchmark::State &state) override
     {
-        DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
-        usleep(usleepTime);
-    }
-protected:
-    const int16_t subscribeId = 0;
-};
-
-class AuthenticateDeviceTest : public DeviceManagerFaTest {
-public:
-    void TearDown(const ::benchmark::State &state) override
-    {
-        DmDeviceInfo deviceInfo;
-        DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceInfo);
-        usleep(usleepTime);
-    }
-};
-
-class UnAuthenticateDeviceTest : public DeviceManagerFaTest {
-public:
-    void SetUp(const ::benchmark::State &state) override
-    {
-        DmDeviceInfo deviceInfo;
-        std::shared_ptr<AuthenticateCallback> callback = nullptr;
-        DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-            authType, deviceInfo, extraString, callback);
-        usleep(usleepTime);
     }
 };
 
@@ -159,8 +150,18 @@ class RegisterDevStateTest : public DeviceManagerFaTest {
 public:
     void TearDown(const ::benchmark::State &state) override
     {
-        DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
+        DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName);
         usleep(usleepTime);
+    }
+};
+
+class UnRegisterDevStateTest : public DeviceManagerFaTest {
+public:
+    void SetUp(const ::benchmark::State &state) override
+    {
+    }
+    void TearDown(const ::benchmark::State &state) override
+    {
     }
 };
 
@@ -169,10 +170,47 @@ BENCHMARK_F(GetTrustedDeviceListTest, GetTrustedDeviceListTestCase)(
     benchmark::State &state)
 {
     while (state.KeepRunning()) {
+        state.PauseTiming();
+        std::shared_ptr<BenchmarkDmInit> callback = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
+        state.ResumeTiming();
         std::vector<DmDeviceInfo> devList {};
-        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);
+        DmDeviceInfo deviceInfo;
+        string deviceInfoId = "12345678";
+        string deviceInfoName = "com.OHOS";
+        deviceInfo.deviceTypeId = 0; 
+        string deviceNetworkId = "com.OHOS.app";
+        strncpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceInfoId.c_str(), deviceInfoId.length());
+        strncpy_s(deviceInfo.deviceName,DM_MAX_DEVICE_NAME_LEN,deviceInfoName.c_str(),deviceInfoName.length());
+        strncpy_s(deviceInfo.networkId,DM_MAX_DEVICE_ID_LEN,deviceNetworkId.c_str(),deviceNetworkId.length());
+        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(pkgName, extra, devList);
         if (ret != DM_OK) {
             state.SkipWithError("GetTrustedDeviceListTestCase failed.");
+        }
+    }
+}
+
+// GetLocalDeviceInfo
+BENCHMARK_F(GetLocalDeviceInfoTest, GetLocalDeviceInfoTestCase)(
+    benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        state.PauseTiming();
+        std::shared_ptr<BenchmarkDmInit> callback = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
+        state.ResumeTiming();
+        std::vector<DmDeviceInfo> devList {};
+        DmDeviceInfo deviceInfo;
+        string deviceInfoId = "12345678";
+        string deviceInfoName = "com.OHOS";
+        deviceInfo.deviceTypeId = 0; 
+        string deviceNetworkId = "com.OHOS.app";
+        strncpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceInfoId.c_str(), deviceInfoId.length());
+        strncpy_s(deviceInfo.deviceName,DM_MAX_DEVICE_NAME_LEN,deviceInfoName.c_str(),deviceInfoName.length());
+        strncpy_s(deviceInfo.networkId,DM_MAX_DEVICE_ID_LEN,deviceNetworkId.c_str(),deviceNetworkId.length());
+        int32_t ret = DeviceManager::GetInstance().GetLocalDeviceInfo(pkgName, deviceInfo);
+        if (ret != DM_OK) {
+            state.SkipWithError("GetLocalDeviceInfoTestCase failed.");
         }
     }
 }
@@ -182,13 +220,27 @@ BENCHMARK_F(DeviceDiscoveryTest, StartDeviceDiscoveryTestCase)(
     benchmark::State &state)
 {
     while (state.KeepRunning()) {
+        string packageName = "com.devicemanager";
+        state.PauseTiming();
+        std::shared_ptr<BenchmarkDmInit> callback_ = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(packageName, callback_);
+        state.ResumeTiming();  
         DmSubscribeInfo subInfo;
+        subInfo.subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        subInfo.mode = DM_DISCOVER_MODE_ACTIVE;
+        subInfo.medium = DM_AUTO;
+        subInfo.freq = DM_HIGH;
+        subInfo.isSameAccount = false;
+        subInfo.isWakeRemote = false;
+        strcpy(subInfo.capability, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
+        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packageName,
         subInfo, extra, callback);
         if (ret != DM_OK) {
             state.SkipWithError("StartDeviceDiscoveryTestCase faild.");
         }
+        uint16_t subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        DeviceManager::GetInstance().StopDeviceDiscovery(packageName, subscribeId);
     }
 }
 
@@ -197,55 +249,29 @@ BENCHMARK_F(DeviceDiscoveryTest, StoptDeviceDiscoveryTestCase)(
     benchmark::State &state)
 {
     while (state.KeepRunning()) {
+        string packageName = "com.devicemanager";
         state.PauseTiming();
+        std::shared_ptr<BenchmarkDmInit> callback_ = std::make_shared<BenchmarkDmInit>();
+        DeviceManager::GetInstance().InitDeviceManager(packageName, callback_);
         DmSubscribeInfo subInfo;
+        subInfo.subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        subInfo.mode = DM_DISCOVER_MODE_ACTIVE;
+        subInfo.medium = DM_AUTO;
+        subInfo.freq = DM_HIGH;
+        subInfo.isSameAccount = false;
+        subInfo.isWakeRemote = false;
+        strcpy(subInfo.capability, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
+        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(pkgName,
         subInfo, extra, callback);
         if (ret != DM_OK) {
             state.SkipWithError("StopDeviceDiscoveryTestCase faild.");
         }
         state.ResumeTiming();
-        ret =DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
+        uint16_t subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        ret =DeviceManager::GetInstance().StopDeviceDiscovery(packageName, subscribeId);
         if (ret != DM_OK) {
             state.SkipWithError("StopDeviceDiscoveryTestCase faild.");
-        }
-    }
-}
-
-// AuthenticateDevice
-BENCHMARK_F(AuthenticateDeviceTest, AuthenticateDeviceTestCase)(
-    benchmark::State &state)
-{
-    while (state.KeepRunning()) {
-        DmDeviceInfo deviceInfo;
-        std::shared_ptr<AuthenticateCallback> callback = nullptr;
-        int32_t ret = DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-        authType, deviceInfo, extraString, callback);
-		
-        if (ret != DM_OK) {
-            state.SkipWithError("AuthenticateDeviceTestCase faild.");
-        }
-    }
-}
-
-// UnAuthenticateDevice
-BENCHMARK_F(UnAuthenticateDeviceTest, UnAuthenticateDeviceTestCase)(
-    benchmark::State &state)
-{
-    while (state.KeepRunning()) {
-        state.PauseTiming();
-        DmDeviceInfo deviceInfo;
-        std::shared_ptr<AuthenticateCallback> callback = nullptr;
-        int32_t ret = DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-        authType, deviceInfo, extraString, callback);
-        if (ret != DM_OK) {
-            state.SkipWithError("UnAuthenticateDeviceTestCase faild.");
-        }
-        state.ResumeTiming();
-        ret = DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceInfo);
-        if (ret != DM_OK) {
-            state.SkipWithError("UnAuthenticateDeviceTestCase faild.");
         }
     }
 }
@@ -275,7 +301,7 @@ BENCHMARK_F(UnRegisterDeviceManagerFaTest, UnRegisterDeviceManagerFaCallbackTest
             state.SkipWithError("AuthenticateDeviceTestCase faild.");
         }
         state.ResumeTiming();
-        ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
+        ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(packageName);
         if (ret != DM_OK) {
             state.SkipWithError("UnRegisterDeviceManagerFaCallbackTestCase faild.");
         }
@@ -287,9 +313,21 @@ BENCHMARK_F(RegisterDevStateTest, RegisterDevStateCallbackTestCase)(
     benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra);
+        int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
         if (ret != DM_OK) {
             state.SkipWithError("RegisterDevStateCallbackTestCase faild.");
+        }
+    }
+}
+
+// UnRegisterDevStateCallback
+BENCHMARK_F(UnRegisterDevStateTest, UnRegisterDevStateCallbackTestCase)(
+    benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName);
+        if (ret != DM_OK) {
+            state.SkipWithError("UnRegisterDevStateCallbackTestCase faild.");
         }
     }
 }
