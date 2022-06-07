@@ -502,7 +502,7 @@ void DmAuthManager::StartRespAuthProcess()
             [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestInputState>());
     } else {
         LOGE("do not accept");
         authResponseContext_->state = AuthState::AUTH_REQUEST_REPLY;
