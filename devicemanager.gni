@@ -19,7 +19,7 @@ utils_path = "${devicemanager_path}/utils"
 services_path = "${devicemanager_path}/services/devicemanagerservice"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
 ext_path = "${devicemanager_path}/ext"
-aainnerkits_path = "//foundation/ability/ability_runtime/interfaces/innerkits"
+aainnerkits_path = "//foundation/ability/ability_runtime/interfaces/inner_api"
 aaservices_path = "//foundation/ability/ability_runtime/services"
 
 #--------------------------softbus----------------------------------#
