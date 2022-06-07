@@ -187,8 +187,8 @@ const std::string ETH_PORT = "ETH_PORT";
 // ACE
 const int32_t ACE_X = 50;
 const int32_t ACE_Y = 300;
-const int32_t ACE_WIDTH = 600;
-const int32_t ACE_HEIGHT = 400;
+const int32_t ACE_WIDTH = 580;
+const int32_t ACE_HEIGHT = 520;
 const std::string EVENT_CONFIRM = "EVENT_CONFIRM";
 const std::string EVENT_CANCEL = "EVENT_CANCEL";
 const std::string EVENT_INIT = "EVENT_INIT";

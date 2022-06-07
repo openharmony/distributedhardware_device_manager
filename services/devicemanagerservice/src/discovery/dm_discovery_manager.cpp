@@ -23,24 +23,6 @@ namespace OHOS {
 namespace DistributedHardware {
 const std::string DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
-const int32_t SESSION_CANCEL_TIMEOUT = 0;
-
-static void TimeOut(void *data, DmTimer& timer)
-{
-    LOGI("time out %s", timer.GetTimerName().c_str());
-    if (data == nullptr || timer.GetTimerName() != DISCOVERY_TIMEOUT_TASK) {
-        LOGE("time out is not our timer");
-        return;
-    }
-
-    DmDiscoveryManager *discoveryMgr = (DmDiscoveryManager *)data;
-    if (discoveryMgr == nullptr) {
-        LOGE("discoveryMgr is nullptr");
-        return;
-    }
-
-    discoveryMgr->HandleDiscoveryTimeout();
-}
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                                        std::shared_ptr<DeviceManagerServiceListener> listener)
@@ -72,8 +54,13 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     discoveryContextMap_.emplace(pkgName, context);
     softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
                                                         std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
-    discoveryTimer_ = std::make_shared<DmTimer>(DISCOVERY_TIMEOUT_TASK);
-    discoveryTimer_->Start(DISCOVERY_TIMEOUT, TimeOut, this);
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
+    timer_->StartTimer(DISCOVERY_TIMEOUT_TASK, DISCOVERY_TIMEOUT,
+        [this] (std::string name) {
+            DmDiscoveryManager::HandleDiscoveryTimeout(name);
+        });
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
@@ -85,7 +72,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
     if (!discoveryContextMap_.empty()) {
         discoveryContextMap_.erase(pkgName);
         softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-        discoveryTimer_->Stop(SESSION_CANCEL_TIMEOUT);
+        timer_->DeleteTimer(DISCOVERY_TIMEOUT_TASK);
     }
     return softbusConnector_->StopDiscovery(subscribeId);
 }
@@ -115,10 +102,21 @@ void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t 
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
 
-void DmDiscoveryManager::HandleDiscoveryTimeout()
+void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
-    StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
+    if (discoveryQueue_.empty()) {
+        LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
+        return;
+    }
+
+    std::string pkgName = discoveryQueue_.front();
+    auto iter = discoveryContextMap_.find(pkgName);
+    if (iter == discoveryContextMap_.end()) {
+        LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+        return;
+    }
+    StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

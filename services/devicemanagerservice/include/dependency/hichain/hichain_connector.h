@@ -62,7 +62,7 @@ public:
     int32_t DeleteGroup(const int32_t userId, std::string &groupId);
     bool IsDevicesInGroup(std::string hostDevice, std::string peerDevice);
     int32_t GetRelatedGroups(std::string DeviceId, std::vector<GroupInfo> &groupList);
-    int32_t GetGroupInfo(std::string queryParams, std::vector<GroupInfo> &groupList);
+    bool GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList);
     int32_t GetGroupInfo(const int32_t userId, std::string queryParams, std::vector<GroupInfo> &groupList);
     int32_t DeleteTimeOutGroup(const char* deviceId);
 private:

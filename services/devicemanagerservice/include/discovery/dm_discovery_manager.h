@@ -41,14 +41,14 @@ public:
     void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info);
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
     void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason);
-    void HandleDiscoveryTimeout();
+    void HandleDiscoveryTimeout(std::string name);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
-    std::shared_ptr<DmTimer> discoveryTimer_;
+    std::shared_ptr<DmTimer> timer_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

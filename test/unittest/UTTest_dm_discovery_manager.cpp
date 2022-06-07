@@ -225,20 +225,6 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
     std ::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
-
-/**
- * @tc.name: HandleDiscoveryTimeout_001
- * @tc.desc: set pkgName not null and return 1(true)
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.helloworld";
-    discoveryMgr_->HandleDiscoveryTimeout();
-    int ret = discoveryMgr_->discoveryContextMap_.count(pkgName);
-    EXPECT_EQ(ret, 1);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

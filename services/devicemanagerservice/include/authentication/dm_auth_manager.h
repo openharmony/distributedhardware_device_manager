@@ -153,7 +153,7 @@ public:
     int32_t SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState);
     int32_t GetPinCode();
     std::string GenerateGroupName();
-    int32_t HandleAuthenticateTimeout();
+    void HandleAuthenticateTimeout(std::string name);
     void CancelDisplay();
     int32_t GeneratePincode();
     void ShowConfigDialog();
@@ -176,7 +176,7 @@ private:
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor_;
-    std::map<std::string, std::shared_ptr<DmTimer>> timerMap_;
+    std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
