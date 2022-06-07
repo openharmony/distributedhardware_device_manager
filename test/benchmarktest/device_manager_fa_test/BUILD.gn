@@ -41,24 +41,24 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   }
 
   deps = [
-    "${utils_path}:devicemanagerutils",
-    "${utils_path}:devicemanagerutils",
-    "//foundation/arkui/napi:ace_napi",
-    "//foundation/communication/dsoftbus/sdk:softbus_client",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//third_party/benchmark:benchmark",
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutils",
     "//base/security/deviceauth/services:deviceauth_sdk",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/communication/dsoftbus/sdk:softbus_client",
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/mbedtls:mbedtls_shared",
+    "//foundation/communication/dsoftbus/sdk:softbus_client",
+    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
-    ]
+    "//third_party/benchmark:benchmark",
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/googletest:gtest_main",
+    "//third_party/mbedtls:mbedtls_shared",
+    "//utils/native/base:utils",
+  ]
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
