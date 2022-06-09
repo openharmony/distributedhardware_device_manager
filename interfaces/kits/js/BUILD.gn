@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/distributedhardware/device_manager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ohos_shared_library("devicemanager") {
   include_dirs = [

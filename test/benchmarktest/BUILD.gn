@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//foundation/distributedhardware/device_manager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 group("benchmarktest") {
   testonly = true

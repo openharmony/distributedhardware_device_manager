@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/distributedhardware/device_manager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 module_out_path = "device_manager/component_loader_test"
 
 group("unittest") {

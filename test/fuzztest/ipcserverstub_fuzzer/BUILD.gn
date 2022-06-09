@@ -14,7 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//foundation/distributedhardware/device_manager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("IpcServerStubFuzzTest") {

@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 
-import("//foundation/distributedhardware/device_manager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
 } else {

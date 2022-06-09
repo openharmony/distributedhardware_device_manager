@@ -215,7 +215,7 @@ This FA is called **DeviceManager_UI.hap**, which is preset as a system applicat
 
 - Compilation and running
 
-  Import the **devicemanager/display** project to DevEco Studio 2.2 Beta1. Copy the **@ohos.distributedHardware.deviceManager.d.ts** file in the **display** directory to the **Sdk\js\2.2.0.1\api\common** directory for compilation, building, and debugging.
+  Import the **device_manager/display** project to DevEco Studio 2.2 Beta1. Copy the **@ohos.distributedHardware.deviceManager.d.ts** file in the **display** directory to the **Sdk\js\2.2.0.1\api\common** directory for compilation, building, and debugging.
 
 - Compilation environment: IDE 2.2 SDK6
 
