@@ -26,7 +26,7 @@ if (defined(ohos_lite)) {
       deps = []
     }
   } else {
-    lite_component("device_manager_base") {
+    lite_component("device_manager") {
       features = [
         "utils:devicemanagerutils",
         "services/devicemanagerservice:devicemanagerservice",
@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
     }
   }
 } else {
-  group("device_manager_base") {
+  group("device_manager") {
     deps = [
       "ext:ext_modules",
       "interfaces/inner_kits/native_cpp:devicemanagersdk",

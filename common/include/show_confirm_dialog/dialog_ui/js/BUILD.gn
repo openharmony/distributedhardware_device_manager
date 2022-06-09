@@ -17,6 +17,6 @@ import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
 gen_sa_dialog_js("dialog_js_files_etc") {
   project_path = "//foundation/distributedhardware/devicemanager/common/include/show_confirm_dialog/dialog_ui/js"
   dialog_name = "config_dialog_service"
-  part_name = "device_manager_base"
+  part_name = "device_manager"
   subsystem_name = "distributedhardware"
 }
