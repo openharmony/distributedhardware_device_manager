@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
-module_out_path = "device_manager_base/component_loader_test"
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+module_out_path = "device_manager/component_loader_test"
 
 group("unittest") {
   testonly = true
@@ -152,8 +152,8 @@ ohos_unittest("UTTest_softbus_connector") {
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/devicestate/dm_device_state_manager.cpp",
     "${services_path}/src/discovery/dm_discovery_manager.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/ipc_server_listener.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/parameter.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_softbus_connector.cpp",
   ]
 
@@ -353,8 +353,8 @@ ohos_unittest("UTTest_dm_device_state_manager") {
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/devicestate/dm_device_state_manager.cpp",
     "${services_path}/src/discovery/dm_discovery_manager.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/ipc_server_listener.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/parameter.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_dm_device_state_manager.cpp",
   ]
 
@@ -369,7 +369,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 
   sources = [
     "${services_path}/src/device_manager_service_listener.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "UTTest_device_manager_service_listener.cpp",
   ]
 
@@ -442,8 +442,8 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "${services_path}/src/dependency/timer/dm_timer.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/discovery/dm_discovery_manager.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/ipc_server_listener.cpp",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/parameter.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_dm_discovery_manager.cpp",
   ]
 
@@ -486,12 +486,12 @@ config("device_manager_test_common_public_config") {
     "//foundation/communication/dsoftbus/interfaces/kits/common",
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/devicemanager/ext/mini/services/devicemanagerservice/include/dispatch",
-    "//foundation/distributedhardware/devicemanager/ext/profile/include",
+    "//foundation/distributedhardware/device_manager/ext/mini/services/devicemanagerservice/include/dispatch",
+    "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
-    "//foundation/distributedhardware/devicemanager/ext/mini/common/include",
+    "//foundation/distributedhardware/device_manager/ext/mini/common/include",
     "//base/security/deviceauth/interfaces/innerkits",
     "${services_path}/include/ability",
     "${services_path}/include/config",
@@ -524,8 +524,8 @@ ohos_static_library("device_manager_test_common") {
     "${services_path}:devicemanagerservice",
     "${utils_path}:devicemanagerutils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/devicemanager/ext/profile:devicemanagerext_profile",
-    "//foundation/distributedhardware/devicemanager/interfaces/kits/js:devicemanager",
+    "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
+    "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
@@ -562,7 +562,7 @@ config("device_manager_test_common_public") {
     "${services_path}/include/discovery",
     "${services_path}/include/deviceinfo/",
     "${services_path}/include/devicestate",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock/",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/",
     "${services_path}/include/ability",
     "${services_path}/include/config",
     "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
@@ -612,7 +612,7 @@ ohos_static_library("device_manager_test") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/devicemanager/interfaces/kits/js:devicemanager",
+    "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",

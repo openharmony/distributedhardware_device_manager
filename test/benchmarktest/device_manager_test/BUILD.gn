@@ -12,9 +12,9 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-module_output_path = "device_manager_base/devicemanager"
+module_output_path = "device_manager/devicemanager"
 
 ohos_benchmarktest("DeviceManagerTest") {
   module_out_path = module_output_path
@@ -31,7 +31,7 @@ ohos_benchmarktest("DeviceManagerTest") {
     "${utils_path}:devicemanagerutils",
     "${utils_path}:devicemanagerutils",
     "//foundation/arkui/napi:ace_napi",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",

@@ -12,11 +12,11 @@
 # limitations under the License.
 
 import("//foundation/arkui/ace_engine/build/ace_gen_sa_dialog_js.gni")
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 gen_sa_dialog_js("dialog_js_files_etc") {
-  project_path = "//foundation/distributedhardware/devicemanager/ext/pin_auth/input_pin_dialog/dialog_ui/js"
+  project_path = "//foundation/distributedhardware/device_manager/ext/pin_auth/input_pin_dialog/dialog_ui/js"
   dialog_name = "input_pin_service"
-  part_name = "device_manager_base"
+  part_name = "device_manager"
   subsystem_name = "distributedhardware"
 }

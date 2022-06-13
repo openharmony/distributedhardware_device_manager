@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
 }
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
   if (ohos_kernel_type == "liteos_m") {
@@ -152,6 +152,6 @@ if (defined(ohos_lite)) {
 
     subsystem_name = "distributedhardware"
 
-    part_name = "device_manager_base"
+    part_name = "device_manager"
   }
 }

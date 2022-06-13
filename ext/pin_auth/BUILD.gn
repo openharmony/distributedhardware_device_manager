@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
 }
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
   shared_library("devicemanagerext_pin_auth") {
@@ -142,7 +142,7 @@ if (defined(ohos_lite)) {
       "${utils_path}:devicemanagerutils",
       "//base/security/deviceauth/services:deviceauth_sdk",
       "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
-      "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
+      "//foundation/distributedhardware/device_manager/services/devicemanagerservice:devicemanagerservice",
       "//utils/native/base:utils",
     ]
 
@@ -169,6 +169,6 @@ if (defined(ohos_lite)) {
 
     subsystem_name = "distributedhardware"
 
-    part_name = "device_manager_base"
+    part_name = "device_manager"
   }
 }

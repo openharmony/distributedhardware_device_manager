@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 innerkits_path_mini = "${devicemanager_path}/interfaces/inner_kits"
 kits_path = "${devicemanager_path}/interfaces/kits"
 

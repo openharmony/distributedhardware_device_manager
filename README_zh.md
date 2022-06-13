@@ -11,7 +11,7 @@ DeviceManager组件在OpenHarmony上提供账号无关的分布式设备的认�
 ## 目录
 
 ```
-foundation/distributedhardware/devicemanager
+foundation/distributedhardware/device_manager
 ├── common                        #公共能力头文件存放目录
 │   └── include
 │       └── ipc

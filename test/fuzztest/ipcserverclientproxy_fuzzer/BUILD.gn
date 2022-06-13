@@ -14,16 +14,16 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("IpcServerClientProxyFuzzTest") {
-  module_out_path = "device_manager_base/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/devicemanager/test/fuzztest/ipcserverclientproxy_fuzzer"
+  module_out_path = "device_manager/devicemanager"
+  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/ipcserverclientproxy_fuzzer"
 
   include_dirs = [
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
-    "//foundation/distributedhardware/devicemanager/interfaces/kits/js/include",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    "//foundation/distributedhardware/device_manager/interfaces/kits/js/include",
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
@@ -54,12 +54,12 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/kits/common",
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//foundation/distributedhardware/devicemanager/test/unittest/mock",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/devicemanager/ext/mini/services/devicemanagerservice/include/dispatch",
-    "//foundation/distributedhardware/devicemanager/ext/profile/include",
+    "//foundation/distributedhardware/device_manager/ext/mini/services/devicemanagerservice/include/dispatch",
+    "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
-    "//foundation/distributedhardware/devicemanager/ext/mini/common/include",
+    "//foundation/distributedhardware/device_manager/ext/mini/common/include",
     "//base/security/deviceauth/interfaces/innerkits",
     "${services_path}/include/ability",
     "${services_path}/include/config",
@@ -93,8 +93,8 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "${utils_path}:devicemanagerutils",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     "//base/security/deviceauth/services:deviceauth_sdk",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/devicemanager/services/devicemanagerservice:devicemanagerservice",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "//foundation/distributedhardware/device_manager/services/devicemanagerservice:devicemanagerservice",
   ]
 
   defines = [
@@ -124,7 +124,7 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/devicemanager/interfaces/kits/js:devicemanager",
+    "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",

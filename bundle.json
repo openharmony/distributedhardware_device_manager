@@ -1,20 +1,20 @@
 {
-    "name": "@ohos/device_manager_base",
+    "name": "@ohos/device_manager",
     "description": "device manager service",
     "version": "3.1",
     "license": "Apache License 2.0",
     "repository": "https://gitee.com/openharmony/device_manager",
     "publishAs": "code-segment",
     "segment": {
-        "destPath": "foundation/distributedhardware/devicemanager"
+        "destPath": "foundation/distributedhardware/device_manager"
     },
     "dirs": {},
     "scripts": {},
     "component": {
-        "name": "device_manager_base",
+        "name": "device_manager",
         "subsystem": "distributedhardware",
         "syscap":[ "SystemCapability.DistributedHardware.DeviceManager" ],
-        "features":["device_manager_base_no_interaction_auth"],
+        "features":["device_manager_no_interaction_auth"],
         "adapted_system_type": [ "standard", "small" ],
         "rom": "2M",
         "ram": "16M",
@@ -42,12 +42,12 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributedhardware/devicemanager:device_manager_base"
+                "//foundation/distributedhardware/device_manager:device_manager"
             ],
             "inner_kits": [
                 {
                 "type": "so",
-                "name": "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+                "name": "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
                 "header": {
                     "header_files": [
                         "device_manager.h",
@@ -55,12 +55,12 @@
                         "dm_device_info.h",
                         "dm_subscribe_info.h"
                     ],
-                    "header_base": "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include"
+                    "header_base": "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include"
                 }
                 }
             ],
             "test": [
-                "//foundation/distributedhardware/devicemanager:device_manager_test"
+                "//foundation/distributedhardware/device_manager:device_manager_test"
             ]
         }
     }

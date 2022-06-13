@@ -12,13 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/distributedhardware/devicemanager/devicemanager.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 group("ext_modules") {
   deps = []
   if (support_jsapi) {
     deps += [ "./profile:devicemanagerext_profile" ]
-    if (device_manager_base_no_interaction_auth) {
+    if (device_manager_no_interaction_auth) {
       deps += [ "./no_interaction_auth:devicemanagerext_no_interaction_auth" ]
     } else {
       deps += [ "./pin_auth:devicemanagerext_pin_auth" ]
