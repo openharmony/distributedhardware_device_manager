@@ -297,10 +297,10 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
-        #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_FAILED,
             OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm add member to group failed.");
-        #endif
+#endif
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
         }
