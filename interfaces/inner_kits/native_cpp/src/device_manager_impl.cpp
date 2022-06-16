@@ -69,9 +69,6 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     }
     if (ret != DM_OK) {
         LOGE("InitDeviceManager error: proxy init failed ret: %d", ret);
-        #if defined(__LITEOS_M__)
-                DmMutex mutexLock;
-        #else
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_INIT_DEVICE_MANAGER_FAILED,
             OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, "init devicemanager failed.");
         return ERR_DM_INIT_FAILED;
