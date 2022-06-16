@@ -35,6 +35,7 @@
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
+#include "dm_hisysevent.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -68,11 +69,15 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     }
     if (ret != DM_OK) {
         LOGE("InitDeviceManager error: proxy init failed ret: %d", ret);
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_INIT_DEVICE_MANAGER_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, "init devicemanager failed.");
         return ERR_DM_INIT_FAILED;
     }
 
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     LOGI("InitDeviceManager success");
+    DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_INIT_DEVICE_MANAGER_SUCCESS,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "init devicemanager success.");
     return DM_OK;
 }
 
@@ -140,11 +145,15 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGI("GetLocalDeviceInfo error: failed ret: %d", ret);
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(GET_LOCAL_DEVICE_INFO_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "get local device info failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
 
     info = rsp->GetLocalDeviceInfo();
     LOGI("GetLocalDeviceInfo completed,pkgname%s", req->GetPkgName().c_str());
+    DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(GET_LOCAL_DEVICE_INFO_SUCCESS,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "get local device info success.");
     return DM_OK;
 }
 
@@ -206,10 +215,14 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("StartDeviceDiscovery error: Failed with ret %d", ret);
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(START_DEVICE_DISCOVERY_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "device manager discovery failed.");
         return ret;
     }
 
     LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(START_DEVICE_DISCOVERY_SUCCESS,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "device manager discovery success.");
     return DM_OK;
 }
 
@@ -264,8 +277,12 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     int32_t ret = ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("AuthenticateDevice error: Send Request failed ret: %d", ret);
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_SEND_REQUEST_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "send request failed.");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
+    DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_SEND_REQUEST_SUCCESS,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "send request success.");
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -297,8 +314,12 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Failed with ret %d", ret);
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(UNAUTHENTICATE_DEVICE_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "unauthenticate device failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
+    DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(UNAUTHENTICATE_DEVICE_SUCCESS,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "unauthenticate device success.");
 
     LOGI("UnAuthenticateDevice completed, pkgName: %s", pkgName.c_str());
     return DM_OK;

@@ -35,6 +35,7 @@ if (defined(ohos_lite)) {
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
       ]
@@ -42,6 +43,7 @@ if (defined(ohos_lite)) {
       sources = [
         "${utils_path}/src/dm_anonymous.cpp",
         "${utils_path}/src/dm_error_message.cpp",
+        "${utils_path}/src/dm_hisysevent.cpp",
         "${utils_path}/src/dm_log.cpp",
         "${utils_path}/src/dm_random.cpp",
         "${utils_path}/src/permission/lite/permission_manager.cpp",
@@ -55,6 +57,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
         "//foundation/distributedschedule/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
@@ -81,6 +84,7 @@ if (defined(ohos_lite)) {
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
@@ -93,6 +97,7 @@ if (defined(ohos_lite)) {
       sources = [
         "src/dm_anonymous.cpp",
         "src/dm_error_message.cpp",
+        "src/dm_hisysevent.cpp",
         "src/dm_log.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
@@ -135,6 +140,7 @@ if (defined(ohos_lite)) {
       "src/dm_anonymous.cpp",
       "src/dm_error_message.cpp",
       "src/dm_hash.cpp",
+      "src/dm_hisysevent.cpp",
       "src/dm_log.cpp",
       "src/dm_random.cpp",
       "src/ipc/standard/ipc_cmd_register.cpp",
@@ -158,6 +164,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
+      "hisysevent_native:libhisysevent",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",

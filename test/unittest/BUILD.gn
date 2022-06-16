@@ -283,6 +283,7 @@ ohos_unittest("UTTest_profile_connector") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
   ]
 }
 
@@ -300,6 +301,7 @@ ohos_unittest("UTTest_device_profile_adapter") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
   ]
 }
 
@@ -640,6 +642,7 @@ ohos_static_library("device_manager_test") {
     "common_event_service:cesfwk_innerkits",
     "dsoftbus_standard:softbus_client",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

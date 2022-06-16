@@ -33,6 +33,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//utils/native/lite/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
         "//third_party/json/include",
@@ -75,6 +76,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//utils/native/lite/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
@@ -143,6 +145,7 @@ if (defined(ohos_lite)) {
     deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
+      "hisysevent_native:libhisysevent",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "samgr_standard:samgr_proxy",

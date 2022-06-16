@@ -16,6 +16,7 @@
 
 #include "dm_log.h"
 #include "dm_constants.h"
+#include "dm_hisysevent.h"
 #include "dm_adapter_manager.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_auth_result_req.h"

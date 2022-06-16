@@ -17,7 +17,6 @@
 
 #include <functional>
 
-
 #include "device_manager_service_listener.h"
 #include "dm_constants.h"
 #include "dm_device_info_manager.h"

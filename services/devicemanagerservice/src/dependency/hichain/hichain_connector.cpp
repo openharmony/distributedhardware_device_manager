@@ -14,6 +14,7 @@
  */
 
 #include "hichain_connector.h"
+#include "dm_hisysevent.h"
 
 #include <securec.h>
 
@@ -261,12 +262,16 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_SUCCESS,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm add member to group success.");
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_SUCCESS,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm create group success.");
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
             hiChainConnectorCallback_->OnGroupCreated(requestId, data);
@@ -286,12 +291,16 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm add member to group failed.");
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
+        DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_FAILED,
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm create group failed.");
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnGroupCreated(requestId, "{}");
         }
