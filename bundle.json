@@ -28,7 +28,7 @@
                 "device_profile_core",
                 "samgr_standard",
                 "common_event_service",
-                "dsoftbus_standard",
+                "dsoftbus",
                 "utils_base",
                 "napi",
                 "deviceauth_standard"
