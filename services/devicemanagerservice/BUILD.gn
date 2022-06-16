@@ -45,7 +45,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "//base/security/deviceauth/interfaces/innerkits",
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/json/include",
         "${utils_path}/include",
         "${utils_path}/include/permission/lite",
@@ -56,7 +55,6 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs += [
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//base/security/deviceauth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
@@ -112,7 +110,6 @@ if (defined(ohos_lite)) {
         defines += [ "OS_ACCOUNT_PART_EXISTS" ]
         include_dirs += [
           "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
-          "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         ]
       }
 
@@ -164,7 +161,6 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include/ipc/lite",
       ]
       include_dirs += [
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//base/security/deviceauth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
@@ -263,7 +259,6 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/fwkload/standard",
       "${utils_path}/include/permission/standard",
       "//base/security/deviceauth/interfaces/innerkits",
-      "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
       "//third_party/json/include",
     ]
 

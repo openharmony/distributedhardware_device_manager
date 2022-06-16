@@ -14,7 +14,9 @@
  */
 
 #include "hichain_connector.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_hisysevent.h"
+#endif
 
 #include <securec.h>
 
@@ -262,16 +264,20 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
+        #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_SUCCESS,
             OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm add member to group success.");
+        #endif
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
+        #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_SUCCESS,
             OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm create group success.");
+        #endif
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
             hiChainConnectorCallback_->OnGroupCreated(requestId, data);
@@ -291,16 +297,20 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
+        #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_FAILED,
             OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm add member to group failed.");
+        #endif
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
+        #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         DistributedDM::HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_FAILED,
             OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "dm create group failed.");
+        #endif
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnGroupCreated(requestId, "{}");
         }

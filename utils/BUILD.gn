@@ -35,7 +35,6 @@ if (defined(ohos_lite)) {
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
       ]
@@ -57,7 +56,6 @@ if (defined(ohos_lite)) {
 
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
         "//foundation/distributedschedule/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
@@ -84,7 +82,6 @@ if (defined(ohos_lite)) {
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
         "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
