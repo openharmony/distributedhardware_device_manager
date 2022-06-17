@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
       ]
 
       defines = [
-        "LITE_DEVICE",
+        "__LITEOS_M__",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerutils\"",
         "LOG_DOMAIN=0xD004100",
