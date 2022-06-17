@@ -49,6 +49,7 @@ if (defined(ohos_lite)) {
       ]
 
       defines = [
+        "LITE_DEVICE",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerutils\"",
         "LOG_DOMAIN=0xD004100",
@@ -102,6 +103,7 @@ if (defined(ohos_lite)) {
         "src/permission/lite/permission_manager.cpp",
       ]
       defines = [
+        "LITE_DEVICE",
         "hI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerutils\"",
         "lOG_DOMAIN=0xD004100",
@@ -152,7 +154,6 @@ if (defined(ohos_lite)) {
     public_configs = [ ":devicemanagerutils_config" ]
 
     defines = [
-      "LITE_DEVICE",
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
       "LOG_DOMAIN=0xD004100",
