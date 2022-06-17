@@ -45,6 +45,7 @@ namespace DistributedDM {
 #define UNAUTHENTICATE_DEVICE_SUCCESS "UNAUTHENTICATE_DEVICE_SUCCESS"
 #define UNAUTHENTICATE_DEVICE_FAILED "UNAUTHENTICATE_DEVICE_FAILED"
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 class HisyseventUtil {
 DECLARE_SINGLE_INSTANCE_BASE(HisyseventUtil);
 public:
@@ -57,6 +58,7 @@ private:
     HisyseventUtil() = default;
     ~HisyseventUtil() = default;
 };
+#endif
 }  // namespace DistributedDM
 }  // namespace DistributedHardware
 }  // namespace OHOS

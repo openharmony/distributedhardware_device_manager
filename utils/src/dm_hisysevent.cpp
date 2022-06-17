@@ -20,6 +20,7 @@ namespace DistributedHardware {
 namespace DistributedDM {
 IMPLEMENT_SINGLE_INSTANCE(HisyseventUtil);
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
     std::string msg)
 {
@@ -67,6 +68,7 @@ void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEve
         LOGE("Write HiSysEvent error, res:%d", res);
     }
 }
+#endif
 } // namespace DistributedDM
 } // namespace DistributedHardware
 } // namespace OHOS
