@@ -24,9 +24,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_hisysevent.h"
-#endif
 #include "dm_log.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_device_state_req.h"

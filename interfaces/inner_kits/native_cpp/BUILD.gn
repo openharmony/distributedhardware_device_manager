@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/notify",
         "${utils_path}/include",
+        "${utils_path}/include/hisysevent/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
@@ -70,6 +71,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "${utils_path}/include",
+        "${utils_path}/include/hisysevent/lite",
         "${utils_path}/include/ipc/lite",
       ]
       include_dirs += [
@@ -117,6 +119,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
+      "${utils_path}/include/ipc/standard",
     ]
   }
 

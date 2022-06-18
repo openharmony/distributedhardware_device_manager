@@ -16,21 +16,17 @@
 #ifndef OHOS_DISTRIBUTED_DM_HISYSEVENT_H
 #define OHOS_DISTRIBUTED_DM_HISYSEVENT_H
 
-#include <cstring>
-#include <unistd.h>
-
 #include "single_instance.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "hisysevent.h"
-#endif
 #include "dm_log.h"
 #include "dm_constants.h"
 #include "dm_anonymous.h"
+#include "hisysevent.h"
+
+#include <cstring>
+#include <unistd.h>
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace DistributedDM {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #define DM_INIT_DEVICE_MANAGER_SUCCESS "DM_INIT_DEVICE_MANAGER_SUCCESS"
 #define DM_INIT_DEVICE_MANAGER_FAILED "DM_INIT_DEVICE_MANAGER_FAILED"
 #define START_DEVICE_DISCOVERY_SUCCESS "START_DEVICE_DISCOVERY_SUCCESS"
@@ -46,20 +42,16 @@ namespace DistributedDM {
 #define UNAUTHENTICATE_DEVICE_SUCCESS "UNAUTHENTICATE_DEVICE_SUCCESS"
 #define UNAUTHENTICATE_DEVICE_FAILED "UNAUTHENTICATE_DEVICE_FAILED"
 
+#define DM_SYSEVENTT_FAULT OHOS::HiviewDFX::HiSysEvent::EventType::FAULT
+#define DM_SYSEVENTT_BEHAVIOR OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR
+
 class HisyseventUtil {
-DECLARE_SINGLE_INSTANCE_BASE(HisyseventUtil);
+    DECLARE_SINGLE_INSTANCE(HisyseventUtil);
+
 public:
     void SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType, std::string msg);
-    void SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
-        std::string devId, std::string msg);
-    void SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
-        std::string devId, std::string dhId, std::string msg);
-private:
-    HisyseventUtil() = default;
-    ~HisyseventUtil() = default;
+
 };
-#endif
-}  // namespace DistributedDM
-}  // namespace DistributedHardware
-}  // namespace OHOS
-#endif  // OHOS_DISTRIBUTED_DM_HISYSEVENT_H
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

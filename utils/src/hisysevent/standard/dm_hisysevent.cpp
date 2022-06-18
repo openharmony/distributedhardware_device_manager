@@ -17,8 +17,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace DistributedDM {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 IMPLEMENT_SINGLE_INSTANCE(HisyseventUtil);
 
 void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
@@ -35,40 +33,5 @@ void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEve
         LOGE("Write HiSysEvent error, res:%d", res);
     }
 }
-
-void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
-    std::string devId, std::string msg)
-{
-    int32_t res = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-        status,
-        eventType,
-        "DEVID", GetAnonyString(devId),
-        "PID", getpid(),
-        "UID", getuid(),
-        "MSG", msg);
-    if (res != DM_OK) {
-        LOGE("Write HiSysEvent error, res:%d", res);
-    }
-}
-
-void HisyseventUtil::SysEventWrite(std::string status, OHOS::HiviewDFX::HiSysEvent::EventType eventType,
-    std::string devId, std::string dhId, std::string msg)
-{
-    int32_t res = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-        status,
-        eventType,
-        "DEVID", GetAnonyString(devId),
-        "DHID", GetAnonyString(dhId),
-        "PID", getpid(),
-        "UID", getuid(),
-        "MSG", msg);
-    if (res != DM_OK) {
-        LOGE("Write HiSysEvent error, res:%d", res);
-    }
-}
-#endif
-} // namespace DistributedDM
 } // namespace DistributedHardware
 } // namespace OHOS
