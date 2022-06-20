@@ -48,7 +48,7 @@ uint32_t DmDistributedHardwareLoad::GetDistributedHardwareLoadCount()
 void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
-    LOGI("DmDistributedHhardware Load SA success, systemAbilityId:%d, remoteObject result:%s",
+    LOGI("DmDistributedHardware Load SA success, systemAbilityId:%d, remoteObject result:%s",
         systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (remoteObject == nullptr) {
         LOGE("remoteObject is nullptr");
@@ -58,9 +58,9 @@ void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
 }
 void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    LOGE("DmDistributedHhardware Load SA failed, systemAbilityId:%d", systemAbilityId);
+    LOGE("DmDistributedHardware Load SA failed, systemAbilityId:%d", systemAbilityId);
     
-    if (DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount() < MAX_LOAD_VAVLUE) {
+    if (DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount() < MAX_LOAD_VALUE) {
         DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     } else {
         DmDistributedHardwareLoad::GetInstance().InitDistributedHardwareLoadCount();
