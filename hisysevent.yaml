@@ -41,84 +41,84 @@ domain: DISTDM
 
 DM_INIT_DEVICE_MANAGER_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm init devicemanager success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm init devicemanager success}
 
 DM_INIT_DEVICE_MANAGER_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm init devicemanager failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm init devicemanager failed}
 
 START_DEVICE_DISCOVERY_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: device manager discovery success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: device manager discovery success}
 
 START_DEVICE_DISCOVERY_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: device manager discovery failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: device manager discovery failed}
 
 GET_LOCAL_DEVICE_INFO_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm get local device info success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm get local device info success}
 
 GET_LOCAL_DEVICE_INFO_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm get local device info failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm get local device info failed}
 
 DM_SEND_REQUEST_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm send request success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm send request success}
 
 DM_SEND_REQUEST_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm send request failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm send request failed}
 
 ADD_HICHAIN_GROUP_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm add member to group success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm add member to group success}
 
 ADD_HICHAIN_GROUP_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm add member to group failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm add member to group failed}
 
 DM_CREATE_GROUP_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm create group success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm create group success}
 
 DM_CREATE_GROUP_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dm create group failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: dm create group failed}
 
 UNAUTHENTICATE_DEVICE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: unauthenticate device success}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: unauthenticate device success}
 
 UNAUTHENTICATE_DEVICE_FAILED:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: unauthenticate device failed}
-  PID: {type: INT32, desc: dhdevevicemanager pid}
-  UID: {type: INT32, desc: dhdevevicemanager uid}
+  PID: {type: INT32, desc: devevicemanager pid}
+  UID: {type: INT32, desc: devevicemanager uid}
   MSG: {type: STRING, desc: unauthenticate device failed}

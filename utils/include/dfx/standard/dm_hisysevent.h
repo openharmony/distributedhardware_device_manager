@@ -32,7 +32,7 @@ class HisyseventUtil {
     DECLARE_SINGLE_INSTANCE(HisyseventUtil);
 
 public:
-    void SysEventWrite(std::string &status, DM_HISYEVENT_EventType eventType, std::string &msg);
+    void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

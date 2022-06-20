@@ -121,7 +121,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${utils_path}/include/ipc/standard",
       "${utils_path}/include/dfx",
       "${utils_path}/include/dfx/standard",
     ]

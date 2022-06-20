@@ -363,8 +363,6 @@ ohos_unittest("UTTest_dm_device_state_manager") {
   ]
 
   deps = [ ":device_manager_test" ]
-
-  external_deps = [ "hisysevent_native:libhisysevent" ]
 }
 
 ## UnitTest UTTest_dm_device_state_manager }}}
@@ -646,7 +644,6 @@ ohos_static_library("device_manager_test") {
     "common_event_service:cesfwk_innerkits",
     "dsoftbus_standard:softbus_client",
     "eventhandler:libeventhandler",
-    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
