@@ -128,7 +128,7 @@ int32_t SoftbusConnector::Init()
     ret = GetParameter(DISCOVER_STATUS_KEY.c_str(), "not exist", discoverStatus, DISCOVER_STATUS_LEN);
     if (strcmp(discoverStatus, "not exist") == 0) {
         ret = SetParameter(DISCOVER_STATUS_KEY.c_str(), DISCOVER_STATUS_ON.c_str());
-        LOGI("service set poatrameter result is : %d", ret);
+        LOGI("service set parameter result is : %d", ret);
 
         ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {

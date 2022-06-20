@@ -238,7 +238,7 @@ BENCHMARK_F(DeviceDiscoveryTest, StartDeviceDiscoveryTestCase)(
         int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packageName,
         subInfo, extra, callback);
         if (ret != DM_OK) {
-            state.SkipWithError("StartDeviceDiscoveryTestCase faild.");
+            state.SkipWithError("StartDeviceDiscoveryTestCase failed.");
         }
         uint16_t subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         DeviceManager::GetInstance().StopDeviceDiscovery(packageName, subscribeId);
@@ -266,13 +266,13 @@ BENCHMARK_F(DeviceDiscoveryTest, StoptDeviceDiscoveryTestCase)(
         int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(pkgName,
         subInfo, extra, callback);
         if (ret != DM_OK) {
-            state.SkipWithError("StopDeviceDiscoveryTestCase faild.");
+            state.SkipWithError("StopDeviceDiscoveryTestCase failed.");
         }
         state.ResumeTiming();
         uint16_t subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         ret =DeviceManager::GetInstance().StopDeviceDiscovery(packageName, subscribeId);
         if (ret != DM_OK) {
-            state.SkipWithError("StopDeviceDiscoveryTestCase faild.");
+            state.SkipWithError("StopDeviceDiscoveryTestCase failed.");
         }
     }
 }
@@ -285,7 +285,7 @@ BENCHMARK_F(RegisterDeviceManagerFaTest, RegisterDeviceManagerFaCallbackTestCase
         std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
         int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
         if (ret != DM_OK) {
-            state.SkipWithError("AuthenticateDeviceTestCase faild.");
+            state.SkipWithError("AuthenticateDeviceTestCase failed.");
         }
     }
 }
@@ -299,12 +299,12 @@ BENCHMARK_F(UnRegisterDeviceManagerFaTest, UnRegisterDeviceManagerFaCallbackTest
         std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
         int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
         if (ret != DM_OK) {
-            state.SkipWithError("AuthenticateDeviceTestCase faild.");
+            state.SkipWithError("AuthenticateDeviceTestCase failed.");
         }
         state.ResumeTiming();
         ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(packageName);
         if (ret != DM_OK) {
-            state.SkipWithError("UnRegisterDeviceManagerFaCallbackTestCase faild.");
+            state.SkipWithError("UnRegisterDeviceManagerFaCallbackTestCase failed.");
         }
     }
 }
@@ -316,7 +316,7 @@ BENCHMARK_F(RegisterDevStateTest, RegisterDevStateCallbackTestCase)(
     while (state.KeepRunning()) {
         int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
         if (ret != DM_OK) {
-            state.SkipWithError("RegisterDevStateCallbackTestCase faild.");
+            state.SkipWithError("RegisterDevStateCallbackTestCase failed.");
         }
     }
 }
@@ -328,7 +328,7 @@ BENCHMARK_F(UnRegisterDevStateTest, UnRegisterDevStateCallbackTestCase)(
     while (state.KeepRunning()) {
         int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName);
         if (ret != DM_OK) {
-            state.SkipWithError("UnRegisterDevStateCallbackTestCase faild.");
+            state.SkipWithError("UnRegisterDevStateCallbackTestCase failed.");
         }
     }
 }

@@ -78,7 +78,7 @@ BENCHMARK_F(DeviceManagerTest, GetFaParamTestCase)(benchmark::State &state)
         DmAuthParam authParam;
         int32_t ret = DeviceManager::GetInstance().GetFaParam(pkgName, authParam);
         if (ret != DM_OK) {
-            state.SkipWithError("GetFaParamTestCase. faild");
+            state.SkipWithError("GetFaParamTestCase. failed");
         }
     }
 }
