@@ -18,6 +18,7 @@
 
 #include "single_instance.h"
 #include "dm_constants.h"
+#include "dm_dfx_constants.h"
 
 #include <cstring>
 #include <unistd.h>
@@ -28,7 +29,7 @@ class HisyseventUtil {
     DECLARE_SINGLE_INSTANCE(HisyseventUtil);
 
 public:
-    void SysEventWrite(void);
+    void SysEventWrite(std::string status, DM_HISYEVENT_EventType dmeventType, std::string msg);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -24,6 +24,7 @@ if (defined(ohos_lite)) {
     static_library("devicemanagerutils_mini") {
       include_dirs = [
         "${utils_path}/include",
+        "${utils_path}/include/dfx",
         "${utils_path}/include/dfx/lite",
         "${utils_path}/include/permission/lite",
         "${common_path}/include",
@@ -73,6 +74,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "include",
+        "include/dfx",
         "include/dfx/lite",
         "include/fwkload/lite",
         "include/ipc/lite",
@@ -127,6 +129,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "include/fwkload/standard",
+      "include/dfx",
       "include/dfx/standard",
       "include/ipc/standard",
       "${common_path}/include",

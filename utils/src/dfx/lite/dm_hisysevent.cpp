@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(HisyseventUtil);
-void HisyseventUtil::SysEventWrite(void)
+void HisyseventUtil::SysEventWrite(std::string status, DM_HISYEVENT_EventType dmeventType, std::string msg)
 {
     return;
 }
