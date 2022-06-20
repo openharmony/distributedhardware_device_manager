@@ -28,9 +28,7 @@ class HisyseventUtil {
     DECLARE_SINGLE_INSTANCE(HisyseventUtil);
 
 public:
-    void SysEventWrite(std::string status, DM_HISYEVENT_EventType dmeventType, std::string msg);
-{
-};
+    void SysEventWrite(void);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

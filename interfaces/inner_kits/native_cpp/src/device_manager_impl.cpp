@@ -69,7 +69,7 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     }
     if (ret != DM_OK) {
         LOGE("InitDeviceManager error: proxy init failed ret: %d", ret);
-        HisyseventUtil::GetInstance().SysEventWrite(DM_INIT_DEVICE_MANAGER_FAILED, DM_HISYEVENT_FAULT, 
+        HisyseventUtil::GetInstance().SysEventWrite(DM_INIT_DEVICE_MANAGER_FAILED, DM_HISYEVENT_FAULT,
                                                     DM_INIT_DEVICE_MANAGER_FAILED_MSG);
         return ERR_DM_INIT_FAILED;
     }
