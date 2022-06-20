@@ -60,7 +60,7 @@ ohos_fuzztest("IpcServerListenerFuzzTest") {
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
-    "//base/security/deviceauth/interfaces/innerkits",
+    "//base/security/device_auth/interfaces/innerkits",
     "${services_path}/include/ability",
     "${services_path}/include/config",
     "//utils/native/lite/include",
@@ -91,7 +91,7 @@ ohos_fuzztest("IpcServerListenerFuzzTest") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
-    "//base/security/deviceauth/services:deviceauth_sdk",
+    "//base/security/device_auth/services:deviceauth_sdk",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//foundation/distributedhardware/device_manager/services/devicemanagerservice:devicemanagerservice",
   ]

@@ -54,7 +54,7 @@ if (defined(ohos_lite)) {
       "//utils/system/safwk/native/include",
       "//base/notification/common_event_service/frameworks/core/include",
       "//base/notification/common_event_service/interfaces/innerkits/native/include",
-      "//base/security/deviceauth/interfaces/innerkits",
+      "//base/security/device_auth/interfaces/innerkits",
       "//base/startup/syspara_lite/interfaces/kits",
       "//base/startup/syspara_lite/adapter/native/syspara/include",
     ]
@@ -69,7 +69,7 @@ if (defined(ohos_lite)) {
       "${aaservices_path}/abilitymgr:abilityms",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
-      "//base/security/deviceauth/services:deviceauth_sdk",
+      "//base/security/device_auth/services:deviceauth_sdk",
       "//foundation/distributedhardware/device_manager/services/devicemanagerservice:devicemanagerservice",
       "//utils/native/base:utils",
     ]

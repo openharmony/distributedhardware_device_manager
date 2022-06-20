@@ -492,7 +492,7 @@ config("device_manager_test_common_public_config") {
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
-    "//base/security/deviceauth/interfaces/innerkits",
+    "//base/security/device_auth/interfaces/innerkits",
     "${services_path}/include/ability",
     "${services_path}/include/config",
   ]
@@ -570,7 +570,7 @@ config("device_manager_test_common_public") {
     "//foundation/communication/dsoftbus/interfaces/kits/common",
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//base/security/deviceauth/interfaces/innerkits",
+    "//base/security/device_auth/interfaces/innerkits",
     "//foundation/distributedschedule/safwk/services/safwk",
   ]
 
@@ -624,7 +624,7 @@ ohos_static_library("device_manager_test") {
     "${aaservices_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
-    "//base/security/deviceauth/services:deviceauth_sdk",
+    "//base/security/device_auth/services:deviceauth_sdk",
   ]
 
   if (os_account_part_exists) {

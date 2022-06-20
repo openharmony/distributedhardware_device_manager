@@ -29,7 +29,7 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs += [
-        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
@@ -75,7 +75,7 @@ if (defined(ohos_lite)) {
         "include/permission/lite",
       ]
       include_dirs += [
-        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",

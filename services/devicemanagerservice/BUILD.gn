@@ -44,7 +44,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
-        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/innerkits",
         "//third_party/json/include",
         "${utils_path}/include",
         "${utils_path}/include/permission/lite",
@@ -55,7 +55,7 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs += [
-        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
@@ -117,7 +117,7 @@ if (defined(ohos_lite)) {
         "${devicemanager_path}/interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
         "${utils_path}:devicemanagerutils_mini",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//base/security/deviceauth/services:deviceauth",
+        "//base/security/device_auth/services:deviceauth",
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/distributedschedule/samgr_lite/samgr",
@@ -157,7 +157,7 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include/ipc/lite",
       ]
       include_dirs += [
-        "//base/security/deviceauth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
@@ -213,7 +213,7 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp:devicemanagersdk",
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//base/security/deviceauth/services:deviceauth_sdk",
+        "//base/security/device_auth/services:deviceauth_sdk",
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
@@ -254,7 +254,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include",
       "${utils_path}/include/fwkload/standard",
       "${utils_path}/include/permission/standard",
-      "//base/security/deviceauth/interfaces/innerkits",
+      "//base/security/device_auth/interfaces/innerkits",
       "//third_party/json/include",
     ]
 
@@ -303,7 +303,7 @@ if (defined(ohos_lite)) {
       "${aaservices_path}/abilitymgr:abilityms",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
-      "//base/security/deviceauth/services:deviceauth_sdk",
+      "//base/security/device_auth/services:deviceauth_sdk",
     ]
 
     if (os_account_part_exists) {

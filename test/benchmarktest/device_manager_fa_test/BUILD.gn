@@ -42,7 +42,7 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
-    "//base/security/deviceauth/services:deviceauth_sdk",
+    "//base/security/device_auth/services:deviceauth_sdk",
     "//foundation/arkui/napi:ace_napi",
     "//foundation/communication/dsoftbus/sdk:softbus_client",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
