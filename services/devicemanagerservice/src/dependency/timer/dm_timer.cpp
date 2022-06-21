@@ -79,11 +79,9 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     for (auto iter : timerMap_) {
         if (iter.second->timerName_ == timerName) {
             iter.second->state_ = false;
-            return DM_OK;
         }
     }
-    LOGE("DmTimer DeleteTimer no have this timer");
-    return ERR_DM_INPUT_PARAMETER_EMPTY;
+    return DM_OK;
 }
 
 int32_t DmTimer::DeleteAll()
