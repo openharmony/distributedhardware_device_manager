@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-// HisysEvent Type 
+// HisysEvent Type
 const int DM_HISYEVENT_FAULT = 1;
 const int DM_HISYEVENT_STATISTIC = 2;
 const int DM_HISYEVENT_SECURITY  = 3;
