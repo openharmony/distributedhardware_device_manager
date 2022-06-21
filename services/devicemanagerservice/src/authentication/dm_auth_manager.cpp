@@ -390,14 +390,16 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
         authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
         authRequestContext_->reason = ERR_DM_AUTH_OPEN_SESSION_FAILED;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        if (authRequestState_ != nullptr) {
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        }
     }
     return DM_OK;
 }
 
 void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::StartNegotiate session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->localDeviceId = localDeviceId;
@@ -415,12 +417,12 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::RespNegotiate session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (!ret) {
-        LOGE("DmAuthManager::EstablishAuthChannel device is in group");
+        LOGE("DmAuthManager::RespNegotiate device is in group");
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
@@ -459,7 +461,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::EstablishAuthChannel session id");
+    LOGI("DmAuthManager::SendAuthRequest session id");
     timer_->DeleteTimer(NEGOTIATE_TIMEOUT_TASK);
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
