@@ -16,7 +16,6 @@
 #ifndef OHOS_DISTRIBUTED_DM_HISYSEVENT_H
 #define OHOS_DISTRIBUTED_DM_HISYSEVENT_H
 
-#include "single_instance.h"
 #include "dm_constants.h"
 #include "dm_dfx_constants.h"
 
@@ -25,12 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class HisyseventUtil {
-    DECLARE_SINGLE_INSTANCE(HisyseventUtil);
-
-public:
-    void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg);
-};
+void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

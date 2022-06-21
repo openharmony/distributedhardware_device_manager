@@ -262,16 +262,14 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
-        HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR,
-                                                    ADD_HICHAIN_GROUP_SUCCESS_MSG);
+        SysEventWrite(ADD_HICHAIN_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR, ADD_HICHAIN_GROUP_SUCCESS_MSG);
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
-        HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR,
-                                                    DM_CREATE_GROUP_SUCCESS_MSG);
+        SysEventWrite(DM_CREATE_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR, DM_CREATE_GROUP_SUCCESS_MSG);
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
             hiChainConnectorCallback_->OnGroupCreated(requestId, data);
@@ -291,16 +289,14 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
-        HisyseventUtil::GetInstance().SysEventWrite(ADD_HICHAIN_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR,
-                                                    ADD_HICHAIN_GROUP_FAILED_MSG);
+        SysEventWrite(ADD_HICHAIN_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR, ADD_HICHAIN_GROUP_FAILED_MSG);
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
-        HisyseventUtil::GetInstance().SysEventWrite(DM_CREATE_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR,
-                                                    DM_CREATE_GROUP_FAILED_MSG);
+        SysEventWrite(DM_CREATE_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR, DM_CREATE_GROUP_FAILED_MSG);
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnGroupCreated(requestId, "{}");
         }

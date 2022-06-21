@@ -22,10 +22,13 @@ namespace DistributedHardware {
 // type
 enum DM_HISYEVENT_EventType {
     DM_HISYEVENT_FAULT     = 1,    // system fault event
+
     DM_HISYEVENT_STATISTIC = 2,    // system statistic event
     DM_HISYEVENT_SECURITY  = 3,    // system security event
     DM_HISYEVENT_BEHAVIOR  = 4     // system behavior event
 };
+
+// DMHisyseventFault = 1;
 
 // state
 const std::string DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
@@ -58,6 +61,14 @@ const std::string DM_CREATE_GROUP_SUCCESS_MSG = "dm create group success.";
 const std::string DM_CREATE_GROUP_FAILED_MSG = "dm create group failed.";
 const std::string UNAUTHENTICATE_DEVICE_SUCCESS_MSG = "unauthenticate device success.";
 const std::string UNAUTHENTICATE_DEVICE_FAILED_MSG = "unauthenticate device failed.";
+
+// dfx hitrace
+const std::string DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
+const std::string DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
+const std::string DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
+const std::string DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
+const std::string DM_HITRACE_DEVICE_ONLINE = "DM_HITRACE_DEVICE_ONLINE";
+const std::string DM_HITRACE_INIT = "DM_HITRACE_INIT";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

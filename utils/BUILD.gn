@@ -43,6 +43,7 @@ if (defined(ohos_lite)) {
 
       sources = [
         "${utils_path}/src/dfx/lite/dm_hisysevent.cpp",
+        "${utils_path}/src/dfx/lite/dm_hitrace.cpp",
         "${utils_path}/src/dm_anonymous.cpp",
         "${utils_path}/src/dm_error_message.cpp",
         "${utils_path}/src/dm_log.cpp",
@@ -98,6 +99,7 @@ if (defined(ohos_lite)) {
       ]
       sources = [
         "src/dfx/lite/dm_hisysevent.cpp",
+        "src/dfx/lite/dm_hitrace.cpp",
         "src/dm_anonymous.cpp",
         "src/dm_error_message.cpp",
         "src/dm_log.cpp",
@@ -143,6 +145,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("devicemanagerutils") {
     sources = [
       "src/dfx/standard/dm_hisysevent.cpp",
+      "src/dfx/standard/dm_hitrace.cpp",
       "src/dm_anonymous.cpp",
       "src/dm_error_message.cpp",
       "src/dm_hash.cpp",
@@ -170,6 +173,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",

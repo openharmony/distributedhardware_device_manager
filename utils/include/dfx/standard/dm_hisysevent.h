@@ -28,12 +28,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class HisyseventUtil {
-    DECLARE_SINGLE_INSTANCE(HisyseventUtil);
-
-public:
-    void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg);
-};
+void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

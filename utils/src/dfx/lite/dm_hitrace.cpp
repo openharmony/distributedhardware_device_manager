@@ -12,23 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "dm_hisysevent.h"
+#include "dm_hitrace.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg)
+void DMTraceStart(const std::string &msg)
 {
-    int32_t res = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-        status.c_str(),
-        (OHOS::HiviewDFX::HiSysEvent::EventType)eventType,
-        "PID", getpid(),
-        "UID", getuid(),
-        "MSG", msg.c_str());
-    if (res != DM_OK) {
-        LOGE("%s  Write HiSysEvent error, res:%d", status.c_str(), res);
-    }
+    return;
+}
+
+void DMTraceEnd()
+{
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
