@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg)
+void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg)
 {
     return;
 }

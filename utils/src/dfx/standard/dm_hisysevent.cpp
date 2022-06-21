@@ -17,8 +17,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void SysEventWrite(const std::string &status, DM_HISYEVENT_EventType eventType, const std::string &msg)
+void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg)
 {
+    // DeviceManageHisysEventType eventType = (DeviceManageHisysEventType)eventType;
+    // DeviceManageHisysEventType::DM_HISYEVENT_BEHAVIOR = eventType;
     int32_t res = OHOS::HiviewDFX::HiSysEvent::Write(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         status.c_str(),

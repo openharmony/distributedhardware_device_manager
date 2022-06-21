@@ -19,16 +19,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-// type
-enum DM_HISYEVENT_EventType {
-    DM_HISYEVENT_FAULT     = 1,    // system fault event
-
-    DM_HISYEVENT_STATISTIC = 2,    // system statistic event
-    DM_HISYEVENT_SECURITY  = 3,    // system security event
-    DM_HISYEVENT_BEHAVIOR  = 4     // system behavior event
-};
-
-// DMHisyseventFault = 1;
+// HisysEvent Type 
+const int DM_HISYEVENT_FAULT = 1;
+const int DM_HISYEVENT_STATISTIC = 2;
+const int DM_HISYEVENT_SECURITY  = 3;
+const int DM_HISYEVENT_BEHAVIOR  = 4;
 
 // state
 const std::string DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
