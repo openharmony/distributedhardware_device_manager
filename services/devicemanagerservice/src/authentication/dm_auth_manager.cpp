@@ -310,11 +310,15 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
 
 void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId)
 {
-    LOGI("DmAuthManager::OnGroupCreated start group id %s", groupId.c_str());
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to OnGroupCreated because authResponseContext_ is nullptr");
+        return;
+    }
     if (authResponseState_ == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice end");
         return;
     }
+    LOGI("DmAuthManager::OnGroupCreated start group id %s", groupId.c_str());
     if (groupId == "{}") {
         authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -340,6 +344,10 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to OnMemberJoin because authResponseContext_ is nullptr");
+        return;
+    }
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
     if (authRequestState_ != nullptr) {
         authTimes_++;
@@ -399,7 +407,11 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 
 void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::StartNegotiate session id is %d", sessionId);
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to StartNegotiate because authResponseContext_ is nullptr");
+        return;
+    }
+    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->localDeviceId = localDeviceId;
@@ -417,12 +429,16 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::RespNegotiate session id is %d", sessionId);
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to RespNegotiate because authResponseContext_ is nullptr");
+        return;
+    }
+    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (!ret) {
-        LOGE("DmAuthManager::RespNegotiate device is in group");
+        LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
@@ -461,7 +477,11 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 {
-    LOGI("DmAuthManager::SendAuthRequest session id");
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to SendAuthRequest because authResponseContext_ is nullptr");
+        return;
+    }
+    LOGI("DmAuthManager::EstablishAuthChannel session id");
     timer_->DeleteTimer(NEGOTIATE_TIMEOUT_TASK);
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
@@ -482,12 +502,11 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 
 int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
 {
-    LOGI("DmAuthManager:: StartAuthProcess");
     if (authResponseContext_ == nullptr) {
-        LOGI("Authenticate is not start");
+        LOGE("failed to StartAuthProcess because authResponseContext_ is nullptr");
         return ERR_DM_AUTH_NOT_START;
     }
-
+    LOGI("DmAuthManager:: StartAuthProcess");
     authResponseContext_->reply = action;
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
@@ -502,6 +521,10 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
 
 void DmAuthManager::StartRespAuthProcess()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to StartRespAuthProcess because authResponseContext_ is nullptr");
+        return;
+    }
     LOGI("DmAuthManager::StartRespAuthProcess", authResponseContext_->sessionId);
     timer_->DeleteTimer(CONFIRM_TIMEOUT_TASK);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
@@ -520,7 +543,11 @@ void DmAuthManager::StartRespAuthProcess()
 
 int32_t DmAuthManager::CreateGroup()
 {
-    LOGI("DmAuthManager:: CreateGroup");
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to CreateGroup because authResponseContext_ is nullptr");
+        return ERR_DM_FAILED;
+    }
+    LOGI("DmAuthManager:: CreateGroup start");
     authResponseContext_->groupName = GenerateGroupName();
     authResponseContext_->requestId = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
     hiChainConnector_->CreateGroup(authResponseContext_->requestId, authResponseContext_->groupName);
@@ -529,6 +556,10 @@ int32_t DmAuthManager::CreateGroup()
 
 int32_t DmAuthManager::AddMember(int32_t pinCode)
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to AddMember because authResponseContext_ is nullptr");
+        return ERR_DM_FAILED;
+    }
     LOGI("DmAuthManager::AddMember start group id %s", authResponseContext_->groupId.c_str());
     timer_->DeleteTimer(INPUT_TIMEOUT_TASK);
     nlohmann::json jsonObject;
@@ -559,6 +590,10 @@ std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 
 int32_t DmAuthManager::JoinNetwork()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to JoinNeWork because authResponseContext_ is nullptr");
+        return ERR_DM_FAILED;
+    }
     LOGI("DmAuthManager JoinNetwork start");
     timer_->DeleteTimer(AUTHENTICATE_TIMEOUT_TASK);
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
@@ -569,6 +604,10 @@ int32_t DmAuthManager::JoinNetwork()
 
 void DmAuthManager::AuthenticateFinish()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to AuthenticateFinish because authResponseContext_ is nullptr");
+        return;
+    }
     LOGI("DmAuthManager::AuthenticateFinish start");
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
@@ -629,6 +668,10 @@ int32_t DmAuthManager::GeneratePincode()
 
 std::string DmAuthManager::GenerateGroupName()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to GenerateGroupName because authResponseContext_ is nullptr.");
+        return "";
+    }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
@@ -672,12 +715,20 @@ int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> a
 
 int32_t DmAuthManager::GetPinCode()
 {
-    LOGI("ShowConfigDialog start add member pin code %d", authResponseContext_->code);
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to GetPinCode because authResponseContext_ is nullptr");
+        return ERR_DM_AUTH_NOT_START;
+    }
+    LOGI("ShowConfigDialog start add member pin code.");
     return authResponseContext_->code;
 }
 
 void DmAuthManager::ShowConfigDialog()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to ShowConfigDialog because authResponseContext_ is nullptr");
+        return;
+    }
     LOGI("ShowConfigDialog start");
     dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
@@ -693,6 +744,10 @@ void DmAuthManager::ShowConfigDialog()
 
 void DmAuthManager::ShowAuthInfoDialog()
 {
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to ShowAuthInfoDialog because authResponseContext_ is nullptr");
+        return;
+    }
     LOGI("DmAuthManager::ShowAuthInfoDialog start %d", authResponseContext_->code);
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
@@ -702,7 +757,11 @@ void DmAuthManager::ShowAuthInfoDialog()
 
 void DmAuthManager::ShowStartAuthDialog()
 {
-    LOGI("DmAuthManager::ShowStartAuthDialog start");
+    if (authResponseContext_ == nullptr) {
+        LOGE("failed to ShowStartAuthDialog because authResponseContext_ is nullptr");
+        return;
+    }
+    LOGI("DmAuthManager::ShowStartAuthDialog start because authResponseContext_ is nullptr");
     authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
 }
 
@@ -717,7 +776,7 @@ int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
         LOGE("Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
-    
+
     dmAbilityMgr_->StartAbilityDone();
     AbilityRole role = dmAbilityMgr_->GetAbilityRole();
     authParam.direction = (int32_t)role;
