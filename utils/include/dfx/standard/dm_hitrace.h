@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-// constexpr uint64_t DM_HITRACE_LABEL = HITRACE_TAG_DEVICE_MANAGER;
 void DMTraceStart(const std::string &msg);
 void DMTraceEnd();
 } // namespace DistributedHardware
