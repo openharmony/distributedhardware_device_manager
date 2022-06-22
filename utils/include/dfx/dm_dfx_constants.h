@@ -66,4 +66,4 @@ const std::string DM_HITRACE_DEVICE_ONLINE = "DM_HITRACE_DEVICE_ONLINE";
 const std::string DM_HITRACE_INIT = "DM_HITRACE_INIT";
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_CONSTANTS_H
+#endif // OHOS_DM_DFX_CONSTANTS_H

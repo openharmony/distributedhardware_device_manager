@@ -467,6 +467,8 @@ ohos_unittest("UTTest_dm_discovery_manager") {
   ]
 
   deps = [ ":device_manager_test" ]
+
+  external_deps = [ "hitrace_native:hitrace_meter" ]
 }
 
 ## UnitTest UTTest_dm_discovery_manager }}}
