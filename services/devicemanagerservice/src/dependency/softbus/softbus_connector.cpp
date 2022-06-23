@@ -113,7 +113,7 @@ int32_t SoftbusConnector::Init()
     PublishInfo dmPublishInfo;
     dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-    dmPublishInfo.medium = ExchanageMedium::AUTO;
+    dmPublishInfo.medium = ExchangeMedium::AUTO;
     dmPublishInfo.freq = ExchangeFreq::HIGH;
     dmPublishInfo.capability = DM_CAPABILITY_OSD;
     dmPublishInfo.capabilityData = nullptr;
@@ -227,7 +227,7 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     SubscribeInfo subscribeInfo;
     subscribeInfo.subscribeId = dmSubscribeInfo.subscribeId;
     subscribeInfo.mode = (DiscoverMode)dmSubscribeInfo.mode;
-    subscribeInfo.medium = (ExchanageMedium)dmSubscribeInfo.medium;
+    subscribeInfo.medium = (ExchangeMedium)dmSubscribeInfo.medium;
     subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
     subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
@@ -585,7 +585,7 @@ void SoftbusConnector::OnParameterChgCallback(const char *key, const char *value
         PublishInfo dmPublishInfo;
         dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-        dmPublishInfo.medium = ExchanageMedium::AUTO;
+        dmPublishInfo.medium = ExchangeMedium::AUTO;
         dmPublishInfo.freq = ExchangeFreq::HIGH;
         dmPublishInfo.capability = DM_CAPABILITY_OSD;
         dmPublishInfo.capabilityData = nullptr;
