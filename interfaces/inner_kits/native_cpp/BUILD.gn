@@ -25,6 +25,8 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/notify",
         "${utils_path}/include",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
@@ -45,7 +47,7 @@ if (defined(ohos_lite)) {
       ]
 
       defines = [
-        "LITE_DEVICE",
+        "__LITEOS_M__",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerkit\"",
         "LOG_DOMAIN=0xD004100",
@@ -70,6 +72,8 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "${utils_path}/include",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
         "${utils_path}/include/ipc/lite",
       ]
       include_dirs += [
@@ -117,6 +121,8 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
+      "${utils_path}/include/dfx",
+      "${utils_path}/include/dfx/standard",
     ]
   }
 
@@ -143,6 +149,8 @@ if (defined(ohos_lite)) {
     deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
+      "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "samgr_standard:samgr_proxy",

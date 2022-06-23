@@ -158,6 +158,11 @@ ohos_unittest("UTTest_softbus_connector") {
   ]
 
   deps = [ ":device_manager_test" ]
+
+  external_deps = [
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+  ]
 }
 
 ## UnitTest UTTest_softbus_connector }}}
@@ -169,6 +174,11 @@ ohos_unittest("UTTest_softbus_session") {
   sources = [ "UTTest_softbus_session.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+  ]
 }
 
 ## UnitTest UTTest_softbus_session }}}
@@ -283,6 +293,8 @@ ohos_unittest("UTTest_profile_connector") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
   ]
 }
 
@@ -300,6 +312,8 @@ ohos_unittest("UTTest_device_profile_adapter") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
   ]
 }
 
@@ -359,6 +373,11 @@ ohos_unittest("UTTest_dm_device_state_manager") {
   ]
 
   deps = [ ":device_manager_test" ]
+
+  external_deps = [
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+  ]
 }
 
 ## UnitTest UTTest_dm_device_state_manager }}}
@@ -448,6 +467,8 @@ ohos_unittest("UTTest_dm_discovery_manager") {
   ]
 
   deps = [ ":device_manager_test" ]
+
+  external_deps = [ "hitrace_native:hitrace_meter" ]
 }
 
 ## UnitTest UTTest_dm_discovery_manager }}}
@@ -640,6 +661,8 @@ ohos_static_library("device_manager_test") {
     "common_event_service:cesfwk_innerkits",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

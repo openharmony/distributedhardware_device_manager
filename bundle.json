@@ -18,6 +18,9 @@
         "adapted_system_type": [ "standard", "small" ],
         "rom": "2M",
         "ram": "16M",
+        "hisysevent_config": [
+            "//foundation/distributedhardware/device_manager/hisysevent.yaml"
+          ],
         "deps": {
             "components": [
                 "appexecfwk_standard",

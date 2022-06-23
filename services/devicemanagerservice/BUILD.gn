@@ -47,6 +47,8 @@ if (defined(ohos_lite)) {
         "//base/security/device_auth/interfaces/innerkits",
         "//third_party/json/include",
         "${utils_path}/include",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
         "${utils_path}/include/permission/lite",
         "foundation/multimedia/image_standard/mock/native/include",
         "${services_path}/include/dispatch",
@@ -100,7 +102,7 @@ if (defined(ohos_lite)) {
       ]
 
       defines = [
-        "LITE_DEVICE",
+        "__LITEOS_M__",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerservice\"",
         "LOG_DOMAIN=0xD004100",
@@ -124,6 +126,11 @@ if (defined(ohos_lite)) {
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
         "//utils/native/lite:utils",
+      ]
+
+      external_deps = [
+        "hisysevent_native:libhisysevent",
+        "hitrace_native:hitrace_meter",
       ]
     }
   } else {
@@ -150,6 +157,8 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${utils_path}/include",
         "${utils_path}/include/fwkload/lite",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
         "${utils_path}/include/ipc/lite",
         "${utils_path}/include/permission/lite",
         "${innerkits_path}/native_cpp/include",
@@ -253,6 +262,8 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "${utils_path}/include",
       "${utils_path}/include/fwkload/standard",
+      "${utils_path}/include/dfx",
+      "${utils_path}/include/dfx/standard",
       "${utils_path}/include/permission/standard",
       "//base/security/device_auth/interfaces/innerkits",
       "//third_party/json/include",
@@ -327,6 +338,8 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "dsoftbus:softbus_client",
       "eventhandler:libeventhandler",
+      "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
