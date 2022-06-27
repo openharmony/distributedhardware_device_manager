@@ -45,7 +45,7 @@ foundation/distributedhardware/device_manager
 │   └── devicemanagerservice      #devicemanagerservice服务实现核心代码
 │       ├── include
 │       │   ├── ability           #与PIN码显示FA拉起管理相关头文件
-│       │   ├── auth              #devie_auth交互相关头文件
+│       │   ├── auth              #device_auth交互相关头文件
 │       │   ├── ipc               #进程间通信相关头文件
 │       │   │   ├── lite          #small
 │       │   │   └── standard      #standard
@@ -57,7 +57,7 @@ foundation/distributedhardware/device_manager
 │           ├── ability           #与PIN码显示FA拉起管理相关功能代码
 │           │   ├── lite          #small
 │           │   └── standard      #standard
-│           ├── auth              #devie_auth交互相关核心代码
+│           ├── auth              #device_auth交互相关核心代码
 │           ├── ipc               #进程间通信相功能代码
 │           │   ├── lite          #small
 │           │   └── standard      #standard

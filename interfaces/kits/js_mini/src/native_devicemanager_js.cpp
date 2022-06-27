@@ -80,7 +80,7 @@ void DmJSIInitCallback::OnRemoteDied()
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnRemoteDied, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnRemoteDied, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnRemoteDied();
@@ -95,7 +95,7 @@ void DmJSIDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDeviceOnline, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDeviceOnline, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnDeviceStateChange(DmJSIDevStateChangeAction::ONLINE, deviceInfo);
@@ -105,7 +105,7 @@ void DmJSIDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDeviceOnline, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDeviceOnline, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnDeviceStateChange(DmJSIDevStateChangeAction::READY, deviceInfo);
@@ -115,7 +115,7 @@ void DmJSIDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDeviceOffline, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDeviceOffline, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnDeviceStateChange(DmJSIDevStateChangeAction::OFFLINE, deviceInfo);
@@ -125,7 +125,7 @@ void DmJSIDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDeviceChanged, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDeviceChanged, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnDeviceStateChange(DmJSIDevStateChangeAction::CHANGE, deviceInfo);
@@ -135,7 +135,7 @@ void DmJSIDiscoverCallback::OnDeviceFound(uint16_t subscribeId,  const DmDeviceI
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDeviceFound, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDeviceFound, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
 
@@ -147,7 +147,7 @@ void DmJSIDiscoverCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fail
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDiscoverFailed, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDiscoverFailed, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
 
@@ -158,7 +158,7 @@ void DmJSIDiscoverCallback::OnDiscoverySuccess(uint16_t subscribeId)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnDiscoverySuccess, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnDiscoverySuccess, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     LOGI("DiscoverySuccess for %s, subscribeId %d", bundleName_.c_str(), (int32_t)subscribeId);
@@ -169,7 +169,7 @@ void DmJSIAuthenticateCallback::OnAuthResult(const std::string &deviceId, const 
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnAuthResult, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnAuthResult, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnAuthResult(deviceId, token, status, reason);
@@ -179,7 +179,7 @@ void DmJSICheckAuthCallback::OnVerifyAuthResult(const std::string &deviceId, int
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnCheckAuthResult, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnCheckAuthResult, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnVerifyResult(deviceId, resultCode, flag);
@@ -189,7 +189,7 @@ void DmJSIDeviceManagerFaCallback::OnCall(const std::string &paramJson)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
-        LOGE("OnCall, deviceManagerJSI not find for bunderName %s", bundleName_.c_str());
+        LOGE("OnCall, deviceManagerJSI not find for bundleName %s", bundleName_.c_str());
         return;
     }
     deviceManagerJSI->OnDmfaCall(paramJson);
@@ -649,7 +649,7 @@ void DeviceManagerModule::JsToDmAuthInfo(const JSIValue &object, std::string &ex
 
 void DeviceManagerModule::CreateDmCallback(std::string &bundleName, std::string &eventType)
 {
-    LOGI("CreateDmCallback for bunderName %s eventType %s", bundleName.c_str(), eventType.c_str());
+    LOGI("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
     if (eventType == DM_JSI_EVENT_DEVICE_STATE_CHANGE) {
         auto iter = g_deviceStateCallbackMap.find(bundleName);
         if (iter == g_deviceStateCallbackMap.end()) {
@@ -658,7 +658,7 @@ void DeviceManagerModule::CreateDmCallback(std::string &bundleName, std::string 
             int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(
                 bundleName, extra, callback);
             if (ret != 0) {
-                LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+                LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
                 return;
             }
             g_deviceStateCallbackMap[bundleName] = callback;
@@ -688,7 +688,7 @@ void DeviceManagerModule::CreateDmCallback(std::string &bundleName, std::string 
             int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(
                 bundleName, callback);
             if (ret != 0) {
-                LOGE("RegisterDeviceManagerFaCallback failed for bunderName %s", bundleName.c_str());
+                LOGE("RegisterDeviceManagerFaCallback failed for bundleName %s", bundleName.c_str());
                 return;
             }
             g_dmfaCallbackMap[bundleName] = callback;
@@ -702,12 +702,12 @@ void DeviceManagerModule::ReleaseDmCallback(std::string &bundleName, std::string
     if (eventType == DM_JSI_EVENT_DEVICE_STATE_CHANGE) {
         auto iter = g_deviceStateCallbackMap.find(bundleName);
         if (iter == g_deviceStateCallbackMap.end()) {
-            LOGE("ReleaseDmCallback: cannot find stateCallback for bunderName %s", bundleName.c_str());
+            LOGE("ReleaseDmCallback: cannot find stateCallback for bundleName %s", bundleName.c_str());
             return;
         }
         int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
         if (ret != 0) {
-            LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+            LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
         g_deviceStateCallbackMap.erase(bundleName);
@@ -732,13 +732,13 @@ void DeviceManagerModule::ReleaseDmCallback(std::string &bundleName, std::string
     if (eventType == DM_JSI_EVENT_DMFA_CALLBACK) {
         auto iter = g_dmfaCallbackMap.find(bundleName);
         if (iter == g_dmfaCallbackMap.end()) {
-            LOGE("cannot find dmFaCallback for bunderName %s", bundleName.c_str());
+            LOGE("cannot find dmFaCallback for bundleName %s", bundleName.c_str());
             return;
         }
         int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(
             bundleName);
         if (ret != 0) {
-            LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+            LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
         g_dmfaCallbackMap.erase(bundleName);
@@ -770,7 +770,7 @@ JSIValue DeviceManagerModule::UnAuthenticateDevice(const JSIValue thisVal, const
     int32_t ret = 0;
     ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceId);
     if (ret != 0) {
-        LOGI("UnAuthenticateDevice for bunderName %s failed, ret %d", bundleName.c_str(), ret);
+        LOGI("UnAuthenticateDevice for bundleName %s failed, ret %d", bundleName.c_str(), ret);
     }
 
     JSIValue result = JSI::CreateObject();
@@ -822,7 +822,7 @@ JSIValue DeviceManagerModule::SetUserOperationSync(const JSIValue thisVal, const
 
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().SetUserOperation(bundleName, action);
     if (ret != 0) {
-        LOGE("SetUserOperation for bunderName %s failed, ret %d",
+        LOGE("SetUserOperation for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
         return JSI::CreateNull();
     }
@@ -857,7 +857,7 @@ JSIValue DeviceManagerModule::GetTrustedDeviceListSync(const JSIValue thisVal, c
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetTrustedDeviceList(
         bundleName, extra, devList);
     if (ret != 0) {
-        LOGE("GetTrustedDeviceList for bunderName %s failed, ret %d",
+        LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d",
              bundleName.c_str(), ret);
         return array;
     }
@@ -918,7 +918,7 @@ JSIValue DeviceManagerModule::StartDeviceDiscoverSync(const JSIValue thisVal, co
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
         subInfo, extra, discoverCallback);
     if (ret != 0) {
-        LOGE("StartDeviceDiscovery for bunderName %s failed, ret %d",
+        LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
         return JSI::CreateNull();
     }
@@ -945,7 +945,7 @@ JSIValue DeviceManagerModule::StopDeviceDiscoverSync(const JSIValue thisVal, con
     LOGI("subscribeId %d", subscribeId);
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
     if (ret != 0) {
-        LOGE("StopDeviceDiscovery for bunderName %s failed, ret %d",
+        LOGE("StopDeviceDiscovery for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
         return JSI::CreateNull();
     }
@@ -994,7 +994,7 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().AuthenticateDevice(
         bundleName, 1, deviceInfo, extra, authCallback);
     if (ret != 0) {
-        LOGE("AuthenticateDevice for bunderName %s failed, ret %d",
+        LOGE("AuthenticateDevice for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
     }
 
@@ -1031,7 +1031,7 @@ JSIValue DeviceManagerModule::VerifyAuthInfo(const JSIValue thisVal, const JSIVa
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().VerifyAuthentication(bundleName,
         authParam, verifyCallback);
     if (ret != 0) {
-        LOGE("VerifyAuthInfo for bunderName %s failed, ret %d",
+        LOGE("VerifyAuthInfo for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
     }
     return JSI::CreateUndefined();
@@ -1055,7 +1055,7 @@ JSIValue DeviceManagerModule::JsOn(const JSIValue thisVal, const JSIValue *args,
     }
     std::string eventType = JSI::ValueToString(args[0]);
     
-    LOGI("JsOn for bunderName %s, eventType %s ", bundleName.c_str(),
+    LOGI("JsOn for bundleName %s, eventType %s ", bundleName.c_str(),
         eventType.c_str());
     std::shared_ptr<DmNativeEvent> DmNativeEventobj = std::make_shared<DmNativeEvent>(thisVal);
     DmNativeEventobj->On(eventType, args[1], thisVal);
@@ -1076,7 +1076,7 @@ JSIValue DeviceManagerModule::JsOff(const JSIValue thisVal, const JSIValue *args
 
     std::string eventType = JSI::ValueToString(args[0]);
 
-    LOGI("JsOff for bunderName %s, eventType %s ", bundleName.c_str(),
+    LOGI("JsOff for bundleName %s, eventType %s ", bundleName.c_str(),
         eventType.c_str());
     
     DmNativeEvent* DmNativeEventobj = new DmNativeEvent();
@@ -1091,11 +1091,11 @@ JSIValue DeviceManagerModule::ReleaseDeviceManager(const JSIValue thisVal, const
 {
     LOGI("ReleaseDeviceManager in");
     std::string bundleName = GetJSIAppBundleName();
-    LOGI("ReleaseDeviceManager for bunderName %s", bundleName.c_str());
+    LOGI("ReleaseDeviceManager for bundleName %s", bundleName.c_str());
     
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnInitDeviceManager(bundleName);
     if (ret != 0) {
-        LOGE("ReleaseDeviceManager for bunderName %s failed, ret %d",
+        LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d",
             bundleName.c_str(), ret);
         JSIValue result = JSI::CreateNumber((double)ret);
         return result;
@@ -1123,10 +1123,10 @@ JSIValue DeviceManagerModule::CreateDeviceManager(const JSIValue thisVal, const 
         return JSI::CreateNull();
     }
     std::string bundleName = GetJSIAppBundleName();
-    LOGI("CreateDeviceManager for bunderName is %s", bundleName.c_str());
+    LOGI("CreateDeviceManager for bundleName is %s", bundleName.c_str());
 
     if (DeviceManagerModule::GetDeviceManagerJSI(bundleName) != nullptr) {
-        LOGI("CreateDeviceManager repeat for bunderName %s", bundleName.c_str());
+        LOGI("CreateDeviceManager repeat for bundleName %s", bundleName.c_str());
         return JSI::CreateNull();
     }
 
@@ -1138,7 +1138,7 @@ JSIValue DeviceManagerModule::CreateDeviceManager(const JSIValue thisVal, const 
     std::shared_ptr<DmJSIInitCallback> initCallback = std::make_shared<DmJSIInitCallback>(bundleName);
     ret = OHOS::DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
     if (ret == 0) {
-        LOGI("InitDeviceManager for bunderName %s success", bundleName.c_str());
+        LOGI("InitDeviceManager for bundleName %s success", bundleName.c_str());
         JSIValue success = JSI::GetNamedProperty(args[1], CB_SUCCESS);
         JSIValue data = JSI::CreateObject();
         std::string str = "InitDeviceManager success";
@@ -1146,7 +1146,7 @@ JSIValue DeviceManagerModule::CreateDeviceManager(const JSIValue thisVal, const 
         JSI::CallFunction(success, thisVal, &data, 1);
     }
     if (ret != 0) {
-        LOGI("InitDeviceManager for bunderName %s fail", bundleName.c_str());
+        LOGI("InitDeviceManager for bundleName %s fail", bundleName.c_str());
         JSIValue fail = JSI::GetNamedProperty(args[1], CB_FAIL);
         JSIValue err = JSI::CreateObject();
         std::string str = "InitDeviceManager fail";
