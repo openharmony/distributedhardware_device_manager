@@ -3544,7 +3544,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthResult1, testing::ext::TestSize.Level0)
  *                  3. call DeviceManagerNotifyTest RegisterAuthenticateCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnAuthResult wiht testPkgName
+ *                  6. call DeviceManagerNotify OnAuthResult with testPkgName
  *                  7. check if callback OnDiscoverySuccess called
  */
 HWTEST_F(DeviceManagerNotifyTest, OnAuthResult2, testing::ext::TestSize.Level0)
@@ -3587,7 +3587,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthResult2, testing::ext::TestSize.Level0)
  *                  3. call DeviceManagerNotifyTest RegisterAuthenticateCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnAuthResult wiht testDeviceId
+ *                  6. call DeviceManagerNotify OnAuthResult with testDeviceId
  *                  7. check if callback OnDiscoverySuccess called
  */
 HWTEST_F(DeviceManagerNotifyTest, OnAuthResult3, testing::ext::TestSize.Level0)

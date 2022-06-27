@@ -49,11 +49,11 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
             if (params == EVENT_INIT_CODE) {
-                LOGI("Dialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                LOGI("Dialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
                 authManager->SetPageId(id);
             } else {
                 Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                LOGI("CancelDialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
                 authManager->StartAuthProcess(std::stoi(params));
             }
         });

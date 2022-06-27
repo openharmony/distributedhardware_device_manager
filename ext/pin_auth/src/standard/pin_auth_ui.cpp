@@ -50,7 +50,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
                 authManager->SetPageId(id);
             }
             if (params == EVENT_CANCEL_CODE) {
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
+                LOGI("CancelDialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
                 Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
             }
         });
@@ -79,7 +79,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
             if (event == EVENT_INIT) {
                 authManager->SetPageId(id);
             } else if (event == EVENT_CONFIRM) {
-                LOGI("On confirm event for page id:%d, parms:%s", id, params.c_str());
+                LOGI("On confirm event for page id:%d, params:%s", id, params.c_str());
                 if (params.length() <= DEFAULT_PIN_CODE_LENGTH) {
                     authManager->AddMember(std::stoi(params));
                 }

@@ -131,7 +131,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         return ERR_DM_NOT_INIT;
     }
 
-    LOGI("Register device manager listener for pakage name: %s", pkgName.c_str());
+    LOGI("Register device manager listener for package name: %s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(pkgName);
     if (iter != dmListener_.end()) {
