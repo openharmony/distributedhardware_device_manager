@@ -38,7 +38,7 @@ namespace OHOS {
 namespace DistributedHardware {
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
 IPublishCallback SoftbusListener::softbusPublishCallback_ = {.OnPublishSuccess = SoftbusListener::OnPublishSuccess,
-                                                              .OnPublishFail = SoftbusListener::OnPublishFail};
+                                                             .OnPublishFail = SoftbusListener::OnPublishFail};
 
 INodeStateCb SoftbusListener::softbusNodeStateCb_ = {
     .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED,

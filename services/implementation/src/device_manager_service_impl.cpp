@@ -119,7 +119,7 @@ void DeviceManagerServiceImpl::Release()
 }
 
 int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                                   const std::string &extra)
+    const std::string &extra)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGI("The caller does not have permission to call");
@@ -146,7 +146,7 @@ int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName
 }
 
 int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-                                                 const std::string &deviceId, const std::string &extra)
+    const std::string &deviceId, const std::string &extra)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGI("The caller does not have permission to call");

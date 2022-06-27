@@ -60,8 +60,8 @@ public:
      * @tc.desc: Auth Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
-                      int32_t reason);
+    virtual void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
+                              int32_t status, int32_t reason);
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnVerifyAuthResult
