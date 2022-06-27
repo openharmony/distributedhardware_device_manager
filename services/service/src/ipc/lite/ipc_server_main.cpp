@@ -17,13 +17,11 @@
 #include <unistd.h>
 
 #include "dm_constants.h"
-#include "dm_log.h"
 
 static void InitAll()
 {
     const int32_t DM_SERVICE_INIT_DELAY = 2;
     sleep(DM_SERVICE_INIT_DELAY);
-    LOGI("DM ipc server Init success");
 }
 
 int32_t main(int32_t argc, char *argv[])
