@@ -30,7 +30,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
-        "${services_path}/include/dispatch",
+        "${servicesimpl_path}/include/dispatch",
       ]
       include_dirs += [
         "//utils/native/lite/include",

@@ -28,11 +28,11 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${ext_path}/profile/include",
-      "${services_path}/include",
-      "${services_path}/include/adapter",
-      "${services_path}/include/dependency/softbus",
+      "${servicesimpl_path}/include",
+      "${servicesimpl_path}/include/adapter",
+      "${servicesimpl_path}/include/dependency/softbus",
       "${services_path}/include/ipc/standard",
-      "${services_path}/include/devicestate",
+      "${servicesimpl_path}/include/devicestate",
       "${utils_path}/include",
       "${utils_path}/include/ipc/standard",
       "${innerkits_path}/native_cpp/include",
@@ -51,7 +51,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${services_path}:devicemanagerservice",
+      "${servicesimpl_path}:devicemanagerserviceimpl",
       "${utils_path}:devicemanagerutils",
       "//utils/native/base:utils",
     ]

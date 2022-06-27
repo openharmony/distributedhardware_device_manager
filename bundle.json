@@ -63,7 +63,6 @@
                 }
             ],
             "test": [
-                "//foundation/distributedhardware/device_manager:device_manager_test"
             ]
         }
     }

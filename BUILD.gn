@@ -16,7 +16,8 @@ if (defined(ohos_lite)) {
     lite_component("devicemanager_mini") {
       features = [
         "utils:devicemanagerutils_mini",
-        "services/devicemanagerservice:devicemanagerservice_mini",
+        "services/service:devicemanagerservice_mini",
+        "services/implementation:devicemanagerserviceimpl_mini",
         "interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
         "interfaces/kits/js_mini:devicemanager_native_js",
       ]
@@ -29,7 +30,8 @@ if (defined(ohos_lite)) {
     lite_component("device_manager") {
       features = [
         "utils:devicemanagerutils",
-        "services/devicemanagerservice:devicemanagerservice",
+        "services/service:devicemanagerservice",
+        "services/implementation:devicemanagerserviceimpl",
         "interfaces/inner_kits/native_cpp:devicemanagersdk",
         "ext/pin_auth:devicemanagerext_pin_auth",
       ]
@@ -46,12 +48,13 @@ if (defined(ohos_lite)) {
       "interfaces/inner_kits/native_cpp:devicemanagersdk",
       "interfaces/kits:devicemanager_native_js",
       "sa_profile:dm_sa_profile",
-      "services/devicemanagerservice:devicemanagerservice",
+      "services/service:devicemanagerservice",
+      "services/implementation:devicemanagerserviceimpl",
       "utils:devicemanagerutils",
     ]
   }
   group("device_manager_test") {
     testonly = true
-    deps = [ "test:test" ]
+    deps = []
   }
 }
