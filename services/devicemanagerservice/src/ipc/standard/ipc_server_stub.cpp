@@ -59,6 +59,7 @@ void IpcServerStub::OnStart()
 bool IpcServerStub::Init()
 {
     LOGI("IpcServerStub::Init ready to init.");
+    DeviceManagerService::GetInstance().Init();
     if (!registerToService_) {
         bool ret = Publish(this);
         if (!ret) {
@@ -67,7 +68,6 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
     }
-    DeviceManagerService::GetInstance().Init();
     return true;
 }
 
