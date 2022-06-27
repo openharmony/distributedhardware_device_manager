@@ -17,7 +17,6 @@ if (defined(ohos_lite)) {
       features = [
         "utils:devicemanagerutils_mini",
         "services/service:devicemanagerservice_mini",
-        "services/implementation:devicemanagerserviceimpl_mini",
         "interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
         "interfaces/kits/js_mini:devicemanager_native_js",
       ]
