@@ -32,7 +32,6 @@ if (defined(ohos_lite)) {
         "utils:devicemanagerutils",
         "services/service:devicemanagerservice",
         "interfaces/inner_kits/native_cpp:devicemanagersdk",
-        "ext/pin_auth:devicemanagerext_pin_auth",
       ]
     }
     group("device_manager_test") {
