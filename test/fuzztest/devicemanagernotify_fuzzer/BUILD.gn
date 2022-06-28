@@ -54,7 +54,7 @@ ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/device_manager/ext/mini/services/devicemanagerservice/include/dispatch",
+    "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
@@ -72,7 +72,8 @@ ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
 
   deps = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/devicemanagerservice:devicemanagerservice",
+    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+    "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
   ]
 
   defines = [
