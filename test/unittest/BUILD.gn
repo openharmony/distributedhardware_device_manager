@@ -146,7 +146,6 @@ ohos_unittest("UTTest_softbus_connector") {
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/softbus/softbus_listener.cpp",
     "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
-    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
     "${servicesimpl_path}/src/config/dm_config_manager.cpp",
     "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
     "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
