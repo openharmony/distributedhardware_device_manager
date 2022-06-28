@@ -14,6 +14,9 @@
  */
 
 #include "UTTest_ipc_client_stub.h"
+
+#include <unistd.h>
+
 #include "dm_device_info.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"
@@ -27,8 +30,6 @@
 #include "ipc_rsp.h"
 #include "ipc_def.h"
 #include "dm_constants.h"
-
-#include <unistd.h>
 
 namespace OHOS {
 namespace DistributedHardware {

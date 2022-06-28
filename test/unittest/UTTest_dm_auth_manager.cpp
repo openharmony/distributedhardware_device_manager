@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#include "dm_auth_manager.h"
+#include "UTTest_dm_auth_manager.h"
 
 #include "nlohmann/json.hpp"
 
 #include "dm_log.h"
 #include "dm_constants.h"
+#include "dm_auth_manager.h"
 #include "auth_message_processor.h"
-#include "UTTest_dm_auth_manager.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

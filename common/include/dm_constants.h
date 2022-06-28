@@ -18,6 +18,12 @@
 
 #include <string>
 
+#ifdef __LP64__
+const std::string LIB_LOAD_PATH = "/system/lib64/";
+#else
+const std::string LIB_LOAD_PATH = "/system/lib/";
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 const std::string DM_PKG_NAME = "ohos.distributedhardware.devicemanager";

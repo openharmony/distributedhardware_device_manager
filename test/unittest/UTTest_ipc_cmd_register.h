@@ -30,6 +30,7 @@
 #include "ipc_types.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcCmdRegisterTest : public testing::Test {

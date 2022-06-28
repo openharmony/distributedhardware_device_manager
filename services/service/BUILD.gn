@@ -1,0 +1,263 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
+
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagerservice_mini") {
+      include_dirs = [
+        "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+        "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/notify",
+        "${servicesimpl_path}/include",
+        "${servicesimpl_path}/include/config",
+        "${servicesimpl_path}/include/adapter",
+        "${servicesimpl_path}/include/authentication",
+        "${servicesimpl_path}/include/authentication/showconfirm/lite",
+        "${servicesimpl_path}/include/ability",
+        "${servicesimpl_path}/include/devicestate",
+        "${servicesimpl_path}/include/discovery",
+        "${servicesimpl_path}/include/dependency/commonevent",
+        "${servicesimpl_path}/include/dependency/multipleuser",
+        "${servicesimpl_path}/include/dependency/hichain",
+        "${servicesimpl_path}/include/dependency/softbus",
+        "${servicesimpl_path}/include/dependency/mini",
+        "${servicesimpl_path}/include/dependency/timer",
+        "${servicesimpl_path}/include/eventbus",
+        "${common_path}/include",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/model",
+        "//base/security/device_auth/interfaces/innerkits",
+        "//third_party/json/include",
+        "${utils_path}/include",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
+        "${utils_path}/include/permission/lite",
+        "foundation/multimedia/image_standard/mock/native/include",
+        "${servicesimpl_path}/include/dispatch",
+        "${ext_path}/pin_auth/include",
+        "${ext_path}/pin_auth/include/lite",
+      ]
+
+      include_dirs += [
+        "//base/security/device_auth/interfaces/innerkits",
+        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//utils/native/lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+        "//foundation/communication/dsoftbus/interfaces/kits/transport",
+        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+        "//foundation/distributedhardware/device_manager/services/implementation/include/dependency/multipleuser",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+      ]
+
+      sources = [
+        "${services_path}/src/ability/lite/dm_ability_manager.cpp",
+        "${services_path}/src/adapter/standard/dm_adapter_manager.cpp",
+        "${services_path}/src/authentication/auth_message_processor.cpp",
+        "${services_path}/src/authentication/auth_request_state.cpp",
+        "${services_path}/src/authentication/auth_response_state.cpp",
+        "${services_path}/src/authentication/dm_auth_manager.cpp",
+        "${services_path}/src/authentication/showconfirm/lite/show_confirm.cpp",
+        "${services_path}/src/config/mini/dm_config_manager.cpp",
+        "${services_path}/src/config/mini/pin_auth.cpp",
+        "${services_path}/src/dependency/hichain/hichain_connector.cpp",
+        "${services_path}/src/dependency/mini/dm_mutex.cpp",
+        "${services_path}/src/dependency/mini/dm_thread.cpp",
+        "${services_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
+        "${services_path}/src/dependency/softbus/softbus_listener.cpp",
+        "${services_path}/src/dependency/softbus/softbus_session.cpp",
+        "${services_path}/src/dependency/timer/mini/dm_timer.cpp",
+        "${services_path}/src/device_manager_service.cpp",
+        "${services_path}/src/deviceinfo/dm_device_info_manager.cpp",
+        "${services_path}/src/devicestate/dm_device_state_manager.cpp",
+        "${services_path}/src/discovery/dm_discovery_manager.cpp",
+        "${services_path}/src/dispatch/command_dispatch.cpp",
+        "${services_path}/src/dispatch/device_manager_service_listener_mini.cpp",
+        "${services_path}/src/dispatch/server_stub.cpp",
+      ]
+
+      defines = [
+        "__LITEOS_M__",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerservice\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
+
+      if (os_account_part_exists) {
+        defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+        include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+      }
+
+      ldflags = dm_ldflags
+
+      deps = [
+        "${devicemanager_path}/interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
+        "${utils_path}:devicemanagerutils_mini",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//base/security/device_auth/services:deviceauth",
+        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//third_party/bounds_checking_function:libsec_static",
+        "//third_party/mbedtls",
+        "//utils/native/lite:utils",
+      ]
+
+      external_deps = [
+        "hisysevent_native:libhisysevent",
+        "hitrace_native:hitrace_meter",
+      ]
+    }
+  } else {
+    executable("devicemanagerservice") {
+      include_dirs = [
+        "include",
+        "include/softbus",
+        "include/ipc/lite",
+        "${common_path}/include",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/model",
+        "${utils_path}/include",
+        "${utils_path}/include/fwkload/lite",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
+        "${utils_path}/include/ipc/lite",
+        "${utils_path}/include/permission/lite",
+        "${innerkits_path}/native_cpp/include",
+        "${innerkits_path}/native_cpp/include/ipc",
+        "${innerkits_path}/native_cpp/include/ipc/lite",
+      ]
+
+      include_dirs += [
+        "//base/security/device_auth/interfaces/innerkits",
+        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//utils/native/lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+        "//foundation/communication/dsoftbus/interfaces/kits/transport",
+        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+      ]
+
+      sources = [
+        "src/ipc/lite/ipc_server_main.cpp",
+      ]
+      ldflags = dm_ldflags
+
+      defines = [
+        "LITE_DEVICE",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerservice\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
+
+      deps = [
+        "${innerkits_path}/native_cpp:devicemanagersdk",
+        "${utils_path}:devicemanagerutils",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//base/security/device_auth/services:deviceauth_sdk",
+        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
+        "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/mbedtls:mbedtls_shared",
+        "//utils/native/lite:utils",
+      ]
+    }
+  }
+} else if (!support_jsapi) {
+  group("devicemanagerservice") {
+    deps = []
+  }
+} else {
+  config("devicemanagerservice_config") {
+    include_dirs = [
+      "include",
+      "include/softbus",
+      "include/ipc",
+      "include/ipc/standard",
+      "${common_path}/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/model",
+      "${utils_path}/include",
+      "${utils_path}/include/fwkload/standard",
+      "${utils_path}/include/dfx",
+      "${utils_path}/include/dfx/standard",
+      "${utils_path}/include/permission/standard",
+    ]
+  }
+
+  ohos_shared_library("devicemanagerservice") {
+    sources = [
+      "src/device_manager_service.cpp",
+      "src/device_manager_service_listener.cpp",
+      "src/ipc/standard/ipc_cmd_parser.cpp",
+      "src/ipc/standard/ipc_server_client_proxy.cpp",
+      "src/ipc/standard/ipc_server_listener.cpp",
+      "src/ipc/standard/ipc_server_stub.cpp",
+      "src/softbus/softbus_listener.cpp",
+    ]
+
+    public_configs = [ ":devicemanagerservice_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerservice\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
+
+    deps = [
+      "${aainnerkits_path}/ability_manager:ability_manager",
+      "${aaservices_path}/abilitymgr:abilityms",
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${utils_path}:devicemanagerutils",
+      "//base/security/device_auth/services:deviceauth_sdk",
+    ]
+
+    external_deps = [
+      "dsoftbus:softbus_client",
+      "ipc:ipc_core",
+      "safwk:system_ability_fwk",
+      "samgr_standard:samgr_proxy",
+      "startup_l2:syspara",
+      "startup_l2:syspara_watchagent",
+      "utils_base:utils",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+}

@@ -24,6 +24,7 @@
 #include "ipc_client.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcClientProxyTest : public testing::Test {

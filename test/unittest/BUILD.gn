@@ -29,7 +29,6 @@ group("unittest") {
     ":UTTest_device_profile_adapter",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_auth_manager",
-    ":UTTest_dm_device_info_manager",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_discovery_manager",
     ":UTTest_dm_timer",
@@ -45,6 +44,7 @@ group("unittest") {
     ":UTTest_multiple_user_connector",
     ":UTTest_profile_connector",
     ":UTTest_softbus_connector",
+    ":UTTest_softbus_listener",
     ":UTTest_softbus_session",
   ]
 }
@@ -126,32 +126,34 @@ ohos_unittest("UTTest_hichain_connector") {
 
 ## UnitTest UTTest_hichain_connector }}}
 
-## UnitTest UTTest_dm_device_info_manager {{{
-ohos_unittest("UTTest_dm_device_info_manager") {
+## UnitTest UTTest_softbus_listener {{{
+ohos_unittest("UTTest_softbus_listener") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_device_info_manager.cpp" ]
+  sources = [ "UTTest_softbus_listener.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 }
 
-## UnitTest UTTest_dm_device_info_manager }}}
+## UnitTest UTTest_softbus_listener }}}
 
 ## UnitTest UTTest_softbus_connector {{{
 ohos_unittest("UTTest_softbus_connector") {
   module_out_path = module_out_path
 
   sources = [
-    "${services_path}/src/adapter/standard/dm_adapter_manager.cpp",
-    "${services_path}/src/config/dm_config_manager.cpp",
-    "${services_path}/src/dependency/hichain/hichain_connector.cpp",
-    "${services_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
-    "${services_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${services_path}/src/dependency/softbus/softbus_session.cpp",
-    "${services_path}/src/dependency/timer/dm_timer.cpp",
+    "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/devicestate/dm_device_state_manager.cpp",
-    "${services_path}/src/discovery/dm_discovery_manager.cpp",
+    "${services_path}/src/softbus/softbus_listener.cpp",
+    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
+    "${servicesimpl_path}/src/config/dm_config_manager.cpp",
+    "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
+    "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
+    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
+    "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
+    "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_softbus_connector.cpp",
@@ -357,16 +359,18 @@ ohos_unittest("UTTest_dm_device_state_manager") {
   module_out_path = module_out_path
 
   sources = [
-    "${services_path}/src/adapter/standard/dm_adapter_manager.cpp",
-    "${services_path}/src/config/dm_config_manager.cpp",
-    "${services_path}/src/dependency/hichain/hichain_connector.cpp",
-    "${services_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
-    "${services_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${services_path}/src/dependency/softbus/softbus_session.cpp",
-    "${services_path}/src/dependency/timer/dm_timer.cpp",
+    "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/devicestate/dm_device_state_manager.cpp",
-    "${services_path}/src/discovery/dm_discovery_manager.cpp",
+    "${services_path}/src/softbus/softbus_listener.cpp",
+    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
+    "${servicesimpl_path}/src/config/dm_config_manager.cpp",
+    "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
+    "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
+    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
+    "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
+    "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_dm_device_state_manager.cpp",
@@ -456,11 +460,13 @@ ohos_unittest("UTTest_dm_discovery_manager") {
   module_out_path = module_out_path
 
   sources = [
-    "${services_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${services_path}/src/dependency/softbus/softbus_session.cpp",
-    "${services_path}/src/dependency/timer/dm_timer.cpp",
+    "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/discovery/dm_discovery_manager.cpp",
+    "${services_path}/src/softbus/softbus_listener.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
+    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
+    "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_dm_discovery_manager.cpp",
@@ -488,19 +494,20 @@ config("device_manager_test_common_public_config") {
     "${common_path}/include/ipc/model",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/dependency/timer",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/authentication",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/deviceinfo/",
+    "${servicesimpl_path}/include/devicestate",
     "${services_path}/include",
-    "${services_path}/include/dependency/timer",
-    "${services_path}/include/discovery",
-    "${services_path}/include/dependency/softbus",
-    "${services_path}/include/dependency/softbus",
-    "${services_path}/include/authentication",
-    "${services_path}/include/adapter",
-    "${services_path}/include",
-    "${services_path}/include/ipc/standard",
-    "${services_path}/include/discovery",
-    "${services_path}/include/dependency/hichain",
-    "${services_path}/include/deviceinfo/",
-    "${services_path}/include/devicestate",
+    "${services_path}/include/softbus",
     "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
     "//foundation/communication/softbus_lite/interfaces/kits/transport",
     "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
@@ -509,13 +516,13 @@ config("device_manager_test_common_public_config") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/device_manager/ext/mini/services/devicemanagerservice/include/dispatch",
+    "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
     "//base/security/device_auth/interfaces/innerkits",
-    "${services_path}/include/ability",
-    "${services_path}/include/config",
+    "${servicesimpl_path}/include/ability",
+    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [
@@ -543,6 +550,7 @@ ohos_static_library("device_manager_test_common") {
   public_deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
@@ -570,22 +578,24 @@ config("device_manager_test_common_public") {
     "${common_path}/include/ipc/model",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/dependency/timer",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/dependency/multipleuser",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/authentication",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/deviceinfo/",
+    "${servicesimpl_path}/include/devicestate",
+    "${servicesimpl_path}/include/ability",
+    "${servicesimpl_path}/include/config",
     "${services_path}/include",
-    "${services_path}/include/dependency/timer",
-    "${services_path}/include/discovery",
-    "${services_path}/include/dependency/softbus",
-    "${services_path}/include/dependency/hichain",
-    "${services_path}/include/dependency/multipleuser",
-    "${services_path}/include/dependency/softbus",
-    "${services_path}/include/authentication",
-    "${services_path}/include/adapter",
-    "${services_path}/include",
-    "${services_path}/include/discovery",
-    "${services_path}/include/deviceinfo/",
-    "${services_path}/include/devicestate",
+    "${services_path}/include/softbus",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/",
-    "${services_path}/include/ability",
-    "${services_path}/include/config",
     "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
     "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
     "//foundation/communication/dsoftbus/interfaces/kits/common",

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "UTTest_dm_discovery_manager.h"
+
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -23,7 +25,7 @@
 #include "ipc_server_listener.h"
 #include "device_manager_service_listener.h"
 #include "discovery_service.h"
-#include "UTTest_dm_discovery_manager.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

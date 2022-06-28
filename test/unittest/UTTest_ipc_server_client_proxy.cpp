@@ -14,7 +14,9 @@
  */
 
 #include "UTTest_ipc_server_client_proxy.h"
+
 #include <unistd.h>
+
 #include "dm_device_info.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"

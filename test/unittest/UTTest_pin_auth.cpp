@@ -16,12 +16,12 @@
 #include "UTTest_pin_auth.h"
 
 #include <unistd.h>
-
 #include <memory>
 
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

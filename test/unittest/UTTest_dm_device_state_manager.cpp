@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "UTTest_dm_device_state_manager.h"
+
 #include <iostream>
 
 #include "dm_log.h"
@@ -24,7 +27,7 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "hichain_connector.h"
-#include "UTTest_dm_device_state_manager.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

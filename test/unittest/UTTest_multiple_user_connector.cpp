@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "UTTest_multiple_user_connector.h"
+
 #include "dm_constants.h"
 #include "multiple_user_connector.h"
-#include "UTTest_multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,7 +36,7 @@ void MultipleUserConnectorTest::TearDownTestCase()
 namespace {
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -50,7 +51,7 @@ HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::T
 
 /**
  * @tc.name: SetSwitchOldUserId_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -67,7 +68,7 @@ HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSi
 
 /**
  * @tc.name: GetSwitchOldUserId_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC

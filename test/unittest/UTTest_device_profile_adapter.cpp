@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "UTTest_device_profile_adapter.h"
+
 #include "dm_constants.h"
 #include "dm_device_state_manager.h"
 #include "profile_adapter.h"
@@ -20,7 +22,7 @@
 #include "profile_connector.h"
 #include "device_profile_adapter.h"
 #include "distributed_device_profile_client.h"
-#include "UTTest_device_profile_adapter.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -46,7 +48,7 @@ std::shared_ptr<DmDeviceStateManager> deviceStateMgr = std::make_shared<DmDevice
                                                                                               hiChainConnector);
 /**
  * @tc.name: RegisterProfileListener_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -65,7 +67,7 @@ HWTEST_F(DeviceProfileAdapterTest, RegisterProfileListener_001, testing::ext::Te
 
 /**
  * @tc.name: UnRegisterProfileListener_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -83,7 +85,7 @@ HWTEST_F(DeviceProfileAdapterTest, UnRegisterProfileListener_001, testing::ext::
 
 /**
  * @tc.name: OnProfileChanged_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -102,7 +104,7 @@ HWTEST_F(DeviceProfileAdapterTest, OnProfileChanged_001, testing::ext::TestSize.
 
 /**
  * @tc.name: OnProfileComplete_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC

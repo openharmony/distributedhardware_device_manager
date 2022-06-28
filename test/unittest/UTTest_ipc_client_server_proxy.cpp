@@ -14,7 +14,9 @@
  */
 
 #include "UTTest_ipc_client_server_proxy.h"
+
 #include <unistd.h>
+
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
@@ -23,7 +25,6 @@
 #include "ipc_set_useroperation_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_start_discovery_req.h"
-
 
 namespace OHOS {
 namespace DistributedHardware {

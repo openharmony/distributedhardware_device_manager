@@ -42,18 +42,17 @@ void DeviceManagerServiceTest::TearDownTestCase()
 namespace {
 /**
  * @tc.name: StartDeviceDiscovery_001
- * @tc.desc: Set StartDeviceDiscovery's flag bit intFlag_ to False and return ERR_DM_NOT_INIT
+ * @tc.desc: Start device discovery and return ERR_DM_NOT_INIT
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -92,17 +91,16 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestS
 
 /**
  * @tc.name: StopDeviceDiscovery_001
- * @tc.desc: Set StopDeviceDiscovery's flag bit intFlag_ to false and return ERR_DM_NOT_INIT
+ * @tc.desc: Stop device discovery and return ERR_DM_NOT_INIT
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -128,10 +126,9 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
  */
 HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     DmDeviceInfo info;
     int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -156,9 +153,8 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     int ret = DeviceManagerService::GetInstance().Init();
-    EXPECT_EQ(ret, ERR_DM_INIT_REPEATED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -169,7 +165,6 @@ HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DeviceManagerServiceTest, Init_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::shared_ptr<SoftbusConnector> softbusConnector_ = nullptr;
     int ret = DeviceManagerService::GetInstance().Init();
     EXPECT_EQ(ret, DM_OK);
@@ -184,12 +179,11 @@ HWTEST_F(DeviceManagerServiceTest, Init_002, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     std::vector<DmDeviceInfo> deviceList;
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -200,7 +194,6 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName;
     std::string extra = "jdddd";
     std::vector<DmDeviceInfo> deviceList;
@@ -216,13 +209,12 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
     std::string deviceId = "2345";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -233,7 +225,6 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName;
     std::string extra = "jdddd";
     int32_t authType = 0;
@@ -250,7 +241,6 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
@@ -266,7 +256,6 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
@@ -283,11 +272,10 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -298,7 +286,6 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName;
     std::string deviceId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
@@ -314,7 +301,6 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "com.ohos.test";
     std::string deviceId;
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
@@ -330,10 +316,9 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string authParam = "jdjjjj";
     int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -345,7 +330,6 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
     std::string udid = "";
@@ -362,12 +346,11 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
     std::string udid = "";
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -379,7 +362,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "";
     std::string netWorkId = "";
     std::string udid = "";
@@ -396,7 +378,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
     std::string uuid = "";
@@ -413,12 +394,11 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = false;
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
     std::string uuid = "";
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -430,7 +410,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSiz
  */
 HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().intFlag_ = true;
     std::string pkgName = "";
     std::string netWorkId = "";
     std::string uuid = "";

@@ -21,6 +21,7 @@
 #include "ipc_client_stub.h"
 #include "ipc_server_stub.h"
 #include "ipc_server_listener.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcServerStubTest : public testing::Test {

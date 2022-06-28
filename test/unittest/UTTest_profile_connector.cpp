@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "UTTest_profile_connector.h"
+
 #include "dm_constants.h"
 #include "dm_device_state_manager.h"
 #include "profile_adapter.h"
@@ -20,7 +22,7 @@
 #include "profile_connector.h"
 #include "device_profile_adapter.h"
 #include "distributed_device_profile_client.h"
-#include "UTTest_profile_connector.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,12 +43,12 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-std::shared_ptr<DmDeviceStateManager> deviceStateMgr = std::make_shared<DmDeviceStateManager>(softbusConnector,
-                                                                                              listener,
-                                                                                              hiChainConnector);
+std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
+    std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector);
+
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -69,7 +71,7 @@ HWTEST_F(ProfileConnectorTest, RegisterProfileCallback_001, testing::ext::TestSi
 
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -87,7 +89,7 @@ HWTEST_F(ProfileConnectorTest, UnRegisterProfileCallback_001, testing::ext::Test
 
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -106,7 +108,7 @@ HWTEST_F(ProfileConnectorTest, SubscribeProfileEvents_001, testing::ext::TestSiz
 
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -126,7 +128,7 @@ HWTEST_F(ProfileConnectorTest, UnSubscribeProfileEvents_001, testing::ext::TestS
 
 /**
  * @tc.name: OnDecisionFilterResult_002
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC
@@ -143,7 +145,7 @@ HWTEST_F(ProfileConnectorTest, UnSubscribeProfileEvents_002, testing::ext::TestS
 
 /**
  * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor DmDeviceInfoManager new
+ * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
  * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC

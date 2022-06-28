@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "UTTest_hichain_connector.h"
+
 #include <cstdlib>
 #include <ctime>
 #include <functional>
@@ -24,7 +26,7 @@
 #include "dm_constants.h"
 #include "dm_random.h"
 #include "hichain_connector.h"
-#include "UTTest_hichain_connector.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

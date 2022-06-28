@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 #include <refbase.h>
-
 #include <map>
 #include <memory>
 #include <mutex>
@@ -32,6 +31,7 @@
 #include "dm_subscribe_info.h"
 #include "softbus_bus_center.h"
 #include "softbus_connector.h"
+#include "softbus_listener.h"
 #include "softbus_discovery_callback.h"
 #include "softbus_session.h"
 #include "softbus_state_callback.h"

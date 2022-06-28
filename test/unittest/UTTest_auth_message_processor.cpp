@@ -13,13 +13,15 @@
  * limitations under the License.
  */
 
+#include "UTTest_auth_message_processor.h"
+
 #include "dm_log.h"
 #include "dm_constants.h"
 #include "auth_message_processor.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
 #include "dm_auth_manager.h"
-#include "UTTest_auth_message_processor.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

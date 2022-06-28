@@ -16,7 +16,6 @@
 #include "UTTest_pin_auth_ui.h"
 
 #include <unistd.h>
-
 #include <memory>
 
 #include "dm_ability_manager.h"
@@ -24,6 +23,7 @@
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "ui_service_mgr_client.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

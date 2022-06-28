@@ -14,6 +14,11 @@
  */
 
 #include "UTTest_ipc_server_stub.h"
+
+#include <algorithm>
+#include <thread>
+#include <unistd.h>
+
 #include "dm_device_info.h"
 #include "ipc_server_stub.h"
 #include "device_manager_impl.h"
@@ -25,10 +30,6 @@
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
-
-#include <algorithm>
-#include <thread>
-#include <unistd.h>
 
 namespace OHOS {
 namespace DistributedHardware {

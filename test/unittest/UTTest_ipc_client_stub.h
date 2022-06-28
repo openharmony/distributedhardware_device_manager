@@ -20,6 +20,7 @@
 #include <refbase.h>
 
 #include "ipc_client_stub.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcClientStubTest : public testing::Test {

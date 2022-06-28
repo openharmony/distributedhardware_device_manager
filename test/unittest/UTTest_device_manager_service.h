@@ -24,7 +24,6 @@
 #include "device_manager_service.h"
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
-#include "dm_device_info_manager.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
 #include "single_instance.h"

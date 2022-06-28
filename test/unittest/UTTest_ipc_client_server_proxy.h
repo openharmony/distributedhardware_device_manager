@@ -22,6 +22,7 @@
 #include "ipc_remote_broker.h"
 #include "ipc_client_server_proxy.h"
 #include "iremote_proxy.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcClientServerProxyTest : public testing::Test {

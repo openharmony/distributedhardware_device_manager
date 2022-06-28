@@ -20,6 +20,7 @@
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "device_manager_service_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

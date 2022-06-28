@@ -14,7 +14,9 @@
  */
 
 #include "UTTest_ipc_cmd_register.h"
+
 #include <unistd.h>
+
 #include "ipc_client_manager.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_get_trustdevice_rsp.h"
