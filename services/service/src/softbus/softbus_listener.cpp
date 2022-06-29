@@ -175,7 +175,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     return DM_OK;
 }
 
-bool SoftbusListener::DumperIsDeviceOnline(const std::string &deviceId)
+bool SoftbusListener::IsDeviceOnline(const std::string &deviceId)
 {
     NodeBasicInfo *info = nullptr;
     int32_t infoNum = 0;

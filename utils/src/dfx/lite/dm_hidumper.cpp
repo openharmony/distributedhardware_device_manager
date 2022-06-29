@@ -17,21 +17,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(HidumpHelper);
-int32_t HidumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
+IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
+int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {
     return DM_OK;
 }
 
-int32_t HidumpHelper::GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag)
+int32_t HiDumpHelper::GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag)
 {
     return DM_OK;
 }
 
-void HidumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo, const bool deviceStates)
+void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo, const bool deviceStates)
 {
     return;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

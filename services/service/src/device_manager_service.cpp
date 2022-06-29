@@ -87,8 +87,6 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     return ret;
 }
 
-
-
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
 {
@@ -274,9 +272,9 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
-    LOGI("Hidumper GetTrustedDeviceList");
+    LOGI("HiDump GetTrustedDeviceList");
     std::vector<HidumperFlag> dumpflag;
-    HidumpHelper::GetInstance().GetArgsType(args, dumpflag);
+    HiDumpHelper::GetInstance().GetArgsType(args, dumpflag);
 
     for (unsigned int i = 0; i < dumpflag.size(); i++) {
         if (dumpflag[i] == HidumperFlag::HIDUMPER_GET_TRUSTED_LIST) {
@@ -284,19 +282,19 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
 
             int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
             if (ret != DM_OK) {
-                result.append("Hidumper GetTrustedDeviceList failed");
-                LOGE("Hidumper GetTrustedDeviceList failed");
+                result.append("HiDumpHelper GetTrustedDeviceList failed");
+                LOGE("HiDumpHelper GetTrustedDeviceList failed");
                 return ERR_DM_FAILED;
             }
             bool deviceState = false;
             for (unsigned int  j = 0; j < deviceList.size(); j++) {
-                deviceState = softbusListener_->DumperIsDeviceOnline(deviceList[j].deviceId);
-                HidumpHelper::GetInstance().SetNodeInfo(deviceList[j], deviceState);
+                deviceState = softbusListener_->IsDeviceOnline(deviceList[j].deviceId);
+                HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j], deviceState);
                 LOGI("DeviceManagerService::DmHiDumper  SetNodeInfo.");
             }
         }
     }
-    HidumpHelper::GetInstance().HiDump(args, result);
+    HiDumpHelper::GetInstance().HiDump(args, result);
     return DM_OK;
 }
 } // namespace DistributedHardware

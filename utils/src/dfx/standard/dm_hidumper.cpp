@@ -15,17 +15,17 @@
 
 #include <string>
 
-#include "dm_hidumper.h"
 #include "dm_anonymous.h"
 #include "dm_dfx_constants.h"
 #include "dm_device_info.h"
+#include "dm_hidumper.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(HidumpHelper);
-int32_t HidumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
+IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
+int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {
-    LOGI("HidumpHelper hidumper start.");
+    LOGI("HiDumpHelper start.");
     result.clear();
     int32_t errCode = ERR_DM_FAILED;
 
@@ -41,9 +41,9 @@ int32_t HidumpHelper::HiDump(const std::vector<std::string>& args, std::string &
     return errCode;
 }
 
-void HidumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo, const bool deviceStates)
+void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo, const bool deviceStates)
 {
-    LOGI("HidumpHelper::SetNodeInfo");
+    LOGI("HiDumpHelper::SetNodeInfo");
     nodeInfos_.push_back(deviceInfo);
     std::string deviceState = "offline";
     if (deviceStates) {
@@ -52,7 +52,7 @@ void HidumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo, const bool device
     deviceState_.push_back(deviceState);
 }
 
-int32_t HidumpHelper::ProcessDump(const HidumperFlag &flag, std::string &result)
+int32_t HiDumpHelper::ProcessDump(const HidumperFlag &flag, std::string &result)
 {
     LOGI("Process Dump.");
     int32_t ret = ERR_DM_FAILED;
@@ -73,7 +73,7 @@ int32_t HidumpHelper::ProcessDump(const HidumperFlag &flag, std::string &result)
     return ret;
 }
 
-int32_t HidumpHelper::ShowAllLoadTrustedList(std::string &result)
+int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
 {
     LOGI("Dump Show All Load Trust List");
     int32_t ret = DM_OK;
@@ -90,13 +90,13 @@ int32_t HidumpHelper::ShowAllLoadTrustedList(std::string &result)
     }
 
     nodeInfos_.clear();
-    LOGI("HidumpHelper ShowAllLoadTrustedList %s", result.c_str());
+    LOGI("HiDumpHelper ShowAllLoadTrustedList %s", result.c_str());
     return ret;
 }
 
-int32_t HidumpHelper::ShowHelp(std::string &result)
+int32_t HiDumpHelper::ShowHelp(std::string &result)
 {
-    LOGI("Show hidumper help.");
+    LOGI("Show hidumper help");
     result.append("DistributedHardwareDeviceManager hidumper options:\n");
     result.append(" -help                    ");
     result.append(": Show help\n");
@@ -106,17 +106,17 @@ int32_t HidumpHelper::ShowHelp(std::string &result)
     return DM_OK;
 }
 
-int32_t HidumpHelper::ShowIllealInfomation(std::string &result)
+int32_t HiDumpHelper::ShowIllealInfomation(std::string &result)
 {
-    LOGI("ShowIllealInfomation Dump.");
+    LOGI("ShowIllealInfomation Dump");
     result.clear();
     result.append("Unrecognized option, -h for help.");
     return DM_OK;
 }
 
-int32_t HidumpHelper::GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag)
+int32_t HiDumpHelper::GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag)
 {
-    LOGI("HidumpHelper::GetArgsType");
+    LOGI("HiDumpHelper::GetArgsType");
     int32_t ret = ERR_DM_FAILED;
     if (args.empty()) {
         Flag.push_back(HidumperFlag::HIDUMPER_GET_HELP);

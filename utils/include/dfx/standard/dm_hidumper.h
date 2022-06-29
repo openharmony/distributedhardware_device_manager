@@ -29,8 +29,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class HidumpHelper {
-DECLARE_SINGLE_INSTANCE(HidumpHelper);
+class HiDumpHelper {
+DECLARE_SINGLE_INSTANCE(HiDumpHelper);
 public:
     int32_t HiDump(const std::vector<std::string>& args, std::string &result);
     int32_t GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag);
