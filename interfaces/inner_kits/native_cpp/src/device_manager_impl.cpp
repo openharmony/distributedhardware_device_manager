@@ -655,11 +655,12 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
 
-    if (ipcClientProxy_->SendRequest(UNREGISTER_CREDENTIAL_CALLBACK, req, rsp) != DM_OK) {
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_CREDENTIAL_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
         LOGE("UnRegisterCredentialCallback error: Send Request failed ret: %d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-    int32_t ret = rsp->GetErrCode();
+    ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnRegisterCredentialCallback Failed with ret %d", ret);
         return ret;
