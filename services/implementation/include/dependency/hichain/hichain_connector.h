@@ -37,7 +37,7 @@ struct GroupInfo {
     int32_t groupVisibility;
     std::string userId;
 
-    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0), userId(0)
+    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0), userId("")
     {
     }
 };
