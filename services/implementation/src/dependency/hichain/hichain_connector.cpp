@@ -585,7 +585,7 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
     jsonObj[FIELD_GROUP_TYPE] = authType;
     std::string queryParams = jsonObj.dump();
     std::vector<GroupInfo> groupList;
-    if (GetGroupInfo(queryParams, groupList)) {
+    if (!GetGroupInfo(queryParams, groupList)) {
         LOGE("failed to get device join groups");
         return ERR_DM_FAILED;
     }
