@@ -86,8 +86,8 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
   sources = [ "ipc_client_manager_fuzzer.cpp" ]
 
   deps = [
-    "${aainnerkits_path}/ability_manager:ability_manager",
-    "${aaservices_path}/abilitymgr:abilityms",
+    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
+    "${ability_runtime_services_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
