@@ -82,8 +82,8 @@ public:
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
     bool IsDMServiceImplReady();
-	
-	int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
+
+    int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
 
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
 
