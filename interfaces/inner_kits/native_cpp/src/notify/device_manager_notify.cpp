@@ -309,7 +309,6 @@ void DeviceManagerNotify::OnCredentialResult(const std::string &pkgName, int32_t
         return;
     }
     credentialCallback_[pkgName]->OnCredentialResult(action, credentialResult);
-    credentialCallback_.erase(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
