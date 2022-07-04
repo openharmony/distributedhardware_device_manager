@@ -174,7 +174,7 @@ using DeviceGroupManager = struct _DeviceGroupManager {
     int32_t (*authKeyAgree)(int64_t requestId, const char *appId, const char *buildParams);
     int32_t (*processKeyAgreeData)(int64_t requestId, const char *appId, const uint8_t *data, uint32_t dataLen);
     int32_t (*processCredential)(int operationCode, const char *reqJsonStr, char **returnJsonStr);
-    int32_t (*getRegisterInfo)(char **returnRegisterInfo);
+    int32_t (*getRegisterInfo)(const char *reqJsonStr, char **returnRegisterInfo);
     int32_t (*getLocalConnectInfo)(char *returnInfo, int32_t bufLen);
     int32_t (*checkAccessToGroup)(int32_t osAccountId, const char *appId, const char *groupId);
     int32_t (*getPkInfoList)(int32_t osAccountId, const char *appId, const char *queryParams, char **returnInfoList,

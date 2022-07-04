@@ -19,6 +19,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_notify_auth_result_req.h"
+#include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
@@ -117,6 +118,19 @@ void DeviceManagerServiceListener::OnFaCall(std::string &pkgName, std::string &p
     pReq->SetPkgName(pkgName);
     pReq->SetJsonParam(paramJson);
     ipcServerListener_.SendRequest(SERVER_DEVICE_FA_NOTIFY, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnCredentialResult(const std::string &pkgName, int32_t action,
+    const std::string &resultInfo)
+{
+    LOGI("call OnCredentialResult for %s, action %d", pkgName.c_str(), action);
+    std::shared_ptr<IpcNotifyCredentialReq> pReq = std::make_shared<IpcNotifyCredentialReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
+    pReq->SetPkgName(pkgName);
+    pReq->SetCredentialAction(action);
+    pReq->SetCredentialResult(resultInfo);
+    ipcServerListener_.SendRequest(SERVER_CREDENTIAL_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

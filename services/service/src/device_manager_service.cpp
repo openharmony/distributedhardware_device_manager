@@ -237,6 +237,51 @@ void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsi
     dmServiceImpl_->OnBytesReceived(sessionId, data, dataLen);
 }
 
+int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("RequestCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
+}
+
+int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->ImportCredential(pkgName, credentialInfo);
+}
+
+int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("DeleteCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->DeleteCredential(pkgName, deleteInfo);
+}
+
+int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgName)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("RegisterCredentialCallback failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->RegisterCredentialCallback(pkgName);
+}
+
+int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pkgName)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnRegisterCredentialCallback failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->UnRegisterCredentialCallback(pkgName);
+}
+
 bool DeviceManagerService::IsDMServiceImplReady()
 {
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {

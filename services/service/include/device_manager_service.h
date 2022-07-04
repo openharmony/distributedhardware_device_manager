@@ -84,6 +84,17 @@ public:
     bool IsDMServiceImplReady();
 
     int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
+
+    int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
+
+    int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
+
+    int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
+
+    int32_t RegisterCredentialCallback(const std::string &pkgName);
+
+    int32_t UnRegisterCredentialCallback(const std::string &pkgName);
+
 private:
     bool isImplsoLoaded_ = false;
     std::shared_ptr<SoftbusListener> softbusListener_;

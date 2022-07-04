@@ -35,8 +35,9 @@ struct GroupInfo {
     std::string groupOwner;
     int32_t groupType;
     int32_t groupVisibility;
+    std::string userId;
 
-    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0)
+    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0), userId("")
     {
     }
 };
@@ -76,6 +77,14 @@ public:
     int32_t CreateGroup(int64_t requestId, const std::string &groupName);
 
     /**
+     * @tc.name: HiChainConnector::CreateGroup
+     * @tc.desc: Create Group of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t CreateGroup(int64_t requestId, int32_t authType, const std::string &userId,
+        nlohmann::json &jsonOutObj);
+
+    /**
      * @tc.name: HiChainConnector::AddMember
      * @tc.desc: Add Member of the HiChain Connector
      * @tc.type: FUNC
@@ -102,6 +111,13 @@ public:
      * @tc.type: FUNC
      */
     int32_t DeleteGroup(const int32_t userId, std::string &groupId);
+
+    /**
+     * @tc.name: HiChainConnector::DeleteGroup
+     * @tc.desc: DeleteGroup of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t DeleteGroup(int64_t requestId_, const std::string &userId, const int32_t authType);
 
     /**
      * @tc.name: HiChainConnector::IsDevicesInGroup
@@ -137,18 +153,47 @@ public:
      * @tc.type: FUNC
      */
     int32_t DeleteTimeOutGroup(const char* deviceId);
+
+    /**
+     * @tc.name: HiChainConnector::RegisterHiChainCallback
+     * @tc.desc: Register HiChain Callback of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t RegisterHiChainGroupCallback(const std::shared_ptr<IDmGroupResCallback> &callback);
+
+    /**
+     * @tc.name: HiChainConnector::UnRegisterHiChainCallback
+     * @tc.desc: Un Register HiChain Callback of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t UnRegisterHiChainGroupCallback();
+
+     /**
+     * @tc.name: HiChainConnector::getRegisterInfo
+     * @tc.desc: Get RegisterInfo Info of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t getRegisterInfo(const std::string &queryParams, std::string &returnJsonStr);
+
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
     int32_t GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList);
     std::string GetConnectPara(std::string deviceId, std::string reqDeviceId);
     bool IsGroupCreated(std::string groupName, GroupInfo &groupInfo);
+    bool IsRedundanceGroup(const std::string &userId, int32_t authType, std::vector<GroupInfo> &groupList);
+    void DealRedundanceGroup(const std::string &userId, int32_t authType);
+    void DeleteRedundanceGroup(std::string &userId);
     bool IsGroupInfoInvalid(GroupInfo &group);
+    int32_t GetStrFieldByType(const std::string &reqJsonStr, const std::string &outField, int32_t type);
+    int32_t GetNumsFieldByType(const std::string &reqJsonStr, int32_t &outField, int32_t type);
 
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IHiChainConnectorCallback> hiChainConnectorCallback_;
+    static std::shared_ptr<IDmGroupResCallback> hiChainResCallback_;
+    static int32_t networkStyle_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

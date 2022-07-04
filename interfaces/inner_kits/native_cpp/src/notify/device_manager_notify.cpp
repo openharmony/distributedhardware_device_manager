@@ -130,6 +130,19 @@ void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &p
     dmFaCallback_.erase(pkgName);
 }
 
+void DeviceManagerNotify::RegisterCredentialCallback(const std::string &pkgName,
+                                                     std::shared_ptr<CredentialCallback> callback)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    credentialCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterCredentialCallback(const std::string &pkgName)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    credentialCallback_.erase(pkgName);
+}
+
 void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManager : OnRemoteDied");
@@ -284,6 +297,18 @@ void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
         return;
     }
     dmFaCallback_[pkgName]->OnCall(paramJson);
+}
+
+void DeviceManagerNotify::OnCredentialResult(const std::string &pkgName, int32_t &action,
+                                             const std::string &credentialResult)
+{
+    LOGI("DeviceManagerNotify::OnCredentialResult pkgName:%s, action:%d", pkgName.c_str(), action);
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (credentialCallback_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnCredentialResult: no register credentialCallback_ for this package");
+        return;
+    }
+    credentialCallback_[pkgName]->OnCredentialResult(action, credentialResult);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

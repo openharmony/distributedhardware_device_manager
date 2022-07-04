@@ -26,7 +26,7 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     int32_t ret = DM_OK;
-    if (cmdCode < 0 || cmdCode >= UNREGISTER_DEV_STATE_CALLBACK || pBaseReq == nullptr) {
+    if (cmdCode < 0 || cmdCode >= UNREGISTER_CREDENTIAL_CALLBACK || pBaseReq == nullptr) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }

@@ -24,6 +24,7 @@
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_notify_auth_result_req.h"
+#include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
@@ -505,6 +506,113 @@ ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &re
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;
+}
+
+ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
+{
+    LOGE("start to request device credential.");
+    std::string packageName = data.ReadString();
+    std::string reqJsonStr = data.ReadString();
+    std::string returnJsonStr;
+    int32_t ret = DeviceManagerService::GetInstance().RequestCredential(reqJsonStr, returnJsonStr);
+    if (!reply.WriteInt32(ret)) {
+        LOGE("write ret failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (ret == DM_OK && !returnJsonStr.empty()) {
+        if (!reply.WriteString(returnJsonStr))
+        {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    LOGI("REQUEST_CREDENTIAL success.");
+    return DM_OK;
+}
+
+ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
+{
+    LOGE("start to import credential to device.");
+    std::string packageName = data.ReadString();
+    std::string credentialInfo = data.ReadString();
+    int32_t ret = DeviceManagerService::GetInstance().ImportCredential(packageName, credentialInfo);
+    if (!reply.WriteInt32(ret)) {
+        LOGE("write ret failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    LOGI("IMPORT_CREDENTIAL success.");
+    return DM_OK;
+}
+
+ON_IPC_CMD(DELETE_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
+{
+    LOGE("start to delete credential from device.");
+    std::string packageName = data.ReadString();
+    std::string deleteInfo = data.ReadString();
+    int32_t ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, deleteInfo);
+    if (!reply.WriteInt32(ret)) {
+        LOGE("write ret failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    LOGI("DELETE_CREDENTIAL success.");
+    return DM_OK;
+}
+
+ON_IPC_CMD(REGISTER_CREDENTIAL_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    int result = DeviceManagerService::GetInstance().RegisterCredentialCallback(packageName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return result;
+}
+
+ON_IPC_CMD(UNREGISTER_CREDENTIAL_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    int result = DeviceManagerService::GetInstance().UnRegisterCredentialCallback(packageName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return result;
+}
+
+ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyCredentialReq> pReq = std::static_pointer_cast<IpcNotifyCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    int32_t action = pReq->GetCredentialAction();
+    std::string credentialResult = pReq->GetCredentialResult();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(action)) {
+        LOGE("write action failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(credentialResult)) {
+        LOGE("write credentialResult failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_CREDENTIAL_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

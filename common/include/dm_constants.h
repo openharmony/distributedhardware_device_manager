@@ -79,6 +79,7 @@ enum {
     ERR_DM_AUTH_MESSAGE_INCOMPLETE = -20025,
     ERR_DM_CREATE_GROUP_FAILED = -20026,
     ERR_DM_IPC_READ_FAILED = -20027,
+    ERR_DM_ENCRYPT_FAILED = -20028,
 };
 
 const std::string TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -147,7 +148,10 @@ const int32_t AUTH_TYPE_TOUCH = 3;
 const int32_t DEFAULT_PIN_CODE = 0;
 const int32_t DEFAULT_PIN_TOKEN = 0;
 const int32_t DEFAULT_PIN_CODE_LENGTH = 6;
-
+const int32_t LOCAL_CREDENTIAL_DEAL_TYPE = 1;
+const int32_t REMOTE_CREDENTIAL_DEAL_TYPE = 2;
+const int32_t NONSYMMETRY_CREDENTIAL_TYPE = 2;
+const int32_t SYMMETRY_CREDENTIAL_TYPE = 1;
 // Softbus
 const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const uint32_t SOFTBUS_SUBSCRIBE_ID_PREFIX_LEN = 16;
@@ -206,6 +210,23 @@ const int32_t MAX_EVENT_NUMBER = 10;
 const int32_t EXPAND_TWICE = 2;
 const int32_t SEC_TO_MM = 1000;
 const int32_t MAX_EVENTS = 5;
+
+// credential
+const std::string FIELD_CREDENTIAL = "credential";
+const std::string FIELD_CREDENTIAL_VERSION = "version";
+const std::string FIELD_DEVICE_PK = "devicePk";
+const std::string FIELD_SERVER_PK = "serverPk";
+const std::string FIELD_PKINFO_SIGNATURE = "pkInfoSignature";
+const std::string FIELD_PKINFO = "pkInfo";
+const std::string FIELD_PROCESS_TYPE = "processType";
+const std::string FIELD_AUTH_TYPE = "authType";
+const std::string FIELD_CREDENTIAL_DATA = "credentialData";
+const std::string FIELD_CREDENTIAL_ID = "credentialId";
+const int32_t SAME_ACCOUNT_TYPE = 1;
+const int32_t CROSS_ACCOUNT_TYPE = 2;
+const int32_t PIN_CODE_NETWORK = 0;
+const int32_t CREDENTIAL_NETWORK = 1;
+const int32_t DELAY_TIME_MS = 10000; // 10ms
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

@@ -31,6 +31,7 @@ if (defined(ohos_lite)) {
         "${servicesimpl_path}/include/authentication",
         "${servicesimpl_path}/include/authentication/showconfirm/lite",
         "${servicesimpl_path}/include/ability",
+        "${servicesimpl_path}/include/credential",
         "${servicesimpl_path}/include/devicestate",
         "${servicesimpl_path}/include/discovery",
         "${servicesimpl_path}/include/dependency/commonevent",

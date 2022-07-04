@@ -29,6 +29,8 @@
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
+#include "ipc_set_credential_req.h"
+#include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
@@ -510,6 +512,128 @@ ON_IPC_CMD(SERVER_DEVICE_FA_NOTIFY, MessageParcel &data, MessageParcel &reply)
         LOGE("write return failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REQUEST_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string requestJsonStr = pReq->GetCredentialParam();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkg failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(requestJsonStr)) {
+        LOGE("write requestJsonStr failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REQUEST_CREDENTIAL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    if (pRsp->GetErrCode() == DM_OK) {
+        std::string returnJsonStr = reply.ReadString();
+        pRsp->SetCredentialResult(returnJsonStr);
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(IMPORT_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string credentialInfo = pReq->GetCredentialParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkg failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(credentialInfo)) {
+        LOGE("write credentialInfo failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(IMPORT_CREDENTIAL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(DELETE_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string deleteInfo = pReq->GetCredentialParam();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkg failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(deleteInfo)) {
+        LOGE("write deleteInfo failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(DELETE_CREDENTIAL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REGISTER_CREDENTIAL_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REGISTER_CREDENTIAL_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UNREGISTER_CREDENTIAL_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNREGISTER_CREDENTIAL_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_CREDENTIAL_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t action = data.ReadInt32();
+    std::string credentialResult = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    reply.WriteInt32(DM_OK);
     return DM_OK;
 }
 } // namespace DistributedHardware

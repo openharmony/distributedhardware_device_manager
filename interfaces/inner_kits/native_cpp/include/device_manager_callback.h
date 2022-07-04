@@ -75,6 +75,14 @@ public:
     }
     virtual void OnCall(const std::string &paramJson) = 0;
 };
+
+class CredentialCallback {
+public:
+    virtual ~CredentialCallback()
+    {
+    }
+    virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

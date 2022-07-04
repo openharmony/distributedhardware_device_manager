@@ -77,6 +77,13 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnFaCall(std::string &pkgName, std::string &paramJson);
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnCredentialResult
+     * @tc.desc: Credential Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

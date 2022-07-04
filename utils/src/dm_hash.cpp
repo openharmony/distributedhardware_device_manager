@@ -70,5 +70,37 @@ int32_t GetUdidHash(uint8_t *udid, int32_t udidDataLen, uint8_t outudidData[32])
     mbedtls_md_free(&ctx);
     return ret;
 }
+
+int32_t GenerateStrHash(const unsigned char *strInput, uint32_t len, unsigned char *hash)
+{
+    if (strInput == nullptr || hash == nullptr || len == 0) {
+        return ERR_DM_POINT_NULL;
+    }
+
+    mbedtls_md_context_t ctx;
+    const mbedtls_md_info_t *info = nullptr;
+    mbedtls_md_init(&ctx);
+
+    info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    if (mbedtls_md_setup(&ctx, info, 0) != 0) {
+        mbedtls_md_free(&ctx);
+        return ERR_DM_FAILED;
+    }
+    if (mbedtls_md_starts(&ctx) != 0) {
+        mbedtls_md_free(&ctx);
+        return ERR_DM_FAILED;
+    }
+    if (mbedtls_md_update(&ctx, strInput, len) != 0) {
+        mbedtls_md_free(&ctx);
+        return ERR_DM_FAILED;
+    }
+    if (mbedtls_md_finish(&ctx, hash) != 0) {
+        mbedtls_md_free(&ctx);
+        return ERR_DM_FAILED;
+    }
+
+    mbedtls_md_free(&ctx);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -80,6 +80,13 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
         hiChainConnector_->RegisterHiChainCallback(authMgr_);
     }
+    if (credentialMgr_ == nullptr) {
+        credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
+        if (credentialMgr_ == nullptr) {
+            LOGE("Init failed, credentialMgr_ apply for failure");
+            return ERR_DM_INIT_FAILED;
+        }
+    }
 
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId > 0) {
@@ -264,6 +271,74 @@ void DeviceManagerServiceImpl::OnSessionClosed(int sessionId)
 void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     SoftbusSession::OnBytesReceived(sessionId, data, dataLen);
+}
+
+int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
+{
+    if (reqJsonStr.empty()) {
+        LOGE("reqJsonStr is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialMgr_!= nullptr) {
+        credentialMgr_->RequestCredential(reqJsonStr, returnJsonStr);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
+{
+    if (pkgName.empty()) {
+        LOGE("ImportCredential failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialInfo.empty()) {
+        LOGE("credentialInfo is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialMgr_!= nullptr) {
+        credentialMgr_->ImportCredential(pkgName, credentialInfo);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
+{
+    if (pkgName.empty()) {
+        LOGE("DeleteCredential failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (deleteInfo.empty()) {
+        LOGE("deleteInfo is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialMgr_!= nullptr) {
+        credentialMgr_->DeleteCredential(pkgName, deleteInfo);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("RegisterCredentialCallback failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialMgr_ != nullptr) {
+        credentialMgr_->RegisterCredentialCallback(pkgName);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("UnRegisterCredentialCallback failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialMgr_!= nullptr) {
+        credentialMgr_->UnRegisterCredentialCallback(pkgName);
+    }
+    return DM_OK;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

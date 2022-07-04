@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 int32_t GetUdidHash(uint8_t *udid, int32_t udiddataLen, uint8_t outudiddData[32]);
+int32_t GenerateStrHash(const unsigned char *strInput, uint32_t len, unsigned char *hash);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_HASH_H

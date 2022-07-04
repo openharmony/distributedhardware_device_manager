@@ -31,6 +31,8 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
+#include "ipc_set_credential_req.h"
+#include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
@@ -520,6 +522,150 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
         LOGE("UnRegisterDevStateCallback Failed with ret %d", ret);
         return ret;
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    if (pkgName.empty()) {
+        LOGE("request credential failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (reqJsonStr.empty()) {
+        LOGE("request credential reqJsonStr is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("start to RequestCredential.");
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(reqJsonStr);
+    if (ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp) != DM_OK) {
+        LOGE("failed to send request while request credential.");
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while request credential.");
+        return ret;
+    }
+    returnJsonStr = rsp->GetCredentialResult();
+    LOGI("request device credential completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
+{
+    if (pkgName.empty()) {
+        LOGE("import credential failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (credentialInfo.empty()) {
+        LOGE("the imported credential credentialInfo is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("start to ImportCredential.");
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(credentialInfo);
+    if (ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp) != DM_OK) {
+        LOGE("failed to request while import credential.");
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while import credential.");
+        return ret;
+    }
+    LOGI("import credential to device completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
+{
+    if (pkgName.empty()) {
+        LOGE("delete credential failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if (deleteInfo.empty()) {
+        LOGE("the deleted credential deleteInfo is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("start to DeleteCredential.");
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(deleteInfo);
+    if (ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp) != DM_OK) {
+        LOGE("failed to request while delete credential.");
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while import credential.");
+        return ret;
+    }
+    LOGI("delete credential from device completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName,
+    std::shared_ptr<CredentialCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("RegisterCredentialCallback error: Invalid para");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("DeviceManager::RegisterCredentialCallback start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_CREDENTIAL_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("RegisterCredentialCallback error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("RegisterCredentialCallback error: Failed with ret %d", ret);
+        return ret;
+    }
+    LOGI("RegisterCredentialCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("UnRegisterCredentialCallback error: Invalid para");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("DeviceManager::UnRegisterCredentialCallback start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().UnRegisterCredentialCallback(pkgName);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_CREDENTIAL_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnRegisterCredentialCallback error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnRegisterCredentialCallback Failed with ret %d", ret);
+        return ret;
+    }
+    LOGI("UnRegisterCredentialCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

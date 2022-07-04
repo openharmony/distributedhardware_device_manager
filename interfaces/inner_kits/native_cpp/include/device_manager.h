@@ -151,6 +151,38 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
+        /**
+     * @tc.name: DeviceManagerImpl::RequestCredential
+     * @tc.desc: RequestCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t RequestCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::ImportCredential
+     * @tc.desc: ImportCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::DeleteCredential
+     * @tc.desc: DeleteCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::RegisterCredentialCallback
+     * @tc.desc: RegisterCredentialCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterCredentialCallback(const std::string &pkgName,
+        std::shared_ptr<CredentialCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterCredentialCallback
+     * @tc.desc: UnRegisterCredentialCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

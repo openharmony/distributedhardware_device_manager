@@ -25,6 +25,11 @@ public:
     virtual std::string GetConnectAddr(std::string deviceId) = 0;
     virtual int32_t GetPinCode() = 0;
 };
+
+class IDmGroupResCallback {
+public:
+    virtual void OnGroupResult(int64_t requestId, int32_t action, const std::string &resultInfo) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_HICHAIN_CONNECTOR_CALLBACK_H

@@ -49,6 +49,7 @@ public:
 
     void OnFaCall(std::string &pkgName, std::string &paramJson);
 
+    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

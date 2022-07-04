@@ -21,6 +21,7 @@
 
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
+#include "dm_credential_manager.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
@@ -69,6 +70,16 @@ public:
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
+
+    int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
+
+    int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
+
+    int32_t RegisterCredentialCallback(const std::string &pkgName);
+
+    int32_t UnRegisterCredentialCallback(const std::string &pkgName);
+
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -76,6 +87,7 @@ private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<DmCredentialManager> credentialMgr_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

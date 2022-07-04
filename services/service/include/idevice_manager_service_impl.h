@@ -142,6 +142,37 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
+    /**
+     * @tc.name: DeviceManagerService::RequestCredential
+     * @tc.desc: RequestCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
+    /**
+     * @tc.name: DeviceManagerService::ImportCredential
+     * @tc.desc: ImportCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
+    /**
+     * @tc.name: DeviceManagerService::DeleteCredential
+     * @tc.desc: DeleteCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
+    /**
+     * @tc.name: DeviceManagerService::RegisterCredentialCallback
+     * @tc.desc: RegisterCredentialCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterCredentialCallback(const std::string &pkgName);
+    /**
+     * @tc.name: DeviceManagerService::UnRegisterCredentialCallback
+     * @tc.desc: UnRegisterCredentialCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
