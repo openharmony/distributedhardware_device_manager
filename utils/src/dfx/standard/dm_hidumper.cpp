@@ -81,12 +81,25 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
         result.append("\n{\n    deviceId          : ").append(GetAnonyString(nodeInfos_[i].deviceId).c_str());
         result.append("\n{\n    deviceName        : ").append(nodeInfos_[i].deviceName);
         result.append("\n{\n    networkId         : ").append(GetAnonyString(nodeInfos_[i].networkId).c_str());
-        result.append("\n{\n    deviceTypeId      : ").append(std::to_string(nodeInfos_[i].deviceTypeId));
+        std::string deviceType = GetDeviceType(nodeInfos_[i].deviceTypeId);
+        result.append("\n{\n    deviceType        : ").append(deviceType);
     }
 
     nodeInfos_.clear();
     LOGI("HiDumpHelper ShowAllLoadTrustedList %s", result.c_str());
     return ret;
+}
+
+std::string HiDumpHelper::GetDeviceType(int32_t deviceTypeId)
+{
+    std::string dmDeviceTypeIdString = "";
+    for (int32_t i = 0; i < (sizeof(dumperDeviceType) / sizeof(dumperDeviceType[0])); i++) {
+        if (deviceTypeId == dumperDeviceType[i].deviceTypeId) {
+            dmDeviceTypeIdString = dumperDeviceType[i].deviceTypeInfo;
+            break;
+        }
+    }
+    return dmDeviceTypeIdString;
 }
 
 int32_t HiDumpHelper::ShowHelp(std::string &result)
@@ -96,8 +109,7 @@ int32_t HiDumpHelper::ShowHelp(std::string &result)
     result.append(" -help                    ");
     result.append(": show help\n");
     result.append(" -getTrustlist            ");
-    result.append(": show all get trusted list:\n\n");
-    LOGI("result is %s", result.c_str());
+    result.append(": show all trusted device list\n\n");
     return DM_OK;
 }
 
@@ -105,7 +117,7 @@ int32_t HiDumpHelper::ShowIllealInfomation(std::string &result)
 {
     LOGI("ShowIllealInfomation Dump");
     result.clear();
-    result.append("unrecognized option, -h for help.");
+    result.append("unrecognized option, -help for help.");
     return DM_OK;
 }
 

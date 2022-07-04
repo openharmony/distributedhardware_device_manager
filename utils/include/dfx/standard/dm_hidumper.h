@@ -41,6 +41,7 @@ private:
     int32_t ShowAllLoadTrustedList(std::string &result);
     int32_t ShowHelp(std::string &result);
     int32_t ShowIllealInfomation(std::string &result);
+    std::string GetDeviceType(int32_t deviceTypeId);
 
 private:
     std::vector<DmDeviceInfo> nodeInfos_;
