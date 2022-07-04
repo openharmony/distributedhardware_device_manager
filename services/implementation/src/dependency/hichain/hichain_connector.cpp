@@ -62,10 +62,10 @@ void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 
 std::shared_ptr<IHiChainConnectorCallback> HiChainConnector::hiChainConnectorCallback_ = nullptr;
 std::shared_ptr<IDmGroupResCallback> HiChainConnector::hiChainResCallback_ = nullptr;
+int32_t HiChainConnector::networkStyle_ = PIN_CODE_NETWORK;
 bool g_createGroupFlag = false;
 bool g_deleteGroupFlag = false;
 bool g_groupIsRedundance = false;
-HiChainConnector::networkStyle_ = PIN_CODE_NETWORK;
 
 HiChainConnector::HiChainConnector()
 {
