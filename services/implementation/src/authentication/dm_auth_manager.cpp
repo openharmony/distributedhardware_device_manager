@@ -310,7 +310,6 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
 
 void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId)
 {
-    //wyb
     if (authResponseContext_ == nullptr) {
         LOGE("failed to OnGroupCreated because authResponseContext_ is nullptr");
         return;
@@ -649,7 +648,6 @@ void DmAuthManager::AuthenticateFinish()
         authPtr_ = nullptr;
         authTimes_ = 0;
     }
-    //wyb
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
