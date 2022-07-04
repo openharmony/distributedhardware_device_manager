@@ -106,7 +106,6 @@ static DumperDeviceTypeId dumperDeviceType[] = {
     {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
     {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
 };
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DFX_CONSTANTS_H
