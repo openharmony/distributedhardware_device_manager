@@ -65,7 +65,7 @@ std::shared_ptr<IDmGroupResCallback> HiChainConnector::hiChainResCallback_ = nul
 bool g_createGroupFlag = false;
 bool g_deleteGroupFlag = false;
 bool g_groupIsRedundance = false;
-networkStyle_ = PIN_CODE_NETWORK;
+HiChainConnector::networkStyle_ = PIN_CODE_NETWORK;
 
 HiChainConnector::HiChainConnector()
 {
