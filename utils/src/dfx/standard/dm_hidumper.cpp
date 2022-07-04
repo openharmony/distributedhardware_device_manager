@@ -94,8 +94,8 @@ std::string HiDumpHelper::GetDeviceType(int32_t deviceTypeId)
 {
     std::string dmDeviceTypeIdString = "";
     for (int32_t i = 0; i < (sizeof(dumperDeviceType) / sizeof(dumperDeviceType[0])); i++) {
-        if (deviceTypeId == dumperDeviceType[i].dmDeviceTypeId) {
-            dmDeviceTypeIdString = dumperDeviceType[i].dmDeviceTypeIdString;
+        if (deviceTypeId == dumperDeviceType[i].deviceTypeId) {
+            dmDeviceTypeIdString = dumperDeviceType[i].deviceTypeInfo;
             break;
         }
     }
