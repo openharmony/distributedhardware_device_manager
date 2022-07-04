@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "device_auth.h"
+#include "dm_constants.h"
 #include "hichain_connector_callback.h"
 #include "nlohmann/json.hpp"
 #include "single_instance.h"
