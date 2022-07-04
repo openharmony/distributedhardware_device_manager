@@ -192,8 +192,8 @@ private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IHiChainConnectorCallback> hiChainConnectorCallback_;
-    static std::shared_ptr<IDmGroupResCallback> hiChainCredentialCallback_;
-    int32_t networkStyle_ = PIN_CODE_NETWORK;
+    static std::shared_ptr<IDmGroupResCallback> hiChainResCallback_;
+    static int32_t networkStyle_ = PIN_CODE_NETWORK;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
