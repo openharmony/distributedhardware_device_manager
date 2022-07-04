@@ -248,6 +248,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "dsoftbus:softbus_client",
+      "hitrace_native:hitrace_meter",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
