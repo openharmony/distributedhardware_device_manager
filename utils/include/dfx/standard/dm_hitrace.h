@@ -27,8 +27,6 @@ namespace OHOS {
 namespace DistributedHardware {
 void DmTraceStart(const std::string &msg);
 void DmTraceEnd();
-void DmStartAsyncTrace(const std::string& msg);
-void DmFinishAsyncTrace(const std::string& msg);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

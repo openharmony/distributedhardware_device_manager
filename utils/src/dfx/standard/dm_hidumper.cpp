@@ -82,7 +82,7 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
         result.append("\n{\n    deviceName        : ").append(nodeInfos_[i].deviceName);
         result.append("\n{\n    networkId         : ").append(GetAnonyString(nodeInfos_[i].networkId).c_str());
         std::string deviceType = GetDeviceType(nodeInfos_[i].deviceTypeId);
-        result.append("\n{\n    deviceTypeId      : ").append(deviceType);
+        result.append("\n{\n    deviceType        : ").append(deviceType);
     }
 
     nodeInfos_.clear();
@@ -109,7 +109,7 @@ int32_t HiDumpHelper::ShowHelp(std::string &result)
     result.append(" -help                    ");
     result.append(": show help\n");
     result.append(" -getTrustlist            ");
-    result.append(": show all get trusted list\n\n");
+    result.append(": show all trusted device list\n\n");
     return DM_OK;
 }
 

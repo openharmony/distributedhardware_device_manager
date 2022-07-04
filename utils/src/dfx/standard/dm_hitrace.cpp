@@ -26,15 +26,5 @@ void DmTraceEnd()
 {
     FinishTrace(HITRACE_TAG_DEVICE_MANAGER);
 }
-
-void DmStartAsyncTrace(const std::string& msg)
-{
-    StartAsyncTrace(HITRACE_TAG_DEVICE_MANAGER, msg, DeviceManager_OPEN_CHANNEL_TASKID, -1);
-}
-
-void DmFinishAsyncTrace(const std::string& msg)
-{
-    FinishAsyncTrace(HITRACE_TAG_DEVICE_MANAGER, msg, DeviceManager_OPEN_CHANNEL_TASKID);
-}
 } // namespace DistributedHardware
 } // namespace OHOS

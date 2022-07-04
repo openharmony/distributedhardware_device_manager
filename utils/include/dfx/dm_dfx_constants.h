@@ -65,12 +65,7 @@ const std::string DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
 const std::string DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
 const std::string DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 const std::string DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
-const std::string DM_HITRACE_DEVICE_ONLINE = "DM_HITRACE_DEVICE_ONLINE";
 const std::string DM_HITRACE_INIT = "DM_HITRACE_INIT";
-
-enum DeviceManagerTaskId {
-    DeviceManager_OPEN_CHANNEL_TASKID = 0,
-};
 
 // HiDumper Flag
 enum class HidumperFlag {
@@ -90,21 +85,17 @@ const std::unordered_map<std::string, HidumperFlag> MAP_ARGS = {
     { HIDUMPER_GET_TRUSTED_LIST_INFO, HidumperFlag::HIDUMPER_GET_TRUSTED_LIST },
 };
 
-typedef struct DumperDeviceTypeId {
-    DmDeviceType dmDeviceTypeId;
-    std::string dmDeviceTypeIdString;
-} ERROR_INFO;
-
+//  HiDumper device type
 static DumperDeviceTypeId dumperDeviceType[] = {
-    {DEVICE_TYPE_UNKNOWN, "DEVICE_TYPE_UNKNOWN"},
-    {DEVICE_TYPE_WIFI_CAMERA, "DEVICE_TYPE_WIFI_CAMERA"},
-    {DEVICE_TYPE_AUDIO, "DEVICE_TYPE_AUDIO"},
-    {DEVICE_TYPE_PC, "DEVICE_TYPE_PC"},
-    {DEVICE_TYPE_PHONE, "DEVICE_TYPE_PHONE"},
-    {DEVICE_TYPE_PAD, "DEVICE_TYPE_PAD"},
-    {DEVICE_TYPE_WATCH, "DEVICE_TYPE_WATCH"},
-    {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
-    {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
+    {0x00, "DEVICE_TYPE_UNKNOWN"},
+    {0x08, "DEVICE_TYPE_WIFI_CAMERA"},
+    {0x0A, "DEVICE_TYPE_AUDIO"},
+    {0x0C, "DEVICE_TYPE_PC"},
+    {0x0E, "DEVICE_TYPE_PHONE"},
+    {0x11, "DEVICE_TYPE_PAD"},
+    {0x6D, "DEVICE_TYPE_WATCH"},
+    {0x83, "DEVICE_TYPE_CAR"},
+    {0x9C, "DEVICE_TYPE_TV"},
 };
 } // namespace DistributedHardware
 } // namespace OHOS

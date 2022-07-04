@@ -30,8 +30,6 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "dm_dfx_constants.h"
-#include "dm_hitrace.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -223,7 +221,6 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
 
 void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 {
-    DmFinishAsyncTrace(DM_HITRACE_DEVICE_ONLINE);
     LOGI("OnSoftBusDeviceOnline: received device online callback from softbus.");
     if (info == nullptr) {
         LOGE("SoftbusListener::OnSoftbusDeviceOffline NodeBasicInfo is nullptr");

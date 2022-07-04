@@ -273,7 +273,6 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
         LOGI("Create group success");
         SysEventWrite(DM_CREATE_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR, DM_CREATE_GROUP_SUCCESS_MSG);
         if (hiChainConnectorCallback_ != nullptr) {
-            DmStartAsyncTrace(DM_HITRACE_DEVICE_ONLINE);
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
             hiChainConnectorCallback_->OnGroupCreated(requestId, data);
         }
