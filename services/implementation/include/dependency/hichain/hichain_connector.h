@@ -180,14 +180,15 @@ public:
      * @tc.desc: Get RegisterInfo Info of the HiChain Connector
      * @tc.type: FUNC
      */
-    int32_t addMultiMembers(const int32_t groupType, const std::string &userId, const nlohmann::json &jsonDeviceList);
-
+    int32_t addMultiMembers(const int32_t groupType, const std::string &userId,
+                            const nlohmann::json &jsonDeviceList);
     /**
      * @tc.name: HiChainConnector::deleteMultiMembers
      * @tc.desc: Get RegisterInfo Info of the HiChain Connector
      * @tc.type: FUNC
      */
-    int32_t deleteMultiMembers(const int32_t groupType, const std::string &userId, const nlohmann::json &jsonDeviceList);
+    int32_t deleteMultiMembers(const int32_t groupType, const std::string &userId,
+                            const nlohmann::json &jsonDeviceList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);

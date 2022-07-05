@@ -311,7 +311,7 @@ void from_json(const nlohmann::json &jsonObject, CredentialDataInfo &credentialD
         if (jsonObject.contains(FIELD_AUTH_CODE)) {
             jsonObject[FIELD_AUTH_CODE].get_to(credentialDataInfo.authCode);
         }
-    } eles {
+    } else {
         LOGE("credentialType john key is unknown");
         return;
     }
