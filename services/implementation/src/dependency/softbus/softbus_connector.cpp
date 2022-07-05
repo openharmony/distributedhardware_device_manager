@@ -100,7 +100,7 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     int32_t ret = ::StopDiscovery(DM_PKG_NAME.c_str(), subscribeId);
     if (ret != 0) {
         LOGE("StopDiscovery failed with ret %d", ret);
-        return ret;
+        return ERR_DM_DISCOVERY_FAILED;
     }
     LOGI("SoftbusConnector::StopDiscovery completed");
     return DM_OK;

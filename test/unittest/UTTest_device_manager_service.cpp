@@ -41,6 +41,18 @@ void DeviceManagerServiceTest::TearDownTestCase()
 
 namespace {
 /**
+ * @tc.name: Init_001
+ * @tc.desc: Init device manager service and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
+{
+    int ret = DeviceManagerService::GetInstance().Init();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: StartDeviceDiscovery_001
  * @tc.desc: Start device discovery and return ERR_DM_NOT_INIT
  * @tc.type: FUNC
@@ -52,7 +64,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestS
     DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
@@ -66,7 +78,6 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_002, testing::ext::TestS
     std::string pkgName;
     DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
-    DeviceManagerService::GetInstance().Init();
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
@@ -100,7 +111,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSi
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
@@ -113,7 +124,6 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
 {
     std::string pkgName;
     uint16_t subscribeId = 1;
-    DeviceManagerService::GetInstance().Init();
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
@@ -140,33 +150,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info;
-    DeviceManagerService::GetInstance().Init();
     int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: Init_001
- * @tc.desc: The OnDeviceFound function does the worong case and return ERR_DM_INIT_REPEATED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
-{
-    int ret = DeviceManagerService::GetInstance().Init();
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: Init_002
- * @tc.desc: The OnDeviceFound function does the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, Init_002, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusConnector> softbusConnector_ = nullptr;
-    int ret = DeviceManagerService::GetInstance().Init();
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -203,7 +187,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
 
 /**
  * @tc.name: AuthenticateDevice_001
- * @tc.desc: 将GAuthenticateDevice的intFlag设置为false，设置pkgName = "com.ohos.test";其返回值为ERR_DM_NOT_INIT
+ * @tc.desc: Set unsupport authType = 0 and return ERR_DM_UNSUPPORTED_AUTH_TYPE
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -214,7 +198,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
     int32_t authType = 0;
     std::string deviceId = "2345";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }
 
 /**
@@ -248,21 +232,6 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
 }
-/**
- * @tc.name: AuthenticateDevice_004
- * @tc.desc: Set intFlag for GAuthenticateDevice to true and pkgName to com.ohos.test
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "jdddd";
-    int32_t authType = 0;
-    std::string deviceId = "123456";
-    int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
-}
 
 /**
  * @tc.name: UnAuthenticateDevice_001
@@ -275,7 +244,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -318,7 +287,7 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestS
 {
     std::string authParam = "jdjjjj";
     int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_AUTH_NOT_START);
 }
 
 /**
