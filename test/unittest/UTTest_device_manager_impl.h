@@ -68,6 +68,12 @@ public:
     virtual ~DeviceManagerFaCallbackTest() override {}
     virtual void OnCall(const std::string &paramJson) override {}
 };
+
+class CredentialCallbackTest : public CredentialCallback {
+public:
+    virtual ~CredentialCallbackTest() {}
+    virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

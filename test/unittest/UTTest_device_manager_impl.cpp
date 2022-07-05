@@ -2507,6 +2507,451 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_010, testing::ext::Te
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
+
+/**
+ * @tc.name: RequestCredential_001
+ * @tc.desc: 1. set packName null
+ *              set reqJsonStr null
+ *           2. call DeviceManagerImpl::RequestCredential with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::string reqJsonStr;
+    std::string returnJsonStr;
+    int32_t ret= DeviceManager::GetInstance().RequestCredential(packName, reqJsonStr,
+                                                                returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: RequestCredential_002
+ * @tc.desc: 1. set packName not null
+ *              set reqJsonStr not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_IPC_SEND_REQUEST_FAILED
+ *           3. call DeviceManagerImpl::RequestCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string reqJsonStr = R"({"version":"1.0.0.1","userId":"123"})";
+    std::string returnJsonStr;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret= DeviceManager::GetInstance().RequestCredential(packName, reqJsonStr,
+                                                                returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: RequestCredential_003
+ * @tc.desc: 1. set packName not null
+ *              set reqJsonStr not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::RequestCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string reqJsonStr = R"({"version":"1.0.0.1","userId":"123"})";
+    std::string returnJsonStr;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().RequestCredential(packName, reqJsonStr,
+                                                                returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: RequestCredential_004
+ * @tc.desc: 1. set packName not null
+ *              set reqJsonStr not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
+ *           3. call DeviceManagerImpl::RequestCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string reqJsonStr = R"({"version":"1.0.0.1","userId":"123"})";
+    std::string returnJsonStr;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
+    int32_t ret= DeviceManager::GetInstance().RequestCredential(packName, reqJsonStr,
+                                                                returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: ImportCredential_001
+ * @tc.desc: 1. set packName null
+ *              set reqJsonStr null
+ *           2. call DeviceManagerImpl::ImportCredential with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::string credentialInfo;
+    int32_t ret= DeviceManager::GetInstance().ImportCredential(packName, credentialInfo);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: ImportCredential_002
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_IPC_SEND_REQUEST_FAILED
+ *           3. call DeviceManagerImpl::ImportCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
+    "credentialData": [{ "credentialType": 1, "credentialId": "104",
+    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret= DeviceManager::GetInstance().ImportCredential(packName, credentialInfo);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: ImportCredential_003
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::ImportCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
+    "credentialData": [{ "credentialType": 1, "credentialId": "104",
+    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().ImportCredential(packName, credentialInfo);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: ImportCredential_004
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
+ *           3. call DeviceManagerImpl::ImportCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
+    "credentialData": [{ "credentialType": 1, "credentialId": "104",
+    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
+    int32_t ret= DeviceManager::GetInstance().ImportCredential(packName, credentialInfo);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: DeleteCredential_001
+ * @tc.desc: 1. set packName null
+ *              set deleteInfo null
+ *           2. call DeviceManagerImpl::DeleteCredential with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::string deleteInfo;
+    int32_t ret= DeviceManager::GetInstance().DeleteCredential(packName, deleteInfo);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: DeleteCredential_002
+ * @tc.desc: 1. set packName not null
+ *              set deleteInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_IPC_SEND_REQUEST_FAILED
+ *           3. call DeviceManagerImpl::DeleteCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, DeleteCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string deleteInfo = R"({"processType":1,"authType":1,"userId":"123"})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret= DeviceManager::GetInstance().DeleteCredential(packName, deleteInfo);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: DeleteCredential_003
+ * @tc.desc: 1. set packName not null
+ *              set deleteInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::DeleteCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string deleteInfo = R"({"processType":1,"authType":1,"userId":"123"})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().DeleteCredential(packName, deleteInfo);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: DeleteCredential_004
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
+ *           3. call DeviceManagerImpl::DeleteCredential with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string deleteInfo = R"({"processType":1,"authType":1,"userId":"123"})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
+    int32_t ret= DeviceManager::GetInstance().DeleteCredential(packName, deleteInfo);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_001
+ * @tc.desc: 1. set packName  null
+ *              set callback null
+ *           3. call DeviceManagerImpl::RegisterCredentialCallback with parameter
+ *           4. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::shared_ptr<CredentialCallbackTest> callback = nullptr;
+    int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_002
+ * @tc.desc: 1. set packName not null
+ *              set callback not null
+ *           2. call DeviceManagerImpl::RegisterCredentialCallback with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::shared_ptr<CredentialCallbackTest> callback = std::make_shared<CredentialCallbackTest>();
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_003
+ * @tc.desc: 1. set packName not null
+ *              set callback null
+ *           2. call DeviceManagerImpl::RegisterCredentialCallback with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::shared_ptr<CredentialCallbackTest> callback = nullptr;
+    int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_004
+ * @tc.desc: 1. set packName null
+ *              set callback not null
+ *           2. call DeviceManagerImpl::RegisterCredentialCallback with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::shared_ptr<CredentialCallbackTest> callback = std::make_shared<CredentialCallbackTest>();
+    int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: UnRegisterCredentialCallback_001
+ * @tc.desc: 1. set packName null
+ *           2. call DeviceManagerImpl::UnRegisterCredentialCallback with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    int32_t ret= DeviceManager::GetInstance().UnRegisterCredentialCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: UnRegisterCredentialCallback_002
+ * @tc.desc: 1. set packName not null
+ *           2. call DeviceManagerImpl::UnRegisterCredentialCallback with parameter
+ *           3. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret= DeviceManager::GetInstance().UnRegisterCredentialCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnRegisterCredentialCallback_003
+ * @tc.desc: 1. set packName not null
+ *              set callback null
+ *           2. call DeviceManagerImpl::UnRegisterCredentialCallback with parameter
+ *           3. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_003, testing::ext::TestSize.Level0)
+{
+    // 1. set packName null
+    std::string packName = "com.ohos.test";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
+    int32_t ret= DeviceManager::GetInstance().UnRegisterCredentialCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnRegisterCredentialCallback_004
+ * @tc.desc: 1. set packName not null
+ *           2. call DeviceManagerImpl::UnRegisterCredentialCallback with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().UnRegisterCredentialCallback(packName);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
