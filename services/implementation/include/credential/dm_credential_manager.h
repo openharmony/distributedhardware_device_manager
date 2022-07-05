@@ -74,11 +74,18 @@ public:
     int32_t ImportLocalCredential(const std::string &credentialInfo);
 
     /**
-     * @tc.name: HiChainConnector::ImportRemoteCredential
+     * @tc.name: DmCredentialManager::ImportRemoteCredential
      * @tc.desc: Import Symmetry Credential Info of the DmCredential Manager
      * @tc.type: FUNC
      */
     int32_t ImportRemoteCredential(const std::string &credentialInfo);
+
+    /**
+     * @tc.name: DmCredentialManager::DeleteRemoteCredential
+     * @tc.desc: delete Symmetry Credential Info of the DmCredential Manager
+     * @tc.type: FUNC
+     */
+    int32_t DeleteRemoteCredential(const std::string &credentialInfo);
 
      /**
      * @tc.name: HiChainConnector::DeleteCredential
@@ -103,6 +110,7 @@ private:
 private:
     int32_t GetCredentialData(const std::string &credentialInfo, const CredentialData &inputCreData,
         nlohmann::json &jsonOutObj);
+    int32_t GetAddDeviceList(const nlohmann::json &jsonObject, nlohmann::json &jsonDeviceList);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

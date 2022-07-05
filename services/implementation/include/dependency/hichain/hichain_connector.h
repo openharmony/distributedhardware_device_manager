@@ -175,6 +175,20 @@ public:
      */
     int32_t getRegisterInfo(const std::string &queryParams, std::string &returnJsonStr);
 
+    /**
+     * @tc.name: HiChainConnector::addMultiMembers
+     * @tc.desc: Get RegisterInfo Info of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t addMultiMembers(const int32_t groupType, const std::string &userId,
+                            const nlohmann::json &jsonDeviceList);
+    /**
+     * @tc.name: HiChainConnector::deleteMultiMembers
+     * @tc.desc: Get RegisterInfo Info of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    int32_t deleteMultiMembers(const int32_t groupType, const std::string &userId,
+                            const nlohmann::json &jsonDeviceList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
@@ -187,7 +201,7 @@ private:
     bool IsGroupInfoInvalid(GroupInfo &group);
     int32_t GetStrFieldByType(const std::string &reqJsonStr, const std::string &outField, int32_t type);
     int32_t GetNumsFieldByType(const std::string &reqJsonStr, int32_t &outField, int32_t type);
-
+    int32_t GetGroupId(const std::string &userId, const int32_t groupType, std::string &groupId);
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;

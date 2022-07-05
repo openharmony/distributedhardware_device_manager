@@ -67,6 +67,7 @@
 #define FIELD_IS_DELETE_ALL "isDeleteAll"
 #define FIELD_BLE_CHALLENGE "bleChallenge"
 #define FIELD_OS_ACCOUNT_ID "osAccountId"
+#define FIELD_DEVICE_LIST "deviceList"
 
 using OsAccountEnum = enum _OsAccountEnum : int32_t {
     DEFAULT_OS_ACCOUNT = 0,
@@ -167,6 +168,8 @@ using DeviceGroupManager = struct _DeviceGroupManager {
     int32_t (*deleteMemberFromGroup)(int32_t osAccountId, int64_t requestId, const char *appId,
         const char *deleteParams);
     int32_t (*processData)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
+    int32_t (*addMultiMembersToGroup)(int32_t osAccountId, const char *appId, const char *addParams);
+    int32_t (*delMultiMembersFromGroup)(int32_t osAccountId, const char *appId, const char *deleteParams);
     int32_t (*confirmRequest)(int32_t osAccountId, int64_t requestId, const char *appId, const char *confirmParams);
     int32_t (*bindPeer)(int64_t requestId, const char *appId, const char *bindParams);
     int32_t (*unbindPeer)(int64_t requestId, const char *appId, const char *unbindParams);

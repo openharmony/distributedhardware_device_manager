@@ -24,6 +24,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+struct CredentialDataInfo {
+    int32_t credentialType;
+    std::string credentailId;
+    std::string serverPk;
+    std::string pkInfoSignature;
+    std::string pkInfo;
+    std::string authCode;
+    std::string peerDeviceId;
+    std::string userId;
+    CredentialDataInfo() : credentialType(UNKNOWN_CREDENTIAL_TYPE)
+    {
+    }
+};
+
+struct PeerCredentialInfo {
+    std::string peerDeviceId;
+    std::string peerCredentialId;
+};
 void from_json(const nlohmann::json &jsonObject, CredentialData &credentialData)
 {
     if (!jsonObject.contains(FIELD_CREDENTIAL_TYPE) || !jsonObject.contains(FIELD_CREDENTIAL_ID) ||
@@ -100,7 +118,7 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
     if (processType == LOCAL_CREDENTIAL_DEAL_TYPE) {
         return ImportLocalCredential(credentialInfo);
     } else if (processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
-        return DM_OK;
+        return ImportRemoteCredential(credentialInfo);
     } else {
         LOGE("credential type error!");
     }
@@ -185,7 +203,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
     if (processType == LOCAL_CREDENTIAL_DEAL_TYPE) {
         return hiChainConnector_->DeleteGroup(requestId_, userId, authType);
     } else if (processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
-        return DM_OK;
+        return DeleteRemoteCredential(deleteInfo);
     } else {
         LOGE("credential type error!");
     }
@@ -265,6 +283,194 @@ int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo
         return ERR_DM_FAILED;
     }
     jsonOutObj = jsonCreObj;
+    return DM_OK;
+}
+
+void from_json(const nlohmann::json &jsonObject, CredentialDataInfo &credentialDataInfo)
+{
+    if (!jsonObject.contains(FIELD_CREDENTIAL_TYPE)) {
+        LOGE("credentialType json key not exist");
+        return;
+    }
+    jsonObject[FIELD_CREDENTIAL_TYPE].get_to(credentialDataInfo.credentialType);
+    if (jsonObject.contains(FIELD_CREDENTIAL_ID)) {
+        jsonObject[FIELD_CREDENTIAL_ID].get_to(credentialDataInfo.credentailId);
+    }
+    if (credentialDataInfo.credentialType == NONSYMMETRY_CREDENTIAL_TYPE) {
+        if (jsonObject.contains(FIELD_SERVER_PK)) {
+            jsonObject[FIELD_SERVER_PK].get_to(credentialDataInfo.serverPk);
+        }
+        if (jsonObject.contains(FIELD_PKINFO_SIGNATURE)) {
+            jsonObject[FIELD_PKINFO_SIGNATURE].get_to(credentialDataInfo.pkInfoSignature);
+        }
+        if (jsonObject.contains(FIELD_PKINFO)) {
+            nlohmann::json jsonPkInfo = jsonObject[FIELD_PKINFO];
+            credentialDataInfo.pkInfo = jsonPkInfo.dump().c_str();
+        }
+    } else if (credentialDataInfo.credentialType == SYMMETRY_CREDENTIAL_TYPE) {
+        if (jsonObject.contains(FIELD_AUTH_CODE)) {
+            jsonObject[FIELD_AUTH_CODE].get_to(credentialDataInfo.authCode);
+        }
+    } else {
+        LOGE("credentialType john key is unknown");
+        return;
+    }
+    if (jsonObject.contains(FIELD_PEER_DEVICE_ID)) {
+        jsonObject[FIELD_PEER_DEVICE_ID].get_to(credentialDataInfo.peerDeviceId);
+    }
+}
+
+void to_json(nlohmann::json &jsonObject, const CredentialDataInfo &credentialDataInfo)
+{
+    jsonObject[FIELD_DEVICE_ID] = credentialDataInfo.peerDeviceId;
+    jsonObject[FIELD_UDID] =credentialDataInfo.peerDeviceId;
+    jsonObject[FIELD_USER_ID] = credentialDataInfo.userId;
+    jsonObject[FIELD_CREDENTIAL_TYPE] = credentialDataInfo.credentialType;
+    jsonObject[FIELD_CREDENTIAL_ID] = atoi(credentialDataInfo.credentailId.c_str());
+    if (credentialDataInfo.credentialType == NONSYMMETRY_CREDENTIAL_TYPE) {
+        jsonObject[FIELD_SERVER_PK] = credentialDataInfo.serverPk;
+        jsonObject[FIELD_PKINFO_SIGNATURE] = credentialDataInfo.pkInfoSignature;
+        jsonObject[FIELD_PKINFO] = credentialDataInfo.pkInfo;
+    } else if (credentialDataInfo.credentialType == SYMMETRY_CREDENTIAL_TYPE) {
+        jsonObject[FIELD_AUTH_CODE] = credentialDataInfo.authCode;
+    }
+}
+
+int32_t DmCredentialManager::GetAddDeviceList(const nlohmann::json &jsonObject, nlohmann::json &jsonDeviceList)
+{
+    if (!jsonObject.contains(FIELD_CREDENTIAL_DATA) || !jsonObject.contains(FIELD_AUTH_TYPE)) {
+        LOGE("credentaildata or authType string key not exist!");
+        return ERR_DM_FAILED;
+    }
+    nlohmann::json credentialJson = jsonObject[FIELD_CREDENTIAL_DATA];
+    auto credentialDataList = credentialJson.get<std::vector<CredentialDataInfo>>();
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE];
+
+    for (auto &credentialData : credentialDataList) {
+        if (authType == SAME_ACCOUNT_TYPE) {
+            if (jsonObject.contains(FIELD_USER_ID)) {
+                credentialData.userId = jsonObject[FIELD_USER_ID];
+            }
+        } else if (authType == CROSS_ACCOUNT_TYPE) {
+            if (jsonObject.contains(FIELD_PEER_USER_ID)) {
+                credentialData.userId = jsonObject[FIELD_PEER_USER_ID];
+            }
+        }
+    }
+    for (size_t i = 0; i < credentialDataList.size(); i++) {
+        jsonDeviceList[FIELD_DEVICE_LIST][i] = credentialDataList.at(i);
+    }
+    return DM_OK;
+}
+
+int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentialInfo)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("credentialInfo string not a json type.");
+        return ERR_DM_FAILED;
+    }
+    if (!jsonObject.contains(FIELD_AUTH_TYPE) || !jsonObject.contains(FIELD_CREDENTIAL_DATA)) {
+        LOGE("auth type, credentialData string key not exist!");
+        return ERR_DM_FAILED;
+    }
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE];
+    std::string userId;
+    int32_t groupType = 0;
+    if (authType == SAME_ACCOUNT_TYPE) {
+        groupType = IDENTICAL_ACCOUNT_GROUP;
+        if (!jsonObject.contains(FIELD_USER_ID)) {
+            LOGE("userId string key not exist!");
+            return ERR_DM_FAILED;
+        } else {
+            userId = jsonObject[FIELD_USER_ID];
+        }
+    } else if (authType == CROSS_ACCOUNT_TYPE) {
+        groupType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
+        if (!jsonObject.contains(FIELD_PEER_USER_ID)) {
+            LOGE("peerUserId string key not exist!");
+            return ERR_DM_FAILED;
+        } else {
+            userId = jsonObject[FIELD_PEER_USER_ID];
+        }
+    }
+    nlohmann::json jsonDeviceList;
+    if (GetAddDeviceList(jsonObject, jsonDeviceList) != DM_OK) {
+        LOGE("failed to get add DeviceList.");
+        return ERR_DM_FAILED;
+    }
+    if (hiChainConnector_->addMultiMembers(groupType, userId, jsonDeviceList) != DM_OK) {
+        LOGE("failed to add members to group.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+void from_json(const nlohmann::json &jsonObject, PeerCredentialInfo &peerCredentialInfo)
+{
+    if (jsonObject.contains(FIELD_PEER_USER_ID)) {
+        jsonObject[FIELD_PEER_USER_ID].get_to(peerCredentialInfo.peerDeviceId);
+    }
+}
+
+void to_json(nlohmann::json &jsonObject, const PeerCredentialInfo &peerCredentialInfo)
+{
+    jsonObject[FIELD_DEVICE_ID] = peerCredentialInfo.peerDeviceId;
+}
+
+int32_t GetDeleteDeviceList(const nlohmann::json &jsonObject, nlohmann::json &deviceList)
+{
+    if (!jsonObject.contains(FIELD_PEER_CREDENTIAL_INFO)) {
+        LOGE("devicelist string key not exist!");
+        return ERR_DM_FAILED;
+    }
+    auto peerCredentialInfo = jsonObject[FIELD_PEER_CREDENTIAL_INFO].get<std::vector<PeerCredentialInfo>>();
+    for (size_t i = 0; i < peerCredentialInfo.size(); i++) {
+        deviceList[FIELD_DEVICE_LIST][i] = peerCredentialInfo[i];
+    }
+    return DM_OK;
+}
+
+int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInfo)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(deleteInfo, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("credentialInfo string not a json type.");
+        return ERR_DM_FAILED;
+    }
+    if (!jsonObject.contains(FIELD_AUTH_TYPE) || !jsonObject.contains(FIELD_PEER_CREDENTIAL_INFO)) {
+        LOGE("authType, peerCredential or peerUserId string key not exist!");
+        return ERR_DM_FAILED;
+    }
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE];
+    std::string userId;
+    int32_t groupType = 0;
+    if (authType == SAME_ACCOUNT_TYPE) {
+        if (!jsonObject.contains(FIELD_USER_ID)) {
+            LOGE("userId string key not exist.");
+            return ERR_DM_FAILED;
+        } else {
+            userId = jsonObject[FIELD_USER_ID];
+        }
+        groupType = IDENTICAL_ACCOUNT_GROUP;
+    } else if (authType == CROSS_ACCOUNT_TYPE) {
+        if (!jsonObject.contains(FIELD_PEER_USER_ID)) {
+            LOGE("peerUserId string key not exist.");
+            return ERR_DM_FAILED;
+        } else {
+            userId = jsonObject[FIELD_PEER_USER_ID];
+        }
+        groupType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
+    }
+    nlohmann::json jsonDeviceList;
+    if (GetDeleteDeviceList(jsonObject, jsonDeviceList) != DM_OK) {
+        LOGE("failed to get delete DeviceList.");
+        return ERR_DM_FAILED;
+    }
+    if (hiChainConnector_->deleteMultiMembers(groupType, userId, jsonDeviceList) != DM_OK) {
+        LOGE("failed to delete members from group.");
+        return ERR_DM_FAILED;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware
