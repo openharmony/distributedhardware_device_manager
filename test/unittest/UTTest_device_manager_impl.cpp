@@ -2639,7 +2639,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_002, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData":[{"credentialType":1,"credentialId":"104",
+    "credentialData":[{"credentialType":1, "credentialId":"104",
     "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
     "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":""}]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -2666,7 +2666,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_003, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData":[{"credentialType":1,"credentialId":"104",
+    "credentialData":[{"credentialType":1, "credentialId":"104",
     "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
     "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":""}]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -2693,7 +2693,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_004, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData":[{"credentialType":1,"credentialId":"104",
+    "credentialData":[{"credentialType":1, "credentialId":"104",
     "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
     "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":""}]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
