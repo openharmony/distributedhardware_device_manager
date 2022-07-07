@@ -80,7 +80,7 @@ if (defined(ohos_lite)) {
         "src/device_manager_service_listener.cpp",
         "src/ipc/lite/ipc_cmd_parser.cpp",
         "src/ipc/lite/ipc_server_listener.cpp",
-        "src/ipc/lite/ipc_server_main",
+        "src/ipc/lite/ipc_server_main.cpp",
         "src/ipc/lite/ipc_server_stub.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
