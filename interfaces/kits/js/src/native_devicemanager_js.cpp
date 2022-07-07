@@ -1105,7 +1105,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
                 DeviceInfoToJsArray(env, deviceInfoListAsyncCallbackInfo->devList, (int32_t)i, array[1]);
             }
             napi_resolve_deferred(env, deviceInfoListAsyncCallbackInfo->deferred, array[1]);
-            LOGE("devList is OK");
+            LOGI("devList is OK");
         } else {
             LOGE("devList is null");
         }
@@ -1183,7 +1183,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
             for (size_t i = 0; i != deviceInfoListAsyncCallbackInfo->devList.size(); ++i) {
                 DeviceInfoToJsArray(env, deviceInfoListAsyncCallbackInfo->devList, i, array[1]);
             }
-            LOGE("devList is OK");
+            LOGI("devList is OK");
         } else {
             LOGE("devList is null");
         }
@@ -1267,7 +1267,7 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackI
                 return;
             }
             deviceInfoAsyncCallbackInfo->status = 0;
-            LOGE("CallAsyncWorkSync status %d", deviceInfoAsyncCallbackInfo->status);
+            LOGI("CallAsyncWorkSync status %d", deviceInfoAsyncCallbackInfo->status);
         },
         [](napi_env env, napi_status status, void *data) {
             (void)status;
@@ -1298,7 +1298,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoAsyncCallbackInfo 
                 return;
             }
             deviceInfoAsyncCallbackInfo->status = 0;
-            LOGE("CallAsyncWork status %d", deviceInfoAsyncCallbackInfo->status);
+            LOGI("CallAsyncWork status %d", deviceInfoAsyncCallbackInfo->status);
         },
         [](napi_env env, napi_status status, void *data) {
             (void)status;
@@ -1332,7 +1332,7 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env,
                 return;
             }
             deviceInfoListAsyncCallbackInfo->status = 0;
-            LOGE("CallAsyncWorkSync status %d", deviceInfoListAsyncCallbackInfo->status);
+            LOGI("CallAsyncWorkSync status %d", deviceInfoListAsyncCallbackInfo->status);
         },
         [](napi_env env, napi_status status, void *data) {
             (void)status;
@@ -1368,7 +1368,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackI
                 return;
             }
             deviceInfoListAsyncCallbackInfo->status = 0;
-            LOGE("CallAsyncWork status %d", deviceInfoListAsyncCallbackInfo->status);
+            LOGI("CallAsyncWork status %d", deviceInfoListAsyncCallbackInfo->status);
         },
         [](napi_env env, napi_status status, void *data) {
             (void)status;
@@ -1391,13 +1391,13 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
     napi_valuetype eventHandleType = napi_undefined;
     napi_typeof(env, argv[0], &eventHandleType);
     if (eventHandleType == napi_function) {
-        LOGE("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
+        LOGI("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
         napi_create_reference(env, argv[0], 1, &deviceInfoListAsyncCallbackInfo->callback);
         CallAsyncWork(env, deviceInfoListAsyncCallbackInfo);
         napi_get_undefined(env, &result);
         return result;
     } else {
-        LOGE("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
+        LOGI("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
         napi_deferred deferred;
         napi_value promise = 0;
         napi_create_promise(env, &deferred, &promise);
@@ -1457,7 +1457,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
     deviceInfoListAsyncCallbackInfo->env = env;
     deviceInfoListAsyncCallbackInfo->devList = devList;
     deviceInfoListAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
-    LOGE("GetTrustedDeviceList for argc %d", argc);
+    LOGI("GetTrustedDeviceList for argc %d", argc);
     if (argc == 0) {
         std::string extra = "";
         deviceInfoListAsyncCallbackInfo->extra = extra;
@@ -1473,12 +1473,12 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         napi_valuetype valueType;
         napi_typeof(env, argv[0], &valueType);
-        LOGE("GetTrustedDeviceList for argc %d Type = %d", argc, (int)valueType);
+        LOGI("GetTrustedDeviceList for argc %d Type = %d", argc, (int)valueType);
         NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type, string expected.");
 
         napi_valuetype eventHandleType = napi_undefined;
         napi_typeof(env, argv[1], &eventHandleType);
-        LOGE("GetTrustedDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
+        LOGI("GetTrustedDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
         NAPI_ASSERT(env, eventHandleType == napi_function, "Wrong argument type. Object expected.");
         char extra[20];
         JsObjectToString(env, argv[0], "extra", extra, sizeof(extra));
@@ -1529,7 +1529,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
     deviceInfoAsyncCallbackInfo->env = env;
     deviceInfoAsyncCallbackInfo->deviceInfo = deviceInfo;
     deviceInfoAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
-    LOGE("GetLocalDeviceInfo for argc %d", argc);
+    LOGI("GetLocalDeviceInfo for argc %d", argc);
     if (argc == 0) {
         std::string extra = "";
         deviceInfoAsyncCallbackInfo->extra = extra;
