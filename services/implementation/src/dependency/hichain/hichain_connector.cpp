@@ -769,10 +769,10 @@ int32_t HiChainConnector::GetGroupId(const std::string &userId, const int32_t gr
         LOGI("groupinfo.groupId:%s", groupinfo.groupId.c_str());
         if (groupinfo.userId == userId) {
             groupId = groupinfo.groupId;
-            break;
+            return DM_OK;
         }
     }
-    return DM_OK;
+    return ERR_DM_FAILED;
 }
 
 int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::string &userId,
