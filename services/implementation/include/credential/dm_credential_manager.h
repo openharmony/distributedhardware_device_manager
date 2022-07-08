@@ -43,14 +43,14 @@ public:
      * @tc.desc: Register Credential Callback Info of the DmCredential Manager
      * @tc.type: FUNC
      */
-    void RegisterCredentialCallback(const std::string &pkgName);
+    int32_t RegisterCredentialCallback(const std::string &pkgName);
 
     /**
      * @tc.name: HiChainConnector::UnRegisterCredentialCallback
      * @tc.desc: UnRegister Credential Callback Info of the DmCredential Manager
      * @tc.type: FUNC
      */
-    void UnRegisterCredentialCallback(const std::string &pkgName);
+    int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
     /**
      * @tc.name: HiChainConnector::RequestCredential

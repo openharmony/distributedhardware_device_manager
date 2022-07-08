@@ -279,10 +279,11 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
         LOGE("reqJsonStr is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialMgr_!= nullptr) {
-        credentialMgr_->RequestCredential(reqJsonStr, returnJsonStr);
+    if (credentialMgr_== nullptr) {
+        LOGE("credentialMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
     }
-    return DM_OK;
+    return credentialMgr_->RequestCredential(reqJsonStr, returnJsonStr);
 }
 
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
@@ -295,10 +296,11 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
         LOGE("credentialInfo is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialMgr_!= nullptr) {
-        credentialMgr_->ImportCredential(pkgName, credentialInfo);
+    if (credentialMgr_== nullptr) {
+        LOGE("credentialMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
     }
-    return DM_OK;
+    return credentialMgr_->ImportCredential(pkgName, credentialInfo);
 }
 
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
@@ -311,10 +313,11 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
         LOGE("deleteInfo is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialMgr_!= nullptr) {
-        credentialMgr_->DeleteCredential(pkgName, deleteInfo);
+    if (credentialMgr_== nullptr) {
+        LOGE("credentialMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
     }
-    return DM_OK;
+    return credentialMgr_->DeleteCredential(pkgName, deleteInfo);
 }
 
 int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &pkgName)
@@ -323,10 +326,11 @@ int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &
         LOGE("RegisterCredentialCallback failed, pkgName is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialMgr_ != nullptr) {
-        credentialMgr_->RegisterCredentialCallback(pkgName);
+    if (credentialMgr_ == nullptr) {
+        LOGE("credentialMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
     }
-    return DM_OK;
+    return credentialMgr_->RegisterCredentialCallback(pkgName);
 }
 
 int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string &pkgName)
@@ -335,10 +339,11 @@ int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string
         LOGE("UnRegisterCredentialCallback failed, pkgName is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialMgr_!= nullptr) {
-        credentialMgr_->UnRegisterCredentialCallback(pkgName);
+    if (credentialMgr_== nullptr) {
+        LOGE("credentialMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
     }
-    return DM_OK;
+    return credentialMgr_->UnRegisterCredentialCallback(pkgName);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

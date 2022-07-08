@@ -220,23 +220,23 @@ void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
     listener_->OnCredentialResult(pkgName_, action, resultInfo);
 }
 
-void DmCredentialManager::RegisterCredentialCallback(const std::string &pkgName)
+int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("DmCredentialManager::RegisterCredentialCallback input param is empty");
-        return;
+        return ERR_DM_FAILED;
     }
     LOGI("DmCredentialManager::RegisterCredentialCallback pkgName=%s",
         GetAnonyString(pkgName).c_str());
     credentialVec_.push_back(pkgName);
-    hiChainConnector_->RegisterHiChainGroupCallback(std::shared_ptr<IDmGroupResCallback>(shared_from_this()));
+    return hiChainConnector_->RegisterHiChainGroupCallback(std::shared_ptr<IDmGroupResCallback>(shared_from_this()));
 }
 
-void DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkgName)
+int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("DmCredentialManager::UnRegisterCredentialStateCallback input param is empty");
-        return;
+        return ERR_DM_FAILED;
     }
     LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName=%s",
         GetAnonyString(pkgName).c_str());
@@ -244,7 +244,7 @@ void DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkgNam
     if (iter != credentialVec_.end()) {
         credentialVec_.erase(iter);
     }
-    hiChainConnector_->UnRegisterHiChainGroupCallback();
+    return hiChainConnector_->UnRegisterHiChainGroupCallback();
 }
 
 int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo, const CredentialData &inputCreData,
