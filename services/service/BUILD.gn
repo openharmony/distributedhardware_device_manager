@@ -231,6 +231,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "dsoftbus:softbus_client",
+      "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
