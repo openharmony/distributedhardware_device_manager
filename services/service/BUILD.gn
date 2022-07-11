@@ -231,11 +231,10 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "dsoftbus:softbus_client",
+      "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
-      "startup_l2:syspara",
-      "startup_l2:syspara_watchagent",
       "utils_base:utils",
     ]
 

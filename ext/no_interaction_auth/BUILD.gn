@@ -54,8 +54,6 @@ if (defined(ohos_lite)) {
       "//base/notification/common_event_service/frameworks/core/include",
       "//base/notification/common_event_service/interfaces/innerkits/native/include",
       "//base/security/device_auth/interfaces/innerkits",
-      "//base/startup/syspara_lite/interfaces/kits",
-      "//base/startup/syspara_lite/adapter/native/syspara/include",
     ]
 
     sources = [
@@ -82,11 +80,10 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "dsoftbus:softbus_client",
       "hiviewdfx_hilog_native:libhilog",
+      "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
-      "startup_l2:syspara",
-      "startup_l2:syspara_watchagent",
     ]
 
     defines = [

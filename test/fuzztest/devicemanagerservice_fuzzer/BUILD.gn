@@ -83,9 +83,9 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
   ]
 
   external_deps = [
+    "init:libbegetutil",
     "ipc:ipc_core",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
   ]
 }
 
