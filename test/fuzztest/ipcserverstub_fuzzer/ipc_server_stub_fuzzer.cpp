@@ -47,13 +47,11 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
-    IpcServerStub::GetInstance().OnStart();
     IpcServerStub::GetInstance().OnRemoteRequest(code, data1, reply, option);
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     IpcServerStub::GetInstance().GetDmListener(pkgName);
     IpcServerStub::GetInstance().SendCmd(code, req, rsp);
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    IpcServerStub::GetInstance().OnStop();
 }
 }
 }

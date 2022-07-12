@@ -36,32 +36,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
-public:
-    DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
-    virtual ~DeviceDiscoveryCallbackTest() {}
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
-};
-
-class DmInitCallbackTest : public DmInitCallback {
-public:
-    DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override {}
-};
-
-class DeviceStateCallbackTest : public DeviceStateCallback {
-public:
-    DeviceStateCallbackTest() : DeviceStateCallback() {}
-    virtual ~DeviceStateCallbackTest() override {}
-    virtual void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
-};
-
 class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
 public:
     DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}

@@ -31,11 +31,9 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
     DmSubscribeInfo subscribeInfo;
     std::vector<DmDeviceInfo> deviceList;
-    DmDeviceInfo info;
     DmAuthParam authParam;
 
     int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, pkgName, pkgName);
     ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, pkgName, pkgName);

@@ -47,30 +47,6 @@ public:
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
-class DmInitCallbackTest : public DmInitCallback {
-public:
-    DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override {}
-};
-
-class DeviceStateCallbackTest : public DeviceStateCallback {
-public:
-    DeviceStateCallbackTest() : DeviceStateCallback() {}
-    virtual ~DeviceStateCallbackTest() override {}
-    virtual void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
-};
-
-class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
-public:
-    DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}
-    virtual ~DeviceManagerFaCallbackTest() override {}
-    virtual void OnCall(const std::string &paramJson) override {}
-};
-
 void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
