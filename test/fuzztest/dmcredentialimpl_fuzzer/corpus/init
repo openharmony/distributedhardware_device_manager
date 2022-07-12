@@ -10,19 +10,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-group("fuzztest") {
-  testonly = true
-
-  deps = [
-    "devicemanagerimpl_fuzzer:fuzztest",
-    "devicemanagernotify_fuzzer:fuzztest",
-    "devicemanagerservice_fuzzer:fuzztest",
-    "dmcredentialimpl_fuzzer:fuzztest",
-    "ipcclientmanager_fuzzer:fuzztest",
-    "ipccmdregister_fuzzer:fuzztest",
-    "ipcserverclientproxy_fuzzer:fuzztest",
-    "ipcserverlistener_fuzzer:fuzztest",
-    "ipcserverstub_fuzzer:fuzztest",
-  ]
-}
+FUZZ
