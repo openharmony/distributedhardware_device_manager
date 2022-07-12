@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_MANAGER_IMPL_FUZZER_H
-#define DEVICE_MANAGER_IMPL_FUZZER_H
+#ifndef REGISTER_DEV_STATE_CALLBACK_FUZZ_TEST_H
+#define REGISTER_DEV_STATE_CALLBACK_FUZZ_TEST_H
 
-#define FUZZ_PROJECT_NAME "devicemanagerimpl_fuzzer"
+#define FUZZ_PROJECT_NAME "registerdevstatecallback_fuzzer"
 
-#endif // DEVICE_MANAGER_IMPL_FUZZER_H
+#endif // REGISTER_DEV_STATE_CALLBACK_FUZZ_TEST_H
