@@ -64,9 +64,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-     "ipc:ipc_core",
-  ]
+  external_deps = [ "ipc:ipc_core" ]
 }
 
 ###############################################################################

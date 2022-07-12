@@ -15,10 +15,10 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "dmcredentialimpl_fuzzer:fuzztest",
     "devicemanagerimpl_fuzzer:fuzztest",
     "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
+    "dmcredentialimpl_fuzzer:fuzztest",
     "ipcclientmanager_fuzzer:fuzztest",
     "ipccmdregister_fuzzer:fuzztest",
     "ipcserverclientproxy_fuzzer:fuzztest",
