@@ -28,7 +28,6 @@
 #include "device_manager_callback.h"
 #include "dm_app_image_info.h"
 #include "dm_device_info.h"
-#include "dm_native_event.h"
 #include "dm_subscribe_info.h"
 #include "nlohmann/json.hpp"
 #include "native_devicemanager_js.h"

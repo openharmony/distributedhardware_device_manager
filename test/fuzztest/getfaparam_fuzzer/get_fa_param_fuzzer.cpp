@@ -13,14 +13,8 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
 #include <securec.h>
 #include <uv.h>
-#include <string>
-#include <iostream>
 #include "device_manager_impl.h"
 #include "device_manager.h"
 #include "dm_constants.h"

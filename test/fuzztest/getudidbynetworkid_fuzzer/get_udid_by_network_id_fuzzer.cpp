@@ -13,14 +13,8 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
 #include <securec.h>
 #include <uv.h>
-#include <string>
-#include <iostream>
 #include "device_manager_impl.h"
 #include "device_manager.h"
 #include "dm_constants.h"
@@ -28,10 +22,7 @@
 #include "device_manager_callback.h"
 #include "dm_app_image_info.h"
 #include "dm_device_info.h"
-#include "dm_native_event.h"
 #include "dm_subscribe_info.h"
-#include "nlohmann/json.hpp"
-#include "native_devicemanager_js.h"
 #include "get_udid_by_network_id_fuzzer.h"
 
 namespace OHOS {
@@ -58,4 +49,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::GetUdidByNetworkIdFuzzTest(data, size);
     return 0;
 }
-Get_Udid_By_Network_Id_Fuzz_Test
