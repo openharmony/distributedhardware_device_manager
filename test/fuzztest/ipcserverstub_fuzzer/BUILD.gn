@@ -111,12 +111,12 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
   ]
 
   public_deps = [
