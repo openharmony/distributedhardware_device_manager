@@ -21,10 +21,10 @@
 #include "ipc_remote_broker.h"
 #include "iremote_stub.h"
 #include "refbase.h"            // for sptr
-namespace OHOS{ class MessageOption; }
-namespace OHOS{ class MessageParcel; }
-namespace OHOS::DistributedHardware{ class IpcReq; }
-namespace OHOS::DistributedHardware{ class IpcRsp; }
+namespace OHOS { class MessageOption; }
+namespace OHOS { class MessageParcel; }
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

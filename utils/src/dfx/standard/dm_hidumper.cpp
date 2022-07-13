@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#include <string>              // for basic_string, operator==, hash
 #include "dm_hidumper.h"
+#include <string>              // for basic_string, operator==, hash
+#include <unordered_map>       // for __hash_map_const_iterator, unordered_map
+#include <utility>             // for pair
+#include <vector>              // for vector
 #include "dm_anonymous.h"      // for GetAnonyString
 #include "dm_constants.h"      // for DM_OK, ERR_DM_FAILED
 #include "dm_device_info.h"    // for DmDeviceInfo
 #include "dm_dfx_constants.h"  // for HidumperFlag, DumperInfo, MAP_ARGS
 #include "dm_log.h"            // for LOGI, LOGE
-#include <unordered_map>       // for __hash_map_const_iterator, unordered_map
-#include <utility>             // for pair
-#include <vector>              // for vector
 
 namespace OHOS {
 namespace DistributedHardware {

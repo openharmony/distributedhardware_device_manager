@@ -14,10 +14,10 @@
  */
 
 #include "dm_hisysevent.h"
+#include <string>          // for basic_string
 #include "dm_constants.h"  // for DM_OK
 #include "dm_log.h"        // for LOGE
 #include "hisysevent.h"    // for HiSysEvent, HiSysEvent::Domain, HiSysEvent...
-#include <string>          // for basic_string
 #include "unistd.h"        // for getpid, getuid
 
 namespace OHOS {

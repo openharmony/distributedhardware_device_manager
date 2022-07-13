@@ -16,11 +16,11 @@
 #ifndef OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
 #define OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
 
-#include "single_instance.h"
 #include "system_ability_load_callback_stub.h"
-#include <stdint.h>                             // for int32_t, uint32_t
+#include <cstdint>                              // for int32_t, uint32_t
+#include "single_instance.h"
 #include "refbase.h"                            // for sptr
-namespace OHOS{ class IRemoteObject; }
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

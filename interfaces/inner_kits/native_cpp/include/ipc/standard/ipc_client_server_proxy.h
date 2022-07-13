@@ -25,7 +25,7 @@
 #include "refbase.h"            // for sptr
 #include "ipc_req.h"
 #include "ipc_rsp.h"
-namespace OHOS{ class IRemoteObject; }
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

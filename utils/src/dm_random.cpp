@@ -15,11 +15,11 @@
 
 #include "dm_random.h"
 #include <random>
+#include <cstdlib>             // for free, malloc
+#include <algorithm>           // for uniform_int_distribution
 #include "dm_constants.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
-#include <stdlib.h>            // for free, malloc
-#include <algorithm>           // for uniform_int_distribution
 
 #if defined(__LITEOS_M__)
 #include <time.h>

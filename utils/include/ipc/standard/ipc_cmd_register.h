@@ -22,7 +22,7 @@
 #include "single_instance.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
-namespace OHOS{ class MessageParcel; }
+namespace OHOS { class MessageParcel; }
 
 namespace OHOS {
 namespace DistributedHardware {

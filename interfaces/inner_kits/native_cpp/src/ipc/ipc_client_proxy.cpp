@@ -16,9 +16,8 @@
 #include "ipc_client_proxy.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include <memory>
-namespace OHOS::DistributedHardware{ class IpcReq; }
-namespace OHOS::DistributedHardware{ class IpcRsp; }
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

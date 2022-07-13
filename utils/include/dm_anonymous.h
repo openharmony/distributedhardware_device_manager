@@ -16,7 +16,7 @@
 #ifndef OHOS_DM_ANONYMOUS_H
 #define OHOS_DM_ANONYMOUS_H
 
-#include <stdint.h>  // for int32_t
+#include <cstdint>   // for int32_t
 #include "iosfwd"    // for string
 
 namespace OHOS {

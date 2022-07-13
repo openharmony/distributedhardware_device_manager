@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 
+#include <cstddef>                                // for size_t
+#include <cstdint>                                // for int32_t, int16_t
+#include <string>                                 // for basic_string
+#include <vector>                                 // for vector
+#include <memory>                                 // for shared_ptr, static_...
 #include "device_manager_notify.h"
-#include <stddef.h>                               // for size_t
-#include <stdint.h>                               // for int32_t, int16_t
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -42,12 +45,10 @@
 #include "securec.h"
 #include "dm_subscribe_info.h"                    // for DmSubscribeInfo
 #include "iosfwd"                                 // for string
-#include <memory>                                 // for shared_ptr, static_...
 #include "message_parcel.h"                       // for MessageParcel
 #include "refbase.h"                              // for sptr
-#include <string>                                 // for basic_string
-#include <vector>                                 // for vector
-namespace OHOS{ class IRemoteObject; }
+
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

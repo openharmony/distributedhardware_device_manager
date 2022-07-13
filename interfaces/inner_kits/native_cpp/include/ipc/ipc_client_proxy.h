@@ -21,8 +21,8 @@
 #include "ipc_client.h"
 #include "iosfwd"
 #include "ipc_def.h"
-namespace OHOS::DistributedHardware{ class IpcReq; }
-namespace OHOS::DistributedHardware{ class IpcRsp; }
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

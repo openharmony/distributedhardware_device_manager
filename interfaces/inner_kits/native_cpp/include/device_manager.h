@@ -18,11 +18,11 @@
 
 #include <memory>
 #include <vector>
+#include <cstdint>             // for int32_t, uint16_t
+#include <iosfwd>              // for string
 #include "dm_device_info.h"
 #include "device_manager_callback.h"
 #include "dm_subscribe_info.h"
-#include <stdint.h>             // for int32_t, uint16_t
-#include <iosfwd>               // for string
 
 namespace OHOS {
 namespace DistributedHardware {
