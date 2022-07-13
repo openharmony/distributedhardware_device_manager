@@ -15,7 +15,19 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "devicemanagerimpl_fuzzer:fuzztest",
+    "authenticatedevice_fuzzer:fuzztest",
+    "devicediscovery_fuzzer:fuzztest",
+    "devicelist_fuzzer:fuzztest",
+    "devicemanagernotify_fuzzer:fuzztest",
+    "getfaparam_fuzzer:fuzztest",
+    "getudidbynetworkid_fuzzer:fuzztest",
+    "getuuidbynetworkid_fuzzer:fuzztest",
+    "initdevicemanager_fuzzer:fuzztest",
+    "registerdevicemanagerfacallback_fuzzer:fuzztest",
+    "registerdevstatecallback_fuzzer:fuzztest",
+    "setuseroperation_fuzzer:fuzztest",
+    "unauthenticatedevice_fuzzer:fuzztest",
+    "unregisterdevicemanagerfacallback_fuzzer:fuzztest",
     "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
     "ipcclientmanager_fuzzer:fuzztest",
