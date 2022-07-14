@@ -17,9 +17,24 @@
 #include <cstdint>
 #include <string>
 
-#include "device_manager_impl.h"
-#include "device_manager.h"
-#include "device_manager_callback.h"
+#include <algorithm>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include "ipc_client_manager.h"
+#include "ipc_set_useroperation_req.h"
+#include "ipc_rsp.h"
+#include "ipc_def.h"
+#include "device_manager_notify.h"
+#include "dm_device_info.h"
+#include "ipc_client_stub.h"
+#include "ipc_register_listener_req.h"
+#include "ipc_remote_broker.h"
+#include "iremote_object.h"
+#include "iservice_registry.h"
+#include "dm_constants.h"
+#include "system_ability_definition.h"
 #include "device_manager_notify_fuzzer.h"
 
 namespace OHOS {
