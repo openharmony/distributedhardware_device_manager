@@ -13,9 +13,13 @@
  * limitations under the License.
  */
 
+#include "dm_distributed_hardware_load.h"
+
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "dm_distributed_hardware_load.h"
+#include "if_system_ability_manager.h"      // for ISystemAbilityManager
+#include "iservice_registry.h"              // for SystemAbilityManagerClient
+#include "system_ability_definition.h"      // for DISTRIBUTED_HARDWARE_SA_ID
 
 namespace OHOS {
 namespace DistributedHardware {

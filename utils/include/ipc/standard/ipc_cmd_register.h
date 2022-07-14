@@ -22,9 +22,8 @@
 
 #include "ipc_req.h"
 #include "ipc_rsp.h"
-#include "ipc_types.h"
-#include "iremote_broker.h"
 #include "single_instance.h"
+namespace OHOS { class MessageParcel; }
 
 namespace OHOS {
 namespace DistributedHardware {

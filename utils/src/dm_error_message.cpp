@@ -15,6 +15,8 @@
 
 #include "dm_error_message.h"
 
+#include "dm_constants.h"  // for ERR_DM_AUTH_BUSINESS_BUSY, ERR_DM_AUTH_FAILED
+
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct ERROR_INFO {

@@ -17,6 +17,7 @@
 #define OHOS_DM_DEVICE_INFO_H
 
 #include <cstdint>
+#include <string>
 
 #include "dm_app_image_info.h"
 

@@ -17,6 +17,8 @@
 
 #include "dm_constants.h"
 #include "dm_log.h"
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

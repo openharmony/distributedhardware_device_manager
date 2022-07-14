@@ -15,9 +15,12 @@
 
 #include "ipc_cmd_register.h"
 
+#include <utility>         // for pair
+
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_def.h"
+namespace OHOS { class MessageParcel; }
 
 namespace OHOS {
 namespace DistributedHardware {

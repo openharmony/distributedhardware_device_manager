@@ -18,11 +18,8 @@
 #include <random>
 
 #include "dm_constants.h"
-#include "mbedtls/base64.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
-#include "mbedtls/gcm.h"
-#include "mbedtls/md.h"
 
 #if defined(__LITEOS_M__)
 #include <time.h>

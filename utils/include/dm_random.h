@@ -16,7 +16,7 @@
 #ifndef OHOS_DM_RANDOM_H
 #define OHOS_DM_RANDOM_H
 
-#include <string>
+#include <stdint.h>
 
 namespace OHOS {
 namespace DistributedHardware {
