@@ -18,11 +18,6 @@
 
 #include <string>
 
-#include "hitrace_meter.h"
-
-#include "dm_constants.h"
-#include "dm_dfx_constants.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 void DmTraceStart(const std::string &msg);

@@ -49,6 +49,9 @@ const int32_t DISCOVER_STATUS_LEN = 20;
 const int32_t COMMON_CALLBACK_MAX_SIZE = 200;
 const uint32_t MAX_LOAD_VALUE = 3;
 
+const int32_t DM_AUTH_TYPE_MAX = 4;
+const int32_t DM_AUTH_TYPE_MIN = 1;
+
 enum {
     DM_OK = 0,
     ERR_DM_FAILED = -20000,

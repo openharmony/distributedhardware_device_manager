@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
-#include <string>
-
-#include "dm_anonymous.h"
-#include "dm_dfx_constants.h"
-#include "dm_device_info.h"
 #include "dm_hidumper.h"
+
+#include <unordered_map>       // for __hash_map_const_iterator, unordered_map
+#include <utility>             // for pair
+
+#include "dm_anonymous.h"      // for GetAnonyString
+#include "dm_constants.h"      // for DM_OK, ERR_DM_FAILED
+#include "dm_log.h"            // for LOGI, LOGE
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -93,7 +95,7 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
 std::string HiDumpHelper::GetDeviceType(int32_t deviceTypeId)
 {
     std::string dmDeviceTypeIdString = "";
-    for (int32_t i = 0; i < (sizeof(dumperDeviceType) / sizeof(dumperDeviceType[0])); i++) {
+    for (uint32_t i = 0; i < (sizeof(dumperDeviceType) / sizeof(dumperDeviceType[0])); i++) {
         if (deviceTypeId == dumperDeviceType[i].deviceTypeId) {
             dmDeviceTypeIdString = dumperDeviceType[i].deviceTypeInfo;
             break;

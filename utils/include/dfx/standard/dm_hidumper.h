@@ -17,15 +17,12 @@
 #define OHOS_DM_HIDUMPER_H
 
 #include <cstdint>
-#include <set>
 #include <string>
 #include <vector>
 
-#include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_dfx_constants.h"
 #include "single_instance.h"
-#include "dm_log.h"
-#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -15,9 +15,12 @@
 
 #include "ipc_cmd_register.h"
 
+#include <utility>         // for pair
+
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_def.h"
+namespace OHOS { class MessageParcel; }
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,7 +29,7 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     int32_t ret = DM_OK;
-    if (cmdCode < 0 || cmdCode >= UNREGISTER_CREDENTIAL_CALLBACK || pBaseReq == nullptr) {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || pBaseReq == nullptr) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }

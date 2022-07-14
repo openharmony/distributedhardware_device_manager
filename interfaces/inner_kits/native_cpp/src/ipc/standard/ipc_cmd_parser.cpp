@@ -26,6 +26,7 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_register_dev_state_callback_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -36,8 +37,8 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
-#include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

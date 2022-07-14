@@ -20,10 +20,11 @@
 #include <memory>
 
 #include "ipc_remote_broker.h"
-#include "ipc_req.h"
-#include "ipc_rsp.h"
-#include "iremote_broker.h"
 #include "iremote_stub.h"
+namespace OHOS { class MessageOption; }
+namespace OHOS { class MessageParcel; }
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

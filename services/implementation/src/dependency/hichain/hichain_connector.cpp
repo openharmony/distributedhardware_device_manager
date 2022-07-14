@@ -15,14 +15,14 @@
 
 #include "hichain_connector.h"
 
-#include <securec.h>
-
 #include <cstdlib>
 #include <ctime>
 #include <functional>
+#include <securec.h>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_log.h"
 #include "dm_random.h"
@@ -30,6 +30,7 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
+#include "unistd.h"
 
 namespace OHOS {
 namespace DistributedHardware {

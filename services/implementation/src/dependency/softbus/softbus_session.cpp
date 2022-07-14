@@ -17,6 +17,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_dfx_constants.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"

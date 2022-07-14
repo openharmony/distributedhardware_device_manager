@@ -18,8 +18,11 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
-#include "ipc_skeleton.h"
-#include "ipc_types.h"
+#include "ipc_object_stub.h"   // for IPCObjectStub
+#include "message_option.h"    // for MessageOption
+#include "message_parcel.h"    // for MessageParcel
+namespace OHOS::DistributedHardware { class IpcReq; }
+namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {

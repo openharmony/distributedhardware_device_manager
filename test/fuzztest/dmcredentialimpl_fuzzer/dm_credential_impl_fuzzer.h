@@ -13,14 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DISTRIBUTED_DM_HISYSEVENT_H
-#define OHOS_DISTRIBUTED_DM_HISYSEVENT_H
+#ifndef DM_CREDENTIAL_IMPL_FUZZER_H
+#define DM_CREDENTIAL_IMPL_FUZZER_H
 
-#include <string>
+#define FUZZ_PROJECT_NAME "dmcredentialimpl_fuzzer"
 
-namespace OHOS {
-namespace DistributedHardware {
-void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg);
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H
+#endif // DM_CREDENTIAL_IMPL_FUZZER_H
