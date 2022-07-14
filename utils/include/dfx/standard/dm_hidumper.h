@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "dm_device_info.h"
 #include "dm_dfx_constants.h"
 #include "single_instance.h"

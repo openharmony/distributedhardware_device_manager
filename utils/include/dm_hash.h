@@ -16,7 +16,7 @@
 #ifndef OHOS_DM_HASH_H
 #define OHOS_DM_HASH_H
 
-#include <stdint.h>  // for int32_t, uint8_t, uint32_t
+#include <stdint.h>
 
 namespace OHOS {
 namespace DistributedHardware {

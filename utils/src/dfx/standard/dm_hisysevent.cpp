@@ -14,6 +14,7 @@
  */
 
 #include "dm_hisysevent.h"
+
 #include "dm_constants.h"  // for DM_OK
 #include "dm_log.h"        // for LOGE
 #include "hisysevent.h"    // for HiSysEvent, HiSysEvent::Domain, HiSysEvent...

@@ -14,6 +14,7 @@
  */
 
 #include "softbus_session.h"
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_dfx_constants.h"

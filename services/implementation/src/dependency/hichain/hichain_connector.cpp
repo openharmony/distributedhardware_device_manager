@@ -14,10 +14,12 @@
  */
 
 #include "hichain_connector.h"
+
 #include <cstdlib>
 #include <ctime>
 #include <functional>
 #include <securec.h>
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_dfx_constants.h"

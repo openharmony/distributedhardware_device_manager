@@ -14,6 +14,7 @@
  */
 
 #include "dm_hash.h"
+
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "md.h"            // for mbedtls_md_free, mbedtls_md_finish, mbedtl...

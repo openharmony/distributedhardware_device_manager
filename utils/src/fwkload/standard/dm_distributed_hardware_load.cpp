@@ -14,6 +14,7 @@
  */
 
 #include "dm_distributed_hardware_load.h"
+
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "if_system_ability_manager.h"      // for ISystemAbilityManager
