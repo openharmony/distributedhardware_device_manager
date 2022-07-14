@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 
-#include <securec.h>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+
 #include "device_manager_impl.h"
 #include "device_manager.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 #include "device_manager_callback.h"
-#include "dm_app_image_info.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
 #include "device_list_fuzzer.h"
 
 namespace OHOS {

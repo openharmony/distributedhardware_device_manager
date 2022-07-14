@@ -13,24 +13,13 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <securec.h>
-#include <uv.h>
 #include <string>
-#include <iostream>
+
 #include "device_manager_impl.h"
 #include "device_manager.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 #include "device_manager_callback.h"
-#include "dm_app_image_info.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
-#include "nlohmann/json.hpp"
-#include "native_devicemanager_js.h"
 #include "register_dev_state_callback_fuzzer.h"
 
 namespace OHOS {
