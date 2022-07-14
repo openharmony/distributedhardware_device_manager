@@ -168,8 +168,8 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
-        LOGE("AuthenticateDevice failed, authType is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        LOGE("AuthenticateDevice failed, authType is illegal");
+        return ERR_DM_AUTH_FAILED;
     }
     if (extra.empty()) {
         LOGE("AuthenticateDevice failed, extra is empty");
