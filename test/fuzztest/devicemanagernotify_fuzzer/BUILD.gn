@@ -17,9 +17,9 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DeviceManagerServiceFuzzTest") {
+ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/devicemanagerservice_fuzzer"
+  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/devicemanagernotify_fuzzer"
 
   include_dirs = [
     "//utils/native/base/include",
@@ -68,7 +68,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "device_manager_service_fuzzer.cpp" ]
+  sources = [ "device_manager_notify_fuzzer.cpp" ]
 
   deps = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
@@ -78,7 +78,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DeviceManagerServiceFuzzTest\"",
+    "DH_LOG_TAG=\"DeviceManagerNotifyFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
 
@@ -93,6 +93,6 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":DeviceManagerServiceFuzzTest" ]
+  deps = [ ":DeviceManagerNotifyFuzzTest" ]
 }
 ###############################################################################
