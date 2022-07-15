@@ -558,15 +558,11 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
 
 int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("import credential failed, pkgName is empty.");
+    if (pkgName.empty() || credentialInfo.empty()) {
+        LOGE("DeviceManagerImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
+            pkgName.c_str(), credentialInfo.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (credentialInfo.empty()) {
-        LOGE("the imported credential credentialInfo is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-
     LOGI("start to ImportCredential.");
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -587,15 +583,11 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
 
 int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("delete credential failed, pkgName is empty.");
+    if (pkgName.empty() || deleteInfo.empty()) {
+        LOGE("DeviceManagerImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
+            pkgName.c_str(), deleteInfo.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (deleteInfo.empty()) {
-        LOGE("the deleted credential deleteInfo is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-
     LOGI("start to DeleteCredential.");
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();

@@ -159,21 +159,14 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
         LOGI("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty()) {
-        LOGE("AuthenticateDevice failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-    if (deviceId.empty()) {
-        LOGE("AuthenticateDevice failed, deviceId is empty");
+    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
+            pkgName.c_str(), deviceId.c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
         LOGE("AuthenticateDevice failed, authType is illegal");
-        return ERR_DM_AUTH_FAILED;
-    }
-    if (extra.empty()) {
-        LOGE("AuthenticateDevice failed, extra is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
@@ -184,12 +177,9 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
         LOGI("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty()) {
-        LOGE("UnAuthenticateDevice failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-    if (deviceId.empty()) {
-        LOGE("UnAuthenticateDevice failed, deviceId is empty");
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s",
+            pkgName.c_str(), deviceId.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     return authMgr_->UnAuthenticateDevice(pkgName, deviceId);
@@ -296,12 +286,9 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("ImportCredential failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-    if (credentialInfo.empty()) {
-        LOGE("credentialInfo is empty");
+    if (pkgName.empty() || credentialInfo.empty()) {
+        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
+            pkgName.c_str(), credentialInfo.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (credentialMgr_== nullptr) {
@@ -313,12 +300,9 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("DeleteCredential failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
-    if (deleteInfo.empty()) {
-        LOGE("deleteInfo is empty");
+    if (pkgName.empty() || deleteInfo.empty()) {
+        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
+            pkgName.c_str(), deleteInfo.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (credentialMgr_== nullptr) {
