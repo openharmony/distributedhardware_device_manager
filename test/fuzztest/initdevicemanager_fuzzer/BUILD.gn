@@ -32,10 +32,12 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
     "${common_path}/include/ipc/model",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
-#    "${servicesimpl_path}/include/dependency/timer",
-#    "${servicesimpl_path}/include/discovery",
+
+    #    "${servicesimpl_path}/include/dependency/timer",
+    #    "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
-#    "${servicesimpl_path}/include/authentication",
+
+    #    "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/ipc/standard",
     "${servicesimpl_path}/include/dependency/hichain",
@@ -45,10 +47,12 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
-#    "//foundation/distributedhardware/device_manager/ext/profile/include",
+
+    #    "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//base/security/device_auth/interfaces/innerkits",
-#    "${servicesimpl_path}/include/ability",
-#    "${servicesimpl_path}/include/config",
+
+    #    "${servicesimpl_path}/include/ability",
+    #    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [
@@ -71,14 +75,14 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
   ]
 
   external_deps = [
-#    "bundle_framework:appexecfwk_base",
-#    "bundle_framework:appexecfwk_core",
-#    "eventhandler:libeventhandler",
-#    "hiviewdfx_hilog_native:libhilog",
-     "ipc:ipc_core",
-#    "safwk:system_ability_fwk",
-#    "samgr_standard:samgr_proxy",
-#    "startup_l2:syspara",
+    #    "bundle_framework:appexecfwk_base",
+    #    "bundle_framework:appexecfwk_core",
+    #    "eventhandler:libeventhandler",
+    #    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    #    "safwk:system_ability_fwk",
+    #    "samgr_standard:samgr_proxy",
+    #    "startup_l2:syspara",
   ]
 }
 
