@@ -22,8 +22,6 @@
 #include "device_manager_callback.h"
 #include "device_discovery_fuzzer.h"
 
-const int nCapabiltyBufferSize = 65;
-
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
@@ -49,7 +47,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     subInfo.freq = *(reinterpret_cast<const DmExchangeFreq*>(data));
     subInfo.isSameAccount = *(reinterpret_cast<const bool*>(data));
     subInfo.isWakeRemote = *(reinterpret_cast<const bool*>(data));
-    strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, nCapabiltyBufferSize);
+    strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN);
     std::string extra(reinterpret_cast<const char*>(data), size);
     int16_t subscribeId = *(reinterpret_cast<const int16_t*>(data));
 
