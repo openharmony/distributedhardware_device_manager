@@ -47,7 +47,10 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     subInfo.freq = *(reinterpret_cast<const DmExchangeFreq*>(data));
     subInfo.isSameAccount = *(reinterpret_cast<const bool*>(data));
     subInfo.isWakeRemote = *(reinterpret_cast<const bool*>(data));
-    strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN);
+    if (strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN) != DM_OK) {
+        LOGE("strncpy_s failed, filed ");
+        return;
+    }
     std::string extra(reinterpret_cast<const char*>(data), size);
     int16_t subscribeId = *(reinterpret_cast<const int16_t*>(data));
 
