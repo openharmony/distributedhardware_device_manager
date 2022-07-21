@@ -147,13 +147,13 @@ int32_t DmCredentialManager::ImportLocalCredential(const std::string &credential
     }
     std::string userId = jsonObject[FIELD_USER_ID];
     requestId_ = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
-    nlohmann::json creArray = jsonObject[FIELD_CREDENTIAL_DATA.c_str()];
+    nlohmann::json creArray = jsonObject[FIELD_CREDENTIAL_DATA];
     if (!creArray.is_array()) {
         LOGI("ImportLocalCredential credentialData is not a array object!");
         return ERR_DM_FAILED;
     }
     std::vector<CredentialData> vecCredentialData =
-        jsonObject[FIELD_CREDENTIAL_DATA.c_str()].get<std::vector<CredentialData>>();
+        jsonObject[FIELD_CREDENTIAL_DATA].get<std::vector<CredentialData>>();
     if (vecCredentialData.size() != 1) {
         LOGI("ImportLocalCredential credentialData err");
         return ERR_DM_FAILED;
