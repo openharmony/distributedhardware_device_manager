@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr const char* DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
+constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,

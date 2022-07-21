@@ -191,15 +191,14 @@ constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
 
 // timer
-constexpr const char* TIMER_PREFIX = "deviceManagerTimer:";
-constexpr const char* AUTHENTICATE_TIMEOUT_TASK = TIMER_PREFIX + "authenticate";
-constexpr const char* NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "negotiate";
-constexpr const char* CONFIRM_TIMEOUT_TASK = TIMER_PREFIX + "confirm";
-constexpr const char* INPUT_TIMEOUT_TASK = TIMER_PREFIX + "input";
-constexpr const char* ADD_TIMEOUT_TASK = TIMER_PREFIX + "add";
-constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = TIMER_PREFIX + "waitNegotiate";
-constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = TIMER_PREFIX + "waitRequest";
-constexpr const char* STATE_TIMER_PREFIX = "stateTimer_";
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
+constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
+constexpr const char* CONFIRM_TIMEOUT_TASK = "deviceManagerTimer:confirm";
+constexpr const char* INPUT_TIMEOUT_TASK = "deviceManagerTimer:input";
+constexpr const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
+constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNegotiate";
+constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
+constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
 const int32_t TIMER_PREFIX_LENGTH = 19;
 const int32_t TIMER_DEFAULT = 0;
 const int32_t NO_TIMER = -1;
