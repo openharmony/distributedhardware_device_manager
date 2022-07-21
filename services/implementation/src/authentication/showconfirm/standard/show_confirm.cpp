@@ -48,7 +48,7 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
         OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
         ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
         [authManager](int32_t id, const std::string& event, const std::string& params) {
-            if (params == EVENT_INIT_CODE) {
+            if (params == std::string(EVENT_INIT_CODE)) {
                 LOGI("Dialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
                 authManager->SetPageId(id);
             } else {

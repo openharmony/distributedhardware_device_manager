@@ -212,7 +212,7 @@ void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std:
 int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 {
     if (softbusConnector_ != nullptr) {
-        return softbusConnector_->RegisterSoftbusStateCallback(DM_PKG_NAME, shared_from_this());
+        return softbusConnector_->RegisterSoftbusStateCallback(std::string(DM_PKG_NAME), shared_from_this());
     }
     return DM_OK;
 }
@@ -270,7 +270,8 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
-    std::string timerName = TIMER_PREFIX + STATE_TIMER_PREFIX + std::to_string(cumulativeQuantity_++);
+    std::string timerName = std::string(TIMER_PREFIX) + std::string(STATE_TIMER_PREFIX) +
+        std::to_string(cumulativeQuantity_++);
     StateTimerInfo stateTimer = {
         .timerName = timerName,
         .netWorkId = deviceInfo.deviceId,
