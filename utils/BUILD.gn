@@ -39,7 +39,7 @@ if (defined(ohos_lite)) {
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
 
       sources = [
@@ -63,7 +63,7 @@ if (defined(ohos_lite)) {
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
-        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
         "//third_party/mbedtls:mbedtls_shared",
@@ -98,7 +98,7 @@ if (defined(ohos_lite)) {
         "//foundation/communication/dsoftbus/interfaces/kits/discovery",
         "//foundation/communication/dsoftbus/interfaces/kits/transport",
         "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
       sources = [
         "src/dfx/lite/dm_hidumper.cpp",
@@ -123,7 +123,7 @@ if (defined(ohos_lite)) {
         "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-        "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
         "//utils/native/lite:utils",
@@ -183,7 +183,7 @@ if (defined(ohos_lite)) {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
       "utils_base:utils",
     ]
     if (support_jsapi) {

@@ -29,7 +29,7 @@
                 "safwk",
                 "startup_l2",
                 "device_profile_core",
-                "samgr_standard",
+                "samgr",
                 "common_event_service",
                 "dsoftbus",
                 "utils_base",

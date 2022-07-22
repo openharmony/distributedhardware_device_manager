@@ -69,7 +69,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/communication/dsoftbus/sdk:softbus_client",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
       "//third_party/mbedtls:mbedtls_shared",
       "//utils/native/lite:utils",
@@ -150,7 +150,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
     ]
 
     defines = [
