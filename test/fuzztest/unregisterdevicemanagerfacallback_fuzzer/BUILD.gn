@@ -57,7 +57,7 @@ ohos_fuzztest("UnRegisterDeviceManagerFaCallback") {
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
-    "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
     "//base/security/device_auth/interfaces/innerkits",
     "${servicesimpl_path}/include/ability",

@@ -57,7 +57,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "device_profile_core:distributed_device_profile_client",
+      "device_info_manager:distributed_device_profile_client",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
