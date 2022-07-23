@@ -28,7 +28,7 @@
                 "ipc",
                 "safwk",
                 "startup_l2",
-                "device_profile_core",
+                "device_info_manager",
                 "samgr_standard",
                 "common_event_service",
                 "dsoftbus",
