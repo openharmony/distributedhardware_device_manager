@@ -35,7 +35,7 @@ public:
 
 void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= sizeof(int32_t))) {
+    if ((data == nullptr) || (size <= 0)) {
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
@@ -47,9 +47,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     subInfo.freq = *(reinterpret_cast<const DmExchangeFreq*>(data));
     subInfo.isSameAccount = *(reinterpret_cast<const bool*>(data));
     subInfo.isWakeRemote = *(reinterpret_cast<const bool*>(data));
-    if (strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN) != 0) {
-        return;
-    }
+    strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN);
     std::string extra(reinterpret_cast<const char*>(data), size);
     int16_t subscribeId = *(reinterpret_cast<const int16_t*>(data));
 
