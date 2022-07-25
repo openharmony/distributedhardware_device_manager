@@ -72,12 +72,11 @@ DmConfigManager::DmConfigManager()
             LOGE("adapter json config string parse error");
             break;
         }
-        const char *jsonKey = ADAPTER_LOAD_JSON_KEY.c_str();
-        if (!adapterJsonObject.contains(jsonKey)) {
+        if (!adapterJsonObject.contains(ADAPTER_LOAD_JSON_KEY)) {
             LOGE("adapter json config string key not exist");
             break;
         }
-        auto soLoadInfo = adapterJsonObject[jsonKey].get<std::vector<AdapterSoLoadInfo>>();
+        auto soLoadInfo = adapterJsonObject[ADAPTER_LOAD_JSON_KEY].get<std::vector<AdapterSoLoadInfo>>();
         for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
             if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
                 soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
@@ -85,7 +84,7 @@ DmConfigManager::DmConfigManager()
                 LOGE("adapter json config string exist invalid members");
                 continue;
             }
-            soLoadInfo[i].soPath = LIB_LOAD_PATH;
+            soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
             soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
             LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
             LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
@@ -102,12 +101,11 @@ DmConfigManager::DmConfigManager()
             LOGE("auth json config string parse error!\n");
             break;
         }
-        const char *jsonKey = AUTH_LOAD_JSON_KEY.c_str();
-        if (!authJsonObject.contains(jsonKey)) {
+        if (!authJsonObject.contains(AUTH_LOAD_JSON_KEY)) {
             LOGE("auth json config string key not exist!\n");
             break;
         }
-        auto soLoadInfo = authJsonObject[jsonKey].get<std::vector<AuthSoLoadInfo>>();
+        auto soLoadInfo = authJsonObject[AUTH_LOAD_JSON_KEY].get<std::vector<AuthSoLoadInfo>>();
         for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
             if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
                 soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
@@ -115,7 +113,7 @@ DmConfigManager::DmConfigManager()
                 LOGE("adapter json config string exist invalid members");
                 continue;
             }
-            soLoadInfo[i].soPath = LIB_LOAD_PATH;
+            soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
             soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
             LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
             LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
@@ -155,7 +153,7 @@ std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std:
         return nullptr;
     }
     auto soInfoIter = soAdapterLoadInfo_.find(soName);
-    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != DECISION_JSON_TYPE_KEY) {
+    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != std::string(DECISION_JSON_TYPE_KEY)) {
         LOGE("not find so info or type key not match");
         return nullptr;
     }
@@ -193,7 +191,7 @@ std::shared_ptr<IProfileAdapter> DmConfigManager::GetProfileAdapter(const std::s
     }
 
     auto soInfoIter = soAdapterLoadInfo_.find(soName);
-    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != PROFILE_JSON_TYPE_KEY) {
+    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != std::string(PROFILE_JSON_TYPE_KEY)) {
         LOGE("not find so info or type key not match");
         return nullptr;
     }
@@ -231,7 +229,7 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
     }
 
     auto soInfoIter = soAdapterLoadInfo_.find(soName);
-    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != CPYPTO_JSON_TYPE_KEY) {
+    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != std::string(CPYPTO_JSON_TYPE_KEY)) {
         LOGE("not find so info or type key not match");
         return nullptr;
     }
@@ -269,7 +267,7 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
 {
     authAdapter.clear();
     for (auto iter = soAuthLoadInfo_.begin(); iter != soAuthLoadInfo_.end(); iter++) {
-        if ((iter->second).type != AUTH_JSON_TYPE_KEY) {
+        if ((iter->second).type != std::string(AUTH_JSON_TYPE_KEY)) {
             LOGE("type key not match");
             continue;
         }
