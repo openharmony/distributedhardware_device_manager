@@ -17,6 +17,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_dfx_constants.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
@@ -49,7 +50,7 @@ int32_t SoftbusSession::UnRegisterSessionCallback()
 int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
 {
     LOGI("SoftbusSession::OpenAuthSession");
-    DmTraceStart(DM_HITRACE_AUTH_TO_OPPEN_SESSION);
+    DmTraceStart(std::string(DM_HITRACE_AUTH_TO_OPPEN_SESSION));
     int32_t sessionId = -1;
     std::string connectAddr;
     ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(deviceId, connectAddr);
@@ -57,7 +58,7 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
         LOGE("GetConnectAddr error");
         return sessionId;
     }
-    sessionId = ::OpenAuthSession(DM_SESSION_NAME.c_str(), addrInfo, 1, nullptr);
+    sessionId = ::OpenAuthSession(DM_SESSION_NAME, addrInfo, 1, nullptr);
     if (sessionId < 0) {
         LOGE("open session error, ret:%d", sessionId);
         return sessionId;

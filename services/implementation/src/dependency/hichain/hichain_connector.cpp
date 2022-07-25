@@ -15,14 +15,14 @@
 
 #include "hichain_connector.h"
 
-#include <securec.h>
-
 #include <cstdlib>
 #include <ctime>
 #include <functional>
+#include <securec.h>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_log.h"
 #include "dm_random.h"
@@ -30,6 +30,7 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
+#include "unistd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -81,7 +82,7 @@ HiChainConnector::HiChainConnector()
         LOGI("HiChainConnector::constructor, failed to init group manager!");
         return;
     }
-    deviceGroupManager_->regCallback(DM_PKG_NAME.c_str(), &deviceAuthCallback_);
+    deviceGroupManager_->regCallback(DM_PKG_NAME, &deviceAuthCallback_);
     LOGI("HiChainConnector::constructor success.");
 }
 
@@ -130,7 +131,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
         return ERR_DM_FAILED;
     }
 
-    int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME.c_str(), jsonObj.dump().c_str());
+    int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     if (ret != 0) {
         LOGE("Failed to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
         return ERR_DM_CREATE_GROUP_FAILED;
@@ -182,7 +183,7 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
         LOGE("get current process account user id failed");
         return false;
     }
-    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME.c_str(), queryParams.c_str(), &groupVec, &num);
+    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
         LOGE("HiChainConnector::GetGroupInfo failed , ret: %d.", ret);
         return false;
@@ -217,7 +218,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
-    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME.c_str(), queryParams.c_str(), &groupVec, &num);
+    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
         LOGE("HiChainConnector::GetGroupInfo failed , ret: %d.", ret);
         return false;
@@ -280,7 +281,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME.c_str(), tmpStr.c_str());
+    int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME, tmpStr.c_str());
     LOGI("HiChainConnector::AddMember completed");
     return ret;
 }
@@ -294,14 +295,16 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
-        SysEventWrite(ADD_HICHAIN_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR, ADD_HICHAIN_GROUP_SUCCESS_MSG);
+        SysEventWrite(std::string(ADD_HICHAIN_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
+            std::string(ADD_HICHAIN_GROUP_SUCCESS_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
-        SysEventWrite(DM_CREATE_GROUP_SUCCESS, DM_HISYEVENT_BEHAVIOR, DM_CREATE_GROUP_SUCCESS_MSG);
+        SysEventWrite(std::string(DM_CREATE_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
+            std::string(DM_CREATE_GROUP_SUCCESS_MSG));
         if (networkStyle_ == CREDENTIAL_NETWORK) {
             if (hiChainResCallback_ != nullptr) {
                 int32_t importAction = 0;
@@ -339,14 +342,16 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
-        SysEventWrite(ADD_HICHAIN_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR, ADD_HICHAIN_GROUP_FAILED_MSG);
+        SysEventWrite(std::string(ADD_HICHAIN_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
+            std::string(ADD_HICHAIN_GROUP_FAILED_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
             hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
-        SysEventWrite(DM_CREATE_GROUP_FAILED, DM_HISYEVENT_BEHAVIOR, DM_CREATE_GROUP_FAILED_MSG);
+        SysEventWrite(std::string(DM_CREATE_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
+            std::string(DM_CREATE_GROUP_FAILED_MSG));
         if (networkStyle_ == CREDENTIAL_NETWORK) {
             if (hiChainResCallback_ != nullptr) {
                 int32_t importAction = 0;
@@ -435,7 +440,7 @@ int32_t HiChainConnector::GetRelatedGroups(const std::string &deviceId, std::vec
         return ERR_DM_FAILED;
     }
     int32_t ret =
-        deviceGroupManager_->getRelatedGroups(userId, DM_PKG_NAME.c_str(), deviceId.c_str(), &returnGroups, &groupNum);
+        deviceGroupManager_->getRelatedGroups(userId, DM_PKG_NAME, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("HiChainConnector::GetRelatedGroups failed , ret: %d.", ret);
         return ERR_DM_FAILED;
@@ -499,7 +504,7 @@ bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std
 bool HiChainConnector::IsGroupInfoInvalid(GroupInfo &group)
 {
     if (group.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP || group.groupVisibility == GROUP_VISIBILITY_PUBLIC ||
-        group.groupOwner != DM_PKG_NAME) {
+        group.groupOwner != std::string(DM_PKG_NAME)) {
         return true;
     }
     return false;
@@ -535,8 +540,7 @@ int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const s
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    int32_t ret = deviceGroupManager_->deleteMemberFromGroup(userId, requestId,
-        DM_PKG_NAME.c_str(), deleteParams.c_str());
+    int32_t ret = deviceGroupManager_->deleteMemberFromGroup(userId, requestId, DM_PKG_NAME, deleteParams.c_str());
     if (ret != 0) {
         LOGE("HiChainConnector::DelMemberFromGroup failed , ret: %d.", ret);
         return ret;
@@ -556,7 +560,7 @@ int32_t HiChainConnector::DeleteGroup(std::string &groupId)
         return ERR_DM_FAILED;
     }
 
-    int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME.c_str(), disbandParams.c_str());
+    int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
     if (ret != 0) {
         LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
         return ERR_DM_FAILED;
@@ -570,7 +574,7 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = jsonObj.dump();
-    int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME.c_str(), disbandParams.c_str());
+    int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
     if (ret != 0) {
         LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
         return ERR_DM_FAILED;
@@ -611,7 +615,7 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    int32_t ret = deviceGroupManager_->deleteGroup(osAccountUserId, requestId_, DM_PKG_NAME.c_str(),
+    int32_t ret = deviceGroupManager_->deleteGroup(osAccountUserId, requestId_, DM_PKG_NAME,
         disbandParams.c_str());
     if (ret != 0) {
         LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
@@ -641,7 +645,7 @@ int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     for (auto &group : peerGroupInfoList) {
-        if (deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME.c_str(), group.groupId.c_str(), localDeviceId)) {
+        if (deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME, group.groupId.c_str(), localDeviceId)) {
             DeleteGroup(group.groupId);
             return DM_OK;
         }
@@ -707,8 +711,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
         return ERR_DM_FAILED;
     }
     LOGI("[DM] createParams:%s", jsonObj.dump().c_str());
-    int32_t ret = deviceGroupManager_->createGroup(osAccountUserId, requestId, DM_PKG_NAME.c_str(),
-        jsonObj.dump().c_str());
+    int32_t ret = deviceGroupManager_->createGroup(osAccountUserId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     if (ret != DM_OK) {
         LOGE("Failed to start CreateGroup task, ret: %d, requestId %lld.", ret, requestId);
         return ERR_DM_CREATE_GROUP_FAILED;
@@ -814,8 +817,7 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
         return ERR_DM_FAILED;
     }
 
-    int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId,
-        DM_PKG_NAME.c_str(), addParams.c_str());
+    int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId, DM_PKG_NAME, addParams.c_str());
     if (ret!= DM_OK) {
         LOGE("HiChainConnector::addMultiMemberstoGroup failure! ret=%d", ret);
         return ret;
@@ -838,8 +840,7 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
         return ERR_DM_FAILED;
     }
 
-    int32_t ret = deviceGroupManager_->delMultiMembersFromGroup(osAccountUserId,
-        DM_PKG_NAME.c_str(), deleteParams.c_str());
+    int32_t ret = deviceGroupManager_->delMultiMembersFromGroup(osAccountUserId, DM_PKG_NAME, deleteParams.c_str());
     if (ret != DM_OK) {
         LOGE("HiChainConnector::deleteMultiMembers failure!, ret=%d", ret);
         return ret;

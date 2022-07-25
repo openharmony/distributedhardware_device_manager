@@ -37,7 +37,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
     pReq->SetPkgName(pkgName);
     pReq->SetDeviceState(state);
     pReq->SetDeviceInfo(info);
-    if (pkgName == DM_PKG_NAME) {
+    if (pkgName == std::string(DM_PKG_NAME)) {
         ipcServerListener_.SendAll(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     } else {
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
