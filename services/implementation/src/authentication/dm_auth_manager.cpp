@@ -102,7 +102,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
-    timer_->StartTimer(AUTHENTICATE_TIMEOUT_TASK, AUTHENTICATE_TIMEOUT,
+    timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), AUTHENTICATE_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
@@ -175,7 +175,7 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
         LOGE("authResponseContext_ is not init");
         return ERR_DM_AUTH_NOT_START;
     }
-    timer_->DeleteTimer(INPUT_TIMEOUT_TASK);
+    timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
     int32_t ret = authPtr_->VerifyAuthentication(authResponseContext_->authToken, authParam);
     switch (ret) {
         case DM_OK:
@@ -206,11 +206,11 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authResponseState_->Enter();
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
             timer_ = std::make_shared<DmTimer>();
-            timer_->StartTimer(AUTHENTICATE_TIMEOUT_TASK, AUTHENTICATE_TIMEOUT,
+            timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), AUTHENTICATE_TIMEOUT,
                 [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
                 });
-            timer_->StartTimer(WAIT_NEGOTIATE_TIMEOUT_TASK, WAIT_NEGOTIATE_TIMEOUT,
+            timer_->StartTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK), WAIT_NEGOTIATE_TIMEOUT,
                 [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
                 });
@@ -293,7 +293,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
         switch (authResponseContext_->msgType) {
             case MSG_TYPE_NEGOTIATE:
                 if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
-                    timer_->DeleteTimer(WAIT_NEGOTIATE_TIMEOUT_TASK);
+                    timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
                     authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
                 } else {
                     LOGE("Device manager auth state error");
@@ -301,7 +301,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
                 break;
             case MSG_TYPE_REQ_AUTH:
                 if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
-                    timer_->DeleteTimer(WAIT_REQUEST_TIMEOUT_TASK);
+                    timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
                     authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
                 } else {
                     LOGE("Device manager auth state error");
@@ -364,14 +364,14 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
     if (authRequestState_ != nullptr) {
         authTimes_++;
-        timer_->DeleteTimer(ADD_TIMEOUT_TASK);
+        timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
                 authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
                 authRequestContext_->reason = ERR_DM_INPUT_PARAMETER_EMPTY;
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             } else {
-                timer_->StartTimer(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT,
+                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
                     [this] (std::string name) {
                         DmAuthManager::HandleAuthenticateTimeout(name);
                     });
@@ -434,7 +434,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-    timer_->StartTimer(NEGOTIATE_TIMEOUT_TASK, NEGOTIATE_TIMEOUT,
+    timer_->StartTimer(std::string(NEGOTIATE_TIMEOUT_TASK), NEGOTIATE_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
@@ -482,7 +482,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
     message = jsonObject.dump();
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-    timer_->StartTimer(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT,
+    timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
@@ -495,7 +495,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     LOGI("DmAuthManager::EstablishAuthChannel session id");
-    timer_->DeleteTimer(NEGOTIATE_TIMEOUT_TASK);
+    timer_->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
     }
@@ -507,7 +507,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
-    timer_->StartTimer(CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT,
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
@@ -539,9 +539,9 @@ void DmAuthManager::StartRespAuthProcess()
         return;
     }
     LOGI("DmAuthManager::StartRespAuthProcess", authResponseContext_->sessionId);
-    timer_->DeleteTimer(CONFIRM_TIMEOUT_TASK);
+    timer_->DeleteTimer(std::string(CONFIRM_TIMEOUT_TASK));
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
-        timer_->StartTimer(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT,
+        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
             [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
@@ -574,7 +574,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         return ERR_DM_FAILED;
     }
     LOGI("DmAuthManager::AddMember start group id %s", authResponseContext_->groupId.c_str());
-    timer_->DeleteTimer(INPUT_TIMEOUT_TASK);
+    timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
     nlohmann::json jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;
     jsonObject[TAG_GROUP_NAME] = authResponseContext_->groupName;
@@ -582,7 +582,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     jsonObject[TAG_REQUEST_ID] = authResponseContext_->requestId;
     jsonObject[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     std::string connectInfo = jsonObject.dump();
-    timer_->StartTimer(ADD_TIMEOUT_TASK, ADD_TIMEOUT,
+    timer_->StartTimer(std::string(ADD_TIMEOUT_TASK), ADD_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
@@ -608,7 +608,7 @@ int32_t DmAuthManager::JoinNetwork()
         return ERR_DM_FAILED;
     }
     LOGI("DmAuthManager JoinNetwork start");
-    timer_->DeleteTimer(AUTHENTICATE_TIMEOUT_TASK);
+    timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());

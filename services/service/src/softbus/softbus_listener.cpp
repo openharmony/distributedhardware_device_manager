@@ -75,7 +75,7 @@ SoftbusListener::SoftbusListener()
                                         .OnBytesReceived = SoftbusListener::OnBytesReceived,
                                         .OnMessageReceived = nullptr,
                                         .OnStreamReceived = nullptr};
-    int32_t ret = CreateSessionServer(DM_PKG_NAME.c_str(), DM_SESSION_NAME.c_str(), &sessionListener);
+    int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
         LOGE("CreateSessionServer failed");
     } else {
@@ -86,7 +86,7 @@ SoftbusListener::SoftbusListener()
 
 SoftbusListener::~SoftbusListener()
 {
-    RemoveSessionServer(DM_PKG_NAME.c_str(), DM_SESSION_NAME.c_str());
+    RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     LOGI("SoftbusListener destructor");
 }
 
@@ -95,7 +95,7 @@ int32_t SoftbusListener::Init()
     int32_t ret;
     int32_t retryTimes = 0;
     do {
-        ret = RegNodeDeviceStateCb(DM_PKG_NAME.c_str(), &softbusNodeStateCb_);
+        ret = RegNodeDeviceStateCb(DM_PKG_NAME, &softbusNodeStateCb_);
         if (ret != DM_OK) {
             ++retryTimes;
             LOGE("RegNodeDeviceStateCb failed with ret %d, retryTimes %d", ret, retryTimes);
@@ -112,37 +112,37 @@ int32_t SoftbusListener::Init()
     dmPublishInfo.capabilityData = nullptr;
     dmPublishInfo.dataLen = 0;
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+    ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
     if (ret == DM_OK) {
         publishStatus = ALLOW_BE_DISCOVERY;
     }
 #else
     char discoverStatus[DISCOVER_STATUS_LEN + 1] = {0};
-    ret = GetParameter(DISCOVER_STATUS_KEY.c_str(), "not exist", discoverStatus, DISCOVER_STATUS_LEN);
+    ret = GetParameter(DISCOVER_STATUS_KEY, "not exist", discoverStatus, DISCOVER_STATUS_LEN);
     if (strcmp(discoverStatus, "not exist") == 0) {
-        ret = SetParameter(DISCOVER_STATUS_KEY.c_str(), DISCOVER_STATUS_ON.c_str());
+        ret = SetParameter(DISCOVER_STATUS_KEY, DISCOVER_STATUS_ON);
         LOGI("service set parameter result is : %d", ret);
 
-        ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+        ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
-    } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_ON.c_str()) == 0) {
-        ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+    } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_ON) == 0) {
+        ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
-    } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_OFF.c_str()) == 0) {
-        ret = UnPublishService(DM_PKG_NAME.c_str(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_OFF) == 0) {
+        ret = UnPublishService(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             publishStatus = NOT_ALLOW_BE_DISCOVERY;
         }
         LOGI("service unpublish result is : %d", ret);
     }
 
-    ret = WatchParameter(DISCOVER_STATUS_KEY.c_str(), &SoftbusListener::OnParameterChgCallback, nullptr);
+    ret = WatchParameter(DISCOVER_STATUS_KEY, &SoftbusListener::OnParameterChgCallback, nullptr);
 #endif
     return ret;
 }
@@ -152,7 +152,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     LOGI("SoftbusListener::GetTrustDevices start");
     int32_t infoNum = 0;
     NodeBasicInfo *nodeInfo = nullptr;
-    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeInfo, &infoNum);
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &infoNum);
     if (ret != 0) {
         LOGE("GetAllNodeDeviceInfo failed with ret %d", ret);
         return ERR_DM_FAILED;
@@ -179,7 +179,7 @@ int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
     LOGI("SoftbusListener::GetLocalDeviceInfo start");
     NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME.c_str(), &nodeBasicInfo);
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != 0) {
         LOGE("GetLocalNodeDeviceInfo failed with ret %d", ret);
         return ERR_DM_FAILED;
@@ -194,7 +194,7 @@ int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &
     LOGI("GetUdidByNetworkId begin");
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
+        GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
@@ -209,7 +209,7 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
     LOGI("GetUuidByNetworkId begin");
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME.c_str(), networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
+        GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
@@ -278,7 +278,7 @@ int32_t SoftbusListener::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &node
 
 void SoftbusListener::OnParameterChgCallback(const char *key, const char *value, void *context)
 {
-    if (strcmp(value, DISCOVER_STATUS_ON.c_str()) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
+    if (strcmp(value, DISCOVER_STATUS_ON) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
         PublishInfo dmPublishInfo;
         dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
@@ -287,13 +287,13 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
         dmPublishInfo.capability = DM_CAPABILITY_OSD;
         dmPublishInfo.capabilityData = nullptr;
         dmPublishInfo.dataLen = 0;
-        int32_t ret = PublishService(DM_PKG_NAME.c_str(), &dmPublishInfo, &softbusPublishCallback_);
+        int32_t ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
-    } else if (strcmp(value, DISCOVER_STATUS_OFF.c_str()) == 0 && publishStatus != NOT_ALLOW_BE_DISCOVERY) {
-        int32_t ret = UnPublishService(DM_PKG_NAME.c_str(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    } else if (strcmp(value, DISCOVER_STATUS_OFF) == 0 && publishStatus != NOT_ALLOW_BE_DISCOVERY) {
+        int32_t ret = UnPublishService(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             publishStatus = NOT_ALLOW_BE_DISCOVERY;
         }

@@ -23,7 +23,7 @@
 #include "permission_manager.h"
 #include "dm_distributed_hardware_load.h"
 
-const std::string LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
+constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,7 +35,7 @@ DeviceManagerService::~DeviceManagerService()
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
-    std::string soPathName = LIB_LOAD_PATH + LIB_IMPL_NAME;
+    std::string soPathName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
     void *so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         dlclose(so_handle);
@@ -288,7 +288,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         return true;
     }
 
-    std::string soName = LIB_LOAD_PATH + LIB_IMPL_NAME;
+    std::string soName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
     void *so_handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_NOLOAD);
     if (so_handle == nullptr) {
         so_handle = dlopen(soName.c_str(), RTLD_NOW);

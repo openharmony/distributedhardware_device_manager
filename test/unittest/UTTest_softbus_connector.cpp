@@ -587,8 +587,8 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_003, testing::ext::TestSize
             .deviceName = "123456",
             .deviceTypeId = 1
         };
-    std::string oldName = DM_PKG_NAME;
-    std::string DM_PKG_NAME = "com.ohos.test";
+    std::string oldName = std::string(DM_PKG_NAME);
+    std::string pkgName = "com.ohos.test";
     softbusListener->OnSoftBusDeviceOnline(&info);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -596,7 +596,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_003, testing::ext::TestSize
         ret = true;
     }
     EXPECT_EQ(ret, false);
-    DM_PKG_NAME = oldName;
+    pkgName = oldName;
 }
 
 /**

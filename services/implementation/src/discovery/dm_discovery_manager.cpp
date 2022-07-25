@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string DISCOVERY_TIMEOUT_TASK = TIMER_PREFIX + "discovery";
+constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -58,7 +58,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
-    timer_->StartTimer(DISCOVERY_TIMEOUT_TASK, DISCOVERY_TIMEOUT,
+    timer_->StartTimer(std::string(DISCOVERY_TIMEOUT_TASK), DISCOVERY_TIMEOUT,
         [this] (std::string name) {
             DmDiscoveryManager::HandleDiscoveryTimeout(name);
         });
@@ -74,7 +74,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
     if (!discoveryContextMap_.empty()) {
         discoveryContextMap_.erase(pkgName);
         softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-        timer_->DeleteTimer(DISCOVERY_TIMEOUT_TASK);
+        timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
     }
     return softbusConnector_->StopDiscovery(subscribeId);
 }
