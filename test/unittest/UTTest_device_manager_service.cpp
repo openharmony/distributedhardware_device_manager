@@ -129,48 +129,6 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
 }
 
 /**
- * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc: Set the flag bit of GetLocalDeviceInfo to intFlag_ to false; The return value is ERR_DM_NOT_INIT
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name:GetLocalDeviceInfo_002
- * @tc.desc: Initialize the GetLocalDeviceInfo function with the return value DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetTrustedDeviceList_001
- * @tc.desc: Set the intFlag of GetTrustedDeviceList to false. The return value is ERR_DM_NOT_INIT
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "jdddd";
-    std::vector<DmDeviceInfo> deviceList;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: GetTrustedDeviceList_002
  * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC

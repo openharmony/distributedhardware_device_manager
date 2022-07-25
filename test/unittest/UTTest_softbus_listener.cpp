@@ -51,36 +51,6 @@ HWTEST_F(SoftbusListenerTest, Init_001, testing::ext::TestSize.Level0)
     int ret = softbusListener->Init();
     EXPECT_EQ(ret, DM_OK);
 }
-
-/**
- * @tc.name: GetTrustedDeviceList_001
- * @tc.desc:  Returns a new pointer to the constructor
- * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
-{
-    std::vector<DmDeviceInfo> deviceList;
-    int32_t ret = softbusListener->GetTrustedDeviceList(deviceList);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc:  Returns a new pointer to the constructor
- * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo deviceInfo;
-    int32_t ret = softbusListener->GetLocalDeviceInfo(deviceInfo);
-    ASSERT_EQ(ret, DM_OK);
-}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
