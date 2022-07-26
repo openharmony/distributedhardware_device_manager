@@ -53,10 +53,10 @@ if (defined(ohos_lite)) {
     deps = [
       "${servicesimpl_path}:devicemanagerserviceimpl",
       "${utils_path}:devicemanagerutils",
-      "//utils/native/base:utils",
     ]
 
     external_deps = [
+      "c_utils:utils",
       "device_info_manager:distributed_device_profile_client",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",

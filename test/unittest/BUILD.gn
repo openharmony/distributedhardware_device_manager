@@ -482,7 +482,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc/standard",
@@ -552,13 +552,13 @@ ohos_static_library("device_manager_test_common") {
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",
+    "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
-    "//utils/native/base:utils",
   ]
 }
 
@@ -567,7 +567,7 @@ ohos_static_library("device_manager_test_common") {
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc",
@@ -642,12 +642,12 @@ ohos_static_library("device_manager_test") {
   public_deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
+    "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
-    "//utils/native/base:utils",
   ]
 
   deps = [

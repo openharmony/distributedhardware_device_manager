@@ -230,13 +230,13 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "c_utils:utils",
       "dsoftbus:softbus_client",
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
-      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"
