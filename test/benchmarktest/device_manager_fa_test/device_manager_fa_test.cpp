@@ -233,7 +233,7 @@ BENCHMARK_F(DeviceDiscoveryTest, StartDeviceDiscoveryTestCase)(
         subInfo.freq = DM_HIGH;
         subInfo.isSameAccount = false;
         subInfo.isWakeRemote = false;
-        strcpy(subInfo.capability, DM_CAPABILITY_OSD);
+        strcpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
         int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packageName,
         subInfo, extra, callback);
@@ -261,7 +261,7 @@ BENCHMARK_F(DeviceDiscoveryTest, StoptDeviceDiscoveryTestCase)(
         subInfo.freq = DM_HIGH;
         subInfo.isSameAccount = false;
         subInfo.isWakeRemote = false;
-        strcpy(subInfo.capability, DM_CAPABILITY_OSD);
+        strcpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
         int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(pkgName,
         subInfo, extra, callback);
