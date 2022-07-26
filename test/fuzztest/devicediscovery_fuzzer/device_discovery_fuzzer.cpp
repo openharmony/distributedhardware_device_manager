@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <unistd.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -24,6 +25,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+    constexpr uint32_t SLEEP_TIME_US = 10 * 1000;
+}
+
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
@@ -56,6 +61,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
         subInfo, extra, callback);
+    usleep(SLEEP_TIME_US);
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
 }
 }
