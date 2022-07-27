@@ -14,6 +14,7 @@
  */
 
 #include "dm_anonymous.h"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -55,6 +56,26 @@ std::string GetAnonyInt32(const int32_t value)
         tempString[i] = '*';
     }
     return tempString;
+}
+
+bool IsNumberString(const std::string &inputString)
+{
+    LOGI("IsNumberString for DeviceManagerNapi");
+    if (inputString.length() == 0) {
+        LOGE("inputString is Null");
+        return false;
+    }
+    const int32_t MIN_ASCLL_NUM = 48;
+    const int32_t MAX_ASCLL_NUM = 57;
+    for (int i = 0; i < inputString.length(); i++) {
+        int num = (int)inputString[i];
+        if (num >= MIN_ASCLL_NUM && num <= MAX_ASCLL_NUM) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
