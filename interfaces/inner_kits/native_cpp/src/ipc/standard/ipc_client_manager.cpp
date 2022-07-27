@@ -138,7 +138,6 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
         LOGE("DeviceManager not Init");
         return false;
     }
-    std::lock_guard<std::mutex> autoLock(lock_);
 
     return true;
 }
