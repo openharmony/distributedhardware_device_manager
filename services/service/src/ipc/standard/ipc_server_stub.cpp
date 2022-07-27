@@ -132,7 +132,17 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     auto iter = dmListener_.find(pkgName);
     if (iter != dmListener_.end()) {
         LOGI("RegisterDeviceManagerListener: listener already exists");
-        return DM_OK;
+        auto recipientIter = appRecipient_.find(pkgName);
+        if (recipientIter == appRecipient_.end()) {
+            LOGI("RegisterDeviceManagerListener: appRecipient not exists");
+            dmListener_.erase(pkgName);
+        } else {
+            auto listener = iter->second;
+            auto appRecipient = recipientIter->second;
+            listener->RemoveDeathRecipient(appRecipient);
+            appRecipient_.erase(pkgName);
+            dmListener_.erase(pkgName);
+        }
     }
 
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
@@ -141,6 +151,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     }
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
+    LOGI("RegisterDeviceManagerListener: Register listener complete.");
     return DM_OK;
 }
 
