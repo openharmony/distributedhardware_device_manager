@@ -112,7 +112,6 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         return ret;
     }
 
-
     dmInterface_ = nullptr;
     dmRecipient_ = nullptr;
 
