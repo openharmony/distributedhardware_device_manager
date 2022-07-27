@@ -14,7 +14,7 @@
  */
 
 #include "dm_discovery_manager.h"
-
+#include "dm_discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -36,25 +36,8 @@ DmDiscoveryManager::~DmDiscoveryManager()
     LOGI("DmDiscoveryManager destructor");
 }
 
-int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                                 const std::string &extra)
+void DmDiscoveryManager::CfgDiscoveryTimer()
 {
-    if (!discoveryQueue_.empty()) {
-        if (pkgName == discoveryQueue_.front()) {
-            LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
-            return ERR_DM_DISCOVERY_REPEATED;
-        } else {
-            LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
-                 discoveryQueue_.front().c_str());
-            StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
-        }
-    }
-    std::lock_guard<std::mutex> autoLock(locks_);
-    discoveryQueue_.push(pkgName);
-    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId};
-    discoveryContextMap_.emplace(pkgName, context);
-    softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
-                                                        std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
@@ -62,6 +45,44 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
         [this] (std::string name) {
             DmDiscoveryManager::HandleDiscoveryTimeout(name);
         });
+}
+
+int32_t DmDiscoveryManager::CheckDiscoveryQueue(const std::string &pkgName)
+{
+    if (discoveryQueue_.empty()) {
+        return DM_OK;
+    }
+
+    if (pkgName == discoveryQueue_.front()) {
+        LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
+        return ERR_DM_DISCOVERY_REPEATED;
+    } else {
+        LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
+                discoveryQueue_.front().c_str());
+        StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
+        return DM_OK;
+    }
+}
+
+int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
+    const std::string &extra)
+{
+    DmDeviceFilterOption dmFilter;
+    if (dmFilter.TransformToFilter(extra) != DM_OK) {
+        return ERR_DM_FAILED;
+    }
+
+    if (CheckDiscoveryQueue(pkgName) != DM_OK) {
+        return ERR_DM_DISCOVERY_REPEATED;
+    }
+
+    std::lock_guard<std::mutex> autoLock(locks_);
+    discoveryQueue_.push(pkgName);
+    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp, dmFilter.filters};
+    discoveryContextMap_.emplace(pkgName, context);
+    softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
+                                                        std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
+    CfgDiscoveryTimer();
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
@@ -87,7 +108,14 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
         LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
         return;
     }
-    listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
+    DmDiscoveryFilter filter;
+    DmDeviceFilterPara filterPara;
+    filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
+    filterPara.range    = info.range;
+    if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
+        listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
+    }
+    return;
 }
 
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)

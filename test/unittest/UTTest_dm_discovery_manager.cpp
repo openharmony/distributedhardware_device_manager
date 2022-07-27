@@ -24,7 +24,7 @@
 #include "dm_anonymous.h"
 #include "ipc_server_listener.h"
 #include "device_manager_service_listener.h"
-#include "discovery_service.h"
+#include "softbus_bus_center.h"
 #include "device_manager_service_listener.h"
 
 namespace OHOS {
@@ -121,8 +121,22 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
 HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::string filterOptions  = R"(
+    {
+        "filter_op": "OR",
+        "filters":
+        [
+            {
+                "type" : "credible",
+                "value" : 0
+            }
+        ]
+    }
+    )";
+    DmDeviceFilterOption dmFilter;
+    dmFilter.TransformToFilter(filterOptions);
     uint16_t aaa = 11;
-    DmDiscoveryContext context { pkgName, "121110", aaa };
+    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp, dmFilter.filters };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     sleep(1);
     DmDeviceInfo info;
@@ -146,6 +160,23 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
 HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::string filterOptions = R"(
+    {
+        "filter_op": "AND",
+        "filters":
+        [
+            {
+                "type" : "credible",
+                "value" : 2
+            }
+        ]
+    }
+    )";
+    DmDeviceFilterOption dmFilter;
+    dmFilter.TransformToFilter(filterOptions);
+    uint16_t aaa = 11;
+    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp, dmFilter.filters };
+    discoveryMgr_->discoveryContextMap_[pkgName] = context;
     DmDeviceInfo info;
     discoveryMgr_->OnDeviceFound(pkgName, info);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);

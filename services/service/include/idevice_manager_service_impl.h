@@ -21,6 +21,7 @@
 
 #include "idevice_manager_service_listener.h"
 #include "dm_device_info.h"
+#include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 
 namespace OHOS {
@@ -57,6 +58,20 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
+
+   /**
+     * @tc.name: IDeviceManagerServiceImpl::PublishDeviceDiscovery
+     * @tc.desc: Publish Device Discovery of the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::UnPublishDeviceDiscovery
+     * @tc.desc: UnPublish Device Discovery of the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::AuthenticateDevice

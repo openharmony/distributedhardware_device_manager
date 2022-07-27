@@ -56,6 +56,10 @@ public:
 
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
 
+    int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
+
+    int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
+
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
 

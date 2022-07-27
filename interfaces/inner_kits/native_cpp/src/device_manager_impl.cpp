@@ -29,6 +29,7 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_publish_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
@@ -37,6 +38,7 @@
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
+#include "ipc_unpublish_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
@@ -266,6 +268,67 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo,
+    std::shared_ptr<PublishCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("PublishDeviceDiscovery error: pkgName %s invalid para", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("DeviceManager::PublishDeviceDiscovery start, pkgName %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishInfo.publishId, callback);
+
+    std::shared_ptr<IpcPublishReq> req = std::make_shared<IpcPublishReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetPublishInfo(publishInfo);
+    int32_t ret = ipcClientProxy_->SendRequest(PUBLISH_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("PublishDeviceDiscovery error: Send Request failed ret: %d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishInfo.publishId);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("PublishDeviceDiscovery error: Failed with ret %d", ret);
+        return ret;
+    }
+
+    LOGI("PublishDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
+{
+    if (pkgName.empty()) {
+        LOGE("UnPublishDeviceDiscovery error: pkgName %s invalid para", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+
+    LOGI("UnPublishDeviceDiscovery start, pkgName %s", pkgName.c_str());
+    std::shared_ptr<IpcUnPublishReq> req = std::make_shared<IpcUnPublishReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetPublishId(publishId);
+    int32_t ret = ipcClientProxy_->SendRequest(UNPUBLISH_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnPublishDeviceDiscovery error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnPublishDeviceDiscovery error: Failed with ret %d", ret);
+        return ret;
+    }
+
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    LOGI("UnPublishDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                               const DmDeviceInfo &deviceInfo, const std::string &extra,
                                               std::shared_ptr<AuthenticateCallback> callback)
@@ -370,7 +433,7 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
         LOGE("VerifyAuthentication error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    
+
     DeviceManagerNotify::GetInstance().RegisterVerifyAuthenticationCallback(pkgName, authPara, callback);
 
     std::shared_ptr<IpcVerifyAuthenticateReq> req = std::make_shared<IpcVerifyAuthenticateReq>();

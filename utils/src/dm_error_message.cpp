@@ -53,6 +53,8 @@ static ERROR_INFO g_errorMessages[] = {
     {ERR_DM_AUTH_MESSAGE_INCOMPLETE, "authentication message is incomplete."},
     {ERR_DM_CREATE_GROUP_FAILED, "create group failed."},
     {ERR_DM_IPC_READ_FAILED, "ipc read object failed."},
+    {ERR_DM_PUBLISH_FAILED, "device publish failed."},
+    {ERR_DM_PUBLISH_REPEATED, "repeat device publish warning."},
 };
 
 std::string GetErrorString(int failedReason)

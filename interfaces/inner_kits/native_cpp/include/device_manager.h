@@ -22,6 +22,7 @@
 
 #include "device_manager_callback.h"
 #include "dm_device_info.h"
+#include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 
 namespace OHOS {
@@ -82,6 +83,21 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
+
+    /**
+     * @tc.name: DeviceManagerImpl::PublishDeviceDiscovery
+     * @tc.desc: Publish device discovery
+     * @tc.type: FUNC
+     */
+    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo,
+        std::shared_ptr<PublishCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnPublishDeviceDiscovery
+     * @tc.desc: UnPublish device discovery
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) = 0;
+
     /**
      * @tc.name: DeviceManagerImpl::AuthenticateDevice
      * @tc.desc: Complete verifying the device

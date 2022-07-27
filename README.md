@@ -173,6 +173,30 @@ dmClass.startDeviceDiscovery(info);
 // Stop device discovery (used with startDeviceDiscovery).
 dmClass.stopDeviceDiscovery(subscribeId);
 
+// publish device discovery
+var publishId = 0;
+dmClass.on('publishSuccess', (data) => {
+    if (data == null) {
+        this.log("publishSuccess error data=null")
+        return;
+    }
+    this.logList.push("publishSuccess:" + JSON.stringify(data));
+});
+dmClass.on('publishFailed', (data) => {
+    this.log("publishFailed on:" + JSON.stringify(data));
+});
+publishId = Math.floor(Math.random() * 10000 + 1000)
+var info = {
+    "publishId": publishId,
+    "mode": 0xAA,
+    "freq": 2,
+    "capability": 0
+};
+dmClass.publishDeviceDiscovery(info);
+
+// unPublish device discovery
+dmClass.unPublishDeviceDiscovery(publishId);
+
 // Authenticate a device.
 var deviceInfo ={
     "deviceId": "XXXXXXXX",

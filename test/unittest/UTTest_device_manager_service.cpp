@@ -62,7 +62,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestS
 {
     std::string pkgName = "com.ohos.test";
     DmSubscribeInfo subscribeInfo;
-    std::string extra = "test";
+    std::string extra;
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
@@ -93,7 +93,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestS
 {
     std::string pkgName = "com.ohos.test";
     DmSubscribeInfo subscribeInfo;
-    std::string extra = "test";
+    std::string extra;
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     pkgName = "1com.ohos.test1";
     ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);

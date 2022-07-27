@@ -56,6 +56,7 @@
                         "device_manager.h",
                         "device_manager_callback.h",
                         "dm_device_info.h",
+                        "dm_publish_info.h",
                         "dm_subscribe_info.h"
                     ],
                     "header_base": "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include"

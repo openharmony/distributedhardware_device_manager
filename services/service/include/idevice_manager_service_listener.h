@@ -56,6 +56,13 @@ public:
     virtual void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
 
     /**
+     * @tc.name: IDeviceManagerServiceListener::OnPublishResult
+     * @tc.desc: OnPublish Result of the Dm Publish Manager
+     * @tc.type: FUNC
+     */
+    virtual void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
+
+    /**
      * @tc.name: IDeviceManagerServiceListener::OnAuthResult
      * @tc.desc: Auth Result of the DeviceManager Service Listener
      * @tc.type: FUNC

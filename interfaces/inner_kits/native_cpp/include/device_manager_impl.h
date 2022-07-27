@@ -83,6 +83,19 @@ public:
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) override;
     /**
+     * @tc.name: DeviceManagerImpl::PublishDeviceDiscovery
+     * @tc.desc: Publish device discovery
+     * @tc.type: FUNC
+     */
+    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo,
+        std::shared_ptr<PublishCallback> callback) override;
+    /**
+     * @tc.name: DeviceManagerImpl::UnPublishDeviceDiscovery
+     * @tc.desc: UnPublish device discovery
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) override;
+    /**
      * @tc.name: DeviceManagerImpl::AuthenticateDevice
      * @tc.desc: Complete verifying the device
      * @tc.type: FUNC
