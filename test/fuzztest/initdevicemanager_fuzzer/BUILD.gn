@@ -82,7 +82,7 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
     "ipc:ipc_core",
     #    "safwk:system_ability_fwk",
     #    "samgr_standard:samgr_proxy",
-    #    "startup_l2:syspara",
+    #    "init:libbegetutil",
   ]
 }
 
