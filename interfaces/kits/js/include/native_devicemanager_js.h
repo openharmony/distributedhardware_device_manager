@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
+#include "dm_publish_info.h"
 #include "dm_anonymous.h"
 #include "dm_error_message.h"
 #include "napi/native_api.h"
@@ -91,6 +92,15 @@ struct DmNapiStateJsCallback {
     DmNapiStateJsCallback(std::string bundleName, uint16_t subscribeId, int32_t reason,
         OHOS::DistributedHardware::DmDeviceInfo deviceInfo)
         : bundleName_(bundleName), subscribeId_(subscribeId), reason_(reason), deviceInfo_(deviceInfo) {}
+};
+
+struct DmNapiPublishJsCallback {
+    std::string bundleName_;
+    int32_t     publishId_;
+    int32_t     reason_;
+
+    DmNapiPublishJsCallback(std::string bundleName, int32_t publishId, int32_t reason)
+        : bundleName_(bundleName), publishId_(publishId), reason_(reason) {}
 };
 
 struct DmNapiAuthJsCallback {
@@ -171,6 +181,25 @@ private:
     std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
+class DmNapiPublishCallback : public OHOS::DistributedHardware::PublishCallback {
+public:
+    explicit DmNapiPublishCallback(napi_env env, std::string &bundleName)
+        : env_(env), refCount_(0), bundleName_(bundleName)
+    {
+    }
+    virtual ~DmNapiPublishCallback() {};
+    void OnPublishResult(int32_t publishId, int32_t publishResult) override;
+    void IncreaseRefCount();
+    void DecreaseRefCount();
+    int32_t GetRefCount();
+
+private:
+    napi_env env_;
+    std::atomic<int32_t> refCount_;
+    std::string bundleName_;
+    std::unique_ptr<DmNapiPublishJsCallback> jsCallback_;
+};
+
 class DmNapiDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerFaCallback {
 public:
     explicit DmNapiDeviceManagerFaCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
@@ -236,6 +265,8 @@ public:
     static napi_value UnAuthenticateDevice(napi_env env, napi_callback_info info);
     static napi_value StartDeviceDiscoverSync(napi_env env, napi_callback_info info);
     static napi_value StopDeviceDiscoverSync(napi_env env, napi_callback_info info);
+    static napi_value PublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
+    static napi_value UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
     static napi_value AuthenticateDevice(napi_env env, napi_callback_info info);
     static napi_value VerifyAuthInfo(napi_env env, napi_callback_info info);
     static napi_value JsOn(napi_env env, napi_callback_info info);
@@ -265,6 +296,8 @@ public:
     static std::string JsObjectToString(const napi_env &env, const napi_value &object);
     static int32_t JsToDmSubscribeInfo(const napi_env &env, const napi_value &object,
                                        OHOS::DistributedHardware::DmSubscribeInfo &info);
+    static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
+                                  OHOS::DistributedHardware::DmPublishInfo &info);
     static void JsToDmDeviceInfo(const napi_env &env, const napi_value &object,
                                  OHOS::DistributedHardware::DmDeviceInfo &info);
     static void JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra, int32_t &authType);
@@ -283,11 +316,13 @@ public:
                              const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo);
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason);
+    void OnPublishResult(int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag);
     void OnDmfaCall(const std::string &paramJson);
 
 private:
+    static void ReleasePublishCallback(std::string &bundleName);
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static void CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);

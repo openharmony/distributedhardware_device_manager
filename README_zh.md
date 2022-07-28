@@ -173,6 +173,30 @@ dmClass.startDeviceDiscovery(info);
 // 停止设备发现（需要和startDeviceDiscovery接口配对使用）
 dmClass.stopDeviceDiscovery(subscribeId);
 
+// 开始发布设备发现
+var publishId = 0;
+dmClass.on('publishSuccess', (data) => {
+    if (data == null) {
+        this.log("publishSuccess error data=null")
+        return;
+    }
+    this.logList.push("publishSuccess:" + JSON.stringify(data));
+});
+dmClass.on('publishFailed', (data) => {
+    this.log("publishFailed on:" + JSON.stringify(data));
+});
+publishId = Math.floor(Math.random() * 10000 + 1000)
+var info = {
+    "publishId": publishId,
+    "mode": 0xAA,
+    "freq": 2,
+    "capability": 0
+};
+dmClass.publishDeviceDiscovery(info);
+
+// 停止发布设备发现
+dmClass.unPublishDeviceDiscovery(publishId);
+
 // 设备认证
 var deviceInfo ={
     "deviceId": "XXXXXXXX",

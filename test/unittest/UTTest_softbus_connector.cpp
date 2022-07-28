@@ -231,6 +231,33 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext:
 }
 
 /**
+ * @tc.name: GetTrustedDeviceList_001
+ * @tc.desc: create GetAllNodeDeviceInfo  not equal 0, and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceInfoList;
+    int ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceInfo_001
+ * @tc.desc: set pkgName to com.softbus.test,define deviceInfo,and return DM_OK.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.softbus.test";
+    DmDeviceInfo deviceInfo;
+    int ret = softbusListener->GetLocalDeviceInfo(deviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: StartDiscovery_001
  * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
@@ -635,19 +662,19 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: OnSoftbusDiscoveryFailed_001
+ * @tc.name: OnSoftbusDiscoveryResult_001
  * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryFailed_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestSize.Level0)
 {
     int32_t subscribeId= 123456;
-    DiscoveryFailReason failReason = (DiscoveryFailReason)1;
+    RefreshResult result = (RefreshResult)1;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
         pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
-    softbusConnector->OnSoftbusDiscoveryFailed(subscribeId, failReason);
+    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
@@ -658,18 +685,19 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryFailed_001, testing::ext::TestS
 }
 
 /**
- * @tc.name: OnSoftbusDiscoverySuccess_001
+ * @tc.name: OnSoftbusDiscoveryResult_001
  * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoverySuccess_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_002, testing::ext::TestSize.Level0)
 {
     int32_t subscribeId= 123456;
+    RefreshResult result = (RefreshResult)0;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
         pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
-    softbusConnector->OnSoftbusDiscoverySuccess(subscribeId);
+    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;

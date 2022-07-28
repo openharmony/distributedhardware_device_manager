@@ -37,8 +37,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
-IPublishCallback SoftbusListener::softbusPublishCallback_ = {.OnPublishSuccess = SoftbusListener::OnPublishSuccess,
-                                                             .OnPublishFail = SoftbusListener::OnPublishFail};
+IPublishCb SoftbusListener::softbusPublishCallback_ = {
+    .OnPublishResult = SoftbusListener::OnPublishResult,
+};
 
 INodeStateCb SoftbusListener::softbusNodeStateCb_ = {
     .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED,
@@ -90,6 +91,21 @@ SoftbusListener::~SoftbusListener()
     LOGI("SoftbusListener destructor");
 }
 
+void SoftbusListener::SetPublishInfo(PublishInfo &dmPublishInfo)
+{
+    dmPublishInfo.publishId       = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+    dmPublishInfo.mode            = DiscoverMode::DISCOVER_MODE_ACTIVE;
+    dmPublishInfo.medium          = ExchangeMedium::AUTO;
+    dmPublishInfo.freq            = ExchangeFreq::HIGH;
+    dmPublishInfo.capability      = DM_CAPABILITY_OSD;
+    dmPublishInfo.capabilityData  = nullptr;
+    dmPublishInfo.dataLen         = 0;
+    dmPublishInfo.businessData    = nullptr;
+    dmPublishInfo.businessDataLen = 0;
+    dmPublishInfo.ranging         = false;
+    return;
+}
+
 int32_t SoftbusListener::Init()
 {
     int32_t ret;
@@ -104,15 +120,9 @@ int32_t SoftbusListener::Init()
     } while (ret != DM_OK);
 
     PublishInfo dmPublishInfo;
-    dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-    dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-    dmPublishInfo.medium = ExchangeMedium::AUTO;
-    dmPublishInfo.freq = ExchangeFreq::HIGH;
-    dmPublishInfo.capability = DM_CAPABILITY_OSD;
-    dmPublishInfo.capabilityData = nullptr;
-    dmPublishInfo.dataLen = 0;
+    SetPublishInfo(dmPublishInfo);
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
+    ret = PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
     if (ret == DM_OK) {
         publishStatus = ALLOW_BE_DISCOVERY;
     }
@@ -123,19 +133,19 @@ int32_t SoftbusListener::Init()
         ret = SetParameter(DISCOVER_STATUS_KEY, DISCOVER_STATUS_ON);
         LOGI("service set parameter result is : %d", ret);
 
-        ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
+        ret = PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
     } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_ON) == 0) {
-        ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
+        ret = PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
     } else if (ret >= 0 && strcmp(discoverStatus, DISCOVER_STATUS_OFF) == 0) {
-        ret = UnPublishService(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        ret = StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             publishStatus = NOT_ALLOW_BE_DISCOVERY;
         }
@@ -280,20 +290,23 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
 {
     if (strcmp(value, DISCOVER_STATUS_ON) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
         PublishInfo dmPublishInfo;
-        dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-        dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-        dmPublishInfo.medium = ExchangeMedium::AUTO;
-        dmPublishInfo.freq = ExchangeFreq::HIGH;
-        dmPublishInfo.capability = DM_CAPABILITY_OSD;
-        dmPublishInfo.capabilityData = nullptr;
-        dmPublishInfo.dataLen = 0;
-        int32_t ret = PublishService(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
+        dmPublishInfo.publishId       = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        dmPublishInfo.mode            = DiscoverMode::DISCOVER_MODE_ACTIVE;
+        dmPublishInfo.medium          = ExchangeMedium::AUTO;
+        dmPublishInfo.freq            = ExchangeFreq::HIGH;
+        dmPublishInfo.capability      = DM_CAPABILITY_OSD;
+        dmPublishInfo.capabilityData  = nullptr;
+        dmPublishInfo.dataLen         = 0;
+        dmPublishInfo.businessData    = nullptr;
+        dmPublishInfo.businessDataLen = 0;
+        dmPublishInfo.ranging         = false;
+        int32_t ret = ::PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
         }
         LOGI("service publish result is : %d", ret);
     } else if (strcmp(value, DISCOVER_STATUS_OFF) == 0 && publishStatus != NOT_ALLOW_BE_DISCOVERY) {
-        int32_t ret = UnPublishService(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        int32_t ret = ::StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             publishStatus = NOT_ALLOW_BE_DISCOVERY;
         }
@@ -316,14 +329,9 @@ void SoftbusListener::OnBytesReceived(int sessionId, const void *data, unsigned 
     DeviceManagerService::GetInstance().OnBytesReceived(sessionId, data, dataLen);
 }
 
-void SoftbusListener::OnPublishSuccess(int publishId)
+void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 {
-    LOGI("SoftbusListener::OnPublishSuccess, publishId: %d", publishId);
-}
-
-void SoftbusListener::OnPublishFail(int publishId, PublishFailReason reason)
-{
-    LOGI("SoftbusListener::OnPublishFail failed, publishId: %d, reason: %d", publishId, reason);
+    LOGI("SoftbusListener::OnPublishResult, publishId: %d, result: %d", publishId, result);
 }
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)

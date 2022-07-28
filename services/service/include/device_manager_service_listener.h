@@ -41,6 +41,8 @@ public:
 
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
 
+    void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
+
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
                       int32_t reason);
 

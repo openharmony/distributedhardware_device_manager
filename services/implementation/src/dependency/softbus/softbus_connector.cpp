@@ -32,11 +32,15 @@ SoftbusConnector::PulishStatus SoftbusConnector::publishStatus = SoftbusConnecto
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::stateCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
+std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 
-IDiscoveryCallback SoftbusConnector::softbusDiscoveryCallback_ = {
+IPublishCb SoftbusConnector::softbusPublishCallback_ = {
+    .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
+};
+IRefreshCallback SoftbusConnector::softbusDiscoveryCallback_ = {
     .OnDeviceFound = SoftbusConnector::OnSoftbusDeviceFound,
-    .OnDiscoverFailed = SoftbusConnector::OnSoftbusDiscoveryFailed,
-    .OnDiscoverySuccess = SoftbusConnector::OnSoftbusDiscoverySuccess};
+    .OnDiscoverResult = SoftbusConnector::OnSoftbusDiscoveryResult,
+};
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -49,7 +53,7 @@ SoftbusConnector::~SoftbusConnector()
 }
 
 int32_t SoftbusConnector::RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
-                                                           const std::shared_ptr<ISoftbusDiscoveryCallback> callback)
+    const std::shared_ptr<ISoftbusDiscoveryCallback> callback)
 {
     discoveryCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
@@ -61,8 +65,31 @@ int32_t SoftbusConnector::UnRegisterSoftbusDiscoveryCallback(const std::string &
     return DM_OK;
 }
 
+int32_t SoftbusConnector::RegisterSoftbusPublishCallback(const std::string &pkgName,
+    const std::shared_ptr<ISoftbusPublishCallback> callback)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::mutex registerCallback;
+    std::lock_guard<std::mutex> lock(registerCallback);
+#endif
+
+    publishCallbackMap_.emplace(pkgName, callback);
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pkgName)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::mutex unRegisterCallback;
+    std::lock_guard<std::mutex> lock(unRegisterCallback);
+#endif
+
+    publishCallbackMap_.erase(pkgName);
+    return DM_OK;
+}
+
 int32_t SoftbusConnector::RegisterSoftbusStateCallback(const std::string &pkgName,
-                                                       const std::shared_ptr<ISoftbusStateCallback> callback)
+    const std::shared_ptr<ISoftbusStateCallback> callback)
 {
     stateCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
@@ -74,21 +101,59 @@ int32_t SoftbusConnector::UnRegisterSoftbusStateCallback(const std::string &pkgN
     return DM_OK;
 }
 
+int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
+{
+    PublishInfo                 publishInfo;
+    publishInfo.publishId       = dmPublishInfo.publishId;
+    publishInfo.mode            = (DiscoverMode)dmPublishInfo.mode;
+    publishInfo.medium          = ExchangeMedium::AUTO;
+    publishInfo.freq            = (ExchangeFreq)dmPublishInfo.freq;
+    publishInfo.capability      = dmPublishInfo.capability;
+    publishInfo.capabilityData  = nullptr;
+    publishInfo.dataLen         = 0;
+    publishInfo.businessData    = nullptr;
+    publishInfo.businessDataLen = 0;
+    publishInfo.ranging         = dmPublishInfo.ranging;
+    LOGI("PublishDiscovery begin, publishId : %d, mode : 0x%x, ranging : %d", publishInfo.publishId, publishInfo.mode,
+        publishInfo.ranging);
+    int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
+    if (ret != DM_OK) {
+        LOGE("PublishLNN failed with ret %d.", ret);
+        return ERR_DM_PUBLISH_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::UnPublishDiscovery(int32_t publishId)
+{
+    LOGI("UnPublishDiscovery begin, publishId : %d", publishId);
+    int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
+    if (ret != DM_OK) {
+        LOGE("StopPublishLNN failed with ret %d", ret);
+        return ERR_DM_PUBLISH_FAILED;
+    }
+    return DM_OK;
+}
+
 int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 {
-    SubscribeInfo subscribeInfo;
-    subscribeInfo.subscribeId = dmSubscribeInfo.subscribeId;
-    subscribeInfo.mode = (DiscoverMode)dmSubscribeInfo.mode;
-    subscribeInfo.medium = (ExchangeMedium)dmSubscribeInfo.medium;
-    subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
-    subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
-    subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
-    subscribeInfo.capability = dmSubscribeInfo.capability;
-    subscribeInfo.capabilityData = nullptr;
-    subscribeInfo.dataLen = 0;
-    int32_t ret = ::StartDiscovery(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
-    if (ret != 0) {
-        LOGE("StartDiscovery failed with ret %d.", ret);
+    SubscribeInfo                 subscribeInfo;
+    subscribeInfo.subscribeId     = dmSubscribeInfo.subscribeId;
+    subscribeInfo.mode            = (DiscoverMode)dmSubscribeInfo.mode;
+    subscribeInfo.medium          = (ExchangeMedium)dmSubscribeInfo.medium;
+    subscribeInfo.freq            = (ExchangeFreq)dmSubscribeInfo.freq;
+    subscribeInfo.isSameAccount   = dmSubscribeInfo.isSameAccount;
+    subscribeInfo.isWakeRemote    = dmSubscribeInfo.isWakeRemote;
+    subscribeInfo.capability      = dmSubscribeInfo.capability;
+    subscribeInfo.capabilityData  = nullptr;
+    subscribeInfo.dataLen         = 0;
+    subscribeInfo.businessData    = nullptr;
+    subscribeInfo.businessDataLen = 0;
+    LOGI("StartDiscovery begin, subscribeId : %d, mode : 0x%x, medium : %d", subscribeInfo.subscribeId,
+        subscribeInfo.mode, subscribeInfo.medium);
+    int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
+    if (ret != DM_OK) {
+        LOGE("RefreshLNN failed with ret %d.", ret);
         return ERR_DM_DISCOVERY_FAILED;
     }
     return DM_OK;
@@ -97,9 +162,9 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
 {
     LOGI("StopDiscovery begin, subscribeId:%d", (int32_t)subscribeId);
-    int32_t ret = ::StopDiscovery(DM_PKG_NAME, subscribeId);
-    if (ret != 0) {
-        LOGE("StopDiscovery failed with ret %d", ret);
+    int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
+    if (ret != DM_OK) {
+        LOGE("StopRefreshLNN failed with ret %d", ret);
         return ERR_DM_DISCOVERY_FAILED;
     }
     LOGI("SoftbusConnector::StopDiscovery completed");
@@ -294,6 +359,7 @@ void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, 
         LOGE("CovertDeviceInfoToDmDevice copy deviceName data failed");
     }
     dmDeviceInfo.deviceTypeId = deviceInfo.devType;
+    dmDeviceInfo.range        = deviceInfo.range;
 }
 
 void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
@@ -326,6 +392,19 @@ void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
     }
 }
 
+void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult result)
+{
+    LOGI("Callback In, publishId %d, result %d", publishId, result);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::mutex publishResult;
+    std::lock_guard<std::mutex> lock(publishResult);
+#endif
+
+    for (auto &iter : publishCallbackMap_) {
+        iter.second->OnPublishResult(iter.first, publishId, result);
+    }
+}
+
 void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
     if (device == nullptr) {
@@ -333,22 +412,24 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
         return;
     }
     std::string deviceId = device->devId;
-    LOGI("SoftbusConnector::OnSoftbusDeviceFound device %s found.", GetAnonyString(deviceId).c_str());
-    if (IsDeviceOnLine(deviceId)) {
-        return;
+    LOGI("SoftbusConnector::OnSoftbusDeviceFound device %s found, range : %d.", GetAnonyString(deviceId).c_str(),
+        device->range);
+
+    if (!IsDeviceOnLine(deviceId)) {
+        std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+        DeviceInfo *srcInfo = infoPtr.get();
+        if (memcpy_s(srcInfo, sizeof(DeviceInfo), device, sizeof(DeviceInfo)) != 0) {
+            LOGE("save discovery device info failed");
+            return;
+        }
+        discoveryDeviceInfoMap_[deviceId] = infoPtr;
+        // Remove the earliest element when reached the max size
+        if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
+            auto iter = discoveryDeviceInfoMap_.begin();
+            discoveryDeviceInfoMap_.erase(iter->second->devId);
+        }
     }
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    DeviceInfo *srcInfo = infoPtr.get();
-    if (memcpy_s(srcInfo, sizeof(DeviceInfo), device, sizeof(DeviceInfo)) != 0) {
-        LOGE("save discovery device info failed");
-        return;
-    }
-    discoveryDeviceInfoMap_[deviceId] = infoPtr;
-    // Remove the earliest element when reached the max size
-    if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
-        auto iter = discoveryDeviceInfoMap_.begin();
-        discoveryDeviceInfoMap_.erase(iter->second->devId);
-    }
+
     DmDeviceInfo dmDeviceInfo;
     CovertDeviceInfoToDmDevice(*device, dmDeviceInfo);
     for (auto &iter : discoveryCallbackMap_) {
@@ -356,21 +437,18 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 }
 
-void SoftbusConnector::OnSoftbusDiscoveryFailed(int subscribeId, DiscoveryFailReason failReason)
+void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
-    LOGI("In, subscribeId %d, failReason %d", subscribeId, (int32_t)failReason);
+    LOGI("In, subscribeId %d, result %d", subscribeId, result);
     uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
-    for (auto &iter : discoveryCallbackMap_) {
-        iter.second->OnDiscoveryFailed(iter.first, originId, (int32_t)failReason);
-    }
-}
-
-void SoftbusConnector::OnSoftbusDiscoverySuccess(int subscribeId)
-{
-    LOGI("In, subscribeId %d", subscribeId);
-    uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
-    for (auto &iter : discoveryCallbackMap_) {
-        iter.second->OnDiscoverySuccess(iter.first, originId);
+    if (result == REFRESH_LNN_SUCCESS) {
+        for (auto &iter : discoveryCallbackMap_) {
+            iter.second->OnDiscoverySuccess(iter.first, originId);
+        }
+    } else {
+        for (auto &iter : discoveryCallbackMap_) {
+            iter.second->OnDiscoveryFailed(iter.first, originId, result);
+        }
     }
 }
 } // namespace DistributedHardware

@@ -22,12 +22,11 @@
 #include <string>
 #include <vector>
 
-#include "discovery_service.h"
+#include "softbus_bus_center.h"
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
 #include "inner_session.h"
 #include "session.h"
-#include "softbus_bus_center.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,18 +40,11 @@ public:
 
 public:
     /**
-     * @tc.name: SoftbusListener::OnPublishSuccess
-     * @tc.desc: OnPublishSuccess of the SoftbusListener
+     * @tc.name: SoftbusListener::OnPublishResult
+     * @tc.desc: OnPublishResult of the SoftbusListener
      * @tc.type: FUNC
      */
-    static void OnPublishSuccess(int publishId);
-
-    /**
-     * @tc.name: SoftbusListener::OnPublishFail
-     * @tc.desc: OnPublishFail of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnPublishFail(int publishId, PublishFailReason reason);
+    static void OnPublishResult(int publishId, PublishResult result);
 
     /**
      * @tc.name: SoftbusListener::OnSoftBusDeviceOnline
@@ -76,7 +68,7 @@ public:
     static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
 
     /**
-     * @tc.name: SoftbusListener::OnPublishSuccess
+     * @tc.name: SoftbusListener::OnParameterChgCallback
      * @tc.desc: OnParameter Chg Callback of the SoftbusListener
      * @tc.type: FUNC
      */
@@ -104,6 +96,7 @@ public:
 
 private:
     int32_t Init();
+    void SetPublishInfo(PublishInfo &dmPublishInfo);
     static int32_t CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
 
 private:
@@ -114,7 +107,7 @@ private:
     };
     static PulishStatus publishStatus;
     static INodeStateCb softbusNodeStateCb_;
-    static IPublishCallback softbusPublishCallback_;
+    static IPublishCb softbusPublishCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -25,6 +25,7 @@
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
+#include "dm_publish_manager.h"
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
@@ -44,6 +45,10 @@ public:
                                  const std::string &extra);
 
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
+
+    int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
+
+    int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
 
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
@@ -84,6 +89,7 @@ private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
     std::shared_ptr<DmDiscoveryManager> discoveryMgr_;
+    std::shared_ptr<DmPublishManager> publishMgr_;
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
