@@ -322,7 +322,7 @@ public:
     void OnDmfaCall(const std::string &paramJson);
 
 private:
-    static ReleasePublishCallback(std::string &bundleName);
+    static void ReleasePublishCallback(std::string &bundleName);
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static void CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
