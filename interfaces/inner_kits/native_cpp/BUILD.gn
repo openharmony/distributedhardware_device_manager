@@ -149,12 +149,12 @@ if (defined(ohos_lite)) {
     deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
+      "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "samgr:samgr_proxy",
-      "utils_base:utils",
     ]
 
     subsystem_name = "distributedhardware"

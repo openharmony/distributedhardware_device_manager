@@ -35,12 +35,12 @@ ohos_benchmarktest("DeviceManagerTest") {
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",

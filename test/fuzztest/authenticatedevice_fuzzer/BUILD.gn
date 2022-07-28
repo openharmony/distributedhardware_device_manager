@@ -25,7 +25,7 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "${utils_path}/include",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc/standard",
@@ -91,7 +91,6 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "${utils_path}:devicemanagerutils",
     "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -103,6 +102,7 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
   external_deps = [
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",

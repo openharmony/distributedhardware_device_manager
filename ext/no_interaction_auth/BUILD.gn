@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include/ipc",
       "${innerkits_path}/native_cpp/include/ipc/standard",
       "//third_party/json/include",
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//utils/system/safwk/native/include",
       "//base/notification/common_event_service/frameworks/core/include",
       "//base/notification/common_event_service/interfaces/innerkits/native/include",
@@ -69,13 +69,13 @@ if (defined(ohos_lite)) {
       "//base/security/device_auth/services:deviceauth_sdk",
       "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
       "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
-      "//utils/native/base:utils",
     ]
 
     external_deps = [
       "ability_base:want",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "dsoftbus:softbus_client",

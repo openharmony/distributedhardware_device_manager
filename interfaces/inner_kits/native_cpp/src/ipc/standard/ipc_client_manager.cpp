@@ -74,10 +74,6 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
         LOGE("InitDeviceManager Failed with ret %d", ret);
         return ret;
     }
-    if (dmListener_.count(pkgName) > 0) {
-        LOGI("dmListener_ Already Init");
-        return DM_OK;
-    }
 
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     std::shared_ptr<IpcRegisterListenerReq> req = std::make_shared<IpcRegisterListenerReq>();
@@ -93,7 +89,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     if (ret != DM_OK) {
         return ret;
     }
-    dmListener_[pkgName] = listener;
+
     LOGI("completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -107,21 +103,18 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     }
 
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmListener_.count(pkgName) > 0) {
-        std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-        std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-        req->SetPkgName(pkgName);
-        int32_t ret = dmInterface_->SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
-        if (ret != DM_OK) {
-            LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
-            return ret;
-        }
-        dmListener_.erase(pkgName);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = dmInterface_->SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
+        return ret;
     }
-    if (dmListener_.empty()) {
-        dmInterface_ = nullptr;
-        dmRecipient_ = nullptr;
-    }
+
+    dmInterface_ = nullptr;
+    dmRecipient_ = nullptr;
+
     LOGI("completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -145,11 +138,7 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
         LOGE("DeviceManager not Init");
         return false;
     }
-    std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmListener_.count(pkgName) == 0) {
-        LOGE("dmListener_ not Init for %s", pkgName.c_str());
-        return false;
-    }
+
     return true;
 }
 } // namespace DistributedHardware

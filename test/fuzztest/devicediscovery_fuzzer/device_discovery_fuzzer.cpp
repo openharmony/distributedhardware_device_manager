@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <unistd.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -24,6 +25,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+    constexpr uint32_t SLEEP_TIME_US = 10 * 1000;
+}
+
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
@@ -47,13 +52,16 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     subInfo.freq = *(reinterpret_cast<const DmExchangeFreq*>(data));
     subInfo.isSameAccount = *(reinterpret_cast<const bool*>(data));
     subInfo.isWakeRemote = *(reinterpret_cast<const bool*>(data));
-    strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN);
+    if (strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, (char*)data, DM_MAX_DEVICE_CAPABILITY_LEN) != 0) {
+        return;
+    }
     std::string extra(reinterpret_cast<const char*>(data), size);
     int16_t subscribeId = *(reinterpret_cast<const int16_t*>(data));
 
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName,
         subInfo, extra, callback);
+    usleep(SLEEP_TIME_US);
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
 }
 }

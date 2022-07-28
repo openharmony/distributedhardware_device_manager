@@ -58,7 +58,7 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
 {
     times_ += 1;
     if (authParam.length() == 1) {
-        if (authParam == EVENT_CONFIRM_CODE) {
+        if (authParam == std::string(EVENT_CONFIRM_CODE)) {
             return DM_OK;
         }
         LOGE("Peer rejection");

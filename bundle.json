@@ -32,7 +32,7 @@
                 "samgr",
                 "common_event_service",
                 "dsoftbus",
-                "utils_base",
+                "c_utils",
                 "napi",
                 "device_auth"
             ],

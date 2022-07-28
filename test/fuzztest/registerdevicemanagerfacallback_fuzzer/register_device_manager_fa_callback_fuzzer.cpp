@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <unistd.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -24,6 +25,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+    constexpr uint32_t SLEEP_TIME_US = 10 * 1000;
+}
+
 class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
 public:
     DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}
@@ -42,6 +47,7 @@ void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
 
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);
+    usleep(SLEEP_TIME_US);
 }
 }
 }
