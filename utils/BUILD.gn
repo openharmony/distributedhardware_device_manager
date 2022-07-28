@@ -178,13 +178,13 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
+      "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
       "samgr_standard:samgr_proxy",
-      "utils_base:utils",
     ]
     if (support_jsapi) {
       external_deps += [
