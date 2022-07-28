@@ -27,7 +27,7 @@ const std::string FILTER_OP_KEY = "filter_op";
 const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
 
-enum DmDiscoveryCredibleType {
+enum class DmDiscoveryFilter {
     DM_OFFLINE_DEVICE = 0,
     DM_ONLINE_DEVICE = 1,
     DM_ALL_DEVICE = 2
@@ -66,7 +66,7 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
         filterOp = FILTERS_TYPE_OR;
         DmDeviceFilters deviceFilters;
         deviceFilters.type  = "credible";
-        deviceFilters.value = DM_OFFLINE_DEVICE;
+        deviceFilters.value = DmDiscoveryFilter::DM_OFFLINE_DEVICE;
         filters.push_back(deviceFilters);
         return DM_OK;
     }
@@ -83,13 +83,13 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
 
 bool DmDiscoveryFilter::FilterByCredible(int32_t value, bool isOnline)
 {
-    if (value == DM_OFFLINE_DEVICE) {
+    if (value == DmDiscoveryFilter::DM_OFFLINE_DEVICE) {
         return !isOnline;
     }
-    if (value == DM_ONLINE_DEVICE) {
+    if (value == DmDiscoveryFilter::DM_ONLINE_DEVICE) {
         return isOnline;
     }
-    return (value == DM_ALL_DEVICE);
+    return (value == DmDiscoveryFilter::DM_ALL_DEVICE);
 }
 
 bool DmDiscoveryFilter::FilterByRange(int32_t value, int range)

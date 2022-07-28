@@ -1094,6 +1094,22 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
     }
 }
 
+void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
+{
+    std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
+    auto iter = g_publishCallbackMap.find(bundleName);
+    if (iter == g_publishCallbackMap.end()) {
+        return;
+    }
+
+    publishCallback = iter->second;
+    publishCallback->DecreaseRefCount();
+    if (publishCallback->GetRefCount() == 0) {
+        g_publishCallbackMap.erase(bundleName);
+    }
+    return;
+}
+
 void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &eventType)
 {
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
@@ -1127,17 +1143,7 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
     }
 
     if (eventType == DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_PUBLISH_FAIL) {
-        std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
-        auto iter = g_publishCallbackMap.find(bundleName);
-        if (iter == g_publishCallbackMap.end()) {
-            return;
-        }
-
-        publishCallback = iter->second;
-        publishCallback->DecreaseRefCount();
-        if (publishCallback->GetRefCount() == 0) {
-            g_publishCallbackMap.erase(bundleName);
-        }
+        ReleasePublishCallback(bundleName);
         return;
     }
 

@@ -68,10 +68,10 @@ int32_t SoftbusConnector::UnRegisterSoftbusDiscoveryCallback(const std::string &
 int32_t SoftbusConnector::RegisterSoftbusPublishCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusPublishCallback> callback)
 {
-    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::mutex registerCallback;
     std::lock_guard<std::mutex> lock(registerCallback);
-    #endif
+#endif
 
     publishCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
@@ -79,10 +79,10 @@ int32_t SoftbusConnector::RegisterSoftbusPublishCallback(const std::string &pkgN
 
 int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pkgName)
 {
-    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::mutex unRegisterCallback;
     std::lock_guard<std::mutex> lock(unRegisterCallback);
-    #endif
+#endif
 
     publishCallbackMap_.erase(pkgName);
     return DM_OK;
@@ -395,10 +395,10 @@ void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
 void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult result)
 {
     LOGI("Callback In, publishId %d, result %d", publishId, result);
-    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::mutex publishResult;
     std::lock_guard<std::mutex> lock(publishResult);
-    #endif
+#endif
 
     for (auto &iter : publishCallbackMap_) {
         iter.second->OnPublishResult(iter.first, publishId, result);

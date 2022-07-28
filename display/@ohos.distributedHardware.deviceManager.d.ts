@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,6 +52,7 @@ declare namespace deviceManager {
     networkId: string;
 
     /**
+     * @since 9
      * The distance of dicovered device, in centimeters(cm).
      */
     range: number;
@@ -406,7 +407,18 @@ declare namespace deviceManager {
     /**
      * Start to discover device.
      *
+     * @since 8
      * @param subscribeInfo subscribe info to discovery device
+     * @systemapi this method can be used only by system applications.
+     */
+    startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;
+
+    /**
+     * Start to discover device.
+     *
+     * @since 9
+     * @param subscribeInfo subscribe info to discovery device
+     * @param filterOptions filterOptions to filter discovery device
      * @systemapi this method can be used only by system applications.
      */
     startDeviceDiscovery(subscribeInfo: SubscribeInfo, filterOptions?: string): void;
@@ -517,6 +529,7 @@ declare namespace deviceManager {
     /**
      * Register a device publish result callback so that the application can be notified when the device publish success
      *
+     * @since 9
      * @param callback Indicates the device publish result callback to register.
      * @systemapi this method can be used only by system applications.
      */
@@ -525,14 +538,16 @@ declare namespace deviceManager {
     /**
      * UnRegister a device publish result callback so that the application can be notified when the device publish was failed
      *
-     * @param callback Indicates the device found result callback to register.
+     * @since 9
+     * @param callback Indicates the device publish result callback to register.
      * @systemapi this method can be used only by system applications.
      */
      off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void;
 
     /**
-     * Register a device publish result callback so that the application can be notified when the device discover was failed
+     * Register a device publish result callback so that the application can be notified when the device publish was failed
      *
+     * @since 9
      * @param callback Indicates the device publish result callback to register.
      * @systemapi this method can be used only by system applications.
      */
@@ -541,6 +556,7 @@ declare namespace deviceManager {
     /**
      * UnRegister a device publish result callback so that the application can be notified when the device publish was failed
      *
+     * @since 9
      * @param callback Indicates the device publish result callback to register.
      * @systemapi this method can be used only by system applications.
      */

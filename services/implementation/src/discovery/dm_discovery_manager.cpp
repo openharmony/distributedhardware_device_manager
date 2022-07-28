@@ -58,7 +58,7 @@ int32_t DmDiscoveryManager::CheckDiscoveryQueue(const std::string &pkgName)
         return ERR_DM_DISCOVERY_REPEATED;
     } else {
         LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
-                discoveryQueue_.front().c_str());
+            discoveryQueue_.front().c_str());
         StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
         return DM_OK;
     }
