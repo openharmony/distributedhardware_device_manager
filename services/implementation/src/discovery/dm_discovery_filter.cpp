@@ -27,7 +27,7 @@ const std::string FILTER_OP_KEY = "filter_op";
 const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
 
-enum class DmDiscoveryDeviceFilter {
+enum class DmDiscoveryDeviceFilter : int32_t {
     DM_OFFLINE_DEVICE = 0,
     DM_ONLINE_DEVICE = 1,
     DM_ALL_DEVICE = 2
