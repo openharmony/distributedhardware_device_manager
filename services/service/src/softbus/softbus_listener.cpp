@@ -98,10 +98,6 @@ void SoftbusListener::SetPublishInfo(PublishInfo &dmPublishInfo)
     dmPublishInfo.medium          = ExchangeMedium::AUTO;
     dmPublishInfo.freq            = ExchangeFreq::HIGH;
     dmPublishInfo.capability      = DM_CAPABILITY_OSD;
-    dmPublishInfo.capabilityData  = nullptr;
-    dmPublishInfo.dataLen         = 0;
-    dmPublishInfo.businessData    = nullptr;
-    dmPublishInfo.businessDataLen = 0;
     dmPublishInfo.ranging         = false;
     return;
 }
@@ -120,6 +116,7 @@ int32_t SoftbusListener::Init()
     } while (ret != DM_OK);
 
     PublishInfo dmPublishInfo;
+    (void)memset_s(&dmPublishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
     SetPublishInfo(dmPublishInfo);
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ret = PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
@@ -290,15 +287,12 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
 {
     if (strcmp(value, DISCOVER_STATUS_ON) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
         PublishInfo dmPublishInfo;
+        (void)memset_s(&dmPublishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
         dmPublishInfo.publishId       = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         dmPublishInfo.mode            = DiscoverMode::DISCOVER_MODE_ACTIVE;
         dmPublishInfo.medium          = ExchangeMedium::AUTO;
         dmPublishInfo.freq            = ExchangeFreq::HIGH;
         dmPublishInfo.capability      = DM_CAPABILITY_OSD;
-        dmPublishInfo.capabilityData  = nullptr;
-        dmPublishInfo.dataLen         = 0;
-        dmPublishInfo.businessData    = nullptr;
-        dmPublishInfo.businessDataLen = 0;
         dmPublishInfo.ranging         = false;
         int32_t ret = ::PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {

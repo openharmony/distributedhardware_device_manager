@@ -104,15 +104,12 @@ int32_t SoftbusConnector::UnRegisterSoftbusStateCallback(const std::string &pkgN
 int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
 {
     PublishInfo                 publishInfo;
+    (void)memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
     publishInfo.publishId       = dmPublishInfo.publishId;
     publishInfo.mode            = (DiscoverMode)dmPublishInfo.mode;
     publishInfo.medium          = ExchangeMedium::AUTO;
     publishInfo.freq            = (ExchangeFreq)dmPublishInfo.freq;
     publishInfo.capability      = dmPublishInfo.capability;
-    publishInfo.capabilityData  = nullptr;
-    publishInfo.dataLen         = 0;
-    publishInfo.businessData    = nullptr;
-    publishInfo.businessDataLen = 0;
     publishInfo.ranging         = dmPublishInfo.ranging;
     LOGI("PublishDiscovery begin, publishId : %d, mode : 0x%x, ranging : %d", publishInfo.publishId, publishInfo.mode,
         publishInfo.ranging);
@@ -138,6 +135,7 @@ int32_t SoftbusConnector::UnPublishDiscovery(int32_t publishId)
 int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 {
     SubscribeInfo                 subscribeInfo;
+    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
     subscribeInfo.subscribeId     = dmSubscribeInfo.subscribeId;
     subscribeInfo.mode            = (DiscoverMode)dmSubscribeInfo.mode;
     subscribeInfo.medium          = (ExchangeMedium)dmSubscribeInfo.medium;
@@ -145,10 +143,6 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     subscribeInfo.isSameAccount   = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote    = dmSubscribeInfo.isWakeRemote;
     subscribeInfo.capability      = dmSubscribeInfo.capability;
-    subscribeInfo.capabilityData  = nullptr;
-    subscribeInfo.dataLen         = 0;
-    subscribeInfo.businessData    = nullptr;
-    subscribeInfo.businessDataLen = 0;
     LOGI("StartDiscovery begin, subscribeId : %d, mode : 0x%x, medium : %d", subscribeInfo.subscribeId,
         subscribeInfo.mode, subscribeInfo.medium);
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
