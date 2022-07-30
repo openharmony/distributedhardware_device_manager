@@ -29,8 +29,6 @@ typedef struct {
     DmDiscoverMode mode;
     /** Service publishing frequency. For details, see {@link ExchangeFreq}. */
     DmExchangeFreq freq;
-    /** Service publishing capabilities. For details, see {@link g_capabilityMap}. */
-    char capability[DM_MAX_DEVICE_CAPABILITY_LEN];
     /** Discovery ranging. For details, see {@link PublishInfo}. */
     bool ranging;
 } DmPublishInfo;

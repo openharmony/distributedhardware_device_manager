@@ -825,12 +825,6 @@ void DeviceManagerNapi::JsToDmPublishInfo(const napi_env &env, const napi_value 
     JsObjectToInt(env, object, "freq", freq);
     info.freq = (DmExchangeFreq)freq;
 
-    int32_t capability = -1;
-    JsObjectToInt(env, object, "capability", capability);
-    if ((capability == DM_NAPI_SUBSCRIBE_CAPABILITY_DDMP) || (capability == DM_NAPI_SUBSCRIBE_CAPABILITY_OSD)) {
-        (void)strncpy_s(info.capability, sizeof(info.capability), DM_CAPABILITY_OSD, strlen(DM_CAPABILITY_OSD));
-    }
-
     JsObjectToBool(env, object, "ranging", info.ranging);
     return;
 }
@@ -1019,6 +1013,18 @@ void DeviceManagerNapi::JsToDmAuthInfo(const napi_env &env, const napi_value &ob
     jsonObj[PIN_TOKEN] = token;
     JsToJsonObject(env, object, "extraInfo", jsonObj);
     extra = jsonObj.dump();
+}
+
+void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
+{
+    char filterOption[DM_NAPI_BUF_LENGTH] = {0};
+    size_t typeLen = 0;
+    NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, nullptr, 0, &typeLen));
+    NAPI_ASSERT_RETURN_VOID(env, typeLen > 0, "typeLen == 0.");
+    NAPI_ASSERT_RETURN_VOID(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= BUF_MAX_LENGTH.");
+    NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, filterOption, typeLen + 1, &typeLen));
+    extra = filterOption;
+    LOGI("JsToDmDiscoveryExtra, extra :%s, typeLen : %d", extra.c_str(), typeLen);
 }
 
 void DeviceManagerNapi::DmDeviceInfotoJsDeviceInfo(const napi_env &env, const DmDeviceInfo &vecDevInfo,
@@ -1734,10 +1740,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         napi_typeof(env, argv[1], &valueType1);
         NAPI_ASSERT(env, valueType1 == napi_string, "Wrong argument type. string expected.");
 
-        char filterOption[100];
-        JsObjectToString(env, argv[1], "filterOptions", filterOption, sizeof(filterOption));
-        extra = filterOption;
-        LOGI("StartDeviceDiscoverSync filterOptions : %s", extra.c_str());
+        JsToDmDiscoveryExtra(env, argv[1], extra);
     }
 
     std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;

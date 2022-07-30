@@ -198,9 +198,14 @@ ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, Mess
 {
     std::shared_ptr<IpcStartDiscoveryReq> pReq = std::static_pointer_cast<IpcStartDiscoveryReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
+    std::string extra = pReq->GetExtra();
     const DmSubscribeInfo dmSubscribeInfo = pReq->GetSubscribeInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(extra)) {
+        LOGE("write extra failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&dmSubscribeInfo, sizeof(DmSubscribeInfo))) {

@@ -17,6 +17,7 @@
 #define OHOS_DM_DISCOVERY_MANAGER_H
 
 #include <queue>
+
 #include "dm_discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"

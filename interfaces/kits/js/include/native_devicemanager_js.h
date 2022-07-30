@@ -309,6 +309,7 @@ public:
     static void JsToDmTokenInfo(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                 nlohmann::json &jsonObj);
     static void JsToDmAuthExtra(const napi_env &env, const napi_value &param, nlohmann::json &jsonObj);
+    static void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
     static void DmDeviceInfotoJsDeviceInfo(const napi_env &env,
                                            const OHOS::DistributedHardware::DmDeviceInfo &vecDevInfo,
                                            napi_value &result);
