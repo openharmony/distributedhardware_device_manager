@@ -180,7 +180,7 @@ var filterOptions = {
         {
             "type": "range",
             "value": 50
-        },
+        }
     ]
 };
 dmClass.startDeviceDiscovery(info, filterOptions);
