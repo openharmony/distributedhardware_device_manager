@@ -173,7 +173,7 @@ var info = {
     "capability": 0
 };
 var filterOptions = {
-    "filter_op": "AND",
+    "filter_op": "OR", // optional, "OR" default
     "filters": [
         {
             "type": "range",

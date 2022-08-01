@@ -172,7 +172,7 @@ var info = {
     "capability": 0
 };
 var filterOptions = {
-    "filter_op": "AND",
+    "filter_op": "OR", //可选，默认"OR", 多个过滤选项操作条件
     "filters": [
         {
             "type": "range",
