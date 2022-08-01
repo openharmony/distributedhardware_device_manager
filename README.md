@@ -176,12 +176,8 @@ var filterOptions = {
     "filter_op": "AND",
     "filters": [
         {
-            "type": "credible",
-            "value": 2
-        },
-        {
             "type": "range",
-            "value": 50
+            "value": 50 // need to filter the distance of dicovered device, in centimeters(cm).
         }
     ]
 };

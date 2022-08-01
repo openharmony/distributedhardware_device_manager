@@ -175,12 +175,8 @@ var filterOptions = {
     "filter_op": "AND",
     "filters": [
         {
-            "type": "credible",
-            "value": 2
-        },
-        {
             "type": "range",
-            "value": 50
+            "value": 50 // 需要过滤发现设备的距离，单位(cm)
         }
     ]
 };
