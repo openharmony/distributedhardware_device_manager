@@ -127,7 +127,7 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | on(type: 'publishSuccess', callback: Callback<{ publishId: number }>): void; | publish device success     |
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | delete unpublish device success |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | publish device fail     |
-| off(type: 'publishFail', callback?: Callback<{ publishId: number }>): void; | delete unpublish device fail |
+| off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | delete unpublish device fail |
 
 ```
 // Create a DeviceManager instance.

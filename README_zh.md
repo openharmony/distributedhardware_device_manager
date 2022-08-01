@@ -127,7 +127,7 @@ foundation/distributedhardware/device_manager
 | on(type: 'publishSuccess', callback: Callback<{ publishId: number }>): void; | 发布设备成功回调     |
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
-| off(type: 'publishFail', callback?: Callback<{ publishId: number }>): void; | 取消发布设备失败回调 |
+| off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
 ## 示例如下：
 
 ```
