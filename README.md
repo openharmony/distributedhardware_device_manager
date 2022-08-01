@@ -124,6 +124,10 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | Unsubscribes from discovered device list changes.|
 | on(type: 'discoverFail', callback: Callback<{ subscribeId: number, reason: number }>): void; | Subscribes to device discovery failures.    |
 | off(type: 'discoverFail', callback?: Callback<{ subscribeId: number, reason: number }>): void; | Unsubscribes from device discovery failures.|
+| on(type: 'publishSuccess', callback: Callback<{ publishId: number }>): void; | publish device success     |
+| off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | delete unpublish device success |
+| on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | publish device fail     |
+| off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | delete unpublish device fail |
 
 ## Sample Code
 
@@ -168,7 +172,16 @@ var info = {
     "isWakeRemote": true,
     "capability": 0
 };
-dmClass.startDeviceDiscovery(info);
+var filterOptions = {
+    "filter_op": "OR", // optional, "OR" default
+    "filters": [
+        {
+            "type": "range",
+            "value": 50 // need to filter the distance of dicovered device, in centimeters(cm).
+        }
+    ]
+};
+dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
 
 // Stop device discovery (used with startDeviceDiscovery).
 dmClass.stopDeviceDiscovery(subscribeId);
@@ -190,11 +203,11 @@ var info = {
     "publishId": publishId,
     "mode": 0xAA,
     "freq": 2,
-    "capability": 0
+    "ranging": 1
 };
 dmClass.publishDeviceDiscovery(info);
 
-// unPublish device discovery
+// unPublish device discovery(used with publishDeviceDiscovery).
 dmClass.unPublishDeviceDiscovery(publishId);
 
 // Authenticate a device.

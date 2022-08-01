@@ -109,7 +109,7 @@ int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
     publishInfo.mode            = (DiscoverMode)dmPublishInfo.mode;
     publishInfo.medium          = ExchangeMedium::AUTO;
     publishInfo.freq            = (ExchangeFreq)dmPublishInfo.freq;
-    publishInfo.capability      = dmPublishInfo.capability;
+    publishInfo.capability      = DM_CAPABILITY_OSD;
     publishInfo.ranging         = dmPublishInfo.ranging;
     LOGI("PublishDiscovery begin, publishId : %d, mode : 0x%x, ranging : %d", publishInfo.publishId, publishInfo.mode,
         publishInfo.ranging);
@@ -317,17 +317,17 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
         connectAddr = jsonPara.dump();
         return addr;
     }
-    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BLE);
-    if (addr != nullptr) {
-        jsonPara[BLE_MAC] = addr->info.ble.bleMac;
-        LOGI("get BLE ConnectionAddr for deviceId %s", GetAnonyString(deviceId).c_str());
-        connectAddr = jsonPara.dump();
-        return addr;
-    }
     addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BR);
     if (addr != nullptr) {
         jsonPara[BR_MAC] = addr->info.br.brMac;
         LOGI("get BR ConnectionAddr for deviceId %s", GetAnonyString(deviceId).c_str());
+        connectAddr = jsonPara.dump();
+        return addr;
+    }
+    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BLE);
+    if (addr != nullptr) {
+        jsonPara[BLE_MAC] = addr->info.ble.bleMac;
+        LOGI("get BLE ConnectionAddr for deviceId %s", GetAnonyString(deviceId).c_str());
         connectAddr = jsonPara.dump();
         return addr;
     }
