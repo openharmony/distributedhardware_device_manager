@@ -209,7 +209,7 @@ var info = {
 };
 dmClass.publishDeviceDiscovery(info);
 
-// unPublish device discoveryused with publishDeviceDiscovery).
+// unPublish device discovery(used with publishDeviceDiscovery).
 dmClass.unPublishDeviceDiscovery(publishId);
 
 // Authenticate a device.
