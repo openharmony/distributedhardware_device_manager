@@ -130,6 +130,7 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | delete unpublish device fail |
 
 ## Sample Code
+
 ```
 // Create a DeviceManager instance.
 deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
