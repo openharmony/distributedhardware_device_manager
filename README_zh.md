@@ -180,7 +180,7 @@ var filterOptions = {
         }
     ]
 };
-dmClass.startDeviceDiscovery(info, filterOptions);
+dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
 
 // 停止设备发现（需要和startDeviceDiscovery接口配对使用）
 dmClass.stopDeviceDiscovery(subscribeId);

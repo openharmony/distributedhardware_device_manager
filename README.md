@@ -181,7 +181,7 @@ var filterOptions = {
         }
     ]
 };
-dmClass.startDeviceDiscovery(info, filterOptions);
+dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
 
 // Stop device discovery (used with startDeviceDiscovery).
 dmClass.stopDeviceDiscovery(subscribeId);
