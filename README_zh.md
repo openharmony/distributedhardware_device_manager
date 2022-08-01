@@ -124,7 +124,10 @@ foundation/distributedhardware/device_manager
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 取消发现设备列表回调 |
 | on(type: 'discoverFail', callback: Callback<{ subscribeId: number, reason: number }>): void; | 发现设备失败回调     |
 | off(type: 'discoverFail', callback?: Callback<{ subscribeId: number, reason: number }>): void; | 取消发现设备失败回调 |
-
+| on(type: 'publishSuccess', callback: Callback<{ publishId: number }>): void; | 发布设备成功回调     |
+| off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
+| on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
+| off(type: 'publishFail', callback?: Callback<{ publishId: number }>): void; | 取消发布设备失败回调 |
 ## 示例如下：
 
 ```
@@ -168,7 +171,20 @@ var info = {
     "isWakeRemote": true,
     "capability": 0
 };
-dmClass.startDeviceDiscovery(info);
+var filterOptions = {
+    "filter_op": "AND",
+    "filters": [
+        {
+            "type": "credible",
+            "value": 2
+        },
+        {
+            "type": "range",
+            "value": 50
+        },
+    ]
+};
+dmClass.startDeviceDiscovery(info, filterOptions);
 
 // 停止设备发现（需要和startDeviceDiscovery接口配对使用）
 dmClass.stopDeviceDiscovery(subscribeId);
@@ -190,11 +206,11 @@ var info = {
     "publishId": publishId,
     "mode": 0xAA,
     "freq": 2,
-    "capability": 0
+    "ranging": 1
 };
 dmClass.publishDeviceDiscovery(info);
 
-// 停止发布设备发现
+// 停止发布设备发现（需要和publishDeviceDiscovery接口配对使用）
 dmClass.unPublishDeviceDiscovery(publishId);
 
 // 设备认证
