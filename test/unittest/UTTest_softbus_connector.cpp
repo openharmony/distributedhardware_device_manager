@@ -231,33 +231,6 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext:
 }
 
 /**
- * @tc.name: GetTrustedDeviceList_001
- * @tc.desc: create GetAllNodeDeviceInfo  not equal 0, and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
-{
-    std::vector<DmDeviceInfo> deviceInfoList;
-    int ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc: set pkgName to com.softbus.test,define deviceInfo,and return DM_OK.
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.softbus.test";
-    DmDeviceInfo deviceInfo;
-    int ret = softbusListener->GetLocalDeviceInfo(deviceInfo);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: StartDiscovery_001
  * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
