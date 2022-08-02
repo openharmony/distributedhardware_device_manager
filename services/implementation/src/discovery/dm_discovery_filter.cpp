@@ -73,7 +73,7 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
 
     nlohmann::json jsonObject;
     if (ParseFilterJson(filterOptions, jsonObject) == DM_OK) {
-        (!jsonObject.contains(FILTER_OP_KEY)) {
+        if (!jsonObject.contains(FILTER_OP_KEY)) {
             filterOp = FILTERS_TYPE_OR; // filterOp optional, "OR" default
         } else {
             jsonObject[FILTER_OP_KEY].get_to(filterOp);
