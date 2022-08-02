@@ -52,7 +52,7 @@ int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str, nlohmann::
         LOGE("Filters Parse error.");
         return ERR_DM_FAILED;
     }
-    if ((!jsonObject.contains(FILTER_OP_KEY)) || (!jsonObject.contains(FILTERS_KEY))) {
+    if (!jsonObject.contains(FILTERS_KEY)) {
         LOGE("FilterOptions invalid.");
         return ERR_DM_FAILED;
     }
@@ -73,7 +73,11 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
 
     nlohmann::json jsonObject;
     if (ParseFilterJson(filterOptions, jsonObject) == DM_OK) {
-        jsonObject[FILTER_OP_KEY].get_to(filterOp);
+        (!jsonObject.contains(FILTER_OP_KEY)) {
+            filterOp = FILTERS_TYPE_OR; // filterOp optional, "OR" default
+        } else {
+            jsonObject[FILTER_OP_KEY].get_to(filterOp);
+        }
         filters = jsonObject[FILTERS_KEY].get<std::vector<DmDeviceFilters>>();
         return DM_OK;
     }
