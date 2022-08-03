@@ -98,7 +98,7 @@ bool DmDiscoveryFilter::FilterByCredible(int32_t value, bool isOnline)
 
 bool DmDiscoveryFilter::FilterByRange(int32_t value, int range)
 {
-    return ((0 < range) && (range <= value));
+    return ((range > 0) && (range <= value));
 }
 
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
