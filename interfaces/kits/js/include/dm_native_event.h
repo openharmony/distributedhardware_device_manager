@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "napi/native_api.h"
@@ -40,5 +41,8 @@ protected:
     napi_env env_;
     napi_ref thisVarRef_;
     std::map<std::string, std::shared_ptr<DmEventListener>> eventMap_;
+#if !defined(__LITEOS_M__)
+    std::mutex lock_;
+#endif
 };
 #endif // OHOS_DM_NATIVE_EVENT_H
