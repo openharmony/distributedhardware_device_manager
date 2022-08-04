@@ -40,6 +40,9 @@ public:
     void RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
                                    std::shared_ptr<DiscoveryCallback> callback);
     void UnRegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
+    void RegisterPublishCallback(const std::string &pkgName, int32_t publishId,
+        std::shared_ptr<PublishCallback> callback);
+    void UnRegisterPublishCallback(const std::string &pkgName, int32_t publishId);
     void RegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId,
                                       std::shared_ptr<AuthenticateCallback> callback);
     void UnRegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId);
@@ -61,6 +64,7 @@ public:
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &deviceInfo);
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
     void OnDiscoverySuccess(const std::string &pkgName, uint16_t subscribeId);
+    void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
                       uint32_t status, uint32_t reason);
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode, int32_t flag);
@@ -73,6 +77,7 @@ private:
 #endif
     std::map<std::string, std::shared_ptr<DeviceStateCallback>> deviceStateCallback_;
     std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
+    std::map<std::string, std::map<int32_t, std::shared_ptr<PublishCallback>>> devicePublishCallbacks_;
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;
     std::map<std::string, std::shared_ptr<VerifyAuthCallback>> verifyAuthCallback_;
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback_;

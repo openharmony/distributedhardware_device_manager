@@ -635,19 +635,19 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: OnSoftbusDiscoveryFailed_001
+ * @tc.name: OnSoftbusDiscoveryResult_001
  * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryFailed_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestSize.Level0)
 {
     int32_t subscribeId= 123456;
-    DiscoveryFailReason failReason = (DiscoveryFailReason)1;
+    RefreshResult result = (RefreshResult)1;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
         pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
-    softbusConnector->OnSoftbusDiscoveryFailed(subscribeId, failReason);
+    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
@@ -658,18 +658,19 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryFailed_001, testing::ext::TestS
 }
 
 /**
- * @tc.name: OnSoftbusDiscoverySuccess_001
+ * @tc.name: OnSoftbusDiscoveryResult_001
  * @tc.desc: go to the corrort case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoverySuccess_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_002, testing::ext::TestSize.Level0)
 {
     int32_t subscribeId= 123456;
+    RefreshResult result = (RefreshResult)0;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
         pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
-    softbusConnector->OnSoftbusDiscoverySuccess(subscribeId);
+    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;

@@ -18,6 +18,7 @@
 
 #include <queue>
 
+#include "dm_discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
 #include "softbus_connector.h"
@@ -27,6 +28,8 @@ typedef struct DmDiscoveryContext {
     std::string pkgName;
     std::string extra;
     uint16_t subscribeId;
+    std::string                  filterOp;
+    std::vector<DmDeviceFilters> filters;
 } DmDiscoveryContext;
 
 class DmDiscoveryManager final : public ISoftbusDiscoveryCallback,
@@ -78,6 +81,9 @@ public:
      * @tc.type: FUNC
      */
     void HandleDiscoveryTimeout(std::string name);
+private:
+    void CfgDiscoveryTimer();
+    int32_t CheckDiscoveryQueue(const std::string &pkgName);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

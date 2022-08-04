@@ -128,6 +128,24 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
     return dmServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
 }
 
+int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("PublishDeviceDiscovery failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
+}
+
+int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnPublishDeviceDiscovery failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
+}
+
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {

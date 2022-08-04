@@ -23,6 +23,7 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_verify_auth_result_req.h"
 
 namespace OHOS {
@@ -61,7 +62,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
 void DeviceManagerServiceListener::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId,
                                                      int32_t failedReason)
 {
-    LOGI("OnDiscoveryFailed");
+    LOGI("DeviceManagerServiceListener::OnDiscoveryFailed");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -73,7 +74,7 @@ void DeviceManagerServiceListener::OnDiscoveryFailed(const std::string &pkgName,
 
 void DeviceManagerServiceListener::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
-    LOGI("OnDiscoverySuccess");
+    LOGI("DeviceManagerServiceListener::OnDiscoverySuccess");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -81,6 +82,18 @@ void DeviceManagerServiceListener::OnDiscoverySuccess(const std::string &pkgName
     pReq->SetSubscribeId((uint16_t)subscribeId);
     pReq->SetResult(DM_OK);
     ipcServerListener_.SendRequest(SERVER_DISCOVER_FINISH, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult)
+{
+    LOGI("DeviceManagerServiceListener::OnPublishResult : %d", publishResult);
+    std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
+    pReq->SetPkgName(pkgName);
+    pReq->SetPublishId(publishId);
+    pReq->SetResult(publishResult);
+    ipcServerListener_.SendRequest(SERVER_PUBLISH_FINISH, pReq, pRsp);
 }
 
 void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, const std::string &deviceId,

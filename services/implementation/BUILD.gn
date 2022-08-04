@@ -143,6 +143,7 @@ if (defined(ohos_lite)) {
       "include/credential",
       "include/devicestate",
       "include/discovery",
+      "include/publish",
       "include/dependency/commonevent",
       "include/dependency/multipleuser",
       "include/dependency/hichain",
@@ -186,7 +187,9 @@ if (defined(ohos_lite)) {
       "src/dependency/timer/dm_timer.cpp",
       "src/device_manager_service_impl.cpp",
       "src/devicestate/dm_device_state_manager.cpp",
+      "src/discovery/dm_discovery_filter.cpp",
       "src/discovery/dm_discovery_manager.cpp",
+      "src/publish/dm_publish_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerserviceimpl_config" ]

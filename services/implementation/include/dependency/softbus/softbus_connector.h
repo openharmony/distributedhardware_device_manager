@@ -21,11 +21,12 @@
 #include <string>
 #include <vector>
 
-#include "discovery_service.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
 #include "softbus_bus_center.h"
+#include "dm_device_info.h"
+#include "dm_publish_info.h"
+#include "dm_subscribe_info.h"
 #include "softbus_discovery_callback.h"
+#include "softbus_publish_callback.h"
 #include "softbus_session.h"
 #include "softbus_state_callback.h"
 
@@ -34,18 +35,11 @@ namespace DistributedHardware {
 class SoftbusConnector {
 public:
     /**
-     * @tc.name: SoftbusConnector::OnPublishSuccess
-     * @tc.desc: OnPublishSuccess of the SoftbusConnector
+     * @tc.name: SoftbusConnector::OnSoftbusPublishResult
+     * @tc.desc: OnSoftbusPublishResult of the SoftbusConnector
      * @tc.type: FUNC
      */
-    static void OnPublishSuccess(int publishId);
-
-    /**
-     * @tc.name: SoftbusConnector::OnPublishFail
-     * @tc.desc: OnPublishFail of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnPublishFail(int publishId, PublishFailReason reason);
+    static void OnSoftbusPublishResult(int publishId, PublishResult result);
 
     /**
      * @tc.name: SoftbusConnector::OnSoftbusDeviceFound
@@ -55,21 +49,14 @@ public:
     static void OnSoftbusDeviceFound(const DeviceInfo *device);
 
     /**
-     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryFailed
-     * @tc.desc: OnSoftbus Discovery Failed of the SoftbusConnector
+     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryResult
+     * @tc.desc: OnSoftbus Discovery Result of the SoftbusConnector
      * @tc.type: FUNC
      */
-    static void OnSoftbusDiscoveryFailed(int subscribeId, DiscoveryFailReason failReason);
+    static void OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result);
 
     /**
-     * @tc.name: SoftbusConnector::OnSoftbusDiscoverySuccess
-     * @tc.desc: OnSoftbus Discovery Success of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDiscoverySuccess(int subscribeId);
-
-    /**
-     * @tc.name: SoftbusConnector::OnPublishSuccess
+     * @tc.name: SoftbusConnector::OnParameterChgCallback
      * @tc.desc: OnParameter Chg Callback of the SoftbusConnector
      * @tc.type: FUNC
      */
@@ -119,6 +106,11 @@ public:
     int32_t RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
                                              const std::shared_ptr<ISoftbusDiscoveryCallback> callback);
     int32_t UnRegisterSoftbusDiscoveryCallback(const std::string &pkgName);
+    int32_t RegisterSoftbusPublishCallback(const std::string &pkgName,
+                                           const std::shared_ptr<ISoftbusPublishCallback> callback);
+    int32_t UnRegisterSoftbusPublishCallback(const std::string &pkgName);
+    int32_t PublishDiscovery(const DmPublishInfo &dmPublishInfo);
+    int32_t UnPublishDiscovery(int32_t publishId);
     int32_t StartDiscovery(const DmSubscribeInfo &subscribeInfo);
     int32_t StopDiscovery(uint16_t subscribeId);
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
@@ -138,12 +130,13 @@ private:
         NOT_ALLOW_BE_DISCOVERY = 2,
     };
     static PulishStatus publishStatus;
-    static IDiscoveryCallback softbusDiscoveryCallback_;
-    static IPublishCallback softbusPublishCallback_;
+    static IRefreshCallback softbusDiscoveryCallback_;
+    static IPublishCb softbusPublishCallback_;
     std::shared_ptr<SoftbusSession> softbusSession_;
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
+    static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

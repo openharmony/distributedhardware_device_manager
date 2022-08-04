@@ -70,6 +70,28 @@ void DeviceManagerNotify::UnRegisterDiscoveryCallback(const std::string &pkgName
     }
 }
 
+void DeviceManagerNotify::RegisterPublishCallback(const std::string               &pkgName,
+                                                  int32_t                          publishId,
+                                                  std::shared_ptr<PublishCallback> callback)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (devicePublishCallbacks_.count(pkgName) == 0) {
+        devicePublishCallbacks_[pkgName] = std::map<int32_t, std::shared_ptr<PublishCallback>>();
+    }
+    devicePublishCallbacks_[pkgName][publishId] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterPublishCallback(const std::string &pkgName, int32_t publishId)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (devicePublishCallbacks_.count(pkgName) > 0) {
+        devicePublishCallbacks_[pkgName].erase(publishId);
+        if (devicePublishCallbacks_[pkgName].empty()) {
+            devicePublishCallbacks_.erase(pkgName);
+        }
+    }
+}
+
 void DeviceManagerNotify::RegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId,
                                                        std::shared_ptr<AuthenticateCallback> callback)
 {
@@ -96,6 +118,7 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
     deviceDiscoveryCallbacks_.erase(pkgName);
+    devicePublishCallbacks_.erase(pkgName);
     authenticateCallback_.erase(pkgName);
     dmInitCallback_.erase(pkgName);
 }
@@ -246,6 +269,24 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
         return;
     }
     iter->second->OnDiscoverySuccess(subscribeId);
+}
+
+void DeviceManagerNotify::OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult)
+{
+    LOGI("DeviceManager OnPublishResult pkgName:%s, publishId %d, publishResult %d", pkgName.c_str(), publishId,
+         publishResult);
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (devicePublishCallbacks_.count(pkgName) == 0) {
+        LOGE("DeviceManager OnPublishResult: no register PublishCallback for this package");
+        return;
+    }
+    std::map<int32_t, std::shared_ptr<PublishCallback>> &publishCallMap = devicePublishCallbacks_[pkgName];
+    auto iter = publishCallMap.find(publishId);
+    if (iter == publishCallMap.end()) {
+        LOGE("DeviceManager OnPublishResult: no register PublishCallback for publishId %d", publishId);
+        return;
+    }
+    iter->second->OnPublishResult(publishId, publishResult);
 }
 
 void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::string &deviceId,

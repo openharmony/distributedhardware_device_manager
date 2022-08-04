@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "device_manager_service_listener.h"
-#include "discovery_service.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
