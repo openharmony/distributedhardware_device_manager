@@ -44,7 +44,6 @@ group("unittest") {
     ":UTTest_multiple_user_connector",
     ":UTTest_profile_connector",
     ":UTTest_softbus_connector",
-    ":UTTest_softbus_listener",
     ":UTTest_softbus_session",
   ]
 }
@@ -125,17 +124,6 @@ ohos_unittest("UTTest_hichain_connector") {
 }
 
 ## UnitTest UTTest_hichain_connector }}}
-
-## UnitTest UTTest_softbus_listener {{{
-ohos_unittest("UTTest_softbus_listener") {
-  module_out_path = module_out_path
-
-  sources = [ "UTTest_softbus_listener.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-}
-
-## UnitTest UTTest_softbus_listener }}}
 
 ## UnitTest UTTest_softbus_connector {{{
 ohos_unittest("UTTest_softbus_connector") {
