@@ -244,6 +244,10 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("AuthenticateDevice failed, deviceId is empty");
         return DM_INPUT_PARA_EMPTY;
     }
+    if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
+        LOGE("AuthenticateDevice failed, authType is illegal");
+        return DM_AUTH_NOT_SUPPORT;
+    }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 
