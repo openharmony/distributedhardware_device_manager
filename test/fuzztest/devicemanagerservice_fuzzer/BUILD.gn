@@ -53,7 +53,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
@@ -85,7 +85,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
   external_deps = [
     "init:libbegetutil",
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 

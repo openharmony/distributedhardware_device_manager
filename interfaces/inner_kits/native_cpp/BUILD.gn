@@ -36,7 +36,7 @@ if (defined(ohos_lite)) {
         "//utils/native/lite/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
         "//third_party/bounds_checking_function/include",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
         "//third_party/json/include",
       ]
 
@@ -56,7 +56,7 @@ if (defined(ohos_lite)) {
       deps = [
         "${utils_path}:devicemanagerutils_mini",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//utils/native/lite:utils",
       ]
@@ -81,8 +81,8 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
         "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
         "//third_party/json/include",
       ]
       sources = [
@@ -99,7 +99,7 @@ if (defined(ohos_lite)) {
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-        "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//utils/native/lite:utils",
       ]
@@ -154,7 +154,7 @@ if (defined(ohos_lite)) {
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
     ]
 
     subsystem_name = "distributedhardware"

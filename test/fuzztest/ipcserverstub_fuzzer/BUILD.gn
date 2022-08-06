@@ -55,7 +55,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
@@ -66,8 +66,8 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "//utils/native/lite/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
     "//third_party/bounds_checking_function/include",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
     "//third_party/json/include",
     "//foundation/arkui/napi/interfaces/inner_api/napi",
     "//foundation/arkui/napi/interfaces/inner_api",
@@ -115,8 +115,8 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "ipc:ipc_core",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   public_deps = [
@@ -125,7 +125,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]

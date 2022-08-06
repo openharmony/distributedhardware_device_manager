@@ -42,7 +42,7 @@
                 "napi",
                 "os_account",
                 "safwk",
-                "samgr_standard",
+                "samgr",
                 "startup_l2"
             ],
             "third_party": [
