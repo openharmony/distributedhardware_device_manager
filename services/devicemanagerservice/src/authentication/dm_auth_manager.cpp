@@ -69,6 +69,10 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         return DM_INPUT_PARA_EMPTY;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
+    if (listener_ == nullptr) {
+        LOGE("DmAuthManager::AuthenticateDevice is empty nullptr");
+        return DM_INPUT_PARA_EMPTY;
+    }
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_NOT_SUPPORT);
