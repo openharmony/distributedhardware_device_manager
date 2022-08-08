@@ -44,48 +44,27 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     LOGI("DeviceManagerServiceImpl Initialize");
     if (softbusConnector_ == nullptr) {
         softbusConnector_ = std::make_shared<SoftbusConnector>();
-        if (softbusConnector_ == nullptr) {
-            LOGE("Init failed, softbusConnector_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
     }
     if (hiChainConnector_ == nullptr) {
         hiChainConnector_ = std::make_shared<HiChainConnector>();
-        if (hiChainConnector_ == nullptr) {
-            LOGE("Init failed, hiChainConnector_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
     }
     if (deviceStateMgr_ == nullptr) {
         deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
-        if (deviceStateMgr_ == nullptr) {
-            LOGE("Init failed, deviceStateMgr_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
         deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener);
-        if (discoveryMgr_ == nullptr) {
-            LOGE("Init failed, discoveryMgr_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
+    }
+    if (publishMgr_ == nullptr) {
+        publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener);
     }
     if (authMgr_ == nullptr) {
         authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, listener, hiChainConnector_);
-        if (authMgr_ == nullptr) {
-            LOGE("Init failed, authMgr_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
         softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
         hiChainConnector_->RegisterHiChainCallback(authMgr_);
     }
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
-        if (credentialMgr_ == nullptr) {
-            LOGE("Init failed, credentialMgr_ apply for failure");
-            return ERR_DM_INIT_FAILED;
-        }
     }
 
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -120,6 +99,7 @@ void DeviceManagerServiceImpl::Release()
     authMgr_ = nullptr;
     deviceStateMgr_ = nullptr;
     discoveryMgr_ = nullptr;
+    publishMgr_ = nullptr;
     softbusConnector_ = nullptr;
     abilityMgr_ = nullptr;
     hiChainConnector_ = nullptr;
@@ -150,6 +130,32 @@ int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     return discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
+}
+
+int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("PublishDeviceDiscovery failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    return publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
+}
+
+int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("UnPublishDeviceDiscovery failed, pkgName is empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    return publishMgr_->UnPublishDeviceDiscovery(pkgName, publishId);
 }
 
 int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,

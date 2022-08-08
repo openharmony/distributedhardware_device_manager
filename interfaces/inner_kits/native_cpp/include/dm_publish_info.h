@@ -13,44 +13,25 @@
  * limitations under the License.
  */
 
-#include "UTTest_softbus_listener.h"
+#ifndef OHOS_DM_PUBLISH_INFO_H
+#define OHOS_DM_PUBLISH_INFO_H
 
-#include "dm_constants.h"
-#include "dm_log.h"
-#include "softbus_listener.h"
+#include <stdbool.h>
+
+#include "dm_subscribe_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SoftbusListenerTest::SetUp()
-{
-}
-
-void SoftbusListenerTest::TearDown()
-{
-}
-
-void SoftbusListenerTest::SetUpTestCase()
-{
-}
-
-void SoftbusListenerTest::TearDownTestCase()
-{
-}
-
-namespace {
-std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-
-/**
- * @tc.name: Init_001
- * @tc.desc: go to the corrort case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, Init_001, testing::ext::TestSize.Level0)
-{
-    int ret = softbusListener->Init();
-    EXPECT_EQ(ret, DM_OK);
-}
-}
+typedef struct {
+    /** Service ID */
+    int32_t publishId;
+    /** Discovery mode for service publishing. For details, see {@link Discovermode}. */
+    DmDiscoverMode mode;
+    /** Service publishing frequency. For details, see {@link ExchangeFreq}. */
+    DmExchangeFreq freq;
+    /** Discovery ranging. For details, see {@link PublishInfo}. */
+    bool ranging;
+} DmPublishInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_DM_PUBLISH_INFO_H

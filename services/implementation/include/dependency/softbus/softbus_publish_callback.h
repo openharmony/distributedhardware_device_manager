@@ -12,30 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_SOFTBUS_LISTENER_H
-#define OHOS_UTTEST_DM_SOFTBUS_LISTENER_H
 
-#include <gtest/gtest.h>
-#include <refbase.h>
-
-#include <string>
-#include <vector>
-
-#include "device_manager_service_listener.h"
-#include "dm_adapter_manager.h"
-#include "dm_device_info.h"
-#include "softbus_connector.h"
-#include "softbus_session_callback.h"
+#ifndef OHOS_DM_SOFTBUS_PUBLISH_CALLBACK_H
+#define OHOS_DM_SOFTBUS_PUBLISH_CALLBACK_H
 
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusListenerTest : public testing::Test {
+class ISoftbusPublishCallback {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    virtual void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_DM_SOFTBUS_PUBLISH_CALLBACK_H

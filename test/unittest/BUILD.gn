@@ -44,7 +44,6 @@ group("unittest") {
     ":UTTest_multiple_user_connector",
     ":UTTest_profile_connector",
     ":UTTest_softbus_connector",
-    ":UTTest_softbus_listener",
     ":UTTest_softbus_session",
   ]
 }
@@ -126,17 +125,6 @@ ohos_unittest("UTTest_hichain_connector") {
 
 ## UnitTest UTTest_hichain_connector }}}
 
-## UnitTest UTTest_softbus_listener {{{
-ohos_unittest("UTTest_softbus_listener") {
-  module_out_path = module_out_path
-
-  sources = [ "UTTest_softbus_listener.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-}
-
-## UnitTest UTTest_softbus_listener }}}
-
 ## UnitTest UTTest_softbus_connector {{{
 ohos_unittest("UTTest_softbus_connector") {
   module_out_path = module_out_path
@@ -153,6 +141,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
+    "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
@@ -466,6 +455,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
+    "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
@@ -515,7 +505,7 @@ config("device_manager_test_common_public_config") {
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/profile/include",
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
@@ -556,7 +546,7 @@ ohos_static_library("device_manager_test_common") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]
@@ -602,7 +592,7 @@ config("device_manager_test_common_public") {
     "//foundation/communication/dsoftbus/interfaces/kits/discovery",
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//base/security/device_auth/interfaces/innerkits",
-    "//foundation/distributedschedule/safwk/services/safwk",
+    "//foundation/systemabilitymgr/safwk/services/safwk",
   ]
 
   if (os_account_part_exists) {
@@ -645,7 +635,7 @@ ohos_static_library("device_manager_test") {
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]
@@ -676,7 +666,7 @@ ohos_static_library("device_manager_test") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 ## Build device_manager_test.a }}}

@@ -583,31 +583,6 @@ HWTEST_F(IpcClientManagerTest, IsInit_001, testing::ext::TestSize.Level0)
     // 4. check ret is false
     ASSERT_EQ(ret, false);
 }
-
-/**
- * @tc.name: IsInit_002
- * @tc.desc: 1. set pkgName not null
- *           2. set IpcClientManager dmInterface_ not null
- *           3. call IsInit with parameter
- *           4. check ret is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcClientManagerTest, IsInit_002, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName null
-    std::string pkgName = "";
-    // 2. set IpcClientManager dmInterface_ not null
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    sptr<IpcRemoteBroker> dmInterface = iface_cast<IpcRemoteBroker>(object);
-    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
-    instance->dmInterface_ = dmInterface;
-    // 3. call IsInit with parameter
-    bool ret = instance->IsInit(pkgName);
-    // 4. check ret is false
-    ASSERT_EQ(ret, false);
-}
 } // namespace
 
 DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()

@@ -52,6 +52,14 @@ public:
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) = 0;
 };
 
+class PublishCallback {
+public:
+    virtual ~PublishCallback()
+    {
+    }
+    virtual void OnPublishResult(int32_t publishId, int32_t publishResult) = 0;
+};
+
 class AuthenticateCallback {
 public:
     virtual ~AuthenticateCallback()

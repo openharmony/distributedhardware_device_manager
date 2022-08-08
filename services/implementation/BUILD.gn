@@ -71,8 +71,8 @@ if (defined(ohos_lite)) {
         "//foundation/communication/dsoftbus/interfaces/kits/transport",
         "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
         "//foundation/distributedhardware/device_manager/services/implementation/include/dependency/multipleuser",
-        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-        "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       ]
 
       sources = [
@@ -120,7 +120,7 @@ if (defined(ohos_lite)) {
         "//base/security/device_auth/services:deviceauth",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
-        "//foundation/distributedschedule/samgr_lite/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
         "//utils/native/lite:utils",
@@ -143,6 +143,7 @@ if (defined(ohos_lite)) {
       "include/credential",
       "include/devicestate",
       "include/discovery",
+      "include/publish",
       "include/dependency/commonevent",
       "include/dependency/multipleuser",
       "include/dependency/hichain",
@@ -186,7 +187,9 @@ if (defined(ohos_lite)) {
       "src/dependency/timer/dm_timer.cpp",
       "src/device_manager_service_impl.cpp",
       "src/devicestate/dm_device_state_manager.cpp",
+      "src/discovery/dm_discovery_filter.cpp",
       "src/discovery/dm_discovery_manager.cpp",
+      "src/publish/dm_publish_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerserviceimpl_config" ]
@@ -234,7 +237,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
     ]
 
     subsystem_name = "distributedhardware"

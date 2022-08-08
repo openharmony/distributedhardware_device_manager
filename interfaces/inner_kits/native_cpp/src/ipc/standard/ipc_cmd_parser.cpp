@@ -35,6 +35,8 @@
 #include "ipc_set_useroperation_req.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_publish_req.h"
+#include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "securec.h"
@@ -196,9 +198,14 @@ ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, Mess
 {
     std::shared_ptr<IpcStartDiscoveryReq> pReq = std::static_pointer_cast<IpcStartDiscoveryReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
+    std::string extra = pReq->GetExtra();
     const DmSubscribeInfo dmSubscribeInfo = pReq->GetSubscribeInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(extra)) {
+        LOGE("write extra failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&dmSubscribeInfo, sizeof(DmSubscribeInfo))) {
@@ -231,6 +238,54 @@ ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, Messa
 }
 
 ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(PUBLISH_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcPublishReq> pReq = std::static_pointer_cast<IpcPublishReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    const DmPublishInfo dmPublishInfo = pReq->GetPublishInfo();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteRawData(&dmPublishInfo, sizeof(DmPublishInfo))) {
+        LOGE("write dmPublishInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(PUBLISH_DEVICE_DISCOVER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UNPUBLISH_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcUnPublishReq> pReq = std::static_pointer_cast<IpcUnPublishReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    uint16_t publishId = pReq->GetPublishId();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(publishId)) {
+        LOGE("write publishId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNPUBLISH_DEVICE_DISCOVER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
@@ -478,6 +533,20 @@ ON_IPC_CMD(SERVER_DISCOVER_FINISH, MessageParcel &data, MessageParcel &reply)
         DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     }
     reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_PUBLISH_FINISH, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t publishId = data.ReadInt32();
+    int32_t publishResult = data.ReadInt32();
+
+    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
+    if (!reply.WriteInt32(DM_OK)) {
+        LOGE("write return failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     return DM_OK;
 }
 
