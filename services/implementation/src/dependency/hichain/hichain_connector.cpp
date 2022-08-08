@@ -263,6 +263,10 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID]);
+    if (connectInfomation.empty()) {
+        LOGE("get connect para failed");
+        return ERR_DM_FAILED;
+    }
 
     int32_t pinCode = jsonObject[PIN_CODE_KEY];
     std::string groupId = jsonObject[TAG_GROUP_ID];
@@ -283,7 +287,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     }
     int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME, tmpStr.c_str());
     if (ret != 0) {
-        LOGE("HiChainConnector::AddMember failed, ret: %d.", ret);
+        LOGE("HiChainConnector::AddMember failed, ret: %d", ret);
     }
     LOGI("HiChainConnector::AddMember completed");
     return ret;

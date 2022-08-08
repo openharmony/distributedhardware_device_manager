@@ -46,7 +46,7 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
 
 /**
  * @tc.name: OpenAuthSession_001
- * @tc.desc: set  deviceId =null,  return sessionId(1)
+ * @tc.desc: set  deviceId =null, return sessionId(1)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -130,7 +130,7 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: CloseAuthSession_001
- * @tc.desc: set sessionId = 3,  and return DM_OK
+ * @tc.desc: set sessionId = 3, and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

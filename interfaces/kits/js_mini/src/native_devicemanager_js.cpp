@@ -131,7 +131,7 @@ void DmJSIDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
     deviceManagerJSI->OnDeviceStateChange(DmJSIDevStateChangeAction::CHANGE, deviceInfo);
 }
 
-void DmJSIDiscoverCallback::OnDeviceFound(uint16_t subscribeId,  const DmDeviceInfo &deviceInfo)
+void DmJSIDiscoverCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
 {
     DeviceManagerModule *deviceManagerJSI = DeviceManagerModule::GetDeviceManagerJSI(bundleName_);
     if (deviceManagerJSI == nullptr) {
@@ -376,7 +376,7 @@ void DeviceManagerModule::OnVerifyResult(const std::string &deviceId, int32_t re
 }
 
 void DeviceManagerModule::DeviceInfoToJsArray(const std::vector<DmDeviceInfo> &vecDevInfo,
-                                              const int32_t idx,  JSIValue &arrayResult)
+                                              const int32_t idx, JSIValue &arrayResult)
 {
     bool status = false;
     JSIValue result = JSI::CreateObject();
@@ -574,7 +574,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
     }
     *bufferPtr = (uint8_t*)calloc(sizeof(uint8_t), length);
     if (*bufferPtr == nullptr) {
-        LOGE("low memory, calloc return nullptr, length is %d,  filed %s", length, fieldStr.c_str());
+        LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
         return;
     }
     if (memcpy_s(*bufferPtr, length, data, length) != 0) {
