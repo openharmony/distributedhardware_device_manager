@@ -588,17 +588,21 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         });
     int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
     if (ret != 0) {
-        LOGE("DmAuthManager::AddMember failed , ret: %d.", ret);
+        LOGE("DmAuthManager::AddMember failed, ret: %d", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
 }
 
-std::string DmAuthManager::GetConnectAddr(std::string deviceId)
+int32_t DmAuthManager::GetConnectAddr(std::string deviceId, std::string connectAddr)
 {
     LOGI("DmAuthManager::GetConnectAddr");
     std::string connectAddr;
     softbusConnector_->GetConnectAddr(deviceId, connectAddr);
+    if (softbusConnector_->GetConnectAddr(deviceId, connectAddr) == nullptr) {
+        LOGE("DmAuthManager::GetConnectAddr error");
+        return ERR_DM_FAILED;
+    }
     return connectAddr;
 }
 

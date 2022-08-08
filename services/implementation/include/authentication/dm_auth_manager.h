@@ -244,7 +244,7 @@ public:
      * @tc.desc: Get Connect Addr of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    std::string GetConnectAddr(std::string deviceId);
+    int32_t GetConnectAddr(std::string deviceId, std::string connectAddr);
 
     /**
      * @tc.name: DmAuthManager::JoinNetwork
