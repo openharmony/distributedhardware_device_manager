@@ -282,6 +282,9 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         return ERR_DM_FAILED;
     }
     int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME, tmpStr.c_str());
+    if (ret != 0) {
+        LOGE("HiChainConnector::AddMember failed , ret: %d.", ret);
+    }
     LOGI("HiChainConnector::AddMember completed");
     return ret;
 }
