@@ -594,11 +594,10 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     return DM_OK;
 }
 
-int32_t DmAuthManager::GetConnectAddr(std::string deviceId, std::string connectAddr)
+std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 {
     LOGI("DmAuthManager::GetConnectAddr");
     std::string connectAddr;
-    softbusConnector_->GetConnectAddr(deviceId, connectAddr);
     if (softbusConnector_->GetConnectAddr(deviceId, connectAddr) == nullptr) {
         LOGE("DmAuthManager::GetConnectAddr error");
         return ERR_DM_FAILED;
