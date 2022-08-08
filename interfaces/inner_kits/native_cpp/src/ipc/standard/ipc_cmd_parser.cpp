@@ -273,7 +273,7 @@ ON_IPC_SET_REQUEST(UNPUBLISH_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, 
 {
     std::shared_ptr<IpcUnPublishReq> pReq = std::static_pointer_cast<IpcUnPublishReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    uint16_t publishId = pReq->GetPublishId();
+    int32_t publishId = pReq->GetPublishId();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;

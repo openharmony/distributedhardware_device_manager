@@ -588,6 +588,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         });
     int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
     if (ret != 0) {
+        LOGE("DmAuthManager::AddMember failed , ret: %d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
