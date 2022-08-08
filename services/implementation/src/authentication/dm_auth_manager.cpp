@@ -470,6 +470,10 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (jsonObject.is_discarded()) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
+
+    if (!IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
+        jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
+    }
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
@@ -503,6 +507,20 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
+    if (authResponseContext_->isIdenticalAccount) { // identicalAccount joinLNN indirectly, no need to verify
+        if (!IsIdenticalAccount(GROUP_TYPE_IDENTICAL_GROUP)) {
+            std::string connectAddr;
+            LOGI("DmAuthManager::IdenticalAccount JoinLNN, deviceId :%s", authResponseContext_->deviceId.c_str());
+            ConnectionAddr *addrInfo = softbusConnector_->GetConnectAddr(authResponseContext_->deviceId, connectAddr);
+            if (addrInfo != nullptr) {
+                softbusConnector_->JoinLnn(authResponseContext_->targetPkgName, addrInfo);
+            }
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
+            return;
+        }
+
+    }
+
     std::vector<std::string> messageList = authMessageProcessor_->CreateAuthRequestMessage();
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
@@ -894,6 +912,24 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
     return DM_OK;
+}
+
+bool DmAuthManager::IsIdenticalAccount(int32_t authType)
+{
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = authType;
+    std::string queryParams = jsonObj.dump();
+
+    int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (osAccountUserId < 0) {
+        LOGE("get current process account user id failed");
+        return false;
+    }
+    std::vector<GroupInfo> groupList;
+    if (!hiChainConnector->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

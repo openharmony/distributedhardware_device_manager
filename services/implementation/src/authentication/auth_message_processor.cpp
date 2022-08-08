@@ -172,6 +172,9 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         case MSG_TYPE_NEGOTIATE:
             ParseNegotiateMessage(jsonObject);
             break;
+        case MSG_TYPE_RESP_NEGOTIATE:
+            ParseRespNegotiateMessage(jsonObject);
+            break;
         case MSG_TYPE_REQ_AUTH:
             return ParseAuthRequestMessage(jsonObject);
             break;
@@ -257,6 +260,14 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     }
     authResponseContext_->authType = json[TAG_AUTH_TYPE];
     authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
+    authResponseContext_->reply = json[TAG_REPLY];
+}
+
+void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
+{
+    if (json.contains(TAG_IDENTICAL_ACCOUNT)) {
+        authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT];
+    }
     authResponseContext_->reply = json[TAG_REPLY];
 }
 

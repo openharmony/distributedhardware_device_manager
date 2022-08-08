@@ -94,6 +94,7 @@ typedef struct DmAuthResponseContext {
     int32_t msgType;
     int32_t sessionId;
     bool cryptoSupport;
+    bool isIdenticalAccount;
     std::string cryptoName;
     std::string cryptoVer;
     int32_t reply;
@@ -372,6 +373,13 @@ public:
      */
     int32_t SetReasonAndFinish(int32_t reason, int32_t state);
 
+
+    /**
+     * @tc.name: DmAuthManager::IsIdenticalAccount
+     * @tc.desc: judge IdenticalAccount or not
+     * @tc.type: FUNC
+     */
+    int32_t IsIdenticalAccount(int32_t authType);
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;

@@ -113,6 +113,7 @@ constexpr const char* TAG_AUTH_TYPE = "AUTHTYPE";
 constexpr const char* TAG_CRYPTO_SUPPORT = "CRYPTOSUPPORT";
 constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
+constexpr const char* TAG_IDENTICAL_ACCOUNT= "identicalAccount";
 constexpr const char* TAG_VER = "ITF_VER";
 constexpr const char* TAG_TYPE = "MSG_TYPE";
 constexpr const char* DM_ITF_VER = "1.1";

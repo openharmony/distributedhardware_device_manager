@@ -49,6 +49,7 @@ private:
     void ParseAuthResponseMessage(nlohmann::json &json);
     int32_t ParseAuthRequestMessage(nlohmann::json &json);
     void ParseNegotiateMessage(const nlohmann::json &json);
+    void ParseRespNegotiateMessage(const nlohmann::json &json);
     void CreateResponseFinishMessage(nlohmann::json &json);
     void ParseResponseFinishMessage(nlohmann::json &json);
 

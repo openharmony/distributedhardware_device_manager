@@ -56,6 +56,13 @@ public:
     static void OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result);
 
     /**
+     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryResult
+     * @tc.desc: OnSoftbus JoinLNN Result of the SoftbusConnector
+     * @tc.type: FUNC
+     */
+    static void OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result);
+
+    /**
      * @tc.name: SoftbusConnector::OnParameterChgCallback
      * @tc.desc: OnParameter Chg Callback of the SoftbusConnector
      * @tc.type: FUNC
