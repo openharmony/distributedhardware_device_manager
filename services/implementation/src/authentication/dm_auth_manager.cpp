@@ -471,7 +471,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
 
-    if (!IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
+    if (IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
     authResponseContext_ = authResponseState_->GetAuthContext();
@@ -508,7 +508,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     if (authResponseContext_->isIdenticalAccount) { // identicalAccount joinLNN indirectly, no need to verify
-        if (!IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
+        if (IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
             std::string connectAddr;
             LOGI("DmAuthManager::IdenticalAccount JoinLNN, deviceId :%s", authResponseContext_->deviceId.c_str());
             ConnectionAddr *addrInfo = softbusConnector_->GetConnectAddr(authResponseContext_->deviceId, connectAddr);
