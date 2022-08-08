@@ -600,7 +600,6 @@ std::string DmAuthManager::GetConnectAddr(std::string deviceId)
     std::string connectAddr;
     if (softbusConnector_->GetConnectAddr(deviceId, connectAddr) == nullptr) {
         LOGE("DmAuthManager::GetConnectAddr error");
-        return ERR_DM_FAILED;
     }
     return connectAddr;
 }
