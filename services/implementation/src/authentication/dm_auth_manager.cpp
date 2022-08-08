@@ -513,7 +513,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
             LOGI("DmAuthManager::IdenticalAccount JoinLNN, deviceId :%s", authResponseContext_->deviceId.c_str());
             ConnectionAddr *addrInfo = softbusConnector_->GetConnectAddr(authResponseContext_->deviceId, connectAddr);
             if (addrInfo != nullptr) {
-                softbusConnector_->JoinLnn(authResponseContext_->targetPkgName, addrInfo);
+                softbusConnector_->JoinLnn(addrInfo);
             }
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
             return;
@@ -925,7 +925,7 @@ bool DmAuthManager::IsIdenticalAccount(int32_t authType)
         return false;
     }
     std::vector<GroupInfo> groupList;
-    if (!hiChainConnector->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+    if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
         return false;
     }
     return true;

@@ -56,7 +56,7 @@ public:
     static void OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result);
 
     /**
-     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryResult
+     * @tc.name: SoftbusConnector::OnSoftbusJoinLNNResult
      * @tc.desc: OnSoftbus JoinLNN Result of the SoftbusConnector
      * @tc.type: FUNC
      */
@@ -104,6 +104,12 @@ public:
      */
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
 
+    /**
+     * @tc.name: SoftbusConnector::JoinLnn
+     * @tc.desc: Add the current device to the LNN where a specified device resides
+     * @tc.type: FUNC
+     */
+    static void JoinLnn(ConnectionAddr *target);
 public:
     SoftbusConnector();
     ~SoftbusConnector();
