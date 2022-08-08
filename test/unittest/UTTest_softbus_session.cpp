@@ -105,7 +105,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SoftbusSession_001
- * @tc.desc: set SoftbusSession to make a new pointer ,and it not nullptr
+ * @tc.desc: set SoftbusSession to make a new pointer, and it not nullptr
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -117,7 +117,7 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SoftbusSession_002
- * @tc.desc: set SoftbusSession to make a new pointer , it not nullptr and delete it
+ * @tc.desc: set SoftbusSession to make a new pointer, it not nullptr and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

@@ -909,7 +909,7 @@ JSIValue DeviceManagerModule::StartDeviceDiscoverSync(const JSIValue thisVal, co
         return JSI::CreateNull();
     }
 
-    LOGI("subInfo %d , %d, %d, %d, %d , %d, %s",
+    LOGI("subInfo %d, %d, %d, %d, %d, %d, %s",
          subInfo.subscribeId,
          subInfo.mode,
          subInfo.medium, subInfo.freq, subInfo.isSameAccount,
@@ -985,7 +985,7 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
     DmDeviceInfo deviceInfo;
     JsToDmDeviceInfo(args[0], deviceInfo);
 
-    LOGI("deviceInfo %s , %s, %d", GetAnonyString(deviceInfo.deviceId),
+    LOGI("deviceInfo %s, %s, %d", GetAnonyString(deviceInfo.deviceId),
         deviceInfo.deviceName, deviceInfo.deviceTypeId);
     DmAppImageInfo appImageInfo(nullptr, 0, nullptr, 0);
     std::string extra;

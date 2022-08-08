@@ -179,7 +179,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
 
 int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DeviceManager::StopDeviceDiscovery start , pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("StopDeviceDiscovery error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
@@ -209,7 +209,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               const DmDeviceInfo &deviceInfo, const std::string &extra,
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
-    LOGI("DeviceManager::AuthenticateDevice start , pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("AuthenticateDevice error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
@@ -240,7 +240,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(),
+    LOGI("DeviceManager::UnAuthenticateDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
          GetAnonyString(deviceId).c_str());
     if (deviceId.empty()) {
         LOGE("UnAuthenticateDevice error: Invalid para");
