@@ -14,7 +14,7 @@
  * limitations under the License.
  -->
 <info>
-    <process>foundation</process>
+    <process>device_manager</process>
     <systemability> <!-- Declare a system ability and its profile -->
         <name>4802</name> <!-- Declare the name of system ability -->
         <libpath>libdevicemanagerservice.z.so</libpath> <!-- Declare the path of .so file which includes the system ability; Note: 1 .so file can have 1 to N system abilities. -->

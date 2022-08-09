@@ -11,10 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos/sa_profile/sa_profile.gni")
+import("//build/ohos.gni")
 
 ohos_sa_profile("dm_sa_profile") {
   sources = [ "4802.xml" ]
 
   part_name = "device_manager"
+}
+
+ohos_prebuilt_etc("device_manager.cfg") {
+  relative_install_dir = "init"
+  source = "device_manager.cfg"
+  part_name = "device_manager"
+  subsystem_name = "distributedhardware"
 }
