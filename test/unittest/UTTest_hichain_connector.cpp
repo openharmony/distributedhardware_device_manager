@@ -146,7 +146,7 @@ HWTEST_F(HichainConnectorTest, DelMemberFromGroup_002, testing::ext::TestSize.Le
     std::string deviceId = "123";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->DelMemberFromGroup(groupId, deviceId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
@@ -333,7 +333,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level0)
     std::string groupId = "34567";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     int ret = hichainConnector->DeleteGroup(groupId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
