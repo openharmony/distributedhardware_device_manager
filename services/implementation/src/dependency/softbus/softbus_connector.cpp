@@ -165,10 +165,15 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     return DM_OK;
 }
 
-void SoftbusConnector::JoinLnn(ConnectionAddr *target)
+void SoftbusConnector::JoinLnn(const std::string &deviceId)
 {
-    LOGI("JoinLnn begin");
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, target, OnSoftbusJoinLNNResult);
+    std::string connectAddr;
+    LOGI("SoftbusConnector::JoinLnn, deviceId :%s", GetAnonyString(deviceId).c_str());
+    ConnectionAddr *addrInfo = GetConnectAddr(deviceId, connectAddr);
+    if (addrInfo == nullptr) {
+        return;
+    }
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
     if (ret != DM_OK) {
         LOGE("JoinLNN failed with ret %d", ret);
     }

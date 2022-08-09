@@ -109,7 +109,7 @@ public:
      * @tc.desc: Add the current device to the LNN where a specified device resides
      * @tc.type: FUNC
      */
-    static void JoinLnn(ConnectionAddr *target);
+    static void JoinLnn(const std::string &deviceId);
 public:
     SoftbusConnector();
     ~SoftbusConnector();

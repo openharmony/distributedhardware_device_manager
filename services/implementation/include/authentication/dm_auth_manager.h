@@ -379,7 +379,7 @@ public:
      * @tc.desc: judge IdenticalAccount or not
      * @tc.type: FUNC
      */
-    bool IsIdenticalAccount(int32_t authType);
+    bool IsIdenticalAccount(int32_t groupType);
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;

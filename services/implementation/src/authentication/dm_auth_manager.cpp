@@ -509,12 +509,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     }
     if (authResponseContext_->isIdenticalAccount) { // identicalAccount joinLNN indirectly, no need to verify
         if (IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
-            std::string connectAddr;
-            LOGI("DmAuthManager::IdenticalAccount JoinLNN, deviceId :%s", authResponseContext_->deviceId.c_str());
-            ConnectionAddr *addrInfo = softbusConnector_->GetConnectAddr(authResponseContext_->deviceId, connectAddr);
-            if (addrInfo != nullptr) {
-                softbusConnector_->JoinLnn(addrInfo);
-            }
+            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
             return;
         }
@@ -913,10 +908,10 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
     return DM_OK;
 }
 
-bool DmAuthManager::IsIdenticalAccount(int32_t authType)
+bool DmAuthManager::IsIdenticalAccount(int32_t groupType)
 {
     nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = authType;
+    jsonObj[FIELD_GROUP_TYPE] = groupType;
     std::string queryParams = jsonObj.dump();
 
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
