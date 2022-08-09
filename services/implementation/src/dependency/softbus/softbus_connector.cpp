@@ -165,6 +165,21 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     return DM_OK;
 }
 
+void SoftbusConnector::JoinLnn(const std::string &deviceId)
+{
+    std::string connectAddr;
+    LOGI("SoftbusConnector::JoinLnn, deviceId :%s", GetAnonyString(deviceId).c_str());
+    ConnectionAddr *addrInfo = GetConnectAddr(deviceId, connectAddr);
+    if (addrInfo == nullptr) {
+        return;
+    }
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
+    if (ret != DM_OK) {
+        LOGE("JoinLNN failed with ret %d", ret);
+    }
+    return;
+}
+
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("GetUdidByNetworkId begin");
@@ -397,6 +412,11 @@ void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult r
     for (auto &iter : publishCallbackMap_) {
         iter.second->OnPublishResult(iter.first, publishId, result);
     }
+}
+
+void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result)
+{
+    LOGI("SoftbusConnector::OnSoftbusJoinLNNResult, result = %d.", result);
 }
 
 void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
