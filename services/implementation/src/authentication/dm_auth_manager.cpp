@@ -586,7 +586,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
-    LOGE("[wyb] DmAuthManager::AddMember deviceInfo deviceId %s", authRequestContext_->deviceId.c_str());
+    LOGE("[wyb] DmAuthManager::AddMember deviceInfo deviceId %s", authRequestContext_->deviceId.c_str());///authRequestContext_->deviceId
     int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %d", ret);

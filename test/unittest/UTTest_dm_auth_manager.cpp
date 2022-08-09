@@ -209,17 +209,18 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->groupName = "111";
     authManager->authResponseContext_->code = 123;
     authManager->authResponseContext_->requestId = 111;
-    authManager->authResponseContext_->deviceId = "123456";
+    authManager->authResponseContext_->deviceId = "111";
     int32_t pinCode = 444444;
     authManager->timer_ = std::make_shared<DmTimer>();
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr->addrNum = 1;
-    DeviceInfo *deviceInfo = iter->second.get();
+    DeviceInfo foundInfo;
+    (void)memset_s(&foundInfo, sizeof(foundInfo), 0, sizeof(foundInfo));
+    foundInfo.addrNum = 1;
+    std::shared_ptr<DeviceInfo> infoPtr(&foundInfo);
     std::string deviceId = "111";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = infoPtr;
-    int32_t ret = authManager->AddMember(pinCode);
+    int32_t ret = authManager->AddMember(pinCode);///444
     ASSERT_EQ(ret, DM_OK);
 }
 

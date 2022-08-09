@@ -292,7 +292,7 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
     LOGE("[wyb] SoftbusConnector::GetConnectAddr deviceInfo deviceId %s", deviceId.c_str());///111
     auto iter = discoveryDeviceInfoMap_.find(deviceId);
     if (iter == discoveryDeviceInfoMap_.end()) {
-        LOGE("deviceInfo not found by deviceId %s", deviceId.c_str());
+        LOGE("deviceInfo not found by deviceId %s", deviceId.c_str());///authRequestContext_->deviceId 111
         // LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
         return nullptr;
     }
