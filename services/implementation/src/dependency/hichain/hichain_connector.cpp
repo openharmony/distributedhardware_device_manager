@@ -251,6 +251,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
 int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::string &connectInfo)
 {
     LOGI("HiChainConnector::AddMember");
+    LOGE("[wyb] HiChainConnector::AddMember deviceInfo deviceId %s", deviceId.c_str());///111
     if (deviceGroupManager_ == nullptr) {
         LOGI("HiChainConnector::AddMember group manager is null.");
         return ERR_DM_POINT_NULL;
@@ -262,6 +263,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    LOGE("[wyb] HiChainConnector::AddMember2 deviceInfo deviceId %s", deviceId.c_str());///111
     std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID]);
     if (connectInfomation.empty()) {
         LOGE("get connect para failed");
@@ -421,6 +423,7 @@ int64_t HiChainConnector::GenRequestId()
 std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string reqDeviceId)
 {
     LOGI("HiChainConnector::GetConnectPara get addrInfo");
+    LOGE("[wyb] HiChainConnector::GetConnectPara deviceInfo deviceId %s", deviceId.c_str());///111
     if (hiChainConnectorCallback_ == nullptr) {
         LOGE("HiChainConnector::GetConnectPara hiChainConnectorCallback_ is nullptr.");
         return "";

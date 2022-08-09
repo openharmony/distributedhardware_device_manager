@@ -200,19 +200,25 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager->authRequestContext_->deviceId = "111";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObject;
     authManager->authResponseContext_->groupId = "111";
-    authManager->authResponseContext_->groupName = "222";
+    authManager->authResponseContext_->groupName = "111";
     authManager->authResponseContext_->code = 123;
-    authManager->authResponseContext_->requestId = 234;
-    authManager->authResponseContext_->deviceId = "234";
+    authManager->authResponseContext_->requestId = 111;
+    authManager->authResponseContext_->deviceId = "123456";
     int32_t pinCode = 444444;
     authManager->timer_ = std::make_shared<DmTimer>();
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->addrNum = 1;
+    DeviceInfo *deviceInfo = iter->second.get();
+    std::string deviceId = "111";
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = infoPtr;
     int32_t ret = authManager->AddMember(pinCode);
     ASSERT_EQ(ret, DM_OK);
 }
