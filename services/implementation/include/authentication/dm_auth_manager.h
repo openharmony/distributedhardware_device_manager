@@ -373,7 +373,6 @@ public:
      */
     int32_t SetReasonAndFinish(int32_t reason, int32_t state);
 
-
     /**
      * @tc.name: DmAuthManager::IsIdenticalAccount
      * @tc.desc: judge IdenticalAccount or not
