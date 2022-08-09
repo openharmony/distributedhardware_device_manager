@@ -471,7 +471,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
 
-    if (IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
+    if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
     authResponseContext_ = authResponseState_->GetAuthContext();
@@ -508,9 +508,11 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     if (authResponseContext_->isIdenticalAccount) { // identicalAccount joinLNN indirectly, no need to verify
-        if (IsIdenticalAccount(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
+        if (IsIdenticalAccount()) {
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
+            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+            authRequestContext_->reason = DM_OK;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
         }
     }
@@ -908,10 +910,10 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
     return DM_OK;
 }
 
-bool DmAuthManager::IsIdenticalAccount(int32_t groupType)
+bool DmAuthManager::IsIdenticalAccount()
 {
     nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = groupType;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
     std::string queryParams = jsonObj.dump();
 
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
