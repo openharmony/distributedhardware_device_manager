@@ -200,7 +200,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authRequestContext_->deviceId = "111";
+    // authManager->authRequestContext_->deviceId = "111";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -221,7 +221,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     std::string deviceId = "111";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = infoPtr;
     int32_t ret = authManager->AddMember(pinCode);///444
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_OK);
 }
 
 /**
