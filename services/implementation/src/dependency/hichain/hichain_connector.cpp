@@ -185,11 +185,11 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
     }
     int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
-        LOGE("HiChainConnector::GetGroupInfo failed , ret: %d.", ret);
+        LOGE("HiChainConnector::GetGroupInfo failed, ret: %d.", ret);
         return false;
     }
     if (groupVec == nullptr) {
-        LOGE("HiChainConnector::GetGroupInfo failed , returnGroups is nullptr");
+        LOGE("HiChainConnector::GetGroupInfo failed, returnGroups is nullptr");
         return false;
     }
     if (num == 0) {
@@ -220,11 +220,11 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
     uint32_t num = 0;
     int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
-        LOGE("HiChainConnector::GetGroupInfo failed , ret: %d.", ret);
+        LOGE("HiChainConnector::GetGroupInfo failed, ret: %d.", ret);
         return false;
     }
     if (groupVec == nullptr) {
-        LOGE("HiChainConnector::GetGroupInfo failed , returnGroups is nullptr.");
+        LOGE("HiChainConnector::GetGroupInfo failed, returnGroups is nullptr.");
         return false;
     }
     if (num == 0) {
@@ -282,6 +282,9 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         return ERR_DM_FAILED;
     }
     int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME, tmpStr.c_str());
+    if (ret != 0) {
+        LOGE("HiChainConnector::AddMember failed, ret: %d", ret);
+    }
     LOGI("HiChainConnector::AddMember completed");
     return ret;
 }
@@ -442,11 +445,11 @@ int32_t HiChainConnector::GetRelatedGroups(const std::string &deviceId, std::vec
     int32_t ret =
         deviceGroupManager_->getRelatedGroups(userId, DM_PKG_NAME, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
-        LOGE("HiChainConnector::GetRelatedGroups failed , ret: %d.", ret);
+        LOGE("HiChainConnector::GetRelatedGroups failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
     if (returnGroups == nullptr) {
-        LOGE("HiChainConnector::GetRelatedGroups failed , returnGroups is nullptr");
+        LOGE("HiChainConnector::GetRelatedGroups failed, returnGroups is nullptr");
         return ERR_DM_FAILED;
     }
     if (groupNum == 0) {
@@ -542,7 +545,7 @@ int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const s
     }
     int32_t ret = deviceGroupManager_->deleteMemberFromGroup(userId, requestId, DM_PKG_NAME, deleteParams.c_str());
     if (ret != 0) {
-        LOGE("HiChainConnector::DelMemberFromGroup failed , ret: %d.", ret);
+        LOGE("HiChainConnector::DelMemberFromGroup failed, ret: %d", ret);
         return ret;
     }
     return DM_OK;
@@ -562,7 +565,7 @@ int32_t HiChainConnector::DeleteGroup(std::string &groupId)
 
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
     if (ret != 0) {
-        LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
+        LOGE("HiChainConnector::DeleteGroup failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -576,7 +579,7 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
     std::string disbandParams = jsonObj.dump();
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
     if (ret != 0) {
-        LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
+        LOGE("HiChainConnector::DeleteGroup failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -618,7 +621,7 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
     int32_t ret = deviceGroupManager_->deleteGroup(osAccountUserId, requestId_, DM_PKG_NAME,
         disbandParams.c_str());
     if (ret != 0) {
-        LOGE("HiChainConnector::DeleteGroup failed , ret: %d.", ret);
+        LOGE("HiChainConnector::DeleteGroup failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
     int32_t nTickTimes = 0;

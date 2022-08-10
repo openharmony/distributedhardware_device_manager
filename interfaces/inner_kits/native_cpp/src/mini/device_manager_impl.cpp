@@ -81,7 +81,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(GET_TRUST_DEVICE_LIST,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(GET_TRUST_DEVICE_LIST, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
 
@@ -166,7 +166,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     req->SetExtra(extra);
     req->SetSubscribeInfo(subscribeInfo);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(START_DEVICE_DISCOVER,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(START_DEVICE_DISCOVER, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
     int32_t ret = rsp->GetErrCode();
@@ -179,7 +179,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
 
 int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DeviceManager::StopDeviceDiscovery start , pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("StopDeviceDiscovery error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
@@ -191,7 +191,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
     req->SetPkgName(pkgName);
     req->SetSubscribeId(subscribeId);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(STOP_DEVICE_DISCOVER,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(STOP_DEVICE_DISCOVER, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
     int32_t ret = rsp->GetErrCode();
@@ -209,7 +209,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               const DmDeviceInfo &deviceInfo, const std::string &extra,
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
-    LOGI("DeviceManager::AuthenticateDevice start , pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManager::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("AuthenticateDevice error: Invalid para");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
@@ -224,7 +224,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     req->SetAuthType(authType);
     req->SetDeviceInfo(deviceInfo);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(AUTHENTICATE_DEVICE,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(AUTHENTICATE_DEVICE, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
 
@@ -240,7 +240,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("DeviceManager::UnAuthenticateDevice start , pkgName: %s, deviceId: %s", pkgName.c_str(),
+    LOGI("DeviceManager::UnAuthenticateDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
          GetAnonyString(deviceId).c_str());
     if (deviceId.empty()) {
         LOGE("UnAuthenticateDevice error: Invalid para");
@@ -254,7 +254,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(UNAUTHENTICATE_DEVICE,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(UNAUTHENTICATE_DEVICE, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
 
@@ -310,7 +310,7 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
     req->SetPkgName(pkgName);
     req->SetAuthPara(authPara);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(VERIFY_AUTHENTICATION,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(VERIFY_AUTHENTICATION, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
 
@@ -359,7 +359,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
     req->SetPkgName(pkgName);
     req->SetOperation(action);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(SERVER_USER_AUTH_OPERATION,  req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(SERVER_USER_AUTH_OPERATION, req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
     int32_t ret = rsp->GetErrCode();

@@ -20,7 +20,7 @@
 <!-- OAT(OSS Audit Tool) configuration guide:
 basedir: Root dir, the basedir + project path is the real source file location.
 licensefile:
-1.If the project don't have "LICENSE" in root dir, please define all the license files in this project in , OAT will check license files according to this rule.
+1.If the project don't have "LICENSE" in root dir, please define all the license files in this project in, OAT will check license files according to this rule.
 
 tasklist(only for batch mode):
 1. task: Define oat check thread, each task will start a new thread.

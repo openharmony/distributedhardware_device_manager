@@ -931,7 +931,7 @@ void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &obje
     }
     *bufferPtr = (uint8_t *)calloc(sizeof(uint8_t), length);
     if (*bufferPtr == nullptr) {
-        LOGE("low memory, calloc return nullptr, length is %d,  filed %s", length, fieldStr.c_str());
+        LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
         return;
     }
     if (memcpy_s(*bufferPtr, length, data, length) != 0) {
