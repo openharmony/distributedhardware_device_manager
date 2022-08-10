@@ -54,7 +54,9 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributedhardware/device_manager:device_manager"
+                "//foundation/distributedhardware/device_manager:device_manager",
+                "//foundation/distributedhardware/device_manager/sa_profile:device_manager.cfg",
+                "//foundation/distributedhardware/device_manager/sa_profile:dm_sa_profile"
             ],
             "inner_kits": [
                 {
