@@ -302,6 +302,7 @@ int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pk
 
 bool DeviceManagerService::IsDMServiceImplReady()
 {
+    std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
