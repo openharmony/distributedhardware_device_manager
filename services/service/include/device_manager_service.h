@@ -97,6 +97,7 @@ public:
 
 private:
     bool isImplsoLoaded_ = false;
+    std::mutex isImplLoadLock_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
