@@ -214,7 +214,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
     int32_t ret = authManager->AddMember(pinCode);
-    ASSERT_NE(ret, DM_OK);
+    ASSERT_NE(ret, -1);
 }
 
 /**
