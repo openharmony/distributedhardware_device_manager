@@ -64,7 +64,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
+        LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
     int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
@@ -77,7 +77,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
+        LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
