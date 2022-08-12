@@ -59,7 +59,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/init/interfaces/innerkits/include/syspara",
-        "//utils/native/lite/include",
+        "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
@@ -105,11 +105,11 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
         "//base/security/device_auth/services:deviceauth",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
+		"//commonlibrary/utils_lite:utils",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
-        "//utils/native/lite:utils",
       ]
 
       external_deps = [
@@ -140,7 +140,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
         "//base/startup/init/interfaces/innerkits/include/syspara",
-        "//utils/native/lite/include",
+        "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
@@ -171,12 +171,12 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/security/device_auth/services:deviceauth_sdk",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
+		"//commonlibrary/utils_lite:utils",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
-        "//utils/native/lite:utils",
       ]
     }
   }
