@@ -56,7 +56,7 @@ if (defined(ohos_lite)) {
       deps = [
         "${utils_path}:devicemanagerutils_mini",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-		"//commonlibrary/utils_lite:utils",
+        "//commonlibrary/utils_lite:utils",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
       ]
@@ -98,7 +98,7 @@ if (defined(ohos_lite)) {
       deps = [
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-		"//commonlibrary/utils_lite:utils",
+        "//commonlibrary/utils_lite:utils",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
