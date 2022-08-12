@@ -58,7 +58,7 @@ if (defined(ohos_lite)) {
 
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
-        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
@@ -104,7 +104,7 @@ if (defined(ohos_lite)) {
         "${utils_path}:devicemanagerutils_mini",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
         "//base/security/device_auth/services:deviceauth",
-        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
@@ -139,7 +139,7 @@ if (defined(ohos_lite)) {
 
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
-        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
@@ -170,7 +170,7 @@ if (defined(ohos_lite)) {
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/security/device_auth/services:deviceauth_sdk",
-        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",

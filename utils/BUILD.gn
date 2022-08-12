@@ -33,7 +33,7 @@ if (defined(ohos_lite)) {
 
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
-        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
@@ -62,7 +62,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
@@ -86,7 +86,7 @@ if (defined(ohos_lite)) {
       ]
       include_dirs += [
         "//base/security/device_auth/interfaces/innerkits",
-        "//base/startup/syspara_lite/interfaces/innerkits/native/syspara/include",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
         "//utils/native/lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
@@ -120,7 +120,7 @@ if (defined(ohos_lite)) {
       ]
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
