@@ -119,7 +119,7 @@ if (defined(ohos_lite)) {
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
         "//base/security/device_auth/services:deviceauth",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
-		"//commonlibrary/utils_lite:utils",
+        "//commonlibrary/utils_lite:utils",
         "//foundation/communication/dsoftbus/sdk:softbus_client",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
