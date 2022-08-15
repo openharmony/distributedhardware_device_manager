@@ -63,7 +63,7 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "//base/security/device_auth/interfaces/innerkits",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-    "//utils/native/lite/include",
+    "//commonlibrary/utils_lite/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
     "//third_party/bounds_checking_function/include",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",

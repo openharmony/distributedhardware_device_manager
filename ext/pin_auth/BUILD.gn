@@ -67,12 +67,12 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//foundation/communication/dsoftbus/sdk:softbus_client",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
       "//third_party/mbedtls:mbedtls_shared",
-      "//utils/native/lite:utils",
     ]
 
     defines = [
