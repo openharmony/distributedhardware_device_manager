@@ -79,9 +79,11 @@ int32_t GetRandomData(uint8_t *randStr, uint32_t len)
     } while (false);
     if (entropy != nullptr) {
         free(entropy);
+        entropy = nullptr;
     }
     if (ctrDrbg != nullptr) {
         free(ctrDrbg);
+        ctrDrbg = nullptr;
     }
     return ret;
 }
