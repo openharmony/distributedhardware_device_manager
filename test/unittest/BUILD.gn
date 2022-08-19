@@ -347,25 +347,9 @@ ohos_unittest("UTTest_ipc_client_server_proxy") {
 ohos_unittest("UTTest_dm_device_state_manager") {
   module_out_path = module_out_path
 
-  sources = [
-    "${services_path}/src/device_manager_service.cpp",
-    "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/softbus/softbus_listener.cpp",
-    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
-    "${servicesimpl_path}/src/config/dm_config_manager.cpp",
-    "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
-    "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
-    "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
-    "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
-    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
-    "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
-    "UTTest_dm_device_state_manager.cpp",
-  ]
+  sources = [ "UTTest_dm_device_state_manager.cpp" ]
 
-  deps = [ ":device_manager_test" ]
+  deps = [ ":device_manager_test_common" ]
 
   external_deps = [
     "hisysevent_native:libhisysevent",
