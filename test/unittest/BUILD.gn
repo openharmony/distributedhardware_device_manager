@@ -31,6 +31,7 @@ group("unittest") {
     ":UTTest_dm_auth_manager",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_discovery_manager",
+    ":UTTest_dm_publish_manager",
     ":UTTest_dm_timer",
     ":UTTest_hichain_connector",
     ":UTTest_ipc_client_manager",
@@ -143,6 +144,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
+    "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
     "UTTest_softbus_connector.cpp",
@@ -453,6 +455,30 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
 ## UnitTest UTTest_dm_discovery_manager }}}
 
+## UnitTest UTTest_dm_publish_manager {{{
+ohos_unittest("UTTest_dm_publish_manager") {
+  module_out_path = module_out_path
+
+  sources = [
+    "${services_path}/src/device_manager_service.cpp",
+    "${services_path}/src/device_manager_service_listener.cpp",
+    "${services_path}/src/softbus/softbus_listener.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
+    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
+    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
+    "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/ipc_server_listener.cpp",
+    "//foundation/distributedhardware/device_manager/test/unittest/mock/parameter.cpp",
+    "UTTest_dm_publish_manager.cpp",
+  ]
+
+  deps = [ ":device_manager_test" ]
+
+  external_deps = [ "hitrace_native:hitrace_meter" ]
+}
+
+## UnitTest UTTest_dm_publish_manager }}}
+
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
   include_dirs = [
@@ -476,7 +502,7 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/publish",
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/deviceinfo/",
     "${servicesimpl_path}/include/devicestate",
@@ -562,7 +588,7 @@ config("device_manager_test_common_public") {
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/publish",
     "${servicesimpl_path}/include/deviceinfo/",
     "${servicesimpl_path}/include/devicestate",
     "${servicesimpl_path}/include/ability",

@@ -24,6 +24,7 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_verify_auth_result_req.h"
 
 namespace OHOS {
@@ -158,6 +159,37 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
     std::string pkgName = "com.ohos.helloworld";
     uint16_t subscribeId = 1;
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
+}
+
+/**
+ * @tc.name: OnPublishResult_001
+ * @tc.desc: OnPublishResult, construct a dummy listener, pass in pkgName, publishId, failedReason
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string deviceId = "dkdkd";
+    int32_t publishId = 1;
+    int32_t failedReason = 1;
+    listener_->OnPublishResult(pkgName, publishId, failedReason);
+}
+
+/**
+ * @tc.name: OnPublishResult_001
+ * @tc.desc: OnDeviceResult,construct a dummy listener, pass in pkgName, publishId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    int32_t publishId = 1;
+    int32_t failedReason = 0;
+    listener_->OnPublishResult(pkgName, publishId, failedReason);
 }
 
 /**

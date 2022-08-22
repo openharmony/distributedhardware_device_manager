@@ -28,6 +28,7 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_verify_auth_result_req.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -55,6 +56,7 @@ std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListe
 std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
     std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector);
 std::shared_ptr<DmDiscoveryManager> discoveryMgr = std::make_shared<DmDiscoveryManager>(softbusConnector, listener);
+std::shared_ptr<DmPublishManager> publishMgr = std::make_shared<DmPublishManager>(softbusConnector, listener);
 /**
  * @tc.name: DeviceOnLine_001
  * @tc.desc: go to the corrort case and return DM_OK
@@ -199,6 +201,38 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 }
 
 /**
+ * @tc.name: RegisterSoftbusPublishCallback_001
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call RegisterSoftbusPublishCallback function to corrort ,return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, RegisterSoftbusPublishCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    int ret1 = softbusConnector->RegisterSoftbusPublishCallback(
+        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+    int ret = SoftbusConnector::publishCallbackMap_.count(pkgName);
+    EXPECT_EQ(ret1, DM_OK);
+    EXPECT_EQ(ret, 1);
+}
+
+/**
+ * @tc.name: UnRegisterSoftbusPublishCallback_001
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusPublishyCallback function to corrort ,return
+ * DM_OK
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusPublishCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    int ret = softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
+    int ret1 = SoftbusConnector::publishCallbackMap_.count(pkgName);
+    EXPECT_EQ(ret1, 0);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: RegisterSoftbusStateCallback_001
  * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusStateCallback function to corrort ,return DM_OK
  * @tc.type: FUNC
@@ -253,6 +287,32 @@ HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 {
     uint16_t subscribeId = static_cast<uint16_t>(123456);
     int ret = softbusConnector->StopDiscovery(subscribeId);
+    EXPECT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: PublishDiscovery_001
+ * @tc.desc: get PublishDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Level0)
+{
+    DmPublishInfo dmPublishInfo;
+    int ret = softbusConnector->PublishDiscovery(dmPublishInfo);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+/**
+ * @tc.name: UnPublishDiscovery_001
+ * @tc.desc: get UnPublishDiscovery to wrong master and return ERR_DM_PUBLISH_FAILED
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, UnPublishDiscovery_001, testing::ext::TestSize.Level0)
+{
+    int32_t publishId = 123456;
+    int ret = softbusConnector->UnPublishDiscovery(publishId);
     EXPECT_NE(ret, 0);
 }
 
@@ -459,7 +519,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level0
 
 /**
  * @tc.name: CovertNodeBasicInfoToDmDevice_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -473,7 +533,7 @@ HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::
 
 /**
  * @tc.name: CovertNodeBasicInfoToDmDevice_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -500,7 +560,7 @@ HWTEST_F(SoftbusConnectorTest, CovertDeviceInfoToDmDevice_001, testing::ext::Tes
 
 /**
  * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -520,7 +580,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_001, testing::ext::TestSize
 
 /**
  * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -548,7 +608,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_002, testing::ext::TestSize
 
 /**
  * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -574,7 +634,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_003, testing::ext::TestSize
 
 /**
  * @tc.name: OnSoftbusDeviceOffline_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -591,7 +651,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_001, testing::ext::TestSiz
 
 /**
  * @tc.name: OnSoftbusDeviceOffline_002
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -618,7 +678,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_002, testing::ext::TestSiz
 
 /**
  * @tc.name: OnSoftbusDeviceFound_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -636,7 +696,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.
 
 /**
  * @tc.name: OnSoftbusDiscoveryResult_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -659,7 +719,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestS
 
 /**
  * @tc.name: OnSoftbusDiscoveryResult_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -678,6 +738,52 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_002, testing::ext::TestS
     }
     EXPECT_EQ(ret, true);
     softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
+}
+
+/**
+ * @tc.name: OnSoftbusPublishResult_001
+ * @tc.desc: go to the correct case and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_001, testing::ext::TestSize.Level0)
+{
+    int32_t publishId = 123456;
+    PublishResult failReason = (PublishResult)1;
+    std::string pkgName = "com.ohos.helloworld";
+    softbusConnector->RegisterSoftbusPublishCallback(
+        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+    softbusConnector->OnSoftbusPublishResult(publishId, failReason);
+    bool ret = false;
+    if (listener->ipcServerListener_.req_ != nullptr) {
+        listener->ipcServerListener_.req_ = nullptr;
+        ret = true;
+    }
+    EXPECT_EQ(ret, true);
+    softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
+}
+
+/**
+ * @tc.name: OnSoftbusPublishResult_004
+ * @tc.desc: go to the correct case and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_002, testing::ext::TestSize.Level0)
+{
+    int32_t publishId= 123456;
+    std::string pkgName = "com.ohos.helloworld";
+    PublishResult failReason = (PublishResult)0;
+    softbusConnector->RegisterSoftbusPublishCallback(
+        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+    softbusConnector->OnSoftbusPublishResult(publishId, failReason);
+    bool ret = false;
+    if (listener->ipcServerListener_.req_ != nullptr) {
+        listener->ipcServerListener_.req_ = nullptr;
+        ret = true;
+    }
+    EXPECT_EQ(ret, true);
+    softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
 }
 } // namespace
 } // namespace DistributedHardware

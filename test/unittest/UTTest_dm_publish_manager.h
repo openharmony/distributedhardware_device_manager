@@ -12,34 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTest_DM_SOFTBUS_CONNECTOR_H
-#define OHOS_UTTest_DM_SOFTBUS_CONNECTOR_H
+
+#ifndef OHOS_UTTEST_DM_PUBLISH_MANAGER_H
+#define OHOS_UTTEST_DM_PUBLISH_MANAGER_H
 
 #include <gtest/gtest.h>
 #include <refbase.h>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <vector>
+#include <queue>
 
-#include "device_manager_service_listener.h"
-#include "dm_device_info.h"
-#include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
-#include "dm_publish_manager.h"
-#include "dm_subscribe_info.h"
-#include "softbus_bus_center.h"
 #include "softbus_connector.h"
-#include "softbus_listener.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
-#include "softbus_session.h"
-#include "softbus_state_callback.h"
+#include "device_manager_service_listener.h"
+#include "dm_publish_manager.h"
+#include "ipc_notify_publish_result_req.h"
 
+#define private public
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusConnectorTest : public testing::Test {
+class DmPublishManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -48,4 +37,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_UTTEST_DM_PUBLISH_MANAGER_H

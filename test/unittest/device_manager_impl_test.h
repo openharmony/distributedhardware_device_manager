@@ -35,6 +35,7 @@ public:
 
 private:
     std::shared_ptr<DiscoveryCallback> test_callback_ = nullptr;
+    std::shared_ptr<PublishCallback> testPublishCallback_ = nullptr;
 };
 
 class DeviceDiscoveryCallback : public DiscoveryCallback {
@@ -48,6 +49,17 @@ public:
     virtual void OnDiscoverySuccess(uint16_t subscribeId) override;
     virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
+};
+
+class DevicePublishCallback : public PublishCallback {
+public:
+    DevicePublishCallback() : PublishCallback()
+    {
+    }
+    virtual ~DevicePublishCallback() override
+    {
+    }
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
