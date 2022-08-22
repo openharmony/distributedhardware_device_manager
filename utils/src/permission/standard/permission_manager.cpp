@@ -64,7 +64,7 @@ bool PermissionManager::CheckPermission(void)
         sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
         if (remoteObject == nullptr) {
             LOGE("failed to get bundle manager proxy.");
-            return true;
+            return false;
         }
 
         LOGI("get bundle manager proxy success.");
