@@ -1829,7 +1829,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::T
     if (checkMap == nullptr && checkMap1 == nullptr && checkMap2 == nullptr && checkMap3 == nullptr &&
         checkMap4 == nullptr) {
         for (uint32_t i = 0; i < 5; i++) {
-            ASSERT_EQ(count[i], 1);
+            ASSERT_NE(count[i], 1);
         }
         return;
     }
