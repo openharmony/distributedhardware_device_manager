@@ -121,8 +121,9 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${utils_path}/include/dfx",
-      "${utils_path}/include/dfx/standard",
+      "${common_path}/include/ipc/standard",
+      "${common_path}/include/dfx",
+      "${common_path}/include/dfx/standard",
     ]
   }
 
@@ -136,6 +137,11 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_client_stub.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",
       "src/notify/device_manager_notify.cpp",
+      "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
+      "${common_path}/src/dfx/standard/dm_hitrace.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
     ]
 
     public_configs = [ ":devicemanagersdk_config" ]
@@ -145,8 +151,6 @@ if (defined(ohos_lite)) {
       "DH_LOG_TAG=\"devicemanagerkit\"",
       "LOG_DOMAIN=0xD004100",
     ]
-
-    deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
       "c_utils:utils",
