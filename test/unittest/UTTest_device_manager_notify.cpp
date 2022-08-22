@@ -1769,7 +1769,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_003, testing::ext::T
     // call checkMap4 OnPublishResult
     checkMap4->OnPublishResult(publishId, 0);
     // 8. check count count1 count2 count3 is 1
-    for (uint32_t i; i < 5; i++) {
+    for (uint32_t i = 0; i < 5; i++) {
         ASSERT_EQ(count[i], 1);
     }
 }
