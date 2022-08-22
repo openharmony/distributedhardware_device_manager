@@ -58,8 +58,21 @@ DmAuthManager::~DmAuthManager()
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                           const std::string &extra)
 {
-    LOGE("DmAuthManager::AuthenticateDevice start auth type %d", authType);
+    LOGI("DmAuthManager::AuthenticateDevice start auth type %d", authType);
+    if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
+        LOGE("AuthenticateDevice failed, authType is illegal");
+        return DM_FAILED;
+    }
+    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
+        LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
+            pkgName.c_str(), deviceId.c_str(), extra.c_str());
+        return DM_INPUT_PARA_EMPTY;
+    }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
+    if (listener_ == nullptr) {
+        LOGE("DmAuthManager::AuthenticateDevice is empty nullptr");
+        return DM_INPUT_PARA_EMPTY;
+    }
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_AUTH_NOT_SUPPORT);
