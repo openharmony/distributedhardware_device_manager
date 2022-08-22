@@ -16,13 +16,10 @@
 #include "ipc_server_stub.h"
 
 #include <algorithm>
-#include <thread>
 
-#include "device_manager_impl.h"
 #include "device_manager_service.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "dm_hidumper.h"
 #include "if_system_ability_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"

@@ -24,10 +24,8 @@
 
 #include "ipc_remote_broker.h"
 #include "iremote_stub.h"
-#include "nlohmann/json.hpp"
 #include "single_instance.h"
 #include "system_ability.h"
-#include "thread_pool.h"
 
 namespace OHOS {
 namespace DistributedHardware {

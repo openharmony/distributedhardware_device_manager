@@ -26,11 +26,9 @@
 #endif
 
 #include "device_manager_service.h"
-#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
 

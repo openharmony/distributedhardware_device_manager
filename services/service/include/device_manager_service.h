@@ -28,8 +28,6 @@
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
 #include "softbus_listener.h"
-#include "dm_dfx_constants.h"
-#include "dm_hidumper.h"
 
 namespace OHOS {
 namespace DistributedHardware {
