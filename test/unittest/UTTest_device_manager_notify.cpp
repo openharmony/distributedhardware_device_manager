@@ -1828,7 +1828,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::T
     // 6. check if checkMap checkMap1 checkMap2 checkMap3 is null
     if (checkMap == nullptr && checkMap1 == nullptr && checkMap2 == nullptr && checkMap3 == nullptr &&
         checkMap4 == nullptr) {
-        for (uint32_t i; i < 5; i++) {
+        for (uint32_t i = 0; i < 5; i++) {
             ASSERT_EQ(count[i], 1);
         }
         return;
