@@ -28,6 +28,7 @@
 #include "ipc_rsp.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_publish_result_req.h"
 #include "dm_constants.h"
 
 namespace OHOS {
@@ -182,6 +183,46 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_004, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     // set rsp not null
     req->SetSubscribeId(subscribeId);
+    req->SetResult(result);
+    // 3. call IpcServerClientProxy SendCmd with parameter
+    int ret = 0;
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
+    // 4. check ret is not ERR_DM_FAILED
+    ASSERT_NE(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: SendCmd_005
+ * @tc.desc: 1. set cmdCode not null
+ *              set pkgName not null
+ *              set action not null
+ *           2. set remoteObject not nullptr
+ *              set req not null
+ *              set rsp not null
+ *           3. call IpcServerClientProxy SendCmd with parameter
+ *           4. check ret is DM_OK
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(IpcServerClientProxyTest, SendCmd_005, testing::ext::TestSize.Level0)
+{
+    // 1. set cmdCode not null
+    int32_t cmdCode = SERVER_PUBLISH_FINISH;
+    // set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // set action not null
+    int32_t publishId = 1;
+    int32_t result = 1;
+    // 2. set remoteObject not nullptr
+    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    std::shared_ptr<IpcNotifyPublishResultReq> req = std::make_shared<IpcNotifyPublishResultReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // set req not null
+    req->SetPkgName(pkgName);
+    // set rsp not null
+    req->SetPublishId(publishId);
     req->SetResult(result);
     // 3. call IpcServerClientProxy SendCmd with parameter
     int ret = 0;

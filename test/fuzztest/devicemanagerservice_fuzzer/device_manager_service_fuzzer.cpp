@@ -29,8 +29,10 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     std::string extra(reinterpret_cast<const char*>(data), size);
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
     DmSubscribeInfo subscribeInfo;
     std::vector<DmDeviceInfo> deviceList;
+    DmPublishInfo publishInfo;
     DmAuthParam authParam;
 
     int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
@@ -40,11 +42,13 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, pkgName, extra);
     ret = DeviceManagerService::GetInstance().VerifyAuthentication(pkgName);
     ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
+    ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
     ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType);
     ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
     ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
     ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
+    ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
 }
 }
 }

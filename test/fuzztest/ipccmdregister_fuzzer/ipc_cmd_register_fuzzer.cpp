@@ -26,6 +26,8 @@
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_publish_req.h"
+#include "ipc_unpublish_req.h"
 #include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_register_dev_state_callback_req.h"
 #include "ipc_set_useroperation_req.h"

@@ -33,6 +33,8 @@
 #include "ipc_skeleton.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_publish_req.h"
+#include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "securec.h"
@@ -812,7 +814,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_001, testing::ext::TestSize
     // 1. set packName null
     std::string packName = "";
     // set subscribeInfo null
-    std::string extra= "test";
+    std::string extra = "test";
     DmSubscribeInfo subscribeInfo;
     // set callback null
     std::shared_ptr<DiscoveryCallback> callback = nullptr;
@@ -837,7 +839,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_002, testing::ext::TestSize
 {
     // 1. set packName null
     std::string packName = "com.ohos.helloworld";
-    std::string extra= "test";
+    std::string extra = "test";
     // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
     // set callback null
@@ -1078,6 +1080,287 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_005, testing::ext::TestSize.
                 .Times(1).WillOnce(testing::Return(ERR_DM_POINT_NULL));
     // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
+    // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_001
+ * @tc.desc: 1. set packName null
+ *              set subscribeInfo null
+ *              set callback null
+ *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    // 1. set packName null
+    std::string packName = "";
+    // set publishInfo null
+    DmPublishInfo publishInfo;
+    // set callback null
+    std::shared_ptr<PublishCallback> callback = nullptr;
+    // 2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_002
+ * @tc.desc: 1. set packName null
+ *              set subscribeInfo null
+ *              set callback null
+ *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    // 1. set packName null
+    std::string packName = "com.ohos.helloworld";
+    // set publishInfo null
+    DmPublishInfo publishInfo;
+    // set callback null
+    std::shared_ptr<PublishCallback> callback = nullptr;
+    // 2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_003
+ * @tc.desc: 1. set packName null
+ *              set publishInfo null
+ *              set callback null
+ *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           3. check ret is DEVICEMANAGER_INVALID_VALUE
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_003, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set publishInfo is 0
+    DmPublishInfo publishInfo;
+    std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>(); ;
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
+    // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_004
+ * @tc.desc: 1. set packName not null
+ *              set publishInfo null
+ *              set callback not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    // set publishInfo null
+    DmPublishInfo publishInfo;
+    // set callback not null
+    std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
+    // 2. MOCK IpcClientProxy SendRequest return DM_OK
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name:PublishDeviceDiscovery_005
+ * @tc.desc: 1. set packName not null
+ *              set subscribeInfo null
+ *              set callback not null
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
+ *           3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_005, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    // set publishInfo null
+    DmPublishInfo publishInfo;
+    // set callback not null
+    std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
+    // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 4. check ret is DEVICEMANAGER_IPC_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_001
+ * @tc.desc: 1. set packName null
+ *              set publishId is 0
+ *           2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    // 1. set packName null
+    std::string packName = "";
+    // set publishId is 0
+    int32_t publishId = 0;
+    // 2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
+    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_002
+ * @tc.desc: 1. set packName not null
+ *              set publishId is 0
+ *           2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           3. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set subscribeInfo is 0
+    int32_t publishId = 0;
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
+    // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
+    // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_003
+ * @tc.desc: 1. set packName not null
+ *              set publishId is 0
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_003, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set subscribeInfo is 0
+    int32_t publishId = 0;
+    // 2. MOCK IpcClientProxy SendRequest return DM_OK
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_004
+ * @tc.desc: 1. set packName not null
+ *              set publishId is 0
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
+ *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set publishId is 0
+    int32_t publishId = 0;
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
+    // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
+    // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_005
+ * @tc.desc: 1. set packName not null
+ *              set publishId is 0
+ *           2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
+ *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_005, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set publishId is 0
+    int32_t publishId = 0;
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_POINT_NULL));
+    // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
     // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;

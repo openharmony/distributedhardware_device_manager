@@ -47,6 +47,7 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
 
     DeviceManagerNotify::GetInstance().UnRegisterDeathRecipientCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
@@ -54,6 +55,7 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().UnRegisterVerifyAuthenticationCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
     DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
     DeviceManagerNotify::GetInstance().OnFaCall(pkgName, deviceId);
 }
@@ -68,6 +70,7 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     std::string authPara(reinterpret_cast<const char*>(data), size);
     std::string token(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
     int32_t resultCode = *(reinterpret_cast<const int32_t*>(data));
     int32_t flag = *(reinterpret_cast<const int32_t*>(data));
     int32_t failedReason = *(reinterpret_cast<const int32_t*>(data));
@@ -83,6 +86,7 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     
     DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, subscribeId);
+    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, failedReason);
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
     DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
 }
