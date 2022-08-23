@@ -201,6 +201,8 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagerservice") {
     sources = [
+      "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",
@@ -208,8 +210,6 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_server_listener.cpp",
       "src/ipc/standard/ipc_server_stub.cpp",
       "src/softbus/softbus_listener.cpp",
-      "${common_path}/src/dm_log.cpp",
-      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
     ]
 
     public_configs = [ ":devicemanagerservice_config" ]
