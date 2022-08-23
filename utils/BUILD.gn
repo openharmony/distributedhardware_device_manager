@@ -154,8 +154,6 @@ if (defined(ohos_lite)) {
     sources = [
       "src/dm_hash.cpp",
       "src/dm_random.cpp",
-      "src/fwkload/standard/dm_distributed_hardware_load.cpp",
-      "src/permission/standard/permission_manager.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/dm_error_message.cpp",
@@ -164,6 +162,12 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dfx/standard/dm_hitrace.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
     ]
+    if (support_jsapi) {
+      sources += [
+        "src/fwkload/standard/dm_distributed_hardware_load.cpp",
+        "src/permission/standard/permission_manager.cpp",
+      ]
+    }
 
     public_configs = [ ":devicemanagerutils_config" ]
 
