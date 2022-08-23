@@ -129,6 +129,85 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
 }
 
 /**
+ * @tc.name: PublishDeviceDiscovery_001
+ * @tc.desc: Publish device discovery and return ERR_DM_NOT_INIT
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    DmPublishInfo publishInfo;
+    publishInfo.publishId = 1;
+    publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
+    publishInfo.freq = DM_HIGH;
+    publishInfo.ranging = 0;
+    int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_002
+ * @tc.desc: Empty pkgName of PublishDeviceDiscovery and return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DmPublishInfo publishInfo;
+    int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_003
+ * @tc.desc: Call PublishDeviceDiscovery twice with pkgName not null and flag bit not false and return
+ * ERR_DM_DISCOVERY_REPEATED
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    DmPublishInfo publishInfo;
+    int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
+    pkgName = "1com.ohos.test1";
+    ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_001
+ * @tc.desc: UnPublish device discovery and return ERR_DM_NOT_INIT
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t publishId = 1;
+    int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_002
+ * @tc.desc: UnPublishDeviceDiscovery is initialized, pkgName is null, and its return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t publishId = 1;
+    DeviceManagerService::GetInstance().Init();
+    int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+/**
  * @tc.name: GetTrustedDeviceList_002
  * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARAMETER_EMPTY
  * @tc.type: FUNC

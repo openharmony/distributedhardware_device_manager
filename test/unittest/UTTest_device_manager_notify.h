@@ -70,6 +70,15 @@ private:
     int *count_ = nullptr;
 };
 
+class PublishCallbackTest : public PublishCallback {
+public:
+    explicit PublishCallbackTest(int &count);
+    virtual ~PublishCallbackTest() override {}
+    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override;
+private:
+    int *count_ = nullptr;
+};
+
 class AuthenticateCallbackTest : public AuthenticateCallback {
 public:
     explicit AuthenticateCallbackTest(int &count);
