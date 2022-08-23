@@ -70,11 +70,11 @@ if (defined(ohos_lite)) {
         "include/notify",
         "${common_path}/include",
         "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
         "${common_path}/include/ipc/model",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
         "${utils_path}/include",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
-        "${utils_path}/include/ipc/lite",
       ]
       include_dirs += [
         "//commonlibrary/utils_lite/include",
@@ -129,6 +129,11 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagersdk") {
     sources = [
+      "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
+      "${common_path}/src/dfx/standard/dm_hitrace.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager.cpp",
       "src/device_manager_impl.cpp",
       "src/ipc/ipc_client_proxy.cpp",
@@ -137,11 +142,6 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_client_stub.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",
       "src/notify/device_manager_notify.cpp",
-      "${common_path}/src/dm_log.cpp",
-      "${common_path}/src/dm_anonymous.cpp",
-      "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
-      "${common_path}/src/dfx/standard/dm_hitrace.cpp",
-      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
     ]
 
     public_configs = [ ":devicemanagersdk_config" ]

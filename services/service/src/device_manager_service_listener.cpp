@@ -15,7 +15,6 @@
 
 #include "device_manager_service_listener.h"
 
-#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_notify_auth_result_req.h"
@@ -48,8 +47,6 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
 void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                                  const DmDeviceInfo &info)
 {
-    LOGI("call OnDeviceFound for %s, originId %hu, deviceId %s", pkgName.c_str(), subscribeId,
-         GetAnonyString(std::string(info.deviceId)).c_str());
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::make_shared<IpcNotifyDeviceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -99,7 +96,6 @@ void DeviceManagerServiceListener::OnPublishResult(const std::string &pkgName, i
 void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
                                                 const std::string &token, int32_t status, int32_t reason)
 {
-    LOGI("%s, package: %s, deviceId: %s", __FUNCTION__, pkgName.c_str(), GetAnonyString(deviceId).c_str());
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::make_shared<IpcNotifyAuthResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 

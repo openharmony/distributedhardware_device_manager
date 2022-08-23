@@ -75,13 +75,13 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "${common_path}/include",
         "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
         "${common_path}/include/ipc/model",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
         "include",
-        "include/dfx",
-        "include/dfx/lite",
         "include/fwkload/lite",
-        "include/ipc/lite",
         "include/permission/lite",
       ]
       include_dirs += [
@@ -101,15 +101,15 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
       sources = [
-        "src/dfx/lite/dm_hidumper.cpp",
-        "src/dfx/lite/dm_hisysevent.cpp",
-        "src/dfx/lite/dm_hitrace.cpp",
-        "src/dm_anonymous.cpp",
-        "src/dm_error_message.cpp",
-        "src/dm_log.cpp",
+        "${common_path}/src/dfx/lite/dm_hidumper.cpp",
+        "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
+        "${common_path}/src/dfx/lite/dm_hitrace.cpp",
+        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_error_message.cpp",
+        "${common_path}/src/dm_log.cpp",
+        "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
-        "src/ipc/lite/ipc_cmd_register.cpp",
         "src/permission/lite/permission_manager.cpp",
       ]
       defines = [
@@ -135,9 +135,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "include/fwkload/standard",
-      "include/dfx",
-      "include/dfx/standard",
-      "include/ipc/standard",
+      "include/permission/standard",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
@@ -145,25 +143,28 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
       "${innerkits_path}/native_cpp/include",
-      "include/permission/standard",
       "//third_party/mbedtls/include/mbedtls",
     ]
   }
 
   ohos_shared_library("devicemanagerutils") {
     sources = [
-      "src/dm_hash.cpp",
-      "src/dm_random.cpp",
-      "src/fwkload/standard/dm_distributed_hardware_load.cpp",
-      "src/permission/standard/permission_manager.cpp",
-      "${common_path}/src/dm_log.cpp",
-      "${common_path}/src/dm_anonymous.cpp",
-      "${common_path}/src/dm_error_message.cpp",
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
       "${common_path}/src/dfx/standard/dm_hitrace.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_error_message.cpp",
+      "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "src/dm_hash.cpp",
+      "src/dm_random.cpp",
     ]
+    if (support_jsapi) {
+      sources += [
+        "src/fwkload/standard/dm_distributed_hardware_load.cpp",
+        "src/permission/standard/permission_manager.cpp",
+      ]
+    }
 
     public_configs = [ ":devicemanagerutils_config" ]
 

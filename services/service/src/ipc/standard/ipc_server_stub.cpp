@@ -15,8 +15,6 @@
 
 #include "ipc_server_stub.h"
 
-#include <algorithm>
-
 #include "device_manager_service.h"
 #include "dm_constants.h"
 #include "dm_log.h"
