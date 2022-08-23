@@ -28,7 +28,12 @@ namespace DistributedHardware {
 int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DMLOG(DM_LOG_INFO, "code = %d, flags= %d.", code, option.GetFlags());
+    DMLOG(DM_LOG_INFO, "code = %u, flags= %d.", code, option.GetFlags());
+    auto remoteDescriptor = data.ReadInterfaceToken();
+    if (GetDescriptor() != remoteDescriptor) {
+        LOGI("ReadInterfaceToken fail!");
+        return DEVICEMANAGER_FAILED;
+    }
     if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DEVICEMANAGER_OK) {
         return DEVICEMANAGER_OK;
     }

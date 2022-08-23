@@ -87,7 +87,12 @@ void IpcServerStub::OnStop()
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    DMLOG(DM_LOG_INFO, "code = %d, flags= %d.", code, option.GetFlags());
+    DMLOG(DM_LOG_INFO, "code = %u, flags= %d.", code, option.GetFlags());
+    auto remoteDescriptor = data.ReadInterfaceToken();
+    if (GetDescriptor() != remoteDescriptor) {
+        LOGI("ReadInterfaceToken fail!");
+        return DEVICEMANAGER_FAILED;
+    }
     int32_t ret = DEVICEMANAGER_OK;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply);
     if (ret == DEVICEMANAGER_IPC_NOT_REGISTER_FUNC) {
