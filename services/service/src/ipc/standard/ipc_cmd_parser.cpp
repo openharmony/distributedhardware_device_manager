@@ -17,7 +17,6 @@
 
 #include "device_manager_service.h"
 #include "dm_constants.h"
-#include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
@@ -427,9 +426,7 @@ ON_IPC_CMD(UNAUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string deviceId = data.ReadString();
-    int32_t result = DM_OK;
-    LOGI("pkgName:%s, trustedDeviceInfo: %s", pkgName.c_str(), GetAnonyString(deviceId).c_str());
-    result = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
+    int32_t result = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -463,7 +460,6 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("localDeviceInfo: %s", GetAnonyString(std::string(localDeviceInfo.deviceId)).c_str());
     return DM_OK;
 }
 
@@ -514,14 +510,16 @@ ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
     int32_t appIconLen = authParam.imageinfo.GetAppIconLen();
     int32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
 
-    if (!reply.WriteInt32(authParam.direction) || !reply.WriteInt32(authParam.authType) ||
-        !reply.WriteString(authParam.authToken) || !reply.WriteString(authParam.packageName) ||
-        !reply.WriteString(authParam.appName) || !reply.WriteString(authParam.appDescription) ||
-        !reply.WriteInt32(authParam.business) || !reply.WriteInt32(authParam.pincode) ||
-        !reply.WriteInt32(appIconLen) || !reply.WriteInt32(appThumbnailLen)) {
-        LOGE("write reply failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
+    reply.WriteInt32(authParam.direction);
+    reply.WriteInt32(authParam.authType);
+    reply.WriteString(authParam.authToken);
+    reply.WriteString(authParam.packageName);
+    reply.WriteString(authParam.appName);
+    reply.WriteString(authParam.appDescription);
+    reply.WriteInt32(authParam.business);
+    reply.WriteInt32(authParam.pincode);
+    reply.WriteInt32(appIconLen);
+    reply.WriteInt32(appThumbnailLen);
 
     if (appIconLen > 0 && authParam.imageinfo.GetAppIcon() != nullptr) {
         if (!reply.WriteRawData(authParam.imageinfo.GetAppIcon(), appIconLen)) {

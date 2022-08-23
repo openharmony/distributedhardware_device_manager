@@ -20,8 +20,6 @@
 
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "permission_manager.h"
-#include "dm_distributed_hardware_load.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
 
@@ -63,10 +61,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("GetTrustedDeviceList failed, pkgName is empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
     if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
@@ -76,10 +70,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
         LOGE("GetLocalDeviceInfo failed");
@@ -337,27 +327,6 @@ bool DeviceManagerService::IsDMServiceImplReady()
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
-    std::vector<HidumperFlag> dumpflag;
-    HiDumpHelper::GetInstance().GetArgsType(args, dumpflag);
-
-    for (unsigned int i = 0; i < dumpflag.size(); i++) {
-        if (dumpflag[i] == HidumperFlag::HIDUMPER_GET_TRUSTED_LIST) {
-            std::vector<DmDeviceInfo> deviceList;
-
-            int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
-            if (ret != DM_OK) {
-                result.append("HiDumpHelper GetTrustedDeviceList failed");
-                LOGE("HiDumpHelper GetTrustedDeviceList failed");
-                return ERR_DM_FAILED;
-            }
-
-            for (unsigned int  j = 0; j < deviceList.size(); j++) {
-                HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
-                LOGI("DeviceManagerService::DmHiDumper  SetNodeInfo.");
-            }
-        }
-    }
-    HiDumpHelper::GetInstance().HiDump(args, result);
     return DM_OK;
 }
 } // namespace DistributedHardware

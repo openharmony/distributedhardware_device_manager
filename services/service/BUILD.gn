@@ -125,12 +125,12 @@ if (defined(ohos_lite)) {
         "include/ipc/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
         "${common_path}/include/ipc/model",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
         "${utils_path}/include",
         "${utils_path}/include/fwkload/lite",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
-        "${utils_path}/include/ipc/lite",
         "${utils_path}/include/permission/lite",
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/ipc",
@@ -194,16 +194,15 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
-      "${utils_path}/include",
-      "${utils_path}/include/fwkload/standard",
-      "${utils_path}/include/dfx",
-      "${utils_path}/include/dfx/standard",
-      "${utils_path}/include/permission/standard",
+      "${common_path}/include/ipc/standard",
+      "${innerkits_path}/native_cpp/include",
     ]
   }
 
   ohos_shared_library("devicemanagerservice") {
     sources = [
+      "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",
@@ -221,17 +220,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [
-      "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-      "${ability_runtime_services_path}/abilitymgr:abilityms",
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${utils_path}:devicemanagerutils",
-      "//base/security/device_auth/services:deviceauth_sdk",
-    ]
-
     external_deps = [
       "c_utils:utils",
       "dsoftbus:softbus_client",
+      "hiviewdfx_hilog_native:libhilog",
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_core",
