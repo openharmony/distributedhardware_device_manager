@@ -90,7 +90,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code,
     DMLOG(DM_LOG_INFO, "code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
-        LOGI("ReadInterfaceToken fail!");
+        DMLOG(DM_LOG_ERROR, "ReadInterfaceToken fail!");
         return DEVICEMANAGER_FAILED;
     }
     int32_t ret = DEVICEMANAGER_OK;

@@ -31,7 +31,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     DMLOG(DM_LOG_INFO, "code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
-        LOGI("ReadInterfaceToken fail!");
+        DMLOG(DM_LOG_ERROR, "ReadInterfaceToken fail!");
         return DEVICEMANAGER_FAILED;
     }
     if (IpcCmdRegister::GetInstance().OnIpcCmd(code, data, reply) == DEVICEMANAGER_OK) {
