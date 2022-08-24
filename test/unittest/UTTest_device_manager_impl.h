@@ -45,6 +45,13 @@ public:
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
+class DevicePublishCallbackTest : public PublishCallback {
+public:
+    DevicePublishCallbackTest() : PublishCallback() {}
+    virtual ~DevicePublishCallbackTest() {}
+    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
+};
+
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}

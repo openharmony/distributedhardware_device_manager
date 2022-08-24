@@ -26,6 +26,7 @@
 #include "dm_auth_manager.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
+#include "dm_publish_manager.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
 

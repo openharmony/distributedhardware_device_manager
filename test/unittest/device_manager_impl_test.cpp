@@ -171,6 +171,45 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery3, testing::ext::TestSize.Le
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
+
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery1, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    DmPublishInfo publishInfo;
+    std::shared_ptr<PublishCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, publishInfo, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+}
+
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery2, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    DmPublishInfo publishInfo;
+    testPublishCallback_ = std::make_shared<DevicePublishCallback>();
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(DM_OK));
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, testPublishCallback_);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery3, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    DmPublishInfo publishInfo;
+    testPublishCallback_ = std::make_shared<DevicePublishCallback>();
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, testPublishCallback_);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
 } // namespace
 
 void DeviceDiscoveryCallback::OnDiscoverySuccess(uint16_t subscribeId)
@@ -188,6 +227,11 @@ void DeviceDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
 {
     (void)subscribeId;
     (void)deviceInfo;
+}
+void DevicePublishCallback::OnPublishResult(int32_t publishId, int32_t failedReason)
+{
+    (void)publishId;
+    (void)failedReason;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
