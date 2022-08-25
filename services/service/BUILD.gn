@@ -196,6 +196,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "${common_path}/include/ipc/standard",
       "${innerkits_path}/native_cpp/include",
+      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     ]
   }
 
@@ -228,7 +229,6 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
-      "samgr:samgr_proxy",
     ]
 
     subsystem_name = "distributedhardware"

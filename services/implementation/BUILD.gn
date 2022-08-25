@@ -161,6 +161,10 @@ if (defined(ohos_lite)) {
       "//third_party/json/include",
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
+      "//base/global/resource_management/interfaces/inner_api/include",
     ]
 
     if (os_account_part_exists) {
@@ -202,7 +206,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-      "${ability_runtime_services_path}/abilitymgr:abilityms",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/security/device_auth/services:deviceauth_sdk",
@@ -220,24 +223,14 @@ if (defined(ohos_lite)) {
       ]
       defines += [ "SUPPORT_GRAPHICS" ]
     }
+  
     external_deps = [
       "ability_base:want",
-      "ability_runtime:app_manager",
-      "bundle_framework:appexecfwk_base",
-      "bundle_framework:appexecfwk_core",
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "dsoftbus:softbus_client",
-      "eventhandler:libeventhandler",
-      "hisysevent_native:libhisysevent",
-      "hitrace_native:hitrace_meter",
-      "hiviewdfx_hilog_native:libhilog",
-      "init:libbeget_proxy",
       "init:libbegetutil",
-      "ipc:ipc_core",
-      "safwk:system_ability_fwk",
-      "samgr:samgr_proxy",
     ]
 
     subsystem_name = "distributedhardware"

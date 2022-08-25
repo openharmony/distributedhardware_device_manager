@@ -144,6 +144,11 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx/standard",
       "${innerkits_path}/native_cpp/include",
       "//third_party/mbedtls/include/mbedtls",
+      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_base/include",
+      "//third_party/json/include",
+      "//foundation/ability/ability_base/interfaces/kits/native/want/include",
+      "//foundation/ability/ability_base/interfaces/kits/native/uri/include",
+      "//foundation/ability/ability_base/interfaces/inner_api/base/include",
     ]
   }
 
@@ -183,13 +188,10 @@ if (defined(ohos_lite)) {
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
-      "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
     if (support_jsapi) {
       external_deps += [
-        "ability_base:want",
-        "bundle_framework:appexecfwk_base",
         "bundle_framework:appexecfwk_core",
       ]
     }
