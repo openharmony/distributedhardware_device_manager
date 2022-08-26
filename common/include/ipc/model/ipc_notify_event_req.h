@@ -24,27 +24,28 @@ class IpcNotifyEventReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyEventReq);
 
 public:
-    /**
-     * @tc.name: IpcNotifyEventReq::GetEvent
-     * @tc.desc: Get Event
-     * @tc.type: FUNC
-     */
+    int32_t GetEventId() const
+    {
+        return eventId_;
+    }
+
+    void SetEventId(int32_t eventId)
+    {
+        eventId_ = eventId;
+    }
+
     const std::string &GetEvent() const
     {
         return event_;
     }
 
-    /**
-     * @tc.name: IpcNotifyEventReq::SetEvent
-     * @tc.desc: Set Event
-     * @tc.type: FUNC
-     */
     void SetEvent(const std::string &event)
     {
         event_ = event;
     }
 
 private:
+    int32_t eventId_;
     std::string event_;
 };
 } // namespace DistributedHardware

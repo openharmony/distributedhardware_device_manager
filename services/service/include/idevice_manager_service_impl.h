@@ -194,7 +194,7 @@ public:
      * @tc.desc: NotifyEvent
      * @tc.type: FUNC
      */
-    virtual int32_t NotifyEvent(const std::string &pkgName, const std::string &event);
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

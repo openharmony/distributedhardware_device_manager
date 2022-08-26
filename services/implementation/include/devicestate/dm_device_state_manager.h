@@ -16,8 +16,12 @@
 #ifndef OHOS_DM_DEVICE_STATE_MANAGER_H
 #define OHOS_DM_DEVICE_STATE_MANAGER_H
 
-#include <string>
+#include <condition_variable>
 #include <memory>
+#include <queue>
+#include <string>
+#include <thread>
+
 #if defined(__LITEOS_M__)
 #include "dm_mutex.h"
 #else
@@ -37,6 +41,33 @@ struct StateTimerInfo {
     std::string netWorkId;
     std::string deviceId;
 };
+
+class Task {
+public:
+    Task(int32_t eventId, const std::string &deviceId) : eventId_(eventId), deviceId_(deviceId) {};
+    ~Task() {};
+
+    int32_t GetEventId() const
+    {
+        return eventId_;
+    };
+    std::string GetDeviceId() const
+    {
+        return deviceId_;
+    };
+private:
+    int32_t eventId_;
+    std::string deviceId_;
+};
+
+typedef struct NotifyEventTask {
+    std::thread queueThread_;
+    std::condition_variable queueCond_;
+    std::mutex queueMtx_;
+    std::queue<std::shared_ptr<Task>> queue_;
+    bool threadRunning_ = false;
+    bool queueQuit_ = false;
+} NotifyEventTask;
 
 class DmDeviceStateManager final : public ISoftbusStateCallback,
                                    public std::enable_shared_from_this<DmDeviceStateManager> {
@@ -170,7 +201,14 @@ public:
      * @tc.desc: Proc Notify Event of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    int32_t ProcNotifyEvent(nlohmann::json &jsonObject);
+    int32_t ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
+
+private:
+    void StartEventThread();
+    void StopEventThread();
+    void ThreadLoop();
+    int32_t AddTask(const std::shared_ptr<Task> &task);
+    void RunTask(const std::shared_ptr<Task> &task);
 private:
     int32_t cumulativeQuantity_ = 0;
     std::string profileSoName_;
@@ -186,6 +224,7 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string decisionSoName_;
+    NotifyEventTask eventTask_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -712,9 +712,14 @@ ON_IPC_SET_REQUEST(NOTIFY_EVENT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel
 {
     std::shared_ptr<IpcNotifyEventReq> pReq = std::static_pointer_cast<IpcNotifyEventReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
+    int32_t eventId = pReq->GetEventId();
     std::string event = pReq->GetEvent();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(eventId)) {
+        LOGE("write eventId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(event)) {

@@ -27,7 +27,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef enum DmNotifyEvent {
-    DM_NOTIFY_EVENT_ONDEVICEREADY = 0,
+    DM_NOTIFY_EVENT_START = 0,
+    DM_NOTIFY_EVENT_ONDEVICEREADY,
     // Add event here
     DM_NOTIFY_EVENT_BUTT,
 } DmNotifyEvent;

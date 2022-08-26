@@ -23,12 +23,14 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+#define DM_EVENT_QUEUE_CAPACITY 20
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     profileSoName_ = "libdevicemanagerext_profile.z.so";
     decisionSoName_ = "libdevicemanagerext_decision.z.so";
+    StartEventThread();
     LOGI("DmDeviceStateManager constructor");
 }
 
@@ -38,6 +40,7 @@ DmDeviceStateManager::~DmDeviceStateManager()
     if (softbusConnector_ != nullptr) {
         softbusConnector_->UnRegisterSoftbusStateCallback("DM_PKG_NAME");
     }
+    StopEventThread();
 }
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
@@ -352,5 +355,85 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
     stateTimerInfoMap_.erase(name);
 }
 
+
+void DmDeviceStateManager::StartEventThread()
+{
+    eventTask_.threadRunning_ = true;
+    eventTask_.queueQuit_     = false;
+    eventTask_.queueThread_ = std::thread(&DmDeviceStateManager::ThreadLoop, this);
+    while (!eventTask_.queueThread_.joinable()) {
+    }
+    LOGI("StartEventThread");
+}
+
+void DmDeviceStateManager::StopEventThread()
+{
+    eventTask_.threadRunning_ = false;
+    eventTask_.queueQuit_     = true;
+    if (eventTask_.queueThread_.joinable()) {
+        eventTask_.queueThread_.join();
+    }
+    LOGI("StopEventThread");
+}
+
+int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<Task> &task)
+{
+    LOGI("AddTask begin, eventId: %d", task->GetEventId());
+    {
+        std::lock_guard<std::mutex> lock(eventTask_.queueMtx_);
+        if (eventTask_.queue.size() > DM_EVENT_QUEUE_CAPACITY) {
+            LOGE("AddTask failed , queue is full.");
+            return ERR_DM_FAILED;
+        }
+        eventTask_.queue_.push(task);
+        eventTask_.queueCond_.notify_one();
+    }
+    LOGI("AddTask complete");
+    return DM_OK;
+}
+
+void DmDeviceStateManager::ThreadLoop()
+{
+    LOGI("ThreadLoop begin");
+    while (eventTask_.threadRunning_) {
+        if (eventTask_.queueQuit_ && eventTask_.queue_.empty()) {
+            LOGE("ThreadLoop , queue Quit.");
+            break;
+        }
+        std::shared_ptr<Task> task;
+        {
+            std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
+            eventTask_.queueCond_.wait_for(lock, std::chrono::milliseconds(200),
+                [this]() { return !eventTask_.queue_.empty(); });
+            if (eventTask_.queue_.empty()) {
+                continue;
+            }
+            task = eventTask_.queue_.front();
+            eventTask_.queue_.pop();
+        }
+
+        if (task == nullptr) {
+            LOGE("ThreadLoop, task is null.");
+            continue;
+        }
+        RunTask(task);
+    }
+    LOGI("ThreadLoop end");
+}
+
+void DmDeviceStateManager::RunTask(const std::shared_ptr<Task> &task)
+{
+    LOGI("HandleTask begin, eventId: %d", task->GetEventId());
+    if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
+        OnProfileReady(std::string(DM_PKG_NAME), task->GetDeviceId());
+    }
+    LOGI("HandleTask complete");
+}
+
+int32 DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
+    const std::string &deviceId)
+{
+    return AddTask(std::make_shared<Task>(eventId, deviceId));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

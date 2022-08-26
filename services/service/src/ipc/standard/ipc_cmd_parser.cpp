@@ -647,12 +647,13 @@ ON_IPC_CMD(UNREGISTER_CREDENTIAL_CALLBACK, MessageParcel &data, MessageParcel &r
 ON_IPC_CMD(NOTIFY_EVENT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
+    int32_t eventId = data.ReadInt32();
     std::string event = data.ReadString();
     int32_t result = ERR_DM_POINT_NULL;
 
     if (!event.empty()) {
         LOGI("pkgName : %s, event : %s", pkgName.c_str(), event.c_str());
-        result = DeviceManagerService::GetInstance().NotifyEvent(pkgName, event);
+        result = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

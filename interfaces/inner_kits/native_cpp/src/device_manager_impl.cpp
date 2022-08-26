@@ -735,7 +735,7 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const std::string &event)
+int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
 {
     if (pkgName.empty() || event.empty()) {
         LOGE("NotifyEvent error: Invalid para");
@@ -746,6 +746,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const std::st
     std::shared_ptr<IpcNotifyEventReq> req = std::make_shared<IpcNotifyEventReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
+    req->SetEventId(eventId);
     req->SetEvent(event);
 
     int32_t ret = ipcClientProxy_->SendRequest(NOTIFY_EVENT, req, rsp);

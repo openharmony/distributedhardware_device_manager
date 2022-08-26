@@ -97,7 +97,7 @@ public:
 
     int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
-    int32_t NotifyEvent(const std::string &pkgName, const std::string &event);
+    int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;

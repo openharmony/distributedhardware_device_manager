@@ -203,11 +203,11 @@ public:
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
 
     /**
-     * @tc.name: DeviceManagerImpl::NotifyEvent
-     * @tc.desc: NotifyEvent
-     * @tc.type: FUNC
+     * @brief Notify Event to DM
+     * @param pkgName package name
+     * @param event event info
      */
-    virtual int32_t NotifyEvent(const std::string &pkgName, const std::string &event) = 0;
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
