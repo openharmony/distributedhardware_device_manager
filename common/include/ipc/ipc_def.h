@@ -65,6 +65,9 @@ enum IpcCmdID {
     DELETE_CREDENTIAL,
     REGISTER_CREDENTIAL_CALLBACK,
     UNREGISTER_CREDENTIAL_CALLBACK,
+    NOTIFY_EVENT,
+
+    IPC_MSG_BUTT
 };
 } // namespace DistributedHardware
 } // namespace OHOS

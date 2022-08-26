@@ -29,6 +29,8 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace DistributedHardware {
+#define DM_EVENT_QUEUE_CAPACITY 20
+
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
     LOGI("DeviceManagerServiceImpl constructor");
@@ -80,6 +82,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         LOGI("subscribe service user switch common event success");
     }
 #endif
+    StartEventThread();
     LOGI("Init success, singleton initialized");
     return DM_OK;
 }
@@ -95,7 +98,7 @@ void DeviceManagerServiceImpl::Release()
 #endif
     softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
     hiChainConnector_->UnRegisterHiChainCallback();
-
+    StopEventThread();
     authMgr_ = nullptr;
     deviceStateMgr_ = nullptr;
     discoveryMgr_ = nullptr;
@@ -342,6 +345,126 @@ int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->UnRegisterCredentialCallback(pkgName);
+}
+
+int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject)
+{
+    jsonObject = nlohmann::json::parse(event, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("event prase error.");
+        return ERR_DM_INPUT_INVALID;
+    }
+    if ((!jsonObject.contains("eventId")) || (!jsonObject["eventId"].is_number_integer())) {
+        LOGE("deviceId error");
+        return ERR_DM_INPUT_INVALID;
+    }
+    if ((!jsonObject.contains("content")) || (!jsonObject["content"].is_object())) {
+        LOGE("content error");
+        return ERR_DM_INPUT_INVALID;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const std::string &event)
+{
+    nlohmann::json jsonObject;
+    if(PraseNotifyEventJson(event, jsonObject) != DM_OK) {
+        LOGE("NotifyEvent json invalid");
+        return ERR_DM_INPUT_INVALID;
+    }
+    int32_t eventId;
+    jsonObject["eventId"].get_to(eventId);
+    if ((eventId < DM_NOTIFY_EVENT_ONDEVICEREADY) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
+        LOGE("NotifyEvent eventId invalid");
+        return ERR_DM_INPUT_INVALID;
+    }
+    if (eventId == DM_NOTIFY_EVENT_ONDEVICEREADY) {
+        if ((!jsonObject["content"].contains("deviceId")) || (!jsonObject["content"]["deviceId"].is_string())) {
+            LOGE("NotifyEvent deviceId invalid");
+            return ERR_DM_INPUT_INVALID;
+        }
+        std::string deviceId;
+        jsonObject["content"]["deviceId"].get_to(deviceId);
+        AddTask(std::make_shared<Task>(DM_NOTIFY_EVENT_ONDEVICEREADY, deviceId));
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl::StartEventThread()
+{
+    eventTask_.threadRunning_ = true;
+    eventTask_.queueQuit_     = false;
+    eventTask_.queueThread_ = std::thread(&DeviceManagerServiceImpl::ThreadLoop, this);
+    while (!eventTask_.queueThread_.joinable()) {
+    }
+    LOGI("StartEventThread");
+}
+
+void DeviceManagerServiceImpl::StopEventThread()
+{
+    eventTask_.threadRunning_ = false;
+    eventTask_.queueQuit_     = true;
+    if (eventTask_.queueThread_.joinable()) {
+        eventTask_.queueThread_.join();
+    }
+    LOGI("StopEventThread");
+}
+
+void DeviceManagerServiceImpl::AddTask(const std::shared_ptr<Task> &task)
+{
+    LOGI("AddTask begin, eventId: %d", task->GetEventId());
+    {
+        std::lock_guard<std::mutex> lock(eventTask_.queueMtx_);
+        if (eventTask_.queue.size() > DM_EVENT_QUEUE_CAPACITY) {
+            LOGE("AddTask failed , queue is full.");
+            return;
+        }
+        eventTask_.queue_.push(task);
+        eventTask_.queueCond_.notify_one();
+    }
+    LOGI("AddTask complete");
+}
+
+void DeviceManagerServiceImpl::ThreadLoop()
+{
+    LOGI("ThreadLoop begin");
+    while (eventTask_.threadRunning_) {
+        if (eventTask_.queueQuit_ && eventTask_.queue_.empty()) {
+            LOGE("ThreadLoop , queue Quit.");
+            break;
+        }
+        std::shared_ptr<Task> task;
+        {
+            std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
+            eventTask_.queueCond_.wait_for(lock, std::chrono::milliseconds(200),
+                [this]() { return !eventTask_.queue_.empty(); });
+            if (eventTask_.queue_.empty()) {
+                continue;
+            }
+            task = eventTask_.queue_.front();
+            eventTask_.queue_.pop();
+        }
+
+        if (task == nullptr) {
+            LOGE("ThreadLoop, task is null.");
+            continue;
+        }
+        RunTask(task);
+    }
+    LOGI("ThreadLoop end");
+}
+
+void DeviceManagerServiceImpl::RunTask(const std::shared_ptr<Task> &task)
+{
+    LOGI("HandleTask begin, eventId: %d", task->GetEventId());
+    if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
+        if (deviceStateMgr_== nullptr) {
+            LOGE("deviceStateMgr_ is nullptr");
+            return;
+        }
+        deviceStateMgr_->OnProfileReady(std::string(DM_PKG_NAME), task->GetDeviceId());
+    }
+    LOGI("HandleTask complete");
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

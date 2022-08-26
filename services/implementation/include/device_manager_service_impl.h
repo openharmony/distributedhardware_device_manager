@@ -16,7 +16,11 @@
 #ifndef OHOS_DM_SERVICE_IMPL_H
 #define OHOS_DM_SERVICE_IMPL_H
 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "dm_ability_manager.h"
@@ -32,6 +36,34 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+class Task {
+public:
+    Task(int32_t eventId, const std::string &deviceId) : eventId_(eventId), deviceId_(deviceId) {};
+    ~Task() {};
+
+    int32_t GetEventId() const
+    {
+        return eventId_;
+    };
+    std::string GetDeviceId() const
+    {
+        return deviceId_;
+    };
+
+private:
+    int32_t eventId_;
+    std::string deviceId_;
+};
+
+typedef struct NotifyEventTask {
+    std::thread queueThread_;
+    std::condition_variable queueCond_;
+    std::mutex queueMtx_;
+    std::queue<std::shared_ptr<Task>> queue_;
+    bool threadRunning_ = false;
+    bool queueQuit_ = false;
+} NotifyEventTask;
+
 class DeviceManagerServiceImpl : public IDeviceManagerServiceImpl {
 public:
     DeviceManagerServiceImpl();
@@ -70,7 +102,7 @@ public:
     void HandleDeviceOffline(const DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
-    
+
     void OnSessionClosed(int sessionId);
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
@@ -85,6 +117,14 @@ public:
 
     int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
+    int32_t NotifyEvent(const std::string &pkgName, const std::string &event);
+private:
+    int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
+    void StartEventThread();
+    void StopEventThread();
+    void ThreadLoop();
+    void AddTask(const std::shared_ptr<Task> &task);
+    void RunTask(const std::shared_ptr<Task> &task);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -94,6 +134,7 @@ private:
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
+    NotifyEventTask eventTask_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

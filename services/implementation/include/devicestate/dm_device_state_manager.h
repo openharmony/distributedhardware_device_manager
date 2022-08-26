@@ -47,6 +47,20 @@ public:
     ~DmDeviceStateManager();
 
     /**
+     * @tc.name: DmDeviceStateManager::SaveOnlineDeviceInfo
+     * @tc.desc: Save Online DeviceInfo of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    void SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::DeleteOfflineDeviceInfo
+     * @tc.desc: Delete Offline DeviceInfo of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    void DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
      * @tc.name: DmDeviceStateManager::RegisterProfileListener
      * @tc.desc: Register Profile Listener of the Dm Device State Manager
      * @tc.type: FUNC
@@ -151,6 +165,12 @@ public:
      */
     void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
+    /**
+     * @tc.name: DmDeviceStateManager::ProcNotifyEvent
+     * @tc.desc: Proc Notify Event of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    int32_t ProcNotifyEvent(nlohmann::json &jsonObject);
 private:
     int32_t cumulativeQuantity_ = 0;
     std::string profileSoName_;

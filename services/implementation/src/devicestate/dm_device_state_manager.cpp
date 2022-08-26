@@ -40,6 +40,40 @@ DmDeviceStateManager::~DmDeviceStateManager()
     }
 }
 
+void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    std::string udid;
+    if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
+        std::string uuid;
+        DmDeviceInfo saveInfo = info;
+        SoftbusConnector::GetUuidByNetworkId(info.networkId, uuid);
+        {
+#if defined(__LITEOS_M__)
+            DmMutex mutexLock;
+#else
+            std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+            remoteDeviceInfos_[uuid] = saveInfo;
+        }
+        LOGI("SaveDeviceInfo in, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
+            std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
+    }
+}
+
+void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    {
+#if defined(__LITEOS_M__)
+        DmMutex mutexLock;
+#else
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+        if (remoteDeviceInfos_.find(std::string(info.deviceId)) != remoteDeviceInfos_.end()) {
+            remoteDeviceInfos_.erase(std::string(info.deviceId));
+        }
+    }
+}
+
 int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info)
 {
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
@@ -314,5 +348,6 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
     }
     stateTimerInfoMap_.erase(name);
 }
+
 } // namespace DistributedHardware
 } // namespace OHOS

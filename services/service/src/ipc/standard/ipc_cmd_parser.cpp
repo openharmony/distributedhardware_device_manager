@@ -644,6 +644,23 @@ ON_IPC_CMD(UNREGISTER_CREDENTIAL_CALLBACK, MessageParcel &data, MessageParcel &r
     return result;
 }
 
+ON_IPC_CMD(NOTIFY_EVENT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string event = data.ReadString();
+    int32_t result = ERR_DM_POINT_NULL;
+
+    if (!event.empty()) {
+        LOGI("pkgName : %s, event : %s", pkgName.c_str(), event.c_str());
+        result = DeviceManagerService::GetInstance().NotifyEvent(pkgName, event);
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
