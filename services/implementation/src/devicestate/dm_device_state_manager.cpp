@@ -42,6 +42,7 @@ DmDeviceStateManager::~DmDeviceStateManager()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
+    LOGI("SaveOnlineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -62,14 +63,16 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, cons
 
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    {
+    LOGI("DeleteOfflineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
 #if defined(__LITEOS_M__)
-        DmMutex mutexLock;
+    DmMutex mutexLock;
 #else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
 #endif
-        if (remoteDeviceInfos_.find(std::string(info.deviceId)) != remoteDeviceInfos_.end()) {
-            remoteDeviceInfos_.erase(std::string(info.deviceId));
+    for (auto iter: remoteDeviceInfos_) {
+        if (iter.second.deviceId == info.deviceId) {
+            remoteDeviceInfos_.erase(iter.first);
+            break;
         }
     }
 }
