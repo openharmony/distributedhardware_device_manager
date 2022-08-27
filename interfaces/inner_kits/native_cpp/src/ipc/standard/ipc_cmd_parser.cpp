@@ -734,6 +734,5 @@ ON_IPC_READ_RESPONSE(NOTIFY_EVENT, MessageParcel &reply, std::shared_ptr<IpcRsp>
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

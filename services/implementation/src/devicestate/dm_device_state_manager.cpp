@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#define DM_EVENT_QUEUE_CAPACITY 20
+const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
@@ -381,7 +381,7 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<Task> &task)
     LOGI("AddTask begin, eventId: %d", task->GetEventId());
     {
         std::lock_guard<std::mutex> lock(eventTask_.queueMtx_);
-        if (eventTask_.queue.size() > DM_EVENT_QUEUE_CAPACITY) {
+        if (eventTask_.queue_.size() > DM_EVENT_QUEUE_CAPACITY) {
             LOGE("AddTask failed , queue is full.");
             return ERR_DM_FAILED;
         }
@@ -430,7 +430,7 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<Task> &task)
     LOGI("HandleTask complete");
 }
 
-int32 DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
+int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
     const std::string &deviceId)
 {
     return AddTask(std::make_shared<Task>(eventId, deviceId));

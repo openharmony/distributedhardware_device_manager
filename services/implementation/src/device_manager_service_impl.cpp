@@ -361,7 +361,7 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
     const std::string &event)
 {
     nlohmann::json jsonObject;
-    if(PraseNotifyEventJson(event, jsonObject) != DM_OK) {
+    if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
         LOGE("NotifyEvent json invalid");
         return ERR_DM_INPUT_INVALID;
     }
