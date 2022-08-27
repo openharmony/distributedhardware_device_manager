@@ -118,6 +118,20 @@ public:
      */
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
+    /**
+     * @tc.name: IpcServerStub::OnAddSystemAbility
+     * @tc.desc: OnAddSystemAbility of the IpcServerStub
+     * @tc.type: FUNC
+     */
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
+    /**
+     * @tc.name: IpcServerStub::OnRemoveSystemAbility
+     * @tc.desc: OnRemoveSystemAbility of the IpcServerStub
+     * @tc.type: FUNC
+     */
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
 private:
     IpcServerStub();
     ~IpcServerStub() = default;
