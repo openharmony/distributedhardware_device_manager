@@ -50,12 +50,26 @@ void IpcServerStub::OnStart()
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
+
+    LOGI("called:AddAbilityListener begin!");
+    AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
+    LOGI("called:AddAbilityListener end!");
+}
+
+void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
+    DeviceManagerService::GetInstance().Init();
+}
+
+void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
 }
 
 bool IpcServerStub::Init()
 {
     LOGI("IpcServerStub::Init ready to init.");
-    DeviceManagerService::GetInstance().Init();
     if (!registerToService_) {
         bool ret = Publish(this);
         if (!ret) {
