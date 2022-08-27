@@ -355,25 +355,26 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
     stateTimerInfoMap_.erase(name);
 }
 
-
 void DmDeviceStateManager::StartEventThread()
 {
+    LOGI("StartEventThread begin");
     eventTask_.threadRunning_ = true;
     eventTask_.queueQuit_     = false;
     eventTask_.queueThread_ = std::thread(&DmDeviceStateManager::ThreadLoop, this);
     while (!eventTask_.queueThread_.joinable()) {
     }
-    LOGI("StartEventThread");
+    LOGI("StartEventThread complete");
 }
 
 void DmDeviceStateManager::StopEventThread()
 {
+    LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
     eventTask_.queueQuit_     = true;
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
-    LOGI("StopEventThread");
+    LOGI("StopEventThread complete");
 }
 
 int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<Task> &task)
@@ -423,11 +424,11 @@ void DmDeviceStateManager::ThreadLoop()
 
 void DmDeviceStateManager::RunTask(const std::shared_ptr<Task> &task)
 {
-    LOGI("HandleTask begin, eventId: %d", task->GetEventId());
+    LOGI("RunTask begin, eventId: %d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         OnProfileReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
-    LOGI("HandleTask complete");
+    LOGI("RunTask complete");
 }
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,

@@ -16,11 +16,7 @@
 #ifndef OHOS_DM_SERVICE_IMPL_H
 #define OHOS_DM_SERVICE_IMPL_H
 
-#include <condition_variable>
-#include <mutex>
-#include <queue>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "dm_ability_manager.h"
