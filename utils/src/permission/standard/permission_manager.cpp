@@ -76,7 +76,7 @@ bool PermissionManager::CheckPermission(void)
         }
         LOGI("PermissionManager::tokenTypeFlag is hap process");
         return iBundleMgr->CheckIsSystemAppByUid(uid);
-    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE || tokenTypeFlag == ATokenTypeEnum::TOKEN_SHELL) {
         LOGI("PermissionManager::tokenTypeFlag is native process");
         return true;
     } else {
