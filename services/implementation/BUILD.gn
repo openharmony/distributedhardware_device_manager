@@ -223,7 +223,7 @@ if (defined(ohos_lite)) {
       ]
       defines += [ "SUPPORT_GRAPHICS" ]
     }
-  
+
     external_deps = [
       "ability_base:want",
       "c_utils:utils",

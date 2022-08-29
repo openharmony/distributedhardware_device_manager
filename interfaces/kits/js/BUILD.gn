@@ -47,9 +47,7 @@ ohos_shared_library("devicemanager") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-  ]
+  external_deps = [ "bundle_framework:appexecfwk_base" ]
 
   subsystem_name = "distributedhardware"
   relative_install_dir = "module/distributedhardware"
