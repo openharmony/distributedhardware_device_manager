@@ -38,8 +38,8 @@ DmCommonEventManager::~DmCommonEventManager()
 
 bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback)
 {
-    if (eventName.empty()) {
-        LOGE("enentNsmr is empty.");
+    if (eventName.empty() || callback == nullptr) {
+        LOGE("enentNsmr is empty or callback is nullptr.");
         return false;
     }
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
