@@ -51,7 +51,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, c
     MatchingSkills matchingSkills;
     matchingSkills.AddEvent(eventName);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, eventName);
+    subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, eventName);
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         LOGE("samgrProxy is nullptr");
