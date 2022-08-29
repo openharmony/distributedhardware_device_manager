@@ -38,9 +38,13 @@ DmCommonEventManager::~DmCommonEventManager()
 
 bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback)
 {
+    if (eventName.empty) {
+        LOGE("enentNsmr is empty.");
+        return false;
+    }
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
-        LOGI("failed to subscribe commom eventName: %s.", eventName.c_str());
+        LOGE("failed to subscribe commom eventName: %s.", eventName.c_str());
         return false;
     }
 
@@ -77,7 +81,7 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
 {
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
-        LOGI("failed to unsubscribe commom eventName: %s because event is invalid.", eventName_.c_str());
+        LOGE("failed to unsubscribe commom eventName: %s because event is invalid.", eventName_.c_str());
         return false;
     }
     if (subscriber_ != nullptr) {
