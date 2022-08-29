@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
+const uint32_t DM_EVENT_WAIT_TIMEOUT = 2;
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
@@ -404,7 +405,7 @@ void DmDeviceStateManager::ThreadLoop()
         std::shared_ptr<Task> task;
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
-            eventTask_.queueCond_.wait_for(lock, std::chrono::milliseconds(200),
+            eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
                 [this]() { return !eventTask_.queue_.empty(); });
             if (eventTask_.queue_.empty()) {
                 continue;

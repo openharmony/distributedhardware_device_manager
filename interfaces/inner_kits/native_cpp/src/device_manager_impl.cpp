@@ -742,7 +742,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 
-   if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
+    if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("NotifyEvent eventId invalid");
         return ERR_DM_INPUT_INVALID;
     }
