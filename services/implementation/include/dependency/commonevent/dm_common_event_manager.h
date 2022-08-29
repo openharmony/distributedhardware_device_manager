@@ -20,7 +20,6 @@
 #include <map>
 #include <mutex>
 
-#include "common_event.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_subscribe_info.h"
