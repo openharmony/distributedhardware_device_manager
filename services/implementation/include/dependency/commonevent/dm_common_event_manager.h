@@ -28,42 +28,55 @@
 #include "dm_log.h"
 #include "matching_skills.h"
 #include "single_instance.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using OHOS::EventFwk::CommonEventData;
+using OHOS::EventFwk::CommonEventSubscriber;
+using OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommomEventCallback = std::function<void(int32_t)>;
 
-struct CommomEventCallbackNode {
-    int32_t  input_;
+class DmEventSubscriber : public CommonEventSubscriber {
+public:
+    DmEventSubscriber(const CommonEventSubscribeInfo &subscribeInfo, const CommomEventCallback &callback,
+        const std::string &eventName) : CommonEventSubscriber(subscribeInfo),
+        eventName_(eventName), callback_(callback) {}
+    virtual ~DmEventSubscriber() = default;
+    std::string GetSubscriberEventName() const;
+    void OnReceiveEvent(const CommonEventData &data) override;
+
+private:
+    std::string eventName_;
     CommomEventCallback callback_;
 };
 
 class DmCommonEventManager {
-DECLARE_SINGLE_INSTANCE_BASE(DmCommonEventManager);
 public:
-    bool SubscribeServiceEvent(const std::string &event, const CommomEventCallback callback);
-    bool UnsubscribeServiceEvent(const std::string &event);
-    class EventSubscriber : public EventFwk::CommonEventSubscriber {
-    public:
-        EventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, const CommomEventCallback &callback,
-            const std::string &event) : EventFwk::CommonEventSubscriber(subscribeInfo),
-            callback_(callback), event_(event) {}
-        void OnReceiveEvent(const EventFwk::CommonEventData &data);
-    private:
-        CommomEventCallback callback_;
-        std::string event_;
-    };
-private:
-    DmCommonEventManager();
+    DmCommonEventManager() = default;
     ~DmCommonEventManager();
+    bool SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback);
+    bool UnsubscribeServiceEvent();
+
 private:
-    static void DealCallback(void);
+    std::string eventName_;
+    bool eventValidFlag_ = false;
+    std::mutex evenSubscriberMutex_;
+    std::shared_ptr<DmEventSubscriber> subscriber_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+
 private:
-    static std::mutex callbackQueueMutex_;
-    static std::mutex eventSubscriberMutex_;
-    static std::condition_variable notEmpty_;
-    static std::list<CommomEventCallbackNode> callbackQueue_;
-    std::map<std::string, std::shared_ptr<EventSubscriber>> dmEventSubscriber_;
+    class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(std::shared_ptr<DmEventSubscriber> subscriber)
+            : changeSubscriber_(subscriber) {}
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
+    private:
+        std::shared_ptr<DmEventSubscriber> changeSubscriber_;
+    };
 };
 } // namespace DistributedHardware
 } // namespace OHOS
