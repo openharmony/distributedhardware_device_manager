@@ -38,7 +38,7 @@ DmCommonEventManager::~DmCommonEventManager()
 
 bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback)
 {
-    if (eventName.empty) {
+    if (eventName.empty()) {
         LOGE("enentNsmr is empty.");
         return false;
     }
