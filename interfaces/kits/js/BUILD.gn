@@ -47,15 +47,7 @@ ohos_shared_library("devicemanager") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "bundle_framework:appexecfwk_base" ]
 
   subsystem_name = "distributedhardware"
   relative_install_dir = "module/distributedhardware"

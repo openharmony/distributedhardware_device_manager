@@ -118,6 +118,13 @@ if (defined(ohos_lite)) {
       "//base/notification/common_event_service/frameworks/core/include",
       "//base/notification/common_event_service/interfaces/innerkits/native/include",
       "//base/security/device_auth/interfaces/innerkits",
+      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
+      "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+      "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+      "//foundation/communication/dsoftbus/interfaces/kits/common",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//base/global/resource_management/interfaces/inner_api/include",
+      "//foundation/communication/dsoftbus/interfaces/kits/transport",
     ]
 
     sources = [
@@ -128,29 +135,16 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-      "${ability_runtime_services_path}/abilitymgr:abilityms",
       "${ext_path}/pin_auth/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${ext_path}/pin_auth/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${utils_path}:devicemanagerutils",
       "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
       "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
     ]
 
     external_deps = [
       "ability_base:want",
-      "bundle_framework:appexecfwk_base",
-      "bundle_framework:appexecfwk_core",
-      "c_utils:utils",
-      "common_event_service:cesfwk_core",
-      "common_event_service:cesfwk_innerkits",
-      "dsoftbus:softbus_client",
-      "hiviewdfx_hilog_native:libhilog",
-      "init:libbeget_proxy",
       "init:libbegetutil",
-      "ipc:ipc_core",
-      "safwk:system_ability_fwk",
-      "samgr:samgr_proxy",
     ]
 
     defines = [
