@@ -42,10 +42,10 @@ struct StateTimerInfo {
     std::string deviceId;
 };
 
-class Task {
+class NotifyEvent {
 public:
-    Task(int32_t eventId, const std::string &deviceId) : eventId_(eventId), deviceId_(deviceId) {};
-    ~Task() {};
+    NotifyEvent(int32_t eventId, const std::string &deviceId) : eventId_(eventId), deviceId_(deviceId) {};
+    ~NotifyEvent() {};
 
     int32_t GetEventId() const
     {
@@ -60,14 +60,14 @@ private:
     std::string deviceId_;
 };
 
-typedef struct NotifyEventTask {
+typedef struct NotifyTask {
     std::thread queueThread_;
     std::condition_variable queueCond_;
     std::mutex queueMtx_;
-    std::queue<std::shared_ptr<Task>> queue_;
+    std::queue<std::shared_ptr<NotifyEvent>> queue_;
     bool threadRunning_ = false;
     bool queueQuit_ = false;
-} NotifyEventTask;
+} NotifyTask;
 
 class DmDeviceStateManager final : public ISoftbusStateCallback,
                                    public std::enable_shared_from_this<DmDeviceStateManager> {
@@ -207,8 +207,8 @@ private:
     void StartEventThread();
     void StopEventThread();
     void ThreadLoop();
-    int32_t AddTask(const std::shared_ptr<Task> &task);
-    void RunTask(const std::shared_ptr<Task> &task);
+    int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
+    void RunTask(const std::shared_ptr<NotifyEvent> &task);
 private:
     int32_t cumulativeQuantity_ = 0;
     std::string profileSoName_;
@@ -224,7 +224,7 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string decisionSoName_;
-    NotifyEventTask eventTask_;
+    NotifyTask eventTask_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

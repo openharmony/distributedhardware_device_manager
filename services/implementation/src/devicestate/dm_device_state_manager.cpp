@@ -378,7 +378,7 @@ void DmDeviceStateManager::StopEventThread()
     LOGI("StopEventThread complete");
 }
 
-int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<Task> &task)
+int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 {
     LOGI("AddTask begin, eventId: %d", task->GetEventId());
     {
@@ -402,7 +402,7 @@ void DmDeviceStateManager::ThreadLoop()
             LOGE("ThreadLoop , queue Quit.");
             break;
         }
-        std::shared_ptr<Task> task;
+        std::shared_ptr<NotifyEvent> task;
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
             eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
@@ -423,7 +423,7 @@ void DmDeviceStateManager::ThreadLoop()
     LOGI("ThreadLoop end");
 }
 
-void DmDeviceStateManager::RunTask(const std::shared_ptr<Task> &task)
+void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
     LOGI("RunTask begin, eventId: %d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
@@ -435,7 +435,7 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<Task> &task)
 int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
     const std::string &deviceId)
 {
-    return AddTask(std::make_shared<Task>(eventId, deviceId));
+    return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
