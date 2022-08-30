@@ -399,7 +399,7 @@ void DmDeviceStateManager::ThreadLoop()
     LOGI("ThreadLoop begin");
     while (eventTask_.threadRunning_) {
         if (eventTask_.queueQuit_ && eventTask_.queue_.empty()) {
-            LOGE("ThreadLoop , queue Quit.");
+            LOGE("ThreadLoop , queue quit.");
             break;
         }
         std::shared_ptr<NotifyEvent> task;
