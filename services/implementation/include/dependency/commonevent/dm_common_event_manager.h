@@ -54,7 +54,7 @@ class DmCommonEventManager {
 public:
     DmCommonEventManager() = default;
     ~DmCommonEventManager();
-    bool SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback);
+    bool SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback &callback);
     bool UnsubscribeServiceEvent();
 
 private:

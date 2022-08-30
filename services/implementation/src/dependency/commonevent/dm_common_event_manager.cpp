@@ -36,7 +36,7 @@ DmCommonEventManager::~DmCommonEventManager()
     DmCommonEventManager::UnsubscribeServiceEvent();
 }
 
-bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback callback)
+bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback &callback)
 {
     if (eventName.empty() || callback == nullptr) {
         LOGE("enentNsmr is empty or callback is nullptr.");
@@ -87,7 +87,7 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
     if (subscriber_ != nullptr) {
         LOGI("start to unsubscribe commom eventName: %s", eventName_.c_str());
         if (!CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
-            LOGI("failed to unsubscribe commom eventName: %s.", eventName_.c_str());
+            LOGE("failed to unsubscribe commom eventName: %s.", eventName_.c_str());
             return false;
         }
         LOGI("success to unsubscribe commom eventName: %s.", eventName_.c_str());
