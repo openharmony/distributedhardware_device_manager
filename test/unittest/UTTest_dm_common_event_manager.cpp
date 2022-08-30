@@ -46,7 +46,7 @@ namespace {
  */
 HWTEST_F(DmCommonEventManagerTest, DeleteDmCommonEventManager_001, testing::ext::TestSize.Level0)
 {
-    DmCommonEventManager::GetInstance().~DmCommonEventManager();
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
 }
 
 /**
@@ -57,10 +57,10 @@ HWTEST_F(DmCommonEventManagerTest, DeleteDmCommonEventManager_001, testing::ext:
  */
 HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::TestSize.Level0)
 {
-    std::string strEvent = "test";
-    CommomEventCallbackNode callbackNode;
-    callbackNode.callback_ = nullptr;
-    bool result = DmCommonEventManager::GetInstance().SubscribeServiceEvent(strEvent, callbackNode.callback_);
+    std::string strEvent;
+    CommomEventCallback callback = nullptr;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    bool result = commonEventManager->SubscribeServiceEvent(strEvent, callback);
     EXPECT_EQ(false, result);
 }
 
@@ -73,9 +73,9 @@ HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::Test
 HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::TestSize.Level0)
 {
     std::string strEvent = "test";
-    CommomEventCallbackNode callbackNode;
-    std::shared_ptr<DmCommonEventManager::EventSubscriber> subscriber = nullptr;
-    bool result = DmCommonEventManager::GetInstance().SubscribeServiceEvent(strEvent, callbackNode.callback_);
+    CommomEventCallback callback = nullptr;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    bool result = commonEventManager->SubscribeServiceEvent(strEvent, callback);
     EXPECT_EQ(false, result);
 }
 
@@ -87,17 +87,9 @@ HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::Test
  */
 HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::TestSize.Level0)
 {
-    std::string event = "123";
-    CommomEventCallbackNode callbackNode;
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(event);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<DmCommonEventManager::EventSubscriber> subscriber =
-        std::make_shared<DmCommonEventManager::EventSubscriber>(subscriberInfo, callbackNode.callback_, event);
-    DmCommonEventManager::GetInstance().dmEventSubscriber_[event] = subscriber;
-    std::string strEvent = "123";
-    bool result = DmCommonEventManager::GetInstance().UnsubscribeServiceEvent(strEvent);
-    EXPECT_EQ(true, result);
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    bool result = commonEventManager->UnsubscribeServiceEvent();
+    EXPECT_EQ(false, result);
 }
 
 /**
@@ -109,12 +101,8 @@ HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::Te
 HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
 {
     EventFwk::CommonEventData data;
-    EventFwk::CommonEventSubscribeInfo subscribeInfo;
-    CommomEventCallbackNode callbackNode;
-    std::string strEvent = "test";
-    std::shared_ptr<DmCommonEventManager::EventSubscriber> eventSubscriber =
-        std::make_shared<DmCommonEventManager::EventSubscriber>(subscribeInfo, callbackNode.callback_, strEvent);
-    eventSubscriber->OnReceiveEvent(data);
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    commonEventManager->subscriber_->OnReceiveEvent(data)
 }
 } // namespace
 } // namespace DistributedHardware

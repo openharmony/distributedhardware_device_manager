@@ -73,10 +73,12 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         MultipleUserConnector::SetSwitchOldUserId(userId);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
+    if (commonEventManager_ == nullptr) {
+        commonEventManager_ = std::make_shared<DmCommonEventManager>();
+    }
     CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get(),
         std::placeholders::_1);
-    if (dmCommonEventManager.SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
+    if (commonEventManager_->SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
         LOGI("subscribe service user switch common event success");
     }
 #endif
@@ -88,10 +90,7 @@ void DeviceManagerServiceImpl::Release()
 {
     LOGI("DeviceManagerServiceImpl Release");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DmCommonEventManager &dmCommonEventManager = DmCommonEventManager::GetInstance();
-    if (dmCommonEventManager.UnsubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_STOPPED)) {
-        LOGI("subscribe service event success");
-    }
+    commonEventManager_ = nullptr;
 #endif
     softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
     hiChainConnector_->UnRegisterHiChainCallback();
