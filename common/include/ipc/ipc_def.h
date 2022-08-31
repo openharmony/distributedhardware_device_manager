@@ -56,6 +56,8 @@ enum IpcCmdID {
     SERVER_DEVICE_FA_NOTIFY,
     REGISTER_DEV_STATE_CALLBACK,
     UNREGISTER_DEV_STATE_CALLBACK,
+    //Add ipc msg here
+    IPC_MSG_BUTT
 };
 } // namespace DistributedHardware
 } // namespace OHOS

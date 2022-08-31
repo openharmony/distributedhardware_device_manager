@@ -16,6 +16,7 @@
 #include "device_manager_service.h"
 #include <functional>
 #include "device_manager_service_listener.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info_manager.h"
 #include "dm_log.h"
@@ -166,8 +167,8 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
         return DM_NOT_INIT;
     }
 
-    if (pkgName.empty()) {
-        LOGE("StartDeviceDiscovery failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return DM_INPUT_PARA_EMPTY;
     }
     SoftbusConnector::GetUdidByNetworkId(netWorkId.c_str(), udid);
@@ -182,8 +183,8 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
         return DM_NOT_INIT;
     }
 
-    if (pkgName.empty()) {
-        LOGE("StartDeviceDiscovery failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return DM_INPUT_PARA_EMPTY;
     }
     SoftbusConnector::GetUuidByNetworkId(netWorkId.c_str(), uuid);
@@ -238,7 +239,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     }
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-            pkgName.c_str(), deviceId.c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return DM_INPUT_PARA_EMPTY;
     }
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {

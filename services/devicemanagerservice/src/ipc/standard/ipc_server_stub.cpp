@@ -80,7 +80,7 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOGI("code = %u, flags= %d.", code, option.GetFlags());
+    LOGI("code = %u, flags = %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
@@ -98,6 +98,10 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
+        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
     MessageParcel reply;
@@ -187,6 +191,10 @@ const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
 
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
+    if (pkgName.empty()) {
+        LOGE("IpcServerStub::GetDmListener error: Invalid para, pkgName: %s", pkgName.c_str());
+        return nullptr;
+    }
     auto iter = dmListener_.find(pkgName);
     if (iter == dmListener_.end()) {
         return nullptr;

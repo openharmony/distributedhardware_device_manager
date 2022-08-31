@@ -19,6 +19,7 @@
 
 #include "auth_message_processor.h"
 #include "dm_ability_manager.h"
+#include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -67,7 +68,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-            pkgName.c_str(), deviceId.c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return DM_INPUT_PARA_EMPTY;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
