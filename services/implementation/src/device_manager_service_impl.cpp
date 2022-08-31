@@ -354,6 +354,10 @@ int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event,
         LOGE("extra error");
         return ERR_DM_INPUT_INVALID;
     }
+    if ((!jsonObject["extra"].contains("deviceId")) || (!jsonObject["extra"]["deviceId"].is_string())) {
+        LOGE("NotifyEvent deviceId invalid");
+        return ERR_DM_INPUT_INVALID;
+    }
     return DM_OK;
 }
 
@@ -368,10 +372,6 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         nlohmann::json jsonObject;
         if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
             LOGE("NotifyEvent json invalid");
-            return ERR_DM_INPUT_INVALID;
-        }
-        if ((!jsonObject["extra"].contains("deviceId")) || (!jsonObject["extra"]["deviceId"].is_string())) {
-            LOGE("NotifyEvent deviceId invalid");
             return ERR_DM_INPUT_INVALID;
         }
         std::string deviceId;
