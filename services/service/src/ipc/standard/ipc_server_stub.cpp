@@ -59,17 +59,23 @@ void IpcServerStub::OnStart()
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
-    DeviceManagerService::GetInstance().Init();
+    if (SOFTBUS_SERVER_SA_ID == systemAbilityId) {
+        DeviceManagerService::GetInstance().InitSoftbusListener();
+    }
 }
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
+    if (SOFTBUS_SERVER_SA_ID == systemAbilityId) {
+        DeviceManagerService::GetInstance().UninitSoftbusListener();
+    }
 }
 
 bool IpcServerStub::Init()
 {
     LOGI("IpcServerStub::Init ready to init.");
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     if (!registerToService_) {
         bool ret = Publish(this);
         if (!ret) {
@@ -84,6 +90,7 @@ bool IpcServerStub::Init()
 void IpcServerStub::OnStop()
 {
     LOGI("IpcServerStub::OnStop ready to stop service.");
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
 }

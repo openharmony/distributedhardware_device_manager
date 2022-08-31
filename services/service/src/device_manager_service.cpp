@@ -42,16 +42,43 @@ DeviceManagerService::~DeviceManagerService()
 
 int32_t DeviceManagerService::Init()
 {
+    InitSoftbusListener();
+    InitDMServiceListener();
+
+    LOGI("Init success, dm service single instance initialized.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::InitSoftbusListener()
+{
     if (softbusListener_ == nullptr) {
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    LOGI("SoftbusListener init success.");
 
+    return DM_OK;
+}
+
+void DeviceManagerService::UninitSoftbusListener()
+{
+    softbusListener_ = nullptr;
+    LOGI("SoftbusListener uninit.");
+}
+
+int32_t DeviceManagerService::InitDMServiceListener()
+{
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
 
-    LOGI("Init success, dm service single instance initialized.");
+    LOGI("DeviceManagerServiceListener init success.");
     return DM_OK;
+}
+
+void DeviceManagerService::UninitDMServiceListener()
+{
+    listener_ = nullptr;
+    LOGI("DeviceManagerServiceListener uninit.");
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
