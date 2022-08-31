@@ -63,10 +63,10 @@ private:
 typedef struct NotifyTask {
     std::thread queueThread_;
     std::condition_variable queueCond_;
+    std::condition_variable queueFullCond_;
     std::mutex queueMtx_;
     std::queue<std::shared_ptr<NotifyEvent>> queue_;
     bool threadRunning_ = false;
-    bool queueQuit_ = false;
 } NotifyTask;
 
 class DmDeviceStateManager final : public ISoftbusStateCallback,

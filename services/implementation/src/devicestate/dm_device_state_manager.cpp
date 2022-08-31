@@ -360,7 +360,6 @@ void DmDeviceStateManager::StartEventThread()
 {
     LOGI("StartEventThread begin");
     eventTask_.threadRunning_ = true;
-    eventTask_.queueQuit_     = false;
     eventTask_.queueThread_ = std::thread(&DmDeviceStateManager::ThreadLoop, this);
     while (!eventTask_.queueThread_.joinable()) {
     }
@@ -371,7 +370,6 @@ void DmDeviceStateManager::StopEventThread()
 {
     LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
-    eventTask_.queueQuit_     = true;
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
@@ -383,14 +381,14 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
     LOGI("AddTask begin, eventId: %d", task->GetEventId());
     {
         std::lock_guard<std::mutex> lock(eventTask_.queueMtx_);
-        if (eventTask_.queue_.size() > DM_EVENT_QUEUE_CAPACITY) {
-            LOGE("AddTask failed , queue is full.");
-            return ERR_DM_FAILED;
+        while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
+            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT), [this]() {
+                return (eventTask_.queue_.size() << DM_EVENT_QUEUE_CAPACITY); });
         }
         eventTask_.queue_.push(task);
-        eventTask_.queueCond_.notify_one();
     }
-    LOGI("AddTask complete");
+    eventTask_.queueCond_.notify_one();
+    LOGI("AddTask complete, eventId: %d", task->GetEventId());
     return DM_OK;
 }
 
@@ -398,27 +396,22 @@ void DmDeviceStateManager::ThreadLoop()
 {
     LOGI("ThreadLoop begin");
     while (eventTask_.threadRunning_) {
-        if (eventTask_.queueQuit_ && eventTask_.queue_.empty()) {
-            LOGE("ThreadLoop , queue quit.");
-            break;
-        }
         std::shared_ptr<NotifyEvent> task;
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
-            eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
-                [this]() { return !eventTask_.queue_.empty(); });
-            if (eventTask_.queue_.empty()) {
-                continue;
+            while (eventTask_.queue_.empty() && eventTask_.threadRunning_) {
+                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT), [this]() {
+                    return !eventTask_.queue_.empty(); });
             }
-            task = eventTask_.queue_.front();
-            eventTask_.queue_.pop();
+            if (!eventTask_.queue_.empty()) {
+                task = eventTask_.queue_.front();
+                eventTask_.queue_.pop();
+                eventTask_.queueFullCond_.notify_one();
+            }
         }
-
-        if (task == nullptr) {
-            LOGE("ThreadLoop, task is null.");
-            continue;
+        if (task != nullptr) {
+            RunTask(task);
         }
-        RunTask(task);
     }
     LOGI("ThreadLoop end");
 }
