@@ -40,6 +40,14 @@ public:
 
     int32_t Init();
 
+    int32_t InitSoftbusListener();
+
+    void UninitSoftbusListener();
+
+    int32_t InitDMServiceListener();
+
+    void UninitDMServiceListener();
+
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
 
