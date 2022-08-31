@@ -388,7 +388,7 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
         eventTask_.queue_.push(task);
     }
     eventTask_.queueCond_.notify_one();
-    LOGI("AddTask complete, eventId: %d", task->GetEventId());
+    LOGI("AddTask complete");
     return DM_OK;
 }
 
