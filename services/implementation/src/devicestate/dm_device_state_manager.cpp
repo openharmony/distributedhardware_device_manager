@@ -383,7 +383,7 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
         std::lock_guard<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
             eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT), [this]() {
-                return (eventTask_.queue_.size() << DM_EVENT_QUEUE_CAPACITY); });
+                return (eventTask_.queue_.size() < DM_EVENT_QUEUE_CAPACITY); });
         }
         eventTask_.queue_.push(task);
     }
