@@ -262,7 +262,7 @@ This FA is called **DeviceManager_UI.hap**, which is preset as a system applicat
 
   When DeviceManager functions as the authenticated party, the authorization prompt page and PIN display page are controlled by the **DeviceManager_UI.hap** FA by default.
 
-  When DeviceManager functions as the authentication initiator, the PIN input page can be displayed either by **DeviceManager_UI.hap** FA or a developer-customized page. To customize the PIN input page, set the **displayOwner** parameter in the **extraInfo** attribute of the **AuthParam** parameter of the **authenticateDevice** API to **1** (**DISPLAY_OWNER_OTHER**).
+  When DeviceManager functions as the authentication initiator, the PIN input page can be displayed either by **DeviceManager_UI.hap** FA or a developer-customized page. To customize the PIN input page, set the **displayOwner** parameter in the **extraInfo** attribute of the **AuthParam** parameter of the **authenticateDevice** API to **1**.
 
 ### Repositories Involved
 ****

@@ -24,6 +24,25 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t LOCAL_CREDENTIAL_DEAL_TYPE = 1;
+const int32_t REMOTE_CREDENTIAL_DEAL_TYPE = 2;
+const int32_t NONSYMMETRY_CREDENTIAL_TYPE = 2;
+const int32_t SYMMETRY_CREDENTIAL_TYPE = 1;
+const int32_t UNKNOWN_CREDENTIAL_TYPE = 0;
+const int32_t SAME_ACCOUNT_TYPE = 1;
+const int32_t CROSS_ACCOUNT_TYPE = 2;
+
+constexpr const char* FIELD_CREDENTIAL_VERSION = "version";
+constexpr const char* FIELD_DEVICE_PK = "devicePk";
+constexpr const char* FIELD_SERVER_PK = "serverPk";
+constexpr const char* FIELD_PKINFO_SIGNATURE = "pkInfoSignature";
+constexpr const char* FIELD_PKINFO = "pkInfo";
+constexpr const char* FIELD_PROCESS_TYPE = "processType";
+constexpr const char* FIELD_AUTH_TYPE = "authType";
+constexpr const char* FIELD_CREDENTIAL_DATA = "credentialData";
+constexpr const char* FIELD_CREDENTIAL_ID = "credentialId";
+constexpr const char* FIELD_PEER_CREDENTIAL_INFO = "peerCredentialInfo";
+
 struct CredentialDataInfo {
     int32_t credentialType;
     std::string credentailId;

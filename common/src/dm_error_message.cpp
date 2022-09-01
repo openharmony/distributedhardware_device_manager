@@ -28,7 +28,6 @@ static ERROR_INFO g_errorMessages[] = {
     {ERR_DM_FAILED, "dm process execution failed."},
     {ERR_DM_TIME_OUT, "dm process execution timeout."},
     {ERR_DM_NOT_INIT, "dm service is not initialized, please try again later."},
-    {ERR_DM_INIT_REPEATED, "dm service repeated initialization."},
     {ERR_DM_INIT_FAILED, "dm service initialize failed."},
     {ERR_DM_POINT_NULL, "dm service null pointer exception occurred."},
     {ERR_DM_INPUT_PARAMETER_EMPTY, "the function call input parameter is empty."},

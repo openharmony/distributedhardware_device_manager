@@ -19,6 +19,7 @@
 #include <functional>
 
 #include "dm_constants.h"
+#include "dm_hidumper.h"
 #include "dm_log.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
@@ -354,6 +355,27 @@ bool DeviceManagerService::IsDMServiceImplReady()
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
+    std::vector<HidumperFlag> dumpflag;
+    HiDumpHelper::GetInstance().GetArgsType(args, dumpflag);
+
+    for (unsigned int i = 0; i < dumpflag.size(); i++) {
+        if (dumpflag[i] == HidumperFlag::HIDUMPER_GET_TRUSTED_LIST) {
+            std::vector<DmDeviceInfo> deviceList;
+
+            int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
+            if (ret != DM_OK) {
+                result.append("HiDumpHelper GetTrustedDeviceList failed");
+                LOGE("HiDumpHelper GetTrustedDeviceList failed");
+                return ERR_DM_FAILED;
+            }
+
+            for (unsigned int  j = 0; j < deviceList.size(); j++) {
+                HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
+                LOGI("DeviceManagerService::DmHiDumper  SetNodeInfo.");
+            }
+        }
+    }
+    HiDumpHelper::GetInstance().HiDump(args, result);
     return DM_OK;
 }
 } // namespace DistributedHardware

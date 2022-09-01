@@ -169,10 +169,6 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
             pkgName.c_str(), deviceId.c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
-    if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
-        LOGE("AuthenticateDevice failed, authType is illegal");
-        return ERR_DM_UNSUPPORTED_AUTH_TYPE;
-    }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 

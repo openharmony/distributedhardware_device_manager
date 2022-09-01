@@ -34,6 +34,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t DISCOVER_STATUS_LEN = 20;
+const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
+
+constexpr const char* DISCOVER_STATUS_KEY = "persist.distributed_hardware.device_manager.discover_status";
+constexpr const char* DISCOVER_STATUS_ON = "1";
+constexpr const char* DISCOVER_STATUS_OFF = "0";
+
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
 IPublishCb SoftbusListener::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusListener::OnPublishResult,
