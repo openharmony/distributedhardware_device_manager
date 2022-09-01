@@ -29,7 +29,7 @@ public:
         return eventId_;
     }
 
-    void SetEventId(int32_t eventId)
+    void SetEventId(const int32_t eventId)
     {
         eventId_ = eventId;
     }

@@ -396,7 +396,7 @@ void DmDeviceStateManager::ThreadLoop()
 {
     LOGI("ThreadLoop begin");
     while (eventTask_.threadRunning_) {
-        std::shared_ptr<NotifyEvent> task;
+        std::shared_ptr<NotifyEvent> task = nullptr;
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
             while (eventTask_.queue_.empty() && eventTask_.threadRunning_) {
