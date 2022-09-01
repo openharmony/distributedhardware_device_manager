@@ -204,6 +204,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagerservice") {
     sources = [
+      "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",

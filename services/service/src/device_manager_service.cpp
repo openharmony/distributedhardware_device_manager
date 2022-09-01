@@ -371,7 +371,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
 
             for (unsigned int  j = 0; j < deviceList.size(); j++) {
                 HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
-                LOGI("DeviceManagerService::DmHiDumper  SetNodeInfo.");
+                LOGI("DeviceManagerService::DmHiDumper SetNodeInfo.");
             }
         }
     }
