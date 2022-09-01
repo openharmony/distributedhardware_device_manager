@@ -760,7 +760,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::NotifyEvent Failed with ret %d", ret);
+        LOGE("DeviceManager::NotifyEvent failed with ret %d", ret);
         return ret;
     }
     LOGI("DeviceManager::NotifyEvent completed, pkgName: %s", pkgName.c_str());
