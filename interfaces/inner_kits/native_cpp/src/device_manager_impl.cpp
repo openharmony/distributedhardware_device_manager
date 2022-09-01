@@ -743,7 +743,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
     }
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("NotifyEvent eventId invalid");
-        return ERR_DM_INPUT_INVALID;
+        return ERR_DM_FAILED;
     }
     LOGI("DeviceManager::NotifyEvent start, pkgName: %s", pkgName.c_str());
     std::shared_ptr<IpcNotifyEventReq> req = std::make_shared<IpcNotifyEventReq>();
