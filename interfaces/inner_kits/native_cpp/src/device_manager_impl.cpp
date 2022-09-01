@@ -738,7 +738,7 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
 int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
 {
     if (pkgName.empty()) {
-        LOGE("NotifyEvent error: pkgName empty");
+        LOGE("DeviceManager::NotifyEvent error: pkgName empty");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
