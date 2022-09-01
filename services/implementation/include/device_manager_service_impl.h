@@ -21,6 +21,7 @@
 
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
+#include "dm_common_event_manager.h"
 #include "dm_credential_manager.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
@@ -94,6 +95,7 @@ private:
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
+    std::shared_ptr<DmCommonEventManager> commonEventManager_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

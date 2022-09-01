@@ -45,6 +45,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t SLEEP_TIME_MS = 50000; // 50ms
+
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
     static DeviceManagerImpl instance;

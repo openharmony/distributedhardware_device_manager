@@ -34,6 +34,14 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t PIN_CODE_NETWORK = 0;
+const int32_t CREDENTIAL_NETWORK = 1;
+const int32_t DELAY_TIME_MS = 10000; // 10ms
+const int32_t FIELD_EXPIRE_TIME_VALUE = 7;
+
+constexpr const char* DEVICE_ID = "DEVICE_ID";
+constexpr const char* FIELD_CREDENTIAL = "credential";
+
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 {
     if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end()) {

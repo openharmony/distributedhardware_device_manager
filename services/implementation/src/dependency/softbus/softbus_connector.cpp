@@ -28,6 +28,16 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
+const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 20;
+
+constexpr const char* WIFI_IP = "WIFI_IP";
+constexpr const char* WIFI_PORT = "WIFI_PORT";
+constexpr const char* BR_MAC = "BR_MAC";
+constexpr const char* BLE_MAC = "BLE_MAC";
+constexpr const char* ETH_IP = "ETH_IP";
+constexpr const char* ETH_PORT = "ETH_PORT";
+
 SoftbusConnector::PulishStatus SoftbusConnector::publishStatus = SoftbusConnector::STATUS_UNKNOWN;
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::stateCallbackMap_ = {};

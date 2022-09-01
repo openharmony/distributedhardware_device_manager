@@ -24,6 +24,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
+const uint32_t MAX_LOAD_VALUE = 3;
+
 void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
     LOGI("enter DmDistributedHardwareLoad::LoadDistributedHardwareFwk");

@@ -23,6 +23,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t DEFAULT_PIN_CODE_LENGTH = 6;
+constexpr const char* VERIFY_FAILED = "verifyFailed";
+
 PinAuthUi::PinAuthUi()
 {
     LOGI("AuthUi constructor");

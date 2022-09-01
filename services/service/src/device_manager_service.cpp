@@ -20,6 +20,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_hidumper.h"
 #include "dm_log.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
@@ -43,16 +44,43 @@ DeviceManagerService::~DeviceManagerService()
 
 int32_t DeviceManagerService::Init()
 {
+    InitSoftbusListener();
+    InitDMServiceListener();
+
+    LOGI("Init success, dm service single instance initialized.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::InitSoftbusListener()
+{
     if (softbusListener_ == nullptr) {
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    LOGI("SoftbusListener init success.");
 
+    return DM_OK;
+}
+
+void DeviceManagerService::UninitSoftbusListener()
+{
+    softbusListener_ = nullptr;
+    LOGI("SoftbusListener uninit.");
+}
+
+int32_t DeviceManagerService::InitDMServiceListener()
+{
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
 
-    LOGI("Init success, dm service single instance initialized.");
+    LOGI("DeviceManagerServiceListener init success.");
     return DM_OK;
+}
+
+void DeviceManagerService::UninitDMServiceListener()
+{
+    listener_ = nullptr;
+    LOGI("DeviceManagerServiceListener uninit.");
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -378,6 +406,27 @@ bool DeviceManagerService::IsDMServiceImplReady()
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
+    std::vector<HidumperFlag> dumpflag;
+    HiDumpHelper::GetInstance().GetArgsType(args, dumpflag);
+
+    for (unsigned int i = 0; i < dumpflag.size(); i++) {
+        if (dumpflag[i] == HidumperFlag::HIDUMPER_GET_TRUSTED_LIST) {
+            std::vector<DmDeviceInfo> deviceList;
+
+            int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
+            if (ret != DM_OK) {
+                result.append("HiDumpHelper GetTrustedDeviceList failed");
+                LOGE("HiDumpHelper GetTrustedDeviceList failed");
+                return ERR_DM_FAILED;
+            }
+
+            for (unsigned int  j = 0; j < deviceList.size(); j++) {
+                HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
+                LOGI("DeviceManagerService::DmHiDumper SetNodeInfo.");
+            }
+        }
+    }
+    HiDumpHelper::GetInstance().HiDump(args, result);
     return DM_OK;
 }
 } // namespace DistributedHardware

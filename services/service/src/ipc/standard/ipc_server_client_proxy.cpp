@@ -36,7 +36,7 @@ int32_t IpcServerClientProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
         return ERR_DM_IPC_WRITE_FAILED;
     }
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option = { MessageOption::TF_ASYNC };
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }

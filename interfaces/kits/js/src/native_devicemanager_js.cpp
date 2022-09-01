@@ -50,6 +50,9 @@ const int32_t DM_NAPI_SUB_ID_MAX = 65535;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
+const int32_t DM_NAPI_SUBSCRIBE_CAPABILITY_DDMP = 0;
+const int32_t DM_NAPI_SUBSCRIBE_CAPABILITY_OSD = 1;
+
 napi_ref deviceTypeEnumConstructor_ = nullptr;
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 napi_ref discoverModeEnumConstructor_ = nullptr;

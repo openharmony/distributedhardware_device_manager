@@ -18,121 +18,140 @@
 #include <thread>
 
 #include "dm_constants.h"
-
-using namespace OHOS::EventFwk;
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-std::mutex DmCommonEventManager::callbackQueueMutex_;
-std::mutex DmCommonEventManager::eventSubscriberMutex_;
-std::condition_variable DmCommonEventManager::notEmpty_;
-std::list<CommomEventCallbackNode> DmCommonEventManager::callbackQueue_;
+using OHOS::EventFwk::MatchingSkills;
+using OHOS::EventFwk::CommonEventManager;
 
-DmCommonEventManager &DmCommonEventManager::GetInstance()
+std::string DmEventSubscriber::GetSubscriberEventName() const
 {
-    static DmCommonEventManager instance;
-    return instance;
-}
-
-DmCommonEventManager::DmCommonEventManager()
-{
-    std::thread th(DealCallback);
-    th.detach();
+    return eventName_;
 }
 
 DmCommonEventManager::~DmCommonEventManager()
 {
-    std::unique_lock<std::mutex> mutexLock(eventSubscriberMutex_);
-    for (auto iter = dmEventSubscriber_.begin(); iter != dmEventSubscriber_.end(); iter++) {
-        if (!CommonEventManager::UnSubscribeCommonEvent(iter->second)) {
-            LOGI("Unsubscribe service event failed: %s", iter->first.c_str());
-        }
-    }
+    DmCommonEventManager::UnsubscribeServiceEvent();
 }
 
-void DmCommonEventManager::DealCallback(void)
+bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback &callback)
 {
-    while (1) {
-        std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
-        notEmpty_.wait(callbackQueueMutexLock, [] { return !callbackQueue_.empty(); });
-        CommomEventCallbackNode node = callbackQueue_.front();
-        int32_t input = node.input_;
-        CommomEventCallback funcPrt = node.callback_;
-        funcPrt(input);
-        callbackQueue_.pop_front();
+    if (eventName.empty() || callback == nullptr) {
+        LOGE("enentNsmr is empty or callback is nullptr.");
+        return false;
     }
-}
-
-bool DmCommonEventManager::SubscribeServiceEvent(const std::string &event, const CommomEventCallback callback)
-{
-    LOGI("Subscribe event: %s", event.c_str());
-    if (dmEventSubscriber_.find(event) != dmEventSubscriber_.end() || callback == nullptr) {
-        LOGE("Subscribe event：%s has been exist or callback is nullptr", event.c_str());
+    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    if (eventValidFlag_) {
+        LOGE("failed to subscribe commom eventName: %s.", eventName.c_str());
         return false;
     }
 
     MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(event);
+    matchingSkills.AddEvent(eventName);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<EventSubscriber> subscriber =
-        std::make_shared<EventSubscriber>(subscriberInfo, callback, event);
-    if (subscriber == nullptr) {
-        LOGE("subscriber is nullptr %s", event.c_str());
+    subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, eventName);
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        LOGE("samgrProxy is nullptr");
+        subscriber_ = nullptr;
         return false;
     }
-
-    if (!CommonEventManager::SubscribeCommonEvent(subscriber)) {
-        LOGE("Subscribe service event failed: %s", event.c_str());
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
+    if (statusChangeListener_ == nullptr) {
+        LOGE("statusChangeListener_ is nullptr");
+        subscriber_ = nullptr;
         return false;
     }
-
-    std::unique_lock<std::mutex> mutexLock(eventSubscriberMutex_);
-    dmEventSubscriber_[event] = subscriber;
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    if (ret != ERR_OK) {
+        LOGE("failed to subscribe system ability COMMON_EVENT_SERVICE_ID ret:%d", ret);
+        subscriber_ = nullptr;
+        statusChangeListener_ = nullptr;
+        return false;
+    }
+    eventName_ = eventName;
+    eventValidFlag_ = true;
+    LOGI("success to subscribe commom eventName: %s", eventName.c_str());
     return true;
 }
 
-bool DmCommonEventManager::UnsubscribeServiceEvent(const std::string &event)
+bool DmCommonEventManager::UnsubscribeServiceEvent()
 {
-    LOGI("UnSubscribe event: %s", event.c_str());
-    if (dmEventSubscriber_.find(event) == dmEventSubscriber_.end()) {
-        LOGE("UnSubscribe event: %s not been exist", event.c_str());
+    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    if (!eventValidFlag_) {
+        LOGE("failed to unsubscribe commom eventName: %s because event is invalid.", eventName_.c_str());
         return false;
     }
-
-    if (!CommonEventManager::UnSubscribeCommonEvent(dmEventSubscriber_[event])) {
-        LOGE("Unsubscribe service event failed: %s", event.c_str());
-        return false;
+    if (subscriber_ != nullptr) {
+        LOGI("start to unsubscribe commom eventName: %s", eventName_.c_str());
+        if (!CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
+            LOGE("failed to unsubscribe commom eventName: %s.", eventName_.c_str());
+            return false;
+        }
+        LOGI("success to unsubscribe commom eventName: %s.", eventName_.c_str());
+        subscriber_ = nullptr;
+    }
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            LOGE("samgrProxy is nullptr");
+            return false;
+        }
+        int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+        if (ret != ERR_OK) {
+            LOGE("failed to unsubscribe system ability COMMON_EVENT_SERVICE_ID ret:%d", ret);
+            return false;
+        }
+        statusChangeListener_ = nullptr;
     }
 
-    std::unique_lock<std::mutex> mutexLock(eventSubscriberMutex_);
-    dmEventSubscriber_.erase(event);
+    LOGI("success to unsubscribe commom eventName: %s", eventName_.c_str());
+    eventValidFlag_ = false;
     return true;
 }
 
-void DmCommonEventManager::EventSubscriber::OnReceiveEvent(const CommonEventData &data)
+void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     LOGI("Received event: %s", receiveEvent.c_str());
-    if (receiveEvent != event_) {
-        LOGE("Received event is error");
+    if (receiveEvent != eventName_) {
+        LOGE("Received event and local event is not match");
         return;
     }
-
     int32_t userId = data.GetCode();
     if (userId <= 0) {
         LOGE("userId is less zero");
         return;
     }
+    std::thread dealThread(callback_, userId);
+    dealThread.detach();
+}
 
-    std::unique_lock<std::mutex> callbackQueueMutexLock(callbackQueueMutex_);
-    if (callbackQueue_.size() > COMMON_CALLBACK_MAX_SIZE) {
-        LOGE("event callback Queue is too long");
+void DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("systemAbility is added with said: %d.", systemAbilityId);
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
         return;
     }
+    if (changeSubscriber_ == nullptr) {
+        LOGE("failed to subscribe commom event because changeSubscriber_ is nullptr.");
+        return;
+    }
+    std::string eventName = changeSubscriber_->GetSubscriberEventName();
+    LOGI("start to subscribe commom eventName: %s", eventName.c_str());
+    if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
+        LOGE("failed to subscribe commom event: %s", eventName.c_str());
+        return;
+    }
+}
 
-    CommomEventCallbackNode node {userId, callback_};
-    callbackQueue_.push_back(node);
-    notEmpty_.notify_one();
+void DmCommonEventManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("systemAbility is removed with said: %d.", systemAbilityId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

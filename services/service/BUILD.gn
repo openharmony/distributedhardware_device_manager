@@ -192,6 +192,8 @@ if (defined(ohos_lite)) {
       "include/ipc",
       "include/ipc/standard",
       "${common_path}/include",
+      "${common_path}/include/dfx",
+      "${common_path}/include/dfx/standard",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${common_path}/include/ipc/standard",
@@ -202,6 +204,8 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagerservice") {
     sources = [
+      "${common_path}/src/dfx/standard/dm_hidumper.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
