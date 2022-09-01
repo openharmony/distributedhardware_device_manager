@@ -25,10 +25,10 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcServerListenerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    int32_t cmdCode = *(reinterpret_cast<const int32_t*>(data));
+    int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
@@ -44,6 +44,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::IpcServerListenerFuzzTest(data, size);
-
     return 0;
 }

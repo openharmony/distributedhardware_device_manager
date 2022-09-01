@@ -33,14 +33,6 @@
 #include "ipc_set_useroperation_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_unauthenticate_device_req.h"
-#include "ipc_authenticate_device_req.h"
-#include "ipc_get_local_device_info_rsp.h"
-#include "device_manager_notify.h"
-#include "ipc_req.h"
-#include "dm_device_info.h"
-#include "dm_constants.h"
-#include "ipc_def.h"
-#include "dm_log.h"
 #include "ipc_rsp.h"
 #include "ipc_cmd_register_fuzzer.h"
 
@@ -48,10 +40,10 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcCmdRegisterFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    int32_t cmdCode = *(reinterpret_cast<const int32_t*>(data));
+    int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     MessageParcel data1;
@@ -69,6 +61,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::IpcCmdRegisterFuzzTest(data, size);
-
     return 0;
 }

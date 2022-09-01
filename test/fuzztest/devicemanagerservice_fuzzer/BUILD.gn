@@ -62,6 +62,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
   ]
+
   cflags = [
     "-g",
     "-O0",

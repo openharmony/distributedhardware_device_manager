@@ -44,10 +44,11 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= 0)) {
         return;
     }
+
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
+    uint16_t subscribeId = 33;
+    int32_t publishId = 123;
 
     DeviceManagerNotify::GetInstance().UnRegisterDeathRecipientCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
@@ -59,6 +60,7 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
     DeviceManagerNotify::GetInstance().OnFaCall(pkgName, deviceId);
 }
+
 void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
@@ -69,13 +71,13 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string authPara(reinterpret_cast<const char*>(data), size);
     std::string token(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t resultCode = *(reinterpret_cast<const int32_t*>(data));
-    int32_t flag = *(reinterpret_cast<const int32_t*>(data));
-    int32_t failedReason = *(reinterpret_cast<const int32_t*>(data));
-    uint32_t status = *(reinterpret_cast<const int32_t*>(data));
-    uint32_t reason = *(reinterpret_cast<const int32_t*>(data));
+    uint16_t subscribeId = 12;
+    int32_t publishId = 111;
+    int32_t resultCode = 1234;
+    int32_t flag = 1;
+    int32_t failedReason = 231;
+    uint32_t status = 3;
+    uint32_t reason = 14;
     DmDeviceInfo deviceInfo;
 
     DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceInfo);
@@ -83,7 +85,6 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, deviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceInfo);
-    
     DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, subscribeId);
     DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, failedReason);

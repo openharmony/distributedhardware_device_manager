@@ -17,6 +17,7 @@
 
 #include <functional>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
@@ -167,7 +168,7 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
     }
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-            pkgName.c_str(), deviceId.c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
@@ -226,8 +227,9 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
 
 int32_t DeviceManagerServiceImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (pkgName.empty()) {
-        LOGE("RegisterDevStateCallback failed, pkgName is empty");
+    if (pkgName.empty() || extra.empty()) {
+        LOGE("DeviceManagerServiceImpl::RegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (deviceStateMgr_ != nullptr) {

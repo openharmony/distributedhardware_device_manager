@@ -41,6 +41,11 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
     if (setRequestMapIter != setIpcRequestFuncMap_.end()) {
+        SetIpcRequestFunc ptr = setRequestMapIter->second;
+        if (ptr == nullptr) {
+            LOGE("IpcCmdRegister::SetRequest setRequestMapIter->second is null");
+            return ERR_DM_POINT_NULL;
+        }
         ret = (setRequestMapIter->second)(pBaseReq, data);
     }
     return ret;
@@ -48,6 +53,10 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || pBaseRsp == nullptr) {
+        LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
         LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
@@ -61,6 +70,10 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
         LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);

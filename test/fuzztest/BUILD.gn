@@ -19,7 +19,6 @@ group("fuzztest") {
     "devicediscovery_fuzzer:fuzztest",
     "devicelist_fuzzer:fuzztest",
     "devicemanagernotify_fuzzer:fuzztest",
-    "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
     "dmcredentialimpl_fuzzer:fuzztest",
     "getfaparam_fuzzer:fuzztest",

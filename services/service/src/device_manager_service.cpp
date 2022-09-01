@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <functional>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
@@ -57,10 +58,12 @@ int32_t DeviceManagerService::Init()
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    if (pkgName.empty()) {
-        LOGE("GetTrustedDeviceList failed, pkgName is empty");
+    if (pkgName.empty() || extra.empty()) {
+        LOGE("DeviceManagerService::GetTrustedDeviceList error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
+    LOGI("DeviceManagerService::GetTrustedDeviceList is called");
     int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
     if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
@@ -80,8 +83,8 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
 {
-    if (pkgName.empty()) {
-        LOGE("GetUdidByNetworkId failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
+        LOGE("DeviceManagerService::GetUdidByNetworkId error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
@@ -91,8 +94,8 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &uuid)
 {
-    if (pkgName.empty()) {
-        LOGE("GetUuidByNetworkId failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
+        LOGE("DeviceManagerService::GetUuidByNetworkId error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
@@ -102,6 +105,11 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                    const std::string &extra)
 {
+    if (pkgName.empty() || extra.empty()) {
+        LOGE("DeviceManagerService::StartDeviceDiscovery error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("StartDeviceDiscovery failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -111,6 +119,10 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::StopDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("StopDeviceDiscovery failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -120,6 +132,10 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
 
 int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
 {
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::PublishDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("PublishDeviceDiscovery failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -129,6 +145,10 @@ int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName,
 
 int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::UnPublishDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("UnPublishDeviceDiscovery failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -139,6 +159,11 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {
+    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
+        LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("AuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -148,6 +173,10 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("DeviceManagerService::UnAuthenticateDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("UnAuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -157,8 +186,12 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
 
 int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 {
+    if (authParam.empty()) {
+        LOGE("DeviceManagerService::VerifyAuthentication error: Invalid parameter, authParam: %s", authParam.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
-        LOGE("VerifyAuthentication failed, instance not init or init failed.");
+        LOGE("DeviceManagerService::VerifyAuthentication failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->VerifyAuthentication(authParam);
@@ -166,6 +199,10 @@ int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 
 int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &authParam)
 {
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::GetFaParam error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("GetFaParam failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -175,6 +212,10 @@ int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &auth
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action)
 {
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -184,6 +225,11 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
+    if (pkgName.empty() || extra.empty()) {
+        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("RegisterDevStateCallback failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -193,6 +239,11 @@ int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgNam
 
 int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
+    if (pkgName.empty() || extra.empty()) {
+        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), extra.c_str());
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("UnRegisterDevStateCallback failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
