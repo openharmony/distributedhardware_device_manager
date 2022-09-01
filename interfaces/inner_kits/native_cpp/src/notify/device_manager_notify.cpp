@@ -73,7 +73,7 @@ void DeviceManagerNotify::UnRegisterDeviceStateCallback(const std::string &pkgNa
 void DeviceManagerNotify::RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
                                                     std::shared_ptr<DiscoveryCallback> callback)
 {
-    if (pkgName.empty() || subscribeId < 0 || subscribeId > DM_NAPI_SUB_ID_MAX) {
+    if (pkgName.empty() || subscribeId < 0) {
         LOGE("DeviceManagerNotify::RegisterDiscoveryCallback error: Invalid parameter, pkgName: %s, subscribeId: %d ",
             pkgName.c_str(), subscribeId);
         return;
@@ -121,7 +121,7 @@ void DeviceManagerNotify::UnRegisterPublishCallback(const std::string &pkgName, 
 {
     if (pkgName.empty()) {
         LOGE("DeviceManagerNotify::UnRegisterPublishCallback error: Invalid parameter, pkgName: %s",
-            pkgName.c_str(), GetAnonyString(deviceId).c_str());
+            pkgName.c_str());
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
