@@ -23,7 +23,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
 
   include_dirs = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
-    "//foundation/distributedhardware/device_manager/interfaces/kits/js/include",
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
@@ -82,7 +81,10 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "ipc_client_manager_fuzzer.cpp" ]
+  sources = [
+    "ipc_client_manager_fuzzer.cpp",
+    "${innerkits_path}/native_cpp/src/ipc/standard/ipc_client_manager.cpp",
+  ]
 
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
@@ -124,7 +126,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "${utils_path}:devicemanagerutils",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",

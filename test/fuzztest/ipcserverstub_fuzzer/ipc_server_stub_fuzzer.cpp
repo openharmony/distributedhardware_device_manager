@@ -35,7 +35,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
     uint32_t code = *(reinterpret_cast<const uint32_t*>(data));
@@ -61,6 +61,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::IpcServerStubFuzzTest(data, size);
-
     return 0;
 }
