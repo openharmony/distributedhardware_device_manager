@@ -49,7 +49,6 @@ const int32_t DM_AUTH_TYPE_MAX = 4;
 const int32_t DM_AUTH_TYPE_MIN = 1;
 const int32_t BUSINESS_FA_MIRGRATION = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
-const int32_t AUTH_SESSION_SIDE_CLIENT = 1;
 
 constexpr const char* APP_NAME_KEY = "appName";
 constexpr const char* APP_ICON_KEY = "appIcon";
