@@ -210,8 +210,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
     LOGI("DeviceManager::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("AuthenticateDevice error: Invalid para");
+    if (pkgName.empty() || deviceInfo == nullptr) {
+        LOGE("AuthenticateDevice error: Invalid para, pkgName is %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 

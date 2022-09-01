@@ -25,18 +25,18 @@ namespace OHOS {
 namespace DistributedHardware {
 struct DmDeviceFilters {
     std::string type;
-    int32_t     value;
+    int32_t value;
 };
 
 struct DmDeviceFilterOption {
-    std::string                  filterOp;
+    std::string filterOp;
     std::vector<DmDeviceFilters> filters;
     int32_t ParseFilterJson(const std::string &str, nlohmann::json &jsonObject);
     int32_t TransformToFilter(const std::string &filterOptions);
 };
 
 struct DmDeviceFilterPara {
-    bool    isOnline;
+    bool isOnline;
     int32_t range;
 };
 

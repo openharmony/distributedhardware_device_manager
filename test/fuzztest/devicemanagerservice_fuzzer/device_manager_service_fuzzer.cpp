@@ -27,10 +27,11 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
-    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authType = 123;
+    uint16_t subscribeId = 12;
+    int32_t publishId = 14;
     DmSubscribeInfo subscribeInfo;
+    subscribeInfo.subscribeId = 1;
     std::vector<DmDeviceInfo> deviceList;
     DmPublishInfo publishInfo;
     DmAuthParam authParam;

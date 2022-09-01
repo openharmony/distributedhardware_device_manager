@@ -25,7 +25,6 @@
 #include "dm_publish_manager.h"
 #include "ipc_notify_publish_result_req.h"
 
-#define private public
 namespace OHOS {
 namespace DistributedHardware {
 class DmPublishManagerTest : public testing::Test {

@@ -25,6 +25,10 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                                    size_t buffLen)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
     if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
         LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
@@ -45,6 +49,10 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, IpcIo &reply, std::shared_
 
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, IpcIo &reply)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
         LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);

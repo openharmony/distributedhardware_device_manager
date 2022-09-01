@@ -38,7 +38,8 @@ typedef enum DmExchangeMedium {
     DM_COAP = 2,
     /** USB */
     DM_USB = 3,
-    DM_MEDIUM_BUTT
+
+    DM_MEDIUM_BUTT = 4,
 } DmExchangeMedium;
 
 /**
