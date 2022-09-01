@@ -208,6 +208,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
             pkgName.c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
+
     LOGI("DeviceManager::StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
