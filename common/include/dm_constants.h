@@ -85,7 +85,6 @@ enum {
     ERR_DM_ENCRYPT_FAILED = -20028,
     ERR_DM_PUBLISH_FAILED = -20029,
     ERR_DM_PUBLISH_REPEATED  = -20030,
-    ERR_DM_INPUT_INVALID  = -20031,
 };
 
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
