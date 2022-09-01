@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || req == nullptr || rsp == nullptr) {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }

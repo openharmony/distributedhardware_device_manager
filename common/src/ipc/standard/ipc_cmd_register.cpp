@@ -53,7 +53,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || pBaseRsp == nullptr) {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
         LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
