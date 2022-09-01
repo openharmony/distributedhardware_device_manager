@@ -261,7 +261,7 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 
   DeviceManager作为认证被控端，授权提示界面、PIN码显示界面由DeviceManager_UI FA默认进行显示；
 
-  DeviceManager作为认证发起端，PIN码输入界面可以选择由DeviceManager_UI FA进行显示，还是由开发者自行显示。开发者如需自己定制PIN码输入界面，需要在authenticateDevice接口的认证参数AuthParam中，extraInfo属性里面指定displayOwner参数为1（DISPLAY_OWNER_OTHER）。
+  DeviceManager作为认证发起端，PIN码输入界面可以选择由DeviceManager_UI FA进行显示，还是由开发者自行显示。开发者如需自己定制PIN码输入界面，需要在authenticateDevice接口的认证参数AuthParam中，extraInfo属性里面指定displayOwner参数为1。
 
 ### 相关仓
 ****

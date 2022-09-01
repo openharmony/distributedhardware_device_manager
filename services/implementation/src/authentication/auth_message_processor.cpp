@@ -22,6 +22,17 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t MSG_MAX_SIZE = 45 * 1024;
+const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
+
+constexpr const char* TAG_HOST = "HOST";
+constexpr const char* TAG_REQUESTER = "REQUESTER";
+constexpr const char* TAG_VISIBILITY = "VISIBILITY";
+constexpr const char* TAG_DEVICE_TYPE = "DEVICETYPE";
+constexpr const char* TAG_APP_ICON = "APPICON";
+constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
+constexpr const char* TAG_THUMBNAIL_SIZE = "THUMSIZE";
+
 AuthMessageProcessor::AuthMessageProcessor(std::shared_ptr<DmAuthManager> authMgr) : authMgr_(authMgr)
 {
     LOGI("AuthMessageProcessor constructor");

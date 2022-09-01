@@ -27,6 +27,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
+constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
+constexpr const char* CONFIRM_TIMEOUT_TASK = "deviceManagerTimer:confirm";
+constexpr const char* INPUT_TIMEOUT_TASK = "deviceManagerTimer:input";
+constexpr const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
+constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNegotiate";
+constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
+constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
+
 constexpr int32_t DELAY_TICK_MILLSECONDS = 1000;
 typedef std::chrono::steady_clock::time_point   timerPoint;
 typedef std::chrono::steady_clock               steadyClock;

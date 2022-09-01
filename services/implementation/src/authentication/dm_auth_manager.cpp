@@ -41,6 +41,20 @@ const int32_t WAIT_REQUEST_TIMEOUT = 10;
 const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
 const int32_t DEVICE_ID_HALF = 2;
 const int32_t MAX_AUTH_TIMES = 3;
+const int32_t MIN_PIN_TOKEN = 10000000;
+const int32_t MAX_PIN_TOKEN = 90000000;
+const int32_t MIN_PIN_CODE = 100000;
+const int32_t MAX_PIN_CODE = 999999;
+const int32_t DM_AUTH_TYPE_MAX = 4;
+const int32_t DM_AUTH_TYPE_MIN = 1;
+const int32_t BUSINESS_FA_MIRGRATION = 0;
+const int32_t AUTH_SESSION_SIDE_SERVER = 0;
+
+constexpr const char* APP_NAME_KEY = "appName";
+constexpr const char* APP_ICON_KEY = "appIcon";
+constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
+constexpr const char* APP_DESCRIPTION_KEY = "appDescription";
+constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,

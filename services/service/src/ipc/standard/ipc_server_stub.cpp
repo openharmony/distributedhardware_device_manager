@@ -97,13 +97,11 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOGI("code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
         return ERR_DM_IPC_READ_FAILED;
     }
-
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
     if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
         LOGW("unsupported code: %d", code);
@@ -114,7 +112,6 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -122,7 +119,6 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         LOGE("set request cmd failed");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-    
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
         LOGW("unsupported code: %d", cmdCode);
