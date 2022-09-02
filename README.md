@@ -144,18 +144,18 @@ deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
 dmClass.on('deviceStateChange', (data) => {
     this.log("deviceStateChange on:" + JSON.stringify(data));
     switch (data.action) {
-      case 0: 
-        // ONLINE, the device is physically online
+      case ONLINE: 
+        // the device is physically online
         break;
-      case 1:
-        // READY, the information between devices has been synchronized in the Distributed Data Service (DDS) module,
+      case READY:
+        // the information between devices has been synchronized in the Distributed Data Service (DDS) module,
         // and the device is ready for running distributed services
         break;
-      case 2:
-        // OFFLINE, the device is physically offline
+      case OFFLINE:
+        // the device is physically offline
         break;
-      case 3:
-        // CHANGE, the device information is changed
+      case CHANGE:
+        // the device information is changed
         break;
       default:
         break;

@@ -143,17 +143,17 @@ deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
 dmClass.on('deviceStateChange', (data) => {
     this.log("deviceStateChange on:" + JSON.stringify(data));
     switch (data.action) {
-      case 0: 
-        // ONLINE, 设备物理上线状态
+      case ONLINE: 
+        // 设备物理上线状态
         break;
-      case 1:
-        // READY, 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
+      case READY:
+        // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
         break;
-      case 2:
-        // OFFLINE, 设备物理下线状态
+      case OFFLINE:
+        // 设备物理下线状态
         break;
-      case 3:
-        // CHANGE, 设备信息变更
+      case CHANGE:
+        // 设备信息变更
         break;
       default:
         break;
