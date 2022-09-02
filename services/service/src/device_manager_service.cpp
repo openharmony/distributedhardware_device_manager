@@ -251,7 +251,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s",pkgName.c_str());
+        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (!IsDMServiceImplReady()) {

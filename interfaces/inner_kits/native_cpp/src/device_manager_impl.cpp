@@ -203,7 +203,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
                                                 const std::string &extra, std::shared_ptr<DiscoveryCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
-        LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %s,",pkgName.c_str());
+        LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 

@@ -82,8 +82,8 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "ipc_server_client_proxy_fuzzer.cpp",
     "//foundation/distributedhardware/device_manager/services/service/src/ipc/standard/ipc_server_client_proxy.cpp",
+    "ipc_server_client_proxy_fuzzer.cpp",
   ]
 
   deps = [

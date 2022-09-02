@@ -82,8 +82,8 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "ipc_client_manager_fuzzer.cpp",
     "${innerkits_path}/native_cpp/src/ipc/standard/ipc_client_manager.cpp",
+    "ipc_client_manager_fuzzer.cpp",
   ]
 
   deps = [

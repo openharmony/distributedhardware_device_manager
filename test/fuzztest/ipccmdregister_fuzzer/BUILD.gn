@@ -84,8 +84,8 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
   ]
 
   sources = [
-    "ipc_cmd_register_fuzzer.cpp",
     "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+    "ipc_cmd_register_fuzzer.cpp",
   ]
 
   deps = [
