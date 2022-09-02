@@ -378,5 +378,14 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
     HiDumpHelper::GetInstance().HiDump(args, result);
     return DM_OK;
 }
+
+int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("NotifyEvent failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

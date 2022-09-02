@@ -143,7 +143,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int OnSessionOpened(int sessionId, int result);
-    
+
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionClosed
      * @tc.desc: Send Session Closed event to the device manager service impl
@@ -188,6 +188,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName);
+
+    /**
+     * @tc.name: DeviceManagerService::NotifyEvent
+     * @tc.desc: NotifyEvent
+     * @tc.type: FUNC
+     */
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

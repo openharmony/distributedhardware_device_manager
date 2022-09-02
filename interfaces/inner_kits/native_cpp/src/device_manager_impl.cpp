@@ -29,6 +29,7 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -733,6 +734,37 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
         return ret;
     }
     LOGI("UnRegisterCredentialCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManager::NotifyEvent error: pkgName empty");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
+        LOGE("DeviceManager::NotifyEvent eventId invalid");
+        return ERR_DM_FAILED;
+    }
+    LOGI("DeviceManager::NotifyEvent start, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcNotifyEventReq> req = std::make_shared<IpcNotifyEventReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetEventId(eventId);
+    req->SetEvent(event);
+
+    int32_t ret = ipcClientProxy_->SendRequest(NOTIFY_EVENT, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManager::NotifyEvent error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DeviceManager::NotifyEvent failed with ret %d", ret);
+        return ret;
+    }
+    LOGI("DeviceManager::NotifyEvent completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -58,16 +58,18 @@ public:
      */
     virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &deviceInfo) = 0;
     /**
-     * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
-     * @tc.desc: Register device development status callback
-     * @tc.type: FUNC
+     * @brief Register device status callback
+     * @param pkgName package name
+     * @param extra extra info
+     * @param callback device state callback
+     * @return if success return 0
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
                                              std::shared_ptr<DeviceStateCallback> callback) = 0;
     /**
-     * @tc.name: DeviceManagerImpl::UnRegisterDevStateCallback
-     * @tc.desc: UnRegister device development status callback
-     * @tc.type: FUNC
+     * @brief  Unregister device status callback
+     * @param pkgName package name
+     * @return if success return 0
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) = 0;
     /**
@@ -155,16 +157,16 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
-    /**
-     * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
-     * @tc.desc: Register development status callback
-     * @tc.type: FUNC
+   /**
+     * @brief  Unregister device status callback
+     * @param pkgName package name
+     * @param extra extra info
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
     /**
-     * @tc.name: DeviceManagerImpl::UnRegisterDevStateCallback
-     * @tc.desc: Unregister development status callback
-     * @tc.type: FUNC
+     * @brief  Unregister device status callback
+     * @param pkgName package name
+     * @param extra extra info
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
         /**
@@ -199,6 +201,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
+
+    /**
+     * @brief Notify Event to DM
+     * @param pkgName package name
+     * @param event event info
+     */
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

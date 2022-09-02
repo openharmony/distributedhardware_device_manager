@@ -23,12 +23,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
+const uint32_t DM_EVENT_WAIT_TIMEOUT = 2;
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     profileSoName_ = "libdevicemanagerext_profile.z.so";
     decisionSoName_ = "libdevicemanagerext_decision.z.so";
+    StartEventThread();
     LOGI("DmDeviceStateManager constructor");
 }
 
@@ -37,6 +40,44 @@ DmDeviceStateManager::~DmDeviceStateManager()
     LOGI("DmDeviceStateManager destructor");
     if (softbusConnector_ != nullptr) {
         softbusConnector_->UnRegisterSoftbusStateCallback("DM_PKG_NAME");
+    }
+    StopEventThread();
+}
+
+void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("SaveOnlineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+    std::string udid;
+    if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
+        std::string uuid;
+        DmDeviceInfo saveInfo = info;
+        SoftbusConnector::GetUuidByNetworkId(info.networkId, uuid);
+        {
+#if defined(__LITEOS_M__)
+            DmMutex mutexLock;
+#else
+            std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+            remoteDeviceInfos_[uuid] = saveInfo;
+        }
+        LOGI("SaveDeviceInfo in, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
+            std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
+    }
+}
+
+void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("DeleteOfflineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+    for (auto iter: remoteDeviceInfos_) {
+        if (iter.second.deviceId == info.deviceId) {
+            remoteDeviceInfos_.erase(iter.first);
+            break;
+        }
     }
 }
 
@@ -313,6 +354,79 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
         }
     }
     stateTimerInfoMap_.erase(name);
+}
+
+void DmDeviceStateManager::StartEventThread()
+{
+    LOGI("StartEventThread begin");
+    eventTask_.threadRunning_ = true;
+    eventTask_.queueThread_ = std::thread(&DmDeviceStateManager::ThreadLoop, this);
+    LOGI("StartEventThread complete");
+}
+
+void DmDeviceStateManager::StopEventThread()
+{
+    LOGI("StopEventThread begin");
+    eventTask_.threadRunning_ = false;
+    if (eventTask_.queueThread_.joinable()) {
+        eventTask_.queueThread_.join();
+    }
+    LOGI("StopEventThread complete");
+}
+
+int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
+{
+    LOGI("AddTask begin, eventId: %d", task->GetEventId());
+    {
+        std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
+        while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
+            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
+                [this]() { return (eventTask_.queue_.size() < DM_EVENT_QUEUE_CAPACITY); });
+        }
+        eventTask_.queue_.push(task);
+    }
+    eventTask_.queueCond_.notify_one();
+    LOGI("AddTask complete");
+    return DM_OK;
+}
+
+void DmDeviceStateManager::ThreadLoop()
+{
+    LOGI("ThreadLoop begin");
+    while (eventTask_.threadRunning_) {
+        std::shared_ptr<NotifyEvent> task = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
+            while (eventTask_.queue_.empty() && eventTask_.threadRunning_) {
+                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
+                    [this]() { return !eventTask_.queue_.empty(); });
+            }
+            if (!eventTask_.queue_.empty()) {
+                task = eventTask_.queue_.front();
+                eventTask_.queue_.pop();
+                eventTask_.queueFullCond_.notify_one();
+            }
+        }
+        if (task != nullptr) {
+            RunTask(task);
+        }
+    }
+    LOGI("ThreadLoop end");
+}
+
+void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
+{
+    LOGI("RunTask begin, eventId: %d", task->GetEventId());
+    if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
+        OnProfileReady(std::string(DM_PKG_NAME), task->GetDeviceId());
+    }
+    LOGI("RunTask complete");
+}
+
+int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
+    const std::string &deviceId)
+{
+    return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

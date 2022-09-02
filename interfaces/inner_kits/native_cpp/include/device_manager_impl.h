@@ -200,6 +200,12 @@ public:
      */
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) override;
 
+    /**
+     * @tc.name: DeviceManagerImpl::NotifyEvent
+     * @tc.desc: NotifyEvent
+     * @tc.type: FUNC
+     */
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

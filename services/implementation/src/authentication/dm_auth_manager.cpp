@@ -805,7 +805,7 @@ void DmAuthManager::ShowStartAuthDialog()
         LOGE("failed to ShowStartAuthDialog because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::ShowStartAuthDialog start because authResponseContext_ is nullptr");
+    LOGI("DmAuthManager::ShowStartAuthDialog start");
     authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
 }
 
