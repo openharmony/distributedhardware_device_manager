@@ -62,7 +62,7 @@ int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, co
 int32_t ProfileConnector::UnRegisterProfileCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("Not a reasonable function argument");
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
 

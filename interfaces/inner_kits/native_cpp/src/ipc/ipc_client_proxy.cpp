@@ -40,7 +40,8 @@ int32_t IpcClientProxy::UnInit(const std::string &pkgName)
 
 int32_t IpcClientProxy::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || ipcClientManager_ == nullptr) {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || ipcClientManager_ == nullptr || req == nullptr
+        || rsp == nullptr ) {
         LOGE("req,rsp or ipc client is null");
         return ERR_DM_POINT_NULL;
     }

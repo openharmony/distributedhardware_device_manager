@@ -29,7 +29,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     }
     std::string pkgName = req->GetPkgName();
     if (pkgName.empty()) {
-        LOGE("IpcServerListener::SendRequest error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);

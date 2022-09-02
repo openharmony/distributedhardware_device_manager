@@ -84,9 +84,9 @@ ohos_fuzztest("DeviceDiscoveryFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ 
-    "device_discovery_fuzzer.cpp",
+  sources = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/src/device_manager_impl.cpp",
+    "device_discovery_fuzzer.cpp",
   ]
 
   deps = [

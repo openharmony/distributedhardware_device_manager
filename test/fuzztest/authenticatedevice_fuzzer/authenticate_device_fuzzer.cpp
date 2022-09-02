@@ -45,7 +45,6 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DmDeviceInfo deviceInfo;
     std::string extraString(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
-    std::string deviceId = deviceInfo.deviceId;
 
     DeviceManager::GetInstance().AuthenticateDevice(pkgName, authType, deviceInfo, extraString, callback);
 }
