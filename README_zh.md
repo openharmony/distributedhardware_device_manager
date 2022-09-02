@@ -144,16 +144,16 @@ dmClass.on('deviceStateChange', (data) => {
     this.log("deviceStateChange on:" + JSON.stringify(data));
     switch (data.action) {
       case 0: 
-        // DEVICE_STATE_ONLINE, 设备物理上线状态
+        // ONLINE, 设备物理上线状态
         break;
       case 1:
-        // DEVICE_INFO_READY, 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
+        // READY, 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
         break;
       case 2:
-        // DEVICE_STATE_OFFLINE, 设备物理下线状态
+        // OFFLINE, 设备物理下线状态
         break;
       case 3:
-        // DEVICE_INFO_CHANGED, 设备信息变更
+        // CHANGE, 设备信息变更
         break;
       default:
         break;
