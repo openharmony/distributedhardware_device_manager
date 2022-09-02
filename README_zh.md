@@ -140,7 +140,25 @@ deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
 });
 
 // 注册/去注册设备上下线监听
-dmClass.on('deviceStateChange', data => this.log("deviceStateChange on:" + JSON.stringify(data)))
+dmClass.on('deviceStateChange', (data) => {
+    this.log("deviceStateChange on:" + JSON.stringify(data));
+    switch (data.action) {
+      case ONLINE: 
+        // 设备物理上线状态
+        break;
+      case READY:
+        // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
+        break;
+      case OFFLINE:
+        // 设备物理下线状态
+        break;
+      case CHANGE:
+        // 设备信息变更
+        break;
+      default:
+        break;
+    }
+});
 dmClass.off('deviceStateChange')
 
 // 查询可信设备列表
