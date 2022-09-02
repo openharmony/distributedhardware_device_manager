@@ -85,7 +85,6 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
-
     /**
      * @tc.name: DeviceManagerImpl::PublishDeviceDiscovery
      * @tc.desc: Publish device discovery
@@ -99,7 +98,6 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) = 0;
-
     /**
      * @tc.name: DeviceManagerImpl::AuthenticateDevice
      * @tc.desc: Complete verifying the device
@@ -203,7 +201,6 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
-
     /**
      * @brief Notify Event to DM
      * @param pkgName package name
