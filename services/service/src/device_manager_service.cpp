@@ -111,7 +111,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
                                                  std::string &udid)
 {
     if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
-        LOGE("DeviceManagerService::GetUdidByNetworkId error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
@@ -122,7 +122,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
                                                  std::string &uuid)
 {
     if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
-        LOGE("DeviceManagerService::GetUuidByNetworkId error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
