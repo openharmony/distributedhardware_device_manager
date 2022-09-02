@@ -50,7 +50,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
-                                         std::vector<DmDeviceInfo> &deviceList) = 0;
+        std::vector<DmDeviceInfo> &deviceList) = 0;
     /**
      * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
      * @tc.desc: Get local device information
@@ -78,7 +78,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                         const std::string &extra, std::shared_ptr<DiscoveryCallback> callback) = 0;
+        const std::string &extra, std::shared_ptr<DiscoveryCallback> callback) = 0;
     /**
      * @tc.name: DeviceManagerImpl::StopDeviceDiscovery
      * @tc.desc: Stop device discovery
@@ -106,7 +106,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &deviceInfo,
-                                       const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
+        const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
     /**
      * @tc.name: DeviceManagerImpl::UnAuthenticateDevice
      * @tc.desc: Cancel complete verification of device
@@ -119,14 +119,14 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
-                                         std::shared_ptr<VerifyAuthCallback> callback) = 0;
+        std::shared_ptr<VerifyAuthCallback> callback) = 0;
     /**
      * @tc.name: DeviceManagerImpl::RegisterDeviceManagerFaCallback
      * @tc.desc: Register Fa callback for device manager
      * @tc.type: FUNC
      */
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                    std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
+        std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
     /**
      * @tc.name: DeviceManagerImpl::UnRegisterDeviceManagerFaCallback
      * @tc.desc: Unregister Fa callback for device manager
