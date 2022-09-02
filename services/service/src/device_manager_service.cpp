@@ -185,9 +185,8 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {
-    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
-        LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %s, extra: %s",
-            pkgName.c_str(), extra.c_str());
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (!IsDMServiceImplReady()) {
@@ -251,9 +250,8 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (pkgName.empty() || extra.empty()) {
-        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
-            pkgName.c_str(), extra.c_str());
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s",pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (!IsDMServiceImplReady()) {
@@ -265,9 +263,8 @@ int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgNam
 
 int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (pkgName.empty() || extra.empty()) {
-        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
-            pkgName.c_str(), extra.c_str());
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     if (!IsDMServiceImplReady()) {
