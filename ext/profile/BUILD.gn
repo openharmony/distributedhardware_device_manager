@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
       "${innerkits_path}/native_cpp/include/ipc",
       "${innerkits_path}/native_cpp/include/ipc/standard",
+      "//base/notification/eventhandler/interfaces/inner_api",
       "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
       "//foundation/communication/dsoftbus/interfaces/kits/common",
       "//foundation/communication/dsoftbus/interfaces/kits/discovery",
