@@ -531,7 +531,7 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
                                               std::string &uuid)
 {
     if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
-        LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, udid: %s",
+        LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, uuid: %s",
             pkgName.c_str(), netWorkId.c_str(), uuid.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
