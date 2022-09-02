@@ -260,32 +260,6 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
 
 // Cancel device authentication.
 dmClass.unAuthenticateDevice(this.deviceInfo);
-
-// register device state callback
-dmClass.on('deviceStateChange', (data) => {
-    this.log("deviceStateChange on:" + JSON.stringify(data));
-    switch (data.action) {
-      case 0: 
-        // DEVICE_STATE_ONLINE, the device is physically online
-        break;
-      case 1:
-        // DEVICE_INFO_READY, the information between devices has been synchronized in the Distributed Data Service (DDS) module,
-        // and the device is ready for running distributed services
-        break;
-      case 2:
-        // DEVICE_STATE_OFFLINE, the device is physically offline
-        break;
-      case 3:
-        // DEVICE_INFO_CHANGED, the device information is changed
-        break;
-      default:
-        break;
-    }
-});
-
-// unregister device state callback
-dmClass.off('deviceStateChange');
-
 ```
 ## System Dialog Box FAs
 
