@@ -258,10 +258,6 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
 
 // 设备取消认证
 dmClass.unAuthenticateDevice(this.deviceInfo);
-
-
-// 去注册设备状态监听
-dmClass.off('deviceStateChange');
 ```
 ## 系统弹框FA
 
