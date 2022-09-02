@@ -29,7 +29,7 @@ void IpcServerClientProxyFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t cmdCode = *(reinterpret_cast<const int32_t*>(data));
+    int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     sptr<IRemoteObject> remoteObject = nullptr;

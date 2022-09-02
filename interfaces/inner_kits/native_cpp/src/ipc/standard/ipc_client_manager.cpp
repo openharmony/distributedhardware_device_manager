@@ -69,7 +69,7 @@ int32_t IpcClientManager::ClientInit()
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("IpcClientManager::Init error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -101,7 +101,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
 int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("IpcClientManager::UnInit error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     LOGI("in, pkgName %s", pkgName.c_str());

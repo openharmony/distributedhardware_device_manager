@@ -97,10 +97,6 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (code > sizeof(uint32_t)) {
-        LOGE("IpcServerStub::OnRemoteRequest error: Invalid para, code: %d", (int32_t)code);
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
-    }
     LOGI("code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
@@ -180,7 +176,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("IpcServerStub::UnRegisterDeviceManagerListener error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     LOGI("In, pkgName: %s", pkgName.c_str());
@@ -212,7 +208,7 @@ const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
     if (pkgName.empty()) {
-        LOGE("IpcServerStub::GetDmListener error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return nullptr;
     }
     auto iter = dmListener_.find(pkgName);
@@ -258,7 +254,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
         }
     }
     if (pkgName.empty()) {
-        LOGE("AppDeathRecipient: OnRemoteDied, no pkgName matched");
+        LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
     LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());

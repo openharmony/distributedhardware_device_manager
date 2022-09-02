@@ -89,7 +89,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
 int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
     if (pkgName.empty()) {
-        LOGE("DmDiscoveryManager::StopDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     std::lock_guard<std::mutex> autoLock(locks_);

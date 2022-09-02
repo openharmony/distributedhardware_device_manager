@@ -53,7 +53,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &pkgName
 int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("not a reasonable function argument");
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     LOGI("unregister profile listener with pkgName: %s", pkgName.c_str());

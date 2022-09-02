@@ -157,7 +157,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
     if (pkgName.empty()) {
-        LOGE(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_FAILED;
     }
     std::string deviceUdid;
