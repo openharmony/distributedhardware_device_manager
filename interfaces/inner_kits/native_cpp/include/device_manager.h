@@ -60,16 +60,16 @@ public:
     /**
      * @brief Register device status callback
      * @param pkgName package name
-     * @param extra extra info
+     * @param extra extra info.This parameter can be null.
      * @param callback device state callback
-     * @return if success return 0
+     * @return return 0 if success
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
-                                             std::shared_ptr<DeviceStateCallback> callback) = 0;
+        std::shared_ptr<DeviceStateCallback> callback) = 0;
     /**
-     * @brief  Unregister device status callback
+     * @brief Unregister device status callback
      * @param pkgName package name
-     * @return if success return 0
+     * @return return 0 if success
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) = 0;
     /**
@@ -160,13 +160,15 @@ public:
    /**
      * @brief  Unregister device status callback
      * @param pkgName package name
-     * @param extra extra info
+     * @param extra extra info.This parameter can be null.
+     * @return return 0 if success
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
     /**
      * @brief  Unregister device status callback
      * @param pkgName package name
-     * @param extra extra info
+     * @param extra extra info.This parameter can be null.
+     * @return return 0 if success
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
         /**
