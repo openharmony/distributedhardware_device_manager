@@ -140,7 +140,25 @@ deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
 });
 
 // 注册/去注册设备上下线监听
-dmClass.on('deviceStateChange', data => this.log("deviceStateChange on:" + JSON.stringify(data)))
+dmClass.on('deviceStateChange', (data) => {
+    this.log("deviceStateChange on:" + JSON.stringify(data));
+    switch (data.action) {
+      case 0: 
+        // DEVICE_STATE_ONLINE, 设备物理上线状态
+        break;
+      case 1:
+        // DEVICE_INFO_READY, 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
+        break;
+      case 2:
+        // DEVICE_STATE_OFFLINE, 设备物理下线状态
+        break;
+      case 3:
+        // DEVICE_INFO_CHANGED, 设备信息变更
+        break;
+      default:
+        break;
+    }
+});
 dmClass.off('deviceStateChange')
 
 // 查询可信设备列表
@@ -241,26 +259,6 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
 // 设备取消认证
 dmClass.unAuthenticateDevice(this.deviceInfo);
 
-// 注册设备状态监听
-dmClass.on('deviceStateChange', (data) => {
-    this.log("deviceStateChange on:" + JSON.stringify(data));
-    switch (data.action) {
-      case 0: 
-        // DEVICE_STATE_ONLINE, 设备物理上线状态
-        break;
-      case 1:
-        // DEVICE_INFO_READY, 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
-        break;
-      case 2:
-        // DEVICE_STATE_OFFLINE, 设备物理下线状态
-        break;
-      case 3:
-        // DEVICE_INFO_CHANGED, 设备信息变更
-        break;
-      default:
-        break;
-    }
-});
 
 // 去注册设备状态监听
 dmClass.off('deviceStateChange');
