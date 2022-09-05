@@ -150,7 +150,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "UTTest_softbus_connector.cpp",
   ]
 
-  deps = [ ":device_manager_test" ]
+  deps = [ ":device_manager_test_common" ]
 
   external_deps = [
     "hisysevent_native:libhisysevent",
@@ -371,7 +371,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
     "UTTest_device_manager_service_listener.cpp",
   ]
 
-  deps = [ ":device_manager_test" ]
+  deps = [ ":device_manager_test_common" ]
 }
 
 ## UnitTest UTTest_device_manager_service_listener }}}
@@ -448,7 +448,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "UTTest_dm_discovery_manager.cpp",
   ]
 
-  deps = [ ":device_manager_test" ]
+  deps = [ ":device_manager_test_common" ]
 
   external_deps = [ "hitrace_native:hitrace_meter" ]
 }
@@ -472,7 +472,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "UTTest_dm_publish_manager.cpp",
   ]
 
-  deps = [ ":device_manager_test" ]
+  deps = [ ":device_manager_test_common" ]
 
   external_deps = [ "hitrace_native:hitrace_meter" ]
 }
@@ -498,10 +498,8 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/dependency/softbus",
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/publish",
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/deviceinfo/",
@@ -523,85 +521,8 @@ config("device_manager_test_common_public_config") {
     "//base/security/device_auth/interfaces/innerkits",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-  ]
-
-  cflags = [
-    "-Wall",
-    "-Werror",
-    "-g3",
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"device_manager_UTtest\"",
-    "LOG_DOMAIN=0xD004190",
-  ]
-}
-
-ohos_static_library("device_manager_test_common") {
-  testonly = true
-
-  visibility = [ ":*" ]
-
-  public_configs = [ ":device_manager_test_common_public_config" ]
-
-  public_deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservice",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${utils_path}:devicemanagerutils",
-    "//commonlibrary/c_utils/base:utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
-    "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest",
-  ]
-}
-
-## Build device_manager_test_common.a }}}
-
-## Build device_manager_test_common.a {{{
-config("device_manager_test_common_public") {
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "${innerkits_path}/native_cpp/include",
-    "${innerkits_path}/native_cpp/include/ipc",
-    "${innerkits_path}/native_cpp/include/notify",
-    "//third_party/json/include",
-    "${common_path}/include",
-    "${common_path}/include/ipc",
-    "${common_path}/include/ipc/model",
-    "${utils_path}/include",
-    "${utils_path}/include/ipc/standard",
-    "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/discovery",
-    "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/dependency/multipleuser",
-    "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/authentication",
-    "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/publish",
-    "${servicesimpl_path}/include/deviceinfo/",
-    "${servicesimpl_path}/include/devicestate",
-    "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
-    "${services_path}/include",
-    "${services_path}/include/softbus",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/",
-    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-    "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
-    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//base/security/device_auth/interfaces/innerkits",
     "//foundation/systemabilitymgr/safwk/services/safwk",
   ]
 
@@ -626,24 +547,25 @@ config("device_manager_test_common_public") {
     "DH_LOG_TAG=\"device_manager_UTtest\"",
     "LOG_DOMAIN=0xD004190",
   ]
-
-  if (os_account_part_exists) {
-    defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-  }
 }
 
-ohos_static_library("device_manager_test") {
+ohos_static_library("device_manager_test_common") {
   testonly = true
+
   cflags_cc = []
+
   visibility = [ ":*" ]
 
-  public_configs = [ ":device_manager_test_common_public" ]
+  public_configs = [ ":device_manager_test_common_public_config" ]
 
   public_deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${services_path}:devicemanagerservice",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
@@ -653,8 +575,6 @@ ohos_static_library("device_manager_test") {
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${ability_runtime_services_path}/abilitymgr:abilityms",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
     "//base/security/device_auth/services:deviceauth_sdk",
   ]
 
@@ -679,4 +599,5 @@ ohos_static_library("device_manager_test") {
     "samgr:samgr_proxy",
   ]
 }
-## Build device_manager_test.a }}}
+
+## Build device_manager_test_common.a }}}
