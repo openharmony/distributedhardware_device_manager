@@ -599,5 +599,4 @@ ohos_static_library("device_manager_test_common") {
     "samgr:samgr_proxy",
   ]
 }
-
 ## Build device_manager_test_common.a }}}
