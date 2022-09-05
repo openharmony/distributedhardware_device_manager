@@ -26,6 +26,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+typedef enum DmNotifyEvent {
+    DM_NOTIFY_EVENT_START = 0,
+    DM_NOTIFY_EVENT_ONDEVICEREADY,
+    // Add event here
+    DM_NOTIFY_EVENT_BUTT,
+} DmNotifyEvent;
+
 typedef enum DmDeviceType {
     DEVICE_TYPE_UNKNOWN = 0x00,
     DEVICE_TYPE_WIFI_CAMERA = 0x08,

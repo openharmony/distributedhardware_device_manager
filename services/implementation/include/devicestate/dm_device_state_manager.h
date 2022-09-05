@@ -16,8 +16,12 @@
 #ifndef OHOS_DM_DEVICE_STATE_MANAGER_H
 #define OHOS_DM_DEVICE_STATE_MANAGER_H
 
-#include <string>
+#include <condition_variable>
 #include <memory>
+#include <queue>
+#include <string>
+#include <thread>
+
 #if defined(__LITEOS_M__)
 #include "dm_mutex.h"
 #else
@@ -38,6 +42,33 @@ struct StateTimerInfo {
     std::string deviceId;
 };
 
+class NotifyEvent {
+public:
+    NotifyEvent(int32_t eventId, const std::string &deviceId) : eventId_(eventId), deviceId_(deviceId) {};
+    ~NotifyEvent() {};
+
+    int32_t GetEventId() const
+    {
+        return eventId_;
+    };
+    std::string GetDeviceId() const
+    {
+        return deviceId_;
+    };
+private:
+    int32_t eventId_;
+    std::string deviceId_;
+};
+
+typedef struct NotifyTask {
+    std::thread queueThread_;
+    std::condition_variable queueCond_;
+    std::condition_variable queueFullCond_;
+    std::mutex queueMtx_;
+    std::queue<std::shared_ptr<NotifyEvent>> queue_;
+    bool threadRunning_ = false;
+} NotifyTask;
+
 class DmDeviceStateManager final : public ISoftbusStateCallback,
                                    public std::enable_shared_from_this<DmDeviceStateManager> {
 public:
@@ -45,6 +76,20 @@ public:
                          std::shared_ptr<IDeviceManagerServiceListener> listener,
                          std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDeviceStateManager();
+
+    /**
+     * @tc.name: DmDeviceStateManager::SaveOnlineDeviceInfo
+     * @tc.desc: Save Online DeviceInfo of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    void SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
+
+    /**
+     * @tc.name: DmDeviceStateManager::DeleteOfflineDeviceInfo
+     * @tc.desc: Delete Offline DeviceInfo of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    void DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::RegisterProfileListener
@@ -151,6 +196,19 @@ public:
      */
     void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
+    /**
+     * @tc.name: DmDeviceStateManager::ProcNotifyEvent
+     * @tc.desc: Proc Notify Event of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    int32_t ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
+
+private:
+    void StartEventThread();
+    void StopEventThread();
+    void ThreadLoop();
+    int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
+    void RunTask(const std::shared_ptr<NotifyEvent> &task);
 private:
     int32_t cumulativeQuantity_ = 0;
     std::string profileSoName_;
@@ -166,6 +224,7 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::string decisionSoName_;
+    NotifyTask eventTask_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -71,7 +71,7 @@ public:
     void HandleDeviceOffline(const DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
-    
+
     void OnSessionClosed(int sessionId);
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
@@ -86,6 +86,9 @@ public:
 
     int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
+    int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
+private:
+    int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
