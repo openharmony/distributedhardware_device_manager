@@ -129,7 +129,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || req == nullptr || rsp == nullptr) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
         LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
