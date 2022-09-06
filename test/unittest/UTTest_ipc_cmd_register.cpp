@@ -79,8 +79,8 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_001, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

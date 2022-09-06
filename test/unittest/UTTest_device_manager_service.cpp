@@ -69,7 +69,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestS
 
 /**
  * @tc.name: StartDeviceDiscovery_002
- * @tc.desc: Empty pkgName of StartDeviceDiscovery and return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Empty pkgName of StartDeviceDiscovery and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -79,7 +79,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_002, testing::ext::TestS
     DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -116,7 +116,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSi
 
 /**
  * @tc.name:StopDeviceDiscovery_002
- * @tc.desc: StopDeviceDiscovery is initialized, pkgName is null, and its return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: StopDeviceDiscovery is initialized, pkgName is null, and its return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -125,7 +125,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
     std::string pkgName;
     uint16_t subscribeId = 1;
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -149,7 +149,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::Tes
 
 /**
  * @tc.name: PublishDeviceDiscovery_002
- * @tc.desc: Empty pkgName of PublishDeviceDiscovery and return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Empty pkgName of PublishDeviceDiscovery and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -158,7 +158,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::Tes
     std::string pkgName;
     DmPublishInfo publishInfo;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -194,7 +194,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::T
 
 /**
  * @tc.name: UnPublishDeviceDiscovery_002
- * @tc.desc: UnPublishDeviceDiscovery is initialized, pkgName is null, and its return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: UnPublishDeviceDiscovery is initialized, pkgName is null, and its return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -204,12 +204,12 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::T
     int32_t publishId = 1;
     DeviceManagerService::GetInstance().Init();
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: GetTrustedDeviceList_002
- * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -219,7 +219,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
     std::string extra = "jdddd";
     std::vector<DmDeviceInfo> deviceList;
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -240,7 +240,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
 
 /**
  * @tc.name: AuthenticateDevice_002
- * @tc.desc: Set intFlag for GAuthenticateDevice to True and pkgName to null; Return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Set intFlag for GAuthenticateDevice to True and pkgName to null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -251,12 +251,12 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSiz
     int32_t authType = 0;
     std::string deviceId = " 2345";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: AuthenticateDevice_003
- * @tc.desc: Set intFlag for GAuthenticateDevice to True and deviceId to null; Return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Set intFlag for GAuthenticateDevice to True and deviceId to null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -267,7 +267,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
     int32_t authType = 0;
     std::string deviceId;
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -286,7 +286,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestS
 
 /**
  * @tc.name: UnAuthenticateDevice_002
- * @tc.desc:  Set intFlag for UnAuthenticateDevice to True and pkgName to null; Return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc:  Set intFlag for UnAuthenticateDevice to True and pkgName to null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -295,13 +295,13 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestS
     std::string pkgName;
     std::string deviceId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnAuthenticateDevice_003
  * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId  null ，The return
- * value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -310,7 +310,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     std::string deviceId;
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -362,7 +362,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSiz
 /**
  * @tc.name: GetUdidByNetworkId_003
  * @tc.desc: Make pkgName empty for GetUdidByNetworkId，The return value is
- * ERR_DM_INPUT_PARAMETER_EMPTY
+ * ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -372,7 +372,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSiz
     std::string netWorkId = "";
     std::string udid = "";
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -410,7 +410,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSiz
 /**
  * @tc.name: GetUuidByNetworkId_003
  * @tc.desc: Make pkgName empty for GetUuidByNetworkId，The return value is
- * ERR_DM_INPUT_PARAMETER_EMPTY
+ * ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -420,7 +420,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSiz
     std::string netWorkId = "";
     std::string uuid = "";
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -441,7 +441,7 @@ HWTEST_F(DeviceManagerServiceTest, GetFaParam_001, testing::ext::TestSize.Level0
 /**
  * @tc.name: GetFaParam_002
  * @tc.desc: Make pkgName empty for GetFaParam, The return value is
- * ERR_DM_INPUT_PARAMETER_EMPTY
+ * ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -450,7 +450,7 @@ HWTEST_F(DeviceManagerServiceTest, GetFaParam_002, testing::ext::TestSize.Level0
     std::string pkgName = "";
     DmAuthParam authParam;
     int ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -471,7 +471,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.
 /**
  * @tc.name: SetUserOperation_002
  * @tc.desc: Make pkgName empty for SetUserOperation，The return value is
- * ERR_DM_INPUT_PARAMETER_EMPTY
+ * ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -480,7 +480,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
     std::string pkgName = "";
     int32_t action = 0;
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

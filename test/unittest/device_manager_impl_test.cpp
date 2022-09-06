@@ -43,7 +43,7 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager, testing::ext::TestSize.Level0
 {
     std::string packName = "";
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, nullptr);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, AuthenticateDevice1, testing::ext::TestSize.Level0)
@@ -54,7 +54,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice1, testing::ext::TestSize.Leve
     std::string extra = "";
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().AuthenticateDevice(packName, authType, dmDeviceInfo, extra, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, AuthenticateDevice2, testing::ext::TestSize.Level0)
@@ -97,7 +97,7 @@ HWTEST_F(DeviceManagerImplTest, VerifyAuthentication1, testing::ext::TestSize.Le
     std::string authPara = "";
     std::shared_ptr<VerifyAuthCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(packName, authPara, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, VerifyAuthentication2, testing::ext::TestSize.Level0)
@@ -137,7 +137,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery1, testing::ext::TestSize.Le
     std::string extra = "";
     std::shared_ptr<DiscoveryCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery2, testing::ext::TestSize.Level0)
@@ -178,7 +178,7 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery1, testing::ext::TestSize.
     DmPublishInfo publishInfo;
     std::shared_ptr<PublishCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, publishInfo, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery2, testing::ext::TestSize.Level0)

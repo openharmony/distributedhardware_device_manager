@@ -220,7 +220,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_003, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DmAuthManager::VerifyAuthentication_004
- * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -236,7 +236,7 @@ HWTEST_F(PinAuthTest, VerifyAuthentication_004, testing::ext::TestSize.Level0)
     std::string authToken = authTokenJson.dump();
     std::string authParam = authParamJson.dump();
     int32_t ret = pinAuth->VerifyAuthentication(authToken, authParam);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

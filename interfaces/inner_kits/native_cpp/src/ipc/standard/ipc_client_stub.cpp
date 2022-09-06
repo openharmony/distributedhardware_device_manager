@@ -44,7 +44,7 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
@@ -54,7 +54,7 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         LOGE("set request cmd failed");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-    
+
     LOGI("cmdCode = %d, flags= %d.", cmdCode, option.GetFlags());
     if (IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply) == DM_OK) {
         LOGE("on ipc cmd success");

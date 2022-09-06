@@ -60,7 +60,7 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     DmTraceStart(std::string(DM_HITRACE_INIT));
     if (pkgName.empty() || dmInitCallback == nullptr) {
         LOGE("DeviceManagerImpl::InitDeviceManager error: Invalid parameter, pkgName: %s", pkgName.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     int32_t ret = DM_OK;
@@ -96,7 +96,7 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManager::UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
@@ -115,7 +115,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::GetTrustedDeviceList start, pkgName: %s, extra: %s", pkgName.c_str(), extra.c_str());
 
@@ -175,7 +175,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     LOGI("DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDevStateCallback error: Invalid para");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
@@ -190,7 +190,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManager::UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
@@ -205,7 +205,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("DeviceManager::StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
@@ -243,7 +243,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
     LOGI("DeviceManager::StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("StopDeviceDiscovery in, pkgName %s", pkgName.c_str());
@@ -273,7 +273,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("PublishDeviceDiscovery error: pkgName %s invalid para", pkgName.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("DeviceManager::PublishDeviceDiscovery start, pkgName %s", pkgName.c_str());
@@ -304,7 +304,7 @@ int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, 
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("UnPublishDeviceDiscovery start, pkgName %s", pkgName.c_str());
@@ -335,7 +335,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::DeviceManager::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_AUTH_TO_CONSULT));
@@ -374,7 +374,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
         GetAnonyString(std::string(deviceInfo.deviceId)).c_str());
     if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
         LOGE("UnAuthenticateDevice error: Invalid para");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
@@ -406,7 +406,7 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
     LOGI("DeviceManager::RegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDeviceManagerFaCallback error: Invalid para");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     LOGI("DeviceManager::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
@@ -417,7 +417,7 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManager::UnRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
@@ -431,7 +431,7 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
     LOGI("DeviceManager::VerifyAuthentication start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     DeviceManagerNotify::GetInstance().RegisterVerifyAuthenticationCallback(pkgName, authPara, callback);
@@ -461,7 +461,7 @@ int32_t DeviceManagerImpl::GetFaParam(const std::string &pkgName, DmAuthParam &d
     LOGI("DeviceManager::GetFaParam start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
@@ -482,7 +482,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
     LOGI("DeviceManager::SetUserOperation start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcGetOperationReq> req = std::make_shared<IpcGetOperationReq>();
@@ -508,7 +508,7 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
     if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
         LOGE("DeviceManagerImpl::GetUdidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s",
             pkgName.c_str(), GetAnonyString(netWorkId).c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
@@ -534,7 +534,7 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
     if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
         LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, uuid: %s",
             pkgName.c_str(), netWorkId.c_str(), uuid.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
@@ -558,7 +558,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
@@ -581,7 +581,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
@@ -606,7 +606,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
     if (pkgName.empty() || reqJsonStr.empty()) {
         LOGE("DeviceManagerImpl::RequestCredential error: Invalid para, pkgName is %s, reqJsonStr is %s",
             pkgName.c_str(), reqJsonStr.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("start to RequestCredential.");
@@ -633,7 +633,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
             pkgName.c_str(), credentialInfo.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to ImportCredential.");
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
@@ -658,7 +658,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
             pkgName.c_str(), deleteInfo.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to DeleteCredential.");
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
@@ -683,7 +683,7 @@ int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterCredentialCallback error: Invalid para");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("DeviceManager::RegisterCredentialCallback start, pkgName: %s", pkgName.c_str());
@@ -710,7 +710,7 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("DeviceManager::UnRegisterCredentialCallback start, pkgName: %s", pkgName.c_str());
@@ -737,11 +737,11 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
 {
     if (pkgName.empty()) {
         LOGE("DeviceManager::NotifyEvent error: pkgName empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("DeviceManager::NotifyEvent eventId invalid");
-        return ERR_DM_FAILED;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManager::NotifyEvent start, pkgName: %s", pkgName.c_str());
     std::shared_ptr<IpcNotifyEventReq> req = std::make_shared<IpcNotifyEventReq>();

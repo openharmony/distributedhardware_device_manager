@@ -55,16 +55,16 @@ HWTEST_F(TimeHeapTest, StartTimer_001, testing::ext::TestSize.Level0)
 
     std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
     int32_t ret = timer->StartTimer("", timeout, TimeOut);
-    EXPECT_EQ(ERR_DM_INPUT_PARAMETER_EMPTY, ret);
+    EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), 400, TimeOut);
-    EXPECT_EQ(ERR_DM_INPUT_PARAMETER_EMPTY, ret);
+    EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), -20, TimeOut);
-    EXPECT_EQ(ERR_DM_INPUT_PARAMETER_EMPTY, ret);
+    EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), timeout, nullptr);
-    EXPECT_EQ(ERR_DM_INPUT_PARAMETER_EMPTY, ret);
+    EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 }
 
 /**
@@ -98,7 +98,7 @@ HWTEST_F(TimeHeapTest, DeleteTimer_001, testing::ext::TestSize.Level0)
     std::string name = std::string(AUTHENTICATE_TIMEOUT_TASK);
     std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
     int32_t ret = timer->DeleteTimer("");
-    EXPECT_EQ(ERR_DM_INPUT_PARAMETER_EMPTY, ret);
+    EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->DeleteTimer(name);
     EXPECT_EQ(DM_OK, ret);

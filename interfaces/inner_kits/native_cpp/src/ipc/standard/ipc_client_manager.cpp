@@ -70,7 +70,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     int32_t ret = ClientInit();
@@ -102,7 +102,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
@@ -131,7 +131,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
         LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("IpcClientManager::SendRequest in");
     std::string pkgName = req->GetPkgName();

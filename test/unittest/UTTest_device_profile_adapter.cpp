@@ -50,7 +50,7 @@ std::shared_ptr<DmDeviceStateManager> deviceStateMgr = std::make_shared<DmDevice
  * @tc.name: RegisterProfileListener_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -69,7 +69,7 @@ HWTEST_F(DeviceProfileAdapterTest, RegisterProfileListener_001, testing::ext::Te
  * @tc.name: UnRegisterProfileListener_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -77,7 +77,7 @@ HWTEST_F(DeviceProfileAdapterTest, UnRegisterProfileListener_001, testing::ext::
 {
     std::string pkgName = "com.ohos.test";
     std::shared_ptr<DeviceProfileAdapter> deviceProfileAdapter = std::make_shared<DeviceProfileAdapter>();
-    
+
     int32_t ret = DM_OK;
     ret = deviceProfileAdapter->UnRegisterProfileListener(pkgName);
     ASSERT_EQ(ret, DM_OK);
@@ -87,7 +87,7 @@ HWTEST_F(DeviceProfileAdapterTest, UnRegisterProfileListener_001, testing::ext::
  * @tc.name: OnProfileChanged_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -96,7 +96,7 @@ HWTEST_F(DeviceProfileAdapterTest, OnProfileChanged_001, testing::ext::TestSize.
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "deviceId";
     std::shared_ptr<DeviceProfileAdapter> deviceProfileAdapter = std::make_shared<DeviceProfileAdapter>();
-    
+
     int32_t ret = DM_OK;
     deviceProfileAdapter->OnProfileChanged(pkgName, deviceId);
     ASSERT_EQ(ret, DM_OK);
@@ -106,7 +106,7 @@ HWTEST_F(DeviceProfileAdapterTest, OnProfileChanged_001, testing::ext::TestSize.
  * @tc.name: OnProfileComplete_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARAMETER_EMPTY
+ * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -115,7 +115,7 @@ HWTEST_F(DeviceProfileAdapterTest, OnProfileComplete_001, testing::ext::TestSize
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "deviceId";
     std::shared_ptr<DeviceProfileAdapter> deviceProfileAdapter = std::make_shared<DeviceProfileAdapter>();
-    
+
     int32_t ret = DM_OK;
     deviceProfileAdapter->OnProfileComplete(pkgName, deviceId);
     ASSERT_EQ(ret, DM_OK);

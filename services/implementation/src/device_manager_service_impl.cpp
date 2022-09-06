@@ -113,7 +113,7 @@ int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgNam
     }
     if (pkgName.empty()) {
         LOGE("StartDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
 }
@@ -126,7 +126,7 @@ int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName
     }
     if (pkgName.empty()) {
         LOGE("StopDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
 }
@@ -139,7 +139,7 @@ int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgN
     }
     if (pkgName.empty()) {
         LOGE("PublishDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
 }
@@ -152,7 +152,7 @@ int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pk
     }
     if (pkgName.empty()) {
         LOGE("UnPublishDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return publishMgr_->UnPublishDeviceDiscovery(pkgName, publishId);
 }
@@ -167,7 +167,7 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
@@ -181,7 +181,7 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
     if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s",
             pkgName.c_str(), deviceId.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->UnAuthenticateDevice(pkgName, deviceId);
 }
@@ -199,7 +199,7 @@ int32_t DeviceManagerServiceImpl::GetFaParam(std::string &pkgName, DmAuthParam &
 {
     if (pkgName.empty()) {
         LOGE("GetFaParam failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authMgr_ != nullptr) {
         authMgr_->GetAuthenticationParam(authParam);
@@ -211,7 +211,7 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
 {
     if (pkgName.empty()) {
         LOGE("SetUserOperation failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authMgr_ != nullptr) {
         authMgr_->OnUserOperation(action);
@@ -224,7 +224,7 @@ int32_t DeviceManagerServiceImpl::RegisterDevStateCallback(const std::string &pk
     if (pkgName.empty()) {
         LOGE("DeviceManagerServiceImpl::RegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
             pkgName.c_str(), extra.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (deviceStateMgr_ != nullptr) {
         deviceStateMgr_->RegisterDevStateCallback(pkgName, extra);
@@ -236,7 +236,7 @@ int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &
 {
     if (pkgName.empty()) {
         LOGE("UnRegisterDevStateCallback failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (deviceStateMgr_!= nullptr) {
         deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
@@ -277,7 +277,7 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 {
     if (reqJsonStr.empty()) {
         LOGE("reqJsonStr is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
         LOGE("credentialMgr_ is nullptr");
@@ -291,7 +291,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
             pkgName.c_str(), credentialInfo.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
         LOGE("credentialMgr_ is nullptr");
@@ -305,7 +305,7 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
             pkgName.c_str(), deleteInfo.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
         LOGE("credentialMgr_ is nullptr");
@@ -318,7 +318,7 @@ int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &
 {
     if (pkgName.empty()) {
         LOGE("RegisterCredentialCallback failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_ == nullptr) {
         LOGE("credentialMgr_ is nullptr");
@@ -331,7 +331,7 @@ int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string
 {
     if (pkgName.empty()) {
         LOGE("UnRegisterCredentialCallback failed, pkgName is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
         LOGE("credentialMgr_ is nullptr");
@@ -363,13 +363,13 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
 {
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("NotifyEvent eventId invalid");
-        return ERR_DM_FAILED;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (eventId == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         nlohmann::json jsonObject;
         if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
             LOGE("NotifyEvent json invalid");
-            return ERR_DM_FAILED;
+            return ERR_DM_INPUT_PARA_INVALID;
         }
         std::string deviceId;
         jsonObject["extra"]["deviceId"].get_to(deviceId);
@@ -379,7 +379,7 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         }
         if (deviceStateMgr_->ProcNotifyEvent(pkgName, eventId, deviceId) != DM_OK) {
             LOGE("NotifyEvent failed");
-            return ERR_DM_FAILED;
+            return ERR_DM_INPUT_PARA_INVALID;
         };
     }
     return DM_OK;

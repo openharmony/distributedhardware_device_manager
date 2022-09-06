@@ -30,7 +30,7 @@ static ERROR_INFO g_errorMessages[] = {
     {ERR_DM_NOT_INIT, "dm service is not initialized, please try again later."},
     {ERR_DM_INIT_FAILED, "dm service initialize failed."},
     {ERR_DM_POINT_NULL, "dm service null pointer exception occurred."},
-    {ERR_DM_INPUT_PARAMETER_EMPTY, "the function call input parameter is empty."},
+    {ERR_DM_INPUT_PARA_INVALID, "the function call input para is invalid."},
     {ERR_DM_NO_PERMISSION, "no permission for function call."},
     {ERR_DM_MALLOC_FAILED, "memory allocation failed."},
     {ERR_DM_DISCOVERY_FAILED, "device discovery failed."},
