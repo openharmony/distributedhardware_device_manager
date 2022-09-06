@@ -68,6 +68,10 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     int32_t ret = ClientInit();
     if (ret != DM_OK) {
@@ -96,6 +100,10 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
 
 int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     LOGI("in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
@@ -121,6 +129,10 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK || req == nullptr || rsp == nullptr) {
+        LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     LOGI("IpcClientManager::SendRequest in");
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {

@@ -23,7 +23,15 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     std::string pkgName = req->GetPkgName();
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
         LOGI("cannot get listener for package:%s.", pkgName.c_str());
@@ -34,6 +42,10 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
     for (auto iter : listeners) {
         auto pkgName = iter.first;

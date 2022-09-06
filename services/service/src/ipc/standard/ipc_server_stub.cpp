@@ -97,6 +97,7 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    LOGI("code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
@@ -112,6 +113,11 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
+    LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -170,8 +176,8 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("Error: parameter invalid");
-        return ERR_DM_POINT_NULL;
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     LOGI("In, pkgName: %s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
@@ -201,6 +207,10 @@ const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
 
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return nullptr;
+    }
     auto iter = dmListener_.find(pkgName);
     if (iter == dmListener_.end()) {
         return nullptr;
@@ -244,7 +254,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
         }
     }
     if (pkgName.empty()) {
-        LOGE("AppDeathRecipient: OnRemoteDied, no pkgName matched");
+        LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
     LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());

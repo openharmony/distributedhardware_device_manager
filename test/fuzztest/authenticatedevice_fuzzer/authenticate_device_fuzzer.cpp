@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <unistd.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -24,9 +25,18 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+class AuthenticateCallbackTest : public AuthenticateCallback {
+public:
+    virtual ~AuthenticateCallbackTest()
+    {
+    }
+    virtual void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
+                              int32_t reason) override {}
+};
+
 void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
 
@@ -34,10 +44,9 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
     DmDeviceInfo deviceInfo;
     std::string extraString(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
 
-    DeviceManager::GetInstance().AuthenticateDevice(pkgName,
-        authType, deviceInfo, extraString, callback);
+    DeviceManager::GetInstance().AuthenticateDevice(pkgName, authType, deviceInfo, extraString, callback);
 }
 }
 }

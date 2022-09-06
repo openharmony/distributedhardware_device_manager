@@ -28,7 +28,7 @@ typedef struct DmDiscoveryContext {
     std::string pkgName;
     std::string extra;
     uint16_t subscribeId;
-    std::string                  filterOp;
+    std::string filterOp;
     std::vector<DmDeviceFilters> filters;
 } DmDiscoveryContext;
 

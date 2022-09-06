@@ -82,6 +82,10 @@ int32_t DmPublishManager::PublishDeviceDiscovery(const std::string &pkgName, con
 
 int32_t DmPublishManager::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARAMETER_EMPTY;
+    }
     std::lock_guard<std::mutex> autoLock(locks_);
     if (!publishQueue_.empty()) {
         publishQueue_.pop();
@@ -96,6 +100,10 @@ int32_t DmPublishManager::UnPublishDeviceDiscovery(const std::string &pkgName, i
 
 void DmPublishManager::OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult)
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
     LOGI("DmPublishManager::OnPublishResult, publishId = %d, publishResult = %d", publishId, publishResult);
     if (publishResult != 0) {
         UnPublishDeviceDiscovery(pkgName, publishId);

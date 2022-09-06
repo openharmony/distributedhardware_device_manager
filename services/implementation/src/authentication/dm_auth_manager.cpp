@@ -81,7 +81,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-            pkgName.c_str(), deviceId.c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
@@ -157,7 +157,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
     if (pkgName.empty()) {
-        LOGE(" DmAuthManager::UnAuthenticateDevice failed pkgName is null");
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_FAILED;
     }
     std::string deviceUdid;

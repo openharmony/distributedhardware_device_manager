@@ -73,7 +73,6 @@ ohos_fuzztest("DeviceDiscoveryFuzzTest") {
     "//third_party/jsframework/runtime/main/extend/systemplugin",
     "//third_party/node/benchmark",
     "//third_party/libuv/include",
-    "//foundation/distributedhardware/device_manager/interfaces/kits/js/include",
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
@@ -85,7 +84,10 @@ ohos_fuzztest("DeviceDiscoveryFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "device_discovery_fuzzer.cpp" ]
+  sources = [
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/src/device_manager_impl.cpp",
+    "device_discovery_fuzzer.cpp",
+  ]
 
   deps = [
     "${utils_path}:devicemanagerutils",
