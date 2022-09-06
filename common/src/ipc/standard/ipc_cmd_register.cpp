@@ -53,7 +53,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
@@ -70,7 +70,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
