@@ -42,7 +42,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARAMETER_EMPTY;
     }
