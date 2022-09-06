@@ -110,7 +110,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
 {
-    if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -121,7 +121,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &uuid)
 {
-    if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
