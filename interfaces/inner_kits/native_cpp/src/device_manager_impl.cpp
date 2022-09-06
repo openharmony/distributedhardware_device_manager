@@ -505,7 +505,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
 int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                               std::string &udid)
 {
-    if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("DeviceManagerImpl::GetUdidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s",
             pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -531,7 +531,7 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
 int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                               std::string &uuid)
 {
-    if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, uuid: %s",
             pkgName.c_str(), netWorkId.c_str(), uuid.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
