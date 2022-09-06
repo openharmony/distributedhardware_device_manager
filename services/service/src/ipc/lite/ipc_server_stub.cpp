@@ -77,7 +77,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     bool ret = ReadRemoteObject(req, &svc);
     if (!ret || name == NULL || len == 0) {
         LOGE("get para failed");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     CommonSvcId svcId = {0};

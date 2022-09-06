@@ -82,12 +82,12 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     if (pkgName.empty() || deviceId.empty() || extra.empty()) {
         LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
     if (listener_ == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice is empty nullptr");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
@@ -103,13 +103,13 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("AuthenticateDevice failed, the discoveryDeviceInfoMap_ not have this device");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARAMETER_EMPTY);
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (extra.empty()) {
         LOGE("AuthenticateDevice failed, extra is empty");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARAMETER_EMPTY);
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     authPtr_ = authenticationMap_[authType];
@@ -195,12 +195,12 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
         case DM_OK:
             authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
             break;
-        case ERR_DM_INPUT_PARAMETER_EMPTY:
+        case ERR_DM_INPUT_PARA_INVALID:
             listener_->OnVerifyAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-                                          ERR_DM_INPUT_PARAMETER_EMPTY, "");
+                                          ERR_DM_INPUT_PARA_INVALID, "");
             break;
         default:
-            authRequestContext_->reason = ERR_DM_INPUT_PARAMETER_EMPTY;
+            authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
             authResponseContext_->state = authRequestState_->GetStateType();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             break;
@@ -382,7 +382,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
                 authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
-                authRequestContext_->reason = ERR_DM_INPUT_PARAMETER_EMPTY;
+                authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             } else {
                 timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,

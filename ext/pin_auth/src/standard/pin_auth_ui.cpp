@@ -30,7 +30,7 @@ PinAuthUi::PinAuthUi()
 {
     LOGI("AuthUi constructor");
 }
- 
+
 int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("ShowPinDialog start");
@@ -60,7 +60,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     LOGI("ShowConfigDialog end");
     return DM_OK;
 }
- 
+
 int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("InputPinDialog start");
@@ -87,7 +87,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
                     authManager->AddMember(std::stoi(params));
                 }
             } else {
-                authManager->SetReasonAndFinish(ERR_DM_INPUT_PARAMETER_EMPTY, AuthState::AUTH_REQUEST_JOIN);
+                authManager->SetReasonAndFinish(ERR_DM_INPUT_PARA_INVALID, AuthState::AUTH_REQUEST_JOIN);
             }
         });
     LOGI("ShowConfigDialog end");

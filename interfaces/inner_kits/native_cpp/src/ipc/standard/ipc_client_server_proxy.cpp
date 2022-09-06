@@ -25,7 +25,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
 {
     if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {

@@ -61,7 +61,7 @@ namespace {
 /**
  * @tc.name: InitDeviceManager_001
  * @tc.desc: 1. call DeviceManagerImpl::InitDeviceManager with packName = null, dmInitCallback = nullprt
- *           2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -72,8 +72,8 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_001, testing::ext::TestSize.Le
     std::string packName = "";
     std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
     int32_t ret= DeviceManager::GetInstance().InitDeviceManager(packName, dmInitCallback);
-    // 2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 2. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_003, testing::ext::TestSize.Le
 /**
  * @tc.name: InitDeviceManager_004
  * @tc.desc: 1. call DeviceManagerImpl::InitDeviceManager with packName not null, dmInitCallback = nullprt
- *           2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -146,14 +146,14 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_004, testing::ext::TestSize.Le
     std::string packName = "com.ohos.test";
     std::shared_ptr<DmInitCallbackTest> callback = nullptr;
     int32_t ret= DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    // 2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 2. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: InitDeviceManager_005
  * @tc.desc: 1. call DeviceManagerImpl::InitDeviceManager with packName not null, dmInitCallback = nullprt
- *           2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -164,14 +164,14 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_005, testing::ext::TestSize.Le
     std::string packName = "";
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret= DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    // 2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 2. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnInitDeviceManager_001
  * @tc.desc: 1. call DeviceManagerImpl::InitDeviceManager with packName not null, dmInitCallback = nullprt
- *           2. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -182,8 +182,8 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_001, testing::ext::TestSize.
     std::string packName = "";
     // 2. call DeviceManagerImpl::InitDeviceManager with parameter
     int32_t ret= DeviceManager::GetInstance().UnInitDeviceManager(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -288,7 +288,7 @@ HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_005, testing::ext::TestSize.
  *              set extra null
  *              set deviceList null
  *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -303,8 +303,8 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_001, testing::ext::TestSize
     std::vector<DmDeviceInfo> deviceList;
     // 2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
     int32_t ret= DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, deviceList);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -409,7 +409,7 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_004, testing::ext::TestSize
  *              set extra null
  *              set deviceList null
  *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -424,8 +424,8 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_005, testing::ext::TestSize
     std::vector<DmDeviceInfo> deviceList;
     // 2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
     int32_t ret= DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, deviceList);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 
@@ -435,7 +435,7 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_005, testing::ext::TestSize
  *              set extra null
  *              set deviceList null
  *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -554,7 +554,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_004, testing::ext::TestSize.L
  *              set extra null
  *              set deviceList null
  *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -599,8 +599,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_001, testing::ext::Test
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -634,7 +634,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
  *              set extra not null
  *              set callback null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -649,8 +649,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_003, testing::ext::Test
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -675,7 +675,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_004, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra, callback);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -684,7 +684,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_004, testing::ext::Test
  *              set extra not null
  *              set callback  null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -699,15 +699,15 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_005, testing::ext::Test
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_001
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -718,15 +718,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_001, testing::ext::Te
     std::string packName = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_002
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -737,15 +737,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_002, testing::ext::Te
     std::string packName = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_003
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -756,15 +756,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_003, testing::ext::Te
     std::string packName = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_004
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -775,15 +775,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_004, testing::ext::Te
     std::string packName = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_005
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -794,8 +794,8 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_005, testing::ext::Te
     std::string packName = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -804,7 +804,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_005, testing::ext::Te
  *              set subscribeInfo null
  *              set callback null
  *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -820,8 +820,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_001, testing::ext::TestSize
     std::shared_ptr<DiscoveryCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -830,7 +830,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_001, testing::ext::TestSize
  *              set subscribeInfo null
  *              set callback null
  *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -846,8 +846,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_002, testing::ext::TestSize
     std::shared_ptr<DiscoveryCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -952,7 +952,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_005, testing::ext::TestSize
  * @tc.desc: 1. set packName null
  *              set subscribeId is 0
  *           2. call DeviceManagerImpl::StopDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -965,8 +965,8 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_001, testing::ext::TestSize.
     uint16_t subscribeId = 0;
     // 2. call DeviceManagerImpl::StopDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1091,7 +1091,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_005, testing::ext::TestSize.
  *              set subscribeInfo null
  *              set callback null
  *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -1106,8 +1106,8 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_001, testing::ext::TestSi
     std::shared_ptr<PublishCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1116,7 +1116,7 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_001, testing::ext::TestSi
  *              set subscribeInfo null
  *              set callback null
  *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -1131,8 +1131,8 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_002, testing::ext::TestSi
     std::shared_ptr<PublishCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1234,7 +1234,7 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_005, testing::ext::TestSi
  * @tc.desc: 1. set packName null
  *              set publishId is 0
  *           2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -1247,8 +1247,8 @@ HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_001, testing::ext::Test
     int32_t publishId = 0;
     // 2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
     int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1393,7 +1393,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_001, testing::ext::TestSize.L
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().AuthenticateDevice(packName, authType, dmDeviceInfo, extra, callback);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1568,7 +1568,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_001, testing::ext::TestSize
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1594,7 +1594,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_002, testing::ext::TestSize
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 3. check ret is DEVICEMANAGER_INVALID_VALUE
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1704,7 +1704,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_005, testing::ext::TestSize
  *              set extra = null
  *              set callback = nullptr
  *           2. call DeviceManagerImpl::AuthenticateDevice with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -1716,8 +1716,8 @@ HWTEST_F(DeviceManagerImplTest, GetFaParam_001, testing::ext::TestSize.Level0)
     DmAuthParam dmFaParam;
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().GetFaParam(packName, dmFaParam);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1853,7 +1853,7 @@ HWTEST_F(DeviceManagerImplTest, GetFaParam_005, testing::ext::TestSize.Level0)
  * @tc.desc: 1. set packName null
  *              set action null
  *           2. call DeviceManagerImpl::SetUserOperation with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -1866,8 +1866,8 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_001, testing::ext::TestSize.Lev
     int32_t action = 0;
     // 2. call DeviceManagerImpl::SetUserOperation with parameter
     int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1991,7 +1991,7 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_005, testing::ext::TestSize.Lev
  * @tc.desc: 1. set packName null
  *              set action null
  *           2. call DeviceManagerImpl::SetUserOperation with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2005,8 +2005,8 @@ HWTEST_F(DeviceManagerImplTest, GetUdidByNetworkId_001, testing::ext::TestSize.L
     std::string udid = "222";
     // 2. call DeviceManagerImpl::SetUserOperation with parameter
     int32_t ret= DeviceManager::GetInstance().GetUdidByNetworkId(packName, netWorkId, udid);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2134,7 +2134,7 @@ HWTEST_F(DeviceManagerImplTest, GetUdidByNetworkId_005, testing::ext::TestSize.L
  * @tc.desc: 1. set packName null
  *              set action null
  *           2. call DeviceManagerImpl::SetUserOperation with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2148,8 +2148,8 @@ HWTEST_F(DeviceManagerImplTest, GetUuidByNetworkId_001, testing::ext::TestSize.L
     std::string uuid = "222";
     // 2. call DeviceManagerImpl::SetUserOperation with parameter
     int32_t ret= DeviceManager::GetInstance().GetUuidByNetworkId(packName, netWorkId, uuid);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2278,7 +2278,7 @@ HWTEST_F(DeviceManagerImplTest, GetUuidByNetworkId_005, testing::ext::TestSize.L
  *              set action null
  *           2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
  *           3. call DeviceManagerImpl::SetUserOperation with parameter
- *           4. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2291,8 +2291,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_001, testing::ex
     std::shared_ptr<DeviceManagerFaCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2322,7 +2322,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_002, testing::ex
  * @tc.desc: 1. set packName not null
  *              set callback not null
  *           2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2335,8 +2335,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_003, testing::ex
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = nullptr;
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2344,7 +2344,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_003, testing::ex
  * @tc.desc: 1. set packName not null
  *              set callback not null
  *           2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2357,8 +2357,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_004, testing::ex
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2366,7 +2366,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_004, testing::ex
  * @tc.desc: 1. set packName not null
  *              set callback not null
  *           2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2379,15 +2379,15 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_005, testing::ex
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = nullptr;
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDeviceManagerFaCallback_001
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDeviceManagerFaCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2398,8 +2398,8 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_001, testing::
     std::string packName = "";
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(packName);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2541,7 +2541,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_005, testing::
  *              set extra null
  *              set callback null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2554,8 +2554,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_006, testing::ext::Test
     std::string extra= "test";
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY;
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID;
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2564,7 +2564,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_006, testing::ext::Test
  *              set extra null
  *              set callback not null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2578,7 +2578,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_007, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2669,7 +2669,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_010, testing::ext::Test
  * @tc.name: UnRegisterDevStateCallback_006
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2682,15 +2682,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_006, testing::ext::Te
     std::string extra= "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName, extra);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterDevStateCallback_007
  * @tc.desc: 1. set packName not null
  *           2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2703,8 +2703,8 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_007, testing::ext::Te
     std::string extra= "test";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret= DeviceManager::GetInstance().UnRegisterDevStateCallback(packName, extra);
-    // 3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2796,7 +2796,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_010, testing::ext::Te
  * @tc.desc: 1. set packName null
  *              set reqJsonStr null
  *           2. call DeviceManagerImpl::RequestCredential with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2808,7 +2808,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential_001, testing::ext::TestSize.Le
     std::string returnJsonStr;
     int32_t ret= DeviceManager::GetInstance().RequestCredential(packName, reqJsonStr,
                                                                 returnJsonStr);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2894,7 +2894,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential_004, testing::ext::TestSize.Le
  * @tc.desc: 1. set packName null
  *              set reqJsonStr null
  *           2. call DeviceManagerImpl::ImportCredential with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -2904,7 +2904,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_001, testing::ext::TestSize.Lev
     std::string packName;
     std::string credentialInfo;
     int32_t ret= DeviceManager::GetInstance().ImportCredential(packName, credentialInfo);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -2993,7 +2993,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_004, testing::ext::TestSize.Lev
  * @tc.desc: 1. set packName null
  *              set deleteInfo null
  *           2. call DeviceManagerImpl::DeleteCredential with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -3003,7 +3003,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential_001, testing::ext::TestSize.Lev
     std::string packName;
     std::string deleteInfo;
     int32_t ret= DeviceManager::GetInstance().DeleteCredential(packName, deleteInfo);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -3083,7 +3083,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential_004, testing::ext::TestSize.Lev
  * @tc.desc: 1. set packName  null
  *              set callback null
  *           3. call DeviceManagerImpl::RegisterCredentialCallback with parameter
- *           4. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -3093,7 +3093,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_001, testing::ext::Te
     std::string packName = "";
     std::shared_ptr<CredentialCallbackTest> callback = nullptr;
     int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -3124,7 +3124,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_002, testing::ext::Te
  * @tc.desc: 1. set packName not null
  *              set callback null
  *           2. call DeviceManagerImpl::RegisterCredentialCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -3134,7 +3134,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_003, testing::ext::Te
     std::string packName = "com.ohos.test";
     std::shared_ptr<CredentialCallbackTest> callback = nullptr;
     int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -3142,7 +3142,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_003, testing::ext::Te
  * @tc.desc: 1. set packName null
  *              set callback not null
  *           2. call DeviceManagerImpl::RegisterCredentialCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -3152,14 +3152,14 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback_004, testing::ext::Te
     std::string packName = "";
     std::shared_ptr<CredentialCallbackTest> callback = std::make_shared<CredentialCallbackTest>();
     int32_t ret= DeviceManager::GetInstance().RegisterCredentialCallback(packName, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: UnRegisterCredentialCallback_001
  * @tc.desc: 1. set packName null
  *           2. call DeviceManagerImpl::UnRegisterCredentialCallback with parameter
- *           3. check ret is ERR_DM_INPUT_PARAMETER_EMPTY
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -3168,7 +3168,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_001, testing::ext::
 {
     std::string packName = "";
     int32_t ret= DeviceManager::GetInstance().UnRegisterCredentialCallback(packName);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

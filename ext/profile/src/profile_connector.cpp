@@ -38,7 +38,7 @@ int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, co
 {
     if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
         LOGE("Not a reasonable function argument");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("register profile callback with pkgName: %s", pkgName.c_str());
@@ -63,7 +63,7 @@ int32_t ProfileConnector::UnRegisterProfileCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     LOGI("unregister profile callback with pkgName: %s", pkgName.c_str());

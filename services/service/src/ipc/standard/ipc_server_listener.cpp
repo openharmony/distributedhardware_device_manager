@@ -25,12 +25,12 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 {
     if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
         LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string pkgName = req->GetPkgName();
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
@@ -44,7 +44,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
 {
     if (cmdCode < 0 || cmdCode > UNREGISTER_CREDENTIAL_CALLBACK) {
         LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
     for (auto iter : listeners) {

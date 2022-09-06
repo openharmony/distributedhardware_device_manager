@@ -36,7 +36,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &pkgName
 {
     if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
         LOGE("Not a reasonable function argument");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("register profile listener with pkgName: %s", pkgName.c_str());
     std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);
@@ -54,7 +54,7 @@ int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &pkgNa
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("unregister profile listener with pkgName: %s", pkgName.c_str());
     std::lock_guard<std::mutex> mutexLock(deviceProfileAdapterMutex_);

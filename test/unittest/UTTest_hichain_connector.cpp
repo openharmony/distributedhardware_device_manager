@@ -51,7 +51,7 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
 
 /**
  * @tc.name: CreateGroup_001
- * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return ERR_DM_INPUT_PARAMETER_EMPTY
+ * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -61,7 +61,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level0)
     std::string groupName = "dfggg";
     hiChainConnector->deviceGroupManager_ = nullptr;
     int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -75,7 +75,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
     int64_t requestId = 123456;
     std::string groupName = "uuiioo";
     int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARAMETER_EMPTY);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

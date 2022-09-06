@@ -115,7 +115,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::CreateGroup group manager is null, requestId %lld.", requestId);
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     networkStyle_ = PIN_CODE_NETWORK;
     GroupInfo groupInfo;
@@ -699,7 +699,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::CreateGroup group manager is null, requestId %lld.", requestId);
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     DealRedundanceGroup(userId, authType);
     networkStyle_ = CREDENTIAL_NETWORK;
@@ -754,7 +754,7 @@ int32_t HiChainConnector::getRegisterInfo(const std::string &queryParams, std::s
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::deviceGroupManager_ is nullptr.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     char *credentialInfo = nullptr;
     if (deviceGroupManager_->getRegisterInfo(queryParams.c_str(), &credentialInfo) != DM_OK) {
@@ -794,7 +794,7 @@ int32_t HiChainConnector::ParseRemoteCredential(const int32_t groupType, const s
 {
     if (userId.empty() || !jsonDeviceList.contains(FIELD_DEVICE_LIST)) {
         LOGE("userId or deviceList is empty");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string groupId;
     if (GetGroupId(userId, groupType, groupId) != DM_OK) {
@@ -819,7 +819,7 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::deviceGroupManager_ is nullptr.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string addParams;
     int32_t osAccountUserId = 0;
@@ -841,7 +841,7 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::deviceGroupManager_ is nullptr.");
-        return ERR_DM_INPUT_PARAMETER_EMPTY;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::string deleteParams;
