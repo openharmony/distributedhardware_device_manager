@@ -307,7 +307,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         }
     }
     if (stateTimerInfoMap_.find(deviceId) == stateTimerInfoMap_.end()) {
-        std::string timerName = std::string(STATE_TIMER_PREFIX) + "_" + GetAnonyString(deviceId);
+        std::string timerName = std::string(STATE_TIMER_PREFIX) + GetAnonyString(deviceId);
         StateTimerInfo stateTimer = {
             .timerName = timerName,
             .networkId = deviceInfo.deviceId,

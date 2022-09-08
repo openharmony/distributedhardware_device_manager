@@ -293,7 +293,6 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
-    LOGI("pkgName:%s, extra:%s", pkgName.c_str(), extra.c_str());
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     int32_t infoNum =(int32_t)(deviceList.size());
@@ -317,7 +316,6 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("GET_TRUST_DEVICE_LIST ok pkgName:%s, extra:%s", pkgName.c_str(), extra.c_str());
     return DM_OK;
 }
 

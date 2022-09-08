@@ -26,7 +26,6 @@ Timer::Timer(std::string name, int32_t time, TimerCallback callback)
 
 DmTimer::DmTimer()
 {
-    LOGI("DmTimer constructor");
 }
 
 DmTimer::~DmTimer()

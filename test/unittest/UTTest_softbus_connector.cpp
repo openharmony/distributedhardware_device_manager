@@ -537,7 +537,7 @@ HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, CovertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -550,7 +550,7 @@ HWTEST_F(SoftbusConnectorTest, CovertDeviceInfoToDmDevice_001, testing::ext::Tes
         .deviceName = "11111",
         .deviceTypeId = 1
     };
-    softbusConnector->CovertDeviceInfoToDmDevice(deviceInfo, dm);
+    softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dm);
     bool ret = false;
     if (strcmp(dm.deviceId, dm_1.deviceId) == 0) {
         ret = true;

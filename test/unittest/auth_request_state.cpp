@@ -44,7 +44,6 @@ std::shared_ptr<DmAuthRequestContext> AuthRequestState::GetAuthContext()
 
 int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
 {
-    LOGI("AuthRequestState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

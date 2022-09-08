@@ -171,7 +171,6 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
         LOGE("StopRefreshLNN failed with ret %d", ret);
         return ERR_DM_DISCOVERY_FAILED;
     }
-    LOGI("SoftbusConnector::StopDiscovery completed");
     return DM_OK;
 }
 
@@ -192,7 +191,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
 
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
-    LOGI("GetUdidByNetworkId begin");
+    LOGI("GetUdidByNetworkId for networkId=%s", GetAnonyString(std::string(networkId)).c_str());
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
@@ -201,13 +200,12 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
         return ERR_DM_FAILED;
     }
     udid = (char *)mUdid;
-    LOGI("SoftbusConnector::GetUdidByNetworkId completed");
     return DM_OK;
 }
 
 int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
-    LOGI("GetUuidByNetworkId begin");
+    LOGI("GetUuidByNetworkId for networkId=%s", GetAnonyString(std::string(networkId)).c_str());
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
@@ -216,7 +214,6 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
         return ERR_DM_FAILED;
     }
     uuid = (char *)mUuid;
-    LOGI("SoftbusConnector::GetUuidByNetworkId completed");
     return DM_OK;
 }
 
@@ -360,22 +357,19 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
     return nullptr;
 }
 
-void SoftbusConnector::CovertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)
+void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)
 {
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
-        LOGE("CovertDeviceInfoToDmDevice copy deviceId data failed");
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed");
     }
 
-    if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), 0,
-                 sizeof(dmDeviceInfo.networkId)) != DM_OK) {
-        LOGE("CovertDeviceInfoToDmDevice copy networkId data failed");
-    }
+    (void)memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), 0, sizeof(dmDeviceInfo.networkId));
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
-        LOGE("CovertDeviceInfoToDmDevice copy deviceName data failed");
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed");
     }
     dmDeviceInfo.deviceTypeId = deviceInfo.devType;
     dmDeviceInfo.range        = deviceInfo.range;
@@ -455,7 +449,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 
     DmDeviceInfo dmDeviceInfo;
-    CovertDeviceInfoToDmDevice(*device, dmDeviceInfo);
+    ConvertDeviceInfoToDmDevice(*device, dmDeviceInfo);
     for (auto &iter : discoveryCallbackMap_) {
         iter.second->OnDeviceFound(iter.first, dmDeviceInfo);
     }
