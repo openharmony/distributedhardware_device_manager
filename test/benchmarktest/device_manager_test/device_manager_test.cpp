@@ -20,7 +20,6 @@
 #include "device_manager.h"
 #include "dm_app_image_info.h"
 #include "dm_constants.h"
-#include "system_ability_definition.h"
 
 using namespace std;
 using namespace OHOS;

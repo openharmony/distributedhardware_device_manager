@@ -63,7 +63,6 @@ ohos_fuzztest("UnAuthenticateDeviceFuzzTest") {
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "//commonlibrary/utils_lite/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
     "//third_party/bounds_checking_function/include",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
@@ -72,10 +71,10 @@ ohos_fuzztest("UnAuthenticateDeviceFuzzTest") {
     "//third_party/jsframework/runtime/main/extend",
     "//third_party/jsframework/runtime/main/extend/systemplugin",
     "//third_party/node/benchmark",
-    "//third_party/libuv/include",
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
   ]
 
   cflags = [
@@ -87,8 +86,6 @@ ohos_fuzztest("UnAuthenticateDeviceFuzzTest") {
   sources = [ "un_authenticate_device_fuzzer.cpp" ]
 
   deps = [
-    "${utils_path}:devicemanagerutils",
-    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
   ]
 
@@ -99,17 +96,7 @@ ohos_fuzztest("UnAuthenticateDeviceFuzzTest") {
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-    "samgr:samgr_proxy",
   ]
 }
 

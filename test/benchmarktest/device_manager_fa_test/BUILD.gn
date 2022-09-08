@@ -41,28 +41,14 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   deps = [
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
-    "//base/security/device_auth/services:deviceauth_sdk",
     "//foundation/arkui/napi:ace_napi",
-    "//foundation/communication/dsoftbus/sdk:softbus_client",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
-    "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",
-    "//third_party/mbedtls:mbedtls_shared",
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }

@@ -77,6 +77,7 @@ ohos_fuzztest("RegisterDeviceManagerFaCallbackFuzzTest") {
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
   ]
 
   cflags = [
@@ -88,8 +89,6 @@ ohos_fuzztest("RegisterDeviceManagerFaCallbackFuzzTest") {
   sources = [ "register_device_manager_fa_callback_fuzzer.cpp" ]
 
   deps = [
-    "${utils_path}:devicemanagerutils",
-    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
   ]
 
@@ -100,17 +99,7 @@ ohos_fuzztest("RegisterDeviceManagerFaCallbackFuzzTest") {
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-    "samgr:samgr_proxy",
   ]
 }
 

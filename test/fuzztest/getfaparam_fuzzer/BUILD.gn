@@ -69,8 +69,8 @@ ohos_fuzztest("GetFaParamFuzzTest") {
     "//foundation/arkui/napi/interfaces/innerkits",
     "//third_party/jsframework/runtime/main/extend",
     "//third_party/jsframework/runtime/main/extend/systemplugin",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
     "//third_party/node/benchmark",
-    "//third_party/libuv/include",
     "//third_party/node/src",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
@@ -85,8 +85,6 @@ ohos_fuzztest("GetFaParamFuzzTest") {
   sources = [ "get_fa_param_fuzzer.cpp" ]
 
   deps = [
-    "${utils_path}:devicemanagerutils",
-    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
   ]
 
@@ -97,17 +95,7 @@ ohos_fuzztest("GetFaParamFuzzTest") {
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-    "samgr:samgr_proxy",
   ]
 }
 
