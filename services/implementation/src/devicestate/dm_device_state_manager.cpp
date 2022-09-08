@@ -313,7 +313,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
             .networkId = deviceInfo.deviceId,
             .isStart = false,
         };
-        stateTimerInfoMap_[deviceId] = stateTimer;  
+        stateTimerInfoMap_[deviceId] = stateTimer;
     }
 }
 

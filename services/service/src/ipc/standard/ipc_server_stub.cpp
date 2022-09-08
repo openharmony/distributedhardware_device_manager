@@ -242,7 +242,6 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOGW("AppDeathRecipient: OnRemoteDied");
     std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
     std::string pkgName;
     for (auto iter : listeners) {
@@ -250,10 +249,6 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
             pkgName = iter.first;
             break;
         }
-    }
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
     }
     LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);

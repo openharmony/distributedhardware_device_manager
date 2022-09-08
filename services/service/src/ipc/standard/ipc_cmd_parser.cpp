@@ -350,7 +350,6 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     int32_t result = ERR_DM_POINT_NULL;
 
     if (subscribeInfo != nullptr) {
-        LOGI("pkgName:%s, subscribeId: %d", pkgName.c_str(), subscribeInfo->subscribeId);
         result = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, *subscribeInfo, extra);
     }
     if (!reply.WriteInt32(result)) {
@@ -364,7 +363,6 @@ ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     uint16_t subscribeId = (uint16_t)(data.ReadInt32());
-    LOGI("pkgName:%s, subscribeId: %d", pkgName.c_str(), subscribeId);
     int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -380,7 +378,6 @@ ON_IPC_CMD(PUBLISH_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     int32_t result = ERR_DM_POINT_NULL;
 
     if (publishInfo != nullptr) {
-        LOGI("pkgName:%s, publishId: %d", pkgName.c_str(), publishInfo->publishId);
         result = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, *publishInfo);
     }
     if (!reply.WriteInt32(result)) {
@@ -394,7 +391,6 @@ ON_IPC_CMD(UNPUBLISH_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     int32_t publishId = data.ReadInt32();
-    LOGI("pkgName:%s, publishId: %d", pkgName.c_str(), publishId);
     int32_t result = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -411,12 +407,10 @@ ON_IPC_CMD(AUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
     int32_t authType = data.ReadInt32();
     int32_t result = DM_OK;
     result = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    LOGE("AuthenticateDevice");
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGE("AuthenticateDevice %d", result);
     return DM_OK;
 }
 
@@ -434,7 +428,6 @@ ON_IPC_CMD(UNAUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(VERIFY_AUTHENTICATION, MessageParcel &data, MessageParcel &reply)
 {
-    LOGI("ON_IPC_CMD VERIFY_AUTHENTICATION start");
     std::string authPara = data.ReadString();
     int32_t result = DeviceManagerService::GetInstance().VerifyAuthentication(authPara);
     if (!reply.WriteInt32(result)) {
@@ -572,7 +565,6 @@ ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &re
 
 ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
-    LOGE("start to request device credential.");
     std::string packageName = data.ReadString();
     std::string reqJsonStr = data.ReadString();
     std::string returnJsonStr;
@@ -588,13 +580,11 @@ ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
             return ERR_DM_IPC_WRITE_FAILED;
         }
     }
-    LOGI("REQUEST_CREDENTIAL success.");
     return DM_OK;
 }
 
 ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
-    LOGE("start to import credential to device.");
     std::string packageName = data.ReadString();
     std::string credentialInfo = data.ReadString();
     int32_t ret = DeviceManagerService::GetInstance().ImportCredential(packageName, credentialInfo);
@@ -602,13 +592,11 @@ ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
         LOGE("write ret failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("IMPORT_CREDENTIAL success.");
     return DM_OK;
 }
 
 ON_IPC_CMD(DELETE_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
-    LOGE("start to delete credential from device.");
     std::string packageName = data.ReadString();
     std::string deleteInfo = data.ReadString();
     int32_t ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, deleteInfo);
@@ -616,7 +604,6 @@ ON_IPC_CMD(DELETE_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
         LOGE("write ret failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("DELETE_CREDENTIAL success.");
     return DM_OK;
 }
 

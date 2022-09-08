@@ -238,7 +238,6 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
 
 void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
 {
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
     authResponseContext_->reply = json[TAG_REPLY];
     authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     authResponseContext_->token = json[TAG_TOKEN];
@@ -251,7 +250,6 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s",
              GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
     }
-    LOGI("AuthMessageProcessor::ParseAuthResponseMessage ");
 }
 
 void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)

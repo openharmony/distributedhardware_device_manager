@@ -100,6 +100,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
+    LOGI("DeviceManagerService::GetLocalDeviceInfo begin.");
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
         LOGE("GetLocalDeviceInfo failed");
@@ -134,7 +135,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                    const std::string &extra)
 {
-    LOGI("StartDeviceDiscovery begin for pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
+    LOGI("DeviceManagerService::StartDeviceDiscovery begin for pkgName=%s, extra=%s", pkgName.c_str(), extra.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -148,7 +149,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("StopDeviceDiscovery begin for pkgName=%s", pkgName.c_str());
+    LOGI("DeviceManagerService::StopDeviceDiscovery begin for pkgName=%s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -203,6 +204,8 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
 {
+    LOGI("DeviceManagerService::UnAuthenticateDevice begin for pkgName=%s, deviceId=%s",
+        pkgName.c_str(), GetAnonyString(deviceId).c_str());
     if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerService::UnAuthenticateDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
