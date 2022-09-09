@@ -48,9 +48,7 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "samgr:samgr_proxy" ]
 }
 
 group("benchmarktest") {

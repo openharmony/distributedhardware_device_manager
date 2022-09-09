@@ -85,9 +85,7 @@ ohos_fuzztest("SetUserOperationFuzzTest") {
   ]
   sources = [ "set_user_operation_fuzzer.cpp" ]
 
-  deps = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -95,9 +93,7 @@ ohos_fuzztest("SetUserOperationFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 ###############################################################################

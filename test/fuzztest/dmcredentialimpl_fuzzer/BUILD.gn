@@ -54,9 +54,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
   ]
   sources = [ "dm_credential_impl_fuzzer.cpp" ]
 
-  deps = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",

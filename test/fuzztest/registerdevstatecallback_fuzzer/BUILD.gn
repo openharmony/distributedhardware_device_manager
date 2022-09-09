@@ -86,9 +86,7 @@ ohos_fuzztest("RegisterDevStateCallbackFuzzTest") {
   ]
   sources = [ "register_dev_state_callback_fuzzer.cpp" ]
 
-  deps = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -96,9 +94,7 @@ ohos_fuzztest("RegisterDevStateCallbackFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 ###############################################################################

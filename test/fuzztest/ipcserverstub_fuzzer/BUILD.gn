@@ -97,9 +97,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "ipc:ipc_core",
-  ]
+  external_deps = [ "ipc:ipc_core" ]
 
   public_deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",

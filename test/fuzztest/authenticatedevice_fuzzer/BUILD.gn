@@ -84,14 +84,12 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ 
-    "authenticate_device_fuzzer.cpp",
+  sources = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/src/device_manager_impl.cpp",
-    ]
-
-  deps = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "authenticate_device_fuzzer.cpp",
   ]
+
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -99,9 +97,7 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 ###############################################################################
