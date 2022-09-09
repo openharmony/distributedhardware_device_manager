@@ -161,7 +161,6 @@ int32_t SoftbusListener::Init()
 
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    LOGI("SoftbusListener::GetTrustDevices start");
     int32_t infoNum = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &infoNum);
@@ -178,7 +177,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     for (int32_t i = 0; i < infoNum; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         DmDeviceInfo *deviceInfo = *pInfoList + i;
-        CovertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceInfo);
+        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceInfo);
         deviceInfoList.push_back(*deviceInfo);
     }
     FreeNodeInfo(nodeInfo);
@@ -189,21 +188,18 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
 
 int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
-    LOGI("SoftbusListener::GetLocalDeviceInfo start");
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != 0) {
         LOGE("GetLocalNodeDeviceInfo failed with ret %d", ret);
         return ERR_DM_FAILED;
     }
-    CovertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
-    LOGI("SoftbusListener::GetLocalDeviceInfo success");
+    ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
     return DM_OK;
 }
 
 int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
-    LOGI("GetUdidByNetworkId begin");
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
@@ -212,13 +208,11 @@ int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &
         return ERR_DM_FAILED;
     }
     udid = (char *)mUdid;
-    LOGI("SoftbusListener::GetUdidByNetworkId completed");
     return DM_OK;
 }
 
 int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
-    LOGI("GetUuidByNetworkId begin");
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
@@ -227,7 +221,6 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
         return ERR_DM_FAILED;
     }
     uuid = (char *)mUuid;
-    LOGI("SoftbusListener::GetUuidByNetworkId completed");
     return DM_OK;
 }
 
@@ -239,7 +232,7 @@ void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
         return;
     }
     DmDeviceInfo dmDeviceInfo;
-    CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
 #if defined(__LITEOS_M__)
     DmThread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     deviceOnLine.DmCreatThread();
@@ -257,7 +250,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
         return;
     }
     DmDeviceInfo dmDeviceInfo;
-    CovertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
 #if defined(__LITEOS_M__)
     DmThread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     deviceOffLine.DmCreatThread();
@@ -267,22 +260,22 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 #endif
 }
 
-int32_t SoftbusListener::CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
+int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), nodeBasicInfo.networkId,
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("CovertNodeBasicInfoToDmDevice copy deviceId data failed");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
                  std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("CovertNodeBasicInfoToDmDevice copy networkId data failed");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed");
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
-        LOGE("CovertNodeBasicInfoToDmDevice copy deviceName data failed");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     return DM_OK;
@@ -330,12 +323,12 @@ void SoftbusListener::OnBytesReceived(int sessionId, const void *data, unsigned 
 
 void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 {
-    LOGI("SoftbusListener::OnPublishResult, publishId: %d, result: %d", publishId, result);
+    LOGD("SoftbusListener::OnPublishResult, publishId: %d, result: %d", publishId, result);
 }
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
-    LOGI("SoftbusListener::OnSoftbusDeviceInfoChanged.");
+    LOGD("SoftbusListener::OnSoftbusDeviceInfoChanged.");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

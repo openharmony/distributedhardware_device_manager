@@ -97,7 +97,6 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOGI("code = %u, flags= %d.", code, option.GetFlags());
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
@@ -117,7 +116,6 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -244,7 +242,6 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOGW("AppDeathRecipient: OnRemoteDied");
     std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
     std::string pkgName;
     for (auto iter : listeners) {
@@ -252,10 +249,6 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
             pkgName = iter.first;
             break;
         }
-    }
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
     }
     LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);

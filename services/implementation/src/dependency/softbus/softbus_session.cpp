@@ -91,7 +91,6 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
-    LOGI("SendData Start");
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("extrasJson error");
