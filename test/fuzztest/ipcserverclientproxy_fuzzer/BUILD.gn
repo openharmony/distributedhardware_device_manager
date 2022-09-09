@@ -85,7 +85,6 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
   ]
 
   deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${ability_runtime_services_path}/abilitymgr:abilityms",
     "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
   ]

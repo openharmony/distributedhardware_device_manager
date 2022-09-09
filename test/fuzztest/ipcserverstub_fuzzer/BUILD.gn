@@ -83,9 +83,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
   sources = [ "ipc_server_stub_fuzzer.cpp" ]
 
   deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${ability_runtime_services_path}/abilitymgr:abilityms",
-    "${utils_path}:devicemanagerutils",
     "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
   ]
 
@@ -98,8 +96,6 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
   external_deps = [ "ipc:ipc_core" ]
 
   public_deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock",
