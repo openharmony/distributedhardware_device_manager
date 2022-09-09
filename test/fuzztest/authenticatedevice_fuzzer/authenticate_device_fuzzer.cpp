@@ -18,7 +18,6 @@
 #include <string>
 #include <unistd.h>
 
-#include "device_manager_impl.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
 #include "authenticate_device_fuzzer.h"

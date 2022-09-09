@@ -42,6 +42,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
     "//base/security/device_auth/interfaces/innerkits",
   ]
 
@@ -53,18 +54,13 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
   ]
   sources = [ "dm_credential_impl_fuzzer.cpp" ]
 
-  deps = [
-    "${utils_path}:devicemanagerutils",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DMCredentialImplFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
-
-  external_deps = [ "ipc:ipc_core" ]
 }
 
 ###############################################################################

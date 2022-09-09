@@ -343,4 +343,3 @@ BENCHMARK_F(UnRegisterDevStateTest, UnRegisterDevStateCallbackTestCase)(
 
 // Run the benchmark
 BENCHMARK_MAIN();
-
