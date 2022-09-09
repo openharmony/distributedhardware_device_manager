@@ -26,7 +26,7 @@ group("fuzztest") {
     "getuuidbynetworkid_fuzzer:fuzztest",
     "initdevicemanager_fuzzer:fuzztest",
     "ipcclientmanager_fuzzer:fuzztest",
-    "ipccmdregister_fuzzer:fuzztest",
+    #"ipccmdregister_fuzzer:fuzztest",
     "ipcserverclientproxy_fuzzer:fuzztest",
     "ipcserverlistener_fuzzer:fuzztest",
     "ipcserverstub_fuzzer:fuzztest",
