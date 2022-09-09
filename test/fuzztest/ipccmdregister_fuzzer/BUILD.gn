@@ -61,6 +61,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "//commonlibrary/utils_lite/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
     "//third_party/bounds_checking_function/include",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
     "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
