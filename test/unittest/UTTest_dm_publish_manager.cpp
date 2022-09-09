@@ -146,7 +146,7 @@ HWTEST_F(DmPublishManagerTest, OnPublishResult_002, testing::ext::TestSize.Level
     std::shared_ptr<IpcNotifyPublishResultReq> pReq =
         std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
     std::string ret = pReq->GetPkgName();
-    EXPECT_NQ(ret, pkgName);
+    EXPECT_NE(ret, pkgName);
 }
 } // namespace
 } // namespace DistributedHardware
