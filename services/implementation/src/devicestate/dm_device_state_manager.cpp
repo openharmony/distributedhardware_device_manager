@@ -187,7 +187,7 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 {
     LOGI("OnDeviceOffline function is called with pkgName: %s", pkgName.c_str());
     StartOffLineTimer(info);
-    DeleteOnlineDeviceInfo(pkgName, info);
+    DeleteOfflineDeviceInfo(pkgName, info);
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
