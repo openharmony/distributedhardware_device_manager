@@ -370,8 +370,8 @@ void DmDeviceStateManager::StopEventThread()
 {
     LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
-    eventTask_.queueCond_.notify_one();
-    eventTask_.queueFullCond_.notify_one();
+    eventTask_.queueCond_.notify_all();
+    eventTask_.queueFullCond_.notify_all();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
