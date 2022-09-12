@@ -76,6 +76,7 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
     for (auto iter: remoteDeviceInfos_) {
         if (iter.second.deviceId == info.deviceId) {
             remoteDeviceInfos_.erase(iter.first);
+            LOGI("DeleteOfflineDeviceInfo compelete, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
             break;
         }
     }
