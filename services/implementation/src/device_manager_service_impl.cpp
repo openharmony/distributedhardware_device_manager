@@ -367,10 +367,6 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (eventId == DM_NOTIFY_EVENT_ONDEVICEREADY) {
-        if (deviceStateMgr_== nullptr) {
-            LOGE("NotifyEvent, deviceStateMgr is nullptr");
-            return ERR_DM_POINT_NULL;
-        }
         nlohmann::json jsonObject;
         if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
             LOGE("NotifyEvent json invalid");
@@ -378,7 +374,14 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         }
         std::string deviceId;
         jsonObject["extra"]["deviceId"].get_to(deviceId);
-        deviceStateMgr_->ProcNotifyEvent(pkgName, eventId, deviceId);
+        if (deviceStateMgr_== nullptr) {
+            LOGE("deviceStateMgr_ is nullptr");
+            return ERR_DM_POINT_NULL;
+        }
+        if (deviceStateMgr_->ProcNotifyEvent(pkgName, eventId, deviceId) != DM_OK) {
+            LOGE("NotifyEvent failed");
+            return ERR_DM_INPUT_PARA_INVALID;
+        };
     }
     return DM_OK;
 }
