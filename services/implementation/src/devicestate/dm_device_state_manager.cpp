@@ -155,7 +155,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
-    RegisterProfileListener(pkgName, info);
+    SaveOnlineDeviceInfo(pkgName, info);
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -186,7 +186,7 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 {
     LOGI("OnDeviceOffline function is called with pkgName: %s", pkgName.c_str());
     StartOffLineTimer(info);
-    UnRegisterProfileListener(pkgName, info);
+    DeleteOnlineDeviceInfo(pkgName, info);
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -369,6 +369,8 @@ void DmDeviceStateManager::StopEventThread()
 {
     LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
+    eventTask_.queueCond_.notify_one();
+    eventTask_.queueFullCond_.notify_one();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
@@ -381,8 +383,7 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
-            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
-                [this]() { return (eventTask_.queue_.size() < DM_EVENT_QUEUE_CAPACITY); });
+            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT));
         }
         eventTask_.queue_.push(task);
     }
@@ -399,8 +400,7 @@ void DmDeviceStateManager::ThreadLoop()
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
             while (eventTask_.queue_.empty() && eventTask_.threadRunning_) {
-                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
-                    [this]() { return !eventTask_.queue_.empty(); });
+                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT));
             }
             if (!eventTask_.queue_.empty()) {
                 task = eventTask_.queue_.front();
