@@ -201,13 +201,13 @@ public:
      * @tc.desc: Proc Notify Event of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    int32_t ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
+    void ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
 
 private:
     void StartEventThread();
     void StopEventThread();
     void ThreadLoop();
-    int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
+    void AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
 private:
     std::string profileSoName_;
