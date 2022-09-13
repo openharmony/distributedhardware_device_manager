@@ -60,7 +60,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, cons
 #endif
             remoteDeviceInfos_[uuid] = saveInfo;
         }
-        LOGI("SaveOnlineDeviceInfo compelete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
+        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
             std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
     }
 }
@@ -76,7 +76,7 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
     for (auto iter: remoteDeviceInfos_) {
         if (iter.second.deviceId == info.deviceId) {
             remoteDeviceInfos_.erase(iter.first);
-            LOGI("DeleteOfflineDeviceInfo compelete");
+            LOGI("DeleteOfflineDeviceInfo complete");
             break;
         }
     }
