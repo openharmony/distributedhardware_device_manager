@@ -56,7 +56,7 @@ std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
  */
 HWTEST_F(ProfileConnectorTest, RegisterProfileCallback_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "";
     std::string deviceId = "deviceId";
     std::string profileSoName = "libdevicemanagerext_profile.z.so";
 
@@ -66,14 +66,14 @@ HWTEST_F(ProfileConnectorTest, RegisterProfileCallback_001, testing::ext::TestSi
     profileConnector_ = std::make_shared<ProfileConnector>();
     int32_t ret = DM_OK;
     ret = profileConnector_->RegisterProfileCallback(pkgName, deviceId, deviceProfileAdapter);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
  * @tc.name: OnDecisionFilterResult_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
+ * the device. Its return value is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -91,7 +91,7 @@ HWTEST_F(ProfileConnectorTest, UnRegisterProfileCallback_001, testing::ext::Test
  * @tc.name: OnDecisionFilterResult_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
+ * the device. Its return value is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -110,7 +110,7 @@ HWTEST_F(ProfileConnectorTest, SubscribeProfileEvents_001, testing::ext::TestSiz
  * @tc.name: OnDecisionFilterResult_001
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is ERR_DM_INPUT_PARA_INVALID
+ * the device. Its return value is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

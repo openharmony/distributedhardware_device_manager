@@ -165,8 +165,9 @@ HWTEST_F(IpcServerListenerTest, SendRequest_004, testing::ext::TestSize.Level0)
     int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     // set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // 2. set remoteObject not nullptr
+    // 2. set remoteObject nullptr
     sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    remoteObject = nullptr;
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
     // set req not null
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
@@ -263,7 +264,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_002, testing::ext::TestSize.Level0)
     // 1. set cmdCode not null
     int32_t cmdCode = 2;
     // set pkgName not null
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.test2";
     // 2. set remoteObject not nullptr
     sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
