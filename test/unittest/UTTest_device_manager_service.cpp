@@ -155,12 +155,12 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
  */
 HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.test12";
     DmPublishInfo publishInfo;
     publishInfo.publishId = 1;
     publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
     publishInfo.freq = DM_HIGH;
-    publishInfo.ranging = 0;
+    publishInfo.ranging = -1;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
@@ -291,7 +291,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
 
 /**
  * @tc.name: UnAuthenticateDevice_001
- * @tc.desc: 将UnAuthenticateDevice的intFlag设置为false，设置pkgName = "com.ohos.test";ERR_DM_FAILED
+ * @tc.desc: 将UnAuthenticateDevice的intFlag设置为false，设置pkgName = "com.ohos.test";Return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

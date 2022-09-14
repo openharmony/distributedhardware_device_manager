@@ -3711,7 +3711,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishFailed5, testing::ext::TestSize.Level
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
     // set callback not null
-    int count = 2;
+    int count = 0;
     std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
     // set publishId not null
     int32_t publishId = 2;
@@ -4382,7 +4382,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnFaCall4, testing::ext::TestSize.Level0)
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManagerNotify OnFaCall
-    std::string testPkgName = "";
+    std::string testPkgName = "com.ohos.test";
     std::string paramJson = "trstParamJson";
     DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
