@@ -97,7 +97,7 @@ public:
 private:
     int32_t Init();
     void SetPublishInfo(PublishInfo &dmPublishInfo);
-    static int32_t CovertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
+    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
 
 private:
     enum PulishStatus {

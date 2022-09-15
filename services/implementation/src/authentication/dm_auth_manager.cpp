@@ -727,7 +727,6 @@ std::string DmAuthManager::GenerateGroupName()
 
 bool DmAuthManager::GetIsCryptoSupport()
 {
-    LOGI("DmAuthManager::GetIsCryptoSupport start");
     if (authResponseState_ == nullptr) {
         return false;
     }

@@ -32,12 +32,7 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
     "${common_path}/include/ipc/model",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
-
-    #    "${servicesimpl_path}/include/dependency/timer",
-    #    "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
-
-    #    "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/ipc/standard",
     "${servicesimpl_path}/include/dependency/hichain",
@@ -47,12 +42,8 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
-
-    #    "//foundation/distributedhardware/device_manager/ext/profile/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
     "//base/security/device_auth/interfaces/innerkits",
-
-    #    "${servicesimpl_path}/include/ability",
-    #    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [
@@ -63,26 +54,12 @@ ohos_fuzztest("InitDeviceManagerFuzzTest") {
   ]
   sources = [ "init_device_manager_fuzzer.cpp" ]
 
-  deps = [
-    "${utils_path}:devicemanagerutils",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"InitDeviceManagerFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
-  ]
-
-  external_deps = [
-    #    "bundle_framework:appexecfwk_base",
-    #    "bundle_framework:appexecfwk_core",
-    #    "eventhandler:libeventhandler",
-    #    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    #    "safwk:system_ability_fwk",
-    #    "samgr:samgr_proxy",
-    #    "init:libbegetutil",
   ]
 }
 

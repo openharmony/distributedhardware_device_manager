@@ -518,26 +518,26 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level0
 }
 
 /**
- * @tc.name: CovertNodeBasicInfoToDmDevice_001
+ * @tc.name: ConvertNodeBasicInfoToDmDevice_001
  * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, CovertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     NodeBasicInfo nodeBasicInfo;
     DmDeviceInfo dmDeviceInfo;
-    int ret = softbusListener->CovertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
+    int ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(ret, DM_OK);
 }
 
 /**
- * @tc.name: CovertNodeBasicInfoToDmDevice_001
+ * @tc.name: ConvertNodeBasicInfoToDmDevice_001
  * @tc.desc: go to the correct case and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, CovertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -550,7 +550,7 @@ HWTEST_F(SoftbusConnectorTest, CovertDeviceInfoToDmDevice_001, testing::ext::Tes
         .deviceName = "11111",
         .deviceTypeId = 1
     };
-    softbusConnector->CovertDeviceInfoToDmDevice(deviceInfo, dm);
+    softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dm);
     bool ret = false;
     if (strcmp(dm.deviceId, dm_1.deviceId) == 0) {
         ret = true;

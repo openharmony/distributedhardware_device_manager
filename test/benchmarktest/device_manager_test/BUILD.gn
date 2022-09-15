@@ -28,25 +28,10 @@ ohos_benchmarktest("DeviceManagerTest") {
   }
 
   deps = [
-    "${utils_path}:devicemanagerutils",
-    "${utils_path}:devicemanagerutils",
-    "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 }
 

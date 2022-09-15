@@ -74,7 +74,8 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "//third_party/jsframework/runtime/main/extend/systemplugin",
     "//third_party/node/benchmark",
     "//third_party/libuv/include",
-    "//foundation/distributedhardware/device_manager/services/service/include/ipc/lite",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
+    "//foundation/distributedhardware/device_manager/common/include/ipc/standard",
   ]
   cflags = [
     "-g",
@@ -88,10 +89,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "ipc_cmd_register_fuzzer.cpp",
   ]
 
-  deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-    "${ability_runtime_services_path}/abilitymgr:abilityms",
-  ]
+  deps = [ "${ability_runtime_services_path}/abilitymgr:abilityms" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -99,28 +97,12 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "common_event_service:cesfwk_core",
-    "common_event_service:cesfwk_innerkits",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "ipc:ipc_core" ]
 
   public_deps = [
     "${utils_path}:devicemanagerutils",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]

@@ -38,8 +38,8 @@ namespace DistributedHardware {
 #define OFFLINE_TIMEOUT 300
 struct StateTimerInfo {
     std::string timerName;
-    std::string netWorkId;
-    std::string deviceId;
+    std::string networkId;
+    bool isStart;
 };
 
 class NotifyEvent {
@@ -210,7 +210,6 @@ private:
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
 private:
-    int32_t cumulativeQuantity_ = 0;
     std::string profileSoName_;
 #if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
