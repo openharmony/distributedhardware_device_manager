@@ -52,28 +52,13 @@ void IpcServerStubTest::TearDownTestCase()
 namespace {
 /**
  * @tc.name: OnStart_001
- * @tc.desc: 1. Call IpcServerStub OnStart
- *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcServerStubTest, OnStart_001, testing::ext::TestSize.Level0)
-{
-    // 1. Call IpcServerStub OnStart
-    IpcServerStub::GetInstance().OnStart();
-    // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
-    ASSERT_EQ(ServiceRunningState::STATE_RUNNING, IpcServerStub::GetInstance().state_);
-}
-
-/**
- * @tc.name: OnStart_002
  * @tc.desc: 1. set IpcServerStub state is ServiceRunningState::STATE_RUNNING
  *           2. Call IpcServerStub OnStart
  *           3. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(IpcServerStubTest, OnStart_002, testing::ext::TestSize.Level0)
+HWTEST_F(IpcServerStubTest, OnStart_001, testing::ext::TestSize.Level0)
 {
     // 1. set IpcServerStub state is ServiceRunningState::STATE_RUNNING
     IpcServerStub::GetInstance().state_ = ServiceRunningState::STATE_RUNNING;
@@ -93,21 +78,6 @@ HWTEST_F(IpcServerStubTest, OnStart_002, testing::ext::TestSize.Level0)
 HWTEST_F(IpcServerStubTest, Init_001, testing::ext::TestSize.Level0)
 {
     IpcServerStub::GetInstance().registerToService_=true;
-    bool result = IpcServerStub::GetInstance().Init();
-    // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
-    ASSERT_EQ(result, true);
-}
-
-/**
- * @tc.name: Init_002
- * @tc.desc: 1. Call IpcServerStub OnStart
- *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcServerStubTest, Init_002, testing::ext::TestSize.Level0)
-{
-    IpcServerStub::GetInstance().registerToService_ = false;
     bool result = IpcServerStub::GetInstance().Init();
     // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
     ASSERT_EQ(result, true);
@@ -306,16 +276,16 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_005, testing::ext::Tes
 /**
  * @tc.name: UnRegisterDeviceManagerListener_001
  * @tc.desc:  1. Call IpcServerStub UnRegisterDeviceManagerListener
- *            2. check ret is ERR_DM_POINT_NULL
+ *            2. check ret is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "";
+    std::string pkgName;
     int ret = 0;
     ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
