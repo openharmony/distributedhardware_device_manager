@@ -205,7 +205,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_005, testing::ext::TestSize.Level0)
 HWTEST_F(IpcCmdRegisterTest, ReadResponse_001, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = 2000;
+    int32_t cmdCode = 9999;
     //  set MessageParcel data null
     MessageParcel reply;
     // set IpcRegisterListenerReq null

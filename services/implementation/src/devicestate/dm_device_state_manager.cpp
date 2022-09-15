@@ -152,10 +152,6 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    if (pkgName.empty()) {
-        LOGE("DmDeviceStateManager::OnDeviceOnline error: Invalid para, pkgName: %s", pkgName.c_str());
-        return;
-    }
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     LOGI("OnDeviceOnline function is called back with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
