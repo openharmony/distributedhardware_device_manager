@@ -88,45 +88,6 @@ HWTEST_F(ProfileConnectorTest, UnRegisterProfileCallback_001, testing::ext::Test
 }
 
 /**
- * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor
- * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(ProfileConnectorTest, SubscribeProfileEvents_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "deviceId";
-    std::list<std::string> serviceIds;
-    std::shared_ptr<ProfileConnector> profileConnector_;
-    profileConnector_ = std::make_shared<ProfileConnector>();
-    int32_t ret = DM_OK;
-    ret = profileConnector_->SubscribeProfileEvents(serviceIds, deviceId);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnDecisionFilterResult_001
- * @tc.desc:  Returns a new pointer to the constructor
- * to construct an environment where the device has been discovered, and stop discovering
- * the device. Its return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(ProfileConnectorTest, UnSubscribeProfileEvents_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "deviceId";
-    std::list<std::string> serviceIds;
-    std::shared_ptr<ProfileConnector> profileConnector_;
-    profileConnector_ = std::make_shared<ProfileConnector>();
-    int32_t ret = DM_OK;
-    profileConnector_->SubscribeProfileEvents(serviceIds, deviceId);
-    ret = profileConnector_->UnSubscribeProfileEvents();
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: OnDecisionFilterResult_002
  * @tc.desc:  Returns a new pointer to the constructor
  * to construct an environment where the device has been discovered, and stop discovering

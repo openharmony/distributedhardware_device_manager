@@ -179,7 +179,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("In, pkgName: %s", pkgName.c_str());
+    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(pkgName);
     if (listenerIter == dmListener_.end()) {

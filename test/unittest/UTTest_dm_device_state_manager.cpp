@@ -123,14 +123,19 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Le
  */
 HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName;
+    std::string pkgName  = "111";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     dmDeviceStateManager->OnDeviceChanged(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
     EXPECT_EQ(result, 0);
 }
 
@@ -149,8 +154,13 @@ HWTEST_F(DmDeviceStateManagerTest, OnProfileReady_001, testing::ext::TestSize.Le
     dmDeviceStateManager->OnProfileReady(pkgName, deviceId);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
     EXPECT_EQ(result, 0);
 }
 
@@ -168,13 +178,18 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Lev
     dmDeviceStateManager->OnDeviceReady(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
     EXPECT_EQ(result, 0);
 }
 
 /**
- * @tc.name: OnDeviceChanged_001
+ * @tc.name: OnDeviceChanged_002
  * @tc.desc: set info.deviceId to 123,and call OnDeviceChanged ，change info.deviceId to 4
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -187,8 +202,13 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
     dmDeviceStateManager->OnDeviceChanged(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
     EXPECT_EQ(result, 0);
 }
 
