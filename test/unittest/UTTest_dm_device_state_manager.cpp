@@ -105,8 +105,13 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Le
     dmDeviceStateManager->OnDeviceOnline(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo ret = pReq->GetDeviceInfo();
-    int result = strcmp(info.deviceId, ret.deviceId);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
     EXPECT_EQ(result, 0);
 }
 

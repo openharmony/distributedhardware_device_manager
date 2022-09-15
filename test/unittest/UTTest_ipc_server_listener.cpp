@@ -162,7 +162,7 @@ HWTEST_F(IpcServerListenerTest, SendRequest_003, testing::ext::TestSize.Level0)
 HWTEST_F(IpcServerListenerTest, SendRequest_004, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
+    int32_t cmdCode = 999;
     // set pkgName not null
     std::string pkgName = "com.ohos.test";
     // 2. set remoteObject nullptr
