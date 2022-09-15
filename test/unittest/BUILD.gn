@@ -524,6 +524,8 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/dependency/multipleuser",
     "//foundation/distributedhardware/device_manager/test/unittest/mock/",
     "//foundation/systemabilitymgr/safwk/services/safwk",
+    "//base/security/access_token/interfaces/innerkits/nativetoken/include",
+    "//base/security/access_token/interfaces/innerkits/token_setproc/include",
   ]
 
   if (os_account_part_exists) {
@@ -570,6 +572,8 @@ ohos_static_library("device_manager_test_common") {
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
+    "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
   ]
 
   deps = [
