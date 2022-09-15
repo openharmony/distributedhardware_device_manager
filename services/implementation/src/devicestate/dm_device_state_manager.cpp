@@ -46,7 +46,7 @@ DmDeviceStateManager::~DmDeviceStateManager()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("SaveOnlineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("SaveOnlineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -60,14 +60,14 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, cons
 #endif
             remoteDeviceInfos_[uuid] = saveInfo;
         }
-        LOGI("SaveDeviceInfo in, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
+        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
             std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
     }
 }
 
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("DeleteOfflineDeviceInfo in, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("DeleteOfflineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
 #else
@@ -76,6 +76,7 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
     for (auto iter: remoteDeviceInfos_) {
         if (iter.second.deviceId == info.deviceId) {
             remoteDeviceInfos_.erase(iter.first);
+            LOGI("DeleteOfflineDeviceInfo complete");
             break;
         }
     }
@@ -155,7 +156,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
-    RegisterProfileListener(pkgName, info);
+    SaveOnlineDeviceInfo(pkgName, info);
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -186,7 +187,7 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 {
     LOGI("OnDeviceOffline function is called with pkgName: %s", pkgName.c_str());
     StartOffLineTimer(info);
-    UnRegisterProfileListener(pkgName, info);
+    DeleteOfflineDeviceInfo(pkgName, info);
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -369,6 +370,8 @@ void DmDeviceStateManager::StopEventThread()
 {
     LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
+    eventTask_.queueCond_.notify_all();
+    eventTask_.queueFullCond_.notify_all();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
@@ -381,8 +384,7 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
-            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
-                [this]() { return (eventTask_.queue_.size() < DM_EVENT_QUEUE_CAPACITY); });
+            eventTask_.queueFullCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT));
         }
         eventTask_.queue_.push(task);
     }
@@ -399,8 +401,7 @@ void DmDeviceStateManager::ThreadLoop()
         {
             std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
             while (eventTask_.queue_.empty() && eventTask_.threadRunning_) {
-                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT),
-                    [this]() { return !eventTask_.queue_.empty(); });
+                eventTask_.queueCond_.wait_for(lock, std::chrono::seconds(DM_EVENT_WAIT_TIMEOUT));
             }
             if (!eventTask_.queue_.empty()) {
                 task = eventTask_.queue_.front();
@@ -427,6 +428,7 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
     const std::string &deviceId)
 {
+    LOGI("ProcNotifyEvent in, eventId: %d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 } // namespace DistributedHardware
