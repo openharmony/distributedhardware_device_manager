@@ -35,7 +35,6 @@ static ERROR_INFO g_errorMessages[] = {
     {ERR_DM_MALLOC_FAILED, "memory allocation failed."},
     {ERR_DM_DISCOVERY_FAILED, "device discovery failed."},
     {ERR_DM_MAP_KEY_ALREADY_EXISTS, "map key already exists."},
-    {ERR_DM_PROFILE_EVENTS_FAILED, "process profile events failed."},
     {ERR_DM_IPC_WRITE_FAILED, "ipc write object failed."},
     {ERR_DM_IPC_COPY_FAILED, "ipc copy data failed."},
     {ERR_DM_IPC_SEND_REQUEST_FAILED, "ipc send request failed."},

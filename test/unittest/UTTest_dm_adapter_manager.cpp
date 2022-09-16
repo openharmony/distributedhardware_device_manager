@@ -52,21 +52,6 @@ HWTEST_F(DmAdapterManagerTest, GetDecisionAdapter_001, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: DmAdapterManager::GetProfileAdapter_001
- * @tc.desc: 1 set soName to null
- *           2 callDmAdapterManager::GetProfileAdapter_001 with soName = nullptr
- * @tc.type: FUNC
- * @tc.require:AR000GHSJK
- */
-HWTEST_F(DmAdapterManagerTest, GetProfileAdapter_001, testing::ext::TestSize.Level0)
-{
-    std::string soName = "123";
-    soName.clear();
-    std::shared_ptr<IProfileAdapter> iProfileAdapter = dmAdapterManager->GetProfileAdapter(soName);
-    EXPECT_EQ(nullptr, iProfileAdapter);
-}
-
-/**
  * @tc.name: DmAdapterManager::GetCryptoAdapter_001
  * @tc.desc: 1 set soName to null
  *           2 callDmAdapterManager::GetCryptoAdapter_001 with soName = nullptr

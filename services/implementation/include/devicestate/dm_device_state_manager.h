@@ -92,20 +92,6 @@ public:
     void DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
-     * @tc.name: DmDeviceStateManager::RegisterProfileListener
-     * @tc.desc: Register Profile Listener of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    int32_t RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::UnRegisterProfileListener
-     * @tc.desc: UnRegister Profile Listener of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    int32_t UnRegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
      * @tc.name: DmDeviceStateManager::PostDeviceOnline
      * @tc.desc: Post Device Online of the Dm Device State Manager
      * @tc.type: FUNC
@@ -148,11 +134,11 @@ public:
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
-     * @tc.name: DmDeviceStateManager::OnProfileReady
-     * @tc.desc: OnProfile Ready of the Dm Device State Manager
+     * @tc.name: DmDeviceStateManager::OnDbReady
+     * @tc.desc: OnDb Ready of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void OnProfileReady(const std::string &pkgName, const std::string &deviceId);
+    void OnDbReady(const std::string &pkgName, const std::string &deviceId);
 
     /**
      * @tc.name: DmDeviceStateManager::RegisterSoftbusStateCallback
@@ -210,7 +196,6 @@ private:
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
 private:
-    std::string profileSoName_;
 #if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;

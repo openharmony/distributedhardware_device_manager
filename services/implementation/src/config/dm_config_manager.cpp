@@ -183,44 +183,6 @@ std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std:
     return decisionAdapterPtr_[soName];
 }
 
-std::shared_ptr<IProfileAdapter> DmConfigManager::GetProfileAdapter(const std::string &soName)
-{
-    if (soName.empty()) {
-        LOGE("soName size is zero");
-        return nullptr;
-    }
-
-    auto soInfoIter = soAdapterLoadInfo_.find(soName);
-    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != std::string(PROFILE_JSON_TYPE_KEY)) {
-        LOGE("not find so info or type key not match");
-        return nullptr;
-    }
-    std::unique_lock<std::mutex> locker(profileAdapterMutex_);
-    auto ptrIter = profileAdapterPtr_.find(soName);
-    if (ptrIter != profileAdapterPtr_.end()) {
-        return profileAdapterPtr_[soName];
-    }
-    void *so_handle = nullptr;
-    std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
-    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
-    if (so_handle == nullptr) {
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW);
-        if (so_handle == nullptr) {
-            LOGE("load profile so %s failed", soName.c_str());
-            return nullptr;
-        }
-    }
-    dlerror();
-    auto func = (CreateIProfileAdapterFuncPtr)dlsym(so_handle, (soInfoIter->second).funcName.c_str());
-    if (dlerror() != nullptr || func == nullptr) {
-        LOGE("Create object function is not exist");
-        return nullptr;
-    }
-    std::shared_ptr<IProfileAdapter> iProfileAdapter(func());
-    profileAdapterPtr_[soName] = iProfileAdapter;
-    return profileAdapterPtr_[soName];
-}
-
 std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::string &soName)
 {
     if (soName.empty()) {
