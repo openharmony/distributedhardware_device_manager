@@ -18,6 +18,9 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+#include "softbus_common.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -25,6 +28,22 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
 {
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dsoftbus_service",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
 }
 
 void DeviceManagerServiceTest::TearDown()
@@ -136,14 +155,14 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
  */
 HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.test12";
     DmPublishInfo publishInfo;
     publishInfo.publishId = 1;
     publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
     publishInfo.freq = DM_HIGH;
-    publishInfo.ranging = 0;
+    publishInfo.ranging = -1;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 
@@ -224,7 +243,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
 
 /**
  * @tc.name: AuthenticateDevice_001
- * @tc.desc: Set unsupport authType = 0 and return ERR_DM_UNSUPPORTED_AUTH_TYPE
+ * @tc.desc: Set unsupport authType = 0 and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -232,10 +251,10 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
-    int32_t authType = 0;
+    int32_t authType = 1;
     std::string deviceId = "2345";
     int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -272,7 +291,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
 
 /**
  * @tc.name: UnAuthenticateDevice_001
- * @tc.desc: 将UnAuthenticateDevice的intFlag设置为false，设置pkgName = "com.ohos.test";其返回值为ERR_DM_NOT_INIT
+ * @tc.desc: 将UnAuthenticateDevice的intFlag设置为false，设置pkgName = "com.ohos.test";Return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -316,7 +335,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
 /**
  * @tc.name: VerifyAuthentication_001
  * @tc.desc: Set intFlag for VerifyAuthentication to false and  set authParam = "jdjjjj"，The return value is
- * ERR_DM_NOT_INIT
+ * ERR_DM_AUTH_NOT_START
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -337,8 +356,8 @@ HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
-    std::string netWorkId = "";
-    std::string udid = "";
+    std::string netWorkId = "123";
+    std::string udid = "123";
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -346,15 +365,15 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSiz
 /**
  * @tc.name: GetUdidByNetworkId_002
  * @tc.desc: Make not init for GetUdidByNetworkId，The return value is
- * ERR_DM_NOT_INIT
+ * DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
-    std::string netWorkId = "";
-    std::string udid = "";
+    std::string netWorkId = "111";
+    std::string udid = "2222";
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -385,8 +404,8 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
-    std::string netWorkId = "";
-    std::string uuid = "";
+    std::string netWorkId = "12";
+    std::string uuid = "12";
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -401,8 +420,8 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
-    std::string netWorkId = "";
-    std::string uuid = "";
+    std::string netWorkId = "12";
+    std::string uuid = "21";
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
     EXPECT_EQ(ret, DM_OK);
 }

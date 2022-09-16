@@ -36,7 +36,7 @@ ProfileConnector::~ProfileConnector()
 int32_t ProfileConnector::RegisterProfileCallback(const std::string &pkgName, const std::string &deviceId,
                                                   IProfileConnectorCallback* callback)
 {
-    if (pkgName.empty() || deviceId.empty() ||  callback == nullptr) {
+    if (pkgName.empty() || deviceId.empty() || callback == nullptr) {
         LOGE("Not a reasonable function argument");
         return ERR_DM_INPUT_PARA_INVALID;
     }

@@ -102,7 +102,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOnLine_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DeviceOffLine_001
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the corrort case and return false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -118,13 +118,13 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_001, testing::ext::TestSize.Level0)
         ret = true;
         listener->ipcServerListener_.req_ = nullptr;
     }
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
     SoftbusConnector::stateCallbackMap_.clear();
 }
 
 /**
  * @tc.name: DeviceOffLine_002
- * @tc.desc: go to the corrort case and return DM_OK
+ * @tc.desc: go to the corrort case and return false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -602,7 +602,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_002, testing::ext::TestSize
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
     softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
 }
 
@@ -672,7 +672,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_002, testing::ext::TestSiz
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
     softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
 }
 

@@ -198,7 +198,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_005, testing::ext::TestSize.Level0)
  * @tc.desc: 1. set cmdCode 9999
  *              set MessageParcel reply null
  *           2. call IpcCmdRegister ReadResponse with parameter
- *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -213,8 +213,8 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_001, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister ReadResponse with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
-    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -333,7 +333,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_005, testing::ext::TestSize.Level0)
 HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_001, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = 9999;
+    int32_t cmdCode = 23;
     //  set MessageParcel data null
     MessageParcel reply;
     MessageParcel data;

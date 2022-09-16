@@ -172,12 +172,11 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
                                                     std::shared_ptr<DeviceStateCallback> callback)
 {
-    LOGI("DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDevStateCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
+    LOGI("DeviceManager::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     if (!extra.empty()) {
         RegisterDevStateCallback(pkgName, extra);

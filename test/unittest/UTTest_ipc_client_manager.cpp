@@ -252,21 +252,21 @@ HWTEST_F(IpcClientManagerTest, Init_005, testing::ext::TestSize.Level0)
  * @tc.desc:  1. set pkgName null
  *               set IpcClientManager dmInterface_ null
  *            2. call UnInit with pkgName
- *            3. check ret is DEVICEMANAGER_SERVICE_NOT_READY
+ *            3. check ret is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(IpcClientManagerTest, UnInit1, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName null
-    std::string pkgName = "";
+    std::string pkgName;
     // set IpcClientManager dmInterface_ null
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     // 2. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 3. check ret is ERR_DM_INIT_FAILED
-    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
