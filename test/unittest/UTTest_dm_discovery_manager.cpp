@@ -147,7 +147,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
         std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret1, 1);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -183,7 +183,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level
     EXPECT_EQ(ret1, 1);
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -201,7 +201,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoveryFailed_001, testing::ext::TestSize.L
     discoveryMgr_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -221,7 +221,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoveryFailed_002, testing::ext::TestSize.L
     EXPECT_EQ(ret1, 0);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -238,7 +238,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_001, testing::ext::TestSize.
     discoveryMgr_->OnDiscoverySuccess(pkgName, subscribeId);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
@@ -257,7 +257,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
     EXPECT_EQ(ret1, 1);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 } // namespace

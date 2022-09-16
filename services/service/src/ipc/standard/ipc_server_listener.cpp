@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || rsp == nullptr) {
         LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -53,7 +53,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         req->SetPkgName(pkgName);
         sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
         if (listener == nullptr) {
-            LOGI("cannot get listener for package:%s.", pkgName.c_str());
+            LOGE("cannot get listener for package:%s.", pkgName.c_str());
             return ERR_DM_FAILED;
         }
         listener->SendCmd(cmdCode, req, rsp);

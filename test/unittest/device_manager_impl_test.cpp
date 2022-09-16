@@ -39,10 +39,25 @@ void DeviceManagerImplTest::TearDownTestCase()
 }
 
 namespace {
+/**
+ * @tc.name: InitDeviceManager
+ * @tc.desc: 1. set packName not null
+ *              set callback nullptr
+ *           2. MOCK DeviceManager InitDeviceManager return ERR_DM_INPUT_PARA_INVALID
+ *           3. call DeviceManager::InitDeviceManager with parameter
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
 HWTEST_F(DeviceManagerImplTest, InitDeviceManager, testing::ext::TestSize.Level0)
 {
-    std::string packName = "";
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    // set callback nullptr
+    // 3. call DeviceManager::InitDeviceManager with parameter
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, nullptr);
+    //4. check ret is ERR_DM_INPUT_PARA_INVALID
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

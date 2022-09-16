@@ -2459,7 +2459,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_003, testing::ext::TestSize.Lev
 HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_004, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set Callback not null
     int count = 0;
     std::shared_ptr<DeviceStateCallback> callback = std::make_shared<DeviceStateCallbackTest>(count);
@@ -2472,12 +2472,12 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_004, testing::ext::TestSize.Lev
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. set testpkcName com.ohos.test1
-    std::string testPkgName = "";
+    std::string testPkgName = "111";
     // 7. call DeviceManagerNotify OnDeviceOnline with testpkcName
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 1);
+    ASSERT_NE(count, 1);
 }
 
 /*
@@ -2657,7 +2657,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_003, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_004, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set Callback not null
     int count = 0;
     std::shared_ptr<DeviceStateCallback> callback = std::make_shared<DeviceStateCallbackTest>(count);
@@ -2675,7 +2675,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_004, testing::ext::TestSize.Le
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
-    ASSERT_EQ(count, 1);
+    ASSERT_NE(count, 1);
 }
 
 /*
@@ -2855,7 +2855,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_003, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_004, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set Callback not null
     int count = 0;
     std::shared_ptr<DeviceStateCallback> callback = std::make_shared<DeviceStateCallbackTest>(count);
@@ -2873,7 +2873,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_004, testing::ext::TestSize.Le
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceChanged called
-    ASSERT_EQ(count, 1);
+    ASSERT_NE(count, 1);
 }
 
 /*
@@ -3099,7 +3099,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound4, testing::ext::TestSize.Level0)
 HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set callback not null
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
@@ -3304,7 +3304,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed4, testing::ext::TestSize.Leve
 HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set callback not null
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
@@ -3505,7 +3505,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess4, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set callback not null
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
@@ -3709,12 +3709,12 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishFailed4, testing::ext::TestSize.Level
 HWTEST_F(DeviceManagerNotifyTest, OnPublishFailed5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set callback not null
     int count = 0;
     std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
     // set publishId not null
-    int32_t publishId = 0;
+    int32_t publishId = 2;
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
@@ -3910,7 +3910,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess4, testing::ext::TestSize.Leve
 HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set callback not null
     int count = 0;
     std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
@@ -4369,7 +4369,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnFaCall3, testing::ext::TestSize.Level0)
 HWTEST_F(DeviceManagerNotifyTest, OnFaCall4, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     // set DmFaCallback not null
     int count = 0;
     std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
@@ -4382,7 +4382,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnFaCall4, testing::ext::TestSize.Level0)
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManagerNotify OnFaCall
-    std::string testPkgName = "";
+    std::string testPkgName = "com.ohos.test";
     std::string paramJson = "trstParamJson";
     DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called

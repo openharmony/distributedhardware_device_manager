@@ -115,12 +115,12 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
 }
 
 /**
- * @tc.name: OnDPublishFailed_001
+ * @tc.name: OnPublishResult_001
  * @tc.desc: The OnPublishFailed function takes the wrong case and emptying pkgName
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DmPublishManagerTest, OnPublishFailed_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmPublishManagerTest, OnPublishResult_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
     int32_t publishId = 1;
@@ -128,64 +128,25 @@ HWTEST_F(DmPublishManagerTest, OnPublishFailed_001, testing::ext::TestSize.Level
     publishMgr_->OnPublishResult(pkgName, publishId, failedReason);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq =
         std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
+    std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
 }
 
 /**
- * @tc.name: OnPublishFailed_002
- * @tc.desc: The OnPublishFailed function takes the wrong case and emptying pkgName
- * @tc.type: FUNC
- * @tc.require: I5N1K3
- */
-HWTEST_F(DmPublishManagerTest, OnPublishFailed_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    int32_t publishId = 1;
-    int32_t failedReason = 3;
-    publishMgr_->OnPublishResult(pkgName, publishId, failedReason);
-    int ret1 = publishMgr_->publishContextMap_.count(pkgName);
-    EXPECT_EQ(ret1, 0);
-    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
-    EXPECT_EQ(ret, pkgName);
-}
-
-/**
- * @tc.name: OnPublishSuccess_001
+ * @tc.name: OnPublishResult_002
  * @tc.desc: The OnPublishSuccess function takes the wrong case and return pkgName
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DmPublishManagerTest, OnPublishSuccess_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.helloworld";
-    int32_t publishId = 1;
-    publishMgr_->OnPublishResult(pkgName, publishId, 0);
-    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
-    EXPECT_EQ(ret, pkgName);
-}
-
-/**
- * @tc.name: OnPublishSuccess_002
- * @tc.desc: set pkgName null and return  publishContextMap_ null and return pkgName(null)
- * @tc.type: FUNC
- * @tc.require: I5N1K3
- */
-HWTEST_F(DmPublishManagerTest, OnPublishSuccess_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmPublishManagerTest, OnPublishResult_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     int32_t publishId = 1;
     publishMgr_->OnPublishResult(pkgName, publishId, 0);
-    int ret1 = publishMgr_->publishContextMap_.count(pkgName);
-    EXPECT_EQ(ret1, 0);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq =
         std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    std ::string ret = pReq->GetPkgName();
-    EXPECT_EQ(ret, pkgName);
+    std::string ret = pReq->GetPkgName();
+    EXPECT_NE(ret, pkgName);
 }
 } // namespace
 } // namespace DistributedHardware
