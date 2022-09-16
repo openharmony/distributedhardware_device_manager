@@ -365,8 +365,6 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
         LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed");
     }
 
-    (void)memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), 0, sizeof(dmDeviceInfo.networkId));
-
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed");
