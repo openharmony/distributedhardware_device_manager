@@ -29,8 +29,8 @@ struct DmDeviceFilters {
 };
 
 struct DmDeviceFilterOption {
-    std::string filterOp;
-    std::vector<DmDeviceFilters> filters;
+    std::string filterOp_;
+    std::vector<DmDeviceFilters> filters_;
     int32_t ParseFilterJson(const std::string &str, nlohmann::json &jsonObject);
     int32_t TransformToFilter(const std::string &filterOptions);
 };

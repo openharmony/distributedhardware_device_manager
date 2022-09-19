@@ -33,28 +33,41 @@ enum DmDiscoveryDeviceFilter {
     DM_ALL_DEVICE = 2
 };
 
-void from_json(const nlohmann::json &jsonObject, DmDeviceFilters &filters)
+int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str)
 {
-    if (!jsonObject.contains("type") || !jsonObject.contains("value")) {
-        LOGE("Filters key invalid");
-        return;
-    }
-
-    jsonObject["type"].get_to(filters.type);
-    jsonObject["value"].get_to(filters.value);
-    return;
-}
-
-int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str, nlohmann::json &jsonObject)
-{
+    nlohmann::json jsonObject;
     jsonObject = nlohmann::json::parse(str, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("Filters Parse error.");
-        return ERR_DM_FAILED;
+        LOGE("FilterOptions parse error.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!jsonObject.contains(FILTERS_KEY)) {
-        LOGE("FilterOptions invalid.");
-        return ERR_DM_FAILED;
+    if (!jsonObject.contains(FILTERS_KEY) || !jsonObject[FILTERS_KEY].is_array() || jsonObject[FILTERS_KEY].empty()) {
+        LOGE("Filters invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (jsonObject.contains(FILTER_OP_KEY) && !jsonObject[FILTER_OP_KEY].is_string()) {
+        LOGE("Filters_op invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!jsonObject.contains(FILTER_OP_KEY)) {
+        filterOp_ = FILTERS_TYPE_OR; // filterOp optional, "OR" default
+    } else {
+        jsonObject[FILTER_OP_KEY].get_to(filterOp_);
+    }
+
+    for(const auto &object : jsonObject[FILTERS_KEY]) {
+        if (!object.contains("type") || !object["type"].is_string()) {
+            LOGE("Filters type invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        if (!object.contains("value") || !object["value"].is_number_integer()) {
+            LOGE("Filters value invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        DmDeviceFilters deviceFilters;
+        deviceFilters.type = object["type"];
+        deviceFilters.value = object["value"];
+        filters_.push_back(deviceFilters);
     }
     return DM_OK;
 }
@@ -63,26 +76,14 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
 {
     if (filterOptions.empty()) {
         LOGI("DmDeviceFilterOption::filterOptions empty");
-        filterOp = FILTERS_TYPE_OR;
+        filterOp_ = FILTERS_TYPE_OR;
         DmDeviceFilters deviceFilters;
         deviceFilters.type  = "credible";
         deviceFilters.value = DM_OFFLINE_DEVICE;
-        filters.push_back(deviceFilters);
+        filters_.push_back(deviceFilters);
         return DM_OK;
     }
-
-    nlohmann::json jsonObject;
-    if (ParseFilterJson(filterOptions, jsonObject) == DM_OK) {
-        if (!jsonObject.contains(FILTER_OP_KEY)) {
-            filterOp = FILTERS_TYPE_OR; // filterOp optional, "OR" default
-        } else {
-            jsonObject[FILTER_OP_KEY].get_to(filterOp);
-        }
-        filters = jsonObject[FILTERS_KEY].get<std::vector<DmDeviceFilters>>();
-        return DM_OK;
-    }
-
-    return ERR_DM_FAILED;
+    return ParseFilterJson(filterOptions);
 }
 
 bool DmDiscoveryFilter::FilterByCredible(int32_t value, bool isOnline)

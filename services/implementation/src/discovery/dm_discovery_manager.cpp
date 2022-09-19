@@ -69,7 +69,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
 {
     DmDeviceFilterOption dmFilter;
     if (dmFilter.TransformToFilter(extra) != DM_OK) {
-        return ERR_DM_FAILED;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (CheckDiscoveryQueue(pkgName) != DM_OK) {
