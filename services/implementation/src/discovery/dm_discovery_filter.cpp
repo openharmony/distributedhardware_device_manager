@@ -55,7 +55,7 @@ int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str)
         jsonObject[FILTER_OP_KEY].get_to(filterOp_);
     }
 
-    for(const auto &object : jsonObject[FILTERS_KEY]) {
+    for (const auto &object : jsonObject[FILTERS_KEY]) {
         if (!object.contains("type") || !object["type"].is_string()) {
             LOGE("Filters type invalid");
             return ERR_DM_INPUT_PARA_INVALID;
