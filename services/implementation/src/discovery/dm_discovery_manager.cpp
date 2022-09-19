@@ -78,7 +78,7 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
 
     std::lock_guard<std::mutex> autoLock(locks_);
     discoveryQueue_.push(pkgName);
-    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp, dmFilter.filters};
+    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
     discoveryContextMap_.emplace(pkgName, context);
     softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
                                                         std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
