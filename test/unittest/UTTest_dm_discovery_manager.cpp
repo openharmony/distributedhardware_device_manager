@@ -136,7 +136,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
     DmDeviceFilterOption dmFilter;
     dmFilter.TransformToFilter(filterOptions);
     uint16_t aaa = 11;
-    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp, dmFilter.filters };
+    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp_, dmFilter.filters_ };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     sleep(1);
     DmDeviceInfo info;
@@ -175,7 +175,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level
     DmDeviceFilterOption dmFilter;
     dmFilter.TransformToFilter(filterOptions);
     uint16_t aaa = 11;
-    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp, dmFilter.filters };
+    DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp_, dmFilter.filters_ };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     DmDeviceInfo info;
     discoveryMgr_->OnDeviceFound(pkgName, info);
