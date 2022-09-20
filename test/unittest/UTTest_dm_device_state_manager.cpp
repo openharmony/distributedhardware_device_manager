@@ -145,13 +145,13 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string deviceId;
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
+    dmDeviceStateManager->OnDeviceReady(pkgName, deviceId);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo dminfo;
@@ -170,12 +170,12 @@ HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDeviceStateManagerTest, OnDbReady_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    dmDeviceStateManager->OnDbReady(pkgName, info);
+    dmDeviceStateManager->OnDeviceReady(pkgName, info);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo dminfo;
