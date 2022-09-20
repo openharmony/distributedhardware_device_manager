@@ -180,7 +180,7 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
     }
     if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s",
-            pkgName.c_str(), deviceId.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->UnAuthenticateDevice(pkgName, deviceId);

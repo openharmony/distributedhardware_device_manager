@@ -259,7 +259,7 @@ void DeviceManagerModule::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo
     JSI::SetStringProperty(device, "deviceName", deviceInfo.deviceName);
     JSI::SetNumberProperty(device, "deviceTypeId", (double)deviceInfo.deviceTypeId);
     LOGI("OnDeviceFound subscribeId %ld ", subscribeId);
-    LOGI("OnDeviceFound deviceId %s ", deviceInfo.deviceId);
+    LOGI("OnDeviceFound deviceId %s ", GetAnonyString(deviceInfo.deviceId));
     LOGI("OnDeviceFound deviceName %s ", deviceInfo.deviceName);
     LOGI("OnDeviceFound deviceTypeId %x ", deviceInfo.deviceTypeId);
 
@@ -382,11 +382,11 @@ void DeviceManagerModule::DeviceInfoToJsArray(const std::vector<DmDeviceInfo> &v
     JSIValue result = JSI::CreateObject();
     char *deviceId = const_cast<char *>(vecDevInfo[idx].deviceId);
     char *deviceName = const_cast<char *>(vecDevInfo[idx].deviceName);
-    
+
     JSI::SetStringProperty(result, "deviceId", deviceId);
     JSI::SetStringProperty(result, "deviceName", deviceName);
     JSI::SetNumberProperty(result, "deviceTypeId", (double)vecDevInfo[idx].deviceTypeId);
-     
+
     status = JSI::SetPropertyByIndex(arrayResult, idx, result);
     if (status == false) {
         LOGE("DmDeviceInfo To JsArray set element error");
@@ -418,7 +418,7 @@ void DeviceManagerModule::DmAuthParamToJsAuthParamy(const DmAuthParam &authParam
     LOGI("DeviceManagerModule::DmAuthParamToJsAuthParamy, business: %d", authParam.business);
     LOGI("DeviceManagerModule::DmAuthParamToJsAuthParamy, pincode: %d", authParam.pincode);
     LOGI("DeviceManagerModule::DmAuthParamToJsAuthParamy, pinToken: %d", authParam.pinToken);
-    
+
     size_t appIconLen = (size_t)authParam.imageinfo.GetAppIconLen();
     if (appIconLen > 0) {
         uint8_t *appIcon = nullptr;
@@ -781,7 +781,7 @@ JSIValue DeviceManagerModule::UnAuthenticateDevice(const JSIValue thisVal, const
 JSIValue DeviceManagerModule::GetLocalDeviceInfoSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsSize)
 {
     LOGI("GetLocalDeviceInfoSync in");
-    
+
     std::string bundleName = GetJSIAppBundleName();
     DmDeviceInfo deviceInfo;
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceInfo(bundleName, deviceInfo);
@@ -794,7 +794,7 @@ JSIValue DeviceManagerModule::GetLocalDeviceInfoSync(const JSIValue thisVal, con
     JSIValue result = JSI::CreateObject();
     char *deviceId = const_cast<char *>(deviceInfo.deviceId);
     char *deviceName = const_cast<char *>(deviceInfo.deviceName);
-    
+
     JSI::SetStringProperty(result, "deviceId", deviceId);
     JSI::SetStringProperty(result, "deviceName", deviceName);
     JSI::SetNumberProperty(result, "deviceTypeId", (double)deviceInfo.deviceTypeId);
@@ -808,12 +808,12 @@ JSIValue DeviceManagerModule::SetUserOperationSync(const JSIValue thisVal, const
         LOGE("1 argument is required.");
         return JSI::CreateNull();
     }
-    
+
     if (!JSI::ValueIsNumber(args[0])) {
         LOGE("a Number is required.");
         return JSI::CreateNull();
     }
-    
+
     std::string bundleName = GetJSIAppBundleName();
     int32_t action = 0;
     action = static_cast<int32_t>(JSI::ValueToNumber(args[0]));
@@ -841,7 +841,7 @@ JSIValue DeviceManagerModule::GetAuthenticationParamSync(const JSIValue thisVal,
             bundleName.c_str(), ret);
         return JSI::CreateNull();
     }
-    
+
     DmAuthParamToJsAuthParamy(authParam, resultParam);
     return resultParam;
 }
@@ -883,7 +883,7 @@ JSIValue DeviceManagerModule::StartDeviceDiscoverSync(const JSIValue thisVal, co
 {
     LOGI("StartDeviceDiscoverSync in");
     std::string bundleName = GetJSIAppBundleName();
-    
+
     if (argsSize < 1) {
         LOGE("1 argument is required.");
         return JSI::CreateNull();
@@ -893,7 +893,7 @@ JSIValue DeviceManagerModule::StartDeviceDiscoverSync(const JSIValue thisVal, co
         LOGE("a object is required.");
         return JSI::CreateNull();
     }
-    
+
     std::shared_ptr<DmJSIDiscoverCallback> discoverCallback = nullptr;
     auto iter = g_discoverCallbackMap.find(bundleName);
     if (iter == g_discoverCallbackMap.end()) {
@@ -960,7 +960,7 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
         LOGE("3 argument is required.");
         return JSI::CreateNull();
     }
-    
+
     if (!JSI::ValueIsObject(args[0])) {
         LOGE("a object is required.");
         return JSI::CreateNull();
@@ -970,10 +970,10 @@ JSIValue DeviceManagerModule::AuthenticateDevice(const JSIValue thisVal, const J
         LOGE("a object is required.");
         return JSI::CreateNull();
     }
-    
+
     authAsyncCallbackInfo_.thisVal_ = JSI::AcquireValue(thisVal);
     authAsyncCallbackInfo_.callback = JSI::AcquireValue(args[DM_JSI_ARGS_TWO]);
-   
+
     std::shared_ptr<DmJSIAuthenticateCallback> authCallback = nullptr;
     auto iter = g_authCallbackMap.find(bundleName);
     if (iter == g_authCallbackMap.end()) {
@@ -1009,15 +1009,15 @@ JSIValue DeviceManagerModule::VerifyAuthInfo(const JSIValue thisVal, const JSIVa
         LOGE("2 argument is required.");
         return JSI::CreateNull();
     }
-    
+
     if (!JSI::ValueIsObject(args[0])) {
         LOGE("a object is required.");
         return JSI::CreateNull();
     }
-    
+
     verifyAsyncCallbackInfo_.thisVal_ = JSI::AcquireValue(thisVal);
     verifyAsyncCallbackInfo_.callback = JSI::AcquireValue(args[1]);
-  
+
     std::shared_ptr<DmJSICheckAuthCallback> verifyCallback = nullptr;
     auto iter = g_checkAuthCallbackMap.find(bundleName);
     if (iter == g_checkAuthCallbackMap.end()) {
@@ -1054,7 +1054,7 @@ JSIValue DeviceManagerModule::JsOn(const JSIValue thisVal, const JSIValue *args,
         return JSI::CreateNull();
     }
     std::string eventType = JSI::ValueToString(args[0]);
-    
+
     LOGI("JsOn for bundleName %s, eventType %s ", bundleName.c_str(),
         eventType.c_str());
     std::shared_ptr<DmNativeEvent> DmNativeEventobj = std::make_shared<DmNativeEvent>(thisVal);
@@ -1068,7 +1068,7 @@ JSIValue DeviceManagerModule::JsOff(const JSIValue thisVal, const JSIValue *args
 {
     LOGI("JsOff in");
     std::string bundleName = GetJSIAppBundleName();
-    
+
     if (!JSI::ValueIsString(args[0])) {
         LOGE("a string is required.");
         return JSI::CreateNull();
@@ -1078,7 +1078,7 @@ JSIValue DeviceManagerModule::JsOff(const JSIValue thisVal, const JSIValue *args
 
     LOGI("JsOff for bundleName %s, eventType %s ", bundleName.c_str(),
         eventType.c_str());
-    
+
     DmNativeEvent* DmNativeEventobj = new DmNativeEvent();
     DmNativeEventobj->Off(eventType);
     delete(DmNativeEventobj);
@@ -1092,7 +1092,7 @@ JSIValue DeviceManagerModule::ReleaseDeviceManager(const JSIValue thisVal, const
     LOGI("ReleaseDeviceManager in");
     std::string bundleName = GetJSIAppBundleName();
     LOGI("ReleaseDeviceManager for bundleName %s", bundleName.c_str());
-    
+
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnInitDeviceManager(bundleName);
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d",
@@ -1100,14 +1100,14 @@ JSIValue DeviceManagerModule::ReleaseDeviceManager(const JSIValue thisVal, const
         JSIValue result = JSI::CreateNumber((double)ret);
         return result;
     }
-    
+
     g_deviceManagerMap.erase(bundleName);
     g_initCallbackMap.erase(bundleName);
     g_deviceStateCallbackMap.erase(bundleName);
     g_discoverCallbackMap.erase(bundleName);
     g_authCallbackMap.erase(bundleName);
     g_checkAuthCallbackMap.erase(bundleName);
-    
+
     return JSI::CreateUndefined();
 }
 
@@ -1117,7 +1117,7 @@ JSIValue DeviceManagerModule::CreateDeviceManager(const JSIValue thisVal, const 
         LOGE("1 argument is required.");
         return JSI::CreateNull();
     }
- 
+
     if (!JSI::ValueIsString(args[0])) {
         LOGE("a string is required.");
         return JSI::CreateNull();
@@ -1133,7 +1133,7 @@ JSIValue DeviceManagerModule::CreateDeviceManager(const JSIValue thisVal, const 
     DeviceManagerModule *obj = new DeviceManagerModule();
     obj->bundleName_ = bundleName;
     g_deviceManagerMap[bundleName] = obj;
-    
+
     int32_t ret = 0;
     std::shared_ptr<DmJSIInitCallback> initCallback = std::make_shared<DmJSIInitCallback>(bundleName);
     ret = OHOS::DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
