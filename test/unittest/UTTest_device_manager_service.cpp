@@ -158,9 +158,9 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::Tes
     std::string pkgName = "com.ohos.test12";
     DmPublishInfo publishInfo;
     publishInfo.publishId = 1;
-    publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
+    publishInfo.mode = DM_DISCOVER_MODE_ACTIVE;
     publishInfo.freq = DM_HIGH;
-    publishInfo.ranging = -1;
+    publishInfo.ranging = 1;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
