@@ -50,7 +50,7 @@ if (defined(ohos_lite)) {
         "${utils_path}/include/dfx",
         "${utils_path}/include/dfx/lite",
         "${utils_path}/include/permission/lite",
-        "foundation/multimedia/image_standard/mock/native/include",
+        "foundation/multimedia/image_framework/mock/native/include",
         "${servicesimpl_path}/include/dispatch",
         "${ext_path}/pin_auth/include",
         "${ext_path}/pin_auth/include/lite",
