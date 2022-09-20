@@ -29,7 +29,6 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
-    profileSoName_ = "libdevicemanagerext_profile.z.so";
     decisionSoName_ = "libdevicemanagerext_decision.z.so";
     StartEventThread();
     LOGI("DmDeviceStateManager constructor");
@@ -80,55 +79,6 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
             break;
         }
     }
-}
-
-int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info)
-{
-    DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
-    std::shared_ptr<IProfileAdapter> profileAdapter = adapterMgrPtr.GetProfileAdapter(profileSoName_);
-    if (profileAdapter != nullptr) {
-        std::string deviceUdid;
-        int32_t ret = SoftbusConnector::GetUdidByNetworkId(info.deviceId, deviceUdid);
-        if (ret == DM_OK) {
-            std::string uuid;
-            DmDeviceInfo saveInfo = info;
-            SoftbusConnector::GetUuidByNetworkId(info.deviceId, uuid);
-            {
-#if defined(__LITEOS_M__)
-                DmMutex mutexLock;
-#else
-                std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
-                remoteDeviceInfos_[uuid] = saveInfo;
-            }
-            LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s",
-                 GetAnonyString(std::string(info.deviceId)).c_str(), GetAnonyString(deviceUdid).c_str(),
-                 GetAnonyString(uuid).c_str());
-            profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DmDeviceStateManager::UnRegisterProfileListener(const std::string &pkgName, const DmDeviceInfo &info)
-{
-    DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
-    std::shared_ptr<IProfileAdapter> profileAdapter = adapterMgrPtr.GetProfileAdapter(profileSoName_);
-    if (profileAdapter != nullptr) {
-        LOGI("UnRegister Profile Listener");
-        profileAdapter->UnRegisterProfileListener(pkgName);
-    }
-    {
-#if defined(__LITEOS_M__)
-        DmMutex mutexLock;
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
-        if (remoteDeviceInfos_.find(std::string(info.deviceId)) != remoteDeviceInfos_.end()) {
-            remoteDeviceInfos_.erase(std::string(info.deviceId));
-        }
-    }
-    return DM_OK;
 }
 
 void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
@@ -224,11 +174,11 @@ void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDev
     LOGI("OnDeviceReady function is called back with pkgName: %s", pkgName.c_str());
 }
 
-void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std::string &deviceId)
+void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("OnProfileReady function is called with pkgName: %s", pkgName.c_str());
+    LOGI("OnDbReady function is called with pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || deviceId.empty()) {
-        LOGE("On profile ready pkgName is empty or deviceId is deviceId");
+        LOGE("On db ready pkgName is empty or deviceId is deviceId");
         return;
     }
     DmDeviceInfo saveInfo;
@@ -240,7 +190,7 @@ void DmDeviceStateManager::OnProfileReady(const std::string &pkgName, const std:
 #endif
         auto iter = remoteDeviceInfos_.find(deviceId);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnProfileReady complete not find deviceId: %s", GetAnonyString(deviceId).c_str());
+            LOGE("OnDbReady complete not find deviceId: %s", GetAnonyString(deviceId).c_str());
             return;
         }
         saveInfo = iter->second;
@@ -420,7 +370,7 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
     LOGI("RunTask begin, eventId: %d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
-        OnProfileReady(std::string(DM_PKG_NAME), task->GetDeviceId());
+        OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
     LOGI("RunTask complete");
 }

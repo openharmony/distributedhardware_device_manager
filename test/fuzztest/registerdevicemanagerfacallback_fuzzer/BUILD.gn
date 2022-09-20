@@ -55,8 +55,6 @@ ohos_fuzztest("RegisterDeviceManagerFaCallbackFuzzTest") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/device_manager/ext/profile/include",
-    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
     "//base/security/device_auth/interfaces/innerkits",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
