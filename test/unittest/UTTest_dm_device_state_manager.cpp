@@ -165,12 +165,12 @@ HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: OnDeviceReady_001
+ * @tc.name: OnDeviceReady_002
  * @tc.desc: set info.deviceId to 123,and call OnDeviceReady ，change info.deviceId to 4
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     DmDeviceInfo info;
