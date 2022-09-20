@@ -263,7 +263,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_001, testing::ext::TestSize.Level0)
 HWTEST_F(IpcServerListenerTest, SendAll_002, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = 2;
+    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     // set pkgName not null
     std::string pkgName = "com.ohos.test2";
     // 2. set remoteObject nullptr
@@ -285,7 +285,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_002, testing::ext::TestSize.Level0)
 /**
  * @tc.name: SendAll_003
  * @tc.desc: 1. set cmdCode not null
- *              set pkgName not null
+ *              set pkgName null
  *           2. set remoteObject nullptr
  *              set req not null
  *              set rsp not null
@@ -298,7 +298,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_003, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
     int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
-    // set pkgName not null
+    // set pkgName null
     std::string pkgName = "";
     // 2. set remoteObject not nullptr
     sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
@@ -330,12 +330,15 @@ HWTEST_F(IpcServerListenerTest, SendAll_003, testing::ext::TestSize.Level0)
 HWTEST_F(IpcServerListenerTest, SendAll_004, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = 2;
+    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     // set pkgName not null
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.testSendAll_004";
     // 2. set remoteObject not nullptr
     sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
-    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    int ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    if (ret != DM_OK) {
+        return;
+    }
     // set req not null
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     // set rsp not null
@@ -343,7 +346,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_004, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     // 3. call IpcServerListener SendRequest
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
-    int ret = ipcServerListener->SendAll(cmdCode, req, rsp);
+    ret = ipcServerListener->SendAll(cmdCode, req, rsp);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
