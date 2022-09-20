@@ -57,7 +57,7 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager, testing::ext::TestSize.Level0
     // set callback nullptr
     // 3. call DeviceManager::InitDeviceManager with parameter
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, nullptr);
-    //4. check ret is ERR_DM_INPUT_PARA_INVALID
+    // 4. check ret is ERR_DM_INPUT_PARA_INVALID
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
