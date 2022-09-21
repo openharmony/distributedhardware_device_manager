@@ -263,7 +263,7 @@ var deviceInfo ={
     "deviceId": "XXXXXXXX",
     "deviceName": "",
     deviceType: 0
-}；
+};
 let extraInfo = {
     "appIcon": new Uint8Array(), // app图标，可选参数，可不填
     "appThumbnail": new Uint8Array(), // app缩略图，可选参数，可不填
