@@ -161,7 +161,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
 - 示例如下：
 
-```
+```js
 // 创建DeviceManager实例：
 deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
     this.log("createDeviceManager err:" + JSON.stringify(err) + '  --success:' + JSON.stringify(dm))
