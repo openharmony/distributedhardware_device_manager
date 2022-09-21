@@ -22,6 +22,7 @@
 
 #include "ipc_req.h"
 #include "ipc_rsp.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,6 +33,7 @@ public:
     virtual int32_t Init(const std::string &pkgName) = 0;
     virtual int32_t UnInit(const std::string &pkgName) = 0;
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) = 0;
+    virtual int32_t OnDmServiceDied(const wptr<IRemoteObject> &remote) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
