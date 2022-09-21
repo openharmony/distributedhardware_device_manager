@@ -164,9 +164,6 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
 int32_t IpcClientManager::OnDmServiceDied(const wptr<IRemoteObject> &remote)
 {
     LOGI("IpcClientManager::OnDmServiceDied begin");
-    for (auto iter : dmListener_) {
-        LOGI("IpcClientManager::OnDmServiceDied listerner : %s", iter.first.c_str());
-    }
     if (remote.promote() == nullptr) {
         LOGE("IpcClientManager::OnDmServiceDied, remote null");
         return ERR_DM_POINT_NULL;
