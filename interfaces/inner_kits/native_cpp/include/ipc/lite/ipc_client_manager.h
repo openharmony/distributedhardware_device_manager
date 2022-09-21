@@ -47,8 +47,6 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
-
-    virtual int32_t OnDmServiceDied(const wptr<IRemoteObject> &remote);
 private:
     bool IsInit(const std::string &pkgName);
 

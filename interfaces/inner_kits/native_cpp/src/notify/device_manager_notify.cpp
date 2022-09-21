@@ -221,6 +221,7 @@ void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManagerNotify::OnRemoteDied");
     for (auto iter : dmInitCallback_) {
+        LOGI("DeviceManagerNotify::OnRemoteDied, pkgName:%s", pkgName.c_str());
         if (iter.second != nullptr) {
             iter.second->OnRemoteDied();
         }

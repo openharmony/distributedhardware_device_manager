@@ -16,6 +16,7 @@
 #include "ipc_client_manager.h"
 
 #include "device_manager_notify.h"
+#include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_client_server_proxy.h"
@@ -111,7 +112,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     }
 
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmListener_.count(pkgName) > 0)
+    if (dmListener_.count(pkgName) > 0) {
         std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
         std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
         req->SetPkgName(pkgName);
@@ -121,13 +122,13 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
             return ret;
         }
         dmListener_.erase(pkgName);
-        if (dmListener_.empty()) {
-            if (dmRecipient_ != nullptr) {
-                dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
-                dmRecipient_ = nullptr;
-            }
-            dmInterface_ = nullptr;
+    }
+    if (dmListener_.empty()) {
+        if (dmRecipient_ != nullptr) {
+            dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
+            dmRecipient_ = nullptr;
         }
+        dmInterface_ = nullptr;
     }
     LOGI("completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
@@ -160,22 +161,22 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
     return true;
 }
 
-bool IpcClientManager::OnDmServiceDied(const wptr<IRemoteObject> &remote)
+int32_t IpcClientManager::OnDmServiceDied(const wptr<IRemoteObject> &remote)
 {
     LOGI("IpcClientManager::OnDmServiceDied begin");
     for (auto iter : dmListener_) {
         LOGI("IpcClientManager::OnDmServiceDied listerner : %s", iter.first.c_str());
     }
     if (remote.promote() == nullptr) {
-        LOGE("IpcClientManager::OnDmServiceDied remote null");
+        LOGE("IpcClientManager::OnDmServiceDied, remote null");
         return ERR_DM_POINT_NULL;
     }
     if (dmInterface_ == nullptr) {
-        LOGE("IpcClientManager::OnDmServiceDied dmInterface_ null");
+        LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
         return ERR_DM_POINT_NULL;
     }
     if (dmInterface_->AsObject() != remote.promote()) {
-        LOGE("IpcClientManager::OnDmServiceDied don't find remote");
+        LOGE("IpcClientManager::OnDmServiceDied, don't find remote");
         return ERR_DM_FAILED;
     }
     if (dmRecipient_ != nullptr) {

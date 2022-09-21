@@ -53,7 +53,7 @@ int32_t IpcClientProxy::OnDmServiceDied(const wptr<IRemoteObject> &remote)
         LOGE("IpcClientProxy::ipcClientManager_ is null");
         return ERR_DM_POINT_NULL;
     }
-    return ipcClientManager_->OnDmServiceDied(remote);;
+    return ipcClientManager_->OnDmServiceDied(remote);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
