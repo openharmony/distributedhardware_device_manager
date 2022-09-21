@@ -159,7 +159,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
-## 示例如下：
+- 示例如下：
 
 ```
 // 创建DeviceManager实例：
@@ -312,7 +312,7 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 
   DeviceManager作为认证发起端，PIN码输入界面可以选择由DeviceManager_UI FA进行显示，还是由开发者自行显示。开发者如需自己定制PIN码输入界面，需要在authenticateDevice接口的认证参数AuthParam中，extraInfo属性里面指定displayOwner参数为1。
 
-### 相关仓
+## 相关仓
 ****
 
 [**interface_sdk-js**](https://gitee.com/openharmony/interface_sdk-js/)
