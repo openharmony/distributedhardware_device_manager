@@ -40,11 +40,6 @@ std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std:
     return nullptr;
 }
 
-std::shared_ptr<IProfileAdapter> DmConfigManager::GetProfileAdapter(const std::string &soName)
-{
-    return nullptr;
-}
-
 std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::string &soName)
 {
     return nullptr;

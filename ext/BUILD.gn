@@ -17,7 +17,6 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 group("ext_modules") {
   deps = []
   if (support_jsapi) {
-    deps += [ "./profile:devicemanagerext_profile" ]
     if (device_manager_no_interaction_auth) {
       deps += [ "./no_interaction_auth:devicemanagerext_no_interaction_auth" ]
     } else {

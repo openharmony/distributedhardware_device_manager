@@ -384,7 +384,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (so_handle == nullptr) {
         so_handle = dlopen(soName.c_str(), RTLD_NOW);
         if (so_handle == nullptr) {
-            LOGE("load profile so %s failed.", soName.c_str());
+            LOGE("load libdevicemanagerserviceimpl so %s failed.", soName.c_str());
             return false;
         }
     }

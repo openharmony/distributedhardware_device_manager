@@ -20,12 +20,10 @@
 
 #include "crypto_adapter.h"
 #include "decision_adapter.h"
-#include "profile_adapter.h"
 #include "single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IProfileAdapter;
 class DmAdapterManager {
     DECLARE_SINGLE_INSTANCE(DmAdapterManager);
 public:
@@ -35,13 +33,6 @@ public:
      * @tc.type: FUNC
      */
     std::shared_ptr<IDecisionAdapter> GetDecisionAdapter(const std::string &soName);
-
-    /**
-     * @tc.name: DmAdapterManager::GetProfileAdapter
-     * @tc.desc: Get Profile Adapter of the DeviceManager Adapter Manager
-     * @tc.type: FUNC
-     */
-    std::shared_ptr<IProfileAdapter> GetProfileAdapter(const std::string &soName);
 
     /**
      * @tc.name: DmAdapterManager::GetCryptoAdapter

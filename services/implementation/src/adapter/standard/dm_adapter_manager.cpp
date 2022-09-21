@@ -33,12 +33,6 @@ std::shared_ptr<IDecisionAdapter> DmAdapterManager::GetDecisionAdapter(const std
     return dmConfigManager.GetDecisionAdapter(soName);
 }
 
-std::shared_ptr<IProfileAdapter> DmAdapterManager::GetProfileAdapter(const std::string &soName)
-{
-    DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
-    return dmConfigManager.GetProfileAdapter(soName);
-}
-
 std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter(const std::string &soName)
 {
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
