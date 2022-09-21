@@ -766,7 +766,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
 int32_t DeviceManagerImpl::HandleDmServiceDied(const wptr<IRemoteObject> &remote)
 {
     LOGI("DeviceManager::HandleDmServiceDied begin");
-    int32_t ret = IpcClientProxy_->OnDmServiceDied(remote);
+    int32_t ret = ipcClientProxy_->OnDmServiceDied(remote);
     if (ret != DM_OK) {
         LOGE("DeviceManager::HandleDmServiceDied failed, ret: %d", ret);
         return ERR_DM_FAILED;
