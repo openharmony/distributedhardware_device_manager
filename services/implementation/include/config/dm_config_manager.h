@@ -29,7 +29,6 @@
 #include "authentication.h"
 #include "crypto_adapter.h"
 #include "decision_adapter.h"
-#include "profile_adapter.h"
 #include "single_instance.h"
 
 namespace OHOS {
@@ -38,7 +37,6 @@ constexpr const char* AUTH_LOAD_JSON_KEY = "devicemanager_auth_components";
 constexpr const char* ADAPTER_LOAD_JSON_KEY = "devicemanager_adapter_components";
 constexpr const char* AUTH_JSON_TYPE_KEY = "AUTHENTICATE";
 constexpr const char* CPYPTO_JSON_TYPE_KEY = "CPYPTO";
-constexpr const char* PROFILE_JSON_TYPE_KEY = "PROFILE";
 constexpr const char* DECISION_JSON_TYPE_KEY = "DECISION";
 
 typedef struct {
@@ -73,7 +71,6 @@ public:
      */
     void GetAllAuthType(std::vector<std::string> &allAuthType);
     std::shared_ptr<IDecisionAdapter> GetDecisionAdapter(const std::string &soName);
-    std::shared_ptr<IProfileAdapter> GetProfileAdapter(const std::string &soName);
     std::shared_ptr<ICryptoAdapter> GetCryptoAdapter(const std::string &soName);
 
     /**
@@ -91,12 +88,10 @@ private:
     std::mutex authAdapterMutex_;
     std::mutex cryptoAdapterMutex_;
     std::mutex decisionAdapterMutex_;
-    std::mutex profileAdapterMutex_;
 #endif
     std::map<int32_t, AuthSoLoadInfo> soAuthLoadInfo_;
     std::map<std::string, AdapterSoLoadInfo> soAdapterLoadInfo_;
     std::map<std::string, std::shared_ptr<IDecisionAdapter>> decisionAdapterPtr_;
-    std::map<std::string, std::shared_ptr<IProfileAdapter>> profileAdapterPtr_;
     std::map<std::string, std::shared_ptr<ICryptoAdapter>> cryptoAdapterPtr_;
 };
 } // namespace DistributedHardware

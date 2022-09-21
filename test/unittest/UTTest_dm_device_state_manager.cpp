@@ -145,13 +145,13 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDeviceStateManagerTest, OnProfileReady_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string deviceId;
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    dmDeviceStateManager->OnProfileReady(pkgName, deviceId);
+    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
     DmDeviceInfo dminfo;
@@ -221,24 +221,6 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
 HWTEST_F(DmDeviceStateManagerTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
     int ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
-    EXPECT_EQ(ret, DM_OK);
-}
-/**
- * @tc.name: RegisterProfileListener_001
- * @tc.desc: call RegisterProfileListener and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, RegisterProfileListener_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "123";
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->RegisterOffLineTimer(info);
-    int ret = dmDeviceStateManager->RegisterProfileListener(pkgName, info);
     EXPECT_EQ(ret, DM_OK);
 }
 

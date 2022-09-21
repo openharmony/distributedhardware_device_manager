@@ -26,7 +26,6 @@ group("unittest") {
     ":UTTest_device_manager_notify",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_listener",
-    ":UTTest_device_profile_adapter",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_auth_manager",
     ":UTTest_dm_device_state_manager",
@@ -43,7 +42,6 @@ group("unittest") {
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
     ":UTTest_multiple_user_connector",
-    ":UTTest_profile_connector",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_session",
   ]
@@ -275,43 +273,6 @@ ohos_unittest("UTTest_device_manager_impl") {
 
 ## UnitTest UTTest_device_manager_impl }}}
 
-## UnitTest UTTest_profile_connector {{{
-ohos_unittest("UTTest_profile_connector") {
-  module_out_path = module_out_path
-
-  sources = [ "UTTest_profile_connector.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "eventhandler:libeventhandler",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_profile_connector }}}
-
-## UnitTest UTTest_device_profile_adapter {{{
-ohos_unittest("UTTest_device_profile_adapter") {
-  module_out_path = module_out_path
-
-  sources = [ "UTTest_device_profile_adapter.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "eventhandler:libeventhandler",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_device_profile_adapter }}}
-
 ## UnitTest UTTest_multiple_user_connector {{{
 ohos_unittest("UTTest_multiple_user_connector") {
   module_out_path = module_out_path
@@ -514,8 +475,6 @@ config("device_manager_test_common_public_config") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedhardware/device_manager/ext/profile/include",
-    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
     "//base/security/device_auth/interfaces/innerkits",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
@@ -567,7 +526,6 @@ ohos_static_library("device_manager_test_common") {
     "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedhardware/device_manager/ext/profile:devicemanagerext_profile",
     "//foundation/distributedhardware/device_manager/interfaces/kits/js:devicemanager",
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock",
