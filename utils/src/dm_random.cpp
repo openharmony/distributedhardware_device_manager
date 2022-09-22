@@ -87,34 +87,5 @@ int32_t GetRandomData(uint8_t *randStr, uint32_t len)
     }
     return ret;
 }
-
-bool MbedtlsGenRandomStr(char *szOut, int32_t szOutLen, bool numberOnly)
-{
-    const int32_t MIN_OUT_LENGTH = 2;
-    if (szOut == nullptr || szOutLen <= MIN_OUT_LENGTH) {
-        return false;
-    }
-    szOut[--szOutLen] = 0;
-    GetRandomData((uint8_t *)szOut, (uint32_t)szOutLen);
-    const int32_t NUMBER_COUNT = 10;
-    const int32_t ALPHA_COUNT = 26;
-    const int32_t ALPHA_BYTE_COUNT = 2;
-    int32_t tmpNum = numberOnly ? NUMBER_COUNT : (NUMBER_COUNT + ALPHA_BYTE_COUNT * ALPHA_COUNT);
-    for (int32_t i = 0; i < szOutLen; i++) {
-        uint32_t idx = ((uint32_t)szOut[i] % tmpNum);
-        char base;
-        if (idx < NUMBER_COUNT) {
-            base = '0';
-        } else if (idx >= NUMBER_COUNT && idx < (NUMBER_COUNT + ALPHA_COUNT)) {
-            base = 'A';
-            idx -= NUMBER_COUNT;
-        } else {
-            base = 'a';
-            idx -= (NUMBER_COUNT + ALPHA_COUNT);
-        }
-        szOut[i] = base + idx;
-    }
-    return true;
-}
 } // namespace DistributedHardware
 } // namespace OHOS
