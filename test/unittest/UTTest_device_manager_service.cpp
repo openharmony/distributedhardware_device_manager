@@ -15,6 +15,7 @@
 
 #include "UTTest_device_manager_service.h"
 
+#include "accesstoken_kit.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -22,6 +23,7 @@
 #include "token_setproc.h"
 #include "softbus_common.h"
 
+using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
@@ -44,6 +46,7 @@ void DeviceManagerServiceTest::SetUp()
     };
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void DeviceManagerServiceTest::TearDown()
