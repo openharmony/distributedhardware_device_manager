@@ -167,10 +167,10 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         return ERR_DM_FAILED;
     }
 
-    std::string groupId = "";
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
     hiChainConnector_->GetRelatedGroups(deviceUdid, groupList);
     if (groupList.size() > 0) {
+        std::string groupId = "";
         groupId = groupList.front().groupId;
         LOGI(" DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s",
              GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());

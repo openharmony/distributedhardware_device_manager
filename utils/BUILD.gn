@@ -161,7 +161,6 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dm_error_message.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
-      "src/dm_hash.cpp",
       "src/dm_random.cpp",
     ]
     if (support_jsapi) {

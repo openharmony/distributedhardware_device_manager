@@ -23,7 +23,7 @@ namespace DistributedHardware {
 int32_t GenRandInt(int32_t randMin, int32_t randMax);
 int64_t GenRandLongLong(int64_t randMin, int64_t randMax);
 int32_t GetRandomData(uint8_t *randStr, uint32_t len);
-bool MbedtlsGenRandomStr(char *szOut, int32_t szOutLen, bool numberOnly);
+
 } // namespace DistributedHardware
 } // namespace OHOS
 
