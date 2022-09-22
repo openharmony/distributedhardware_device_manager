@@ -17,7 +17,11 @@
 
 #include <unistd.h>
 
+#include "device_manager.h"
+#include "device_manager_impl.h"
+#include "dm_constants.h"
 #include "dm_device_info.h"
+#include "mock/mock_ipc_client_stub.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"
 #include "iservice_registry.h"
@@ -29,7 +33,6 @@
 #include "ipc_types.h"
 #include "ipc_rsp.h"
 #include "ipc_def.h"
-#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -110,6 +113,25 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: OnRemoteRequest_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, OnRemoteRequest_003, testing::ext::TestSize.Level0)
+{
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    int code = GET_TRUST_DEVICE_LIST;
+    std::shared_ptr<MockIpcClientStub> mockInstance = std::make_shared<MockIpcClientStub>();
+    std::shared_ptr<IpcClientStub> ipcClientStub= mockInstance;
+    EXPECT_CALL(*mockInstance, OnRemoteRequest(testing::_, testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    std::shared_ptr<IpcClientStub> instance = std::shared_ptr<IpcClientStub>(ipcClientStub);
+    int ret = instance->OnRemoteRequest(code, data, reply, option);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: SendCmd_001
  * @tc.desc: 1. set set code is SERVER_DEVICE_FA_NOTIFY
  *              set req is nullptr
@@ -132,6 +154,34 @@ HWTEST_F(IpcClientStubTest, SendCmd_001, testing::ext::TestSize.Level0)
     int ret = instance->SendCmd(cmdCode, req, rsp);
     // 3. check result is ERR_DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
+
+/**
+ * @tc.name: SendCmd_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_002, testing::ext::TestSize.Level0)
+{
+    int cmdCode = IPC_MSG_BUTT;
+    std::shared_ptr<IpcReq> req = nullptr;
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    sptr<IpcClientStub> instance = new IpcClientStub();
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendCmd_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_003, testing::ext::TestSize.Level0)
+{
+    int cmdCode = GET_TRUST_DEVICE_LIST;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    sptr<IpcClientStub> instance = new IpcClientStub();
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
