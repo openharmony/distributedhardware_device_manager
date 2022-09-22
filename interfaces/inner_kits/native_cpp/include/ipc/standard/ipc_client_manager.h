@@ -65,7 +65,7 @@ public:
      */
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) override;
 
-    int32_t OnDmServiceDied(const wptr<IRemoteObject> &remote);
+    virtual int32_t OnDmServiceDied(const wptr<IRemoteObject> &remote) override;
 private:
     bool IsInit(const std::string &pkgName);
     int32_t ClientInit();

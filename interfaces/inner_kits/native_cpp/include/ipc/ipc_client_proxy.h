@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "ipc_client.h"
-#include "iremote_broker.h"
 namespace OHOS::DistributedHardware { class IpcReq; }
 namespace OHOS::DistributedHardware { class IpcRsp; }
 
