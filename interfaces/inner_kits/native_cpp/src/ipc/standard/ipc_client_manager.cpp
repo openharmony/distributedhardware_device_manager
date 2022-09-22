@@ -32,6 +32,7 @@ namespace DistributedHardware {
 void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
+    (void)remote;
     DeviceManagerImpl::GetInstance().OnDmServiceDied();
     DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
