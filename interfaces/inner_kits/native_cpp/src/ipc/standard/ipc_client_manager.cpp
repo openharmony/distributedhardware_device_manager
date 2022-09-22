@@ -32,7 +32,7 @@ namespace DistributedHardware {
 void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
-    DeviceManagerImpl::GetInstance().HandleDmServiceDied(remote);
+    DeviceManagerImpl::GetInstance().OnDmServiceDied();
     DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
@@ -161,20 +161,12 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
     return true;
 }
 
-int32_t IpcClientManager::OnDmServiceDied(const wptr<IRemoteObject> &remote)
+int32_t IpcClientManager::OnDmServiceDied()
 {
     LOGI("IpcClientManager::OnDmServiceDied begin");
-    if (remote.promote() == nullptr) {
-        LOGE("IpcClientManager::OnDmServiceDied, remote null");
-        return ERR_DM_POINT_NULL;
-    }
     if (dmInterface_ == nullptr) {
         LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
         return ERR_DM_POINT_NULL;
-    }
-    if (dmInterface_->AsObject() != remote.promote()) {
-        LOGE("IpcClientManager::OnDmServiceDied, don't find remote");
-        return ERR_DM_FAILED;
     }
     if (dmRecipient_ != nullptr) {
         dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
