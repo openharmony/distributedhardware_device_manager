@@ -144,7 +144,7 @@ static BOOL Initialize(Service *service, Identity identity)
         return FALSE;
     }
 
-    DeviceManagerSamgrService *mgrService = (DeviceManagerSamgrService *)service;
+    DeviceManagerSamgrService *mgrService = static_cast<DeviceManagerSamgrService *>(service);
     mgrService->identity = identity;
     return TRUE;
 }
