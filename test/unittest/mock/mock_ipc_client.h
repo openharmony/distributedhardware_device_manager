@@ -28,7 +28,7 @@ public:
     MOCK_METHOD1(Init, int32_t(const std::string &pkgName));
     MOCK_METHOD1(UnInit, int32_t(const std::string &pkgName));
     MOCK_METHOD3(SendRequest, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
-    MOCK_METHOD1(OnDmServiceDied, int32_t(const wptr<IRemoteObject> &remote));
+    MOCK_METHOD0(OnDmServiceDied, int32_t());
 };
 } // namespace DistributedHardware
 } // namespace OHOS
