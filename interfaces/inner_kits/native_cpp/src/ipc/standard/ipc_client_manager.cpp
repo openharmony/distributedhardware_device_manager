@@ -177,6 +177,5 @@ int32_t IpcClientManager::OnDmServiceDied()
     LOGI("IpcClientManager::OnDmServiceDied complete");
     return DM_OK;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
