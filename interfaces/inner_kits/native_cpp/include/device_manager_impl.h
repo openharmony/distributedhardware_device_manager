@@ -207,7 +207,7 @@ public:
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) override;
 
-    virtual int32_t HandleDmServiceDied(const wptr<IRemoteObject> &remote);
+    int32_t HandleDmServiceDied(const wptr<IRemoteObject> &remote);
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

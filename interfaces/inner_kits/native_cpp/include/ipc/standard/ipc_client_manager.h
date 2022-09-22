@@ -37,7 +37,7 @@ public:
      * @tc.type: FUNC
      */
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
-    DmDeathRecipient() = default;
+    explicit DmDeathRecipient(NetworkShareClient &client) : client_(client) {};
     ~DmDeathRecipient() = default;
 };
 
