@@ -91,5 +91,9 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
 {
     return (packageInitSet_.count(pkgName) > 0);
 }
+int32_t IpcClientManager::OnDmServiceDied()
+{
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
