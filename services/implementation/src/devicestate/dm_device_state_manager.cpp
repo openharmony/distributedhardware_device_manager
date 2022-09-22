@@ -116,7 +116,6 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDe
     } else if (decisionInfos_.size() == 0) {
         PostDeviceOnline(pkgName, info);
     } else {
-        std::string extra;
         std::vector<DmDeviceInfo> infoList;
         LOGI("OnDeviceOnline decision decisionInfos_ size: %d", decisionInfos_.size());
         for (auto iter : decisionInfos_) {
@@ -147,7 +146,6 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
     } else if (decisionInfos_.size() == 0) {
         PostDeviceOffline(pkgName, info);
     } else {
-        std::string extra;
         std::vector<DmDeviceInfo> infoList;
         LOGI("OnDeviceOffline decision decisionInfos_ size: %d", decisionInfos_.size());
         for (auto iter : decisionInfos_) {

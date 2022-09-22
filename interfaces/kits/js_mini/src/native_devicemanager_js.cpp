@@ -548,7 +548,7 @@ void DeviceManagerModule::JsToDmAppImageInfoAndDmExtra(const JSIValue &object,
     jsonObj[AUTH_TYPE] = authType;
     std::string extraInfo = "extraInfo";
 
-    JsToJsonObject(object, "extraInfo", jsonObj);
+    JsToJsonObject(object, extraInfo, jsonObj);
     extra = jsonObj.dump();
     LOGI("appIconLen %d, appThumbnailLen %d", appIconBufferLen, appThumbnailBufferLen);
 }
