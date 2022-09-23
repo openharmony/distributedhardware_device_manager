@@ -762,5 +762,16 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
     LOGI("DeviceManager::NotifyEvent completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::OnDmServiceDied()
+{
+    LOGI("DeviceManager::OnDmServiceDied begin");
+    int32_t ret = ipcClientProxy_->OnDmServiceDied();
+    if (ret != DM_OK) {
+        LOGE("DeviceManager::OnDmServiceDied failed, ret: %d", ret);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
