@@ -92,6 +92,36 @@ HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::Te
     bool result = commonEventManager->UnsubscribeServiceEvent();
     EXPECT_EQ(false, result);
 }
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility_001
+ * @tc.desc: call OnAddSystemAbility()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_001, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
+    std::string deviceId;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    auto systemAbilityStatusChangeListener =
+        std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
+    systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility_001
+ * @tc.desc: call OnAddSystemAbility()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_002, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = 0;
+    std::string deviceId;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    auto systemAbilityStatusChangeListener =
+        std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
+    systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

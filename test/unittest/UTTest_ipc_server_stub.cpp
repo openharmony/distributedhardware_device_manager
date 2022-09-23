@@ -163,6 +163,42 @@ HWTEST_F(IpcServerStubTest, SendCmd_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: SendCmd_002
+ * @tc.desc: 1. Call IpcServerStub SendCmd
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, SendCmd_002, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = -1;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // 1. Call IpcServerStub SendCmd
+    int32_t ret = IpcServerStub::GetInstance().SendCmd(cmdCode, req, rsp);
+    // 2. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendCmd_003
+ * @tc.desc: 1. Call IpcServerStub SendCmd
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, SendCmd_003, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = IPC_MSG_BUTT;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // 1. Call IpcServerStub SendCmd
+    int32_t ret = IpcServerStub::GetInstance().SendCmd(cmdCode, req, rsp);
+    // 2. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
  * @tc.name: QueryServiceState_001
  * @tc.desc: 1. Call IpcServerStub QueryServiceState
  *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
@@ -527,12 +563,36 @@ HWTEST_F(IpcServerStubTest, OnRemoveSystemAbility_001, testing::ext::TestSize.Le
 }
 
 /**
+ * @tc.name: OnRemoveSystemAbility_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, OnRemoveSystemAbility_002, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = 9999;
+    std::string deviceId;
+    IpcServerStub::GetInstance().OnRemoveSystemAbility(systemAbilityId, deviceId);
+    ASSERT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+/**
  * @tc.name: OnAddSystemAbility_001
  * @tc.type: FUNC
  */
 HWTEST_F(IpcServerStubTest, OnAddSystemAbility_001, testing::ext::TestSize.Level0)
 {
     int32_t systemAbilityId = SOFTBUS_SERVER_SA_ID;
+    std::string deviceId;
+    IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
+    ASSERT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+/**
+ * @tc.name: OnAddSystemAbility_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, OnAddSystemAbility_002, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = 9999;
     std::string deviceId;
     IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
     ASSERT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
