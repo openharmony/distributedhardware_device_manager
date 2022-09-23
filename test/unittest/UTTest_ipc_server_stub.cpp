@@ -19,6 +19,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "device_manager_service.h"
 #include "dm_device_info.h"
 #include "ipc_server_stub.h"
 #include "device_manager_impl.h"
@@ -51,6 +52,22 @@ void IpcServerStubTest::TearDownTestCase()
 
 namespace {
 /**
+ * @tc.name: OnStop_001
+ * @tc.desc: 1. Call IpcServerStub OnStop
+ *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, OnStop_001, testing::ext::TestSize.Level0)
+{
+    // 1. Call IpcServerStub OnStop
+    IpcServerStub::GetInstance().OnStop();
+    // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
+    ASSERT_EQ(ServiceRunningState::STATE_NOT_START, IpcServerStub::GetInstance().state_);
+    ASSERT_EQ(IpcServerStub::GetInstance().registerToService_, false);
+}
+
+/**
  * @tc.name: OnStart_001
  * @tc.desc: 1. set IpcServerStub state is ServiceRunningState::STATE_RUNNING
  *           2. Call IpcServerStub OnStart
@@ -81,22 +98,6 @@ HWTEST_F(IpcServerStubTest, Init_001, testing::ext::TestSize.Level0)
     bool result = IpcServerStub::GetInstance().Init();
     // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
     ASSERT_EQ(result, true);
-}
-
-/**
- * @tc.name: OnStop_001
- * @tc.desc: 1. Call IpcServerStub OnStop
- *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcServerStubTest, OnStop_001, testing::ext::TestSize.Level0)
-{
-    // 1. Call IpcServerStub OnStop
-    IpcServerStub::GetInstance().OnStop();
-    // 2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
-    ASSERT_EQ(ServiceRunningState::STATE_NOT_START, IpcServerStub::GetInstance().state_);
-    ASSERT_EQ(IpcServerStub::GetInstance().registerToService_, false);
 }
 
 /**
