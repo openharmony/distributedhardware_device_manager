@@ -410,6 +410,58 @@ HWTEST_F(IpcClientProxyTest, SendRequest5, testing::ext::TestSize.Level0)
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: OnDmServiceDied_001
+ * @tc.desc: 1. set req not nullptr
+ *              set rsp  not nullptr
+ *           2. Mock IpcClient OnDmServiceDied return ERR_DM_POINT_NULL
+ *           3. call IpcClientProxy OnDmServiceDied
+ *           4. check ret is ERR_DM_POINT_NULL
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientProxyTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
+{
+    // 1. set req not nullptr
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp  not nullptr
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // 2. Mock IpcClient OnDmServiceDied return ERR_DM_POINT_NULL
+    std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();
+    std::shared_ptr<IpcClient> ipcClientManager = mockInstance;
+    EXPECT_CALL(*mockInstance, OnDmServiceDied()).Times(1).WillOnce(testing::Return(ERR_DM_POINT_NULL));
+    // 3. call IpcClientProxy OnDmServiceDied
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = std::make_shared<IpcClientProxy>(ipcClientManager);
+    int32_t ret = ipcClientProxy->OnDmServiceDied();
+    // 4. check ret is ERR_DM_POINT_NULL
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: OnDmServiceDied_002
+ * @tc.desc: 1. set req not nullptr
+ *              set rsp  not nullptr
+ *           2. Mock IpcClient OnDmServiceDied return DM_OK
+ *           3. call IpcClientProxy OnDmServiceDied
+ *           4. check ret is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientProxyTest, OnDmServiceDied_002, testing::ext::TestSize.Level0)
+{
+    // 1. set req not nullptr
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp  not nullptr
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // 2. Mock IpcClient OnDmServiceDied return DM_OK
+    std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();
+    std::shared_ptr<IpcClient> ipcClientManager = mockInstance;
+    EXPECT_CALL(*mockInstance, OnDmServiceDied()).Times(1).WillOnce(testing::Return(DM_OK));
+    // 3. call IpcClientProxy OnDmServiceDied
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = std::make_shared<IpcClientProxy>(ipcClientManager);
+    int32_t ret = ipcClientProxy->OnDmServiceDied();
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
