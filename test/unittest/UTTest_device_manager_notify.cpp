@@ -205,6 +205,25 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::e
 }
 
 /**
+ * @tc.name: RegisterDeathRecipientCallback_005
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int count = 0;
+    std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
+    std::shared_ptr<DmInitCallback> checkMap = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
+    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
+    if (checkMap == nullptr) {
+        ASSERT_NE(count, 1);
+        return;
+    }
+    ASSERT_NE(checkMap, nullptr);
+}
+
+/**
  * @tc.name: UnRegisterDeathRecipientCallback_001
  * @tc.desc: 1. set pkgName not null
  *              set dmInitCallback not null
@@ -1907,6 +1926,75 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     ASSERT_NE(checkMap2, nullptr);
     ASSERT_NE(checkMap3, nullptr);
     ASSERT_NE(checkMap4, nullptr);
+}
+
+/**
+ * @tc.name: UnRegisterPackageCallback_005
+ * @tc.desc: 1. RegisterDeathRecipientCallback with pkgName and dmInitCallback
+ *           2. RegisterDeviceStateCallback with pkgName and deviceStateCallback
+ *           3. RegisterDiscoverCallback with pkgName and deviceStateCallback and subscribeId
+ *           4. RegisterAuthenticateCallback with pkgName and deviceId and authenticateCallback
+ *           5. RegisterPublishCallback with pkgName and devicePublishCallback and publishId
+ *           6. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
+ *           7. check if checkMap checkMap1 checkMap2 checkMap3 is not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::TestSize.Level0)
+{
+    // 1. RegisterDeathRecipientCallback with pkgName and dmInitCallback
+    std::string pkgName;
+    int count = 0;
+    std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
+    std::shared_ptr<DmInitCallback> checkMap = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
+    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
+    ASSERT_EQ(checkMap, nullptr);
+    // 2. RegisterDeviceStateCallback with pkgName and deviceStateCallback
+    int count1 = 0;
+    std::shared_ptr<DeviceStateCallback> deviceStateCallback = std::make_shared<DeviceStateCallbackTest>(count1);
+    std::shared_ptr<DeviceStateCallback> checkMap1 = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, deviceStateCallback);
+    checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
+    ASSERT_EQ(checkMap1, nullptr);
+    // 3. RegisterDiscoverCallback with pkgName and deviceStateCallback and subscribeId
+    int count2 = 0;
+    std::shared_ptr<DiscoveryCallback> deviceDiscoveryCallback = std::make_shared<DiscoveryCallbackTest>(count2);
+    uint16_t subscribeId = 0;
+    std::shared_ptr<DiscoveryCallback> checkMap2 = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, deviceDiscoveryCallback);
+    checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
+    ASSERT_EQ(checkMap2, nullptr);
+    // 4. RegisterAuthenticateCallback with pkgName and deviceId and authenticateCallback
+    int count3 = 0;
+    std::shared_ptr<AuthenticateCallback> authenticateCallback = std::make_shared<AuthenticateCallbackTest>(count3);
+    std::string deviceId = "1";
+    std::shared_ptr<AuthenticateCallback> checkMap3 = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, authenticateCallback);
+    checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
+    ASSERT_EQ(checkMap3, nullptr);
+    // 5. RegisterPublishCallback with pkgName and devicePublishCallback and publishId
+    int count4 = 0;
+    std::shared_ptr<PublishCallback> devicePublishCallback = std::make_shared<PublishCallbackTest>(count4);
+    int32_t publishId = 0;
+    std::shared_ptr<PublishCallback> checkMap4 = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, devicePublishCallback);
+    checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][subscribeId];
+    ASSERT_EQ(checkMap4, nullptr);
+    // 5. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
+    std::string testPkgName = "";
+    DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(testPkgName);
+    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
+    checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
+    checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
+    checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
+    checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
+    // 6. check if checkMap checkMap1 checkMap2 checkMap3 is null
+    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_EQ(checkMap1, nullptr);
+    ASSERT_EQ(checkMap2, nullptr);
+    ASSERT_EQ(checkMap3, nullptr);
+    ASSERT_EQ(checkMap4, nullptr);
 }
 
 /*

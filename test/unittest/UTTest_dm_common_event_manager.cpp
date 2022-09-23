@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "hichain_connector.h"
 #include "UTTest_dm_common_event_manager.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -90,19 +91,6 @@ HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::Te
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
     bool result = commonEventManager->UnsubscribeServiceEvent();
     EXPECT_EQ(false, result);
-}
-
-/**
- * @tc.name: DmCommonEventManager::EventSubscriber::OnReceiveEvent_001
- * @tc.desc: call OnReceiveEvent(), pass parameters： data
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
-{
-    EventFwk::CommonEventData data;
-    auto commonEventManager = std::make_shared<DmCommonEventManager>();
-    commonEventManager->subscriber_->OnReceiveEvent(data)
 }
 } // namespace
 } // namespace DistributedHardware

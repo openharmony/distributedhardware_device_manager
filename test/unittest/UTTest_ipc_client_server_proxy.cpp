@@ -17,6 +17,10 @@
 
 #include <unistd.h>
 
+#include "mock/mock_ipc_client_proxy.h"
+#include "device_manager.h"
+#include "single_instance.h"
+#include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
@@ -65,6 +69,34 @@ HWTEST_F(IpcClientServerProxyTest, SendCmd_001, testing::ext::TestSize.Level0)
     int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
     // 4. check ret is DEVICEMANAGER_NULLPTR
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: SendCmd_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientServerProxyTest, SendCmd_002, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = IPC_MSG_BUTT;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    auto instance = new IpcClientServerProxy(remoteObject);
+    int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendCmd_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientServerProxyTest, SendCmd_003, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = 1;
+    sptr<IRemoteObject> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    auto instance = new IpcClientServerProxy(remoteObject);
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
