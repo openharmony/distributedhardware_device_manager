@@ -568,13 +568,60 @@ HWTEST_F(IpcClientManagerTest, SendRequest_005, testing::ext::TestSize.Level0)
  */
 HWTEST_F(IpcClientManagerTest, SendRequest_006, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "";
+    std::string pkgName = "com.ohos.test";
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     int ret = instance->SendRequest(IPC_MSG_BUTT, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendRequest_007
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, SendRequest_007, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = nullptr;
+    int ret = instance->SendRequest(-1, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendRequest_008
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, SendRequest_008, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<IpcReq> req = nullptr;
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = nullptr;
+    int ret = instance->SendRequest(0, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendRequest_009
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, SendRequest_009, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = nullptr;
+    int ret = instance->SendRequest(0, req, rsp);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -613,7 +660,7 @@ HWTEST_F(IpcClientManagerTest, OnDmServiceDied_001, testing::ext::TestSize.Level
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     // 2. call OnDmServiceDied
-    bool ret = instance->OnDmServiceDied();
+    int32_t ret = instance->OnDmServiceDied();
     // 3. check ret is false
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
@@ -633,7 +680,7 @@ HWTEST_F(IpcClientManagerTest, OnDmServiceDied_002, testing::ext::TestSize.Level
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = mockInstance;
     // 2. call OnDmServiceDied
-    bool ret = instance->OnDmServiceDied();
+    int32_t ret = instance->OnDmServiceDied();
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -655,7 +702,7 @@ HWTEST_F(IpcClientManagerTest, OnDmServiceDied_003, testing::ext::TestSize.Level
     instance->dmInterface_ = dmInterface;
     instance->dmRecipient_ = sptr<DmDeathRecipient>(new DmDeathRecipient());
     // 2. call OnDmServiceDied
-    bool ret = instance->OnDmServiceDied();
+    int32_t ret = instance->OnDmServiceDied();
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
