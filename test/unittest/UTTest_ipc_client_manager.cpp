@@ -563,6 +563,22 @@ HWTEST_F(IpcClientManagerTest, SendRequest_005, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: SendRequest_006
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, SendRequest_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = nullptr;
+    int ret = instance->SendRequest(IPC_MSG_BUTT, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
  * @tc.name: IsInit_001
  * @tc.desc: 1. set pkgName null
  *           2. set IpcClientManager dmInterface_null
