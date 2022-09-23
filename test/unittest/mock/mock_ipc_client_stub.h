@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class MockIpcClientStub : public IpcClientStub {
 public:
-    explicit MockIpcClientStub (): IpcClientStub() {};
+    explicit MockIpcClientStub(): IpcClientStub() {};
     MOCK_METHOD4(OnRemoteRequest, int32_t(uint32_t code, MessageParcel &data, MessageParcel &reply,
         MessageOption &option));
     MOCK_METHOD3(SendCmd, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
