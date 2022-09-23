@@ -16,6 +16,7 @@
 #include "ipc_client_manager.h"
 
 #include "device_manager_notify.h"
+#include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_client_server_proxy.h"
@@ -30,8 +31,9 @@ namespace OHOS {
 namespace DistributedHardware {
 void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    (void)remote;
     LOGW("DmDeathRecipient : OnRemoteDied");
+    (void)remote;
+    DeviceManagerImpl::GetInstance().OnDmServiceDied();
     DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
@@ -93,7 +95,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     if (ret != DM_OK) {
         return ret;
     }
-
+    dmListener_[pkgName] = listener;
     LOGI("completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -104,25 +106,31 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("in, pkgName %s", pkgName.c_str());
+    LOGI("UnInit in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
         return ERR_DM_INIT_FAILED;
     }
 
     std::lock_guard<std::mutex> autoLock(lock_);
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = dmInterface_->SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
-        return ret;
+    if (dmListener_.count(pkgName) > 0) {
+        std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+        std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+        req->SetPkgName(pkgName);
+        int32_t ret = dmInterface_->SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
+        if (ret != DM_OK) {
+            LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
+            return ret;
+        }
+        dmListener_.erase(pkgName);
     }
-
-    dmInterface_ = nullptr;
-    dmRecipient_ = nullptr;
-
+    if (dmListener_.empty()) {
+        if (dmRecipient_ != nullptr) {
+            dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
+            dmRecipient_ = nullptr;
+        }
+        dmInterface_ = nullptr;
+    }
     LOGI("completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -152,6 +160,22 @@ bool IpcClientManager::IsInit(const std::string &pkgName)
     }
 
     return true;
+}
+
+int32_t IpcClientManager::OnDmServiceDied()
+{
+    LOGI("IpcClientManager::OnDmServiceDied begin");
+    if (dmInterface_ == nullptr) {
+        LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
+        return ERR_DM_POINT_NULL;
+    }
+    if (dmRecipient_ != nullptr) {
+        dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
+        dmRecipient_ = nullptr;
+    }
+    dmInterface_ = nullptr;
+    LOGI("IpcClientManager::OnDmServiceDied complete");
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

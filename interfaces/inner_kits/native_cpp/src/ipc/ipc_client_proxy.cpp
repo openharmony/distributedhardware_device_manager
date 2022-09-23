@@ -46,5 +46,14 @@ int32_t IpcClientProxy::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req
     }
     return ipcClientManager_->SendRequest(cmdCode, req, rsp);
 }
+
+int32_t IpcClientProxy::OnDmServiceDied()
+{
+    if (ipcClientManager_ == nullptr) {
+        LOGE("IpcClientProxy::ipcClientManager_ is null");
+        return ERR_DM_POINT_NULL;
+    }
+    return ipcClientManager_->OnDmServiceDied();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
