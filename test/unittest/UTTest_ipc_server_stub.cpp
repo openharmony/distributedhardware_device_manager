@@ -513,6 +513,30 @@ HWTEST_F(IpcServerStubTest, GetDmListener_005, testing::ext::TestSize.Level0)
     // 3. check ret is nullptr
     ASSERT_EQ(ret, nullptr);
 }
+
+/**
+ * @tc.name: OnRemoveSystemAbility_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, OnRemoveSystemAbility_001, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = SOFTBUS_SERVER_SA_ID;
+    std::string deviceId;
+    IpcServerStub::GetInstance().OnRemoveSystemAbility(systemAbilityId, deviceId);
+    ASSERT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+/**
+ * @tc.name: OnAddSystemAbility_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, OnAddSystemAbility_001, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = SOFTBUS_SERVER_SA_ID;
+    std::string deviceId;
+    IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
+    ASSERT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
