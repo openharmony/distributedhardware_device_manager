@@ -206,6 +206,8 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) override;
+
+    int32_t OnDmServiceDied();
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

@@ -3244,6 +3244,46 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_004, testing::ext::
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
+
+/**
+ * @tc.name: OnDmServiceDied_001
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::OnDmServiceDied
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    int32_t ret= DeviceManagerImpl::GetInstance().OnDmServiceDied();
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
+
+/**
+ * @tc.name: OnDmServiceDied_001
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::OnDmServiceDied
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, OnDmServiceDied_002, testing::ext::TestSize.Level0)
+{
+    // 1. mock IpcClientProxy
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, OnDmServiceDied()).Times(1).WillOnce(testing::Return(ERR_DM_POINT_NULL));
+    // 2. call DeviceManagerImpl::OnDmServiceDied
+    int32_t ret= DeviceManagerImpl::GetInstance().OnDmServiceDied();
+    // 3. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -583,6 +583,66 @@ HWTEST_F(IpcClientManagerTest, IsInit_001, testing::ext::TestSize.Level0)
     // 4. check ret is false
     ASSERT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: IsInit_001
+ * @tc.desc: 1. set IpcClientManager dmInterface_null
+ *           3. call OnDmServiceDied
+ *           4. check ret is ERR_DM_POINT_NULL
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
+{
+    // 1. set IpcClientManager dmInterface_null
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = nullptr;
+    // 2. call OnDmServiceDied
+    bool ret = instance->OnDmServiceDied();
+    // 3. check ret is false
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: OnDmServiceDied_002
+ * @tc.desc: 1. set IpcClientManager dmInterface_null
+ *           3. call OnDmServiceDied
+ *           4. check ret is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, OnDmServiceDied_002, testing::ext::TestSize.Level0)
+{
+    // 1. set IpcClientManager dmInterface_null
+    sptr<IRemoteObject> remoteObject = nullptr;
+    auto mockInstance = new MockIpcClientManager(remoteObject);
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = mockInstance;
+    // 2. call OnDmServiceDied
+    bool ret = instance->OnDmServiceDied();
+    // 3. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: OnDmServiceDied_003
+ * @tc.desc: 1. set IpcClientManager dmInterface_null
+ *           3. call OnDmServiceDied
+ *           4. check ret is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientManagerTest, OnDmServiceDied_003, testing::ext::TestSize.Level0)
+{
+    // 1. set IpcClientManager dmInterface_null
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    sptr<IpcRemoteBroker> dmInterface = iface_cast<IpcRemoteBroker>(object);
+    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
+    instance->dmInterface_ = dmInterface;
+    instance->dmRecipient_ = sptr<DmDeathRecipient>(new DmDeathRecipient());
+    // 2. call OnDmServiceDied
+    bool ret = instance->OnDmServiceDied();
+    // 3. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 
 DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()

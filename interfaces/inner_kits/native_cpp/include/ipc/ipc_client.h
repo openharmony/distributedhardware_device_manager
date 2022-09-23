@@ -32,6 +32,7 @@ public:
     virtual int32_t Init(const std::string &pkgName) = 0;
     virtual int32_t UnInit(const std::string &pkgName) = 0;
     virtual int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) = 0;
+    virtual int32_t OnDmServiceDied() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

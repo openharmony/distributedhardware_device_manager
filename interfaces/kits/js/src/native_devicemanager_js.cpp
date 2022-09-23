@@ -98,6 +98,7 @@ void DmNapiInitCallback::OnRemoteDied()
             LOGE("OnRemoteDied, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
             return;
         }
+        LOGI("OnRemoteDied, deviceManagerNapi bundleName %s", callback->bundleName_.c_str());
         deviceManagerNapi->OnEvent("serviceDie", 0, nullptr);
         delete work;
         work = nullptr;
