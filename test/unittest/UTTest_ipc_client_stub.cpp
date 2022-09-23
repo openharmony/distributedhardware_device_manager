@@ -179,7 +179,11 @@ HWTEST_F(IpcClientStubTest, SendCmd_003, testing::ext::TestSize.Level0)
     int cmdCode = GET_TRUST_DEVICE_LIST;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    std::shared_ptr<MockIpcClientStub> mockInstance = std::make_shared<MockIpcClientStub>();
+    std::shared_ptr<IpcClientStub> ipcClientStub= mockInstance;
+    EXPECT_CALL(*mockInstance, SendCmd(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    std::shared_ptr<IpcClientStub> instance = std::shared_ptr<IpcClientStub>(ipcClientStub);
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, DM_OK);
 }
