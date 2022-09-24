@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_UTTEST_DM_SERVICE_IMPL_H
 #define OHOS_UTTEST_DM_SERVICE_IMPL_H
 
@@ -29,8 +30,8 @@ class DeviceManagerServiceImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp() override;
+    void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -41,7 +41,6 @@ namespace {
  */
 HWTEST_F(DeviceManagerServiceImplTest, Initialize_001, testing::ext::TestSize.Level0)
 {
-
     auto ideviceManagerServiceListener = std::shared_ptr<IDeviceManagerServiceListener>();
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>
     ();
@@ -72,7 +71,7 @@ HWTEST_F(DeviceManagerServiceImplTest, Initialize_002, testing::ext::TestSize.Le
  */
 HWTEST_F(DeviceManagerServiceImplTest, RegisterDevStateCallback_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test"; 
+    std::string pkgName = "com.ohos.test";
     std::string extra;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->RegisterDevStateCallback(pkgName, extra);
