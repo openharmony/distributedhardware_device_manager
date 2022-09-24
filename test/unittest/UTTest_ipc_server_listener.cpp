@@ -216,6 +216,72 @@ HWTEST_F(IpcServerListenerTest, SendRequest_005, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: SendRequest_006
+ * @tc.desc: 1. set cmdCode not null
+ *              set pkgName not null
+ *           2. set remoteObject nullptr
+ *              set req not null
+ *              set rsp null
+ *           3. call IpcServerListener SendRequest
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerListenerTest, SendRequest_006, testing::ext::TestSize.Level0)
+{
+    // 1. set cmdCode not null
+    int32_t cmdCode = 0;
+    // set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // 2. set remoteObject nullptr
+    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    // set req not null
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp null
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    req->SetPkgName(pkgName);
+    // 3. call IpcServerListener SendRequest
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
+    // 4. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendRequest_007
+ * @tc.desc: 1. set cmdCode not null
+ *              set pkgName not null
+ *           2. set remoteObject nullptr
+ *              set req not null
+ *              set rsp not null
+ *           3. call IpcServerListener SendRequest
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerListenerTest, SendRequest_007, testing::ext::TestSize.Level0)
+{
+    // 1. set cmdCode not null
+    int32_t cmdCode = -1;
+    // set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // 2. set remoteObject nullptr
+    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    // set req not null
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp null
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    // 3. call IpcServerListener SendRequest
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
+    // 4. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
  * @tc.name: SendAll_001
  * @tc.desc: 1. set cmdCode not null
  *              set pkgName not null
@@ -382,6 +448,56 @@ HWTEST_F(IpcServerListenerTest, SendAll_005, testing::ext::TestSize.Level0)
     int ret = ipcServerListener->SendAll(cmdCode, req, rsp);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: SendAll_006
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerListenerTest, SendAll_006, testing::ext::TestSize.Level0)
+{
+    // 1. set cmdCode not null
+    int32_t cmdCode = -1;
+    // set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // 2. set remoteObject not nullptr
+    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    // set req not null
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp null
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    req->SetPkgName(pkgName);
+    // 3. call IpcServerListener SendRequest
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    int ret = ipcServerListener->SendAll(cmdCode, req, rsp);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SendAll_007
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerListenerTest, SendAll_007, testing::ext::TestSize.Level0)
+{
+    // 1. set cmdCode not null
+    int32_t cmdCode = IPC_MSG_BUTT;
+    // set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // 2. set remoteObject not nullptr
+    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
+    // set req not null
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    // set rsp null
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    req->SetPkgName(pkgName);
+    // 3. call IpcServerListener SendRequest
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    int ret = ipcServerListener->SendAll(cmdCode, req, rsp);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
 } // namespace DistributedHardware

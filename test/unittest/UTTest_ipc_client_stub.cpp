@@ -187,6 +187,20 @@ HWTEST_F(IpcClientStubTest, SendCmd_003, testing::ext::TestSize.Level0)
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: SendCmd_004
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_004, testing::ext::TestSize.Level0)
+{
+    int cmdCode = -1;
+    std::shared_ptr<IpcReq> req = nullptr;
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    sptr<IpcClientStub> instance = new IpcClientStub();
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
