@@ -4535,20 +4535,17 @@ HWTEST_F(DeviceManagerNotifyTest, OnFaCall5, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult1, testing::ext::TestSize.Level0)
 {
-
     std::string pkgName = "";
     int32_t action = 1;
     std::string credentialResult = "failed";
     DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
 }
-
 /**
  * @tc.name: OnCredentialResult2
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult2, testing::ext::TestSize.Level0)
 {
-
     std::string pkgName = "com.ohos.test";
     int32_t action = 1;
     std::string credentialResult = "failed";
@@ -4561,7 +4558,6 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult2, testing::ext::TestSize.Le
  */
 HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult1, testing::ext::TestSize.Level0)
 {
-
     std::string pkgName = "";
     std::string deviceId = "123";
     int32_t resultCode = 0;
@@ -4575,7 +4571,6 @@ HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult1, testing::ext::TestSize.Le
  */
 HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult2, testing::ext::TestSize.Level0)
 {
-
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "123";
     int32_t resultCode = 0;
