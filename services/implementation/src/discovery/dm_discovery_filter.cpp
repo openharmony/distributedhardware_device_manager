@@ -35,8 +35,7 @@ enum DmDiscoveryDeviceFilter {
 
 int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str)
 {
-    nlohmann::json jsonObject;
-    jsonObject = nlohmann::json::parse(str, nullptr, false);
+    nlohmann::json jsonObject = nlohmann::json::parse(str, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("FilterOptions parse error.");
         return ERR_DM_INPUT_PARA_INVALID;

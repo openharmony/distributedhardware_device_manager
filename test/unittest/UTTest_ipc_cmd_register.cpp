@@ -483,6 +483,32 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_005, testing::ext::TestSize.Level0)
     // 4.check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: OnIpcCmd_006
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_006, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = -1;
+    MessageParcel reply;
+    MessageParcel data;
+    int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: OnIpcCmd_007
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_007, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = IPC_MSG_BUTT;
+    MessageParcel reply;
+    MessageParcel data;
+    int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
