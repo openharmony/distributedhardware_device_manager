@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "hichain_connector.h"
 #include "UTTest_dm_common_event_manager.h"
+#include "matching_skills.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -91,6 +92,99 @@ HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::Te
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
     bool result = commonEventManager->UnsubscribeServiceEvent();
     EXPECT_EQ(false, result);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility_001
+ * @tc.desc: call OnAddSystemAbility()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_001, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
+    std::string deviceId;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    auto systemAbilityStatusChangeListener =
+        std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
+    systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility_001
+ * @tc.desc: call OnAddSystemAbility()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_002, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = 0;
+    std::string deviceId;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    auto systemAbilityStatusChangeListener =
+        std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
+    systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility_001
+ * @tc.desc: call OnRemoveSystemAbility()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnRemoveSystemAbility_002, testing::ext::TestSize.Level0)
+{
+    int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
+    std::string deviceId;
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    auto systemAbilityStatusChangeListener =
+        std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
+    systemAbilityStatusChangeListener->OnRemoveSystemAbility(systemAbilityId, deviceId);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnReceiveEvent_001
+ * @tc.desc: call OnReceiveEvent()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
+{
+    AAFwk::Want want;
+    EventFwk::CommonEventData data;
+    want.SetAction("changeEvent");
+    data.SetWant(want);
+    data.SetCode(0);
+
+    std::string strEvent = "test";
+    CommomEventCallback callback = nullptr;
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(strEvent);
+    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEvent);
+    commonEventManager->subscriber_->OnReceiveEvent(data);
+}
+
+/**
+ * @tc.name: DmCommonEventManager::SystemAbilityStatusChangeListener::OnReceiveEvent_002
+ * @tc.desc: call OnReceiveEvent()
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_002, testing::ext::TestSize.Level0)
+{
+    AAFwk::Want want;
+    EventFwk::CommonEventData data;
+    want.SetAction("test");
+    data.SetWant(want);
+    data.SetCode(0);
+
+    std::string strEvent = "test";
+    CommomEventCallback callback = nullptr;
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(strEvent);
+    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+
+    auto commonEventManager = std::make_shared<DmCommonEventManager>();
+    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEvent);
+    commonEventManager->subscriber_->OnReceiveEvent(data);
 }
 } // namespace
 } // namespace DistributedHardware
