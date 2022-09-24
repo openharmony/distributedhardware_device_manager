@@ -3284,6 +3284,28 @@ HWTEST_F(DeviceManagerImplTest, OnDmServiceDied_002, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
+
+/**
+ * @tc.name: NotifyEvent_001
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::NotifyEvent
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, NotifyEvent_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
+    std::string event = R"({"extra": {"deviceId": "123"})";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret= DeviceManager::GetInstance().NotifyEvent(packName, eventId, event);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
