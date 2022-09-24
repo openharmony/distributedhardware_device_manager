@@ -3306,6 +3306,57 @@ HWTEST_F(DeviceManagerImplTest, NotifyEvent_001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
+
+/**
+ * @tc.name: NotifyEvent_002
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::NotifyEvent
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, NotifyEvent_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
+    std::string event = R"({"extra": {"deviceId": "123"})";
+    int32_t ret= DeviceManager::GetInstance().NotifyEvent(packName, eventId, event);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: NotifyEvent_003
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::NotifyEvent
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, NotifyEvent_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    int32_t eventId = DM_NOTIFY_EVENT_START;
+    std::string event = R"({"extra": {"deviceId": "123"})";
+    int32_t ret= DeviceManager::GetInstance().NotifyEvent(packName, eventId, event);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: NotifyEvent_004
+ * @tc.desc: 1. mock IpcClientProxy
+ *           2. call DeviceManagerImpl::NotifyEvent
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, NotifyEvent_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    int32_t eventId = DM_NOTIFY_EVENT_BUTT;
+    std::string event = R"({"extra": {"deviceId": "123"})";
+    int32_t ret= DeviceManager::GetInstance().NotifyEvent(packName, eventId, event);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
