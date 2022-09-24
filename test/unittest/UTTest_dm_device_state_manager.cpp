@@ -299,6 +299,38 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterOffLineTimer_001, testing::ext::TestS
     };
     dmDeviceStateManager->RegisterOffLineTimer(info);
 }
+
+/**
+ * @tc.name: SaveOnlineDeviceInfo_001
+ * @tc.desc: call SaveOnlineDeviceInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDeviceStateManagerTest, SaveOnlineDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "123";
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    dmDeviceStateManager->SaveOnlineDeviceInfo(pkgName, info);
+}
+
+/**
+ * @tc.name: DeleteOfflineDeviceInfo_001
+ * @tc.desc: call DeleteOfflineDeviceInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDeviceStateManagerTest, DeleteOfflineDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "123";
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    dmDeviceStateManager->DeleteOfflineDeviceInfo(pkgName, info);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -98,6 +98,19 @@ HWTEST_F(IpcClientServerProxyTest, SendCmd_003, testing::ext::TestSize.Level0)
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
+
+/**
+ * @tc.name: SendCmd_004
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientServerProxyTest, SendCmd_004, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = -1;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    auto instance = new IpcClientServerProxy(remoteObject);
+    int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
