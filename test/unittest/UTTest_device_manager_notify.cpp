@@ -965,6 +965,19 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_005, testing::ext::T
 }
 
 /**
+ * @tc.name: RegisterDiscoverCallback_006
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int count = 0;
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
+    uint16_t subscribeId = 0;
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
+}
+
+/**
  * @tc.name: UnRegisterDiscoverCallback_001
  * @tc.desc: 1. set pkgName not null
  *              set callback not null
@@ -4514,6 +4527,55 @@ HWTEST_F(DeviceManagerNotifyTest, OnFaCall5, testing::ext::TestSize.Level0)
     DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 0);
+}
+
+/**
+ * @tc.name: OnCredentialResult1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    int32_t action = 1;
+    std::string credentialResult = "failed";
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+}
+/**
+ * @tc.name: OnCredentialResult2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t action = 1;
+    std::string credentialResult = "failed";
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+}
+
+/**
+ * @tc.name: OnVerifyAuthResult1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string deviceId = "123";
+    int32_t resultCode = 0;
+    int32_t flag = 0;
+    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
+}
+
+/**
+ * @tc.name: OnVerifyAuthResult2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string deviceId = "123";
+    int32_t resultCode = 0;
+    int32_t flag = 0;
+    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
 }
 } // namespace
 
