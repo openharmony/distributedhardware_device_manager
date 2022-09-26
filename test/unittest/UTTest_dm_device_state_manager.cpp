@@ -81,17 +81,6 @@ HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_002, testing::ext::TestS
 }
 
 /**
- * @tc.name: DestructDmDeviceStateManager_001
- * @tc.desc: set DmDeviceStateManager to tne new pointer,and it's not nullptr
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, DestructDmDeviceStateManager_001, testing::ext::TestSize.Level0)
-{
-    dmDeviceStateManager->~DmDeviceStateManager();
-}
-
-/**
  * @tc.name: OnDeviceOnline_001
  * @tc.desc: set info.deviceId to some para, and return it
  * @tc.type: FUNC
