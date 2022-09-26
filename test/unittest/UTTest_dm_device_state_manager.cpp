@@ -320,17 +320,6 @@ HWTEST_F(DmDeviceStateManagerTest, DeleteOfflineDeviceInfo_001, testing::ext::Te
     };
     dmDeviceStateManager->DeleteOfflineDeviceInfo(pkgName, info);
 }
-
-/**
- * @tc.name: DestructDmDeviceStateManager_001
- * @tc.desc: set DmDeviceStateManager to tne new pointer,and it's not nullptr
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, DestructDmDeviceStateManager_001, testing::ext::TestSize.Level0)
-{
-    dmDeviceStateManager->~DmDeviceStateManager();
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
