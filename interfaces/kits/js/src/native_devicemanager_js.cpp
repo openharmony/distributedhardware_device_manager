@@ -905,7 +905,7 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     jsonObj[AUTH_TYPE] = authType;
     std::string extraInfo = "extraInfo";
 
-    JsToJsonObject(env, object, "extraInfo", jsonObj);
+    JsToJsonObject(env, object, extraInfo, jsonObj);
     extra = jsonObj.dump();
     LOGI("appIconLen %d, appThumbnailLen %d", appIconBufferLen, appThumbnailBufferLen);
 }
