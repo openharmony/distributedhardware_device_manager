@@ -175,10 +175,9 @@ HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_002, testing::ext::TestSize.Le
     want.SetAction("test");
     data.SetWant(want);
     data.SetCode(0);
-
-    std::string strEvent = "test";
     CommomEventCallback callback = nullptr;
     EventFwk::MatchingSkills matchingSkills;
+    std::string strEvent = "test";
     matchingSkills.AddEvent(strEvent);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
 
