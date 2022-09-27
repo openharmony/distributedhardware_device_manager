@@ -61,7 +61,7 @@ static BOOL Initialize(Service *service, Identity identity)
 
     DeviceManagerService::GetInstance().Init();
 
-    DeviceManagerSamgrService *mgrService = (DeviceManagerSamgrService *)service;
+    DeviceManagerSamgrService *mgrService = static_cast<DeviceManagerSamgrService *>(service);
     mgrService->identity = identity;
     return TRUE;
 }
