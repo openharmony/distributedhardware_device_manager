@@ -596,6 +596,7 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo *localDeviceInfo = (DmDeviceInfo *)reply.ReadRawData(sizeof(DmDeviceInfo));
     if (localDeviceInfo == nullptr) {
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     pRsp->SetLocalDeviceInfo(*localDeviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
