@@ -48,7 +48,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::InitDeviceManager completed, pkgName: %s, ret=%d", pkgName.c_str(), ret);
+        LOGE("DeviceManager::InitDeviceManager completed, pkgName: %s, ret =%d", pkgName.c_str(), ret);
         return ret;
     }
     packageInitSet_.emplace(pkgName);

@@ -145,7 +145,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SoftbusConnector_001
- * @tc.desc: set SoftbusConnector to new a pointer ,and the pointer nou equal nullptr
+ * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -157,7 +157,7 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_001, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: SoftbusConnector_002
- * @tc.desc: set SoftbusConnector to new a pointer ,and the pointer nou equal nullptr,and delete it
+ * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -170,7 +170,7 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: RegisterSoftbusDiscoveryCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call RegisterSoftbusDiscoveryCallback function to corrort ,return DM_OK
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call RegisterSoftbusDiscoveryCallback function to corrort, return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -186,7 +186,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusDiscoveryCallback_001, testing::ex
 
 /**
  * @tc.name: UnRegisterSoftbusDiscoveryCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusDiscoveryCallback function to corrort ,return
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusDiscoveryCallback function to corrort, return
  * DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -202,7 +202,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 
 /**
  * @tc.name: RegisterSoftbusPublishCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call RegisterSoftbusPublishCallback function to corrort ,return DM_OK
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call RegisterSoftbusPublishCallback function to corrort, return DM_OK
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -218,7 +218,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusPublishCallback_001, testing::ext:
 
 /**
  * @tc.name: UnRegisterSoftbusPublishCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusPublishyCallback function to corrort ,return
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusPublishyCallback function to corrort, return
  * DM_OK
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -234,7 +234,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusPublishCallback_001, testing::ex
 
 /**
  * @tc.name: RegisterSoftbusStateCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusStateCallback function to corrort ,return DM_OK
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusStateCallback function to corrort, return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -251,7 +251,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::T
 
 /**
  * @tc.name: UnRegisterSoftbusStateCallback_001
- * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusStateCallback function to corrort ,return DM_OK
+ * @tc.desc: set pkgName = "com.ohos.helloworld";call UnRegisterSoftbusStateCallback function to corrort, return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -346,7 +346,7 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
 
 /**
  * @tc.name: IsDeviceOnLine_001
- * @tc.desc: set deviceId = "12333";,and return false
+ * @tc.desc: set deviceId = "12333", and return false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -374,7 +374,7 @@ HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0
 
 /**
  * @tc.name: GetSoftbusSession_001
- * @tc.desc: set SoftbusConnector to new a pointer ,and the pointer nou equal nullptr,and delete it
+ * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -386,7 +386,7 @@ HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Lev
 
 /**
  * @tc.name: GetSoftbusSession_001
- * @tc.desc: set SoftbusConnector to new a pointer ,and the pointer nou equal nullptr,and delete it
+ * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -401,7 +401,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level
 
 /**
  * @tc.name: GetSoftbusSession_001
- * @tc.desc: set SoftbusConnector to new a pointer ,and the pointer nou equal nullptr,and delete it
+ * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -415,7 +415,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level
 
 /**
  * @tc.name: GetConnectionIpAddress_001
- * @tc.desc: set deviceId null,and return ERR_DM_FAILED
+ * @tc.desc: set deviceId null, and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -429,7 +429,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_001, testing::ext::TestSiz
 
 /**
  * @tc.name: GetConnectionIpAddress_002
- * @tc.desc: set some corrort para,and return ERR_DM_FAILED
+ * @tc.desc: set some corrort para, and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -458,7 +458,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_003, testing::ext::TestSiz
 
 /**
  * @tc.name: GetConnectAddrByType_001
- * @tc.desc: set deviceInfo'pointer null, go to first master,and return nullptr
+ * @tc.desc: set deviceInfo'pointer null, go to first master, and return nullptr
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.Level0)
@@ -472,7 +472,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.
 
 /**
  * @tc.name: GetConnectAddrByType_002
- * @tc.desc:set deviceInfo to some corrort para,and return nullptr
+ * @tc.desc:set deviceInfo to some corrort para, and return nullptr
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -489,7 +489,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_002, testing::ext::TestSize.
 
 /**
  * @tc.name: GetConnectAddr_001
- * @tc.desc: set deviceId to null,and return nullptr
+ * @tc.desc: set deviceId to null, and return nullptr
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

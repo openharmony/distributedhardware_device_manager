@@ -186,7 +186,7 @@ public:
 
     /**
      * @tc.name: DmAuthManager::EstablishAuthChannel
-     * @tc.desc: Establish Auth Channel of the DeviceManager Authenticate Manager,auth state machine
+     * @tc.desc: Establish Auth Channel of the DeviceManager Authenticate Manager, auth state machine
      * @tc.type: FUNC
      */
     int32_t EstablishAuthChannel(const std::string &deviceId);

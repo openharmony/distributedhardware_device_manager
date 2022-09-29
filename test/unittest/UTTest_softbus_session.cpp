@@ -86,7 +86,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SendData_002
- * @tc.desc: set sessionId = 0 ,go to the SendBytes'smaster and return ERR_DM_FAILED
+ * @tc.desc: set sessionId = 0, go to the SendBytes'smaster and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
