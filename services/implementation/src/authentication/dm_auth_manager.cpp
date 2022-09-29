@@ -172,7 +172,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     if (groupList.size() > 0) {
         std::string groupId = "";
         groupId = groupList.front().groupId;
-        LOGI(" DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s",
+        LOGI("DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s",
              GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
         hiChainConnector_->DeleteGroup(groupId);
     } else {
@@ -435,10 +435,10 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 {
     if (authResponseContext_ == nullptr) {
-        LOGE("failed to StartNegotiate because authResponseContext_ is nullptr");
+        LOGE("DmAuthManager::StartNegotiate error, authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::StartNegotiate session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->localDeviceId = localDeviceId;
@@ -566,7 +566,7 @@ void DmAuthManager::StartRespAuthProcess()
         LOGE("failed to StartRespAuthProcess because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::StartRespAuthProcess", authResponseContext_->sessionId);
+    LOGI("DmAuthManager::StartRespAuthProcess sessionId=%d", authResponseContext_->sessionId);
     timer_->DeleteTimer(std::string(CONFIRM_TIMEOUT_TASK));
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
         timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,

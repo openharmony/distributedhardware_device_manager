@@ -332,7 +332,8 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("OnDeviceFound error, device discovery callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnDeviceFound error, device discovery callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
@@ -362,7 +363,8 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("OnDiscoveryFailed error, device discovery callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnDiscoveryFailed error, device discovery callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
@@ -391,7 +393,7 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("OnDiscoverySuccess error, device discovery callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("OnDiscoverySuccess error, device discovery callback not register for pkgName %s.", pkgName.c_str());
             return;
         }
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
@@ -421,7 +423,8 @@ void DeviceManagerNotify::OnPublishResult(const std::string &pkgName, int32_t pu
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (devicePublishCallbacks_.count(pkgName) == 0) {
-            LOGE("OnPublishResult error, device publish callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnPublishResult error, device publish callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         std::map<int32_t, std::shared_ptr<PublishCallback>> &publishCallMap = devicePublishCallbacks_[pkgName];
@@ -451,7 +454,8 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (authenticateCallback_.count(pkgName) == 0) {
-            LOGE("OnAuthResult error, authenticate callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnAuthResult error, authenticate callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         std::map<std::string, std::shared_ptr<AuthenticateCallback>> &authCallMap = authenticateCallback_[pkgName];
@@ -489,7 +493,8 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (verifyAuthCallback_.count(pkgName) == 0) {
-            LOGE("OnVerifyAuthResult error, verify auth callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnVerifyAuthResult error, verify auth callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         tempCbk = verifyAuthCallback_[pkgName];
@@ -513,7 +518,7 @@ void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (dmFaCallback_.count(pkgName) == 0) {
-            LOGE("OnFaCall error, dm fa callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnFaCall error, dm fa callback not register for pkgName %s.", pkgName.c_str());
             return;
         }
         tempCbk = dmFaCallback_[pkgName];
@@ -537,7 +542,8 @@ void DeviceManagerNotify::OnCredentialResult(const std::string &pkgName, int32_t
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (credentialCallback_.count(pkgName) == 0) {
-            LOGE("OnCredentialResult error, credential callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("DeviceManagerNotify::OnCredentialResult error, credential callback not register for pkgName %s.",
+                pkgName.c_str());
             return;
         }
         tempCbk = credentialCallback_[pkgName];
