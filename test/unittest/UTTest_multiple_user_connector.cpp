@@ -62,7 +62,7 @@ HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSi
     int32_t userIdIn = 1234;
     int32_t userIdOut = -1;
     MultipleUserConnector::SetSwitchOldUserId(userIdIn);
-    userIdOut  = MultipleUserConnector::GetSwitchOldUserId();
+    userIdOut = MultipleUserConnector::GetSwitchOldUserId();
     ASSERT_EQ(userIdIn, userIdOut);
 }
 
@@ -79,7 +79,7 @@ HWTEST_F(MultipleUserConnectorTest, GetSwitchOldUserId_001, testing::ext::TestSi
     int32_t userIdIn = 1234;
     int32_t userIdOut = -1;
     MultipleUserConnector::SetSwitchOldUserId(userIdIn);
-    userIdOut  = MultipleUserConnector::GetSwitchOldUserId();
+    userIdOut = MultipleUserConnector::GetSwitchOldUserId();
     ASSERT_EQ(userIdIn, userIdOut);
 }
 }

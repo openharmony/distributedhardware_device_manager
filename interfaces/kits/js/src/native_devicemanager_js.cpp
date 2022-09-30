@@ -973,29 +973,29 @@ void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &ob
         switch (jsValueType) {
             case napi_string: {
                 std::string natValue = JsObjectToString(env, jsProValue);
-                LOGI("Property name=%s, string, value=%s", strProName.c_str(), natValue.c_str());
+                LOGI("Property name = %s, string, value = %s", strProName.c_str(), natValue.c_str());
                 jsonObj[strProName] = natValue;
                 break;
             }
             case napi_boolean: {
                 bool elementValue = false;
                 napi_get_value_bool(env, jsProValue, &elementValue);
-                LOGI("Property name=%s, boolean, value=%d.", strProName.c_str(), elementValue);
+                LOGI("Property name = %s, boolean, value = %d.", strProName.c_str(), elementValue);
                 jsonObj[strProName] = elementValue;
                 break;
             }
             case napi_number: {
                 int32_t elementValue = 0;
                 if (napi_get_value_int32(env, jsProValue, &elementValue) != napi_ok) {
-                    LOGE("Property name=%s, Property int32_t parse error", strProName.c_str());
+                    LOGE("Property name = %s, Property int32_t parse error", strProName.c_str());
                 } else {
                     jsonObj[strProName] = elementValue;
-                    LOGI("Property name=%s, number, value=%d.", strProName.c_str(), elementValue);
+                    LOGI("Property name = %s, number, value = %d.", strProName.c_str(), elementValue);
                 }
                 break;
             }
             default: {
-                LOGE("Property name=%s, value type not support.", strProName.c_str());
+                LOGE("Property name = %s, value type not support.", strProName.c_str());
                 break;
             }
         }
@@ -1088,7 +1088,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
                                          std::string &eventType, std::string &extra)
 {
-    LOGI("CreateDmCallback for bundleName %s eventType %s extra=%s",
+    LOGI("CreateDmCallback for bundleName %s eventType %s extra = %s",
          bundleName.c_str(), eventType.c_str(), extra.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
@@ -1696,7 +1696,7 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
 
     DmDeviceInfo deviceInfo;
     JsToDmDeviceInfo(env, argv[0], deviceInfo);
-    LOGI("UnAuthenticateDevice deviceId=%s", GetAnonyString(deviceInfo.deviceId).c_str());
+    LOGI("UnAuthenticateDevice deviceId = %s", GetAnonyString(deviceInfo.deviceId).c_str());
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().UnAuthenticateDevice(deviceManagerWrapper->bundleName_, deviceInfo);

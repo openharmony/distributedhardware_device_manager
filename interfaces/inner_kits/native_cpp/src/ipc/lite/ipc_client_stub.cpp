@@ -33,7 +33,7 @@ static int32_t ClientIpcInterfaceMsgHandle(uint32_t code, IpcIo *data, IpcIo *re
     }
 
     int32_t errCode = IpcCmdRegister::GetInstance().OnIpcCmd(code, *data);
-    LOGI("receive ipc transact code:%u, retCode=%d", code, errCode);
+    LOGI("receive ipc transact code:%u, retCode = %d", code, errCode);
     return errCode;
 }
 

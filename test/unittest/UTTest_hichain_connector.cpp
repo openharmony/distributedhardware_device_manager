@@ -121,7 +121,7 @@ HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_002, testing::ext::TestSize.Le
 
 /**
  * @tc.name: DelMemberFromGroup_001
- * @tc.desc:set  groupId, deviceId null and return DM_OK
+ * @tc.desc:set groupId, deviceId null and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -276,7 +276,7 @@ HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: onRequest_001
- * @tc.desc:set  operationCode != GroupOperationCode::MEMBER_JOIN(3);  return nullptr;
+ * @tc.desc:set operationCode != GroupOperationCode::MEMBER_JOIN(3);  return nullptr;
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(HichainConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
@@ -353,7 +353,7 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: GetRelatedGroups_002
- * @tc.desc: set DeviceId  = 12345,groupList null and return ERR_DM_FAILED
+ * @tc.desc: set DeviceId = 12345,groupList null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

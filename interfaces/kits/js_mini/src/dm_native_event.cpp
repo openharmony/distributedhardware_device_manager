@@ -42,7 +42,7 @@ DmNativeEvent::~DmNativeEvent()
 
 void DmNativeEvent::On(std::string &eventType, JSIValue handle, JSIValue thisVal)
 {
-    LOGI("DmNativeEvent On in for event: %s", eventType.c_str());
+    LOGI("DmNativeEvent::On in for event: %s", eventType.c_str());
     std::shared_ptr<DmEventListener> listener= std::make_shared<DmEventListener>();
     
     listener->eventType = eventType;

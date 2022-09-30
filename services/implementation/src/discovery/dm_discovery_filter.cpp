@@ -77,7 +77,7 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
         LOGI("DmDeviceFilterOption::filterOptions empty");
         filterOp_ = FILTERS_TYPE_OR;
         DmDeviceFilters deviceFilters;
-        deviceFilters.type  = "credible";
+        deviceFilters.type = "credible";
         deviceFilters.value = DM_OFFLINE_DEVICE;
         filters_.push_back(deviceFilters);
         return DM_OK;

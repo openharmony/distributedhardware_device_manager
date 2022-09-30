@@ -100,7 +100,7 @@ void DmTimer::Stop(int32_t code)
         osTimerDelete(timerId);
         timerId = NULL;
     }
-    LOGI("DmTimer %s end timer at  (%d)s", mTimerName_.c_str(), mTimeOutSec_);
+    LOGI("DmTimer %s end timer at (%d)s", mTimerName_.c_str(), mTimeOutSec_);
     return;
 }
 
