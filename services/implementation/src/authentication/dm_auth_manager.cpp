@@ -172,7 +172,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     if (groupList.size() > 0) {
         std::string groupId = "";
         groupId = groupList.front().groupId;
-        LOGI("DmAuthManager::UnAuthenticateDevice groupId=%s, deviceId=%s, deviceUdid=%s",
+        LOGI("DmAuthManager::UnAuthenticateDevice groupId = %s, deviceId = %s, deviceUdid = %s",
              GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
         hiChainConnector_->DeleteGroup(groupId);
     } else {
@@ -211,7 +211,7 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
-    LOGI("DmAuthManager::OnSessionOpened sessionId=%d result=%d", sessionId, result);
+    LOGI("DmAuthManager::OnSessionOpened sessionId = %d result = %d", sessionId, result);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
@@ -252,7 +252,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
-    LOGI("DmAuthManager::OnSessionOpened sessionId=%d", sessionId);
+    LOGI("DmAuthManager::OnSessionOpened sessionId = %d", sessionId);
 }
 
 void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string message)
@@ -274,7 +274,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
         // source device auth process
         authRequestContext_ = authMessageProcessor_->GetRequestContext();
         authRequestState_->SetAuthContext(authRequestContext_);
-        LOGI("OnDataReceived for source device, authResponseContext msgType=%d, authRequestState stateType=%d",
+        LOGI("OnDataReceived for source device, authResponseContext msgType = %d, authRequestState stateType = %d",
             authResponseContext_->msgType, authRequestState_->GetStateType());
 
         switch (authResponseContext_->msgType) {
@@ -301,7 +301,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         // sink device auth process
         authResponseState_->SetAuthContext(authResponseContext_);
-        LOGI("OnDataReceived for sink device, authResponseContext msgType=%d, authResponseState stateType=%d",
+        LOGI("OnDataReceived for sink device, authResponseContext msgType = %d, authResponseState stateType = %d",
             authResponseContext_->msgType, authResponseState_->GetStateType());
 
         switch (authResponseContext_->msgType) {
@@ -566,7 +566,7 @@ void DmAuthManager::StartRespAuthProcess()
         LOGE("failed to StartRespAuthProcess because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::StartRespAuthProcess sessionId=%d", authResponseContext_->sessionId);
+    LOGI("DmAuthManager::StartRespAuthProcess sessionId = %d", authResponseContext_->sessionId);
     timer_->DeleteTimer(std::string(CONFIRM_TIMEOUT_TASK));
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
         timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,

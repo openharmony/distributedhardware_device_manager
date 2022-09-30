@@ -600,7 +600,7 @@ void DeviceManagerModule::JsToJsonObject(const JSIValue &object,
     uint32_t jsProCount = 0;
     jsProNameList = JSI::GetObjectKeys(jsonField);
     jsProCount = JSI::GetArrayLength(jsProNameList);
-    LOGI("Property size=%d.", jsProCount);
+    LOGI("Property size = %d.", jsProCount);
 
     JSIValue jsProName = nullptr;
     JSIValue jsProValue = nullptr;
@@ -610,19 +610,19 @@ void DeviceManagerModule::JsToJsonObject(const JSIValue &object,
         jsProValue = JSI::GetNamedProperty(jsonField, strProName.c_str());
         if (JSI::ValueIsString(jsProValue)) {
             std::string natValue = JSI::ValueToString(jsProValue);
-            LOGI("Property name=%s, string, value=%s", strProName.c_str(), natValue.c_str());
+            LOGI("Property name = %s, string, value = %s", strProName.c_str(), natValue.c_str());
             jsonObj[strProName] = natValue;
         }
         if (JSI::ValueIsBoolean(jsProValue)) {
             bool elementValue = JSI::ValueToBoolean(jsProValue);
-            LOGI("Property name=%s, boolean, value=%d.", strProName.c_str(), elementValue);
+            LOGI("Property name = %s, boolean, value = %d.", strProName.c_str(), elementValue);
             jsonObj[strProName] = elementValue;
         }
         if (JSI::ValueIsNumber(jsProValue)) {
             int32_t elementValue = 0;
             elementValue = (int32_t)JSI::ValueToNumber(jsProValue);
             jsonObj[strProName] = elementValue;
-            LOGI("Property name=%s, number, value=%d.", strProName.c_str(), elementValue);
+            LOGI("Property name = %s, number, value = %d.", strProName.c_str(), elementValue);
         }
     }
 }
@@ -766,7 +766,7 @@ JSIValue DeviceManagerModule::UnAuthenticateDevice(const JSIValue thisVal, const
     }
     std::string bundleName = GetJSIAppBundleName();
     std::string deviceId = JSI::GetStringProperty(args[0], "deviceId");
-    LOGI("UnAuthenticateDevice deviceId=%s", GetAnonyString(deviceId.c_str()));
+    LOGI("UnAuthenticateDevice deviceId = %s", GetAnonyString(deviceId.c_str()));
     int32_t ret = 0;
     ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceId);
     if (ret != 0) {

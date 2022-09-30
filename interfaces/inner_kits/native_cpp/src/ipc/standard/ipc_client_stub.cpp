@@ -55,7 +55,7 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    LOGI("cmdCode = %d, flags= %d.", cmdCode, option.GetFlags());
+    LOGI("cmdCode = %d, flags = %d.", cmdCode, option.GetFlags());
     if (IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply) == DM_OK) {
         LOGE("on ipc cmd success");
         return DM_OK;

@@ -213,7 +213,7 @@ void DmDeviceStateManager::RegisterDevStateCallback(const std::string &pkgName, 
         LOGE("DmDeviceStateManager::RegisterDevStateCallback input param is empty");
         return;
     }
-    LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName=%s, extra=%s",
+    LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName = %s, extra = %s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
     if (decisionInfos_.count(pkgName) == 0) {
         decisionInfos_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
@@ -226,7 +226,7 @@ void DmDeviceStateManager::UnRegisterDevStateCallback(const std::string &pkgName
         LOGE("DmDeviceStateManager::UnRegisterDevStateCallback input param is empty");
         return;
     }
-    LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName=%s, extra=%s",
+    LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName = %s, extra = %s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
     if (decisionInfos_.count(pkgName) > 0) {
         auto iter = decisionInfos_.find(pkgName);

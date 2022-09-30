@@ -191,7 +191,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
 
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
-    LOGI("GetUdidByNetworkId for networkId=%s", GetAnonyString(std::string(networkId)).c_str());
+    LOGI("GetUdidByNetworkId for networkId = %s", GetAnonyString(std::string(networkId)).c_str());
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
@@ -205,7 +205,7 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
 
 int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
-    LOGI("GetUuidByNetworkId for networkId=%s", GetAnonyString(std::string(networkId)).c_str());
+    LOGI("GetUuidByNetworkId for networkId = %s", GetAnonyString(std::string(networkId)).c_str());
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret =
         GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
