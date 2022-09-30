@@ -369,7 +369,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
     if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
-        LOGE("UnAuthenticateDevice error: Invalid para. pkgName %s" pkgName.c_str());
+        LOGE("UnAuthenticateDevice error: Invalid para. pkgName %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("UnAuthenticateDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
@@ -607,7 +607,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    int32_t ret = rsp->GetErrCode();
+    ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnRegisterDevStateCallback Failed with ret %d", ret);
         return ret;

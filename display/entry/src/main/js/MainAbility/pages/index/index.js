@@ -150,7 +150,7 @@ export default {
         this.log('getFaParam:' + JSON.stringify(data))
         //        const data = dmClas icationParam:' + JSON.stringify(data))
         // Authentication type, 1 for pin code.
-        if (data&&!data.FaType) {
+        if (data && !data.FaType) {
             return;
         }
         if (data && data.FaType == 1) {
