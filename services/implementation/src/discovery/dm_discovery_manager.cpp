@@ -115,7 +115,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
-    filterPara.range    = info.range;
+    filterPara.range = info.range;
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
     }

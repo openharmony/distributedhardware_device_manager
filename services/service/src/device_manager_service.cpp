@@ -423,7 +423,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
                 return ERR_DM_FAILED;
             }
 
-            for (unsigned int  j = 0; j < deviceList.size(); j++) {
+            for (unsigned int j = 0; j < deviceList.size(); j++) {
                 HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
                 LOGI("DeviceManagerService::DmHiDumper SetNodeInfo.");
             }

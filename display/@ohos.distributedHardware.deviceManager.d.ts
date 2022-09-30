@@ -189,7 +189,7 @@ declare namespace deviceManager {
     freq: ExchangeFreq;
 
     /**
-     *  Whether the device should be ranged  by discoverers.
+     *  Whether the device should be ranged by discoverers.
      */
     ranging : boolean;
   }

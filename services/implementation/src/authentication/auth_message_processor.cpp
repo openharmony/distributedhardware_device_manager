@@ -154,7 +154,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s", GetAnonyString(groupId).c_str(),
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s", GetAnonyString(groupId).c_str(),
              GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }

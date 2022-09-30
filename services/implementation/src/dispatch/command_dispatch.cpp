@@ -175,16 +175,16 @@ static int32_t GetFaParam(const std::shared_ptr<IpcReq> &req, const std::shared_
     DmAuthParam authParam = {
         .authToken = "",
         .packageName = "",
-        .appName     = "",
+        .appName = "",
         .appDescription = "",
-        .authType    = 0,
-        .business    = 0,
-        .pincode     = 0,
-        .direction   = 0,
-        .pinToken    = 0
+        .authType = 0,
+        .business = 0,
+        .pincode = 0,
+        .direction = 0,
+        .pinToken = 0
     };
 
-    LOGI("DeviceManagerStub:: GET_AUTHENTCATION_INFO:pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManagerStub::GET_AUTHENTCATION_INFO:pkgName:%s", pkgName.c_str());
 
     int32_t ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
     pRsp->SetDmAuthParam(authParam);
@@ -201,7 +201,7 @@ static int32_t AuthenticateDevice(const std::shared_ptr<IpcReq> &req, const std:
     int32_t authType = pReq->GetAuthType();
     std::string deviceId = deviceInfo.deviceId;
 
-    LOGI("DeviceManagerStub:: AUTHENTCATION_DEVICE:pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManagerStub::AUTHENTCATION_DEVICE:pkgName:%s", pkgName.c_str());
 
     int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     rsp->SetErrCode(ret);
@@ -227,7 +227,7 @@ static int32_t VerifyAuthentication(const std::shared_ptr<IpcReq> &req, const st
     std::string pkgName = pReq->GetPkgName();
     std::string authParam = pReq->GetAuthPara();
 
-    LOGI("DeviceManagerStub:: VERIFY_AUTHENTCATION:pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManagerStub::VERIFY_AUTHENTCATION:pkgName:%s", pkgName.c_str());
 
     int32_t ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
     rsp->SetErrCode(ret);

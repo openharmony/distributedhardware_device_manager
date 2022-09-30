@@ -345,7 +345,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         LOGE("DmAuthManager::AuthenticateDevice end");
         return;
     }
-    LOGI("DmAuthManager::OnGroupCreated start group id %s", groupId.c_str());
+    LOGI("DmAuthManager::OnGroupCreated start group id %s", GetAnonyString(groupId).c_str());
     if (groupId == "{}") {
         authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -360,7 +360,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
     jsonObj[NFC_CODE_KEY] = GenerateGroupName();
     authResponseContext_->authToken = jsonObj.dump();
-    LOGI("DmAuthManager::OnGroupCreated start group id %s", groupId.c_str());
+    LOGI("DmAuthManager::OnGroupCreated start group id %s", GetAnonyString(groupId).c_str());
     authResponseContext_->groupId = groupId;
     authResponseContext_->code = pinCode;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -547,7 +547,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
         LOGE("failed to StartAuthProcess because authResponseContext_ is nullptr");
         return ERR_DM_AUTH_NOT_START;
     }
-    LOGI("DmAuthManager:: StartAuthProcess");
+    LOGI("DmAuthManager::StartAuthProcess");
     authResponseContext_->reply = action;
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
@@ -588,7 +588,7 @@ int32_t DmAuthManager::CreateGroup()
         LOGE("failed to CreateGroup because authResponseContext_ is nullptr");
         return ERR_DM_FAILED;
     }
-    LOGI("DmAuthManager:: CreateGroup start");
+    LOGI("DmAuthManager::CreateGroup start");
     authResponseContext_->groupName = GenerateGroupName();
     authResponseContext_->requestId = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
     hiChainConnector_->CreateGroup(authResponseContext_->requestId, authResponseContext_->groupName);
@@ -601,7 +601,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         LOGE("failed to AddMember because authResponseContext_ is nullptr");
         return ERR_DM_FAILED;
     }
-    LOGI("DmAuthManager::AddMember start group id %s", authResponseContext_->groupId.c_str());
+    LOGI("DmAuthManager::AddMember start group id %s", GetAnonyString(authResponseContext_->groupId).c_str());
     timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
     nlohmann::json jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;

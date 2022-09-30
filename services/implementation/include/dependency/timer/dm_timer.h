@@ -37,8 +37,8 @@ constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitReques
 constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
 
 constexpr int32_t DELAY_TICK_MILLSECONDS = 1000;
-typedef std::chrono::steady_clock::time_point   timerPoint;
-typedef std::chrono::steady_clock               steadyClock;
+typedef std::chrono::steady_clock::time_point timerPoint;
+typedef std::chrono::steady_clock steadyClock;
 typedef std::chrono::duration<int64_t, std::ratio<1, 1000>> timerDuration;
 using TimerCallback = std::function<void (std::string name)>;
 const int32_t MILLISECOND_TO_SECOND = 1000;

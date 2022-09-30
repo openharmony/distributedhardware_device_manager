@@ -45,7 +45,7 @@ int32_t AuthResponseState::SetAuthManager(std::shared_ptr<DmAuthManager> authMan
 
 int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state)
 {
-    LOGI("AuthRequestState:: TransitionTo");
+    LOGI("AuthRequestState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -66,7 +66,7 @@ int32_t AuthResponseInitState::GetStateType()
 
 int32_t AuthResponseInitState::Enter()
 {
-    LOGI("AuthResponse:: AuthResponseInitState  Enter");
+    LOGI("AuthResponse::AuthResponseInitState Enter");
     return DM_OK;
 }
 
@@ -93,7 +93,7 @@ int32_t AuthResponseConfirmState::GetStateType()
 
 int32_t AuthResponseConfirmState::Enter()
 {
-    LOGI("AuthResponse:: AuthResponseConfirmState  Enter");
+    LOGI("AuthResponse::AuthResponseConfirmState Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
@@ -110,7 +110,7 @@ int32_t AuthResponseGroupState::GetStateType()
 
 int32_t AuthResponseGroupState::Enter()
 {
-    LOGI("AuthResponse:: AuthResponseGroupState  Enter");
+    LOGI("AuthResponse::AuthResponseGroupState Enter");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");

@@ -82,10 +82,10 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_001, testing::ext::TestSiz
 {
     std::string pkgName = "com.ohos.helloworld";
     DmPublishInfo publishInfo;
-    publishInfo.publishId  = 9;
-    publishInfo.mode       = DM_DISCOVER_MODE_PASSIVE;
-    publishInfo.freq       = DM_HIGH;
-    publishInfo.ranging    = 1;
+    publishInfo.publishId = 9;
+    publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
+    publishInfo.freq = DM_HIGH;
+    publishInfo.ranging = 1;
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_REPEATED);
@@ -103,10 +103,10 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
 {
     std::string pkgName = "com.ohos.helloworld";
     DmPublishInfo publishInfo;
-    publishInfo.publishId  = 9;
-    publishInfo.mode       = DM_DISCOVER_MODE_PASSIVE;
-    publishInfo.freq       = DM_FREQ_BUTT;
-    publishInfo.ranging    = 1;
+    publishInfo.publishId = 9;
+    publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
+    publishInfo.freq = DM_FREQ_BUTT;
+    publishInfo.ranging = 1;
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);

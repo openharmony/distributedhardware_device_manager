@@ -682,7 +682,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_004, testing::ext::Test
  * @tc.name: RegisterDevStateCallback_005
  * @tc.desc: 1. set packName not null
  *              set extra not null
- *              set callback  null
+ *              set callback null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
  *           3. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
@@ -2650,7 +2650,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_009, testing::ext::Test
  * @tc.name: RegisterDevStateCallback_010
  * @tc.desc: 1. set packName not null
  *              set extra not null
- *              set callback  null
+ *              set callback null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
  *           3. check ret is DM_OK
  * deviceTypeId
@@ -2776,7 +2776,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_009, testing::ext::Te
  * @tc.name: UnRegisterDevStateCallback_010
  * @tc.desc: 1. set packName not null
  *              set extra not null
- *              set callback  null
+ *              set callback null
  *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
  *           3. check ret is DM_OK
  * deviceTypeId
@@ -3089,7 +3089,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential_004, testing::ext::TestSize.Lev
 
 /**
  * @tc.name: RegisterCredentialCallback_001
- * @tc.desc: 1. set packName  null
+ * @tc.desc: 1. set packName null
  *              set callback null
  *           3. call DeviceManagerImpl::RegisterCredentialCallback with parameter
  *           4. check ret is ERR_DM_INPUT_PARA_INVALID

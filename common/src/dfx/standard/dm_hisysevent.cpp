@@ -32,7 +32,7 @@ void SysEventWrite(const std::string &status, int32_t eventType, const std::stri
         "UID", getuid(),
         "MSG", msg.c_str());
     if (res != DM_OK) {
-        LOGE("%s  Write HiSysEvent error, res:%d", status.c_str(), res);
+        LOGE("%s Write HiSysEvent error, res:%d", status.c_str(), res);
     }
 }
 } // namespace DistributedHardware

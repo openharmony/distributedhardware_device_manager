@@ -25,8 +25,8 @@ namespace DistributedHardware {
 // HisysEvent Type
 const int DM_HISYEVENT_FAULT = 1;
 const int DM_HISYEVENT_STATISTIC = 2;
-const int DM_HISYEVENT_SECURITY  = 3;
-const int DM_HISYEVENT_BEHAVIOR  = 4;
+const int DM_HISYEVENT_SECURITY = 3;
+const int DM_HISYEVENT_BEHAVIOR = 4;
 
 // HisysEvent state
 constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
