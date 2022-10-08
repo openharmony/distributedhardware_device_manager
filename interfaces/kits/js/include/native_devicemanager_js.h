@@ -41,6 +41,7 @@ struct AsyncCallbackInfo {
 
     napi_ref callback = nullptr;
     int32_t status = -1;
+    int32_t ret = 0;
 };
 
 struct DeviceInfoAsyncCallbackInfo {
@@ -56,6 +57,7 @@ struct DeviceInfoAsyncCallbackInfo {
     napi_value thisVar = nullptr;
     napi_deferred deferred = nullptr;
     int32_t status = -1;
+    int32_t ret = 0;
 };
 
 struct DeviceInfoListAsyncCallbackInfo {
@@ -71,6 +73,7 @@ struct DeviceInfoListAsyncCallbackInfo {
     napi_value thisVar = nullptr;
     napi_deferred deferred = nullptr;
     int32_t status = -1;
+    int32_t ret = 0;
 };
 
 struct AuthAsyncCallbackInfo {
@@ -340,7 +343,9 @@ private:
                                            DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
     static void CallGetLocalDeviceInfo(napi_env env, napi_status &status,
                                        DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
-
+    static napi_value GetTrustedDeviceListPromise(napi_env env,
+                                                  DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+    static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
 private:
     napi_env env_;
     napi_ref wrapper_;
