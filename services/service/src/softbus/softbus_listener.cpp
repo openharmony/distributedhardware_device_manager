@@ -98,12 +98,12 @@ SoftbusListener::~SoftbusListener()
 
 void SoftbusListener::SetPublishInfo(PublishInfo &dmPublishInfo)
 {
-    dmPublishInfo.publishId       = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-    dmPublishInfo.mode            = DiscoverMode::DISCOVER_MODE_ACTIVE;
-    dmPublishInfo.medium          = ExchangeMedium::AUTO;
-    dmPublishInfo.freq            = ExchangeFreq::HIGH;
-    dmPublishInfo.capability      = DM_CAPABILITY_OSD;
-    dmPublishInfo.ranging         = false;
+    dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+    dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
+    dmPublishInfo.medium = ExchangeMedium::AUTO;
+    dmPublishInfo.freq = ExchangeFreq::HIGH;
+    dmPublishInfo.capability = DM_CAPABILITY_OSD;
+    dmPublishInfo.ranging = false;
     return;
 }
 
@@ -286,12 +286,12 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
     if (strcmp(value, DISCOVER_STATUS_ON) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
         PublishInfo dmPublishInfo;
         (void)memset_s(&dmPublishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
-        dmPublishInfo.publishId       = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-        dmPublishInfo.mode            = DiscoverMode::DISCOVER_MODE_ACTIVE;
-        dmPublishInfo.medium          = ExchangeMedium::AUTO;
-        dmPublishInfo.freq            = ExchangeFreq::HIGH;
-        dmPublishInfo.capability      = DM_CAPABILITY_OSD;
-        dmPublishInfo.ranging         = false;
+        dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+        dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
+        dmPublishInfo.medium = ExchangeMedium::AUTO;
+        dmPublishInfo.freq = ExchangeFreq::HIGH;
+        dmPublishInfo.capability = DM_CAPABILITY_OSD;
+        dmPublishInfo.ranging = false;
         int32_t ret = ::PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;

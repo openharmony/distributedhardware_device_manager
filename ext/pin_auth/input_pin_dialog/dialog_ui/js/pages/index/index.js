@@ -31,7 +31,7 @@ export default {
     onInit() {
         callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
     },
-    onChange(e){
+    onChange(e) {
         inputValue = e.value;
     },
     onConfirm() {

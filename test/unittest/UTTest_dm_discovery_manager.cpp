@@ -121,7 +121,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
 HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
-    std::string filterOptions  = R"(
+    std::string filterOptions = R"(
     {
         "filter_op": "OR",
         "filters":
@@ -153,7 +153,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
 
 /**
  * @tc.name: OnDeviceFound_002
- * @tc.desc: set pkgName  not null and discoveryContextMap_ null and return
+ * @tc.desc: set pkgName not null and discoveryContextMap_ null and return
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -244,7 +244,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_001, testing::ext::TestSize.
 
 /**
  * @tc.name: OnDiscoverySuccess_002
- * @tc.desc: set pkgName null and return  discoveryContextMap_ null and return pkgName(null)
+ * @tc.desc: set pkgName null and return discoveryContextMap_ null and return pkgName(null)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

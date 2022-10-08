@@ -27,10 +27,10 @@ function uint8ArrayToBase64(array) {
             (num3 >>> 6)] + table[num3 & 0b111111];
     }
     const lastByte = length - i;
-    if(lastByte === 1) {
+    if (lastByte === 1) {
         const lastNum1 = array[i];
         base64Str += table[lastNum1 >>> 2] + table[((lastNum1 & 0b11) << 4)] + '==';
-    } else if(lastByte === 2){
+    } else if (lastByte === 2) {
         const lastNum1 = array[i];
         const lastNum2 = array[i + 1];
         base64Str += table[lastNum1 >>> 2] + table[((lastNum1 & 0b11) << 4) | (lastNum2 >>> 4)] + table[(lastNum2 & 
@@ -150,7 +150,7 @@ export default {
         this.log('getFaParam:' + JSON.stringify(data))
         //        const data = dmClas icationParam:' + JSON.stringify(data))
         // Authentication type, 1 for pin code.
-        if(data&&!data.FaType){
+        if (data && !data.FaType) {
             return;
         }
         if (data && data.FaType == 1) {

@@ -145,8 +145,8 @@ ON_IPC_SET_REQUEST(SERVER_PUBLISH_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mess
     }
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::static_pointer_cast<IpcNotifyPublishResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    int32_t publishId   = pReq->GetPublishId();
-    int32_t result      = pReq->GetResult();
+    int32_t publishId = pReq->GetPublishId();
+    int32_t result = pReq->GetResult();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;

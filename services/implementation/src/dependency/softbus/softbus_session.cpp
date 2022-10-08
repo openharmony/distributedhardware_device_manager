@@ -97,7 +97,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_TYPE];
-    LOGI("AuthMessageProcessor::ParseAuthRequestMessage  msgType = %d", msgType);
+    LOGI("AuthMessageProcessor::ParseAuthRequestMessage msgType = %d", msgType);
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SoftbusSession::SendData Start encryption");
     }

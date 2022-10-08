@@ -244,7 +244,7 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
         LOGE("DmCredentialManager::RegisterCredentialCallback input param is empty");
         return ERR_DM_FAILED;
     }
-    LOGI("DmCredentialManager::RegisterCredentialCallback pkgName=%s",
+    LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %s",
         GetAnonyString(pkgName).c_str());
     credentialVec_.push_back(pkgName);
     return hiChainConnector_->RegisterHiChainGroupCallback(std::shared_ptr<IDmGroupResCallback>(shared_from_this()));
@@ -256,7 +256,7 @@ int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkg
         LOGE("DmCredentialManager::UnRegisterCredentialStateCallback input param is empty");
         return ERR_DM_FAILED;
     }
-    LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName=%s",
+    LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName = %s",
         GetAnonyString(pkgName).c_str());
     std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);
     if (iter != credentialVec_.end()) {

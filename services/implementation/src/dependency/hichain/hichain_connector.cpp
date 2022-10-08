@@ -604,7 +604,7 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
         LOGE("failed to get device join groups");
         return ERR_DM_FAILED;
     }
-    LOGI("HiChainConnector::DeleteGroup groupList count=%d", groupList.size());
+    LOGI("HiChainConnector::DeleteGroup groupList count = %d", groupList.size());
     bool userIsExist = false;
     std::string groupId = "";
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
@@ -615,7 +615,7 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
         }
     }
     if (!userIsExist) {
-        LOGE(" input userId is exist in groupList!");
+        LOGE("input userId is exist in groupList!");
         return ERR_DM_FAILED;
     }
     jsonObj[FIELD_GROUP_ID] = groupId;
@@ -830,7 +830,7 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
 
     int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId, DM_PKG_NAME, addParams.c_str());
     if (ret!= DM_OK) {
-        LOGE("HiChainConnector::addMultiMemberstoGroup failure! ret=%d", ret);
+        LOGE("HiChainConnector::addMultiMemberstoGroup failure! ret = %d", ret);
         return ret;
     }
     return DM_OK;
@@ -853,7 +853,7 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
 
     int32_t ret = deviceGroupManager_->delMultiMembersFromGroup(osAccountUserId, DM_PKG_NAME, deleteParams.c_str());
     if (ret != DM_OK) {
-        LOGE("HiChainConnector::deleteMultiMembers failure!, ret=%d", ret);
+        LOGE("HiChainConnector::deleteMultiMembers failure!, ret = %d", ret);
         return ret;
     }
     return DM_OK;
