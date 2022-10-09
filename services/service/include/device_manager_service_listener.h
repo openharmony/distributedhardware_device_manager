@@ -49,7 +49,7 @@ public:
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
                             const std::string &flag);
 
-    void OnFaCall(std::string &pkgName, std::string &paramJson);
+    void OnUiCall(std::string &pkgName, std::string &paramJson);
 
     void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo);
 private:

@@ -47,7 +47,6 @@ const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 4;
 const int32_t DM_AUTH_TYPE_MIN = 1;
-const int32_t BUSINESS_FA_MIRGRATION = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 
 constexpr const char* APP_NAME_KEY = "appName";
@@ -55,6 +54,7 @@ constexpr const char* APP_ICON_KEY = "appIcon";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* APP_DESCRIPTION_KEY = "appDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
+constexpr const char* VERIFY_FAILED = "verifyFailed";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -389,7 +389,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
                     [this] (std::string name) {
                         DmAuthManager::HandleAuthenticateTimeout(name);
                     });
-                authPtr_->UpdateAuthInfo(authResponseContext_->pageId);
+                UpdateInputDialogDisplay(true);
             }
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
@@ -655,7 +655,7 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
-            authPtr_->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
+            UpdateInputDialogDisplay(false);
         }
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -678,7 +678,7 @@ void DmAuthManager::AuthenticateFinish()
         }
         if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
             authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
-            authPtr_->CloseAuthInfo(authResponseContext_->pageId, shared_from_this());
+            UpdateInputDialogDisplay(false);
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
@@ -702,7 +702,18 @@ void DmAuthManager::CancelDisplay()
     jsonObj[CANCEL_DISPLAY_KEY] = CANCEL_PIN_CODE_DISPLAY;
     std::string paramJson = jsonObj.dump();
     std::string pkgName = "com.ohos.devicemanagerui";
-    listener_->OnFaCall(pkgName, paramJson);
+    listener_->OnUiCall(pkgName, paramJson);
+}
+
+void DmAuthManager::UpdateInputDialogDisplay(bool isShow)
+{
+    LOGI("DmAuthManager::UpdateInputDialogDisplay start");
+    nlohmann::json jsonObj;
+    jsonObj[VERIFY_FAILED] = isShow;
+    jsonObj.dump();
+    std::string paramJson = jsonObj.dump();
+    std::string pkgName = "com.ohos.devicemanagerui";
+    listener_->OnUiCall(pkgName, paramJson);
 }
 
 int32_t DmAuthManager::GeneratePincode()
@@ -810,33 +821,10 @@ void DmAuthManager::ShowStartAuthDialog()
 
 int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 {
-    if (dmAbilityMgr_ == nullptr) {
-        LOGE("dmAbilityMgr_ is nullptr");
-        return ERR_DM_POINT_NULL;
-    }
-
-    if (authResponseContext_ == nullptr) {
-        LOGE("Authenticate is not start");
-        return ERR_DM_AUTH_NOT_START;
-    }
-
-    dmAbilityMgr_->StartAbilityDone();
-    AbilityRole role = dmAbilityMgr_->GetAbilityRole();
-    authParam.direction = (int32_t)role;
-    authParam.authType = AUTH_TYPE_PIN;
-    authParam.authToken = authResponseContext_->token;
-
-    if (role == AbilityRole::ABILITY_ROLE_PASSIVE) {
-        authParam.packageName = authResponseContext_->targetPkgName;
-        authParam.appName = authResponseContext_->appName;
-        authParam.appDescription = authResponseContext_->appDesc;
-        authParam.business = BUSINESS_FA_MIRGRATION;
-        authParam.pincode = authResponseContext_->code;
-    }
     return DM_OK;
 }
 
-int32_t DmAuthManager::OnUserOperation(int32_t action)
+int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("Authenticate is not start");
@@ -852,12 +840,12 @@ int32_t DmAuthManager::OnUserOperation(int32_t action)
             AuthenticateFinish();
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
-            CancelDisplay();
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
-            authRequestContext_->reason = ERR_DM_AUTH_FAILED;
-            authResponseContext_->state = authRequestState_->GetStateType();
-            AuthenticateFinish();
+            SetReasonAndFinish(ERR_DM_INPUT_PARA_INVALID, AuthState::AUTH_REQUEST_JOIN);
+            break;
+        case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
+            AddMember(std::stoi(params));
             break;
         default:
             LOGE("this action id not support");

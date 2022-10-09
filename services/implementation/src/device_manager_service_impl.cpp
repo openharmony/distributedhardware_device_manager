@@ -207,14 +207,16 @@ int32_t DeviceManagerServiceImpl::GetFaParam(std::string &pkgName, DmAuthParam &
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action)
+int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
+    const std::string &params)
 {
-    if (pkgName.empty()) {
-        LOGE("SetUserOperation failed, pkgName is empty");
+    if (pkgName.empty() || params.empty()) {
+        LOGE("DeviceManagerServiceImpl::SetUserOperation error: Invalid parameter, pkgName: %s, extra: %s",
+            pkgName.c_str(), params.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authMgr_ != nullptr) {
-        authMgr_->OnUserOperation(action);
+        authMgr_->OnUserOperation(action, params);
     }
     return DM_OK;
 }

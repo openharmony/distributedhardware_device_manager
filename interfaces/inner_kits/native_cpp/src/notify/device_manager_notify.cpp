@@ -188,10 +188,10 @@ void DeviceManagerNotify::UnRegisterVerifyAuthenticationCallback(const std::stri
 }
 
 void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                          std::shared_ptr<DeviceManagerFaCallback> callback)
+                                                          std::shared_ptr<DeviceManagerUiCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    dmFaCallback_[pkgName] = callback;
+    dmUiCallback_[pkgName] = callback;
 }
 
 void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
@@ -201,7 +201,7 @@ void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &p
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    dmFaCallback_.erase(pkgName);
+    dmUiCallback_.erase(pkgName);
 }
 
 void DeviceManagerNotify::RegisterCredentialCallback(const std::string &pkgName,
@@ -502,24 +502,24 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
     verifyAuthCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
+void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerNotify::OnFaCall error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        LOGE("DeviceManagerNotify::OnUiCall error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnFaCall in, pkgName:%s", pkgName.c_str());
-    std::shared_ptr<DeviceManagerFaCallback> tempCbk;
+    LOGI("DeviceManagerNotify::OnUiCall in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<DeviceManagerUiCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (dmFaCallback_.count(pkgName) == 0) {
-            LOGE("OnFaCall error, dm fa callback not register for pkgName %d.", pkgName.c_str());
+        if (dmUiCallback_.count(pkgName) == 0) {
+            LOGE("OnUiCall error, dm Ui callback not register for pkgName %d.", pkgName.c_str());
             return;
         }
-        tempCbk = dmFaCallback_[pkgName];
+        tempCbk = dmUiCallback_[pkgName];
     }
     if (tempCbk == nullptr) {
-        LOGE("OnFaCall error, registered dm fa callback is nullptr.");
+        LOGE("OnUiCall error, registered dm Ui callback is nullptr.");
         return;
     }
     tempCbk->OnCall(paramJson);

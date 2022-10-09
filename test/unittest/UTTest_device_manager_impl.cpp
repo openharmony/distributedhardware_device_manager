@@ -1873,8 +1873,9 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_001, testing::ext::TestSize.Lev
     std::string packName = "";
     // set authParam null
     int32_t action = 0;
+    const std::string param = "extra";
     // 2. call DeviceManagerImpl::SetUserOperation with parameter
-    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
+    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1896,13 +1897,14 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_002, testing::ext::TestSize.Lev
     std::string packName = "com.ohos.test";
     // set authParam null
     int32_t action = 0;
+    const std::string param = "extra";
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     // 3. call DeviceManagerImpl::SetUserOperation with parameter
-    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
+    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -1925,13 +1927,14 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_003, testing::ext::TestSize.Lev
     std::string packName = "com.ohos.test";
     // set authParam null
     int32_t action = 0;
+    const std::string param = "extra";
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
     // 3. call DeviceManagerImpl::SetUserOperation with parameter
-    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
+    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -1954,13 +1957,14 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_004, testing::ext::TestSize.Lev
     std::string packName = "com.ohos.test";
     // set authParam null
     int32_t action = 0;
+    const std::string param = "extra";
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     // 3. call DeviceManagerImpl::SetUserOperation with parameter
-    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
+    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -1983,13 +1987,14 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_005, testing::ext::TestSize.Lev
     std::string packName = "com.ohos.test";
     // set authParam null
     int32_t action = 0;
+    const std::string param = "extra";
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(ERR_DM_POINT_NULL));
     // 3. call DeviceManagerImpl::SetUserOperation with parameter
-    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action);
+    int32_t ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
@@ -2297,7 +2302,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_001, testing::ex
     // 1. set packName null
     std::string packName = "";
     // set callback null
-    std::shared_ptr<DeviceManagerFaCallback> callback = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::RegisterDeviceManagerFaCallback with parameter
     int32_t ret= DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
@@ -2456,15 +2461,15 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_003, testing::
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     // 4. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 5. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManager UnRegisterDeviceManagerFaCallback with parameter
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     // 7. Get checkMap from pkgName
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap null
     ASSERT_EQ(checkMap, nullptr);
 }
@@ -2495,9 +2500,9 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_004, testing::
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     // 4. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 5. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. set unRegisterPkgNamr different from pkgName
@@ -2505,7 +2510,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_004, testing::
     // 7. call DeviceManager UnRegisterDeviceManagerFaCallback with unRegisterPkgName
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(unRegisterPkgName);
     // 7. Get checkMap from pkgName
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap not null
     ASSERT_NE(checkMap, nullptr);
 }
@@ -2529,9 +2534,9 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_005, testing::
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
     // 2. Set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 4. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 5. Set unRegisterPkgName is different from register pkgName
@@ -2539,7 +2544,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_005, testing::
     // 6. call DeviceManager UnRegisterDeviceManagerFaCallback with parameter
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(unRegisterPkgName);
     // 7. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
 }

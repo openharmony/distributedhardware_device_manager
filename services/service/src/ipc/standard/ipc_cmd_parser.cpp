@@ -531,9 +531,9 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
 {
     std::string packageName = data.ReadString();
     int32_t action = data.ReadInt32();
-    int result = DeviceManagerService::GetInstance().SetUserOperation(packageName, action);
-    if (!reply.WriteInt32(action)) {
-        LOGE("write result failed");
+    std::string params = data.ReadString();
+    int result = DeviceManagerService::GetInstance().SetUserOperation(packageName, action, params);
+    if (!reply.WriteInt32(result)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;

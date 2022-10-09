@@ -79,11 +79,11 @@ public:
                             const std::string &flag);
 
     /**
-     * @tc.name: IDeviceManagerServiceListener::OnFaCall
+     * @tc.name: IDeviceManagerServiceListener::OnUiCall
      * @tc.desc: Fa Call of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnFaCall(std::string &pkgName, std::string &paramJson);
+    virtual void OnUiCall(std::string &pkgName, std::string &paramJson);
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnCredentialResult

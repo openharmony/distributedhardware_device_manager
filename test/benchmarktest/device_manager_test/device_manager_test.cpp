@@ -87,7 +87,8 @@ BENCHMARK_F(DeviceManagerTest, SetUserOperationTestCase)(benchmark::State &state
 {
     while (state.KeepRunning()) {
         int32_t action = 0;
-        int32_t ret = DeviceManager::GetInstance().SetUserOperation(pkgName, action);
+        const std::string params = "extra";
+        int32_t ret = DeviceManager::GetInstance().SetUserOperation(pkgName, action, params);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");
         }

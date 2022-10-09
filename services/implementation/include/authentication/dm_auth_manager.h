@@ -311,6 +311,13 @@ public:
     void CancelDisplay();
 
     /**
+     * @tc.name: DmAuthManager::UpdateInputDialogDisplay
+     * @tc.desc: Update InputDialog Display of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
+    void UpdateInputDialogDisplay(bool isShow);
+
+    /**
      * @tc.name: DmAuthManager::GeneratePincode
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -350,7 +357,7 @@ public:
      * @tc.desc: User Operation of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t OnUserOperation(int32_t action);
+    int32_t OnUserOperation(int32_t action, const std::string &params);
 
     /**
      * @tc.name: DmAuthManager::UserSwitchEventCallback

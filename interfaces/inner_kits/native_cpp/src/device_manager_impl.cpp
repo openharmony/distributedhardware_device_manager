@@ -400,7 +400,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
 }
 
 int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                           std::shared_ptr<DeviceManagerFaCallback> callback)
+                                                           std::shared_ptr<DeviceManagerUiCallback> callback)
 {
     LOGI("DeviceManager::RegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
@@ -476,11 +476,10 @@ int32_t DeviceManagerImpl::GetFaParam(const std::string &pkgName, DmAuthParam &d
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t action)
+int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t action, const std::string &params)
 {
-    LOGI("DeviceManager::SetUserOperation start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || params.empty()) {
+        LOGE("DeviceManager::SetUserOperation start, pkgName: %s, params: %s", pkgName.c_str(), params.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -488,6 +487,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetOperation(action);
+    req->SetParams(params);
 
     if (ipcClientProxy_->SendRequest(SERVER_USER_AUTH_OPERATION, req, rsp) != DM_OK) {
         return ERR_DM_IPC_SEND_REQUEST_FAILED;

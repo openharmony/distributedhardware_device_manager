@@ -45,7 +45,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
     ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
-    ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType);
+    ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, extra);
     ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
     ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
     ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);

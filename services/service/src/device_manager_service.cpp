@@ -243,17 +243,18 @@ int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &auth
     return dmServiceImpl_->GetFaParam(pkgName, authParam);
 }
 
-int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action)
+int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || params.empty()) {
+        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str(),
+            params.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->SetUserOperation(pkgName, action);
+    return dmServiceImpl_->SetUserOperation(pkgName, action, params);
 }
 
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
