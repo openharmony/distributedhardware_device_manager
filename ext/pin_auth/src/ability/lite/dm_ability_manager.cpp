@@ -20,7 +20,7 @@ namespace DistributedHardware {
 AbilityStatus DmAbilityManager::StartAbility(AAFwk::Want &want)
 {
     // not support for L1 yet, do nothing. just save status and role
-    return AbilityStatus::ABILITY_STATUS_SUCCESS;;
+    return AbilityStatus::ABILITY_STATUS_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
