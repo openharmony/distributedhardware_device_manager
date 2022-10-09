@@ -133,7 +133,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGI("GetTrustedDeviceList error, failed ret: %d", ret);
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
 
     deviceList = rsp->GetDeviceVec();
@@ -359,7 +359,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("AuthenticateDevice error: Failed with ret %d", ret);
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     DmTraceEnd();
     LOGI("AuthenticateDevice completed, pkgName: %s", pkgName.c_str());
@@ -388,7 +388,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
         LOGE("UnAuthenticateDevice error: Failed with ret %d", ret);
         SysEventWrite(std::string(UNAUTHENTICATE_DEVICE_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(UNAUTHENTICATE_DEVICE_FAILED_MSG));
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     SysEventWrite(std::string(UNAUTHENTICATE_DEVICE_SUCCESS), DM_HISYEVENT_BEHAVIOR,
         std::string(UNAUTHENTICATE_DEVICE_SUCCESS_MSG));
