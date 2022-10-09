@@ -1995,7 +1995,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][subscribeId];
     ASSERT_EQ(checkMap4, nullptr);
     // 5. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
-    std::string testPkgNamemUiCallback = "";
+    std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(testPkgName);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];

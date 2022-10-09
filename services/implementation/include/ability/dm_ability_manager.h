@@ -28,7 +28,7 @@ namespace OHOS {
 namespace DistributedHardware {
 enum AbilityStatus { ABILITY_STATUS_FAILED = 0, ABILITY_STATUS_SUCCESS = 1, ABILITY_STATUS_START = 2 };
 
-enum SeaAction {
+enum UiAction {
     USER_OPERATION_TYPE_ALLOW_AUTH = 0,
     USER_OPERATION_TYPE_CANCEL_AUTH = 1,
     USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT = 2,
