@@ -45,8 +45,29 @@ public:
         action_ = action;
     }
 
+    /**
+     * @tc.name: IpcGetOperationReq::GetParams
+     * @tc.desc: Ipc Get Params Request Get Params
+     * @tc.type: FUNC
+     */
+    const std::string &GetParams() const
+    {
+        return extra_;
+    }
+
+    /**
+     * @tc.name: IpcGetOperationReq::SetParams
+     * @tc.desc: Ipc Set Params Request Set Params
+     * @tc.type: FUNC
+     */
+    void SetParams(const std::string &extra)
+    {
+        extra_ = extra;
+    }
+
 private:
     int32_t action_ { 0 };
+    std::string extra_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

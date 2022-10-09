@@ -31,11 +31,12 @@ void SetUserOperationFuzzTest(const uint8_t* data, size_t size)
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     int32_t action = *(reinterpret_cast<const int32_t*>(data));
+    const std::string params = "extra";
 
     if (pkgName.empty()) {
         return;
     }
-    DeviceManager::GetInstance().SetUserOperation(pkgName, action);
+    DeviceManager::GetInstance().SetUserOperation(pkgName, action, params);
 }
 }
 }

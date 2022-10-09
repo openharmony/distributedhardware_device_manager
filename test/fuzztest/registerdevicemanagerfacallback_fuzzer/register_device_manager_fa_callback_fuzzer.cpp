@@ -29,9 +29,9 @@ namespace {
     constexpr uint32_t SLEEP_TIME_US = 10 * 1000;
 }
 
-class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
+class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
-    DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}
+    DeviceManagerFaCallbackTest() : DeviceManagerUiCallback() {}
     virtual ~DeviceManagerFaCallbackTest() override {}
     virtual void OnCall(const std::string &paramJson) override {}
 };

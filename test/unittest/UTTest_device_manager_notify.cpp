@@ -1995,7 +1995,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][subscribeId];
     ASSERT_EQ(checkMap4, nullptr);
     // 5. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
-    std::string testPkgName = "";
+    std::string testPkgNamemUiCallback = "";
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(testPkgName);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
@@ -2017,7 +2017,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
  * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
  * EnvConditions: RegisterDeviceManagerFaCallback success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
@@ -2027,15 +2027,15 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_001, testing::
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
 }
@@ -2047,7 +2047,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_001, testing::
  * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
  * EnvConditions: N/A.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback null
+ *                     set dmUiCallback_ null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
@@ -2058,13 +2058,13 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_002, testing::
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback null
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = nullptr;
     // 2. set checkMap not null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap null
     ASSERT_EQ(checkMap, nullptr);
 }
@@ -2076,7 +2076,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_002, testing::
  * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
  * EnvConditions: N/A.
  * CaseDescription: 1. set pkgName com.ohos.test
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. set testpkcName com.ohos.test1
  *                  4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
@@ -2088,15 +2088,15 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_003, testing::
     // 1. set pkgName com.ohos.test
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = nullptr;
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. set testpkcName com.ohos.test1
     std::string testPkgName = "com.ohos.test1";
     // 4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[testPkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[testPkgName];
     // 6. check checkMap not null
     ASSERT_EQ(checkMap, nullptr);
 }
@@ -2108,7 +2108,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_003, testing::
  * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
  * EnvConditions: RegisterDeviceManagerFaCallback success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
@@ -2118,15 +2118,15 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_004, testing::
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call checkMap OnCall
@@ -2142,7 +2142,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_004, testing::
  * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
  * EnvConditions: N/A.
  * CaseDescription: 1. set pkgName com.ohos.test
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. set testpkcName com.ohos.test1
  *                  4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
@@ -2155,15 +2155,15 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_005, testing::
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. set testpkcName com.ohos.test1
     std::string testPkgName = "com.ohos.test1";
     // 4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[testPkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[testPkgName];
     // 6. check checkMap not null
     if (checkMap == nullptr) {
         ASSERT_NE(count, 1);
@@ -2179,7 +2179,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_005, testing::
  * FunctionPoints: DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback
  * EnvConditions: UnRegisterDeviceManagerFaCallback success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
@@ -2194,19 +2194,19 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_001, testing
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback with parameter
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     // 7. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap null
     ASSERT_EQ(checkMap, nullptr);
 }
@@ -2232,15 +2232,15 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_002, testing
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify RegisterDeathRecipientCallback
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. set testpkcName com.ohos.test1
@@ -2248,7 +2248,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_002, testing
     // 7. call DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback with testpkcName
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(testPkgName);
     // 8. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap not null
     ASSERT_NE(checkMap, nullptr);
 }
@@ -2274,15 +2274,15 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_003, testing
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify RegisterDeathRecipientCallback
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. set testpkcName com.ohos.test1
@@ -2290,7 +2290,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_003, testing
     // 7. call DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback with testpkcName
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(testPkgName);
     // 8. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 9. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 10. call checkMap OnCall
@@ -2306,7 +2306,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_003, testing
  * FunctionPoints: DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback
  * EnvConditions: UnRegisterDeviceManagerFaCallback success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
@@ -2321,19 +2321,19 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_004, testing
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback with parameter
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     // 7. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap null
     if (checkMap == nullptr) {
         ASSERT_NE(count, 1);
@@ -2363,15 +2363,15 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_005, testing
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify RegisterDeathRecipientCallback
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. set testpkcName com.ohos.test1
@@ -2379,7 +2379,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_005, testing
     // 7. call DeviceManagerNotifyTest UnRegisterDeviceManagerFaCallback with testpkcName
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(testPkgName);
     // 8. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 9. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 10. call checkMap OnCall
@@ -4340,191 +4340,191 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthResult7, testing::ext::TestSize.Level0)
 }
 
 /*
- * Feature: DeviceManagerNotifyTest OnFaCall
+ * Feature: DeviceManagerNotifyTest OnUiCall
  * Function: DeviceManagerNotifyTest
- * SubFunction: OnFaCall
- * FunctionPoints: DeviceManagerNotifyTest OnFaCall
- * EnvConditions: OnFaCall success.
+ * SubFunction: OnUiCall
+ * FunctionPoints: DeviceManagerNotifyTest OnUiCall
+ * EnvConditions: OnUiCall success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnFaCall
+ *                  6. call DeviceManagerNotify OnUiCall
  *                  7. check if callback OnCheckAuthResult called
  */
-HWTEST_F(DeviceManagerNotifyTest, OnFaCall1, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall1, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
-    // 6. call DeviceManagerNotify OnFaCall
+    // 6. call DeviceManagerNotify OnUiCall
     std::string paramJson = "trstParamJson";
-    DeviceManagerNotify::GetInstance().OnFaCall(pkgName, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(pkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 1);
 }
 
 /*
- * Feature: DeviceManagerNotifyTest OnFaCall
+ * Feature: DeviceManagerNotifyTest OnUiCall
  * Function: DeviceManagerNotifyTest
- * SubFunction: OnFaCall
- * FunctionPoints: DeviceManagerNotifyTest OnFaCall
- * EnvConditions: OnFaCall success.
+ * SubFunction: OnUiCall
+ * FunctionPoints: DeviceManagerNotifyTest OnUiCall
+ * EnvConditions: OnUiCall success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnFaCall with testPkgName
+ *                  6. call DeviceManagerNotify OnUiCall with testPkgName
  *                  7. check if callback OnCheckAuthResult called
  */
-HWTEST_F(DeviceManagerNotifyTest, OnFaCall2, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall2, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
-    // 6. call DeviceManagerNotify OnFaCall
+    // 6. call DeviceManagerNotify OnUiCall
     std::string testPkgName = "com.ohos.test1";
     std::string paramJson = "trstParamJson";
-    DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 0);
 }
 
 /*
- * Feature: DeviceManagerNotifyTest OnFaCall
+ * Feature: DeviceManagerNotifyTest OnUiCall
  * Function: DeviceManagerNotifyTest
- * SubFunction: OnFaCall
- * FunctionPoints: DeviceManagerNotifyTest OnFaCall
- * EnvConditions: OnFaCall success.
+ * SubFunction: OnUiCall
+ * FunctionPoints: DeviceManagerNotifyTest OnUiCall
+ * EnvConditions: OnUiCall success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnFaCall with testPkgName
+ *                  6. call DeviceManagerNotify OnUiCall with testPkgName
  *                  7. check if callback OnCheckAuthResult called
  */
-HWTEST_F(DeviceManagerNotifyTest, OnFaCall3, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall3, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
-    // 6. call DeviceManagerNotify OnFaCall
+    // 6. call DeviceManagerNotify OnUiCall
     std::string testPkgName = "";
     std::string paramJson = "trstParamJson";
-    DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 0);
 }
 
 /*
- * Feature: DeviceManagerNotifyTest OnFaCall
+ * Feature: DeviceManagerNotifyTest OnUiCall
  * Function: DeviceManagerNotifyTest
- * SubFunction: OnFaCall
- * FunctionPoints: DeviceManagerNotifyTest OnFaCall
- * EnvConditions: OnFaCall success.
+ * SubFunction: OnUiCall
+ * FunctionPoints: DeviceManagerNotifyTest OnUiCall
+ * EnvConditions: OnUiCall success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnFaCall with testPkgName
+ *                  6. call DeviceManagerNotify OnUiCall with testPkgName
  *                  7. check if callback OnCheckAuthResult called
  */
-HWTEST_F(DeviceManagerNotifyTest, OnFaCall4, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall4, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
-    // 6. call DeviceManagerNotify OnFaCall
+    // 6. call DeviceManagerNotify OnUiCall
     std::string testPkgName = "com.ohos.test";
     std::string paramJson = "trstParamJson";
-    DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 1);
 }
 
 /*
- * Feature: DeviceManagerNotifyTest OnFaCall
+ * Feature: DeviceManagerNotifyTest OnUiCall
  * Function: DeviceManagerNotifyTest
- * SubFunction: OnFaCall
- * FunctionPoints: DeviceManagerNotifyTest OnFaCall
- * EnvConditions: OnFaCall success.
+ * SubFunction: OnUiCall
+ * FunctionPoints: DeviceManagerNotifyTest OnUiCall
+ * EnvConditions: OnUiCall success.
  * CaseDescription: 1. set pkgName not null
- *                     set DmFaCallback not null
+ *                     set dmUiCallback_ not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
  *                  5. check checkMap not null
- *                  6. call DeviceManagerNotify OnFaCall with testPkgName
+ *                  6. call DeviceManagerNotify OnUiCall with testPkgName
  *                  7. check if callback OnCheckAuthResult called
  */
-HWTEST_F(DeviceManagerNotifyTest, OnFaCall5, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall5, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
     std::string pkgName = "";
-    // set DmFaCallback not null
+    // set dmUiCallback_ not null
     int count = 0;
-    std::shared_ptr<DeviceManagerFaCallback> DmFaCallback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
-    std::shared_ptr<DeviceManagerFaCallback> checkMap = nullptr;
+    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, DmFaCallback);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmFaCallback_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
-    // 6. call DeviceManagerNotify OnFaCall
+    // 6. call DeviceManagerNotify OnUiCall
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(testPkgName);
     std::string paramJson = "trstParamJson";
-    DeviceManagerNotify::GetInstance().OnFaCall(testPkgName, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(testPkgName, paramJson);
     // 7. check if callback OnCheckAuthResult called
     ASSERT_EQ(count, 0);
 }
@@ -4654,7 +4654,7 @@ void AuthenticateCallbackTest::OnAuthResult(const std::string &deviceId, const s
     *count_ = *count_ + 1;
 }
 
-DeviceManagerFaCallbackTest::DeviceManagerFaCallbackTest(int &count) : DeviceManagerFaCallback()
+DeviceManagerFaCallbackTest::DeviceManagerFaCallbackTest(int &count) : DeviceManagerUiCallback()
 {
     count_ = &count;
 }

@@ -384,7 +384,7 @@ ON_IPC_CMD(SERVER_DEVICE_FA_NOTIFY, IpcIo &reply)
     std::string packagename = (const char *)ReadString(&reply, &len);
     size_t jsonLen = 0;
     std::string paramJson = (const char *)ReadString(&reply, &jsonLen);
-    DeviceManagerNotify::GetInstance().OnFaCall(packagename, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(packagename, paramJson);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

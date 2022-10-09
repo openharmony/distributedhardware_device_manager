@@ -107,7 +107,7 @@ public:
      * @tc.desc: Se tUser Operation of device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t SetUserOperation(std::string &pkgName, int32_t action);
+    virtual int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterDevStateCallback

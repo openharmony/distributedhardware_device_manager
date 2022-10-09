@@ -486,7 +486,8 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.
 {
     std::string pkgName = "com.ohos.test";
     int32_t action = 0;
-    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action);
+    const std::string param = "extra";
+    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -501,7 +502,8 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
 {
     std::string pkgName = "";
     int32_t action = 0;
-    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action);
+    const std::string param = "extra";
+    int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

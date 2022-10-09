@@ -203,12 +203,12 @@ private:
     std::unique_ptr<DmNapiPublishJsCallback> jsCallback_;
 };
 
-class DmNapiDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerFaCallback {
+class DmNapiDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback {
 public:
-    explicit DmNapiDeviceManagerFaCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
+    explicit DmNapiDeviceManagerUiCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceManagerFaCallback() {};
+    virtual ~DmNapiDeviceManagerUiCallback() {};
     void OnCall(const std::string &paramJson) override;
 
 private:
@@ -323,7 +323,7 @@ public:
     void OnPublishResult(int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag);
-    void OnDmfaCall(const std::string &paramJson);
+    void OnDmUiCall(const std::string &paramJson);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
