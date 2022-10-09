@@ -26,7 +26,7 @@ namespace DistributedHardware {
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
-    LOGI("call OnDeviceStateChange, state=%d", state);
+    LOGI("call OnDeviceStateChange, state = %d", state);
     std::list<std::string> pkgNameList = CommandDispatch::GetInstance().GetPkgNameList();
     for (auto pkgName : pkgNameList) {
         DmDeviceState deviceState = static_cast<DmDeviceState>(state);

@@ -30,7 +30,7 @@ namespace DistributedHardware {
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
-    LOGI("OnDeviceStateChange, state=%d", state);
+    LOGI("OnDeviceStateChange, state = %d", state);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 

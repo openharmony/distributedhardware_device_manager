@@ -308,7 +308,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest_001, testing::ext::TestSize.Level0)
 /**
  * @tc.name: SendRequest_002
  * @tc.desc: 1. set req not nullptr
- *              set rsp  nullptr
+ *              set rsp nullptr
  *              set IpcClientProxy ipcClientManager not null
  *           2. call IpcClientProxy SendRequest
  *           3. check ret is ERR_DM_POINT_NULL
@@ -346,7 +346,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest_003, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     // set rsp not nullptr
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    // set pcClientProxy ipcClientManager  null
+    // set pcClientProxy ipcClientManager null
     std::shared_ptr<IpcClient> ipcClientManager = nullptr;
     // 2. call IpcClientProxy SendRequest
     std::shared_ptr<IpcClientProxy> ipcClientProxy = std::make_shared<IpcClientProxy>(ipcClientManager);
@@ -358,7 +358,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest_003, testing::ext::TestSize.Level0)
 /**
  * @tc.name: SendRequest_004
  * @tc.desc: 1. set req not nullptr
- *              set rsp  not nullptr
+ *              set rsp not nullptr
  *           2. Mock IpcClient SendRequest return ERR_DM_FAILED
  *           3. call IpcClientProxy SendRequest
  *           4. check ret is ERR_DM_FAILED
@@ -369,7 +369,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest_004, testing::ext::TestSize.Level0)
 {
     // 1. set req not nullptr
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp  not nullptr
+    // set rsp not nullptr
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. Mock IpcClient SendRequest return ERR_DM_FAILED
     std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();
@@ -386,7 +386,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest_004, testing::ext::TestSize.Level0)
 /**
  * @tc.name: SendRequest_004
  * @tc.desc: 1. set req not nullptr
- *              set rsp  not nullptr
+ *              set rsp not nullptr
  *           2. Mock IpcClient SendRequest return DM_OK
  *           3. call IpcClientProxy SendRequest
  *           4. check ret is DM_OK
@@ -397,7 +397,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest5, testing::ext::TestSize.Level0)
 {
     // 1. set req not nullptr
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp  not nullptr
+    // set rsp not nullptr
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. Mock IpcClient SendRequest return ERR_DM_FAILED
     std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();
@@ -414,7 +414,7 @@ HWTEST_F(IpcClientProxyTest, SendRequest5, testing::ext::TestSize.Level0)
 /**
  * @tc.name: OnDmServiceDied_001
  * @tc.desc: 1. set req not nullptr
- *              set rsp  not nullptr
+ *              set rsp not nullptr
  *           2. Mock IpcClient OnDmServiceDied return ERR_DM_POINT_NULL
  *           3. call IpcClientProxy OnDmServiceDied
  *           4. check ret is ERR_DM_POINT_NULL
@@ -424,7 +424,7 @@ HWTEST_F(IpcClientProxyTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
 {
     // 1. set req not nullptr
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp  not nullptr
+    // set rsp not nullptr
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. Mock IpcClient OnDmServiceDied return ERR_DM_POINT_NULL
     std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();
@@ -440,7 +440,7 @@ HWTEST_F(IpcClientProxyTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
 /**
  * @tc.name: OnDmServiceDied_002
  * @tc.desc: 1. set req not nullptr
- *              set rsp  not nullptr
+ *              set rsp not nullptr
  *           2. Mock IpcClient OnDmServiceDied return DM_OK
  *           3. call IpcClientProxy OnDmServiceDied
  *           4. check ret is DM_OK
@@ -450,7 +450,7 @@ HWTEST_F(IpcClientProxyTest, OnDmServiceDied_002, testing::ext::TestSize.Level0)
 {
     // 1. set req not nullptr
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp  not nullptr
+    // set rsp not nullptr
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. Mock IpcClient OnDmServiceDied return DM_OK
     std::shared_ptr<MockIpcClient> mockInstance = std::make_shared<MockIpcClient>();

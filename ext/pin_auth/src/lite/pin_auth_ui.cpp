@@ -38,7 +38,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
     LOGI("InputPinDialog start");
     std::shared_ptr<DmAbilityManager> dmAbilityManager_ = std::make_shared<DmAbilityManager>();
     if (dmAbilityManager_ == nullptr) {
-        LOGE("PinAuthUi::dmAbilityManager is null");
+        LOGE("PinAuthUi::dmAbilityManager dmAbilityManager_ is null");
         return ERR_DM_FAILED;
     }
     LOGI("InputPinDialog end");

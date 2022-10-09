@@ -322,7 +322,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestS
 
 /**
  * @tc.name: UnAuthenticateDevice_003
- * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId  null ，The return
+ * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId null ，The return
  * value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -337,7 +337,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
 
 /**
  * @tc.name: VerifyAuthentication_001
- * @tc.desc: Set intFlag for VerifyAuthentication to false and  set authParam = "jdjjjj"，The return value is
+ * @tc.desc: Set intFlag for VerifyAuthentication to false and set authParam = "jdjjjj"，The return value is
  * ERR_DM_AUTH_NOT_START
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK

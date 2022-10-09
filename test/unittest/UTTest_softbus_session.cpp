@@ -46,7 +46,7 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
 
 /**
  * @tc.name: OpenAuthSession_001
- * @tc.desc: set  deviceId =null, return sessionId(1)
+ * @tc.desc: set deviceId =null, return sessionId(1)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -86,7 +86,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SendData_002
- * @tc.desc: set sessionId = 0 ,go to the SendBytes'smaster and return ERR_DM_FAILED
+ * @tc.desc: set sessionId = 0, go to the SendBytes'smaster and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -143,7 +143,7 @@ HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0
 
 /**
  * @tc.name: GetPeerDeviceId_001
- * @tc.desc: set  sessionId = 3 and return DM_OK
+ * @tc.desc: set sessionId = 3 and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -157,7 +157,7 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: RegisterSessionCallback_001
- * @tc.desc: set  info to null and return DM_OK
+ * @tc.desc: set info to null and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -170,7 +170,7 @@ HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize
 
 /**
  * @tc.name: UnRegisterSessionCallback_001
- * @tc.desc: set  info to null and return ERR_DM_FAILED
+ * @tc.desc: set info to null and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

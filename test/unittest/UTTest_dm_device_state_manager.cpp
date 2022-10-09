@@ -55,7 +55,7 @@ std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
 
 /**
  * @tc.name: DmDeviceStateManager_001
- * @tc.desc: set DmDeviceStateManager to tne new pointer,and it's not nullptr
+ * @tc.desc: set DmDeviceStateManager to tne new pointer, and it's not nullptr
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -112,7 +112,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Le
  */
 HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName  = "111";
+    std::string pkgName = "111";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
     dmDeviceStateManager->OnDeviceChanged(pkgName, info);
@@ -155,7 +155,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: OnDeviceReady_001
- * @tc.desc: set info.deviceId to 123,and call OnDeviceReady ，change info.deviceId to 4
+ * @tc.desc: set info.deviceId to 123, and call OnDeviceReady ，change info.deviceId to 4
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -179,7 +179,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceReady_001, testing::ext::TestSize.Lev
 
 /**
  * @tc.name: OnDeviceChanged_002
- * @tc.desc: set info.deviceId to 123,and call OnDeviceChanged ，change info.deviceId to 4
+ * @tc.desc: set info.deviceId to 123, and call OnDeviceChanged ，change info.deviceId to 4
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -203,7 +203,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
 
 /**
  * @tc.name: RegisterSoftbusStateCallback_001
- * @tc.desc: call  RegisterSoftbusStateCallback and return DM_OK
+ * @tc.desc: call RegisterSoftbusStateCallback and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */

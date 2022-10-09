@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DmPublishContext {
-    std::string   pkgName;
+    std::string pkgName;
     DmPublishInfo publishInfo;
 } DmPublishContext;
 

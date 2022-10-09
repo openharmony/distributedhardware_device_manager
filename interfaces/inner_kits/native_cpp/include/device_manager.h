@@ -156,14 +156,14 @@ public:
      */
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
    /**
-     * @brief  Unregister device status callback
+     * @brief Unregister device status callback
      * @param pkgName package name
      * @param extra extra info.This parameter can be null.
      * @return return 0 if success
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
     /**
-     * @brief  Unregister device status callback
+     * @brief Unregister device status callback
      * @param pkgName package name
      * @param extra extra info.This parameter can be null.
      * @return return 0 if success

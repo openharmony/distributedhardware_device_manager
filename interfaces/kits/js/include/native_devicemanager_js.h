@@ -96,8 +96,8 @@ struct DmNapiStateJsCallback {
 
 struct DmNapiPublishJsCallback {
     std::string bundleName_;
-    int32_t     publishId_;
-    int32_t     reason_;
+    int32_t publishId_;
+    int32_t reason_;
 
     DmNapiPublishJsCallback(std::string bundleName, int32_t publishId, int32_t reason)
         : bundleName_(bundleName), publishId_(publishId), reason_(reason) {}

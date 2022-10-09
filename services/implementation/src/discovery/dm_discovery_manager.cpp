@@ -106,7 +106,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
 
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("DmDiscoveryManager::OnDeviceFound deviceId=%s", GetAnonyString(info.deviceId).c_str());
+    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
     auto iter = discoveryContextMap_.find(pkgName);
     if (iter == discoveryContextMap_.end()) {
         LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
@@ -115,7 +115,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
-    filterPara.range    = info.range;
+    filterPara.range = info.range;
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
     }
@@ -124,14 +124,14 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
 
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)
 {
-    LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId=%d reason=%d", subscribeId, failedReason);
+    LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId = %d reason = %d", subscribeId, failedReason);
     StopDeviceDiscovery(pkgName, (uint32_t)subscribeId);
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, failedReason);
 }
 
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
-    LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId=%d", subscribeId);
+    LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId = %d", subscribeId);
     discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
