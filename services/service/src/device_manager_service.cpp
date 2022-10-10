@@ -86,7 +86,8 @@ void DeviceManagerService::UninitDMServiceListener()
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    LOGI("DeviceManagerService::GetTrustedDeviceList begin for pkgName = %s, extra = %s", pkgName.c_str(), extra.c_str());
+    LOGI("DeviceManagerService::GetTrustedDeviceList begin for pkgName = %s, extra = %s", pkgName.c_str(),
+        extra.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -135,7 +136,8 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                    const std::string &extra)
 {
-    LOGI("DeviceManagerService::StartDeviceDiscovery begin for pkgName = %s, extra = %s", pkgName.c_str(), extra.c_str());
+    LOGI("DeviceManagerService::StartDeviceDiscovery begin for pkgName = %s, extra = %s", pkgName.c_str(),
+        extra.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
