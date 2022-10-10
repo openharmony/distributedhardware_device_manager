@@ -475,29 +475,42 @@ declare namespace deviceManager {
     verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void;
 
     /**
-     * Set user Operation from devicemanager Sea, this interface can only used by devicemanager Sea.
+     * Set user Operation from devicemanager ui, this interface can only be used by devicemanager ui.
      *
+     * @since 9
      * @param operateAction User Operation Actions.
+     * @parm operateAction = 0 - allow authentication
+     * @parm operateAction = 1 - cancel authentication
+     * @parm operateAction = 2 - user operation timeout for authentication confirm
+     * @parm operateAction = 3 - cancel pincode display
+     * @parm operateAction = 4 - cancel pincode input
+     * @parm operateAction = 5 - confirm pincode input
+     * @param params Indicates the input param of the user.
+     * @throws {BusinessError} 401 - Input parameter error.
      * @systemapi this method can be used only by system applications.
      */  
     setUserOperation(operateAction: number, params: string): void;
 
     /**
-     * Register a callback from deviceManager service so that the devicemanager Sea can be notified when some events happen.
-     * this interface can only used by devicemanager Sea.
-     *
-     * @param callback for devicemanager Sea to register.
-     * @systemapi this method can be used only by system applications.
-     */
-    on(type: 'seaStatueChange', callback: Callback<{ param: string}>): void;
+    * Register a callback from deviceManager service so that the devicemanager ui can be notified when ui statue
+    * changes.
+    *
+    * @since 9
+    * @param callback Indicates the devicemanager ui state to register.
+    * @throws {BusinessError} 401 - Input parameter error.
+    * @systemapi this method can be used only by system applications.
+    */
+    on(type: 'uiStateChange', callback: Callback<{ param: string}>): void;
 
     /**
-      * UnRegister dmSeaCallback, this interface can only used by devicemanager Sea.
-      *
-      * @param callback for devicemanager Sea to register.
-      * @systemapi this method can be used only by system applications.
-      */
-    off(type: 'seaStatueChange', callback?: Callback<{ param: string}>): void;
+     * Unregister uiStatueChange, this interface can only be used by devicemanager ui.
+     *
+     * @since 9
+     * @param callback Indicates the devicemanager ui state to unregister.
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @systemapi this method can be used only by system applications.
+     */
+    off(type: 'uiStateChange', callback?: Callback<{ param: string}>): void;
 
     /**
      * Register a device state callback so that the application can be notified upon device state changes based on

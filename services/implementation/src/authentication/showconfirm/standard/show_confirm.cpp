@@ -43,7 +43,7 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
     }
     AbilityStatus status = dmAbilityMgr->StartAbility();
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("ShowConfirm::startFaservice timeout");
+        LOGE("ShowConfirm::start ui service success");
         return;
     }
     LOGI("ShowConfirm hap end");

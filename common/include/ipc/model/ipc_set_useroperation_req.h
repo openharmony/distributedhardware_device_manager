@@ -52,7 +52,7 @@ public:
      */
     const std::string &GetParams() const
     {
-        return extra_;
+        return params_;
     }
 
     /**
@@ -60,14 +60,14 @@ public:
      * @tc.desc: Ipc Set Params Request Set Params
      * @tc.type: FUNC
      */
-    void SetParams(const std::string &extra)
+    void SetParams(const std::string &params)
     {
-        extra_ = extra;
+        params_ = params;
     }
 
 private:
     int32_t action_ { 0 };
-    std::string extra_;
+    std::string params_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
