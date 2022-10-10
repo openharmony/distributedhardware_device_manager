@@ -65,9 +65,9 @@ public:
     virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
 };
 
-class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
+class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
-    DeviceManagerFaCallbackTest() : DeviceManagerFaCallback() {}
+    DeviceManagerFaCallbackTest() : DeviceManagerUiCallback() {}
     virtual ~DeviceManagerFaCallbackTest() override {}
     virtual void OnCall(const std::string &paramJson) override {}
 };

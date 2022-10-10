@@ -193,17 +193,17 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
 }
 
 /**
- * @tc.name: OnFaCall_001
- * @tc.desc: OnFaCall, construct a dummy listener, pass in pkgName, paramJson
+ * @tc.name: OnUiCall_001
+ * @tc.desc: OnUiCall, construct a dummy listener, pass in pkgName, paramJson
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnFaCall_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
     std::string paramJson = "ahaha";
-    listener_->OnFaCall(pkgName, paramJson);
+    listener_->OnUiCall(pkgName, paramJson);
 }
 } // namespace
 } // namespace DistributedHardware

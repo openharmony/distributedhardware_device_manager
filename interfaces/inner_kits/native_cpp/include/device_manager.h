@@ -124,7 +124,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
-        std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
+        std::shared_ptr<DeviceManagerUiCallback> callback) = 0;
     /**
      * @tc.name: DeviceManagerImpl::UnRegisterDeviceManagerFaCallback
      * @tc.desc: Unregister Fa callback for device manager
@@ -142,7 +142,7 @@ public:
      * @tc.desc: Set User Actions
      * @tc.type: FUNC
      */
-    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) = 0;
+    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action, const std::string &params) = 0;
     /**
      * @tc.name: DeviceManagerImpl::GetUdidByNetworkId
      * @tc.desc: Get Udid by NetworkId

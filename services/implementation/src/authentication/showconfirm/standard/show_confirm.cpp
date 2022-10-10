@@ -36,29 +36,17 @@ ShowConfirm::~ShowConfirm()
 void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
                                     std::shared_ptr<DmAbilityManager> dmAbilityMgr)
 {
-#ifdef SUPPORT_GRAPHICS
-    LOGI("ShowConfirm ace start");
-    if (authManager == nullptr) {
+    LOGI("ShowConfirm hap start");
+    if (dmAbilityMgr == nullptr) {
         LOGE("ShowConfirm::dmAbilityManager is null");
         return;
     }
-    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
-        "config_dialog_service",
-        params,
-        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
-        ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
-        [authManager](int32_t id, const std::string& event, const std::string& params) {
-            if (params == std::string(EVENT_INIT_CODE)) {
-                LOGI("Dialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
-                authManager->SetPageId(id);
-            } else {
-                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-                LOGI("CancelDialog start id:%d,event:%s,params:%s", id, event.c_str(), params.c_str());
-                authManager->StartAuthProcess(std::stoi(params));
-            }
-        });
-    LOGI("ShowConfirm ace end");
-#endif
+    AbilityStatus status = dmAbilityMgr->StartAbility();
+    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
+        LOGE("ShowConfirm::start ui service success");
+        return;
+    }
+    LOGI("ShowConfirm hap end");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

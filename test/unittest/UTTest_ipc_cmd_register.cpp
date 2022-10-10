@@ -977,7 +977,7 @@ ON_IPC_CMD(SERVER_DEVICE_FA_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
     std::string packagename = data.ReadString();
     std::string paramJson = data.ReadString();
-    DeviceManagerNotify::GetInstance().OnFaCall(packagename, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(packagename, paramJson);
     if (!reply.WriteInt32(DM_OK)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }

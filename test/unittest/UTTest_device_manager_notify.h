@@ -89,7 +89,7 @@ private:
     int *count_ = nullptr;
 };
 
-class DeviceManagerFaCallbackTest : public DeviceManagerFaCallback {
+class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
     explicit DeviceManagerFaCallbackTest(int &count);
     virtual ~DeviceManagerFaCallbackTest() override {}

@@ -38,9 +38,9 @@ void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<D
         LOGE("ShowConfirm::dmAbilityManager is null");
         return;
     }
-    AbilityStatus status = dmAbilityMgr->StartAbility(AbilityRole::ABILITY_ROLE_PASSIVE);
+    AbilityStatus status = dmAbilityMgr->StartAbility();
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("ShowConfirm::startFaservice timeout");
+        LOGE("ShowConfirm::start ui service success");
         return;
     }
     LOGI("ShowConfirm hap end");
