@@ -479,12 +479,12 @@ declare namespace deviceManager {
      *
      * @since 9
      * @param operateAction User Operation Actions.
-     * @parm operateAction = 0 - allow authentication
-     * @parm operateAction = 1 - cancel authentication
-     * @parm operateAction = 2 - user operation timeout for authentication confirm
-     * @parm operateAction = 3 - cancel pincode display
-     * @parm operateAction = 4 - cancel pincode input
-     * @parm operateAction = 5 - confirm pincode input
+     *        operateAction = 0 - allow authentication
+     *        operateAction = 1 - cancel authentication
+     *        operateAction = 2 - user operation timeout for authentication confirm
+     *        operateAction = 3 - cancel pincode display
+     *        operateAction = 4 - cancel pincode input
+     *        operateAction = 5 - confirm pincode input
      * @param params Indicates the input param of the user.
      * @throws {BusinessError} 401 - Input parameter error.
      * @systemapi this method can be used only by system applications.
