@@ -19,6 +19,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
@@ -386,6 +387,11 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         };
     }
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::LoadHardwareFwkService()
+{
+    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

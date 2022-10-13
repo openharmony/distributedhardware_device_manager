@@ -53,12 +53,13 @@ void IpcServerStub::OnStart()
 
     LOGI("called:AddAbilityListener begin!");
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
     LOGI("called:AddAbilityListener end!");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
+    LOGI("OnAddSystemAbility systemAbilityId:%d added!", systemAbilityId);
     if (SOFTBUS_SERVER_SA_ID == systemAbilityId) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
     }
@@ -66,9 +67,11 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
+    LOGI("OnRemoveSystemAbility systemAbilityId:%d removed!", systemAbilityId);
     if (SOFTBUS_SERVER_SA_ID == systemAbilityId) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
+    } else if (DISTRIBUTED_HARDWARE_SA_ID == systemAbilityId) {
+        DeviceManagerService::GetInstance().LoadHardwareFwkService();
     }
 }
 

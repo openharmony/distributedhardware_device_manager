@@ -444,5 +444,19 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
     }
     return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
 }
+
+void DeviceManagerService::LoadHardwareFwkService()
+{
+    std::string extra;
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = GetTrustedDeviceList(DM_PKG_NAME, extra, deviceList);
+    if (ret != DM_OK) {
+        LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
+        return;
+    }
+    if (deviceList.size() > 0) {
+        dmServiceImpl_->LoadHardwareFwkService();
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
