@@ -1,12 +1,14 @@
 {
   "string": [
     {
-      "name": "entry_MainAbility",
-      "value": "DeviceManagerUI"
-    },
-    {
-      "name": "description_mainability",
-      "value": "JS_Empty Ability"
+      "name": "entry_desc",
+      "value": "description"
     }
-  ]
+  ,{
+      "name": "ServiceExtAbility_desc",
+      "value": "description"
+    },{
+      "name": "ServiceExtAbility_label",
+      "value": "label"
+    }]
 }
