@@ -195,6 +195,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
+
+    /**
+     * @tc.name: DeviceManagerService::LoadHardwareFwkService
+     * @tc.desc: LoadHardwareFwkService
+     * @tc.type: FUNC
+     */
+    virtual void LoadHardwareFwkService();
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
