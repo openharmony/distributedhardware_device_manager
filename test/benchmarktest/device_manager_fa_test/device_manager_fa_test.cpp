@@ -242,11 +242,12 @@ BENCHMARK_F(DeviceDiscoveryTest, StartDeviceDiscoveryTestCase)(
         subInfo.isWakeRemote = false;
         strcpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packageName,
-        subInfo, extra, callback);
+        std::string str;
+        int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packageName, subInfo, str, callback);
         if (ret != DM_OK) {
             state.SkipWithError("StartDeviceDiscoveryTestCase failed.");
         }
+        state.PauseTiming();
         uint16_t subscribeId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         DeviceManager::GetInstance().StopDeviceDiscovery(packageName, subscribeId);
     }
@@ -270,8 +271,9 @@ BENCHMARK_F(DeviceDiscoveryTest, StoptDeviceDiscoveryTestCase)(
         subInfo.isWakeRemote = false;
         strcpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
         std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+        std::string str;
         int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(pkgName,
-        subInfo, extra, callback);
+        subInfo, str, callback);
         if (ret != DM_OK) {
             state.SkipWithError("StopDeviceDiscoveryTestCase failed.");
         }
