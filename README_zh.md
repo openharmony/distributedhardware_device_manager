@@ -133,6 +133,24 @@ foundation/distributedhardware/distributedhardware_device_manager
 | createDeviceManager(bundleName: string, callback: AsyncCallback<DeviceManager>): void; | 以异步方法获取DeviceManager实例 |
 | release(): void;                                             | 释放DeviceManager实例           |
 
+- 示例如下
+```js
+dmClass = undefined;
+
+try {
+    // 创建DeviceManager实例：
+    deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
+    if (err) {
+        console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+        return;
+    }
+    console.info("createDeviceManager success, value =" + data);
+    this.dmClass = data;
+    });
+} catch(err) {
+    console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+}
+```
 
 - 系统能力接口：
 
@@ -171,54 +189,47 @@ foundation/distributedhardware/distributedhardware_device_manager
 - 示例如下：
 
 ```js
-// 创建DeviceManager实例：
-deviceManager.createDeviceManager('com.ohos.xxxx', (err, dm) => {
-    this.log("createDeviceManager err:" + JSON.stringify(err) + '  --success:' + JSON.stringify(dm))
-    if (err) return;
-    dmClass = dm;
-    dmClass.on('serviceDie', data => this.log("serviceDie on:" + JSON.stringify(data)))
-});
-
 // 注册/去注册设备上下线监听
-dmClass.on('deviceStateChange', (data) => {
-    this.log("deviceStateChange on:" + JSON.stringify(data));
+this.dmClass.on('deviceStateChange', (data) => {
+    console.log("deviceStateChange on:" + JSON.stringify(data));
     switch (data.action) {
-      case ONLINE:
+        case deviceManager.DeviceStateChangeAction.ONLINE:
         // 设备物理上线状态
-        break;
-      case READY:
+            break;
+        case deviceManager.DeviceStateChangeAction.READY:
         // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
-        break;
-      case OFFLINE:
+            break;
+        case deviceManager.DeviceStateChangeAction.OFFLINE:
         // 设备物理下线状态
-        break;
-      case CHANGE:
+            break;
+        case deviceManager.DeviceStateChangeAction.CHANGE:
         // 设备信息变更
-        break;
-      default:
-        break;
+            break;
+        default:
+            break;
     }
 });
-dmClass.off('deviceStateChange')
-
+this.dmClass.off('deviceStateChange')
 // 查询可信设备列表
-var array = dmClass.getTrustedDeviceListSync();
+var array = this.dmClass.getTrustedDeviceListSync();
 
 // 获取本地设备信息
-var localDeviceInfo = dmClass.getLocalDeviceInfoSync();
+var localDeviceInfo = this.dmClass.getLocalDeviceInfoSync();
 
 // 开始设备发现（发现周边不可信设备）
 var subscribeId = 0;
-dmClass.on('deviceFound', (data) => {
+this.dmClass.on('deviceFound', (data) => {
     if (data == null) {
-        this.log("deviceFound error data=null")
+        console.log("deviceFound error data=null")
         return;
     }
-    this.logList.push("deviceFound:" + JSON.stringify(data));
+    console.logList.push("deviceFound:" + JSON.stringify(data));
 });
-dmClass.on('discoverFail', (data) => {
-    this.log("discoverFail on:" + JSON.stringify(data));
+
+this.dmClass.on('discoverFail', (data) => {
+    console.log("discoverFail on:" + JSON.stringify(data));
 });
+
 subscribeId = Math.floor(Math.random() * 10000 + 1000)
 var info = {
     "subscribeId": subscribeId,
@@ -238,34 +249,51 @@ var filterOptions = {
         }
     ]
 };
-dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
+try {
+    this.dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
+} catch (error) {
+    console.error("startDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 
 // 停止设备发现（需要和startDeviceDiscovery接口配对使用）
-dmClass.stopDeviceDiscovery(subscribeId);
+try {
+    this.dmClass.stopDeviceDiscovery(subscribeId);
+} catch (error) {
+    console.error("stopDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 
 // 开始发布设备发现
 var publishId = 0;
-dmClass.on('publishSuccess', (data) => {
+this.dmClass.on('publishSuccess', (data) => {
     if (data == null) {
-        this.log("publishSuccess error data=null")
+        console.log("publishSuccess error data=null")
         return;
     }
-    this.logList.push("publishSuccess:" + JSON.stringify(data));
+    console.logList.push("publishSuccess:" + JSON.stringify(data));
 });
-dmClass.on('publishFailed', (data) => {
-    this.log("publishFailed on:" + JSON.stringify(data));
+
+this.dmClass.on('publishFailed', (data) => {
+    console.log("publishFailed on:" + JSON.stringify(data));
 });
 publishId = Math.floor(Math.random() * 10000 + 1000)
-var info = {
+let publishIdInfo = {
     "publishId": publishId,
     "mode": 0xAA,
     "freq": 2,
     "ranging": 1
 };
-dmClass.publishDeviceDiscovery(info);
+try {
+    this.dmClass.publishDeviceDiscovery(publishIdInfo);
+} catch (error) {
+    console.error("publishDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 
 // 停止发布设备发现（需要和publishDeviceDiscovery接口配对使用）
-dmClass.unPublishDeviceDiscovery(publishId);
+try {
+    this.dmClass.unPublishDeviceDiscovery(publishId);
+} catch (error) {
+    console.error("unPublishDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 
 // 设备认证
 var deviceInfo ={
@@ -285,19 +313,27 @@ let authParam = {
     "authType": 1,
     "extraInfo": extraInfo
 }
-dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
-    if (err) {
-        this.logList.push("authenticateDevice err:" + JSON.stringify(err));
-        console.info(TAG + "authenticateDevice err:" + JSON.stringify(err));
-        return;
-    }
-    this.logList.push("authenticateDevice result:" + JSON.stringify(data));
-    console.info(TAG + "authenticateDevice result:" + JSON.stringify(data));
-    token = data.pinToken;
-});
+try {
+    this.dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
+        if (err) {
+            console.logList.push("authenticateDevice err:" + JSON.stringify(err));
+            console.info("authenticateDevice err:" + JSON.stringify(err));
+            return;
+        }
+        console.logList.push("authenticateDevice result:" + JSON.stringify(data));
+        console.info("authenticateDevice result:" + JSON.stringify(data));
+        let token = data.pinToken;
+        });
+} catch (error) {
+    console.error("authenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 
-// 设备取消认证
-dmClass.unAuthenticateDevice(this.deviceInfo);
+try {
+    // 设备取消认证
+    this.dmClass.unAuthenticateDevice(this.deviceInfo);
+} catch (error) {
+    console.error("unAuthenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
+}
 ```
 ## 系统弹框FA
 
