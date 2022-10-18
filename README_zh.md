@@ -134,6 +134,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 | release(): void;                                             | 释放DeviceManager实例           |
 
 - 示例如下
+
 ```js
 try {
     // 创建DeviceManager实例：
@@ -184,6 +185,7 @@ try {
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
+
 - 示例如下：
 
 ```js
@@ -192,22 +194,23 @@ this.dmClass.on('deviceStateChange', (data) => {
     console.log("deviceStateChange on:" + JSON.stringify(data));
     switch (data.action) {
         case deviceManager.DeviceStateChangeAction.ONLINE:
-        // 设备物理上线状态
+            // 设备物理上线状态
             break;
         case deviceManager.DeviceStateChangeAction.READY:
-        // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
+            // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
             break;
         case deviceManager.DeviceStateChangeAction.OFFLINE:
-        // 设备物理下线状态
+            // 设备物理下线状态
             break;
         case deviceManager.DeviceStateChangeAction.CHANGE:
-        // 设备信息变更
+            // 设备信息变更
             break;
         default:
             break;
     }
 });
 this.dmClass.off('deviceStateChange')
+
 // 查询可信设备列表
 var array = this.dmClass.getTrustedDeviceListSync();
 
@@ -223,7 +226,6 @@ this.dmClass.on('deviceFound', (data) => {
     }
     console.logList.push("deviceFound:" + JSON.stringify(data));
 });
-
 this.dmClass.on('discoverFail', (data) => {
     console.log("discoverFail on:" + JSON.stringify(data));
 });
