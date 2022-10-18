@@ -312,7 +312,7 @@ let authParam = {
     "extraInfo": extraInfo
 }
 try {
-    this.dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
+    this.dmClass.authenticateDevice(deviceInfo, authParam, (err, data) => {
         if (err) {
             console.logList.push("authenticateDevice err:" + JSON.stringify(err));
             console.info("authenticateDevice err:" + JSON.stringify(err));
@@ -328,7 +328,7 @@ try {
 
 try {
     // 设备取消认证
-    this.dmClass.unAuthenticateDevice(this.deviceInfo);
+    this.dmClass.unAuthenticateDevice(deviceInfo);
 } catch (error) {
     console.error("unAuthenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
 }
