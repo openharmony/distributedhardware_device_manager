@@ -160,34 +160,34 @@ try {
 | 原型                                                         | 描述                 |
 | ------------------------------------------------------------ | -------------------- |
 | getTrustedDeviceListSync(): Array&lt;DeviceInfo&gt;;                                                                                            | 获取信任设备列表 |
-| getTrustedDeviceList(callback:AsyncCallback<Array&lt;DeviceInfo&gt;>): void;                                                                    | 获取信任设备列表 |
-| getTrustedDeviceList(): Promise<Array&lt;DeviceInfo&gt;>;                                                                                       | 获取信任设备列表 |
+| getTrustedDeviceList(callback:AsyncCallback&lt;Array&lt;DeviceInfo&gt;&gt;): void;                                                                    | 获取信任设备列表 |
+| getTrustedDeviceList(): Promise&lt;Array&lt;DeviceInfo&gt;&gt;;                                                                                       | 获取信任设备列表 |
 | getLocalDeviceInfoSync(): DeviceInfo;                        | 获取本地设备信息 |
 | getLocalDeviceInfo(callback:AsyncCallback&lt;DeviceInfo&gt;): void;                                                                             | 获取本地设备信息 |
 | getLocalDeviceInfo(): Promise&lt;DeviceInfo&gt;;                   | 获取本地设备信息 |
-| on(type: 'deviceStateChange', callback: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                         | 设备状态变更回调 |
-| off(type: 'deviceStateChange', callback?: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                       | 取消设备状态变更回调 |
+| on(type: 'deviceStateChange', callback: Callback&lt;{ action: DeviceStateChangeAction, device: DeviceInfo }&gt;): void;                         | 设备状态变更回调 |
+| off(type: 'deviceStateChange', callback?: Callback&lt;{ action: DeviceStateChangeAction, device: DeviceInfo }&gt;): void;                       | 取消设备状态变更回调 |
 | on(type: 'serviceDie', callback: () => void): void;                                                                                       | 服务错误回调 |
 | off(type: 'serviceDie', callback?: () => void): void;                                                                                     | 取消服务错误回调 |
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;    | 开始设备发现         |
 | stopDeviceDiscovery(subscribeId: number): void;              | 停止发现设备         |
-| authenticateDevice(deviceInfo: DeviceInfo, authParam: AuthParam, callback: AsyncCallback<{deviceId: string, pinToken ?: number}>): void; | 设备认证接口         |
+| authenticateDevice(deviceInfo: DeviceInfo, authParam: AuthParam, callback: AsyncCallback&lt;{deviceId: string, pinToken ?: number}&gt;): void; | 设备认证接口         |
 | unAuthenticateDevice(deviceInfo: DeviceInfo): void;          | 解除认证设备         |
 | setUserOperation(operateAction: number, params: string): void;    | 设置用户ui操作行为         |
-| verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void; | 设备认证信息校验     |
+| verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback&lt;{deviceId: string, level: number}&gt;): void; | 设备认证信息校验     |
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo, filterOptions?: string): void;                                                         | 发现周边设备     |
 | publishDeviceDiscovery(publishInfo: PublishInfo): void;                                                                                   | 发布设备发现     |
 | unPublishDeviceDiscovery(publishId: number): void;                                                                                        | 停止发布设备发现 |
-| on(type: 'deviceFound', callback: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 发现设备列表回调     |
-| off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 取消发现设备列表回调 |
-| on(type: 'discoverFail', callback: Callback<{ subscribeId: number, reason: number }>): void; | 发现设备失败回调     |
-| off(type: 'discoverFail', callback?: Callback<{ subscribeId: number, reason: number }>): void; | 取消发现设备失败回调 |
-| on(type: 'publishSuccess', callback: Callback<{ publishId: number }>): void; | 发布设备成功回调     |
-| off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
-| on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
-| off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
-| on(type: 'uiStateChange', callback: Callback<{ param: string}>): void; | ui状态变更回调     |
-| off(type: 'uiStateChange', callback?: Callback<{ param: string}>): void; | 取消ui状态变更回调     |
+| on(type: 'deviceFound', callback: Callback&lt;{ subscribeId: number, device: DeviceInfo }&gt;): void; | 发现设备列表回调     |
+| off(type: 'deviceFound', callback?: Callback&lt;{ subscribeId: number, device: DeviceInfo }&gt;): void; | 取消发现设备列表回调 |
+| on(type: 'discoverFail', callback: Callback&lt;{ subscribeId: number, reason: number }&gt;): void; | 发现设备失败回调     |
+| off(type: 'discoverFail', callback?: Callback&lt;{ subscribeId: number, reason: number }&gt;): void; | 取消发现设备失败回调 |
+| on(type: 'publishSuccess', callback: Callback&lt;{ publishId: number }&gt;): void; | 发布设备成功回调     |
+| off(type: 'publishSuccess', callback?: Callback&lt;{ publishId: number }&gt;): void; | 取消发布设备成功回调 |
+| on(type: 'publishFail', callback: Callback&lt;{ publishId: number, reason: number }&gt;): void; | 发布设备失败回调     |
+| off(type: 'publishFail', callback?: Callback&lt;{ publishId: number, reason: number  }&gt;): void; | 取消发布设备失败回调 |
+| on(type: 'uiStateChange', callback: Callback&lt;{ param: string}&gt;): void; | ui状态变更回调     |
+| off(type: 'uiStateChange', callback?: Callback&lt;{ param: string}&gt;): void; | 取消ui状态变更回调     |
 - 示例如下：
 
 ```js
