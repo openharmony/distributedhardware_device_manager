@@ -119,6 +119,7 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;    | Starts device discovery.        |
 | stopDeviceDiscovery(subscribeId: number): void;              | Stops device discovery.        |
 | authenticateDevice(deviceInfo: DeviceInfo, authparam: AuthParam, callback: AsyncCallback<{deviceId: string, pinTone ?: number}>): void; | Authenticates a device.        |
+| setUserOperation(operateAction: number, params: string): void;    | Set user ui operation behavior         |
 | verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void; | Verifies device authentication information.    |
 | on(type: 'deviceFound', callback: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | Subscribes to discovered device list changes.    |
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | Unsubscribes from discovered device list changes.|
@@ -128,7 +129,8 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | delete unpublish device success |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | publish device fail     |
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number }>): void; | delete unpublish device fail |
-
+| on(type: 'uiStateChange', callback: Callback<{ param: string}>): void; | UI status change callback     |
+| off(type: 'uiStateChange', callback?: Callback<{ param: string}>): void; | Cancel UI status change callback     |
 ## Sample Code
 
 ```
@@ -229,6 +231,26 @@ dmClass.publishDeviceDiscovery(info);
 // unPublish device discovery(used with publishDeviceDiscovery).
 dmClass.unPublishDeviceDiscovery(publishId);
 
+// operateAction User Operation Actions.
+/*  operateAction = 0 - allow authentication
+    operateAction = 1 - cancel authentication
+    operateAction = 2 - user operation timeout for authentication confirm
+    operateAction = 3 - cancel pincode display
+    operateAction = 4 - cancel pincode input
+    operateAction = 5 - confirm pincode input
+*/
+dmClass.setUserOperation(operation, "extra")
+dmClass.on('uiStateChange', (data) => {
+    console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+    var tmpStr = JSON.parse(data.param)
+    this.isShow = tmpStr.verifyFailed
+    console.log("uiStateChange executed, dialog closed" + this.isShow)
+    if (!this.isShow) {
+        this.destruction()
+    }
+});
+dmClass.off('uiStateChange')
+
 // Authenticate a device.
 var deviceInfo ={
     "deviceId": "XXXXXXXX",
@@ -265,9 +287,9 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 
 Only PIN authentication is supported in the current version. To support PIN authentication, an authorization prompt page, a PIN display page, and a PIN input page must be provided.
 
-Currently, the system does not support the dialog box display through the native layer. Therefore, a temporary Feature Ability (FA) is used to display a dialog box.
+Currently, the system does not support the dialog box display through the native layer. Therefore, a temporary ServiceExtensionAbility is used to display a dialog box.
 
-This FA is called **DeviceManager_UI.hap**, which is preset as a system application.
+This ServiceExtensionAbility is called **DeviceManager_UI.hap**, which is preset as a system application.
 
 - Compilation and running
 
