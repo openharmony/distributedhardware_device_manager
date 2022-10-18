@@ -135,8 +135,6 @@ foundation/distributedhardware/distributedhardware_device_manager
 
 - 示例如下
 ```js
-dmClass = undefined;
-
 try {
     // 创建DeviceManager实例：
     deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
