@@ -150,6 +150,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;    | 开始设备发现         |
 | stopDeviceDiscovery(subscribeId: number): void;              | 停止发现设备         |
 | authenticateDevice(deviceInfo: DeviceInfo, authparam: AuthParam, callback: AsyncCallback<{deviceId: string, pinTone ?: number}>): void; | 设备认证接口         |
+| setUserOperation(operateAction: number, params: string): void;    | 设置用户ui操作行为         |
 | verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void; | 设备认证信息校验     |
 | on(type: 'deviceFound', callback: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 发现设备列表回调     |
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 取消发现设备列表回调 |
@@ -159,6 +160,8 @@ foundation/distributedhardware/distributedhardware_device_manager
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | 取消发布设备成功回调 |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | 发布设备失败回调     |
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number  }>): void; | 取消发布设备失败回调 |
+| on(type: 'uiStateChange', callback: Callback<{ param: string}>): void; | ui状态变更回调     |
+| off(type: 'uiStateChange', callback?: Callback<{ param: string}>): void; | 取消ui状态变更回调     |
 - 示例如下：
 
 ```js
@@ -258,6 +261,26 @@ dmClass.publishDeviceDiscovery(info);
 // 停止发布设备发现（需要和publishDeviceDiscovery接口配对使用）
 dmClass.unPublishDeviceDiscovery(publishId);
 
+// 设置用户ui操作行为
+/*  operateAction = 0 - 允许授权
+    operateAction = 1 - 取消授权
+    operateAction = 2 - 授权框用户操作超时
+    operateAction = 3 - 取消pin码框展示
+    operateAction = 4 - 取消pin码输入框展示
+    operateAction = 5 - pin码输入框确定操作
+*/
+dmClass.setUserOperation(operation, "extra")
+dmClass.on('uiStateChange', (data) => {
+    console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+    var tmpStr = JSON.parse(data.param)
+    this.isShow = tmpStr.verifyFailed
+    console.log("uiStateChange executed, dialog closed" + this.isShow)
+    if (!this.isShow) {
+        this.destruction()
+    }
+});
+dmClass.off('uiStateChange')
+
 // 设备认证
 var deviceInfo ={
     "deviceId": "XXXXXXXX",
@@ -294,9 +317,9 @@ dmClass.unAuthenticateDevice(this.deviceInfo);
 
 当前版本只支持PIN码认证，需要提供PIN码认证的授权提示界面、PIN码显示界面、PIN码输入界面；
 
-当前，由于系统通过native层直接进行弹窗的能力尚不具备，这里使用一个临时的FA来进行对应界面的弹窗。
+当前，由于系统通过native层直接进行弹窗的能力尚不具备，这里使用ServiceExtensionAbility来进行对应界面的弹窗。
 
-该FA为：DeviceManager_UI.hap，作为系统应用进行预置。
+该ServiceExtensionAbility为：DeviceManager_UI.hap，作为系统应用进行预置。
 
 - 编译运行：
 
