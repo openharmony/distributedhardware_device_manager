@@ -69,7 +69,6 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
 
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string authPara(reinterpret_cast<const char*>(data), size);
     std::string token(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = 12;
     int32_t publishId = 111;

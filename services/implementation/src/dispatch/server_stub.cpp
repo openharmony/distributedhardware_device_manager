@@ -66,7 +66,7 @@ static BOOL Initialize(Service *service, Identity identity)
     return TRUE;
 }
 
-static BOOL MessageHandle(Service *service, Request *request)
+static BOOL MessageHandle(const Service *service, const Request *request)
 {
     if ((service == NULL) || (request == NULL)) {
         LOGW("MessageHandle invalid param");

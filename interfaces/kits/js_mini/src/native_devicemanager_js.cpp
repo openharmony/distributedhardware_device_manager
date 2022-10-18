@@ -572,7 +572,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
         LOGE("Invalid AppIconInfo");
         return;
     }
-    *bufferPtr = (uint8_t*)calloc(sizeof(uint8_t), length);
+    *bufferPtr = static_cast<uint8_t*>calloc(sizeof(uint8_t), length);
     if (*bufferPtr == nullptr) {
         LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
         return;

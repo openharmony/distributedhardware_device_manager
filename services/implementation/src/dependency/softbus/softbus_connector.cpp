@@ -199,7 +199,7 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
         LOGE("GetUdidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
     }
-    udid = (char *)mUdid;
+    udid = reinterpret_cast<char *>(mUdid);
     return DM_OK;
 }
 
@@ -213,7 +213,7 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
     }
-    uuid = (char *)mUuid;
+    uuid = reinterpret_cast<char *>(mUuid);
     return DM_OK;
 }
 
@@ -245,7 +245,7 @@ bool SoftbusConnector::IsDeviceOnLine(const std::string &deviceId)
             LOGE("DM_IsDeviceOnLine GetNodeKeyInfo failed");
             break;
         }
-        if (strcmp((char *)udid, deviceId.c_str()) == 0) {
+        if (strcmp(reinterpret_cast<char *>(udid), deviceId.c_str()) == 0) {
             LOGI("DM_IsDeviceOnLine device %s online", GetAnonyString(deviceId).c_str());
             bDeviceOnline = true;
             break;
@@ -390,7 +390,7 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
         LOGE("GetNodeKeyInfo failed");
         return;
     }
-    std::string deviceId = (char *)udid;
+    std::string deviceId = reinterpret_cast<char *>(udid);
     LOGI("device online, deviceId: %s", GetAnonyString(deviceId).c_str());
     discoveryDeviceInfoMap_.erase(deviceId);
 }
