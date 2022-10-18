@@ -130,7 +130,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 
 | 原型                                                         | 描述                            |
 | ------------------------------------------------------------ | ------------------------------- |
-| createDeviceManager(bundleName: string, callback: AsyncCallback<DeviceManager>): void; | 以异步方法获取DeviceManager实例 |
+| createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 以异步方法获取DeviceManager实例 |
 | release(): void;                                             | 释放DeviceManager实例           |
 
 - 示例如下
