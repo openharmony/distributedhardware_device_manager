@@ -165,9 +165,6 @@ try {
 | getLocalDeviceInfoSync(): DeviceInfo;                        | 获取本地设备信息 |
 | getLocalDeviceInfo(callback:AsyncCallback<DeviceInfo>): void;                                                                             | 获取本地设备信息 |
 | getLocalDeviceInfo(): Promise<DeviceInfo>;                   | 获取本地设备信息 |
-| startDeviceDiscovery(subscribeInfo: SubscribeInfo, filterOptions?: string): void;                                                         | 发现周边设备     |
-| publishDeviceDiscovery(publishInfo: PublishInfo): void;                                                                                   | 发布设备发现     |
-| unPublishDeviceDiscovery(publishId: number): void;                                                                                        | 停止发布设备发现 |
 | on(type: 'deviceStateChange', callback: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                         | 设备状态变更回调 |
 | off(type: 'deviceStateChange', callback?: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                       | 取消设备状态变更回调 |
 | on(type: 'serviceDie', callback: () => void): void;                                                                                       | 服务错误回调 |
@@ -177,6 +174,9 @@ try {
 | authenticateDevice(deviceInfo: DeviceInfo, authParam: AuthParam, callback: AsyncCallback<{deviceId: string, pinToken ?: number}>): void; | 设备认证接口         |
 | unAuthenticateDevice(deviceInfo: DeviceInfo): void;          | 解除认证设备         |
 | verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void; | 设备认证信息校验     |
+| startDeviceDiscovery(subscribeInfo: SubscribeInfo, filterOptions?: string): void;                                                         | 发现周边设备     |
+| publishDeviceDiscovery(publishInfo: PublishInfo): void;                                                                                   | 发布设备发现     |
+| unPublishDeviceDiscovery(publishId: number): void;                                                                                        | 停止发布设备发现 |
 | on(type: 'deviceFound', callback: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 发现设备列表回调     |
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | 取消发现设备列表回调 |
 | on(type: 'discoverFail', callback: Callback<{ subscribeId: number, reason: number }>): void; | 发现设备失败回调     |
