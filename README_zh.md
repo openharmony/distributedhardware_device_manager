@@ -159,12 +159,12 @@ try {
 
 | 原型                                                         | 描述                 |
 | ------------------------------------------------------------ | -------------------- |
-| getTrustedDeviceListSync(): Array<DeviceInfo>;                                                                                            | 获取信任设备列表 |
-| getTrustedDeviceList(callback:AsyncCallback<Array<DeviceInfo>>): void;                                                                    | 获取信任设备列表 |
-| getTrustedDeviceList(): Promise<Array<DeviceInfo>>;                                                                                       | 获取信任设备列表 |
+| getTrustedDeviceListSync(): Array&lt;DeviceInfo&gt;;                                                                                            | 获取信任设备列表 |
+| getTrustedDeviceList(callback:AsyncCallback<Array&lt;DeviceInfo&gt;>): void;                                                                    | 获取信任设备列表 |
+| getTrustedDeviceList(): Promise<Array&lt;DeviceInfo&gt;>;                                                                                       | 获取信任设备列表 |
 | getLocalDeviceInfoSync(): DeviceInfo;                        | 获取本地设备信息 |
-| getLocalDeviceInfo(callback:AsyncCallback<DeviceInfo>): void;                                                                             | 获取本地设备信息 |
-| getLocalDeviceInfo(): Promise<DeviceInfo>;                   | 获取本地设备信息 |
+| getLocalDeviceInfo(callback:AsyncCallback&lt;DeviceInfo&gt;): void;                                                                             | 获取本地设备信息 |
+| getLocalDeviceInfo(): Promise&lt;DeviceInfo&gt;;                   | 获取本地设备信息 |
 | on(type: 'deviceStateChange', callback: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                         | 设备状态变更回调 |
 | off(type: 'deviceStateChange', callback?: Callback<{ action: DeviceStateChangeAction, device: DeviceInfo }>): void;                       | 取消设备状态变更回调 |
 | on(type: 'serviceDie', callback: () => void): void;                                                                                       | 服务错误回调 |
