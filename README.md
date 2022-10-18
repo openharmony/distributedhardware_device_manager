@@ -119,6 +119,7 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | startDeviceDiscovery(subscribeInfo: SubscribeInfo): void;    | Starts device discovery.        |
 | stopDeviceDiscovery(subscribeId: number): void;              | Stops device discovery.        |
 | authenticateDevice(deviceInfo: DeviceInfo, authparam: AuthParam, callback: AsyncCallback<{deviceId: string, pinTone ?: number}>): void; | Authenticates a device.        |
+| setUserOperation(operateAction: number, params: string): void;    | Set user ui operation behavior         |
 | verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{deviceId: string, level: number}>): void; | Verifies device authentication information.    |
 | on(type: 'deviceFound', callback: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | Subscribes to discovered device list changes.    |
 | off(type: 'deviceFound', callback?: Callback<{ subscribeId: number, device: DeviceInfo }>): void; | Unsubscribes from discovered device list changes.|
@@ -128,7 +129,8 @@ For details about the APIs, see *ohos.distributedHardware.deviceManager.d.ts* in
 | off(type: 'publishSuccess', callback?: Callback<{ publishId: number }>): void; | delete unpublish device success |
 | on(type: 'publishFail', callback: Callback<{ publishId: number, reason: number }>): void; | publish device fail     |
 | off(type: 'publishFail', callback?: Callback<{ publishId: number, reason: number }>): void; | delete unpublish device fail |
-
+| on(type: 'uiStateChange', callback: Callback<{ param: string}>): void; | UI status change callback     |
+| off(type: 'uiStateChange', callback?: Callback<{ param: string}>): void; | Cancel UI status change callback     |
 ## Sample Code
 
 ```
