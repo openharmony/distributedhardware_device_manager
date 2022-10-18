@@ -60,6 +60,7 @@ struct PeerCredentialInfo {
     std::string peerDeviceId;
     std::string peerCredentialId;
 };
+
 void from_json(const nlohmann::json &jsonObject, CredentialData &credentialData)
 {
     if (!jsonObject.contains(FIELD_CREDENTIAL_TYPE) || !jsonObject.contains(FIELD_CREDENTIAL_ID) ||

@@ -501,8 +501,8 @@ bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std
     GetRelatedGroups(hostDevice, hostGroupInfoList);
     std::vector<GroupInfo> peerGroupInfoList;
     GetRelatedGroups(peerDevice, peerGroupInfoList);
-    for (auto &hostGroupInfo : hostGroupInfoList) {
-        for (auto &peerGroupInfo : peerGroupInfoList) {
+    for (const auto &hostGroupInfo : hostGroupInfoList) {
+        for (const auto &peerGroupInfo : peerGroupInfoList) {
             if (hostGroupInfo.groupId == peerGroupInfo.groupId && hostGroupInfo.groupName == peerGroupInfo.groupName) {
                 LOGE("these are authenticated");
                 return false;
