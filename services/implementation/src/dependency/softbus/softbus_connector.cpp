@@ -206,7 +206,7 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
 {
     LOGI("GetUuidByNetworkId for networkId = %s", GetAnonyString(std::string(networkId)).c_str());
     uint8_t tmpUuid[UUID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(tmpUuid));
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, tmpUuid, sizeof(tmpUuid));
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
