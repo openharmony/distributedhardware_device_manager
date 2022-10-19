@@ -168,7 +168,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         LOGE("GetAllNodeDeviceInfo failed with ret %d", ret);
         return ERR_DM_FAILED;
     }
-    DmDeviceInfo *info = reinterpret_cast<DmDeviceInfo *>(malloc(sizeof(DmDeviceInfo) * (infoNum)));
+    DmDeviceInfo *info = static_cast<DmDeviceInfo *>(malloc(sizeof(DmDeviceInfo) * (infoNum)));
     if (info == nullptr) {
         FreeNodeInfo(nodeInfo);
         return ERR_DM_MALLOC_FAILED;
