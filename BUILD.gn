@@ -44,10 +44,10 @@ if (defined(ohos_lite)) {
       "interfaces/inner_kits/native_cpp:devicemanagersdk",
       "interfaces/kits:devicemanager_native_js",
       "sa_profile:dm_sa_profile",
+      "services/etc:ohos.para.dac",
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "utils:devicemanagerutils",
-      "services/etc:ohos.para.dac",
     ]
   }
   group("device_manager_test") {
