@@ -50,7 +50,7 @@ struct DmTimst {
 
 static void handler(void *data)
 {
-    struct DmTimst *myTimer = (struct DmTimst *)data;
+    struct DmTimst *myTimer = static_cast<struct DmTimst *>data;
     myTimer->handle(myTimer->data, *(myTimer->dmtimer));
 }
 

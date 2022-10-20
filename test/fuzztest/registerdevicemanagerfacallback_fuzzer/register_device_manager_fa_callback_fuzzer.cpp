@@ -42,7 +42,6 @@ void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
     std::string packageName(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
 

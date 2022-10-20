@@ -192,28 +192,26 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("GetUdidByNetworkId for networkId = %s", GetAnonyString(std::string(networkId)).c_str());
-    uint8_t mUdid[UDID_BUF_LEN] = {0};
-    int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
+    uint8_t tmpUdid[UDID_BUF_LEN] = {0};
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, tmpUdid, sizeof(tmpUdid));
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
     }
-    udid = (char *)mUdid;
+    udid = reinterpret_cast<char *>(tmpUdid);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
     LOGI("GetUuidByNetworkId for networkId = %s", GetAnonyString(std::string(networkId)).c_str());
-    uint8_t mUuid[UUID_BUF_LEN] = {0};
-    int32_t ret =
-        GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
+    uint8_t tmpUuid[UUID_BUF_LEN] = {0};
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, tmpUuid, sizeof(tmpUuid));
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
     }
-    uuid = (char *)mUuid;
+    uuid = reinterpret_cast<char *>(tmpUuid);
     return DM_OK;
 }
 
@@ -245,7 +243,7 @@ bool SoftbusConnector::IsDeviceOnLine(const std::string &deviceId)
             LOGE("DM_IsDeviceOnLine GetNodeKeyInfo failed");
             break;
         }
-        if (strcmp((char *)udid, deviceId.c_str()) == 0) {
+        if (strcmp(reinterpret_cast<char *>(udid), deviceId.c_str()) == DM_OK) {
             LOGI("DM_IsDeviceOnLine device %s online", GetAnonyString(deviceId).c_str());
             bDeviceOnline = true;
             break;
@@ -390,7 +388,7 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
         LOGE("GetNodeKeyInfo failed");
         return;
     }
-    std::string deviceId = (char *)udid;
+    std::string deviceId = reinterpret_cast<char *>(udid);
     LOGI("device online, deviceId: %s", GetAnonyString(deviceId).c_str());
     discoveryDeviceInfoMap_.erase(deviceId);
 }
