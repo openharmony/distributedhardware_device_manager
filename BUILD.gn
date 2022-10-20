@@ -47,6 +47,7 @@ if (defined(ohos_lite)) {
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "utils:devicemanagerutils",
+      "services/etc:ohos.para.dac",
     ]
   }
   group("device_manager_test") {
