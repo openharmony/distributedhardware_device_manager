@@ -131,10 +131,10 @@ int32_t SoftbusListener::Init()
 #else
     char discoverStatus[DISCOVER_STATUS_LEN + 1] = {0};
     ret = GetParameter(DISCOVER_STATUS_KEY, "not exist", discoverStatus, DISCOVER_STATUS_LEN);
+    LOGI("service get parameter result is : %d, value : %s", ret, discoverStatus);
     if (strcmp(discoverStatus, "not exist") == 0) {
         ret = SetParameter(DISCOVER_STATUS_KEY, DISCOVER_STATUS_ON);
         LOGI("service set parameter result is : %d", ret);
-
         ret = PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             publishStatus = ALLOW_BE_DISCOVERY;
@@ -155,6 +155,7 @@ int32_t SoftbusListener::Init()
     }
 
     ret = WatchParameter(DISCOVER_STATUS_KEY, &SoftbusListener::OnParameterChgCallback, nullptr);
+    LOGI("service watch parameter result is : %d", ret);
 #endif
     return ret;
 }
