@@ -111,7 +111,7 @@ void ProfileConnector::OnSyncCompleted(const SyncResult &syncResults)
         deviceId = iterResult.first;
         SyncStatus = iterResult.second;
     }
-    LOGI("ProfileEventCallback::OnSyncCompleted, deviceId = %s", deviceId.c_str());
+    LOGI("ProfileEventCallback::OnSyncCompleted");
     std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
     for (auto &iter : callbackMap_) {
         iter.second->OnProfileComplete(iter.first, deviceId);
