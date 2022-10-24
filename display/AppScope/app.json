@@ -11,6 +11,7 @@
     "minAPIVersion": 9,
     "targetAPIVersion": 9,
     "distributedNotificationEnabled": true,
-    "apiReleaseType": "Beta3"
+    "apiReleaseType": "Beta3",
+    "debug": false
   }
 }
