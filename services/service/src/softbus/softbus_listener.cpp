@@ -81,7 +81,7 @@ SoftbusListener::SoftbusListener()
                                         .OnBytesReceived = SoftbusListener::OnBytesReceived,
                                         .OnMessageReceived = nullptr,
                                         .OnStreamReceived = nullptr};
-    LOGD("[SOFTBUS]SoftbusListener constructor.");
+    LOGD("SoftbusListener constructor.");
     int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer failed, ret: %d.", ret);
@@ -94,7 +94,7 @@ SoftbusListener::SoftbusListener()
 SoftbusListener::~SoftbusListener()
 {
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
-    LOGD("[SOFTBUS]SoftbusListener destructor.");
+    LOGD("SoftbusListener destructor.");
 }
 
 void SoftbusListener::SetPublishInfo(PublishInfo &dmPublishInfo)
@@ -183,7 +183,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     }
     FreeNodeInfo(nodeInfo);
     free(info);
-    LOGI("[SOFTBUS]GetTrustDevices success, deviceCount: %d.", deviceCount);
+    LOGI("GetTrustDevices success, deviceCount: %d.", deviceCount);
     return ret;
 }
 
@@ -225,9 +225,9 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
 
 void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 {
-    LOGI("[SOFTBUS]received device online callback from softbus.");
+    LOGI("received device online callback from softbus.");
     if (info == nullptr) {
-        LOGE("[SOFTBUS]NodeBasicInfo is nullptr.");
+        LOGE("NodeBasicInfo is nullptr.");
         return;
     }
     DmDeviceInfo dmDeviceInfo;
@@ -243,9 +243,9 @@ void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 {
-    LOGI("[SOFTBUS]received device offline callback from softbus.");
+    LOGI("received device offline callback from softbus.");
     if (info == nullptr) {
-        LOGE("[SOFTBUS]NodeBasicInfo is nullptr.");
+        LOGE("NodeBasicInfo is nullptr.");
         return;
     }
     DmDeviceInfo dmDeviceInfo;
@@ -264,17 +264,17 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), nodeBasicInfo.networkId,
         std::min(sizeof(dmDeviceInfo.deviceId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("[SOFTBUS]ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
     }
 
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
         std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("[SOFTBUS]ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
         std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
-        LOGE("[SOFTBUS]ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     return DM_OK;
@@ -322,12 +322,12 @@ void SoftbusListener::OnBytesReceived(int sessionId, const void *data, unsigned 
 
 void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 {
-    LOGD("[SOFTBUS]OnPublishResult, publishId: %d, result: %d.", publishId, result);
+    LOGD("OnPublishResult, publishId: %d, result: %d.", publishId, result);
 }
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
-    LOGD("[SOFTBUS]OnSoftbusDeviceInfoChanged.");
+    LOGD("OnSoftbusDeviceInfoChanged.");
 }
 } // namespace DistributedHardware
 } // namespace OHOS
