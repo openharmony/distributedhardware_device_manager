@@ -22,7 +22,7 @@ ohos_hap("DeviceManager_UI") {
   hap_name = "DeviceManager_UI"
   part_name = "prebuilt_hap"
   subsystem_name = "applications"
-  js_build_mode = "debug"
+  js_build_mode = "release"
   module_install_dir = "app/com.ohos.devicemanagerui"
 }
 
