@@ -13,5 +13,13 @@
  * limitations under the License.
  */
  
- // Top-level build file where you can add configuration options common to all sub-projects/modules.
-include ':entry'
+{
+  "apiType": 'stageMode',
+  "buildOption": {
+  },
+  "targets": [
+    {
+      "name": "default"
+    }
+  ]
+}
