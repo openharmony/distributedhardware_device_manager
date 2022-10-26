@@ -221,6 +221,27 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterSoftbusStateCallback_001, testing::ex
  */
 HWTEST_F(DmDeviceStateManagerTest, PostDeviceOnline_001, testing::ext::TestSize.Level0)
 {
+    std::string pkgName = "12";
+    DmDeviceInfo info = {
+        .deviceId = "12",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    std::shared_ptr<IDeviceManagerServiceListener> listener_ = dmDeviceStateManager->listener_;
+    dmDeviceStateManager->listener_ = nullptr;
+    dmDeviceStateManager->PostDeviceOnline(pkgName, info);
+    EXPECT_EQ(dmDeviceStateManager->listener_, nullptr);
+    dmDeviceStateManager->listener_ = listener_;
+}
+
+/**
+ * @tc.name: PostDeviceOnline_002
+ * @tc.desc: call PostDeviceOnline
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, PostDeviceOnline_002, testing::ext::TestSize.Level0)
+{
     std::string pkgName = "123";
     DmDeviceInfo info = {
         .deviceId = "123",
@@ -228,6 +249,7 @@ HWTEST_F(DmDeviceStateManagerTest, PostDeviceOnline_001, testing::ext::TestSize.
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->PostDeviceOnline(pkgName, info);
+    EXPECT_NE(dmDeviceStateManager->listener_, nullptr);
 }
 
 /**
@@ -238,6 +260,27 @@ HWTEST_F(DmDeviceStateManagerTest, PostDeviceOnline_001, testing::ext::TestSize.
  */
 HWTEST_F(DmDeviceStateManagerTest, PostDeviceOffline_001, testing::ext::TestSize.Level0)
 {
+    std::string pkgName = "12";
+    DmDeviceInfo info = {
+        .deviceId = "12",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    std::shared_ptr<IDeviceManagerServiceListener> listener_ = dmDeviceStateManager->listener_;
+    dmDeviceStateManager->listener_ = nullptr;
+    dmDeviceStateManager->PostDeviceOffline(pkgName, info);
+    EXPECT_EQ(dmDeviceStateManager->listener_, nullptr);
+    dmDeviceStateManager->listener_ = listener_;
+}
+
+/**
+ * @tc.name: PostDeviceOffline_002
+ * @tc.desc: call PostDeviceOffline
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, PostDeviceOffline_002, testing::ext::TestSize.Level0)
+{
     std::string pkgName = "123";
     DmDeviceInfo info = {
         .deviceId = "123",
@@ -245,6 +288,7 @@ HWTEST_F(DmDeviceStateManagerTest, PostDeviceOffline_001, testing::ext::TestSize
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->PostDeviceOffline(pkgName, info);
+    EXPECT_NE(dmDeviceStateManager->listener_, nullptr);
 }
 
 /**
@@ -258,6 +302,21 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterDevStateCallback_001, testing::ext::T
     std::string pkgName = "123";
     std::string extra = "ahaha";
     dmDeviceStateManager->RegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(dmDeviceStateManager->decisionInfos_.count(pkgName), 1);
+}
+
+/**
+ * @tc.name: RegisterDevStateCallback_002
+ * @tc.desc: call RegisterDevStateCallback
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, RegisterDevStateCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string extra = "ahaha";
+    dmDeviceStateManager->RegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(dmDeviceStateManager->decisionInfos_.count(pkgName), 0);
 }
 
 /**
@@ -268,9 +327,24 @@ HWTEST_F(DmDeviceStateManagerTest, RegisterDevStateCallback_001, testing::ext::T
  */
 HWTEST_F(DmDeviceStateManagerTest, UnRegisterDevStateCallback_001, testing::ext::TestSize.Level0)
 {
+    std::string pkgName = "";
+    std::string extra;
+    dmDeviceStateManager->UnRegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(dmDeviceStateManager->decisionInfos_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: UnRegisterDevStateCallback_002
+ * @tc.desc: call UnRegisterDevStateCallback
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, UnRegisterDevStateCallback_002, testing::ext::TestSize.Level0)
+{
     std::string pkgName = "123";
     std::string extra;
     dmDeviceStateManager->UnRegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(dmDeviceStateManager->decisionInfos_.count(pkgName), 0);
 }
 
 /**
@@ -282,11 +356,14 @@ HWTEST_F(DmDeviceStateManagerTest, UnRegisterDevStateCallback_001, testing::ext:
 HWTEST_F(DmDeviceStateManagerTest, RegisterOffLineTimer_001, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info = {
-        .deviceId = "123",
+        .deviceId = "12345678901234567890987654321234",
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->RegisterOffLineTimer(info);
+    std::string deviceId;
+    SoftbusConnector::GetUdidByNetworkId(info.deviceId, deviceId);
+    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_.count(deviceId), 0);
 }
 
 /**
@@ -303,6 +380,9 @@ HWTEST_F(DmDeviceStateManagerTest, SaveOnlineDeviceInfo_001, testing::ext::TestS
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->SaveOnlineDeviceInfo(pkgName, info);
+    std::string uuid;
+    SoftbusConnector::GetUuidByNetworkId(info.networkId, uuid);
+    EXPECT_EQ(dmDeviceStateManager->remoteDeviceInfos_.count(uuid), 0);
 }
 
 /**
@@ -319,6 +399,12 @@ HWTEST_F(DmDeviceStateManagerTest, DeleteOfflineDeviceInfo_001, testing::ext::Te
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->DeleteOfflineDeviceInfo(pkgName, info);
+    for (auto iter: dmDeviceStateManager->remoteDeviceInfos_) {
+        if (iter.second.deviceId == info.deviceId) {
+            EXPECT_EQ(dmDeviceStateManager->remoteDeviceInfos_.count(iter.first), 0);
+            break;
+        }
+    }
 }
 } // namespace
 } // namespace DistributedHardware

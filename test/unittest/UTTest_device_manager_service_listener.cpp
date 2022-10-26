@@ -129,6 +129,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
     };
     uint16_t subscribeId = 1;
     listener_->OnDeviceFound(pkgName, subscribeId, info);
+    std::shared_ptr<IpcNotifyDeviceFoundReq> pReq =
+        std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
+    uint16_t ret = pReq->GetSubscribeId();
+    EXPECT_EQ(ret, subscribeId);
 }
 
 /**
@@ -145,6 +149,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::
     uint16_t subscribeId = 1;
     int32_t failedReason = 1;
     listener_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
+    std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
+    int32_t ret = pReq->GetResult();
+    EXPECT_EQ(ret, failedReason);
 }
 
 /**
@@ -159,6 +167,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
     std::string pkgName = "com.ohos.helloworld";
     uint16_t subscribeId = 1;
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
+    std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
+    uint16_t ret = pReq->GetSubscribeId();
+    EXPECT_EQ(ret, subscribeId);
 }
 
 /**
@@ -175,6 +187,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 1;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
+    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
+    int32_t ret = pReq->GetPublishId();
+    EXPECT_EQ(ret, publishId);
 }
 
 /**
@@ -190,6 +206,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 0;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
+    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
+    int32_t ret = pReq->GetPublishId();
+    EXPECT_EQ(ret, publishId);
 }
 
 /**
@@ -204,6 +224,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.
     std::string pkgName = "com.ohos.helloworld";
     std::string paramJson = "ahaha";
     listener_->OnUiCall(pkgName, paramJson);
+    std::shared_ptr<IpcNotifyDMFAResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyDMFAResultReq>(listener_->ipcServerListener_.req_);
+    std::string ret = pReq->GetJsonParam();
+    EXPECT_EQ(ret, paramJson);
 }
 } // namespace
 } // namespace DistributedHardware
