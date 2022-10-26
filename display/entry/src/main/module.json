@@ -1,0 +1,61 @@
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "srcEntrance": "./ets/Application/MyAbilityStage.ts",
+    "description": "$string:entry_desc",
+    "mainElement": "MainAbility",
+    "deviceTypes":  ["default","tablet"],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "uiSyntax": "ets",
+    "abilities": [
+      {
+          "name": "com.ohos.devicemanagerui.MainAbility",
+          "startWindowBackground": "$color:default_background_color",
+          "startWindowIcon": "$media:icon",
+          "srcEntrance": "./ets/MainAbility/MainAbility.ts",
+          "description": "$string:MainAbility_desc",
+          "icon": "$media:icon",
+          "label": "$string:MainAbility_label",
+          "visible": true,
+          "launchType": "standard"
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "com.ohos.devicemanagerui.ConfirmServiceExtAbility",
+        "srcEntrance": "./ets/ServiceExtAbility/ConfirmServiceExtAbility.ts",
+        "description": "$string:ServiceExtAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:ServiceExtAbility_label",
+        "visible": true,
+        "type": "service"
+      },
+      {
+        "name": "com.ohos.devicemanagerui.PincodeServiceExtAbility",
+        "srcEntrance": "./ets/ServiceExtAbility/PincodeServiceExtAbility.ts",
+        "description": "$string:ServiceExtAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:ServiceExtAbility_label",
+        "visible": true,
+        "type": "service"
+      },
+      {
+        "name": "com.ohos.devicemanagerui.InputServiceExtAbility",
+        "srcEntrance": "./ets/ServiceExtAbility/InputServiceExtAbility.ts",
+        "description": "$string:ServiceExtAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:ServiceExtAbility_label",
+        "visible": true,
+        "type": "service"
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.GET_BUNDLE_INFO"
+      }
+    ]
+  }
+}
