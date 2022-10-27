@@ -16,27 +16,27 @@
 #include <string>
 #include <vector>
 #include "device_manager_service.h"
-#include "device_manager_service_fuzzer.h"
+#include "authenticate_device_service_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
         return;
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = 12;
-    int32_t publishId = 14;
-    DmSubscribeInfo subscribeInfo;
-    subscribeInfo.subscribeId = 1;
-    DmPublishInfo publishInfo;
+    int32_t authType = 123;
+    DmAuthParam authParam;
 
-    DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
+    DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, pkgName, extra);
+    DeviceManagerService::GetInstance().VerifyAuthentication(pkgName);
+    DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
+    DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
+    DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, extra);
+    DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
+    DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
 }
 }
 }
@@ -45,7 +45,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceServiceFuzzTest(data, size);
 
     return 0;
 }
