@@ -20,6 +20,7 @@ group("fuzztest") {
     "devicelist_fuzzer:fuzztest",
     "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
+    "devicepublish_fuzzer:fuzztest",
     "dmcredentialimpl_fuzzer:fuzztest",
     "getfaparam_fuzzer:fuzztest",
     "getudidbynetworkid_fuzzer:fuzztest",
