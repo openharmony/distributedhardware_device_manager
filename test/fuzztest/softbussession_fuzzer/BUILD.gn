@@ -41,10 +41,10 @@ ohos_fuzztest("SoftbusSessionFuzzTest") {
   ]
   sources = [ "softbus_session_fuzzer.cpp" ]
 
-  deps = [ 
+  deps = [
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl"
-    ]
+    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
