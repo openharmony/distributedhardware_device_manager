@@ -46,8 +46,8 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
 
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
   ]
 
   defines = [
