@@ -34,7 +34,7 @@ void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
     }
     
     std::string szData(reinterpret_cast<const char*>(data), size);
-    int32_t subscribeId= *(reinterpret_cast<const int32_t*>(data));
+    int32_t subscribeId = *(reinterpret_cast<const int32_t*>(data));
     int publishId = *(reinterpret_cast<const int*>(data));
     PublishResult pResult = (PublishResult)1;
     RefreshResult rResult = (RefreshResult)1;
