@@ -50,9 +50,7 @@ ohos_fuzztest("DmAdapterManagerFuzzTest") {
     "dm_adapter_manager_fuzzer.cpp",
   ]
 
-  deps = [
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
-  ]
+  deps = [ "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl" ]
 
   defines = [
     "HI_LOG_ENABLE",
