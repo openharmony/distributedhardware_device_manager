@@ -58,7 +58,8 @@ int32_t DmDeviceStateManager::RegisterProfileListener(const std::string &pkgName
 #endif
                 remoteDeviceInfos_[uuid] = saveInfo;
             }
-            LOGI("RegisterProfileListener in");
+            LOGI("RegisterProfileListener in, deviceId = %s, deviceUdid = %s, uuid = %s", GetAnonyString(
+                std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
             profileAdapter->RegisterProfileListener(pkgName, deviceUdid, shared_from_this());
         }
     }
