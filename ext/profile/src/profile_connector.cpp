@@ -15,7 +15,7 @@
 
 #include "profile_connector.h"
 
-#include "dm_GetAnonyString.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
