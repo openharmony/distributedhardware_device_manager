@@ -15,6 +15,7 @@
 
 #include "profile_connector.h"
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
@@ -111,7 +112,7 @@ void ProfileConnector::OnSyncCompleted(const SyncResult &syncResults)
         deviceId = iterResult.first;
         SyncStatus = iterResult.second;
     }
-    LOGI("ProfileEventCallback::OnSyncCompleted");
+    LOGI("ProfileEventCallback::OnSyncCompleted, deviceId = %s", GetAnonyString(deviceId).c_str());
     std::lock_guard<std::mutex> mutexLock(callbackMapMutex_);
     for (auto &iter : callbackMap_) {
         iter.second->OnProfileComplete(iter.first, deviceId);
