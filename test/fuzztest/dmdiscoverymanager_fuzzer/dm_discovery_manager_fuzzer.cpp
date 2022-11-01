@@ -38,7 +38,7 @@ void DmDiscoveryManagerFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmDiscoveryManager> dmDiscoveryManager =
         std::make_shared<DmDiscoveryManager>(softbusConnector, listener);
-    std::string pkgName(reinterpret_cast<const char*>(data), size); 
+    std::string pkgName(reinterpret_cast<const char*>(data), size);
     DmSubscribeInfo subscribeInfo;
     std::string extra(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
