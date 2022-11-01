@@ -41,29 +41,14 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
   sources = [ "dm_discovery_manager_fuzzer.cpp" ]
 
   deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${utils_path}:devicemanagerutils",
-    "//base/security/device_auth/services:deviceauth_sdk",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DmDiscoveryManagerFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
-  ]
-
-  external_deps = [
-    "ability_base:want",
-    "c_utils:utils",
-    "common_event_service:cesfwk_core",
-    "common_event_service:cesfwk_innerkits",
-    "dsoftbus:softbus_client",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
   ]
 }
 
