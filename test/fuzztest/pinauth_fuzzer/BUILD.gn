@@ -1,0 +1,108 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+##############################fuzztest##########################################
+ohos_fuzztest("PinAuthFuzzTest") {
+  module_out_path = "device_manager/devicemanager"
+  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/pinauth_fuzzer"
+
+  include_dirs = [
+    "${devicemanager_path}/ext/pin_auth/include",
+    "${devicemanager_path}/ext/pin_auth/include/standard",
+    "${common_path}/include",
+    "${ext_path}/pin_auth/include/ability",
+    "${servicesimpl_path}/include/dependency/timer",
+    "${servicesimpl_path}/include/config",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include/authentication",
+    "${servicesimpl_path}/include/authentication/showconfirm/standard",
+    "${servicesimpl_path}/include/ability",
+    "${servicesimpl_path}/include/devicestate",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/commonevent",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/dependency/timer",
+    "${services_path}/include/",
+    "${services_path}/include/ipc",
+    "${services_path}/include/ipc/standard",
+    "${utils_path}/include",
+    "${utils_path}/include/ipc/standard",
+    "${servicesimpl_path}/include",
+    "${innerkits_path}/native_cpp/include",
+    "${common_path}/include/ipc",
+    "${common_path}/include/ipc/model",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+    "//third_party/json/include",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "//base/notification/common_event_service/frameworks/core/include",
+    "//base/notification/common_event_service/interfaces/innerkits/native/include",
+    "//base/security/device_auth/interfaces/innerkits",
+    "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
+    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+    "//foundation/communication/dsoftbus/interfaces/kits/common",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//base/global/resource_management/interfaces/inner_api/include",
+    "//foundation/communication/dsoftbus/interfaces/kits/transport",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [
+    "${devicemanager_path}/ext/pin_auth/src/ability/standard/dm_ability_manager.cpp",
+    "${devicemanager_path}/ext/pin_auth/src/pin_auth.cpp",
+    "${devicemanager_path}/ext/pin_auth/src/standard/pin_auth_ui.cpp",
+    "pinauth_fuzzer.cpp",
+  ]
+
+  deps = [
+    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
+    "${ext_path}/pin_auth/input_pin_dialog/dialog_ui/js:dialog_js_files_etc",
+    "${ext_path}/pin_auth/show_pin_dialog/dialog_ui/js:dialog_js_files_etc",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
+    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+    "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"PinAuthFuzzTest\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "init:libbegetutil",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = [ ":PinAuthFuzzTest" ]
+}
+###############################################################################
