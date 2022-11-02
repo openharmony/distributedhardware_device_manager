@@ -975,6 +975,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_006, testing::ext::T
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     uint16_t subscribeId = 0;
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_.count(pkgName), 0);
 }
 
 /**
@@ -4539,6 +4540,9 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult1, testing::ext::TestSize.Le
     int32_t action = 1;
     std::string credentialResult = "failed";
     DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    std::shared_ptr<CredentialCallback> tempCbk;
+    tempCbk = DeviceManagerNotify::GetInstance().credentialCallback_[pkgName];
+    EXPECT_EQ(tempCbk, nullptr);
 }
 /**
  * @tc.name: OnCredentialResult2
@@ -4549,7 +4553,40 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult2, testing::ext::TestSize.Le
     std::string pkgName = "com.ohos.test";
     int32_t action = 1;
     std::string credentialResult = "failed";
+    std::shared_ptr<CredentialCallback> tempCbk = std::make_shared<CredentialCallbackTest>();
+    DeviceManagerNotify::GetInstance().credentialCallback_[pkgName] = tempCbk;
     DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    int count = DeviceManagerNotify::GetInstance().credentialCallback_.count(pkgName);
+    EXPECT_EQ(count, 1);
+}
+
+/**
+ * @tc.name: OnCredentialResult3
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult3, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test3";
+    int32_t action = 1;
+    std::string credentialResult = "failed";
+    DeviceManagerNotify::GetInstance().credentialCallback_[pkgName] = nullptr;
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    int count = DeviceManagerNotify::GetInstance().credentialCallback_.count(pkgName);
+    EXPECT_EQ(count, 1);
+}
+
+/**
+ * @tc.name: OnCredentialResult4
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult4, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    int32_t action = 1;
+    std::string credentialResult = "failed";
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    int count = DeviceManagerNotify::GetInstance().credentialCallback_.count(pkgName);
+    EXPECT_EQ(count, 0);
 }
 
 /**
@@ -4563,6 +4600,9 @@ HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult1, testing::ext::TestSize.Le
     int32_t resultCode = 0;
     int32_t flag = 0;
     DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
+    std::shared_ptr<VerifyAuthCallback> tempCbk;
+    tempCbk = DeviceManagerNotify::GetInstance().verifyAuthCallback_[pkgName];
+    EXPECT_EQ(tempCbk, nullptr);
 }
 
 /**
@@ -4571,11 +4611,48 @@ HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult1, testing::ext::TestSize.Le
  */
 HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult2, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.test2";
+    std::string deviceId = "12";
+    int32_t resultCode = 0;
+    int32_t flag = 0;
+    std::shared_ptr<VerifyAuthCallback> tempCbk = std::make_shared<VerifyAuthCallbackTest>();
+    DeviceManagerNotify::GetInstance().verifyAuthCallback_[pkgName] = tempCbk;
+    int count = DeviceManagerNotify::GetInstance().verifyAuthCallback_.count(pkgName);
+    EXPECT_EQ(count, 1);
+    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
+    count = DeviceManagerNotify::GetInstance().verifyAuthCallback_.count(pkgName);
+    EXPECT_EQ(count, 0);
+}
+
+/**
+ * @tc.name: OnVerifyAuthResult3
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult3, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test3";
     std::string deviceId = "123";
     int32_t resultCode = 0;
     int32_t flag = 0;
     DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
+    int count = DeviceManagerNotify::GetInstance().verifyAuthCallback_.count(pkgName);
+    EXPECT_EQ(count, 0);
+}
+
+/**
+ * @tc.name: OnVerifyAuthResult4
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult4, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    std::string deviceId = "1234";
+    int32_t resultCode = 0;
+    int32_t flag = 0;
+    DeviceManagerNotify::GetInstance().verifyAuthCallback_[pkgName] = nullptr;
+    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
+    int count = DeviceManagerNotify::GetInstance().verifyAuthCallback_.count(pkgName);
+    EXPECT_EQ(count, 1);
 }
 } // namespace
 

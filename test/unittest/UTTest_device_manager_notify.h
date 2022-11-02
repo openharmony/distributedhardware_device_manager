@@ -97,6 +97,16 @@ public:
 private:
     int *count_ = nullptr;
 };
+
+class CredentialCallbackTest : public CredentialCallback {
+public:
+    void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+};
+
+class VerifyAuthCallbackTest : public VerifyAuthCallback {
+public:
+    void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 
