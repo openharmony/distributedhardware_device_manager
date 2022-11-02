@@ -32,7 +32,7 @@ export default class ServiceExtAbility extends extension {
                 width: globalThis.style["shareWidth"] * density,
                 height: globalThis.style["shareHeight"] * density * 0.8
             }
-            this.createWindow("picker Dialog:" + startId, window.WindowType.TYPE_DIALOG, dialogRect)
+            this.createWindow("picker Dialog:" + startId, window.WindowType.TYPE_FLOAT, dialogRect)
         })
     }
 
