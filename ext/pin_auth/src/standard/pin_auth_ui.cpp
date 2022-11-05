@@ -19,10 +19,13 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
+#include "parameter.h"
 #include "ui_service_mgr_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* VERIFY_FAILED = "verifyFailed";
+
 PinAuthUi::PinAuthUi()
 {
     LOGI("AuthUi constructor");
@@ -32,60 +35,59 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
 {
     LOGI("ShowPinDialog start");
     if (authManager == nullptr) {
-        LOGE("ShowPinDialog authManager is null");
+        LOGE("authManager is null");
         return DM_FAILED;
     }
-    nlohmann::json jsonObj;
-    jsonObj[PIN_CODE_KEY] = code;
-    jsonObj.dump();
-    const std::string params = jsonObj.dump();
-
-    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
-        "show_pin_service",
-        params,
-        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
-        ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
-        [authManager](int32_t id, const std::string& event, const std::string& params) {
-            if (params == EVENT_INIT_CODE) {
-                authManager->SetPageId(id);
-            }
-            if (params == EVENT_CANCEL_CODE) {
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-            }
-        });
-    LOGI("ShowConfigDialog end");
+    std::shared_ptr<DmAbilityManager> dmAbilityMgr = std::make_shared<DmAbilityManager>();
+    if (dmAbilityMgr == nullptr) {
+        LOGE("PinAuthUi::dmAbilityManager is null");
+        return DM_FAILED;
+    }
+    AAFwk::Want want;
+    want.SetParam("PinCode", std::to_string(code));
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    const std::string deviceId = localDeviceId;
+    const std::string bundleUiName = "com.ohos.devicemanagerui";
+    const std::string abilityUiName = "com.ohos.devicemanagerui.PinDialogAbility";
+    AppExecFwk::ElementName element(deviceId, bundleUiName, abilityUiName);
+    want.SetElement(element);
+    AbilityStatus status = dmAbilityMgr->StartAbility(want);
+    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
+        LOGE("ShowConfirm::start ui service success");
+        return DM_FAILED;
+    }
+    LOGI("ShowPinDialog end");
     return DM_OK;
 }
  
-int32_t PinAuthUi::InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
+int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 {
     LOGI("InputPinDialog start");
     if (authManager == nullptr) {
-        LOGE("ShowPinDialog InputPinDialog is null");
+        LOGE("authManager is null");
         return DM_FAILED;
     }
-    nlohmann::json jsonObj;
-    jsonObj[PIN_CODE_KEY] = code;
-    jsonObj.dump();
-    const std::string params = jsonObj.dump();
-
-    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
-        "input_pin_service",
-        params,
-        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
-        ACE_X, ACE_Y, ACE_WIDTH, ACE_HEIGHT,
-        [authManager](int32_t id, const std::string& event, const std::string& params) {
-            if (params == EVENT_INIT_CODE) {
-                authManager->SetPageId(id);
-            }
-            if (params == EVENT_CANCEL_CODE || params == EVENT_CONFIRM_CODE) {
-                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
-                LOGI("CancelDialog start id:%d,event:%s,parms:%s", id, event.c_str(), params.c_str());
-                authManager->VerifyAuthentication(params.c_str());
-            }
-        });
-    LOGI("ShowConfigDialog end");
+    std::shared_ptr<DmAbilityManager> dmAbilityMgr = std::make_shared<DmAbilityManager>();
+    if (dmAbilityMgr == nullptr) {
+        LOGE("PinAuthUi::dmAbilityManager is null");
+        return DM_FAILED;
+    }
+    AAFwk::Want want;
+    want.SetParam(VERIFY_FAILED, false);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    const std::string deviceId = localDeviceId;
+    const std::string bundleUiName = "com.ohos.devicemanagerui";
+    const std::string abilityUiName = "com.ohos.devicemanagerui.InputPinDialogAbility";
+    AppExecFwk::ElementName element(deviceId, bundleUiName, abilityUiName);
+    want.SetElement(element);
+    AbilityStatus status = dmAbilityMgr->StartAbility(want);
+    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
+        LOGE("ShowConfirm::start ui service success");
+        return DM_FAILED;
+    }
+    LOGI("InputPinDialog end");
     return DM_OK;
 }
 
@@ -97,14 +99,5 @@ int32_t PinAuthUi::ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManage
     return DM_OK;
 }
 
-int32_t PinAuthUi::StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager)
-{
-    AbilityStatus status = dmAbilityManager->StartAbility(AbilityRole::ABILITY_ROLE_INITIATIVE);
-    if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("PinAuthUi::StartFaService timeout");
-        return DM_FAILED;
-    }
-    return DM_OK;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

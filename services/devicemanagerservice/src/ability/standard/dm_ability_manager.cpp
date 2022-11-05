@@ -21,55 +21,30 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "parameter.h"
-#include "semaphore.h"
 #include "single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const int32_t ABILITY_START_TIMEOUT = 3; // 3 second
 const std::string bundleName = "com.ohos.devicemanagerui";
-const std::string abilityName = "com.ohos.devicemanagerui.MainAbility";
+const std::string abilityName = "com.ohos.devicemanagerui.ConfirmDialogAbility";
 } // namespace
 
-AbilityRole DmAbilityManager::GetAbilityRole()
+AbilityStatus DmAbilityManager::StartAbility()
 {
-    return mAbilityStatus_;
-}
-
-AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
-{
-    mAbilityStatus_ = role;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = localDeviceId;
-    mStatus_ = AbilityStatus::ABILITY_STATUS_START;
     AAFwk::Want want;
     AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
     want.SetElement(element);
     AAFwk::AbilityManagerClient::GetInstance()->Connect();
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (result != OHOS::ERR_OK) {
-        LOGE("Start Ability faild");
-        mStatus_ = AbilityStatus::ABILITY_STATUS_FAILED;
-        return mStatus_;
+    if (result != 0) {
+        LOGE("Start Ability failed");
+        return AbilityStatus::ABILITY_STATUS_FAILED;
     }
-    waitForTimeout(ABILITY_START_TIMEOUT);
-    return mStatus_;
-}
-
-void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += (int32_t)timeout_s;
-    sem_timedwait(&mSem_, &ts);
-}
-
-void DmAbilityManager::StartAbilityDone()
-{
-    mStatus_ = AbilityStatus::ABILITY_STATUS_SUCCESS;
-    sem_post(&mSem_);
+    return AbilityStatus::ABILITY_STATUS_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

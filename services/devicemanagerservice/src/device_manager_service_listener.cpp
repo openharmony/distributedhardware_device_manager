@@ -108,9 +108,9 @@ void DeviceManagerServiceListener::OnVerifyAuthResult(const std::string &pkgName
     ipcServerListener_.SendAll(SERVER_VERIFY_AUTH_RESULT, pReq, pRsp);
 }
 
-void DeviceManagerServiceListener::OnFaCall(std::string &pkgName, std::string &paramJson)
+void DeviceManagerServiceListener::OnUiCall(std::string &pkgName, std::string &paramJson)
 {
-    LOGI("OnFaCall in");
+    LOGI("OnUiCall in");
     std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::make_shared<IpcNotifyDMFAResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 

@@ -144,7 +144,7 @@ public:
     int32_t StartAuthProcess(const int32_t &authType);
     void StartRespAuthProcess();
     int32_t CreateGroup();
-    int32_t AddMember(const std::string &deviceId);
+    int32_t AddMember(int32_t pinCode);
     std::string GetConnectAddr(std::string deviceId);
     int32_t JoinNetwork();
     void AuthenticateFinish();
@@ -155,15 +155,33 @@ public:
     std::string GenerateGroupName();
     void HandleAuthenticateTimeout(std::string name);
     void CancelDisplay();
+
+    /**
+     * @tc.name: DmAuthManager::UpdateInputDialogDisplay
+     * @tc.desc: Update InputDialog Display of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
+    void UpdateInputDialogDisplay(bool isShow);
+
+    /**
+     * @tc.name: DmAuthManager::GeneratePincode
+     * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
     int32_t GeneratePincode();
     void ShowConfigDialog();
     void ShowAuthInfoDialog();
     void ShowStartAuthDialog();
     int32_t GetAuthenticationParam(DmAuthParam &authParam);
-    int32_t OnUserOperation(int32_t action);
+    /**
+     * @tc.name: DmAuthManager::OnUserOperation
+     * @tc.desc: User Operation of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
+    int32_t OnUserOperation(int32_t action, const std::string &params);
     void UserSwitchEventCallback(int32_t userId);
     int32_t SetPageId(int32_t pageId);
-    int32_t SetReason(int32_t reason, int32_t state);
+    int32_t SetReasonAndFinish(int32_t reason, int32_t state);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -180,6 +198,8 @@ private:
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
+    int32_t authTimes_ = 0;
+    std::shared_ptr<IAuthentication> authPtr_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

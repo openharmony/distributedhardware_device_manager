@@ -114,20 +114,20 @@ void DeviceManagerNotify::UnRegisterVerifyAuthenticationCallback(const std::stri
 }
 
 void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                          std::shared_ptr<DeviceManagerFaCallback> callback)
+                                                          std::shared_ptr<DeviceManagerUiCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    dmFaCallback_[pkgName] = callback;
+    dmUiCallback_[pkgName] = callback;
 }
 
 void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmFaCallback_.count(pkgName) == 0) {
+    if (dmUiCallback_.count(pkgName) == 0) {
         LOGE("DeviceManager UnRegisterDeviceManagerFaCallback not register");
         return;
     }
-    dmFaCallback_.erase(pkgName);
+    dmUiCallback_.erase(pkgName);
 }
 
 void DeviceManagerNotify::OnRemoteDied()
@@ -271,15 +271,27 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
     verifyAuthCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
+void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
 {
-    LOGI("DeviceManager OnFaCallback pkgName:%s", pkgName.c_str());
-    std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmFaCallback_.count(pkgName) == 0) {
-        LOGE("DeviceManager DmFaCallback not register");
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerNotify::OnUiCall error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return;
     }
-    dmFaCallback_[pkgName]->OnCall(paramJson);
+    LOGI("DeviceManagerNotify::OnUiCall in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<DeviceManagerUiCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (dmUiCallback_.count(pkgName) == 0) {
+            LOGE("OnUiCall error, dm Ui callback not register for pkgName %d.", pkgName.c_str());
+            return;
+        }
+        tempCbk = dmUiCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnUiCall error, registered dm Ui callback is nullptr.");
+        return;
+    }
+    tempCbk->OnCall(paramJson);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

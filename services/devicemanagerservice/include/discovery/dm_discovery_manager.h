@@ -49,6 +49,7 @@ private:
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
     std::shared_ptr<DmTimer> timer_;
+    std::mutex locks_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

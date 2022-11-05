@@ -48,10 +48,20 @@ public:
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                          std::shared_ptr<VerifyAuthCallback> callback) = 0;
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                    std::shared_ptr<DeviceManagerFaCallback> callback) = 0;
+        std::shared_ptr<DeviceManagerUiCallback> callback) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterDeviceManagerFaCallback
+     * @tc.desc: Unregister Fa callback for device manager
+     * @tc.type: FUNC
+     */
     virtual int32_t UnRegisterDeviceManagerFaCallback(const std::string &pkgName) = 0;
     virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) = 0;
-    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) = 0;
+    /**
+     * @tc.name: DeviceManagerImpl::SetUserOperation
+     * @tc.desc: Set User Actions
+     * @tc.type: FUNC
+     */
+    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action, const std::string &params) = 0;
     virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid) = 0;
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;

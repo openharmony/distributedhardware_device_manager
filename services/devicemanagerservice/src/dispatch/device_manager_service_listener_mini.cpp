@@ -91,10 +91,10 @@ void DeviceManagerServiceListener::OnVerifyAuthResult(const std::string &pkgName
     }
 }
 
-void DeviceManagerServiceListener::OnFaCall(std::string &pkgName, std::string &paramJson)
+void DeviceManagerServiceListener::OnUiCall(std::string &pkgName, std::string &paramJson)
 {
-    LOGI("call OnFaCall in");
-    DeviceManagerNotify::GetInstance().OnFaCall(pkgName, paramJson);
+    LOGI("call OnUiCall in");
+    DeviceManagerNotify::GetInstance().OnUiCall(pkgName, paramJson);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -66,12 +66,6 @@ public:
     int32_t Enter() override;
 };
 
-class AuthRequestInputState : public AuthRequestState {
-public:
-    int32_t GetStateType() override;
-    int32_t Enter() override;
-};
-
 class AuthRequestJoinState : public AuthRequestState {
 public:
     int32_t GetStateType() override;

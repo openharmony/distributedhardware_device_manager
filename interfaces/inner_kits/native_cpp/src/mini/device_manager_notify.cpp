@@ -103,18 +103,18 @@ void DeviceManagerNotify::UnRegisterVerifyAuthenticationCallback(const std::stri
 }
 
 void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
-                                                          std::shared_ptr<DeviceManagerFaCallback> callback)
+                                                          std::shared_ptr<DeviceManagerUiCallback> callback)
 {
-    dmFaCallback_[pkgName] = callback;
+    dmUiCallback_[pkgName] = callback;
 }
 
 void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
 {
-    if (dmFaCallback_.count(pkgName) == 0) {
+    if (dmUiCallback_.count(pkgName) == 0) {
         LOGE("DeviceManager UnRegisterDeviceManagerFaCallback not register");
         return;
     }
-    dmFaCallback_.erase(pkgName);
+    dmUiCallback_.erase(pkgName);
 }
 
 
@@ -246,15 +246,15 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
     verifyAuthCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
+void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
 {
-    LOGI("DeviceManager OnFaCallback pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManager OnUiCallback pkgName:%s", pkgName.c_str());
 
-    if (dmFaCallback_.count(pkgName) == 0) {
-        LOGE("DeviceManager DmFaCallback not register");
+    if (dmUiCallback_.count(pkgName) == 0) {
+        LOGE("DeviceManager dmUiCallback_ not register");
         return;
     }
-    dmFaCallback_[pkgName]->OnCall(paramJson);
+    dmUiCallback_[pkgName]->OnCall(paramJson);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

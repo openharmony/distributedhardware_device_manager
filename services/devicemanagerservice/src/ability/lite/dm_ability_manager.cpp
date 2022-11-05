@@ -19,31 +19,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-AbilityRole DmAbilityManager::GetAbilityRole()
+AbilityStatus DmAbilityManager::StartAbility()
 {
-    return mAbilityStatus_;
-}
-
-AbilityStatus DmAbilityManager::StartAbility(AbilityRole role)
-{
-    // not support for L1 yet, do nothing. jsut save status and role
-    mAbilityStatus_ = role;
-    mStatus_ = AbilityStatus::ABILITY_STATUS_SUCCESS;
-    return mStatus_;
-}
-
-void DmAbilityManager::waitForTimeout(uint32_t timeout_s)
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += (int32_t)timeout_s;
-    sem_timedwait(&mSem_, &ts);
-}
-
-void DmAbilityManager::StartAbilityDone()
-{
-    mStatus_ = AbilityStatus::ABILITY_STATUS_SUCCESS;
-    sem_post(&mSem_);
+    // not support for L1 yet, do nothing. just save status and role
+    return AbilityStatus::ABILITY_STATUS_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

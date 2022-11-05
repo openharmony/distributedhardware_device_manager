@@ -68,9 +68,9 @@ public:
     }
     virtual void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) = 0;
 };
-class DeviceManagerFaCallback {
+class DeviceManagerUiCallback {
 public:
-    virtual ~DeviceManagerFaCallback()
+    virtual ~DeviceManagerUiCallback()
     {
     }
     virtual void OnCall(const std::string &paramJson) = 0;
