@@ -116,7 +116,7 @@ private:
     std::string bundleName_;
 };
 
-class DmJSIDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerFaCallback {
+class DmJSIDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback {
 public:
     explicit DmJSIDeviceManagerFaCallback(std::string &bundleName) : bundleName_(bundleName) {}
     virtual ~DmJSIDeviceManagerFaCallback() {};

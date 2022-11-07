@@ -330,6 +330,7 @@ ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq,
     std::shared_ptr<IpcGetOperationReq> pReq = std::static_pointer_cast<IpcGetOperationReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t action = pReq->GetOperation();
+    std::string params = pReq->GetParams();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -337,6 +338,10 @@ ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq,
     }
     if (!data.WriteInt32(action)) {
         LOGE("write action failed");
+        return DM_WRITE_FAILED;
+    }
+    if (!data.WriteString(params)) {
+        LOGE("write params failed");
         return DM_WRITE_FAILED;
     }
 
@@ -489,7 +494,7 @@ ON_IPC_CMD(SERVER_DEVICE_FA_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
     std::string packagename = data.ReadString();
     std::string paramJson = data.ReadString();
-    DeviceManagerNotify::GetInstance().OnFaCall(packagename, paramJson);
+    DeviceManagerNotify::GetInstance().OnUiCall(packagename, paramJson);
     if (!reply.WriteInt32(DM_OK)) {
         LOGE("write return failed");
         return DM_WRITE_FAILED;

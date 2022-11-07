@@ -58,22 +58,6 @@ int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
     return DM_OK;
 }
 
-int32_t AuthRequestInitState::GetStateType()
-{
-    return AuthState::AUTH_REQUEST_INIT;
-}
-
-int32_t AuthRequestInitState::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
-        return DM_FAILED;
-    }
-    stateAuthManager->EstablishAuthChannel(context_->deviceId);
-    return DM_OK;
-}
-
 int32_t AuthRequestNegotiateState::GetStateType()
 {
     return AuthState::AUTH_REQUEST_NEGOTIATE;

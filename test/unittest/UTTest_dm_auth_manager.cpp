@@ -208,11 +208,12 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->code = 123;
     authManager->authResponseContext_->requestId = 234;
     authManager->authResponseContext_->deviceId = "234";
-    std::string deviceId = "44444";
+    int32_t pinCode = 444444;
+    authManager->timer_ = std::make_shared<DmTimer>();
     authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
     authManager->SetAuthResponseState(authResponseState);
-    int32_t ret = authManager->AddMember(deviceId);
-    ASSERT_EQ(ret, DM_FAILED);
+    int32_t ret = authManager->AddMember(pinCode);
+    ASSERT_NE(ret, -1);
 }
 
 /**
@@ -264,8 +265,9 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseContext_->code = 123456;
     int32_t ret = authManager->GetPinCode();
-    ASSERT_EQ(ret, DM_FAILED);
+    ASSERT_EQ(ret, 123456);
 }
 } // namespace
 } // namespace DistributedHardware

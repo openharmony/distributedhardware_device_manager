@@ -20,6 +20,7 @@
 
 #include "dm_auth_manager.h"
 #include "dm_ability_manager.h"
+#include "want.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -27,11 +28,9 @@ class PinAuthUi {
 public:
     PinAuthUi();
     int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
-    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t InputPinDialog(std::shared_ptr<DmAuthManager> authManager);
     int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
-
-private:
-    int32_t StartFaUiService(std::shared_ptr<DmAbilityManager> dmAbilityManager);
+    int32_t UpdatePinDialog(int32_t pageId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

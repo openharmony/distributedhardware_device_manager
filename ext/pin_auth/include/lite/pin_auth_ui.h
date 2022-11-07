@@ -27,7 +27,7 @@ class PinAuthUi {
 public:
     PinAuthUi();
     int32_t ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
-    int32_t InputPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager);
+    int32_t InputPinDialog(std::shared_ptr<DmAuthManager> authManager);
     int32_t ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager);
 
 private:

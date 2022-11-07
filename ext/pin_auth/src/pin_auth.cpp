@@ -51,16 +51,7 @@ int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthMana
 
 int32_t PinAuth::StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(authToken, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return DM_FAILED;
-    }
-    if (!jsonObject.contains(PIN_CODE_KEY)) {
-        LOGE("err json string, first time");
-        return DM_FAILED;
-    }
-    return pinAuthUi_->InputPinDialog(jsonObject[PIN_CODE_KEY], authManager);
+    return pinAuthUi_->InputPinDialog(authManager);
 }
 
 int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string &authParam)

@@ -39,7 +39,7 @@ const std::string DM_NAPI_EVENT_DEVICE_FOUND = "deviceFound";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL = "discoveryFail";
 const std::string DM_NAPI_EVENT_DEVICE_SERVICE_DIE = "serviceDie";
 const std::string DEVICE_MANAGER_NAPI_CLASS_NAME = "DeviceManager";
-const std::string DM_NAPI_EVENT_DMFA_CALLBACK = "dmFaCallback";
+const std::string DM_NAPI_EVENT_UI_STATE_CHANGE = "uiStateChange";
 
 const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
@@ -60,7 +60,7 @@ std::map<std::string, std::shared_ptr<DmNapiDeviceStateCallback>> g_deviceStateC
 std::map<std::string, std::shared_ptr<DmNapiDiscoveryCallback>> g_DiscoveryCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiAuthenticateCallback>> g_authCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiVerifyAuthCallback>> g_verifyAuthCallbackMap;
-std::map<std::string, std::shared_ptr<DmNapiDeviceManagerFaCallback>> g_dmfaCallbackMap;
+std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCallbackMap;
 } // namespace
 
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
@@ -966,15 +966,15 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         return;
     }
 
-    if (eventType == DM_NAPI_EVENT_DMFA_CALLBACK) {
-        auto callback = std::make_shared<DmNapiDeviceManagerFaCallback>(env, bundleName);
+    if (eventType == DM_NAPI_EVENT_UI_STATE_CHANGE) {
+        auto callback = std::make_shared<DmNapiDeviceManagerUiCallback>(env, bundleName);
         int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName, callback);
         if (ret != 0) {
-            LOGE("RegisterDeviceManagerFaCallback failed for bunderName %s", bundleName.c_str());
+            LOGE("RegisterDeviceManagerFaCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
-        g_dmfaCallbackMap.erase(bundleName);
-        g_dmfaCallbackMap[bundleName] = callback;
+        g_dmUiCallbackMap.erase(bundleName);
+        g_dmUiCallbackMap[bundleName] = callback;
     }
 }
 
@@ -1027,18 +1027,18 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
         return;
     }
 
-    if (eventType == DM_NAPI_EVENT_DMFA_CALLBACK) {
-        auto iter = g_dmfaCallbackMap.find(bundleName);
-        if (iter == g_dmfaCallbackMap.end()) {
-            LOGE("cannot find dmFaCallback for bunderName %s", bundleName.c_str());
+    if (eventType == DM_NAPI_EVENT_UI_STATE_CHANGE) {
+        auto iter = g_dmUiCallbackMap.find(bundleName);
+        if (iter == g_dmUiCallbackMap.end()) {
+            LOGE("cannot find dmFaCallback for bundleName %s", bundleName.c_str());
             return;
         }
         int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(bundleName);
         if (ret != 0) {
-            LOGE("RegisterDevStateCallback failed for bunderName %s", bundleName.c_str());
+            LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
-        g_dmfaCallbackMap.erase(bundleName);
+        g_dmUiCallbackMap.erase(bundleName);
         return;
     }
 }
@@ -1069,18 +1069,30 @@ napi_value DeviceManagerNapi::GetAuthenticationParamSync(napi_env env, napi_call
 napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_info info)
 {
     LOGI("SetUserOperationSync in");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. Object expected.");
+	napi_valuetype strType;
+    napi_typeof(env, argv[1], &strType);
+    NAPI_ASSERT(env, strType == napi_string, "Wrong argument type, string expected.");
 
     int32_t action = 0;
     napi_get_value_int32(env, argv[0], &action);
+
+    size_t typeLen = 0;
+    napi_get_value_string_utf8(env, argv[1], nullptr, 0, &typeLen);
+    NAPI_ASSERT(env, typeLen > 0, "typeLen == 0");
+    NAPI_ASSERT(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
+    char type[DM_NAPI_BUF_LENGTH] = {0};
+    napi_get_value_string_utf8(env, argv[1], type, typeLen + 1, &typeLen);
+
+    std::string params = type;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
-    int32_t ret = DeviceManager::GetInstance().SetUserOperation(deviceManagerWrapper->bundleName_, action);
+    int32_t ret = DeviceManager::GetInstance().SetUserOperation(deviceManagerWrapper->bundleName_, action, params);
     if (ret != 0) {
-        LOGE("SetUserOperation for bunderName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+        LOGE("SetUserOperation for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
     }
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
@@ -1121,7 +1133,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
     }
 }
 
-void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
+void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
 {
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
@@ -1130,7 +1142,7 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
-        LOGE("DmNapiDeviceManagerFaCallback: OnCall, No memory");
+        LOGE("DmNapiDeviceManagerUiCallback: OnCall, No memory");
         return;
     }
 
@@ -1141,29 +1153,27 @@ void DmNapiDeviceManagerFaCallback::OnCall(const std::string &paramJson)
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
-            LOGE("OnCall, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
+            LOGE("OnCall, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
             return;
         }
-        deviceManagerNapi->OnDmfaCall(callback->token_);
-        if (work != nullptr) {
-            delete work;
-        }
+        deviceManagerNapi->OnDmUiCall(callback->token_);
+        delete work;
+        work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnCall work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
     }
 }
 
-void DeviceManagerNapi::OnDmfaCall(const std::string &paramJson)
+void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 {
     LOGI("OnCall for paramJson");
     napi_value result;
     napi_create_object(env_, &result);
     SetValueUtf8String(env_, "param", paramJson, result);
-    OnEvent("dmFaCallback", DM_NAPI_ARGS_ONE, &result);
+    OnEvent(DM_NAPI_EVENT_UI_STATE_CHANGE, DM_NAPI_ARGS_ONE, &result);
 }
 
 void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status &status,

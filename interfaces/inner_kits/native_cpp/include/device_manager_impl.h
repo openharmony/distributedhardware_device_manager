@@ -48,11 +48,21 @@ public:
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo) override;
     virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                          std::shared_ptr<VerifyAuthCallback> callback) override;
+    /**
+     * @tc.name: DeviceManagerImpl::RegisterDeviceManagerFaCallback
+     * @tc.desc: Register Fa callback for device manager
+     * @tc.type: FUNC
+     */
     virtual int32_t RegisterDeviceManagerFaCallback(const std::string &packageName,
-                                                    std::shared_ptr<DeviceManagerFaCallback> callback) override;
+                                                    std::shared_ptr<DeviceManagerUiCallback> callback) override;
     virtual int32_t UnRegisterDeviceManagerFaCallback(const std::string &pkgName) override;
     virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) override;
-    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action) override;
+    /**
+     * @tc.name: DeviceManagerImpl::SetUserOperation
+     * @tc.desc: Set User Actions
+     * @tc.type: FUNC
+     */
+    virtual int32_t SetUserOperation(const std::string &pkgName, int32_t action, const std::string &params) override;
     virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        std::string &udid) override;
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,

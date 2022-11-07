@@ -170,12 +170,12 @@ private:
     std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
-class DmNapiDeviceManagerFaCallback : public OHOS::DistributedHardware::DeviceManagerFaCallback {
+class DmNapiDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback {
 public:
-    explicit DmNapiDeviceManagerFaCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
+    explicit DmNapiDeviceManagerUiCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceManagerFaCallback() {};
+    virtual ~DmNapiDeviceManagerUiCallback() {};
     void OnCall(const std::string &paramJson) override;
 
 private:
@@ -284,7 +284,7 @@ public:
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason);
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag);
-    void OnDmfaCall(const std::string &paramJson);
+    void OnDmUiCall(const std::string &paramJson);
 
 private:
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);

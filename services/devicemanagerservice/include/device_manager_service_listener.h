@@ -36,7 +36,8 @@ public:
                       int32_t reason);
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
                             const std::string &flag);
-    void OnFaCall(std::string &pkgName, std::string &paramJson);
+
+    void OnUiCall(std::string &pkgName, std::string &paramJson);
 
 private:
 #if !defined(__LITEOS_M__)

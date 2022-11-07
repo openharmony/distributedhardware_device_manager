@@ -47,7 +47,7 @@ public:
     void RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
                                               std::shared_ptr<VerifyAuthCallback> callback);
     void UnRegisterVerifyAuthenticationCallback(const std::string &pkgName);
-    void RegisterDeviceManagerFaCallback(const std::string &pkgName, std::shared_ptr<DeviceManagerFaCallback> callback);
+    void RegisterDeviceManagerFaCallback(const std::string &pkgName, std::shared_ptr<DeviceManagerUiCallback> callback);
     void UnRegisterDeviceManagerFaCallback(const std::string &pkgName);
 
 public:
@@ -62,7 +62,7 @@ public:
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
                       uint32_t status, uint32_t reason);
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode, int32_t flag);
-    void OnFaCall(std::string &pkgName, std::string &paramJson);
+    void OnUiCall(std::string &pkgName, std::string &paramJson);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -73,7 +73,7 @@ private:
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;
     std::map<std::string, std::shared_ptr<VerifyAuthCallback>> verifyAuthCallback_;
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback_;
-    std::map<std::string, std::shared_ptr<DeviceManagerFaCallback>> dmFaCallback_;
+    std::map<std::string, std::shared_ptr<DeviceManagerUiCallback>> dmUiCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
