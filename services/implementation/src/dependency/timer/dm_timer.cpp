@@ -103,9 +103,9 @@ int32_t DmTimer::TimerRunning()
         }
         while (!timerQueue_.empty() && timerState_) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TICK_MILLSECONDS));
-            while (std::chrono::duration_cast<timerDuration>(steadyClock::now()
-                   - timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_
-                   || !timerQueue_.top()->state_) {
+            while (std::chrono::duration_cast<timerDuration>(steadyClock::now() -
+                timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_ ||
+                !timerQueue_.top()->state_) {
                 std::string name = timerQueue_.top()->timerName_;
                 if (timerQueue_.top()->state_) {
                     timerQueue_.top()->callback_(name);

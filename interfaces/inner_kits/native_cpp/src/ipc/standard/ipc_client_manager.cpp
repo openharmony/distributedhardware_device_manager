@@ -154,6 +154,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 bool IpcClientManager::IsInit(const std::string &pkgName)
 {
+    (void)pkgName;
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
         return false;

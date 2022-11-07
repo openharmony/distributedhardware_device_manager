@@ -392,6 +392,8 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
 
 char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
+    (void)requestId;
+    (void)reqParams;
     if (operationCode != GroupOperationCode::MEMBER_JOIN) {
         LOGE("HiChainConnector::onRequest operationCode %d", operationCode);
         return nullptr;
@@ -829,7 +831,7 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
     }
 
     int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId, DM_PKG_NAME, addParams.c_str());
-    if (ret!= DM_OK) {
+    if (ret != DM_OK) {
         LOGE("HiChainConnector::addMultiMemberstoGroup failure! ret = %d", ret);
         return ret;
     }

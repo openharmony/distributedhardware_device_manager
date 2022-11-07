@@ -138,6 +138,7 @@ void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t 
 
 void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
+    (void)name;
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
     if (discoveryQueue_.empty()) {
         LOGE("HandleDiscoveryTimeout: discovery queue is empty.");

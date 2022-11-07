@@ -124,7 +124,7 @@ class DmAuthManager final : public ISoftbusSessionCallback,
 public:
     DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                   std::shared_ptr<IDeviceManagerServiceListener> listener,
-                  std::shared_ptr<HiChainConnector> hiChainConnector_);
+                  std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmAuthManager();
 
     /**
@@ -217,7 +217,7 @@ public:
      * @tc.desc: Start Auth Process of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t StartAuthProcess(const int32_t &authType);
+    int32_t StartAuthProcess(const int32_t &action);
 
     /**
      * @tc.name: DmAuthManager::StartRespAuthProcess

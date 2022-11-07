@@ -113,6 +113,7 @@ void DmPublishManager::OnPublishResult(const std::string &pkgName, int32_t publi
 
 void DmPublishManager::HandlePublishTimeout(std::string name)
 {
+    (void)name;
     LOGI("DmPublishManager::HandlePublishDiscoveryTimeout");
     if (publishQueue_.empty()) {
         LOGE("HandlePublishDiscoveryTimeout: Publish discovery queue is empty.");

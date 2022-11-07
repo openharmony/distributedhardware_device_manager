@@ -79,7 +79,7 @@ public:
      * @tc.desc: start timer running
      * @tc.type: FUNC
      */
-    int32_t StartTimer(std::string name, int32_t time, TimerCallback callback);
+    int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
 
     /**
      * @tc.name: DmTimer::DeleteTimer

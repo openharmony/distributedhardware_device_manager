@@ -39,7 +39,7 @@ public:
      * @tc.desc: OnSoftbusPublishResult of the SoftbusConnector
      * @tc.type: FUNC
      */
-    static void OnSoftbusPublishResult(int publishId, PublishResult result);
+    static void OnSoftbusPublishResult(int32_t publishId, PublishResult result);
 
     /**
      * @tc.name: SoftbusConnector::OnSoftbusDeviceFound
@@ -124,7 +124,7 @@ public:
     int32_t UnRegisterSoftbusPublishCallback(const std::string &pkgName);
     int32_t PublishDiscovery(const DmPublishInfo &dmPublishInfo);
     int32_t UnPublishDiscovery(int32_t publishId);
-    int32_t StartDiscovery(const DmSubscribeInfo &subscribeInfo);
+    int32_t StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo);
     int32_t StopDiscovery(uint16_t subscribeId);
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     bool HaveDeviceInMap(std::string deviceId);

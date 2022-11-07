@@ -93,6 +93,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 
 int32_t PinAuthUi::ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager)
 {
+    (void)authManager;
     LOGI("PinAuthUi start");
     Ace::UIServiceMgrClient::GetInstance()->CancelDialog(pageId);
     LOGI("PinAuthUi end");

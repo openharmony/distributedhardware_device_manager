@@ -22,7 +22,7 @@ namespace OHOS {
 namespace DistributedHardware {
 std::string GetAnonyString(const std::string &value);
 std::string GetAnonyInt32(const int32_t value);
-bool IsNumberString(const std::string &authToken);
+bool IsNumberString(const std::string &inputString);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H
