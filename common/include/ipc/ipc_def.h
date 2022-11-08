@@ -50,6 +50,8 @@ enum IpcCmdID {
     SERVER_GET_AUTHENTCATION_INFO,
     SERVER_USER_AUTHORIZATION_OPERATION,
     SERVER_DEVICEMANAGER_FA_NOTIFY,
+    //Add ipc msg here
+    IPC_MSG_BUTT 
 };
 } // namespace DistributedHardware
 } // namespace OHOS

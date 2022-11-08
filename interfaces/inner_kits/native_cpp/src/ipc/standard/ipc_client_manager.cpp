@@ -68,6 +68,10 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     int32_t ret = ClientInit();
     if (ret != DEVICEMANAGER_OK) {
@@ -100,6 +104,10 @@ int32_t IpcClientManager::Init(std::string &pkgName)
 
 int32_t IpcClientManager::UnInit(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     DMLOG(DM_LOG_INFO, "in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         DMLOG(DM_LOG_ERROR, "DeviceManager not Init");
@@ -128,6 +136,10 @@ int32_t IpcClientManager::UnInit(std::string &pkgName)
 
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        DMLOG(DM_LOG_ERROR, "IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
         return DEVICEMANAGER_SERVICE_NOT_READY;

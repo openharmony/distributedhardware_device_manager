@@ -173,6 +173,10 @@ const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
 
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Error: parameter invalid");
+        return nullptr;
+    }
     auto iter = dmListener_.find(pkgName);
     if (iter == dmListener_.end()) {
         return nullptr;

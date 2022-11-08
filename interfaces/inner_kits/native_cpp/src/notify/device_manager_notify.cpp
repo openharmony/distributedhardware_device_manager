@@ -18,6 +18,7 @@
 #include "device_manager_log.h"
 #include "device_manager_errno.h"
 #include "nlohmann/json.hpp"
+#include "anonymous_string.h"
 #include "constants.h"
 #include "device_manager.h"
 
@@ -28,12 +29,20 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 void DeviceManagerNotify::RegisterDeathRecipientCallback(std::string &pkgName,
     std::shared_ptr<DmInitCallback> dmInitCallback)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_[pkgName] = dmInitCallback;
 }
 
 void DeviceManagerNotify::UnRegisterDeathRecipientCallback(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_.erase(pkgName);
 }
@@ -41,12 +50,20 @@ void DeviceManagerNotify::UnRegisterDeathRecipientCallback(std::string &pkgName)
 void DeviceManagerNotify::RegisterDeviceStateCallback(std::string &pkgName,
     std::shared_ptr<DeviceStateCallback> callback)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_[pkgName] = callback;
 }
 
 void DeviceManagerNotify::UnRegisterDeviceStateCallback(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
 }
@@ -54,6 +71,10 @@ void DeviceManagerNotify::UnRegisterDeviceStateCallback(std::string &pkgName)
 void DeviceManagerNotify::RegisterDiscoverCallback(std::string &pkgName, uint16_t subscribeId,
     std::shared_ptr<DiscoverCallback> callback)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceDiscoverCallbacks_.count(pkgName) == 0) {
         deviceDiscoverCallbacks_[pkgName] = std::map<uint16_t, std::shared_ptr<DiscoverCallback>>();
@@ -63,6 +84,10 @@ void DeviceManagerNotify::RegisterDiscoverCallback(std::string &pkgName, uint16_
 
 void DeviceManagerNotify::UnRegisterDiscoverCallback(std::string &pkgName, uint16_t subscribeId)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceDiscoverCallbacks_.count(pkgName) > 0) {
         deviceDiscoverCallbacks_[pkgName].erase(subscribeId);
@@ -75,6 +100,11 @@ void DeviceManagerNotify::UnRegisterDiscoverCallback(std::string &pkgName, uint1
 void DeviceManagerNotify::RegisterAuthenticateCallback(std::string &pkgName, std::string &deviceId,
     std::shared_ptr<AuthenticateCallback> callback)
 {
+    if (pkgName.empty() || deviceId.empty()) {
+        DMLOG(DM_LOG_ERROR, "DeviceManagerNotify::RegisterAuthenticateCallback error: Invalid parameter, pkgName: %s, deviceId: %s",
+            pkgName.c_str(), GetAnonyString(deviceId).c_str());
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
         authenticateCallback_[pkgName] = std::map<std::string, std::shared_ptr<AuthenticateCallback>>();
@@ -84,6 +114,11 @@ void DeviceManagerNotify::RegisterAuthenticateCallback(std::string &pkgName, std
 
 void DeviceManagerNotify::UnRegisterAuthenticateCallback(std::string &pkgName, std::string &deviceId)
 {
+    if (pkgName.empty() || deviceId.empty()) {
+        DMLOG(DM_LOG_ERROR, "DeviceManagerNotify::UnRegisterAuthenticateCallback error: Invalid parameter, pkgName: %s, deviceId: %s",
+            pkgName.c_str(), GetAnonyString(deviceId).c_str());
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) > 0) {
         authenticateCallback_[pkgName].erase(deviceId);
@@ -95,6 +130,10 @@ void DeviceManagerNotify::UnRegisterAuthenticateCallback(std::string &pkgName, s
 
 void DeviceManagerNotify::UnRegisterPackageCallback(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
     deviceDiscoverCallbacks_.erase(pkgName);
@@ -124,6 +163,10 @@ void DeviceManagerNotify::RegisterDeviceManagerFaCallback(std::string &packageNa
 
 void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     dmFaCallback_.erase(pkgName);
 }
@@ -139,6 +182,10 @@ void DeviceManagerNotify::OnRemoteDied()
 
 void DeviceManagerNotify::OnDeviceOnline(std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceOnline pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
@@ -150,6 +197,10 @@ void DeviceManagerNotify::OnDeviceOnline(std::string &pkgName, const DmDeviceInf
 
 void DeviceManagerNotify::OnDeviceOffline(std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceOffline pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
@@ -161,6 +212,10 @@ void DeviceManagerNotify::OnDeviceOffline(std::string &pkgName, const DmDeviceIn
 
 void DeviceManagerNotify::OnDeviceChanged(std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceChanged pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStateCallback_.count(pkgName) == 0) {
@@ -173,6 +228,10 @@ void DeviceManagerNotify::OnDeviceChanged(std::string &pkgName, const DmDeviceIn
 void DeviceManagerNotify::OnDeviceFound(std::string &pkgName, uint16_t subscribeId,
     const DmDeviceInfo &deviceInfo)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDeviceFound pkgName:%s, subscribeId:%d.", pkgName.c_str(),
         (int32_t)subscribeId);
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -192,6 +251,10 @@ void DeviceManagerNotify::OnDeviceFound(std::string &pkgName, uint16_t subscribe
 
 void DeviceManagerNotify::OnDiscoverFailed(std::string &pkgName, uint16_t subscribeId, int32_t failedReason)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDiscoverFailed pkgName:%s, subscribeId %d, reason %d",
         pkgName.c_str(), subscribeId, failedReason);
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -211,6 +274,10 @@ void DeviceManagerNotify::OnDiscoverFailed(std::string &pkgName, uint16_t subscr
 
 void DeviceManagerNotify::OnDiscoverySuccess(std::string &pkgName, uint16_t subscribeId)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnDiscoverySuccess pkgName:%s, subscribeId:%d.", pkgName.c_str(),
         subscribeId);
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -231,6 +298,10 @@ void DeviceManagerNotify::OnDiscoverySuccess(std::string &pkgName, uint16_t subs
 void DeviceManagerNotify::OnAuthResult(std::string &pkgName, std::string &deviceId, int32_t pinToken,
     uint32_t status, uint32_t reason)
 {
+    if (pkgName.empty() || deviceId.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid para, pkgName: %s", pkgName.c_str());
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%d",
         pkgName.c_str(), status, reason);
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -254,6 +325,10 @@ void DeviceManagerNotify::OnAuthResult(std::string &pkgName, std::string &device
 void DeviceManagerNotify::OnCheckAuthResult(std::string &pkgName, std::string &deviceId, int32_t resultCode,
     int32_t flag)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "Invalid parameter, pkgName is empty.");
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManagerNotify::OnCheckAuthResult pkgName:%s, resultCode:%d, flag:%d",
         pkgName.c_str(), resultCode, flag);
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -268,6 +343,10 @@ void DeviceManagerNotify::OnCheckAuthResult(std::string &pkgName, std::string &d
 
 void DeviceManagerNotify::OnFaCall(std::string &pkgName, std::string &paramJson)
 {
+    if (pkgName.empty()) {
+        DMLOG(DM_LOG_ERROR, "DeviceManagerNotify::OnFaCall error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return;
+    }
     DMLOG(DM_LOG_INFO, "DeviceManager OnFaCallback pkgName:%s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmFaCallback_.count(pkgName) == 0) {

@@ -34,6 +34,10 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        DMLOG(DM_LOG_ERROR, "IpcCmdRegister::ReadResponse cmdCode param invalid!");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
         DMLOG(DM_LOG_ERROR, "cmdCode:%d not register ReadResponseFunc", cmdCode);
@@ -44,6 +48,10 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        DMLOG(DM_LOG_ERROR, "IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
         DMLOG(DM_LOG_ERROR, "cmdCode:%d not register OnIpcCmdFunc", cmdCode);

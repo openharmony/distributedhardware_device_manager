@@ -77,6 +77,7 @@ if (defined(ohos_lite)) {
       "include/ipc",
       "include/notify",
       "${utils_path}/include/log",
+      "${utils_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${utils_path}/include/ipc/standard",
