@@ -25,6 +25,10 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        DMLOG(DM_LOG_ERROR, "IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return DEVICEMANAGER_INVALID_PARAM;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DMLOG(DM_LOG_ERROR, "remote service null");
