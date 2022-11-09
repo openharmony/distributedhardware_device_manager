@@ -262,11 +262,13 @@ int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgNam
         LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("RegisterDevStateCallback failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    {
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
+        if (registerDevStateMap_.count(pkgName) == 0) {
+            registerDevStateMap_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
+        }
     }
-    return dmServiceImpl_->RegisterDevStateCallback(pkgName, extra);
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
@@ -275,11 +277,16 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
         LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnRegisterDevStateCallback failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    {
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
+        if (registerDevStateMap_.count(pkgName) > 0) {
+            registerDevStateMap_.erase(pkgName);
+        }
     }
-    return dmServiceImpl_->UnRegisterDevStateCallback(pkgName, extra);
+    if (IsDMServiceImplSoLoaded()) {
+        return dmServiceImpl_->UnRegisterDevStateCallback(pkgName, extra);
+    }
+    return DM_OK;
 }
 
 void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
@@ -287,6 +294,12 @@ void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOnline failed, instance not init or init failed.");
         return;
+    }
+    {
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
+        for (auto iter : registerDevStateMap_) {
+            dmServiceImpl_->RegisterDevStateCallback(iter.first, iter.second);
+        }
     }
     dmServiceImpl_->HandleDeviceOnline(info);
 }
@@ -404,6 +417,12 @@ bool DeviceManagerService::IsDMServiceImplReady()
     }
     isImplsoLoaded_ = true;
     return true;
+}
+
+bool DeviceManagerService::IsDMServiceImplSoLoaded()
+{
+    std::lock_guard<std::mutex> lock(isImplLoadLock_);
+    return isImplsoLoaded_;
 }
 
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
