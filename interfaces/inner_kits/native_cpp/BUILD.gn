@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
       "include/ipc",
       "include/ipc/lite",
       "include/notify",
+      "${utils_path}/include",
       "${utils_path}/include/log",
       "${utils_path}/include/ipc/lite",
       "${common_path}/include/ipc",
