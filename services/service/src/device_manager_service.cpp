@@ -266,7 +266,7 @@ int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_)
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
         if (registerDevStateMap_.count(pkgName) == 0) {
             registerDevStateMap_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
         }
@@ -281,7 +281,7 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
         return ERR_DM_INPUT_PARA_INVALID;
     }
     {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_)
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
         if (registerDevStateMap_.count(pkgName) > 0) {
             registerDevStateMap_.erase(pkgName);
         }
@@ -299,7 +299,7 @@ void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
         return;
     }
     {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_)
+        std::lock_guard<std::mutex> lock(registerDevStateLock_);
         for (auto iter : registerDevStateMap_) {
            dmServiceImpl_->RegisterDevStateCallback(iter->first, iter->second);
         }
