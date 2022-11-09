@@ -301,7 +301,7 @@ void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
     {
         std::lock_guard<std::mutex> lock(registerDevStateLock_);
         for (auto iter : registerDevStateMap_) {
-           dmServiceImpl_->RegisterDevStateCallback(iter.first, iter.second);
+            dmServiceImpl_->RegisterDevStateCallback(iter.first, iter.second);
         }
     }
     dmServiceImpl_->HandleDeviceOnline(info);
