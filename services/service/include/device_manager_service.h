@@ -93,6 +93,8 @@ public:
 
     bool IsDMServiceImplReady();
 
+    bool IsDMServiceImplSoLoaded();
+
     int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
 
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
@@ -111,6 +113,8 @@ public:
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;
+    std::mutex registerDevStateLock_;
+    std::map<std::string, std::string> registerDevStateMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
