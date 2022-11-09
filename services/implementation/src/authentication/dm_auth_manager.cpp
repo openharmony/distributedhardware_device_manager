@@ -821,6 +821,7 @@ void DmAuthManager::ShowStartAuthDialog()
 
 int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
 {
+    (void)authParam;
     return DM_OK;
 }
 
@@ -854,7 +855,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
     return DM_OK;
 }
 
-void DmAuthManager::UserSwitchEventCallback (int32_t userId)
+void DmAuthManager::UserSwitchEventCallback(int32_t userId)
 {
     LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
     nlohmann::json jsonObj;

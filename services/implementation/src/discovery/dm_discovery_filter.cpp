@@ -96,7 +96,7 @@ bool DmDiscoveryFilter::FilterByCredible(int32_t value, bool isOnline)
     return (value == DM_ALL_DEVICE);
 }
 
-bool DmDiscoveryFilter::FilterByRange(int32_t value, int range)
+bool DmDiscoveryFilter::FilterByRange(int32_t value, int32_t range)
 {
     return ((range > 0) && (range <= value));
 }

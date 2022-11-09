@@ -36,6 +36,8 @@ ShowConfirm::~ShowConfirm()
 void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
                                     std::shared_ptr<DmAbilityManager> dmAbilityMgr)
 {
+    (void)params;
+    (void)authManager;
     LOGI("ShowConfirm hap start");
     if (dmAbilityMgr == nullptr) {
         LOGE("ShowConfirm::dmAbilityManager is null");

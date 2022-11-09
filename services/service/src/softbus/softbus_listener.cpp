@@ -282,6 +282,8 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
 
 void SoftbusListener::OnParameterChgCallback(const char *key, const char *value, void *context)
 {
+    (void)key;
+    (void)context;
     if (strcmp(value, DISCOVER_STATUS_ON) == 0 && publishStatus != ALLOW_BE_DISCOVERY) {
         PublishInfo dmPublishInfo;
         (void)memset_s(&dmPublishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
@@ -327,6 +329,8 @@ void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
+    (void)type;
+    (void)info;
     LOGD("OnSoftbusDeviceInfoChanged.");
 }
 } // namespace DistributedHardware

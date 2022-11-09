@@ -74,8 +74,8 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!authParamJson.contains(PIN_CODE_KEY) || !authParamJson.contains(PIN_TOKEN)
-        || !authTokenJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_TOKEN)) {
+    if (!authParamJson.contains(PIN_CODE_KEY) || !authParamJson.contains(PIN_TOKEN) ||
+        !authTokenJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_TOKEN)) {
         LOGE("err json string, first time");
         return ERR_DM_FAILED;
     }

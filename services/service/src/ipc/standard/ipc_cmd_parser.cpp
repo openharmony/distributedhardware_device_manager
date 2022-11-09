@@ -295,7 +295,7 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     std::string extra = data.ReadString();
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    int32_t infoNum =(int32_t)(deviceList.size());
+    int32_t infoNum = (int32_t)(deviceList.size());
     DmDeviceInfo deviceInfo;
     if (!reply.WriteInt32(infoNum)) {
         LOGE("write infoNum failed");
@@ -439,6 +439,7 @@ ON_IPC_CMD(VERIFY_AUTHENTICATION, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
+    (void)data;
     DmDeviceInfo localDeviceInfo;
     int32_t result = 0;
     result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);

@@ -54,7 +54,7 @@ public:
      * @tc.desc: Get local device information
      * @tc.type: FUNC
      */
-    virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &deviceInfo) override;
+    virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &info) override;
     /**
      * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
      * @tc.desc: Register device development status callback
@@ -121,7 +121,7 @@ public:
      * @tc.desc: Register Fa callback for device manager
      * @tc.type: FUNC
      */
-    virtual int32_t RegisterDeviceManagerFaCallback(const std::string &packageName,
+    virtual int32_t RegisterDeviceManagerFaCallback(const std::string &pkgName,
                                                     std::shared_ptr<DeviceManagerUiCallback> callback) override;
     /**
      * @tc.name: DeviceManagerImpl::UnRegisterDeviceManagerFaCallback
@@ -134,7 +134,7 @@ public:
      * @tc.desc: Get Fa Param
      * @tc.type: FUNC
      */
-    virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) override;
+    virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &dmFaParam) override;
     /**
      * @tc.name: DeviceManagerImpl::SetUserOperation
      * @tc.desc: Set User Actions

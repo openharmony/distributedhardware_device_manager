@@ -173,6 +173,7 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
 void DeviceManagerNotify::RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
                                                                std::shared_ptr<VerifyAuthCallback> callback)
 {
+    (void)authPara;
     std::lock_guard<std::mutex> autoLock(lock_);
     verifyAuthCallback_[pkgName] = callback;
 }
