@@ -20,7 +20,6 @@
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
-#include "ui_service_mgr_client.h"
 #include "device_manager_service_listener.h"
 
 #include "pinauthui_fuzzer.h"

@@ -33,8 +33,6 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t pageId = *(reinterpret_cast<const int32_t*>(data));;
-
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
