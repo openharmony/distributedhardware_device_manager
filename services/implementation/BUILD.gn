@@ -216,13 +216,7 @@ if (defined(ohos_lite)) {
       deps += [ "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits" ]
     }
 
-    if (!device_manager_no_interaction_auth) {
-      deps += [
-        "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
-        "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
-      ]
-      defines += [ "SUPPORT_GRAPHICS" ]
-    }
+    if (!device_manager_no_interaction_auth) {}
 
     external_deps = [
       "ability_base:want",

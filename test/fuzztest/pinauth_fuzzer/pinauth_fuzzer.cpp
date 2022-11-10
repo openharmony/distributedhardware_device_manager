@@ -48,8 +48,6 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
     int32_t ret = pinauth->ShowAuthInfo(authToken, authManager);
     ret = pinauth->StartAuth(authToken, authManager);
     ret = pinauth->VerifyAuthentication(authToken, authParam);
-    ret = pinauth->CloseAuthInfo(pageId, authManager);
-    ret = pinauth->UpdateAuthInfo(pageId);
 }
 }
 }

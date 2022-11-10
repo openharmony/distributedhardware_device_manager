@@ -34,8 +34,8 @@ foundation/distributedhardware/distributedhardware_device_manager
 │   └── entry
 │       └── src
 │           └── main
-│               ├── js            # DM PIN码显示FA相关JS代码
-│               └── resources     # DM PIN码显示FA相关资源配置文件目录
+│               ├── js            # DM PIN码显示ServiceExtensionAbility相关JS代码
+│               └── resources     # DM PIN码显示ServiceExtensionAbility相关资源配置文件目录
 ├── figures
 ├── interfaces
 │   ├── inner_kits                # 内部接口及实现存放目录
@@ -58,7 +58,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 ├── services
 │   ├── implementation            # devicemanagerservice服务实现核心代码
 │   │   ├── include
-│   │   │   ├── ability           # 与PIN码显示FA拉起管理相关头文件
+│   │   │   ├── ability           # 与PIN码显示ServiceExtensionAbility拉起管理相关头文件
 │   │   │   ├── adapter           # DM适配扩展功能相关头文件
 │   │   │   ├── authentication    # device_auth交互相关头文件
 │   │   │   ├── config            # DM适配扩展相关配置功能头文件
@@ -75,7 +75,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 │   │   │   ├── dispath           # L0上功能实现相关头文件
 │   │   │   └── publish           # 设备主动发现功能相关头文件
 │   │   └── src
-│   │       ├── ability           # 与PIN码显示FA拉起管理相关功能代码
+│   │       ├── ability           # 与PIN码显示ServiceExtensionAbility拉起管理相关功能代码
 │   │       ├── adapter           # DM适配扩展功能代码
 │   │       ├── authentication    # device_auth交互相关核心代码
 │   │       ├── config            # DM适配扩展相关配置功能代码
@@ -357,7 +357,7 @@ try {
     console.error("unAuthenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
 }
 ```
-## 系统弹框FA
+## 系统弹框ServiceExtensionAbility
 
 当前版本只支持PIN码认证，需要提供PIN码认证的授权提示界面、PIN码显示界面、PIN码输入界面；
 
@@ -371,13 +371,13 @@ try {
 
 - 编译环境依赖：IDE 2.2 SDK6
 
-- DeviceManager_UI.hap存放位置：[applications_hap仓库](https://gitee.com/openharmony/applications_hap)
+- DeviceManager_UI.hap包源码存放位置：[device_manager仓库](https://gitee.com/openharmony/distributedhardware_device_manager/tree/master/display)
 
 - UI显示：
 
-  DeviceManager作为认证被控端，授权提示界面、PIN码显示界面由DeviceManager_UI FA默认进行显示；
+  DeviceManager作为认证被控端，授权提示界面、PIN码显示界面由DeviceManager_UI ServiceExtensionAbility默认进行显示；
 
-  DeviceManager作为认证发起端，PIN码输入界面可以选择由DeviceManager_UI FA进行显示，还是由开发者自行显示。开发者如需自己定制PIN码输入界面，需要在authenticateDevice接口的认证参数AuthParam中，extraInfo属性里面指定displayOwner参数为1。
+  DeviceManager作为认证发起端，PIN码输入界面可以选择由DeviceManager_UI ServiceExtensionAbility进行显示，还是由开发者自行显示。开发者如需自己定制PIN码输入界面，需要在authenticateDevice接口的认证参数AuthParam中，extraInfo属性里面指定displayOwner参数为1。
 
 ## 相关仓
 ****

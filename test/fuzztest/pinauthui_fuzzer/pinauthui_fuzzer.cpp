@@ -44,8 +44,6 @@ void PinAuthUiFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<PinAuthUi> pinauthui = std::make_shared<PinAuthUi>();
     int32_t ret = pinauthui->ShowPinDialog(pageId, authManager);
     ret = pinauthui->InputPinDialog(authManager);
-    ret = pinauthui->ClosePage(pageId, authManager);
-    ret = pinauthui->UpdatePinDialog(pageId);
 }
 }
 }
