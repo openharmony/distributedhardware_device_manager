@@ -131,7 +131,7 @@ public:
      * @tc.desc: Get Related Groups of the HiChain Connector
      * @tc.type: FUNC
      */
-    int32_t GetRelatedGroups(const std::string &DeviceId, std::vector<GroupInfo> &groupList);
+    int32_t GetRelatedGroups(const std::string &deviceId, std::vector<GroupInfo> &groupList);
 
     /**
      * @tc.name: HiChainConnector::GetGroupInfo

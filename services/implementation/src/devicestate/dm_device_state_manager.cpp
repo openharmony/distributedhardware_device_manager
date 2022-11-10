@@ -45,6 +45,7 @@ DmDeviceStateManager::~DmDeviceStateManager()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
+    (void)pkgName;
     LOGI("SaveOnlineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
@@ -66,6 +67,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, cons
 
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
+    (void)pkgName;
     LOGI("DeleteOfflineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
@@ -376,6 +378,7 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,
     const std::string &deviceId)
 {
+    (void)pkgName;
     LOGI("ProcNotifyEvent in, eventId: %d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }

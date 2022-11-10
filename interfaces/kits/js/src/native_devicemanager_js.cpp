@@ -2311,7 +2311,6 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         }
         return JsOffFrench(env, 1, thisVar, argv);
     } else {
-        LOGI("JsOff in");
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         size_t requireArgc = 1;
         if (!CheckArgsCount(env, argc >= requireArgc, "Wrong number of arguments, required 1")) {

@@ -58,7 +58,7 @@ public:
      * @tc.type: FUNC
      */
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
-    
+
     /**
      * @tc.name: HiChainConnector::ImportCredential
      * @tc.desc: Import Credential Info of the DmCredential Manager
@@ -85,16 +85,16 @@ public:
      * @tc.desc: delete Symmetry Credential Info of the DmCredential Manager
      * @tc.type: FUNC
      */
-    int32_t DeleteRemoteCredential(const std::string &credentialInfo);
+    int32_t DeleteRemoteCredential(const std::string &deleteInfo);
 
-     /**
+    /**
      * @tc.name: HiChainConnector::DeleteCredential
      * @tc.desc: Delete Credential Info of the DmCredential Manager
      * @tc.type: FUNC
      */
     int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
 
-     /**
+    /**
      * @tc.name: HiChainConnector::OnCredentialResult
      * @tc.desc: Credential Result of the DmCredential Manager
      * @tc.type: FUNC

@@ -419,6 +419,8 @@ void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult r
 
 void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result)
 {
+    (void)addr;
+    (void)networkId;
     LOGD("OnSoftbusJoinLNNResult, result: %d.", result);
 }
 

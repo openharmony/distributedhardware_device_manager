@@ -152,8 +152,8 @@ int32_t DmCredentialManager::ImportLocalCredential(const std::string &credential
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.contains(FIELD_AUTH_TYPE) || !jsonObject.contains(FIELD_USER_ID)
-        || !jsonObject.contains(FIELD_CREDENTIAL_DATA)) {
+    if (!jsonObject.contains(FIELD_AUTH_TYPE) || !jsonObject.contains(FIELD_USER_ID) ||
+        !jsonObject.contains(FIELD_CREDENTIAL_DATA)) {
         LOGE("auth type or user id string key not exist!");
         return ERR_DM_FAILED;
     }
@@ -204,8 +204,8 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         LOGE("deleteInfo string not a json type.");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.contains(FIELD_PROCESS_TYPE) || !jsonObject.contains(FIELD_AUTH_TYPE)
-        || !jsonObject.contains(FIELD_USER_ID)) {
+    if (!jsonObject.contains(FIELD_PROCESS_TYPE) || !jsonObject.contains(FIELD_AUTH_TYPE) ||
+        !jsonObject.contains(FIELD_USER_ID)) {
         LOGE("process type string key not exist!");
         return ERR_DM_FAILED;
     }
@@ -278,8 +278,8 @@ int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo
             LOGE("credentialInfo string not a json type.");
             return ERR_DM_FAILED;
         }
-        if (!jsonObject.contains(FIELD_USER_ID) || !jsonObject.contains(FIELD_CREDENTIAL_VERSION)
-            || !jsonObject.contains(FIELD_DEVICE_ID) || !jsonObject.contains(FIELD_DEVICE_PK)) {
+        if (!jsonObject.contains(FIELD_USER_ID) || !jsonObject.contains(FIELD_CREDENTIAL_VERSION) ||
+            !jsonObject.contains(FIELD_DEVICE_ID) || !jsonObject.contains(FIELD_DEVICE_PK)) {
             LOGE("auth type or user id string key not exist!");
             return ERR_DM_FAILED;
         }

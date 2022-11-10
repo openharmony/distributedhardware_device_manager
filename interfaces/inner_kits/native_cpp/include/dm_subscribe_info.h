@@ -16,7 +16,7 @@
 #ifndef OHOS_DM_SUBSCRIBE_INFO_H
 #define OHOS_DM_SUBSCRIBE_INFO_H
 
-#include <stdbool.h>
+#include <cstdbool>
 
 #define DM_MAX_DEVICE_CAPABILITY_LEN 65
 
