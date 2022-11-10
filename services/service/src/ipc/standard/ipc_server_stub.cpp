@@ -105,7 +105,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         LOGI("ReadInterfaceToken fail!");
         return ERR_DM_IPC_READ_FAILED;
     }
-    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply);
+    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(static_cast<int32_t>(code), data, reply);
     if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
         LOGW("unsupported code: %d", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

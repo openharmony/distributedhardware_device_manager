@@ -346,7 +346,8 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
-    DmSubscribeInfo *subscribeInfo = (DmSubscribeInfo *)data.ReadRawData(sizeof(DmSubscribeInfo));
+    DmSubscribeInfo *subscribeInfo =
+        static_cast<DmSubscribeInfo *>(const_cast<void *>(data.ReadRawData(sizeof(DmSubscribeInfo))));
     int32_t result = ERR_DM_POINT_NULL;
 
     if (subscribeInfo != nullptr) {
@@ -362,7 +363,7 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId = (uint16_t)(data.ReadInt32());
+    uint16_t subscribeId = static_cast<uint16_t>(data.ReadInt32());
     int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -374,7 +375,8 @@ ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(PUBLISH_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    DmPublishInfo *publishInfo = (DmPublishInfo *)data.ReadRawData(sizeof(DmPublishInfo));
+    DmPublishInfo *publishInfo =
+        static_cast<DmPublishInfo *>(const_cast<void *>(data.ReadRawData(sizeof(DmPublishInfo))));
     int32_t result = ERR_DM_POINT_NULL;
 
     if (publishInfo != nullptr) {

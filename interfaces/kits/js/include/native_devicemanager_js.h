@@ -135,9 +135,7 @@ public:
     explicit DmNapiInitCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiInitCallback()
-    {
-    }
+    ~DmNapiInitCallback() override {}
     void OnRemoteDied() override;
 
 private:
@@ -151,7 +149,7 @@ public:
     explicit DmNapiDeviceStateCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceStateCallback() {};
+    ~DmNapiDeviceStateCallback() override {};
     void OnDeviceOnline(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDeviceReady(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDeviceOffline(const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
@@ -169,7 +167,7 @@ public:
         : env_(env), refCount_(0), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDiscoveryCallback() {};
+    ~DmNapiDiscoveryCallback() override {};
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     void OnDiscoverySuccess(uint16_t subscribeId) override;
@@ -190,7 +188,7 @@ public:
         : env_(env), refCount_(0), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiPublishCallback() {};
+    ~DmNapiPublishCallback() override {};
     void OnPublishResult(int32_t publishId, int32_t publishResult) override;
     void IncreaseRefCount();
     void DecreaseRefCount();
@@ -208,7 +206,7 @@ public:
     explicit DmNapiDeviceManagerUiCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiDeviceManagerUiCallback() {};
+    ~DmNapiDeviceManagerUiCallback() override {};
     void OnCall(const std::string &paramJson) override;
 
 private:
@@ -222,7 +220,7 @@ public:
     explicit DmNapiAuthenticateCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiAuthenticateCallback() {};
+    ~DmNapiAuthenticateCallback() override {};
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason) override;
 
 private:
@@ -236,7 +234,7 @@ public:
     explicit DmNapiVerifyAuthCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
     {
     }
-    virtual ~DmNapiVerifyAuthCallback() {};
+    ~DmNapiVerifyAuthCallback() override {};
     void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override;
 
 private:
@@ -248,7 +246,7 @@ private:
 class DeviceManagerNapi : public DmNativeEvent {
 public:
     explicit DeviceManagerNapi(napi_env env, napi_value thisVar);
-    virtual ~DeviceManagerNapi();
+    ~DeviceManagerNapi() override;
     static napi_value Init(napi_env env, napi_value exports);
     static napi_value Constructor(napi_env env, napi_callback_info info);
     static napi_value EnumTypeConstructor(napi_env env, napi_callback_info info);

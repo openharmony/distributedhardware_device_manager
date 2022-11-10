@@ -143,7 +143,8 @@ ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Mess
 ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
-    DmDeviceInfo *localDeviceInfo = (DmDeviceInfo *)reply.ReadRawData(sizeof(DmDeviceInfo));
+    DmDeviceInfo *localDeviceInfo =
+        static_cast<DmDeviceInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceInfo))));
     if (localDeviceInfo != nullptr) {
         pRsp->SetLocalDeviceInfo(*localDeviceInfo);
     }
@@ -485,7 +486,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     DmDeviceState deviceState = static_cast<DmDeviceState>(data.ReadInt32());
     DmDeviceInfo dmDeviceInfo;
     size_t deviceSize = sizeof(DmDeviceInfo);
-    void *deviceInfo = (void *)data.ReadRawData(deviceSize);
+    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
     if (deviceInfo != nullptr && memcpy_s(&dmDeviceInfo, deviceSize, deviceInfo, deviceSize) != 0) {
         reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
         return DM_OK;
@@ -517,7 +518,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
     size_t deviceSize = sizeof(DmDeviceInfo);
-    void *deviceInfo = (void *)data.ReadRawData(deviceSize);
+    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
     if (deviceInfo != nullptr && memcpy_s(&dmDeviceInfo, deviceSize, deviceInfo, deviceSize) != 0) {
         reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
         return ERR_DM_IPC_COPY_FAILED;

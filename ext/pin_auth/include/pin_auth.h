@@ -29,7 +29,7 @@ namespace DistributedHardware {
 class PinAuth : public IAuthentication {
 public:
     PinAuth();
-    ~PinAuth();
+    ~PinAuth() override;
 
     /**
      * @tc.name: PinAuth::ShowAuthInfo
