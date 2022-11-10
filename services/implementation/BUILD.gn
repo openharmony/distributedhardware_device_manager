@@ -216,7 +216,8 @@ if (defined(ohos_lite)) {
       deps += [ "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits" ]
     }
 
-    if (!device_manager_no_interaction_auth) {}
+    if (!device_manager_no_interaction_auth) {
+    }
 
     external_deps = [
       "ability_base:want",
