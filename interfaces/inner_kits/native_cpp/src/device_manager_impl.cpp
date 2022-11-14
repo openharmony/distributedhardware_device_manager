@@ -16,6 +16,7 @@
 #include "device_manager_impl.h"
 #include <unistd.h>
 #include "device_manager_notify.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
@@ -409,8 +410,9 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
 int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                               std::string &udid)
 {
-    if (pkgName.empty()) {
-        LOGE("VerifyAuthentication failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty()) {
+        LOGE("DeviceManagerImpl::GetUdidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s",
+            pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return DM_INVALID_VALUE;
     }
 
@@ -434,8 +436,9 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
 int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                               std::string &uuid)
 {
-    if (pkgName.empty()) {
-        LOGE("VerifyAuthentication failed, pkgName is empty");
+    if (pkgName.empty() || netWorkId.empty()) {
+        LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, uuid: %s",
+            pkgName.c_str(), GetAnonyString(netWorkId).c_str(), GetAnonyString(uuid).c_str());
         return DM_INVALID_VALUE;
     }
 

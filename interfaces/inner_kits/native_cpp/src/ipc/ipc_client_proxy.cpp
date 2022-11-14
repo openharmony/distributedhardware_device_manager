@@ -38,7 +38,8 @@ int32_t IpcClientProxy::UnInit(const std::string &pkgName)
 
 int32_t IpcClientProxy::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (req == nullptr || rsp == nullptr || ipcClientManager_ == nullptr) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr ||
+        ipcClientManager_ == nullptr) {
         LOGI("req,rsp or ipc client is null");
         return DM_POINT_NULL;
     }

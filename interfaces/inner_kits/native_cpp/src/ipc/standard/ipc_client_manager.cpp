@@ -68,6 +68,10 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        LOGE("IpcClientManager::Init error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     int32_t ret = ClientInit();
     if (ret != DM_OK) {
@@ -100,6 +104,10 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
 
 int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        LOGE("IpcClientManager::UnInit error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("in, pkgName %s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
@@ -128,6 +136,10 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
+        LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("IpcClientManager::SendRequest in");
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {

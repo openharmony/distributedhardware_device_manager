@@ -23,7 +23,15 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
+        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     std::string pkgName = req->GetPkgName();
+    if (pkgName.empty()) {
+        LOGE("IpcServerListener::SendRequest error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
         LOGI("cannot get listener for package:%s.", pkgName.c_str());
@@ -34,6 +42,10 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
+        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
     for (auto iter : listeners) {
         auto pkgName = iter.first;
