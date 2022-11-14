@@ -810,7 +810,7 @@ void DeviceManagerNapi::DmAuthParamToJsAuthParam(const napi_env &env, const DmAu
     SetValueInt32(env, "pinCode", authParam.pincode, extraInfo);
     napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
 
-    size_t appIconLen = (size_t)authParam.imageinfo.GetAppIconLen();
+    size_t appIconLen = static_cast<size_t>(authParam.imageinfo.GetAppIconLen());
     if (appIconLen > 0) {
         void *appIcon = nullptr;
         napi_value appIconBuffer = nullptr;
@@ -824,7 +824,7 @@ void DeviceManagerNapi::DmAuthParamToJsAuthParam(const napi_env &env, const DmAu
         }
     }
 
-    size_t appThumbnailLen = (size_t)authParam.imageinfo.GetAppThumbnailLen();
+    size_t appThumbnailLen = static_cast<size_t>(authParam.imageinfo.GetAppThumbnailLen());
     if (appThumbnailLen > 0) {
         void *appThumbnail = nullptr;
         napi_value appThumbnailBuffer = nullptr;
@@ -943,11 +943,11 @@ void DeviceManagerNapi::JsToDmPublishInfo(const napi_env &env, const napi_value 
 
     int32_t mode = -1;
     JsObjectToInt(env, object, "mode", mode);
-    info.mode = (DmDiscoverMode)mode;
+    info.mode = static_cast<DmDiscoverMode>(mode);
 
     int32_t freq = -1;
     JsObjectToInt(env, object, "freq", freq);
-    info.freq = (DmExchangeFreq)freq;
+    info.freq = static_cast<DmExchangeFreq>(freq);
 
     JsObjectToBool(env, object, "ranging", info.ranging);
     return;
@@ -962,19 +962,19 @@ int32_t DeviceManagerNapi::JsToDmSubscribeInfo(const napi_env &env, const napi_v
         return -1;
     }
 
-    info.subscribeId = (uint16_t)subscribeId;
+    info.subscribeId = static_cast<uint16_t>(subscribeId);
 
     int32_t mode = -1;
     JsObjectToInt(env, object, "mode", mode);
-    info.mode = (DmDiscoverMode)mode;
+    info.mode = static_cast<DmDiscoverMode>(mode);
 
     int32_t medium = -1;
     JsObjectToInt(env, object, "medium", medium);
-    info.medium = (DmExchangeMedium)medium;
+    info.medium = static_cast<DmExchangeMedium>(medium);
 
     int32_t freq = -1;
     JsObjectToInt(env, object, "freq", freq);
-    info.freq = (DmExchangeFreq)freq;
+    info.freq = static_cast<DmExchangeFreq>(freq);
 
     JsObjectToBool(env, object, "isSameAccount", info.isSameAccount);
     JsObjectToBool(env, object, "isWakeRemote", info.isWakeRemote);
@@ -993,7 +993,7 @@ void DeviceManagerNapi::JsToDmDeviceInfo(const napi_env &env, const napi_value &
     JsObjectToString(env, object, "deviceName", info.deviceName, sizeof(info.deviceName));
     int32_t deviceType = -1;
     JsObjectToInt(env, object, "deviceType", deviceType);
-    info.deviceTypeId = (DmDeviceType)deviceType;
+    info.deviceTypeId = static_cast<DmDeviceType>(deviceType);
     JsObjectToInt(env, object, "range", info.range);
 }
 
@@ -1062,7 +1062,7 @@ void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &obje
         *bufferPtr = nullptr;
         return;
     }
-    bufferLen = (int32_t)length;
+    bufferLen = static_cast<int32_t>(length);
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
@@ -1962,8 +1962,8 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
-    int32_t ret =
-        DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_, (int16_t)subscribeId);
+    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_,
+                                                                   static_cast<int16_t>(subscribeId));
     if (ret != 0) {
         LOGE("StopDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -2347,7 +2347,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
-        napi_create_uint32(env, (uint32_t)ret, &result);
+        napi_create_uint32(env, static_cast<uint32_t>(ret), &result);
         return result;
     }
 

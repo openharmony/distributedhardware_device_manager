@@ -27,9 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class IpcRemoteBroker : public OHOS::IRemoteBroker {
 public:
-    virtual ~IpcRemoteBroker()
-    {
-    }
+    ~IpcRemoteBroker() override {}
     virtual int32_t SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp) = 0;
 
 public:

@@ -117,9 +117,9 @@ int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
     PublishInfo publishInfo;
     (void)memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
     publishInfo.publishId = dmPublishInfo.publishId;
-    publishInfo.mode = (DiscoverMode)dmPublishInfo.mode;
+    publishInfo.mode = static_cast<DiscoverMode>(dmPublishInfo.mode);
     publishInfo.medium = ExchangeMedium::AUTO;
-    publishInfo.freq = (ExchangeFreq)dmPublishInfo.freq;
+    publishInfo.freq = static_cast<ExchangeFreq>(dmPublishInfo.freq);
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = dmPublishInfo.ranging;
     LOGI("start, publishId: %d, mode: 0x%x, ranging: %d.", publishInfo.publishId, publishInfo.mode,
@@ -148,9 +148,9 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     SubscribeInfo subscribeInfo;
     (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
     subscribeInfo.subscribeId = dmSubscribeInfo.subscribeId;
-    subscribeInfo.mode = (DiscoverMode)dmSubscribeInfo.mode;
-    subscribeInfo.medium = (ExchangeMedium)dmSubscribeInfo.medium;
-    subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
+    subscribeInfo.mode = static_cast<DiscoverMode>(dmSubscribeInfo.mode);
+    subscribeInfo.medium = static_cast<ExchangeMedium>(dmSubscribeInfo.medium);
+    subscribeInfo.freq = static_cast<ExchangeFreq>(dmSubscribeInfo.freq);
     subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
     subscribeInfo.capability = dmSubscribeInfo.capability;
@@ -241,8 +241,7 @@ bool SoftbusConnector::IsDeviceOnLine(const std::string &deviceId)
             break;
         }
         uint8_t udid[UDID_BUF_LEN] = {0};
-        int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid,
-            sizeof(udid));
+        ret = GetNodeKeyInfo(DM_PKG_NAME, networkId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
         if (ret != DM_OK) {
             LOGE("[SOFTBUS]DM_IsDeviceOnLine GetNodeKeyInfo failed, ret: %d.", ret);
             break;
@@ -458,7 +457,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
     LOGI("start, subscribeId: %d, result: %d.", subscribeId, result);
-    uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
+    uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
     if (result == REFRESH_LNN_SUCCESS) {
         for (auto &iter : discoveryCallbackMap_) {
             iter.second->OnDiscoverySuccess(iter.first, originId);

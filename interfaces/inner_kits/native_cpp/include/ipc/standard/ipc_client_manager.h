@@ -38,7 +38,7 @@ public:
      */
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     DmDeathRecipient() = default;
-    ~DmDeathRecipient() = default;
+    ~DmDeathRecipient() override = default;
 };
 
 class IpcClientManager : public IpcClient {

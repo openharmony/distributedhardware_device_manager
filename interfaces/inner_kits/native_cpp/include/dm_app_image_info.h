@@ -89,7 +89,8 @@ public:
             return -1;
         }
 
-        if (memcpy_s(appThumbnail + copyIndex, appThumbnailLen - copyIndex, srcBuffer, (uint32_t)copyLen) != 0) {
+        if (memcpy_s(appThumbnail + copyIndex, appThumbnailLen - copyIndex, srcBuffer,
+                     static_cast<uint32_t>(copyLen)) != 0) {
             return -1;
         }
 
@@ -186,7 +187,7 @@ private:
             }
             if (appIcon != nullptr) {
                 appIconLen = appIconLen_;
-                if (memcpy_s(appIcon, (uint32_t)appIconLen, appIcon_, appIconLen_) != 0) {
+                if (memcpy_s(appIcon, static_cast<uint32_t>(appIconLen), appIcon_, appIconLen_) != 0) {
                     return;
                 }
             }
@@ -206,7 +207,8 @@ private:
             }
             if (appThumbnail != nullptr) {
                 appThumbnailLen = appThumbnailLen_;
-                if (memcpy_s(appThumbnail, (uint32_t)appThumbnailLen, appThumbnail_, appThumbnailLen_) != 0) {
+                if (memcpy_s(appThumbnail, static_cast<uint32_t>(appThumbnailLen), appThumbnail_,
+                             appThumbnailLen_) != 0) {
                     return;
                 }
             }

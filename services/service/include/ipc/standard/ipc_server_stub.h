@@ -40,7 +40,7 @@ public:
      */
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     AppDeathRecipient() = default;
-    ~AppDeathRecipient() = default;
+    ~AppDeathRecipient() override = default;
 };
 
 class IpcServerStub : public SystemAbility, public IRemoteStub<IpcRemoteBroker> {
@@ -134,7 +134,7 @@ public:
 
 private:
     IpcServerStub();
-    ~IpcServerStub() = default;
+    ~IpcServerStub() override = default;
     bool Init();
 
 private:

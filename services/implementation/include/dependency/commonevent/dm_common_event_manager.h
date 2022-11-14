@@ -41,7 +41,7 @@ public:
     DmEventSubscriber(const CommonEventSubscribeInfo &subscribeInfo, const CommomEventCallback &callback,
         const std::string &eventName) : CommonEventSubscriber(subscribeInfo),
         eventName_(eventName), callback_(callback) {}
-    virtual ~DmEventSubscriber() = default;
+    ~DmEventSubscriber() override = default;
     std::string GetSubscriberEventName() const;
     void OnReceiveEvent(const CommonEventData &data) override;
 
@@ -70,8 +70,8 @@ private:
         explicit SystemAbilityStatusChangeListener(std::shared_ptr<DmEventSubscriber> subscriber)
             : changeSubscriber_(subscriber) {}
         ~SystemAbilityStatusChangeListener() = default;
-        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
     private:
         std::shared_ptr<DmEventSubscriber> changeSubscriber_;
