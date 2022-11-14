@@ -18,9 +18,6 @@
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#ifdef SUPPORT_GRAPHICS
-#include "ui_service_mgr_client.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {

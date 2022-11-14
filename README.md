@@ -20,8 +20,8 @@ foundation/distributedhardware/device_manager
 │   └── entry
 │       └── src
 │           └── main
-│               ├── js            # JS code for the PIN display FA
-│               └── resources     # Resource configuration files for PIN display FA
+│               ├── js            # JS code for the PIN display ServiceExtensionAbility
+│               └── resources     # Resource configuration files for PIN display ServiceExtensionAbility
 ├── figures
 ├── interfaces
 │   ├── inner_kits                # Internal interfaces and their implementation
@@ -44,7 +44,7 @@ foundation/distributedhardware/device_manager
 ├── services
 │   └── devicemanagerservice      # devicemanagerservice core code
 │       ├── include
-│       │   ├── ability           # Header files related to PIN display FA startup management
+│       │   ├── ability           # Header files related to PIN display ServiceExtensionAbility startup management
 │       │   ├── auth              # Header files related to device authentication
 │       │   ├── ipc               # IPC header files
 │       │   │   ├── lite          # Small system
@@ -54,7 +54,7 @@ foundation/distributedhardware/device_manager
 │       │   ├── softbus           # Header files related to DSoftBus
 │       │   └── timer             # Header files related to timer processing
 │       └── src
-│           ├── ability           # Core code related to PIN display FA startup management
+│           ├── ability           # Core code related to PIN display ServiceExtensionAbility startup management
 │           │   ├── lite          # Small system
 │           │   └── standard      # Standard system
 │           ├── auth              # Core code related to device authentication
@@ -283,7 +283,7 @@ dmClass.authenticateDevice(this.deviceInfo, authParam, (err, data) => {
 // Cancel device authentication.
 dmClass.unAuthenticateDevice(this.deviceInfo);
 ```
-## System Dialog Box FAs
+## System Dialog Box ServiceExtensionAbility
 
 Only PIN authentication is supported in the current version. To support PIN authentication, an authorization prompt page, a PIN display page, and a PIN input page must be provided.
 
@@ -297,13 +297,13 @@ This ServiceExtensionAbility is called **DeviceManager_UI.hap**, which is preset
 
 - Compilation environment: IDE 2.2 SDK6
 
-- Storage location of **DeviceManager_UI.hap**: [applications_hap repository](https://gitee.com/openharmony/applications_hap)
+- Storage location of **DeviceManager_UI.hap** demo: [device_manager repository](https://gitee.com/openharmony/distributedhardware_device_manager/tree/master/display)
 
 - UI display
 
-  When DeviceManager functions as the authenticated party, the authorization prompt page and PIN display page are controlled by the **DeviceManager_UI.hap** FA by default.
+  When DeviceManager functions as the authenticated party, the authorization prompt page and PIN display page are controlled by the **DeviceManager_UI.hap** ServiceExtensionAbility by default.
 
-  When DeviceManager functions as the authentication initiator, the PIN input page can be displayed either by **DeviceManager_UI.hap** FA or a developer-customized page. To customize the PIN input page, set the **displayOwner** parameter in the **extraInfo** attribute of the **AuthParam** parameter of the **authenticateDevice** API to **1**.
+  When DeviceManager functions as the authentication initiator, the PIN input page can be displayed either by **DeviceManager_UI.hap** ServiceExtensionAbility or a developer-customized page. To customize the PIN input page, set the **displayOwner** parameter in the **extraInfo** attribute of the **AuthParam** parameter of the **authenticateDevice** API to **1**.
 
 ### Repositories Involved
 ****
