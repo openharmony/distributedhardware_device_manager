@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -150,6 +151,8 @@ private:
     static std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
+    static std::mutex discoveryCallbackMutex_;
+    static std::mutex discoveryDeviceInfoMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
