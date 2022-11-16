@@ -504,12 +504,11 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
     LOGI("start, subscribeId: %d, result: %d.", subscribeId, result);
-    uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
+    uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
 
-    uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
     if (result == REFRESH_LNN_SUCCESS) {
         for (auto &iter : discoveryCallbackMap_) {
             iter.second->OnDiscoverySuccess(iter.first, originId);
