@@ -37,10 +37,7 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAbilityManager> dmAbilityMgr = std::make_shared<DmAbilityManager>();
-    if (dmAbilityMgr == nullptr) {
-        LOGE("PinAuthUi::dmAbilityManager is null");
-        return ERR_DM_FAILED;
-    }
+
     AAFwk::Want want;
     want.SetParam("PinCode", std::to_string(code));
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
@@ -67,10 +64,7 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAbilityManager> dmAbilityMgr = std::make_shared<DmAbilityManager>();
-    if (dmAbilityMgr == nullptr) {
-        LOGE("PinAuthUi::dmAbilityManager is null");
-        return ERR_DM_FAILED;
-    }
+
     AAFwk::Want want;
     want.SetParam(VERIFY_FAILED, false);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};

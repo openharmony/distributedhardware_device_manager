@@ -33,14 +33,14 @@ public:
 
 void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     std::string packName(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
 
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    ret = DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 }
 }

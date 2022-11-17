@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcServerListenerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
@@ -33,8 +33,8 @@ void IpcServerListenerFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
-    int32_t ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    ret = ipcServerListener->SendAll(cmdCode, req, rsp);
+    ipcServerListener->SendRequest(cmdCode, req, rsp);
+    ipcServerListener->SendAll(cmdCode, req, rsp);
 }
 }
 }

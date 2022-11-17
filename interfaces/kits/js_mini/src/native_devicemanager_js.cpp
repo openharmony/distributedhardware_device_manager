@@ -572,7 +572,7 @@ void DeviceManagerModule::JsToDmBuffer(const JSIValue &object,
         LOGE("Invalid AppIconInfo");
         return;
     }
-    *bufferPtr = static_cast<uint8_t*>calloc(sizeof(uint8_t), length);
+    *bufferPtr = static_cast<uint8_t*>(calloc(sizeof(uint8_t), length));
     if (*bufferPtr == nullptr) {
         LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
         return;
@@ -1165,6 +1165,7 @@ char *DeviceManagerModule::GetJSIAppBundleName()
     if (ret != DM_OK) {
         LOGE("GetJSIAppBundleName error: copy BundleName failed %d", ret);
         delete(g_targetJSAbility);
+        delete(packageName);
         return nullptr;
     }
     delete(g_targetJSAbility);

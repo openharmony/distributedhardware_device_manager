@@ -32,6 +32,7 @@ void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("failed to get system ability mgr.");
+        return;
     }
     distributedHardwareLoadCount_++;
     sptr<DistributedHardwareLoadCallback> distributedHardwareLoadCallback_ = new DistributedHardwareLoadCallback();
