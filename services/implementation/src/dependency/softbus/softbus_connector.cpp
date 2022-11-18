@@ -191,7 +191,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
     LOGI("start, deviceId: %s.", GetAnonyString(deviceId).c_str());
     ConnectionAddr *addrInfo = GetConnectAddr(deviceId, connectAddr);
     if (addrInfo == nullptr) {
-        LOGE("[SOFTBUS]addrInfo is nullptr.");
+        LOGE("addrInfo is nullptr.");
         return;
     }
     int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
@@ -457,17 +457,17 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
 {
     (void)addr;
     (void)networkId;
-    LOGD("OnSoftbusJoinLNNResult, result: %d.", result);
+    LOGD("[SOFTBUS]OnSoftbusJoinLNNResult, result: %d.", result);
 }
 
 void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
     if (device == nullptr) {
-        LOGE("device is null.");
+        LOGE("[SOFTBUS]device is null.");
         return;
     }
     std::string deviceId = device->devId;
-    LOGI("start, device: %s found, range: %d.", GetAnonyString(deviceId).c_str(), device->range);
+    LOGI("[SOFTBUS]notify found device: %s found, range: %d.", GetAnonyString(deviceId).c_str(), device->range);
     if (!IsDeviceOnLine(deviceId)) {
         std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
         DeviceInfo *srcInfo = infoPtr.get();
@@ -503,17 +503,18 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
-    LOGI("start, subscribeId: %d, result: %d.", subscribeId, result);
     uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
 
     if (result == REFRESH_LNN_SUCCESS) {
+        LOGI("[SOFTBUS]start to discovery device successfully with subscribeId: %d, result: %d.", subscribeId, result);
         for (auto &iter : discoveryCallbackMap_) {
             iter.second->OnDiscoverySuccess(iter.first, originId);
         }
     } else {
+        LOGE("[SOFTBUS]fail to discovery device with subscribeId: %d, result: %d.", subscribeId, result);
         for (auto &iter : discoveryCallbackMap_) {
             iter.second->OnDiscoveryFailed(iter.first, originId, result);
         }
