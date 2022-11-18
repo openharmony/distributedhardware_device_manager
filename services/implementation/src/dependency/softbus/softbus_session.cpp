@@ -86,7 +86,7 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
             GetAnonyString(peerDevId).c_str());
         return ERR_DM_FAILED;
     }
-    LOGE("GetPeerDeviceId failed for session: %d, ret: %d.", sessionId, ret);
+    LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %d, ret: %d.", sessionId, ret);
     peerDevId = "";
     return DM_OK;
 }
@@ -127,7 +127,7 @@ void SoftbusSession::OnSessionClosed(int sessionId)
 void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
-        LOGI("failed, sessionId: %d, dataLen: %d.", sessionId, dataLen);
+        LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
         return;
     }
     LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
