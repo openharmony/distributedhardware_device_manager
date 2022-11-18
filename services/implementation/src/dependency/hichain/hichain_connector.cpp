@@ -201,11 +201,11 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
         return false;
     }
     if (groupVec == nullptr) {
-        LOGE("[HICHAIN]returnGroups is nullptr");
+        LOGE("[HICHAIN]return groups info point is nullptr");
         return false;
     }
     if (num == 0) {
-        LOGE("[HICHAIN]groupNum is zero.");
+        LOGE("[HICHAIN]return groups info number is zero.");
         return false;
     }
     LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%u)", groupVec, num);
