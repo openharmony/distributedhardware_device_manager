@@ -43,6 +43,8 @@ std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDe
 std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::stateCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
+std::mutex SoftbusConnector::discoveryCallbackMutex_;
+std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -66,12 +68,20 @@ SoftbusConnector::~SoftbusConnector()
 int32_t SoftbusConnector::RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusDiscoveryCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     discoveryCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::UnRegisterSoftbusDiscoveryCallback(const std::string &pkgName)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     discoveryCallbackMap_.erase(pkgName);
     return DM_OK;
 }
@@ -263,6 +273,10 @@ std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 
 bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
     auto iter = discoveryDeviceInfoMap_.find(deviceId);
     if (iter == discoveryDeviceInfoMap_.end()) {
         LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
@@ -273,12 +287,20 @@ bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 
 int32_t SoftbusConnector::GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress)
 {
-    auto iter = discoveryDeviceInfoMap_.find(deviceId);
-    if (iter == discoveryDeviceInfoMap_.end()) {
-        LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
-        return ERR_DM_FAILED;
+    DeviceInfo *deviceInfo = nullptr;
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
+        auto iter = discoveryDeviceInfoMap_.find(deviceId);
+        if (iter == discoveryDeviceInfoMap_.end()) {
+            LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
+            return ERR_DM_FAILED;
+        }
+        deviceInfo = iter->second.get();
     }
-    DeviceInfo *deviceInfo = iter->second.get();
+
     if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
         LOGE("deviceInfo address num not valid, addrNum: %d.", deviceInfo->addrNum);
         return ERR_DM_FAILED;
@@ -312,19 +334,24 @@ ConnectionAddr *SoftbusConnector::GetConnectAddrByType(DeviceInfo *deviceInfo, C
 
 ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, std::string &connectAddr)
 {
-    auto iter = discoveryDeviceInfoMap_.find(deviceId);
-    if (iter == discoveryDeviceInfoMap_.end()) {
-        LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
-        return nullptr;
+    DeviceInfo *deviceInfo = nullptr;
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+        auto iter = discoveryDeviceInfoMap_.find(deviceId);
+        if (iter == discoveryDeviceInfoMap_.end()) {
+            LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
+            return nullptr;
+        }
+        deviceInfo = iter->second.get();
     }
-    DeviceInfo *deviceInfo = iter->second.get();
     if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
         LOGE("deviceInfo addrNum not valid, addrNum: %d.", deviceInfo->addrNum);
         return nullptr;
     }
     nlohmann::json jsonPara;
-    ConnectionAddr *addr = nullptr;
-    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_ETH);
+    ConnectionAddr *addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_ETH);
     if (addr != nullptr) {
         LOGI("[SOFTBUS]get ETH ConnectionAddr for deviceId: %s.", GetAnonyString(deviceId).c_str());
         jsonPara[ETH_IP] = addr->info.ip.ip;
@@ -350,7 +377,6 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
     addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BLE);
     if (addr != nullptr) {
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
-        LOGI("[SOFTBUS]get BLE ConnectionAddr for deviceId: %s.", GetAnonyString(deviceId).c_str());
         connectAddr = jsonPara.dump();
         return addr;
     }
@@ -381,9 +407,16 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
         iter.second->OnDeviceOnline(iter.first, info);
     }
 
-    if (discoveryDeviceInfoMap_.empty()) {
-        return;
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
+        if (discoveryDeviceInfoMap_.empty()) {
+            return;
+        }
     }
+
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, info.networkId, NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
     if (ret != DM_OK) {
@@ -392,6 +425,10 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
     }
     std::string deviceId = reinterpret_cast<char *>(udid);
     LOGI("device online, deviceId: %s.", GetAnonyString(deviceId).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
     discoveryDeviceInfoMap_.erase(deviceId);
 }
 
@@ -439,16 +476,26 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
             LOGE("save discovery device info failed, ret: %d.", ret);
             return;
         }
-        discoveryDeviceInfoMap_[deviceId] = infoPtr;
-        // Remove the earliest element when reached the max size
-        if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
-            auto iter = discoveryDeviceInfoMap_.begin();
-            discoveryDeviceInfoMap_.erase(iter->second->devId);
+        {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
+            discoveryDeviceInfoMap_[deviceId] = infoPtr;
+            // Remove the earliest element when reached the max size
+            if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
+                auto iter = discoveryDeviceInfoMap_.begin();
+                discoveryDeviceInfoMap_.erase(iter->second->devId);
+            }
         }
     }
 
     DmDeviceInfo dmDeviceInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDeviceInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     for (auto &iter : discoveryCallbackMap_) {
         iter.second->OnDeviceFound(iter.first, dmDeviceInfo);
     }
@@ -458,6 +505,10 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
 {
     LOGI("start, subscribeId: %d, result: %d.", subscribeId, result);
     uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     if (result == REFRESH_LNN_SUCCESS) {
         for (auto &iter : discoveryCallbackMap_) {
             iter.second->OnDiscoverySuccess(iter.first, originId);
