@@ -229,10 +229,10 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_003, testing::ext::TestSize.L
 {
     std::string pkgName = "com.ohos.test";
     int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
-    std::string event = R"({"extra": {"deviceId": "123"})";
+    std::string event = R"({"extra": {"deviceId": "123"}})";
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->NotifyEvent(pkgName, eventId, event);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
