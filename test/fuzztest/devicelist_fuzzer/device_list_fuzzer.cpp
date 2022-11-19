@@ -26,7 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DeviceListFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 
@@ -35,8 +35,8 @@ void DeviceListFuzzTest(const uint8_t* data, size_t size)
     std::string bundleName(reinterpret_cast<const char*>(data), size);
     DmDeviceInfo deviceInfo;
 
-    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);
-    ret = DeviceManager::GetInstance().GetLocalDeviceInfo(bundleName, deviceInfo);
+    DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);
+    DeviceManager::GetInstance().GetLocalDeviceInfo(bundleName, deviceInfo);
 }
 }
 }

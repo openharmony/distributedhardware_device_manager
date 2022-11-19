@@ -29,10 +29,10 @@ namespace DistributedHardware {
 
 void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    
+
     std::string szData(reinterpret_cast<const char*>(data), size);
     int32_t subscribeId = *(reinterpret_cast<const int32_t*>(data));
     int publishId = *(reinterpret_cast<const int*>(data));

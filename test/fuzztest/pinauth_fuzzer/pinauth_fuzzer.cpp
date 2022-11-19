@@ -29,11 +29,9 @@ namespace OHOS {
 namespace DistributedHardware {
 void PinAuthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
-
-    int32_t pageId = *(reinterpret_cast<const int32_t*>(data));;
 
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
@@ -43,13 +41,11 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
 
     std::string authToken(reinterpret_cast<const char*>(data), size);
     std::string authParam(reinterpret_cast<const char*>(data), size);
-    
+
     std::shared_ptr<PinAuth> pinauth = std::make_shared<PinAuth>();
-    int32_t ret = pinauth->ShowAuthInfo(authToken, authManager);
-    ret = pinauth->StartAuth(authToken, authManager);
-    ret = pinauth->VerifyAuthentication(authToken, authParam);
-    ret = pinauth->CloseAuthInfo(pageId, authManager);
-    ret = pinauth->UpdateAuthInfo(pageId);
+    pinauth->ShowAuthInfo(authToken, authManager);
+    pinauth->StartAuth(authToken, authManager);
+    pinauth->VerifyAuthentication(authToken, authParam);
 }
 }
 }

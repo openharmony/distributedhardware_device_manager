@@ -30,10 +30,10 @@ namespace DistributedHardware {
 
 void DmDiscoveryManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(uint16_t))) {
         return;
     }
-    
+
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DmDiscoveryManager> dmDiscoveryManager =
@@ -42,7 +42,7 @@ void DmDiscoveryManagerFuzzTest(const uint8_t* data, size_t size)
     DmSubscribeInfo subscribeInfo;
     std::string extra(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
-    
+
     dmDiscoveryManager->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     dmDiscoveryManager->StopDeviceDiscovery(pkgName, subscribeId);
 }

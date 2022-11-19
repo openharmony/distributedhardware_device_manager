@@ -40,7 +40,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcCmdRegisterFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
@@ -49,9 +49,9 @@ void IpcCmdRegisterFuzzTest(const uint8_t* data, size_t size)
     MessageParcel data1;
     MessageParcel reply1;
 
-    int32_t ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data1);
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, data1, rsp);
-    ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data1, reply1);
+    IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data1);
+    IpcCmdRegister::GetInstance().ReadResponse(cmdCode, data1, rsp);
+    IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data1, reply1);
 }
 }
 }

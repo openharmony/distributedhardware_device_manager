@@ -26,10 +26,10 @@ namespace DistributedHardware {
 
 void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int))) {
         return;
     }
-    
+
     int sessionId = *(reinterpret_cast<const int*>(data));
     SoftbusSession::OnSessionClosed(sessionId);
 }
