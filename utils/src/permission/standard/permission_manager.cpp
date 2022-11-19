@@ -55,7 +55,7 @@ bool PermissionManager::CheckPermission(void)
             LOGI("app caller uid is: %d,", uid);
             return false;
         }
-        
+
         sptr<ISystemAbilityManager> systemAbilityManager =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (systemAbilityManager == nullptr) {
