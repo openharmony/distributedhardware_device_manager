@@ -267,8 +267,8 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
  */
 HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
 {
-    std::vector<DmDeviceInfo> deviceList;
-    int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(deviceList);
+    DmDeviceInfo info;
+    int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, DM_OK);
 }
 

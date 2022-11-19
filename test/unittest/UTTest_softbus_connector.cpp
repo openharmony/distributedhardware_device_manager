@@ -468,8 +468,8 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_004, testing::ext::TestSiz
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_WLAN;
-    deviceInfo.addr[0].info.ip.ip
-    std::string ipAddress = "1.1.1.1";
+    deviceInfo.addr[0].info.ip.ip = "1.1.1.1";
+    std::string ipAddress;
     std::string deviceId = "3338848";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
@@ -552,7 +552,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level0
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_ETH;
-    deviceInfo.addr[0].info.ip.ip = "0.0.0.0"
+    deviceInfo.addr[0].info.ip.ip = "0.0.0.0";
     deviceInfo.addr[0].info.ip.port = 0;
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
@@ -572,7 +572,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level0
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_WLAN;
-    deviceInfo.addr[0].info.ip.ip = "1.1.1.1"
+    deviceInfo.addr[0].info.ip.ip = "1.1.1.1";
     deviceInfo.addr[0].info.ip.port = 0;
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
@@ -592,7 +592,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level0
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_BR;
-    deviceInfo.addr[0].info.br.brMac = "2.2.2.2"
+    deviceInfo.addr[0].info.br.brMac = "2.2.2.2";
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
 }
@@ -611,7 +611,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_BLE;
-    deviceInfo.addr[0].info.ble.bleMac = "3.3.3.3"
+    deviceInfo.addr[0].info.ble.bleMac = "3.3.3.3";
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
 }
