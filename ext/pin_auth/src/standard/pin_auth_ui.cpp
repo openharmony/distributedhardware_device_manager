@@ -18,9 +18,7 @@
 #include "dm_ability_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
 #include "parameter.h"
-#include "ui_service_mgr_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -81,26 +79,6 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
         return ERR_DM_FAILED;
     }
     LOGI("InputPinDialog end");
-    return DM_OK;
-}
-
-int32_t PinAuthUi::ClosePage(const int32_t &pageId, std::shared_ptr<DmAuthManager> authManager)
-{
-    LOGI("PinAuthUi start");
-    Ace::UIServiceMgrClient::GetInstance()->CancelDialog(pageId);
-    LOGI("PinAuthUi end");
-    return DM_OK;
-}
-
-int32_t PinAuthUi::UpdatePinDialog(int32_t pageId)
-{
-    LOGI("UpdatePinDialog start");
-    nlohmann::json jsonObj;
-    jsonObj[VERIFY_FAILED] = true;
-    jsonObj.dump();
-    const std::string params = jsonObj.dump();
-    Ace::UIServiceMgrClient::GetInstance()->UpdateDialog(pageId, params);
-    LOGI("UpdatePinDialog end");
     return DM_OK;
 }
 } // namespace DistributedHardware
