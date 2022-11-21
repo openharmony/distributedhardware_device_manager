@@ -44,6 +44,7 @@ group("unittest") {
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
     ":UTTest_multiple_user_connector",
+    ":UTTest_permission_manager",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_session",
   ]
@@ -288,6 +289,17 @@ ohos_unittest("UTTest_multiple_user_connector") {
 }
 
 ## UnitTest UTTest_multiple_user_connector }}}
+
+## UnitTest UTTest_permission_manager {{{
+ohos_unittest("UTTest_permission_manager") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_permission_manager.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_permission_manager }}}
 
 ## UnitTest UTTest_device_manager_notify {{{
 ohos_unittest("UTTest_device_manager_notify") {
