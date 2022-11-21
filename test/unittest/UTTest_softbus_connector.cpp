@@ -466,9 +466,10 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_003, testing::ext::TestSiz
 HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_004, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo;
+    constexpr char ETH_IP[] = "0.0.0.0";
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_WLAN;
-    deviceInfo.addr[0].info.ip.ip = "1.1.1.1";
+    (void)strncpy_s(deviceInfo.addr[0].info.ip.ip, IP_STR_MAX_LEN, ETH_IP, strlen(ETH_IP));
     std::string ipAddress;
     std::string deviceId = "3338848";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
