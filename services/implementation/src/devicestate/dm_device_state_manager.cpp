@@ -171,7 +171,6 @@ void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmD
 void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("OnDeviceReady function is called back with pkgName: %s", pkgName.c_str());
-    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
 }
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceId)
@@ -197,6 +196,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     }
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
+        DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
         listener_->OnDeviceStateChange(pkgName, state, saveInfo);
     }
 }
