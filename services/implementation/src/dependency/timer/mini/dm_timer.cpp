@@ -48,9 +48,9 @@ struct DmTimst {
     void *data;
 };
 
-static void handler(void *data)
+static void handler(const void *data)
 {
-    struct DmTimst *myTimer = static_cast<struct DmTimst *>data;
+    struct DmTimst *myTimer = static_cast<struct DmTimst *>(data);
     myTimer->handle(myTimer->data, *(myTimer->dmtimer));
 }
 
