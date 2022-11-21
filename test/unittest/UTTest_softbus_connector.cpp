@@ -550,9 +550,10 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level0
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
     std::string connectAddr;
     DeviceInfo deviceInfo;
+    constexpr char ETH_IP[] = "0.0.0.0";
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_ETH;
-    deviceInfo.addr[0].info.ip.ip = "0.0.0.0";
+    (void)strncpy_s(deviceInfo.addr[0].info.ip.ip, IP_STR_MAX_LEN, ETH_IP, strlen(ETH_IP));
     deviceInfo.addr[0].info.ip.port = 0;
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
@@ -569,10 +570,11 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level0
     std::string deviceId = "123345";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
     std::string connectAddr;
+    constexpr char WLAN_IP[] = "1.1.1.1";
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_WLAN;
-    deviceInfo.addr[0].info.ip.ip = "1.1.1.1";
+    (void)strncpy_s(deviceInfo.addr[0].info.ip.ip, IP_STR_MAX_LEN, WLAN_IP, strlen(WLAN_IP));
     deviceInfo.addr[0].info.ip.port = 0;
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
@@ -591,8 +593,9 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level0
     std::string connectAddr;
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
+    constexpr char BR_MAC[] = "2:2:2:2";
     deviceInfo.addr[0].type = CONNECTION_ADDR_BR;
-    deviceInfo.addr[0].info.br.brMac = "2.2.2.2";
+    (void)strncpy_s(deviceInfo.addr[0].info.br.brMac, IP_STR_MAX_LEN, BR_MAC, strlen(BR_MAC));
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
 }
@@ -609,9 +612,10 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
     std::string connectAddr;
     DeviceInfo deviceInfo;
+    constexpr char BLE_MAC[] = "3:3:3:3";
     deviceInfo.addrNum = 1;
     deviceInfo.addr[0].type = CONNECTION_ADDR_BLE;
-    deviceInfo.addr[0].info.ble.bleMac = "3.3.3.3";
+    (void)strncpy_s(deviceInfo.addr[0].info.ble.bleMac, IP_STR_MAX_LEN, BLE_MAC, strlen(BLE_MAC));
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
 }
@@ -801,11 +805,12 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.
  */
 HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.Level0)
 {
-    DeviceInfo device;
-    device.devId = "123456";
-    device.devName = "test";
-    device.devType = 0;
-    softbusConnector->OnSoftbusDeviceFound(device);
+    DeviceInfo device = {
+        .devId = "123456",
+        .devType = (DeviceType)1,
+        .devName = "11111"
+    };
+    softbusConnector->OnSoftbusDeviceFound(&device);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
