@@ -38,7 +38,7 @@ public:
 
 void DevicePublishFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
@@ -51,9 +51,9 @@ void DevicePublishFuzzTest(const uint8_t* data, size_t size)
     int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
 
     std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(bundleName, publishInfo, callback);
+    DeviceManager::GetInstance().PublishDeviceDiscovery(bundleName, publishInfo, callback);
     usleep(SLEEP_TIME_US);
-    ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(bundleName, publishId);
+    DeviceManager::GetInstance().UnPublishDeviceDiscovery(bundleName, publishId);
 }
 }
 }

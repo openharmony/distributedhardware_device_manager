@@ -41,7 +41,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 
@@ -63,7 +63,7 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
 
 void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 

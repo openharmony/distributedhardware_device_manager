@@ -26,15 +26,14 @@ namespace OHOS {
 namespace DistributedHardware {
 void RegisterDevStateCallbackFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
 
-    int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName,
-        extra);
-    ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
+    DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra);
+    DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
 }
 }
 }

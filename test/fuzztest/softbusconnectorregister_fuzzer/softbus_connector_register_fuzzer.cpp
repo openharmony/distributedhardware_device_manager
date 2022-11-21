@@ -55,7 +55,7 @@ public:
 
 void SoftBusConnectorRegisterFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 
@@ -64,7 +64,7 @@ void SoftBusConnectorRegisterFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<ISoftbusDiscoveryCallback> discoveryCallback = std::make_shared<SoftbusDiscoveryCallbackFuzzTest>();
     std::shared_ptr<ISoftbusStateCallback> stateCallback = std::make_shared<SoftbusStateCallbackFuzzTest>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    
+
     softbusConnector->RegisterSoftbusStateCallback(pkgName, stateCallback);
     softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
     softbusConnector->RegisterSoftbusDiscoveryCallback(pkgName, discoveryCallback);

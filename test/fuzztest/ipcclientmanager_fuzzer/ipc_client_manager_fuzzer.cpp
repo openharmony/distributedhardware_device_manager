@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcClientManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
@@ -36,9 +36,9 @@ void IpcClientManagerFuzzTest(const uint8_t* data, size_t size)
     req->SetPkgName(pkgName);
 
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
-    int32_t ret = instance->Init(pkgName);
-    ret = instance->UnInit(pkgName);
-    ret = instance->SendRequest(cmdCode, req, rsp);
+    instance->Init(pkgName);
+    instance->UnInit(pkgName);
+    instance->SendRequest(cmdCode, req, rsp);
 }
 }
 }
