@@ -245,21 +245,6 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestS
 }
 
 /**
- * @tc.name: GetTrustedDeviceList_002
- * @tc.desc:Set the intFlag of GetTrustedDeviceList to true; Return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "";
-    std::vector<DmDeviceInfo> deviceList;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: AuthenticateDevice_001
  * @tc.desc: Set unsupport authType = 0 and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
