@@ -194,9 +194,9 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         }
         saveInfo = iter->second;
     }
+    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
-        DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
         listener_->OnDeviceStateChange(pkgName, state, saveInfo);
     }
 }
