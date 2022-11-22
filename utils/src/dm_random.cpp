@@ -57,11 +57,11 @@ int32_t GetRandomData(uint8_t *randStr, uint32_t len)
         if (randStr == nullptr || len == 0) {
             break;
         }
-        entropy = (mbedtls_entropy_context *)malloc(sizeof(mbedtls_entropy_context));
+        entropy = reinterpret_cast<mbedtls_entropy_context *>(malloc(sizeof(mbedtls_entropy_context)));
         if (entropy == nullptr) {
             break;
         }
-        ctrDrbg = (mbedtls_ctr_drbg_context *)malloc(sizeof(mbedtls_ctr_drbg_context));
+        ctrDrbg = reinterpret_cast<mbedtls_ctr_drbg_context *>(malloc(sizeof(mbedtls_ctr_drbg_context)));
         if (ctrDrbg == nullptr) {
             break;
         }

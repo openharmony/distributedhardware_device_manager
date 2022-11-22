@@ -54,7 +54,7 @@ static BOOL Initialize(Service *service, Identity identity)
         LOGW("Initialize invalid param");
         return FALSE;
     }
-    
+
     const int32_t DM_SERVICE_INIT_DELAY = 2;
     sleep(DM_SERVICE_INIT_DELAY);
     SAMGR_Bootstrap();
