@@ -230,12 +230,12 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::T
 }
 
 /**
- * @tc.name: GetTrustedDeviceList_002
+ * @tc.name: GetTrustedDeviceList_001
  * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string extra = "jdddd";
