@@ -440,6 +440,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_002, testing::ext::TestSiz
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
 /**
  * @tc.name: GetConnectionIpAddress_003
  * @tc.desc: set deviceInfo.addrNum = -1;go to second master and return ERR_DM_FAILED
@@ -454,6 +455,27 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_003, testing::ext::TestSiz
     std::string deviceId = "3338848";
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetConnectionIpAddress_004
+ * @tc.desc: set deviceInfo.addrNum = 1;go to second master and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    constexpr char ETH_IP[] = "0.0.0.0";
+    deviceInfo->addrNum = 1;
+    deviceInfo->addr[0].type = CONNECTION_ADDR_WLAN;
+    (void)strncpy_s(deviceInfo->addr[0].info.ip.ip, IP_STR_MAX_LEN, ETH_IP, strlen(ETH_IP));
+    std::string ipAddress;
+    std::string deviceId = "3338848";
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
+    EXPECT_EQ(ret, DM_OK);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
 
 /**
@@ -515,6 +537,92 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level0
     deviceInfo.addrNum = -1;
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: GetConnectAddr_003
+ * @tc.desc:set deviceInfo.addrNum = 1
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "123345";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    std::string connectAddr;
+    constexpr char ETH_IP[] = "0.0.0.0";
+    deviceInfo->addrNum = 1;
+    deviceInfo->addr[0].type = CONNECTION_ADDR_ETH;
+    (void)strncpy_s(deviceInfo->addr[0].info.ip.ip, IP_STR_MAX_LEN, ETH_IP, strlen(ETH_IP));
+    deviceInfo->addr[0].info.ip.port = 0;
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    EXPECT_NE(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: GetConnectAddr_004
+ * @tc.desc:set deviceInfo.addrNum = 1
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "123345";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    std::string connectAddr;
+    constexpr char WLAN_IP[] = "1.1.1.1";
+    deviceInfo->addrNum = 1;
+    deviceInfo->addr[0].type = CONNECTION_ADDR_WLAN;
+    (void)strncpy_s(deviceInfo->addr[0].info.ip.ip, IP_STR_MAX_LEN, WLAN_IP, strlen(WLAN_IP));
+    deviceInfo->addr[0].info.ip.port = 0;
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    EXPECT_NE(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: GetConnectAddr_005
+ * @tc.desc:get brMac addr
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "123345";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    std::string connectAddr;
+    deviceInfo->addrNum = 1;
+    constexpr char BR_MAC[] = "2:2:2:2";
+    deviceInfo->addr[0].type = CONNECTION_ADDR_BR;
+    (void)strncpy_s(deviceInfo->addr[0].info.br.brMac, IP_STR_MAX_LEN, BR_MAC, strlen(BR_MAC));
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    EXPECT_NE(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: GetConnectAddr_006
+ * @tc.desc:get bleMac addr
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "123345";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    std::string connectAddr;
+    constexpr char BLE_MAC[] = "3:3:3:3";
+    deviceInfo->addrNum = 1;
+    deviceInfo->addr[0].type = CONNECTION_ADDR_BLE;
+    (void)strncpy_s(deviceInfo->addr[0].info.ble.bleMac, IP_STR_MAX_LEN, BLE_MAC, strlen(BLE_MAC));
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    EXPECT_NE(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
 
 /**
@@ -686,6 +794,28 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.
 {
     DeviceInfo *device = nullptr;
     softbusConnector->OnSoftbusDeviceFound(device);
+    bool ret = false;
+    if (listener->ipcServerListener_.req_ != nullptr) {
+        listener->ipcServerListener_.req_ = nullptr;
+        ret = true;
+    }
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: OnSoftbusDeviceFound_002
+ * @tc.desc: go to the correct case and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.Level0)
+{
+    DeviceInfo device = {
+        .devId = "123456",
+        .devType = (DeviceType)1,
+        .devName = "11111"
+    };
+    softbusConnector->OnSoftbusDeviceFound(&device);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
