@@ -69,7 +69,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     const std::map<std::string, CommonSvcId> &listenerMap = IpcServerListenermgr::GetInstance().GetAllListeners();
-    for (auto &kv : listenerMap) {
+    for (const auto &kv : listenerMap) {
         SvcIdentity svc;
         IpcIo io;
         uint8_t data[MAX_DM_IPC_LEN] = {0};

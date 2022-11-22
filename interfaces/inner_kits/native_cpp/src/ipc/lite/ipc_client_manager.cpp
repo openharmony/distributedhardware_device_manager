@@ -63,10 +63,6 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     }
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    if (req == nullptr) {
-        LOGE("req is null");
-        return ERR_DM_FAILED;
-    }
     req->SetPkgName(pkgName);
     int32_t ret = serverProxy_.SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
     if (ret != DM_OK) {

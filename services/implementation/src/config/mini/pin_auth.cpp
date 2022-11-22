@@ -85,7 +85,7 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
     int32_t inputPinCode = authParamJson[PIN_CODE_KEY];
     if (code == inputPinCode) {
         return DM_OK;
-    } else if (code != inputPinCode && times_ < MAX_VERIFY_TIMES) {
+    } else if (times_ < MAX_VERIFY_TIMES) {
         return ERR_DM_INPUT_PARA_INVALID;
     } else {
         return ERR_DM_FAILED;
