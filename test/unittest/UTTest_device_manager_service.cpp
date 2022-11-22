@@ -260,19 +260,6 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
 }
 
 /**
- * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc:GetLocalDeviceInfo Return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    int ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: AuthenticateDevice_001
  * @tc.desc: Set unsupport authType = 0 and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
