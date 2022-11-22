@@ -474,7 +474,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_004, testing::ext::TestSiz
     std::string deviceId = "3338848";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
     int ret = softbusConnector->GetConnectionIpAddress(deviceId, ipAddress);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
 

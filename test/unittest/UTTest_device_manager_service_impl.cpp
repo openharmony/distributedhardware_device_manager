@@ -127,7 +127,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_002, testing::ext::T
  */
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_003, testing::ext::TestSize.Level0)
 {
-    std::string event = R"({"extra": {"deviceaId": 123}})";
+    std::string event = R"({"extra": {"deviceaId": "123"}})";
     nlohmann::json jsonObject;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
@@ -141,7 +141,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_003, testing::ext::T
  */
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_004, testing::ext::TestSize.Level0)
 {
-    std::string event = R"({"extra", {"deviceId", 123}})";
+    std::string event = R"({"extra": {"deviceId": 123}})";
     nlohmann::json jsonObject;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
@@ -155,7 +155,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_004, testing::ext::T
  */
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_005, testing::ext::TestSize.Level0)
 {
-    std::string event = R"({"Extra", {"deviceaId", "123"}})";
+    std::string event = R"({"Extra": {"deviceId": "123"}})";
     nlohmann::json jsonObject;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
@@ -183,7 +183,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_006, testing::ext::T
  */
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_007, testing::ext::TestSize.Level0)
 {
-    std::string event = R"({"extra", {"deviceId", "123"}})";
+    std::string event = R"({"extra": {"deviceId": "123"}})";
     nlohmann::json jsonObject;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
@@ -229,10 +229,10 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_003, testing::ext::TestSize.L
 {
     std::string pkgName = "com.ohos.test";
     int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
-    std::string event = R"({"extra": {"deviceId": "123"}})";
+    std::string event = R"({"extra": {"deviceId": "123"})";
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     int ret = deviceManagerServiceImpl->NotifyEvent(pkgName, eventId, event);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
 } // namespace DistributedHardware
