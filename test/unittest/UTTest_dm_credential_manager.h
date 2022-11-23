@@ -23,7 +23,6 @@
 #include "dm_timer.h"
 #include "hichain_connector.h"
 
-#define private public
 namespace OHOS {
 namespace DistributedHardware {
 class DmCredentialManagerTest : public testing::Test {

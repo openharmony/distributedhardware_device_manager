@@ -155,8 +155,8 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.
     std::string pkgName = "com.ohos.helloworld";
     std::string reqJsonStr = R"(
     {
-	    "version" : "1.2.3",
-	    "userId" : "123"
+        "version" : "1.2.3",
+        "userId" : "123"
     }
     )";
     std::string returnJsonStr;
