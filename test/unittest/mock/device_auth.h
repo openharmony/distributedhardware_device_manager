@@ -68,6 +68,7 @@
 #define FIELD_BLE_CHALLENGE "bleChallenge"
 #define FIELD_OS_ACCOUNT_ID "osAccountId"
 #define FIELD_DEVICE_LIST "deviceList"
+#define FIELD_AUTH_CODE "authCode"
 
 using OsAccountEnum = enum _OsAccountEnum : int32_t {
     DEFAULT_OS_ACCOUNT = 0,

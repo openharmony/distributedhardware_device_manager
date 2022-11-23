@@ -19,7 +19,7 @@ let TAG = "[DeviceManagerUI:PinDialog]==>"
 @Component
 struct dialogPlusPage {
   @State messageTitle: string = 'PIN码连接'
-  @State messageTips: string = '请在设备端输入链接码进行验证'
+  @State messageTips: string = '请在设备端输入连接码进行验证'
   @State pinCode: string = ""
   @State allow: string = '允许'
   @State cancel: string = '取消'

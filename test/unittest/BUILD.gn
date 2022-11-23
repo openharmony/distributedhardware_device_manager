@@ -30,6 +30,7 @@ group("unittest") {
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_auth_manager",
     ":UTTest_dm_common_event_manager",
+    ":UTTest_dm_credential_manager",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_discovery_manager",
     ":UTTest_dm_publish_manager",
@@ -107,6 +108,17 @@ ohos_unittest("device_manager_impl_test") {
 }
 
 ## UnitTest device_manager_impl_test }}}
+
+## UnitTest UTTest_dm_credential_manager {{{
+ohos_unittest("UTTest_dm_credential_manager") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_credential_manager.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_credential_manager }}}
 
 ## UnitTest UTTest_device_manager_service {{{
 ohos_unittest("UTTest_device_manager_service") {
@@ -490,6 +502,7 @@ config("device_manager_test_common_public_config") {
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/credential",
     "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
@@ -590,6 +603,7 @@ ohos_static_library("device_manager_test_common") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
