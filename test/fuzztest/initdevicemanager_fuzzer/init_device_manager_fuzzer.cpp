@@ -37,7 +37,6 @@ void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string packName(reinterpret_cast<const char*>(data), size);
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
 
     DeviceManager::GetInstance().InitDeviceManager(packName, callback);

@@ -48,7 +48,7 @@ void DmDeathCallback(void *arg)
 static int32_t SendCmdResultCb(IOwner owner, int32_t code, IpcIo *reply)
 {
     (void)code;
-    int32_t cmdCode = *(int32_t *)owner;
+    int32_t cmdCode = *static_cast<int32_t *>(owner);
     LOGI("SendCmdResultCb code:%d", cmdCode);
     (void)IpcCmdRegister::GetInstance().ReadResponse(cmdCode, *reply, pCurRsp);
     return DM_OK;

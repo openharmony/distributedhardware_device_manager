@@ -1165,7 +1165,7 @@ char *DeviceManagerModule::GetJSIAppBundleName()
     if (ret != DM_OK) {
         LOGE("GetJSIAppBundleName error: copy BundleName failed %d", ret);
         delete(g_targetJSAbility);
-        delete(packageName);
+        delete[] packageName;
         return nullptr;
     }
     delete(g_targetJSAbility);

@@ -133,7 +133,7 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SoftbusSession::OnBytesReceived Start decryption");
     }
-    std::string message = std::string((const char *)data, dataLen);
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     sessionCallback_->OnDataReceived(sessionId, message);
     LOGI("OnBytesReceived completed");
 }

@@ -53,7 +53,7 @@ static void DeathCb(void *arg)
         return;
     }
     CommonSvcId svcId = {0};
-    std::string pkgName = (const char *)arg;
+    std::string pkgName = reinterpret_cast<const char *>(arg);
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found client by package name.");
         free(arg);
@@ -94,7 +94,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         LOGE("malloc failed!");
         return ERR_DM_MALLOC_FAILED;
     }
-    if (strcpy_s(pkgName, len + 1, (const char *)name) != DM_OK) {
+    if (strcpy_s(pkgName, len + 1, reinterpret_cast<const char *>(name)) != DM_OK) {
         LOGE("strcpy_s failed!");
         delete[] pkgName;
         return ERR_DM_IPC_COPY_FAILED;
@@ -102,7 +102,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     uint32_t cbId = 0;
     AddDeathRecipient(svc, DeathCb, pkgName, &cbId);
     svcId.cbId = cbId;
-    std::string strPkgName = (const char *)name;
+    std::string strPkgName = reinterpret_cast<const char *>(name);
     return IpcServerListenermgr::GetInstance().RegisterListener(strPkgName, &svcId);
 }
 
@@ -110,7 +110,7 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
     LOGI("unregister service listener.");
     size_t len = 0;
-    std::string pkgName = (const char *)ReadString(req, &len);
+    std::string pkgName = reinterpret_cast<const char *>(ReadString(req, &len));
     if (pkgName == "" || len == 0) {
         LOGE("get para failed");
         return ERR_DM_FAILED;
@@ -149,7 +149,7 @@ static BOOL Initialize(Service *service, Identity identity)
     return TRUE;
 }
 
-static BOOL MessageHandle(Service *service, Request *request)
+static BOOL MessageHandle(const Service *service, const Request *request)
 {
     if ((service == nullptr) || (request == nullptr)) {
         LOGW("invalid param");
