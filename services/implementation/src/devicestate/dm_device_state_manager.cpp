@@ -103,7 +103,6 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
     SaveOnlineDeviceInfo(pkgName, info);
