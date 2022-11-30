@@ -518,7 +518,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::Test
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -538,7 +538,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_003, testing::ext::Test
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -566,7 +566,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::Test
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -594,7 +594,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::Test
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -622,7 +622,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::Test
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
