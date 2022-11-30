@@ -222,40 +222,6 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_004, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: ImportCredential_001
- * @tc.desc: import local credential and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.helloworld";
-    std::string credentialInfo = R"(
-    {
-        "processType" : 1,
-        "authType" : 1,
-        "userId" : "123",
-        "credentialData" : 
-        [
-            {
-                "credentialType" : 1,
-                "credentialId" : "104",
-                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-                "serverPk" : "",
-                "pkInfoSignature" : "",
-                "pkInfo" : "",
-                "peerDeviceId" : ""
-            }
-        ]
-    }
-    )";
-    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->credentialVec_.push_back(pkgName);
-    int32_t ret = dmCreMgr->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: ImportCredential_002
  * @tc.desc: import local credential and return ERR_DM_FAILED
  * @tc.type: FUNC
@@ -394,38 +360,6 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_006, testing::ext::TestSize.L
     dmCreMgr->credentialVec_.push_back(pkgName);
     int32_t ret = dmCreMgr->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: ImportLocalCredential_001
- * @tc.desc: import local credential and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_001, testing::ext::TestSize.Level0)
-{
-    std::string credentialInfo = R"(
-    {
-        "processType" : 1,
-        "authType" : 1,
-        "userId" : "123",
-        "credentialData" : 
-        [
-            {
-                "credentialType" : 1,
-                "credentialId" : "104",
-                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-                "serverPk" : "",
-                "pkInfoSignature" : "",
-                "pkInfo" : "",
-                "peerDeviceId" : ""
-            }
-        ]
-    }
-    )";
-    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->ImportLocalCredential(credentialInfo);
-    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -571,25 +505,264 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestS
 }
 
 /**
- * @tc.name: DeleteCredential_001
- * @tc.desc: delete local credential and return DM_OK
+ * @tc.name: ImportRemoteCredential_002
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
     {
-        "processType" : 1,
-        "authType" : 1,
-        "userId" : "123"
+        "processType" , 2
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->credentialVec_.push_back(pkgName);
-    int32_t ret = dmCreMgr->DeleteCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, DM_OK);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_003
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_004
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+        "credentialData" : 
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "456",
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_005
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "credentialData" : 
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "456",
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_006
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 2,
+        "credentialData" : 
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "456",
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_002
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" , 2
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_003
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+        "peerCredentialInfo" : 
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_004
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_005
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_005, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+        "peerCredentialInfo" : 
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_006
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "peerCredentialInfo" : 
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_007
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 2,
+        "peerCredentialInfo" : 
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
