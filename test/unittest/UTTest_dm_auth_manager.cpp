@@ -189,6 +189,21 @@ HWTEST_F(DmAuthManagerTest, CreateGroup_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: DmAuthManager::CreateGroup_002
+ * @tc.desc: Whether the return value of calling creategroup is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, CreateGroup_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = nullptr;
+    int32_t ret = authManager->CreateGroup();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
  * @tc.name: DmAuthManager::AddMember_001
  * @tc.desc: Whether the return value of calling addmember is DM_ OK
  * @tc.type: FUNC
@@ -219,7 +234,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: DmAuthManager::JoinNetwork_001
- * @tc.desc: Whether the return value of calling joinnetwork is DM_ OK
+ * @tc.desc: Whether the return value of calling joinnetwork is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -236,6 +251,27 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
     authManager->SetAuthRequestState(authRequestState);
     int32_t ret = authManager->JoinNetwork();
     ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::JoinNetwork_002
+ * @tc.desc: Whether the return value of calling joinnetwork is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = nullptr;
+    int32_t userId = 1;
+    bool isShow = false;
+    authManager->UserSwitchEventCallback(userId);
+    authManager->AuthenticateFinish();
+    authManager->CancelDisplay();
+    authManager->UpdateInputDialogDisplay(isShow);
+    int32_t ret = authManager->JoinNetwork();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -269,6 +305,92 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->code = 123456;
     int32_t ret = authManager->GetPinCode();
     ASSERT_EQ(ret, 123456);
+}
+
+/**
+ * @tc.name: DmAuthManager::SetPageId_001
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    int32_t pageId = 123;
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t ret = authManager->SetPageId(pageId);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::SetPageId_002
+ * @tc.desc: Return ERR_DM_AUTH_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    int32_t pageId = 123;
+    authManager->authResponseContext_ = nullptr;
+    int32_t ret = authManager->SetPageId(pageId);
+    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+}
+
+/**
+ * @tc.name: DmAuthManager::SetReasonAndFinish_001
+ * @tc.desc: Return ERR_DM_AUTH_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    int32_t reason = 123;
+    int32_t state = 456;
+    authManager->authResponseContext_ = nullptr;
+    int32_t ret = authManager->SetReasonAndFinish(reason, state);
+    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+}
+
+/**
+ * @tc.name: DmAuthManager::SetReasonAndFinish_002
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    int32_t reason = 1234;
+    int32_t state = 5678;
+    int32_t ret = authManager->SetReasonAndFinish(reason, state);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::SetReasonAndFinish_003
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authRequestState_ = nullptr;
+    authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
+    int32_t reason = 12;
+    int32_t state = 36;
+    int32_t ret = authManager->SetReasonAndFinish(reason, state);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
