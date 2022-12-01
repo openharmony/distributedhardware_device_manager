@@ -417,6 +417,123 @@ HWTEST_F(HichainConnectorTest, GetSyncGroupList_002, testing::ext::TestSize.Leve
     int ret = hichainConnector->GetSyncGroupList(groupList, syncGroupList);
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: IsGroupCreated_001
+ * @tc.desc: return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, IsGroupCreated_001, testing::ext::TestSize.Level0)
+{
+    std::string groupName = "groupNameTest";
+    GroupInfo groupInfo;
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    bool ret = hichainConnector->IsGroupCreated(groupName, groupInfo);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsRedundanceGroup_001
+ * @tc.desc: return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, IsRedundanceGroup_001, testing::ext::TestSize.Level0)
+{
+    const std::string userId = "userIdTest";
+    int32_t authType = 1;
+    std::vector<GroupInfo> groupList;
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    bool ret = hichainConnector->IsRedundanceGroup(userId, authType, groupList);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: onFinish_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int operationCode = GroupOperationCode::MEMBER_JOIN;
+    const char *returnData = "returnDataTest";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr));
+
+    hichainConnector->onFinish(requestId, operationCode, returnData);
+
+    operationCode = GroupOperationCode::GROUP_CREATE;
+    hichainConnector->onFinish(requestId, operationCode, returnData);
+
+    operationCode = GroupOperationCode::MEMBER_DELETE;
+    hichainConnector->onFinish(requestId, operationCode, returnData);
+
+    operationCode = GroupOperationCode::GROUP_DISBAND;
+    hichainConnector->onFinish(requestId, operationCode, returnData);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: onError_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, onError_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int operationCode = GroupOperationCode::MEMBER_JOIN;
+    int errorCode = 1;
+    const char *errorReturn = "errorReturnTest";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr));
+    hichainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    operationCode = GroupOperationCode::GROUP_CREATE;
+    hichainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    operationCode = GroupOperationCode::MEMBER_DELETE;
+    hichainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    operationCode = GroupOperationCode::GROUP_DISBAND;
+    hichainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DeleteGroup_002
+ * @tc.desc: return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, DeleteGroup_002, testing::ext::TestSize.Level0)
+{
+    const int32_t userId = 1;
+    std::string groupId = "groupIdTest";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hichainConnector->DeleteGroup(userId, groupId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteGroup_003
+ * @tc.desc: return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, DeleteGroup_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    std::string userId = "userIdTest";
+    const int32_t authType = 1;
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->DeleteRedundanceGroup(userId);
+    int32_t ret = hichainConnector->DeleteGroup(requestId, userId, authType);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
