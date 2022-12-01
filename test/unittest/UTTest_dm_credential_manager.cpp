@@ -373,7 +373,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestS
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
     {
-        "processType" , 1
+        "processType" , 1,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -514,7 +514,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType" , 2
+        "processType" , 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -582,7 +582,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 1,
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -610,7 +610,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 2,
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -636,7 +636,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType" , 2
+        "processType" , 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -656,7 +656,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_003, testing::ext::Test
     {
         "processType" : 2,
         "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
-        "peerCredentialInfo" : 
+        "peerCredentialInfo" :
         [
             {
                 "peerDeviceId" : "devD"
@@ -702,7 +702,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_005, testing::ext::Test
         "processType" : 2,
         "authType" : 1,
         "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
-        "peerCredentialInfo" : 
+        "peerCredentialInfo" :
         [
             {
                 "peerDeviceId" : "devD"
@@ -752,7 +752,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 2,
-        "peerCredentialInfo" : 
+        "peerCredentialInfo" :
         [
             {
                 "peerDeviceId" : "devD"
@@ -925,7 +925,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 0,
