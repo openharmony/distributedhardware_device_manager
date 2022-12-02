@@ -28,6 +28,7 @@ group("unittest") {
     ":UTTest_device_manager_service_impl",
     ":UTTest_device_manager_service_listener",
     ":UTTest_dm_adapter_manager",
+    ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
@@ -46,6 +47,8 @@ group("unittest") {
     ":UTTest_ipc_server_stub",
     ":UTTest_multiple_user_connector",
     ":UTTest_permission_manager",
+    ":UTTest_pin_auth",
+    ":UTTest_pin_auth_ui",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_session",
   ]
@@ -54,6 +57,8 @@ group("unittest") {
 ## UnitTest UTTest_pin_auth {{{
 ohos_unittest("UTTest_pin_auth") {
   module_out_path = module_out_path
+
+  include_dirs = [ "${ext_path}/pin_auth/include/standard" ]
 
   sources = [ "UTTest_pin_auth.cpp" ]
 
@@ -65,6 +70,8 @@ ohos_unittest("UTTest_pin_auth") {
 ## UnitTest UTTest_pin_auth_ui {{{
 ohos_unittest("UTTest_pin_auth_ui") {
   module_out_path = module_out_path
+
+  include_dirs = [ "${ext_path}/pin_auth/include/standard" ]
 
   sources = [ "UTTest_pin_auth_ui.cpp" ]
 
@@ -202,6 +209,20 @@ ohos_unittest("UTTest_dm_adapter_manager") {
 }
 
 ## UnitTest UTTest_dm_adapter_manager }}}
+
+## UnitTest UTTest_dm_anonymous {{{
+ohos_unittest("UTTest_dm_anonymous") {
+  module_out_path = module_out_path
+
+  sources = [
+    "${common_path}/src/dm_anonymous.cpp",
+    "UTTest_dm_anonymous.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_anonymous }}}
 
 ## UnitTest UTTest_dm_timer {{{
 ohos_unittest("UTTest_dm_timer") {
@@ -499,6 +520,7 @@ config("device_manager_test_common_public_config") {
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
+    "${ext_path}/pin_auth/include",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
@@ -566,6 +588,7 @@ ohos_static_library("device_manager_test_common") {
   public_configs = [ ":device_manager_test_common_public_config" ]
 
   public_deps = [
+    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
