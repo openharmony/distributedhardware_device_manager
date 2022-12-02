@@ -66,7 +66,7 @@ void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
 void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
     LOGE("DmDistributedHardware Load SA failed, systemAbilityId:%d", systemAbilityId);
-    
+
     if (DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount() < MAX_LOAD_VALUE) {
         DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     } else {
