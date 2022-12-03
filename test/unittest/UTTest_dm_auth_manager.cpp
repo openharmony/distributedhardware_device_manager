@@ -248,6 +248,14 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    const int32_t sessionId = 65;
+    const std::string message = "messageTest";
+    int64_t requestId = 444;
+    const std::string groupId = "{}";
+    int32_t status = 1;
+    authManager->OnGroupCreated(requestId, groupId);
+    authManager->OnMemberJoin(requestId, status);
+    authManager->OnDataReceived(sessionId, message);
     authManager->SetAuthRequestState(authRequestState);
     int32_t ret = authManager->JoinNetwork();
     ASSERT_EQ(ret, DM_OK);
@@ -335,6 +343,13 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     int32_t pageId = 123;
     authManager->authResponseContext_ = nullptr;
+    authManager->authMessageProcessor_ = nullptr;
+    const int32_t sessionId = 65;
+    const std::string message = "messageTest";
+    int64_t requestId = 555;
+    int32_t status = 2;
+    authManager->OnMemberJoin(requestId, status);
+    authManager->OnDataReceived(sessionId, message);
     int32_t ret = authManager->SetPageId(pageId);
     ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
 }
@@ -349,9 +364,14 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    const int32_t sessionId = 78;
     int32_t reason = 123;
     int32_t state = 456;
+    authManager->OnSessionClosed(sessionId);
     authManager->authResponseContext_ = nullptr;
+    int64_t requestId = 333;
+    const std::string groupId = "{}";
+    authManager->OnGroupCreated(requestId, groupId);
     int32_t ret = authManager->SetReasonAndFinish(reason, state);
     ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
 }
@@ -370,6 +390,9 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_002, testing::ext::TestSize.Level
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     int32_t reason = 1234;
     int32_t state = 5678;
+    int64_t requestId = 22;
+    const std::string groupId = "{}";
+    authManager->OnGroupCreated(requestId, groupId);
     int32_t ret = authManager->SetReasonAndFinish(reason, state);
     ASSERT_EQ(ret, DM_OK);
 }
