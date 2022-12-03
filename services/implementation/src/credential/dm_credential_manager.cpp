@@ -225,7 +225,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
     } else {
         LOGE("credential type error!");
     }
-    return DM_OK;
+    return ERR_DM_FAILED;
 }
 
 void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
