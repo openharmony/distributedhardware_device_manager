@@ -12,37 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_HICHAIN_CONNECTOR_H
-#define OHOS_UTTEST_HICHAIN_CONNECTOR_H
 
-#include <gtest/gtest.h>
-#include <refbase.h>
-#include <string>
-#include <memory>
-#include <cstdint>
+#ifndef OHOS_DM_DISCOVERY_FILTER_TEST_H
+#define OHOS_DM_DISCOVERY_FILTER_TEST_H
+
 #include <map>
-#include <vector>
+#include <string>
+#include <gtest/gtest.h>
 
+#include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "dm_discovery_filter.h"
+#include "dm_log.h"
 #include "nlohmann/json.hpp"
-#include "device_auth.h"
-#include "single_instance.h"
-#include "hichain_connector_callback.h"
-#include "device_manager_service_listener.h"
-#include "dm_auth_manager.h"
-#include "dm_device_state_manager.h"
-#define private public
-#include "hichain_connector.h"
-#undef private
 
 namespace OHOS {
 namespace DistributedHardware {
-class HichainConnectorTest : public testing::Test {
+class DmDiscoveryFilterTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    virtual void SetUp();
+    virtual void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_HICHAIN_CONNECTOR_H
+#endif

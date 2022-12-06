@@ -168,7 +168,7 @@ public:
      */
     int32_t UnRegisterHiChainGroupCallback();
 
-     /**
+    /**
      * @tc.name: HiChainConnector::getRegisterInfo
      * @tc.desc: Get RegisterInfo Info of the HiChain Connector
      * @tc.type: FUNC
