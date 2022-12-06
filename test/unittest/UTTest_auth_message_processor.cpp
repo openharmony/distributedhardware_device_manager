@@ -556,6 +556,49 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSiz
     std::shared_ptr<DmAuthResponseContext> authResponseContext = authMessageProcessor->GetResponseContext();
     ASSERT_NE(authResponseContext, nullptr);
 }
+
+/**
+ * @tc.name: AuthMessageProcessor::CreateSimpleMessage_001
+ * @tc.desc: return the length of string is empty
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t msgType = MSG_TYPE_SYNC_GROUP;
+    std::string ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_RESP_AUTH;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_REQ_AUTH_TERMINATE;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::GetRequestContext_001
+ * @tc.desc: Compare authRequestContext before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
+    authMessageProcessor->SetRequestContext(authRequestContext);
+    auto ret = authMessageProcessor->GetRequestContext();
+    ASSERT_EQ(authMessageProcessor->authRequestContext_, ret);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

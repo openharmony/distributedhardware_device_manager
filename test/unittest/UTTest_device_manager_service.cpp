@@ -518,8 +518,22 @@ HWTEST_F(DeviceManagerServiceTest, RegisterDevStateCallback_001, testing::ext::T
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "extra";
-    int ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
+    int32_t ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: RegisterDevStateCallback_002
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, RegisterDevStateCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string extra = "extraTest";
+    int32_t ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -535,6 +549,20 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterDevStateCallback_001, testing::ext:
     std::string extra = "extra";
     int ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UnRegisterDevStateCallback_002
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, UnRegisterDevStateCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string extra = "extraTest";
+    int32_t ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -637,7 +665,7 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_002, testing::ext::TestSize.
 
 /**
  * @tc.name: RegisterCredentialCallback_001
- * @tc.desc:The return value is DM_OK
+ * @tc.desc: The return value is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -650,7 +678,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_001, testing::ext:
 
 /**
  * @tc.name: RegisterCredentialCallback_002
- * @tc.desc:The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -685,6 +713,59 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_002, testing::ex
     const std::string pkgName = "";
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterCredentialCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UninitSoftbusListener_001
+ * @tc.desc: DeviceManagerService::GetInstance().softbusListener_ is nullptr
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, UninitSoftbusListener_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().UninitSoftbusListener();
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+/**
+ * @tc.name: UninitDMServiceListener_001
+ * @tc.desc: DeviceManagerService::GetInstance().listener_ is nullptr
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, UninitDMServiceListener_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+}
+
+/**
+ * @tc.name: IsDMServiceImplSoLoaded_001
+ * @tc.desc: DeviceManagerService::GetInstance().isImplsoLoaded_ is false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplSoLoaded_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().LoadHardwareFwkService();
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplSoLoaded();
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsDMServiceImplReady_001
+ * @tc.desc: The return value is is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplReady_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    EXPECT_EQ(ret, true);
 }
 } // namespace
 } // namespace DistributedHardware

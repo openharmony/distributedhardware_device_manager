@@ -33,6 +33,7 @@ group("unittest") {
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_device_state_manager",
+    ":UTTest_dm_discovery_filter",
     ":UTTest_dm_discovery_manager",
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_timer",
@@ -372,6 +373,17 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
 ## UnitTest UTTest_dm_device_state_manager }}}
 
+## UnitTest UTTest_dm_discovery_filter {{{
+ohos_unittest("UTTest_dm_discovery_filter") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_discovery_filter.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_discovery_filter }}}
+
 ## UnitTest UTTest_device_manager_service_impl {{{
 ohos_unittest("UTTest_device_manager_service_impl") {
   module_out_path = module_out_path
@@ -520,7 +532,6 @@ config("device_manager_test_common_public_config") {
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
-    "${ext_path}/pin_auth/include",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
@@ -553,6 +564,7 @@ config("device_manager_test_common_public_config") {
     "//base/security/access_token/interfaces/innerkits/nativetoken/include",
     "//base/security/access_token/interfaces/innerkits/token_setproc/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "${ext_path}/pin_auth/include",
   ]
 
   if (os_account_part_exists) {

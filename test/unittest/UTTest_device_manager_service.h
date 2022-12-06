@@ -21,7 +21,10 @@
 #include <string>
 #include <vector>
 
+#define private public
 #include "device_manager_service.h"
+#undef private
+
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "dm_device_state_manager.h"
