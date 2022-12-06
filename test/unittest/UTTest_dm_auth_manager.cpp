@@ -42,7 +42,8 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-
+const int32_t MIN_PIN_CODE = 100000;
+const int32_t MAX_PIN_CODE = 999999;
 /**
  * @tc.name: DmAuthManager::UnAuthenticateDevice_001
  * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_ FAILED
@@ -414,6 +415,41 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_003, testing::ext::TestSize.Level
     int32_t state = 36;
     int32_t ret = authManager->SetReasonAndFinish(reason, state);
     ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::IsIdenticalAccount_001
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    bool ret = authManager->IsIdenticalAccount();
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DmAuthManager::GeneratePincode_001
+ * @tc.desc: Return OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    int32_t openedSessionId = 66;
+    int32_t sessionSide = 0;
+    int32_t result = 3;
+    const int32_t closedSessionId = 11;
+    authManager->OnSessionOpened(openedSessionId, sessionSide, result);
+    authManager->OnSessionClosed(closedSessionId);
+    int32_t ret = authManager->GeneratePincode();
+    ASSERT_LE(ret, MAX_PIN_CODE);
+    ASSERT_GE(ret, MIN_PIN_CODE);
 }
 } // namespace
 } // namespace DistributedHardware
