@@ -33,6 +33,7 @@ group("unittest") {
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_device_state_manager",
+    ":UTTest_dm_dfx",
     ":UTTest_dm_discovery_filter",
     ":UTTest_dm_discovery_manager",
     ":UTTest_dm_publish_manager",
@@ -372,6 +373,19 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 }
 
 ## UnitTest UTTest_dm_device_state_manager }}}
+
+## UnitTest UTTest_dm_dfx {{{
+ohos_unittest("UTTest_dm_dfx") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter" ]
+
+  sources = [ "UTTest_dm_dfx.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_dfx }}}
 
 ## UnitTest UTTest_dm_discovery_filter {{{
 ohos_unittest("UTTest_dm_discovery_filter") {
