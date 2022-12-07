@@ -60,6 +60,320 @@ void DeviceManagerImplTest::TearDownTestCase()
 namespace {
 /**
  * @tc.name: InitDeviceManager_001
+ * @tc.desc: 1. set packName not null
+ *              set dmInitCallback not null
+ *           2. call DeviceManagerImpl::InitDeviceManager with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, InitDeviceManager_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set dmInitCallback not null
+    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 3. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: UnInitDeviceManager_101
+ * @tc.desc: 1. set packName not null
+ *           2. MOCK IpcClientProxy UnInit return DM_OK
+ *           3. call DeviceManagerImpl::UnInitDeviceManager with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnInitDeviceManager_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test2";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    ret = DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetTrustedDeviceList_101
+ * @tc.desc: 1. set packName not null
+ *              set extra null
+ *              set deviceList null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set extra null
+    std::string extra = "";
+    // set deviceList null
+    std::vector<DmDeviceInfo> deviceList;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+    ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, deviceList);
+    // 3. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: GetLocalDeviceInfo_101
+ * @tc.desc: 1. set packName null
+ *              set extra null
+ *              set deviceList null
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set extra null
+    DmDeviceInfo info;
+    // 2. MOCK IpcClientProxy SendRequest return ERR_DM_IPC_SEND_REQUEST_FAILED
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+    ret = DeviceManager::GetInstance().GetLocalDeviceInfo(packName, info);
+    // 3. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_101
+ * @tc.desc: 1. set packName not null
+ *              set subscribeInfo null
+ *              set callback not null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_DISCOVERY_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    std::string extra= "";
+    // set subscribeInfo null
+    DmSubscribeInfo subscribeInfo;
+    // set callback not null
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    // 3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
+    // 4. check ret is ERR_DM_DISCOVERY_FAILED
+    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: StopDeviceDiscovery_101
+ * @tc.desc: 1. set packName not null
+ *              set subscribeId is 0
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_DISCOVERY_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set subscribeInfo is 0
+    uint16_t subscribeId = 0;
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_101
+ * @tc.desc: 1. set packName not null
+ *              set publishInfo null
+ *              set callback not null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_PUBLISH_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    // set publishInfo null
+    DmPublishInfo publishInfo;
+    // set callback not null
+    std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
+    // 4. check ret is ERR_DM_PUBLISH_FAILED
+    ASSERT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_101
+ * @tc.desc: 1. set packName not null
+ *              set publishId is 0
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_PUBLISH_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set subscribeInfo is 0
+    int32_t publishId = 0;
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
+    // 4. check ret is ERR_DM_PUBLISH_FAILED
+    ASSERT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: AuthenticateDevice_101
+ * @tc.desc: 1. set packName not null
+ *              set dmDeviceInfo null
+ *              set dmAppImageInfo null
+ *              set extra null
+ *              set callback null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::AuthenticateDevice with parameter
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    // set dmDeviceInfo null
+    int32_t authType = 1;
+    // set dmAppImageInfo null
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123XXXX");
+    strcpy_s(dmDeviceInfo.deviceName, DM_MAX_DEVICE_NAME_LEN, "234");
+    dmDeviceInfo.deviceTypeId = 0;
+    // set extra null
+    std::string extra = "test";
+    // set callback null
+    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    // 2.InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    ASSERT_EQ(ret, DM_OK);
+    // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
+    ret = DeviceManager::GetInstance().AuthenticateDevice(packName, authType, dmDeviceInfo, extra, callback);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: UnAuthenticateDevice_101
+ * @tc.desc: 1. set packName not null
+ *              set dmDeviceInfo null
+ *              set dmAppImageInfo null
+ *              set extra null
+ *              set callback null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::AuthenticateDevice with parameter
+ *           4. check ret is ERR_DM_FAILED
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    DmDeviceInfo deviceInfo;
+    deviceInfo.deviceId[0] = '1';
+    deviceInfo.deviceId[1] = '2';
+    deviceInfo.deviceId[2] = '\0';
+    // set callback null
+    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
+    ret = DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
+    // 4. check ret is ERR_DM_FAILED
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: SetUserOperation_101
+ * @tc.desc: 1. set packName not null
+ *              set action null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::SetUserOperation with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, SetUserOperation_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    // set authParam null
+    int32_t action = 0;
+    const std::string param = "extra";
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    // 3. call DeviceManagerImpl::SetUserOperation with parameter
+    ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: InitDeviceManager_001
  * @tc.desc: 1. call DeviceManagerImpl::InitDeviceManager with packName = null, dmInitCallback = nullprt
  *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
@@ -428,7 +742,6 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_005, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-
 /**
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc: 1. set packName null
@@ -576,7 +889,6 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_005, testing::ext::TestSize.L
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
 }
-
 
 /**
  * @tc.name: RegisterDevStateCallback_001
