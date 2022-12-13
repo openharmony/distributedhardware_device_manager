@@ -51,7 +51,7 @@ namespace {
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is DM_OK
+ *           4. check ret is not DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -66,7 +66,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
     instance->dmInterface_ = dmInterface;
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is DM_OK
+    // 4. check ret is not DM_INIT_FAILED
     ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
@@ -75,7 +75,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_001, testing::ext::TestSize.Level0)
  * @tc.desc: 1. new a dmInterface
  *           2. set IpcClientManager dmInterface_ not null
  *           3. call ClientInit
- *           4. check ret is DM_OK
+ *           4. check ret is not DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -84,7 +84,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     // 3. call ClientInit
     int ret = instance->ClientInit();
-    // 4. check ret is DM_OK
+    // 4. check ret is not DM_INIT_FAILED
     ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
@@ -94,7 +94,7 @@ HWTEST_F(IpcClientManagerTest, ClientInit_002, testing::ext::TestSize.Level0)
  *           2. set a pkgName not null
  *           3. add listener and pkgName in dmListener_ Map
  *           4. call Init with pkgName
- *           5. check ret is DM_OK
+ *           5. check ret is not DM_INIT_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -109,7 +109,7 @@ HWTEST_F(IpcClientManagerTest, Init_001, testing::ext::TestSize.Level0)
     instance->dmListener_[pkgName] = listener;
     // 4. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
-    // 5. check ret is DM_OK
+    // 5. check ret is not DM_INIT_FAILED
     ASSERT_NE(ret, DM_INIT_FAILED);
 }
 
@@ -222,21 +222,21 @@ HWTEST_F(IpcClientManagerTest, Init_005, testing::ext::TestSize.Level0)
  * @tc.desc:  1. set pkgName null
  *               set IpcClientManager dmInterface_ null
  *            2. call UnInit with pkgName
- *            3. check ret is DEVICEMANAGER_SERVICE_NOT_READY
+ *            3. check ret is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(IpcClientManagerTest, UnInit1, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName null
-    std::string pkgName = "";
+    std::string pkgName;
     // set IpcClientManager dmInterface_ null
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     // 2. call UnInit with pkgName
     int32_t ret = instance->UnInit(pkgName);
-    // 3. check ret is DM_SERVICE_NOT_READY
-    ASSERT_EQ(ret, DM_SERVICE_NOT_READY);
+    // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
