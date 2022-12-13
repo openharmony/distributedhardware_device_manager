@@ -75,14 +75,15 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     if (CheckDiscoveryQueue(pkgName) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
     }
-
-    std::lock_guard<std::mutex> autoLock(locks_);
-    discoveryQueue_.push(pkgName);
-    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
-    discoveryContextMap_.emplace(pkgName, context);
-    softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
-                                                        std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
-    CfgDiscoveryTimer();
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryQueue_.push(pkgName);
+        DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
+        discoveryContextMap_.emplace(pkgName, context);
+        softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
+            std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
+        CfgDiscoveryTimer();
+    }
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
@@ -92,14 +93,16 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::lock_guard<std::mutex> autoLock(locks_);
-    if (!discoveryQueue_.empty()) {
-        discoveryQueue_.pop();
-    }
-    if (!discoveryContextMap_.empty()) {
-        discoveryContextMap_.erase(pkgName);
-        softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-        timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (!discoveryQueue_.empty()) {
+            discoveryQueue_.pop();
+        }
+        if (!discoveryContextMap_.empty()) {
+            discoveryContextMap_.erase(pkgName);
+            softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
+            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+        }
     }
     return softbusConnector_->StopDiscovery(subscribeId);
 }
