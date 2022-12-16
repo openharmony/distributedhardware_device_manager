@@ -254,21 +254,27 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
 
 void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
 {
-    if (json.contains(TAG_CRYPTO_SUPPORT)) {
+    if (json.contains(TAG_CRYPTO_SUPPORT) && json[TAG_CRYPTO_SUPPORT].is_boolean()) {
         authResponseContext_->cryptoSupport = json[TAG_CRYPTO_SUPPORT];
     }
-    if (json.contains(TAG_CRYPTO_NAME)) {
-        authResponseContext_->cryptoSupport = json[TAG_CRYPTO_NAME];
+    if (json.contains(TAG_CRYPTO_NAME) && json[TAG_CRYPTO_NAME].is_string()) {
+        authResponseContext_->cryptoName = json[TAG_CRYPTO_NAME];
     }
-    if (json.contains(TAG_CRYPTO_VERSION)) {
-        authResponseContext_->cryptoSupport = json[TAG_CRYPTO_VERSION];
+    if (json.contains(TAG_CRYPTO_VERSION) && json[TAG_CRYPTO_VERSION].is_string()) {
+        authResponseContext_->cryptoVer = json[TAG_CRYPTO_VERSION];
     }
-    if (json.contains(TAG_DEVICE_ID)) {
+    if (json.contains(TAG_DEVICE_ID) && json[TAG_DEVICE_ID].is_string()) {
         authResponseContext_->deviceId = json[TAG_DEVICE_ID];
     }
-    authResponseContext_->authType = json[TAG_AUTH_TYPE];
-    authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
-    authResponseContext_->reply = json[TAG_REPLY];
+    if (json.contains(TAG_LOCAL_DEVICE_ID) && json[TAG_LOCAL_DEVICE_ID].is_string()) {
+        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
+    }
+    if (json.contains(TAG_AUTH_TYPE) && json[TAG_AUTH_TYPE].is_number_integer()) {
+        authResponseContext_->authType = json[TAG_AUTH_TYPE];
+    }
+    if (json.contains(TAG_REPLY) && json[TAG_REPLY].is_number_integer()) {
+        authResponseContext_->reply = json[TAG_REPLY];
+    }
 }
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
