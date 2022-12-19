@@ -266,7 +266,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext:
 
 /**
  * @tc.name: StartDiscovery_001
- * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -279,7 +279,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
 
 /**
  * @tc.name: StopDiscovery_001
- * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -292,7 +292,7 @@ HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: PublishDiscovery_001
- * @tc.desc: get PublishDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get PublishDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -305,7 +305,7 @@ HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Leve
 
 /**
  * @tc.name: UnPublishDiscovery_001
- * @tc.desc: get UnPublishDiscovery to wrong master and return ERR_DM_PUBLISH_FAILED
+ * @tc.desc: get UnPublishDiscovery to wrong branch and return ERR_DM_PUBLISH_FAILED
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -318,7 +318,7 @@ HWTEST_F(SoftbusConnectorTest, UnPublishDiscovery_001, testing::ext::TestSize.Le
 
 /**
  * @tc.name: GetUdidByNetworkId_001
- * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -332,7 +332,7 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
 
 /**
  * @tc.name: GetUuidByNetworkId_001
- * @tc.desc: get StartDiscovery to wroing master and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -443,7 +443,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_002, testing::ext::TestSiz
 
 /**
  * @tc.name: GetConnectionIpAddress_003
- * @tc.desc: set deviceInfo.addrNum = -1;go to second master and return ERR_DM_FAILED
+ * @tc.desc: set deviceInfo.addrNum = -1;go to second branch and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -459,7 +459,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_003, testing::ext::TestSiz
 
 /**
  * @tc.name: GetConnectionIpAddress_004
- * @tc.desc: set deviceInfo.addrNum = 1;go to second master and return ERR_DM_FAILED
+ * @tc.desc: set deviceInfo.addrNum = 1;go to second branch and return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -480,7 +480,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectionIpAddress_004, testing::ext::TestSiz
 
 /**
  * @tc.name: GetConnectAddrByType_001
- * @tc.desc: set deviceInfo'pointer null, go to first master, and return nullptr
+ * @tc.desc: set deviceInfo'pointer null, go to first branch, and return nullptr
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.Level0)

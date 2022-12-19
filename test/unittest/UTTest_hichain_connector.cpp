@@ -307,7 +307,7 @@ HWTEST_F(HichainConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: GetConnectPara_001
- * @tc.desc: set para not null and go to the second master
+ * @tc.desc: set para not null and go to the second branch
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
