@@ -599,6 +599,157 @@ HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize
     auto ret = authMessageProcessor->GetRequestContext();
     ASSERT_EQ(authMessageProcessor->authRequestContext_, ret);
 }
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_001
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "AUTHTYPE": 1,
+        "CRYPTOSUPPORT": false,
+        "ITF_VER": "1.1",
+        "LOCALDEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
+        "MSG_TYPE": 80,
+        "REPLY": 2016
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_002
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "AUTHTYPE": 1,
+        "CRYPTOSUPPORT": false,
+        "ITF_VER": "1.1",
+        "LOCALDEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
+        "MSG_TYPE": 90,
+        "REPLY": 2016
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_003
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "APPDESC": "Distributed Calc",
+        "APPICON": "",
+        "APPNAME": "Distributed Calc",
+        "AUTHTYPE":1,
+        "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
+        "DEVICETYPE": "",
+        "HOST": "com.example.distributedcalc",
+        "INDEX": 0,
+        "ITF_VER": "1.1",
+        "MSG_TYPE": 100,
+        "REQUESTER": "",
+        "SLICE": 1,
+        "TARGET": "com.example.distributedcalc",
+        "THUMSIZE": 0,
+        "TOKEN": "73141022",
+        "VISIBILITY": 0
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_004
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "REPLY": 0,
+        "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
+        "TOKEN": "7314",
+        "GROUPNAME": "com.example.test",
+        "ITF_VER": "1.1",
+        "MSG_TYPE": 200,
+        "NETID": "147258963",
+        "REQUESTID": 8448,
+        "authToken": "com.example.distributedcalc62063A65EC8540074FF01413BDC3B6D7",
+        "groupId" : "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5"
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_005
+ * @tc.desc: Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "REPLY": 0,
+        "ITF_VER": "1.1",
+        "MSG_TYPE": 104
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

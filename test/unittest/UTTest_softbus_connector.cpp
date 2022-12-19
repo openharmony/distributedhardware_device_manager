@@ -52,7 +52,6 @@ namespace {
 std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
 std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
     std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector);
 std::shared_ptr<DmDiscoveryManager> discoveryMgr = std::make_shared<DmDiscoveryManager>(softbusConnector, listener);
@@ -68,14 +67,9 @@ HWTEST_F(SoftbusConnectorTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
     std::string pkgName = "123";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    deviceStateMgr->RegisterSoftbusStateCallback();
+    int32_t ret = deviceStateMgr->RegisterSoftbusStateCallback();
     DeviceOnLine(info);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        ret = true;
-        listener->ipcServerListener_.req_ = nullptr;
-    }
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, DM_OK);
     SoftbusConnector::stateCallbackMap_.clear();
 }
 
@@ -631,20 +625,6 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo nodeBasicInfo;
-    DmDeviceInfo dmDeviceInfo;
-    int ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ConvertNodeBasicInfoToDmDevice_001
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
 HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo = {
@@ -664,124 +644,6 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::Te
         ret = true;
     }
     EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "123456";
-    SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftBusDeviceOnline(info);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        listener->ipcServerListener_.req_ = nullptr;
-        ret = true;
-    }
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_002, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "123456";
-    NodeBasicInfo info = {
-            .networkId = "123456",
-            .deviceName = "123456",
-            .deviceTypeId = 1
-        };
-    std::string pkgName = "com.ohos.helloworld";
-    softbusConnector->RegisterSoftbusStateCallback(
-        pkgName, std::shared_ptr<ISoftbusStateCallback>(deviceStateMgr));
-    softbusListener->OnSoftBusDeviceOnline(&info);
-    sleep(1);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        listener->ipcServerListener_.req_ = nullptr;
-        ret = true;
-    }
-    EXPECT_EQ(ret, true);
-    softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
-}
-
-/**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftBusDeviceOnline_003, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "123456";
-    NodeBasicInfo info = {
-            .networkId = "123456",
-            .deviceName = "123456",
-            .deviceTypeId = 1
-        };
-    std::string oldName = std::string(DM_PKG_NAME);
-    std::string pkgName = "com.ohos.test";
-    softbusListener->OnSoftBusDeviceOnline(&info);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        listener->ipcServerListener_.req_ = nullptr;
-        ret = true;
-    }
-    EXPECT_EQ(ret, false);
-    pkgName = oldName;
-}
-
-/**
- * @tc.name: OnSoftbusDeviceOffline_001
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_001, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftbusDeviceOffline(info);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        ret = true;
-    }
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceOffline_002
- * @tc.desc: go to the correct case and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceOffline_002, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo info = {
-            .networkId = "123456",
-            .deviceName = "123456",
-            .deviceTypeId = 1
-        };
-    std::string pkgName = "com.ohos.helloworld";
-    softbusConnector->RegisterSoftbusStateCallback(
-        pkgName, std::shared_ptr<ISoftbusStateCallback>(deviceStateMgr));
-    softbusListener->OnSoftbusDeviceOffline(&info);
-    sleep(1);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        listener->ipcServerListener_.req_ = nullptr;
-        ret = true;
-    }
-    EXPECT_EQ(ret, true);
-    softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
 }
 
 /**

@@ -78,7 +78,7 @@ HWTEST_F(DmDiscoveryManagerTest, DmDiscoveryManager_002, testing::ext::TestSize.
 /**
  * @tc.name:StartDeviceDiscovery_001
  * @tc.desc: keeping pkgame unchanged, call StartDeviceDiscovery twice
- *           so that its discoveryQueue is not empty and return ERR_DM_DISCOVERY_REPEATED
+ *           so that its discoveryQueue is not empty and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -87,9 +87,8 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_001, testing::ext::TestSiz
     std::string pkgName = "com.ohos.helloworld";
     DmSubscribeInfo subscribeInfo;
     const std::string extra;
-    discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
     discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeInfo.subscribeId);
 }
 
