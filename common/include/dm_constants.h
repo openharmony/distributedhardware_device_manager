@@ -79,7 +79,7 @@ constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
 constexpr const char* TAG_IDENTICAL_ACCOUNT = "IDENTICALACCOUNT";
 constexpr const char* TAG_VER = "ITF_VER";
-constexpr const char* TAG_TYPE = "MSG_TYPE";
+constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* APP_THUMBNAIL = "appThumbnail";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
@@ -116,6 +116,8 @@ constexpr const char* EVENT_INIT = "EVENT_INIT";
 constexpr const char* EVENT_CONFIRM_CODE = "0";
 constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
+
+constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

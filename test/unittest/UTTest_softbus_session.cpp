@@ -95,7 +95,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
     int32_t msgType = 2;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
-    jsonObj[TAG_TYPE] = msgType;
+    jsonObj[TAG_MSG_TYPE] = msgType;
     std::string message = jsonObj.dump();
     int32_t sessionId = 0;
     softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr));
