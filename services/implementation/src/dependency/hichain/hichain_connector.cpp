@@ -212,6 +212,10 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
         LOGE("returnGroups parse error");
         return false;
     }
+    if (!jsonObject.is_array()) {
+        LOGE("json string is not array.");
+        return false;
+    }
     std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
     if (groupInfos.size() == 0) {
         LOGE("HiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
@@ -247,6 +251,10 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
         LOGE("returnGroups parse error");
         return false;
     }
+    if (!jsonObject.is_array()) {
+        LOGE("json string is not array.");
+        return false;
+    }
     std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
     if (groupInfos.size() == 0) {
         LOGE("HiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
@@ -268,22 +276,28 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
+    if (!IsString(jsonObject, TAG_DEVICE_ID) || !IsInt32(jsonObject, PIN_CODE_KEY) ||
+        !IsString(jsonObject, TAG_GROUP_ID) || !IsInt64(jsonObject, TAG_REQUEST_ID) ||
+        !IsString(jsonObject, TAG_GROUP_NAME)) {
+        LOGE("HiChainConnector::AddMember err json string.");
+        return ERR_DM_FAILED;
+    }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID]);
+    std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID].get<std::string>());
 
-    int32_t pinCode = jsonObject[PIN_CODE_KEY];
-    std::string groupId = jsonObject[TAG_GROUP_ID];
+    int32_t pinCode = jsonObject[PIN_CODE_KEY].get<int32_t>();
+    std::string groupId = jsonObject[TAG_GROUP_ID].get<std::string>();
     nlohmann::json jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
     jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
     jsonObj[FIELD_IS_ADMIN] = false;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-    jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME];
+    jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].get<std::string>();
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfomation.c_str();
     std::string tmpStr = jsonObj.dump();
-    int64_t requestId = jsonObject[TAG_REQUEST_ID];
+    int64_t requestId = jsonObject[TAG_REQUEST_ID].get<int64_t>();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
@@ -468,6 +482,10 @@ int32_t HiChainConnector::GetRelatedGroups(const std::string &deviceId, std::vec
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
+        return ERR_DM_FAILED;
+    }
+    if (!jsonObject.is_array()) {
+        LOGE("jsonObject is not an array.");
         return ERR_DM_FAILED;
     }
     std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();

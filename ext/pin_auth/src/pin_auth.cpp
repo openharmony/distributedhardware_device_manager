@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
@@ -42,11 +43,11 @@ int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthMana
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.contains(PIN_CODE_KEY)) {
+    if (!IsInt32(jsonObject, PIN_CODE_KEY)) {
         LOGE("err json string, first time");
         return ERR_DM_FAILED;
     }
-    return pinAuthUi_->ShowPinDialog(jsonObject[PIN_CODE_KEY], authManager);
+    return pinAuthUi_->ShowPinDialog(jsonObject[PIN_CODE_KEY].get<int32_t>(), authManager);
 }
 
 int32_t PinAuth::StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
@@ -74,15 +75,15 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!authParamJson.contains(PIN_CODE_KEY) || !authParamJson.contains(PIN_TOKEN)
-        || !authTokenJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_TOKEN)) {
-        LOGE("err json string, first time");
+    if (!IsInt32(authTokenJson, PIN_CODE_KEY) || !IsString(authTokenJson, PIN_TOKEN) ||
+        !IsInt32(authParamJson, PIN_CODE_KEY) || !IsString(authParamJson, PIN_TOKEN)) {
+        LOGE("PinAuth::VerifyAuthentication err json string.");
         return ERR_DM_FAILED;
     }
-    int32_t code = authTokenJson[PIN_CODE_KEY];
-    std::string pinToken = authTokenJson[PIN_TOKEN];
-    int32_t inputPinCode = authParamJson[PIN_CODE_KEY];
-    std::string inputPinToken = authParamJson[PIN_TOKEN];
+    int32_t code = authTokenJson[PIN_CODE_KEY].get<int32_t>();
+    std::string pinToken = authTokenJson[PIN_TOKEN].get<std::string>();
+    int32_t inputPinCode = authParamJson[PIN_CODE_KEY].get<int32_t>();
+    std::string inputPinToken = authParamJson[PIN_TOKEN].get<std::string>();
     if (code == inputPinCode && pinToken == inputPinToken) {
         return DM_OK;
     } else if (code != inputPinCode && times_ < MAX_VERIFY_TIMES) {

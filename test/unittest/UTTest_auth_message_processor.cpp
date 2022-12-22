@@ -91,7 +91,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
-    jsonObj[TAG_TYPE] = msgType;
+    jsonObj[TAG_MSG_TYPE] = msgType;
     jsonObj[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
@@ -100,7 +100,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
 
     nlohmann::json jsonObject;
     jsonObject[TAG_VER] = DM_ITF_VER;
-    jsonObject[TAG_TYPE] = msgType;
+    jsonObj[TAG_MSG_TYPE] = msgType;
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
     jsonObject[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
     jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;

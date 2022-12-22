@@ -124,6 +124,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/standard",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
+      "//third_party/json/include",
     ]
   }
 

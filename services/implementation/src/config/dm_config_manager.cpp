@@ -16,6 +16,7 @@
 
 #include <dlfcn.h>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "json_config.h"
@@ -25,36 +26,34 @@ namespace OHOS {
 namespace DistributedHardware {
 void from_json(const nlohmann::json &jsonObject, AdapterSoLoadInfo &soLoadInfo)
 {
-    if (!jsonObject.contains("name") || !jsonObject.contains("type") || !jsonObject.contains("version") ||
-        !jsonObject.contains("funcName") || !jsonObject.contains("soName") || !jsonObject.contains("soPath")) {
+    if (!IsString(jsonObject, "name") || !IsString(jsonObject, "type") || !IsString(jsonObject, "version") ||
+        !IsString(jsonObject, "funcName") || !IsString(jsonObject, "soName") || !IsString(jsonObject, "soPath")) {
         LOGE("AdapterSoLoadInfo json key Not complete");
         return;
     }
-
-    jsonObject["name"].get_to(soLoadInfo.name);
-    jsonObject["type"].get_to(soLoadInfo.type);
-    jsonObject["version"].get_to(soLoadInfo.version);
-    jsonObject["funcName"].get_to(soLoadInfo.funcName);
-    jsonObject["soName"].get_to(soLoadInfo.soName);
-    jsonObject["soPath"].get_to(soLoadInfo.soPath);
+    soLoadInfo.name = jsonObject["name"].get<std::string>();
+    soLoadInfo.type = jsonObject["type"].get<std::string>();
+    soLoadInfo.version = jsonObject["version"].get<std::string>();
+    soLoadInfo.funcName = jsonObject["funcName"].get<std::string>();
+    soLoadInfo.soName = jsonObject["soName"].get<std::string>();
+    soLoadInfo.soPath = jsonObject["soPath"].get<std::string>();
 }
 
 void from_json(const nlohmann::json &jsonObject, AuthSoLoadInfo &soLoadInfo)
 {
-    if (!jsonObject.contains("name") || !jsonObject.contains("type") || !jsonObject.contains("version") ||
-        !jsonObject.contains("funcName") || !jsonObject.contains("soName") || !jsonObject.contains("soPath") ||
-        !jsonObject.contains("authType")) {
+    if (!IsString(jsonObject, "name") || !IsString(jsonObject, "type") || !IsString(jsonObject, "version") ||
+        !IsString(jsonObject, "funcName") || !IsString(jsonObject, "soName") || !IsString(jsonObject, "soPath") ||
+        !IsInt32(jsonObject, "authType")) {
         LOGE("AuthSoLoadInfo json key Not complete");
         return;
     }
-
-    jsonObject["name"].get_to(soLoadInfo.name);
-    jsonObject["type"].get_to(soLoadInfo.type);
-    jsonObject["version"].get_to(soLoadInfo.version);
-    jsonObject["authType"].get_to(soLoadInfo.authType);
-    jsonObject["funcName"].get_to(soLoadInfo.funcName);
-    jsonObject["soName"].get_to(soLoadInfo.soName);
-    jsonObject["soPath"].get_to(soLoadInfo.soPath);
+    soLoadInfo.authType = jsonObject["authType"].get<int32_t>();
+    soLoadInfo.name = jsonObject["name"].get<std::string>();
+    soLoadInfo.type = jsonObject["type"].get<std::string>();
+    soLoadInfo.version = jsonObject["version"].get<std::string>();
+    soLoadInfo.funcName = jsonObject["funcName"].get<std::string>();
+    soLoadInfo.soName = jsonObject["soName"].get<std::string>();
+    soLoadInfo.soPath = jsonObject["soPath"].get<std::string>();
 }
 
 DmConfigManager &DmConfigManager::GetInstance()
@@ -72,7 +71,7 @@ DmConfigManager::DmConfigManager()
             LOGE("adapter json config string parse error");
             break;
         }
-        if (!adapterJsonObject.contains(ADAPTER_LOAD_JSON_KEY)) {
+        if (!IsArray(adapterJsonObject, ADAPTER_LOAD_JSON_KEY)) {
             LOGE("adapter json config string key not exist");
             break;
         }
@@ -101,7 +100,7 @@ DmConfigManager::DmConfigManager()
             LOGE("auth json config string parse error!\n");
             break;
         }
-        if (!authJsonObject.contains(AUTH_LOAD_JSON_KEY)) {
+        if (!IsArray(authJsonObject, AUTH_LOAD_JSON_KEY)) {
             LOGE("auth json config string key not exist!\n");
             break;
         }
