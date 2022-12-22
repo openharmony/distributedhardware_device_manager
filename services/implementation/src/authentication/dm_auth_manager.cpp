@@ -128,20 +128,20 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestContext_->deviceId = deviceId;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
-        if (jsonObject.contains(TARGET_PKG_NAME_KEY)) {
-            authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY];
+        if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
+            authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].get<std::string>();
         }
-        if (jsonObject.contains(APP_NAME_KEY)) {
-            authRequestContext_->appName = jsonObject[APP_NAME_KEY];
+        if (IsString(jsonObject, APP_NAME_KEY)) {
+            authRequestContext_->appName = jsonObject[APP_NAME_KEY].get<std::string>();
         }
-        if (jsonObject.contains(APP_DESCRIPTION_KEY)) {
-            authRequestContext_->appDesc = jsonObject[APP_DESCRIPTION_KEY];
+        if (IsString(jsonObject, APP_DESCRIPTION_KEY)) {
+            authRequestContext_->appDesc = jsonObject[APP_DESCRIPTION_KEY].get<std::string>();
         }
-        if (jsonObject.contains(APP_THUMBNAIL)) {
-            authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL];
+        if (IsString(jsonObject, APP_THUMBNAIL)) {
+            authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
         }
-        if (jsonObject.contains(APP_ICON_KEY)) {
-            authRequestContext_->appIcon = jsonObject[APP_ICON_KEY];
+        if (IsString(jsonObject, APP_ICON_KEY)) {
+            authRequestContext_->appIcon = jsonObject[APP_ICON_KEY].get<std::string>();
         }
     }
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
@@ -173,7 +173,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         std::string groupId = "";
         groupId = groupList.front().groupId;
         LOGI("DmAuthManager::UnAuthenticateDevice groupId = %s, deviceId = %s, deviceUdid = %s",
-             GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
+            GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
         hiChainConnector_->DeleteGroup(groupId);
     } else {
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");

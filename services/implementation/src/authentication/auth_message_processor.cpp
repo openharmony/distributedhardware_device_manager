@@ -51,7 +51,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
-    jsonObj[TAG_TYPE] = MSG_TYPE_REQ_AUTH;
+    jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_INDEX] = 0;
     jsonObj[TAG_REQUESTER] = authRequestContext_->deviceName;
@@ -73,7 +73,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
         nlohmann::json jsonThumbnailObj;
         jsonThumbnailObj[TAG_VER] = DM_ITF_VER;
-        jsonThumbnailObj[TAG_TYPE] = MSG_TYPE_REQ_AUTH;
+        jsonThumbnailObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
         jsonThumbnailObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
         jsonThumbnailObj[TAG_INDEX] = idx + 1;
         jsonThumbnailObj[TAG_DEVICE_ID] = authRequestContext_->deviceId;
@@ -93,7 +93,7 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
     LOGI("AuthMessageProcessor::CreateSimpleMessage start. msgType is %d", msgType);
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
-    jsonObj[TAG_TYPE] = msgType;
+    jsonObj[TAG_MSG_TYPE] = msgType;
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
         case MSG_TYPE_RESP_NEGOTIATE:
@@ -148,14 +148,14 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
             LOGE("DecodeRequestAuth jsonStr error");
             return;
         }
-        groupId = jsonObject[TAG_GROUP_ID];
+        groupId = jsonObject[TAG_GROUP_ID].get<std::string>();
         json[TAG_NET_ID] = authResponseContext_->networkId;
         json[TAG_REQUEST_ID] = authResponseContext_->requestId;
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s", GetAnonyString(groupId).c_str(),
-             GetAnonyString(authResponseContext_->groupName).c_str());
+            GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
 
@@ -171,11 +171,11 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.contains(TAG_TYPE)) {
+    if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
         LOGE("err json string, first time");
         return ERR_DM_FAILED;
     }
-    int32_t msgType = jsonObject[TAG_TYPE];
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
     authResponseContext_->msgType = msgType;
     LOGI("AuthMessageProcessor::ParseMessage message type %d", authResponseContext_->msgType);
     switch (msgType) {
@@ -202,7 +202,9 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
 
 void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
 {
-    authResponseContext_->reply = json[TAG_REPLY];
+    if (IsInt32(json, TAG_REPLY)) {
+        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    }
 }
 
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
@@ -210,26 +212,29 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     LOGE("start ParseAuthRequestMessage");
     int32_t sliceNum = 0;
     int32_t idx = 0;
-    if (!json.contains(TAG_INDEX) || !json.contains(TAG_DEVICE_ID) ||
-        !json.contains(TAG_SLICE_NUM)) {
-        LOGE("err json string, first time");
+    if (!IsInt32(json, TAG_INDEX) || !IsInt32(json, TAG_SLICE_NUM)) {
+        LOGE("AuthMessageProcessor::ParseAuthRequestMessage err json string, first.");
         return ERR_DM_FAILED;
     }
-
-    idx = json[TAG_INDEX];
-    sliceNum = json[TAG_SLICE_NUM];
+    idx = json[TAG_INDEX].get<int32_t>();
+    sliceNum = json[TAG_SLICE_NUM].get<int32_t>();
     if (idx == 0) {
-        authResponseContext_->deviceId = json[TAG_DEVICE_ID];
-        authResponseContext_->authType = json[TAG_AUTH_TYPE];
-        authResponseContext_->appDesc = json[TAG_APP_DESCRIPTION];
-        authResponseContext_->token = json[TAG_TOKEN];
-        authResponseContext_->targetPkgName = json[TAG_TARGET];
-        authResponseContext_->appName = json[TAG_APP_NAME];
+        if (!IsString(json, TAG_DEVICE_ID) || !IsInt32(json, TAG_AUTH_TYPE) || !IsString(json, TAG_APP_DESCRIPTION) ||
+            !IsString(json, TAG_TOKEN) || !IsString(json, TAG_TARGET) || !IsString(json, TAG_APP_NAME)) {
+            LOGE("AuthMessageProcessor::ParseAuthRequestMessage err json string, second.");
+            return ERR_DM_FAILED;
+        }
+        authResponseContext_->deviceId = json[TAG_DEVICE_ID].get<std::string>();
+        authResponseContext_->authType = json[TAG_AUTH_TYPE].get<int32_t>();
+        authResponseContext_->appDesc = json[TAG_APP_DESCRIPTION].get<std::string>();
+        authResponseContext_->token = json[TAG_TOKEN].get<std::string>();
+        authResponseContext_->targetPkgName = json[TAG_TARGET].get<std::string>();
+        authResponseContext_->appName = json[TAG_APP_NAME].get<std::string>();
         authResponseContext_->appThumbnail = "";
     }
 
-    if (idx < sliceNum && json.contains(TAG_APP_THUMBNAIL)) {
-        std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL];
+    if (idx < sliceNum && IsString(json, TAG_APP_THUMBNAIL)) {
+        std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL].get<std::string>();
         authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
         return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
     }
@@ -238,49 +243,59 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
 
 void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
 {
-    authResponseContext_->reply = json[TAG_REPLY];
-    authResponseContext_->deviceId = json[TAG_DEVICE_ID];
-    authResponseContext_->token = json[TAG_TOKEN];
+    LOGI("start ParseAuthResponseMessage");
+    if (!IsInt32(json, TAG_REPLY) || !IsString(json, TAG_DEVICE_ID) || !IsString(json, TAG_TOKEN)) {
+        LOGE("AuthMessageProcessor::ParseAuthResponseMessage err json string, first time.");
+        return;
+    }
+    authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    authResponseContext_->deviceId = json[TAG_DEVICE_ID].get<std::string>();
+    authResponseContext_->token = json[TAG_TOKEN].get<std::string>();
     if (authResponseContext_->reply == 0) {
-        authResponseContext_->networkId = json[TAG_NET_ID];
-        authResponseContext_->requestId = json[TAG_REQUEST_ID];
-        authResponseContext_->groupId = json[TAG_GROUP_ID];
-        authResponseContext_->groupName = json[TAG_GROUP_NAME];
-        authResponseContext_->authToken = json[TAG_AUTH_TOKEN];
+        if (!IsString(json, TAG_NET_ID) || !IsInt64(json, TAG_REQUEST_ID) || !IsString(json, TAG_GROUP_ID) ||
+            !IsString(json, TAG_GROUP_NAME) || !IsString(json, TAG_AUTH_TOKEN)) {
+            LOGE("AuthMessageProcessor::ParseAuthResponseMessage err json string, second time.");
+            return;
+        }
+        authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
+        authResponseContext_->requestId = json[TAG_REQUEST_ID].get<int64_t>();
+        authResponseContext_->groupId = json[TAG_GROUP_ID].get<std::string>();
+        authResponseContext_->groupName = json[TAG_GROUP_NAME].get<std::string>();
+        authResponseContext_->authToken = json[TAG_AUTH_TOKEN].get<std::string>();
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s",
-             GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
+            GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
     }
 }
 
 void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
 {
-    if (json.contains(TAG_CRYPTO_SUPPORT) && json[TAG_CRYPTO_SUPPORT].is_boolean()) {
-        authResponseContext_->cryptoSupport = json[TAG_CRYPTO_SUPPORT];
+    if (IsBool(json, TAG_CRYPTO_SUPPORT)) {
+        authResponseContext_->cryptoSupport = json[TAG_CRYPTO_SUPPORT].get<bool>();
     }
-    if (json.contains(TAG_CRYPTO_NAME) && json[TAG_CRYPTO_NAME].is_string()) {
-        authResponseContext_->cryptoName = json[TAG_CRYPTO_NAME];
+    if (IsString(json, TAG_CRYPTO_NAME)) {
+        authResponseContext_->cryptoName = json[TAG_CRYPTO_NAME].get<std::string>();
     }
-    if (json.contains(TAG_CRYPTO_VERSION) && json[TAG_CRYPTO_VERSION].is_string()) {
-        authResponseContext_->cryptoVer = json[TAG_CRYPTO_VERSION];
+    if (IsString(json, TAG_CRYPTO_VERSION)) {
+        authResponseContext_->cryptoVer = json[TAG_CRYPTO_VERSION].get<std::string>();
     }
-    if (json.contains(TAG_DEVICE_ID) && json[TAG_DEVICE_ID].is_string()) {
-        authResponseContext_->deviceId = json[TAG_DEVICE_ID];
+    if (IsString(json, TAG_DEVICE_ID)) {
+        authResponseContext_->deviceId = json[TAG_DEVICE_ID].get<std::string>();
     }
-    if (json.contains(TAG_LOCAL_DEVICE_ID) && json[TAG_LOCAL_DEVICE_ID].is_string()) {
-        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID];
+    if (IsString(json, TAG_LOCAL_DEVICE_ID)) {
+        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
     }
-    if (json.contains(TAG_AUTH_TYPE) && json[TAG_AUTH_TYPE].is_number_integer()) {
-        authResponseContext_->authType = json[TAG_AUTH_TYPE];
+    if (IsInt32(json, TAG_AUTH_TYPE)) {
+        authResponseContext_->authType = json[TAG_AUTH_TYPE].get<int32_t>();
     }
-    if (json.contains(TAG_REPLY) && json[TAG_REPLY].is_number_integer()) {
-        authResponseContext_->reply = json[TAG_REPLY];
+    if (IsInt32(json, TAG_REPLY)) {
+        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
     }
 }
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
 {
-    if (json.contains(TAG_IDENTICAL_ACCOUNT)) {
-        authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT];
+    if (IsBool(json, TAG_IDENTICAL_ACCOUNT)) {
+        authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT].get<bool>();
     }
 }
 

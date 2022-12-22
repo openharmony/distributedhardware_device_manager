@@ -14,6 +14,7 @@
  */
 
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -76,6 +77,53 @@ bool IsNumberString(const std::string &inputString)
         }
     }
     return true;
+}
+
+bool IsString(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_string() && jsonObj[key].size() <= MAX_MESSAGE_LEN;
+    if (!res) {
+        LOGE("the key %s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
+bool IsInt32(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_number_integer() && jsonObj[key] >= INT32_MIN &&
+        jsonObj[key] <= INT32_MAX;
+    if (!res) {
+        LOGE("the key %s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
+bool IsInt64(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_number_integer() && jsonObj[key] >= INT64_MIN &&
+        jsonObj[key] <= INT64_MAX;
+    if (!res) {
+        LOGE("the key %s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
+bool IsArray(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_array();
+    if (!res) {
+        LOGE("the key %s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
+bool IsBool(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_boolean();
+    if (!res) {
+        LOGE("the key %s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
