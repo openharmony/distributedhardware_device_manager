@@ -394,6 +394,11 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
         }
+    } else {
+        if (status == DM_OK && authResponseContext_->requestId == requestId &&
+            authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
+            UpdateInputDialogDisplay(false);
+        }
     }
 }
 
