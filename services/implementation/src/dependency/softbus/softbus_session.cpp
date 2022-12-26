@@ -96,7 +96,11 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         LOGE("extrasJson error");
         return ERR_DM_FAILED;
     }
-    int32_t msgType = jsonObject[TAG_TYPE];
+    if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("SoftbusSession::SendData err json string.");
+        return ERR_DM_FAILED;
+    }
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
     LOGI("AuthMessageProcessor::ParseAuthRequestMessage msgType = %d", msgType);
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SoftbusSession::SendData Start encryption");

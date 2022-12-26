@@ -199,6 +199,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/standard",
       "${innerkits_path}/native_cpp/include",
       "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "//third_party/json/include",
     ]
   }
 

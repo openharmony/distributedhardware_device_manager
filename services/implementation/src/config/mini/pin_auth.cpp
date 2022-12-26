@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
@@ -77,12 +78,16 @@ int32_t PinAuth::VerifyAuthentication(std::string &authToken, const std::string 
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!authParamJson.contains(PIN_CODE_KEY) || !authTokenJson.contains(PIN_CODE_KEY)) {
-        LOGE("err json string, first time");
+    if (!IsInt32(authTokenJson, PIN_CODE_KEY)) {
+        LOGE("err authTokenJson string, first time");
         return ERR_DM_FAILED;
     }
-    int32_t code = authTokenJson[PIN_CODE_KEY];
-    int32_t inputPinCode = authParamJson[PIN_CODE_KEY];
+    if (!IsInt32(authParamJson, PIN_CODE_KEY)) {
+        LOGE("err authParamJson string, first time");
+        return ERR_DM_FAILED;
+    }
+    int32_t code = authTokenJson[PIN_CODE_KEY].get<int32_t>();
+    int32_t inputPinCode = authParamJson[PIN_CODE_KEY].get<int32_t>();
     if (code == inputPinCode) {
         return DM_OK;
     } else if (times_ < MAX_VERIFY_TIMES) {
