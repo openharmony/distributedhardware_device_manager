@@ -376,7 +376,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
-    if (authRequestState_ != nullptr) {
+    if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         authTimes_++;
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
@@ -394,6 +394,13 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
         }
+    } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
+        if (status == DM_OK && authResponseContext_->requestId == requestId &&
+            authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
+            UpdateInputDialogDisplay(false);
+        }
+    } else {
+        LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
     }
 }
 
