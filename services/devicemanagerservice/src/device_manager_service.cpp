@@ -167,7 +167,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
         return DM_NOT_INIT;
     }
 
-    if (pkgName.empty() || netWorkId.empty() || udid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return DM_INPUT_PARA_EMPTY;
     }
@@ -183,7 +183,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
         return DM_NOT_INIT;
     }
 
-    if (pkgName.empty() || netWorkId.empty() || uuid.empty()) {
+    if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return DM_INPUT_PARA_EMPTY;
     }
