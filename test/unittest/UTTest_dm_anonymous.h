@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_error_message.h"
 #include "dm_log.h"
 

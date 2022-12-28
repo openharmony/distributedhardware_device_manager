@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* FIELD_CREDENTIAL_DATA = "credentialData";
 void DmAnonymousTest::SetUp()
 {
 }
@@ -166,6 +167,205 @@ HWTEST_F(DmAnonymousTest, GetErrorString_001, testing::ext::TestSize.Level0)
     std::string errorMessage = "dm process execution failed.";
     std::string ret = GetErrorString(failedReason);
     EXPECT_EQ(ret, errorMessage);
+}
+
+/**
+ * @tc.name: IsString_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsString_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "pinToken" : "IsString"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsString(jsonObj, PIN_TOKEN);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsString_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsString_002, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "pinToken" : 123
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsString(jsonObj, PIN_TOKEN);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsInt32_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsInt32_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : 369
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsInt32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsInt32_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : "authtypeTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsInt32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsInt64_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsInt64_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "REQUESTID" : 789
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsInt64(jsonObj, TAG_REQUEST_ID);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsInt64_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "REQUESTID" : "requestidTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsInt64(jsonObj, TAG_REQUEST_ID);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsArray_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsArray_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsArray(jsonObj, FIELD_CREDENTIAL_DATA);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsArray_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsArray_002, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" : "credentialDataTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsArray(jsonObj, FIELD_CREDENTIAL_DATA);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsBool_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsBool_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "CRYPTOSUPPORT" : false,
+        "userId" : "123",
+        "credentialData" : "credentialDataTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsBool(jsonObj, TAG_CRYPTO_SUPPORT);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsBool_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "CRYPTOSUPPORT" : "cryptosupportTest",
+        "userId" : "123",
+        "credentialData" : "credentialDataTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsBool(jsonObj, TAG_CRYPTO_SUPPORT);
+    EXPECT_EQ(ret, false);
 }
 } // namespace
 } // namespace DistributedHardware

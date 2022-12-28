@@ -906,8 +906,13 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
+    int64_t requestId = 1;
+    int32_t action = 2;
+    std::string resultInfo = "resultInfoTest";
     nlohmann::json jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    dmCreMgr->requestId_ = 2;
+    dmCreMgr->OnGroupResult(requestId, action, resultInfo);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -947,8 +952,13 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
+    int64_t requestId = 1;
+    int32_t action = 2;
+    std::string resultInfo = "resultInfoTest";
     nlohmann::json jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    dmCreMgr->requestId_ = 1;
+    dmCreMgr->OnGroupResult(requestId, action, resultInfo);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }

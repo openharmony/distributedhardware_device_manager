@@ -108,6 +108,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_004, testing::ext::TestSize.Level0)
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
     ASSERT_EQ(ret, DM_OK);
 }
+
 /**
  * @tc.name: DmAuthManager::StartAuth_001
  * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
