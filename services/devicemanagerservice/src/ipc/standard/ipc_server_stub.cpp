@@ -98,7 +98,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || req == nullptr || rsp == nullptr) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
         return ERR_DM_INPUT_PARA_INVALID;
     }

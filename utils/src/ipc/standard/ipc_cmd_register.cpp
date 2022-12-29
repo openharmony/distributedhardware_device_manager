@@ -24,6 +24,10 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || pBaseReq == nullptr) {
+        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
     if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
         LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
@@ -34,7 +38,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || pBaseRsp == nullptr) {
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
