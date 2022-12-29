@@ -679,6 +679,21 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Le
     int32_t ret = hichainConnector->deleteMultiMembers(groupType, userId, jsonDeviceList);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
+/**
+ * @tc.name: IsDevicesInGroup_001
+ * @tc.desc: return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, IsDevicesInGroup_001, testing::ext::TestSize.Level0)
+{
+    std::string hostDevice = "hostDeviceTest";
+    std::string peerDevice = "peerDeviceTest";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    bool ret = hichainConnector->IsDevicesInGroup(hostDevice, peerDevice);
+    EXPECT_EQ(ret, true);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

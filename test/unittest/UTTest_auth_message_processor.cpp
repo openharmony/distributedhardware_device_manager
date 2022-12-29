@@ -25,6 +25,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
+
 void AuthMessageProcessorTest::SetUp()
 {
 }
@@ -221,6 +223,48 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext:
 }
 
 /**
+ * @tc.name: AuthMessageProcessor::ParseResponseFinishMessage_002
+ * @tc.desc: Compare JSON before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_REPLY] = 22;
+    authMessageProcessor->ParseResponseFinishMessage(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, jsonObj[TAG_REPLY]);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseResponseFinishMessage_003
+ * @tc.desc: Compare JSON before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    std::string str = R"(
+    {
+        "REPLY" : "30000000000"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    authMessageProcessor->ParseResponseFinishMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->reply, jsonObj[TAG_REPLY]);
+}
+
+/**
  * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_001
  * @tc.desc: Compare JSON before and after assi gnment
  * @tc.type: FUNC
@@ -313,6 +357,61 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_APP_NAME] = "123456";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthRequestMessage_003
+ * @tc.desc: Compare JSON before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    nlohmann::json jsonThumbnail;
+    jsonThumbnail[TAG_SLICE_NUM] = 1;
+    jsonThumbnail[TAG_INDEX] = 0;
+    jsonThumbnail[TAG_DEVICE_ID] = 123;
+    jsonThumbnail[TAG_AUTH_TYPE] = 1;
+    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_TOKEN] = "1234";
+    jsonThumbnail[TAG_TARGET] = "12345";
+    jsonThumbnail[TAG_APP_NAME] = "123456";
+    int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthRequestMessage_004
+ * @tc.desc: Compare JSON before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    nlohmann::json jsonThumbnail;
+    jsonThumbnail[TAG_SLICE_NUM] = 1;
+    jsonThumbnail[TAG_INDEX] = 0;
+    jsonThumbnail[TAG_DEVICE_ID] = "123";
+    jsonThumbnail[TAG_AUTH_TYPE] = 1;
+    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_TOKEN] = "1234";
+    jsonThumbnail[TAG_TARGET] = "12345";
+    jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_APP_THUMBNAIL] = "jsontest";
+    int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, ERR_DM_AUTH_MESSAGE_INCOMPLETE);
 }
 
 /**
@@ -453,6 +552,46 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseRespNegotiateMessage_001
+ * @tc.desc: return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    nlohmann::json jsonObj;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = false;
+    authMessageProcessor->ParseRespNegotiateMessage(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->isIdenticalAccount, jsonObj[TAG_IDENTICAL_ACCOUNT]);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseRespNegotiateMessage_002
+ * @tc.desc: return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    nlohmann::json jsonObj;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = "test";
+    authMessageProcessor->ParseRespNegotiateMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->isIdenticalAccount, jsonObj[TAG_IDENTICAL_ACCOUNT]);
 }
 
 /**
