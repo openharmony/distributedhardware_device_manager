@@ -167,6 +167,22 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: DmAuthManager::StartAuthProcess_003
+ * @tc.desc: Set authResponseContext_ is nullptr return ERR_DM_AUTH_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, StartAuthProcess_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = nullptr;
+    int32_t action = 1;
+    int32_t ret = authManager->StartAuthProcess(action);
+    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+}
+
+/**
  * @tc.name: DmAuthManager::CreateGroup_001
  * @tc.desc: Whether the return value of calling creategroup is DM_ OK
  * @tc.type: FUNC
@@ -330,6 +346,24 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
     authManager->authResponseContext_->code = 123456;
     int32_t ret = authManager->GetPinCode();
     ASSERT_EQ(ret, 123456);
+}
+
+/**
+ * @tc.name: DmAuthManager::GetPinCode_002
+ * @tc.desc: Set authResponseContext_ is nullptr Return ERR_DM_AUTH_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = nullptr;
+    authManager->ShowConfigDialog();
+    authManager->ShowAuthInfoDialog();
+    authManager->ShowStartAuthDialog();
+    int32_t ret = authManager->GetPinCode();
+    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
 }
 
 /**
@@ -641,6 +675,176 @@ HWTEST_F(DmAuthManagerTest, GenerateGroupName_002, testing::ext::TestSize.Level0
     authManager->authResponseContext_->localDeviceId = "localDeviceIdTest";
     std::string ret = authManager->GenerateGroupName();
     ASSERT_TRUE(!ret.empty());
+}
+
+/**
+ * @tc.name: DmAuthManager::GetIsCryptoSupport_001
+ * @tc.desc: Set authResponseState_ is nullptr Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseState_ = nullptr;
+    bool ret = authManager->GetIsCryptoSupport();
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DmAuthManager::GetIsCryptoSupport_002
+ * @tc.desc: Set authResponseState_ is not nullptr and authRequestState_ is nullptr Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
+    authManager->authRequestState_ = nullptr;
+    bool ret = authManager->GetIsCryptoSupport();
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DmAuthManager::GetIsCryptoSupport_003
+ * @tc.desc: Set authResponseState_ is not nullptr and authRequestState_ is nullptr Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
+    authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
+    bool ret = authManager->GetIsCryptoSupport();
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_001
+ * @tc.desc: Set authResponseContext_ is nullptr Return ERR_DM_AUTH_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    int32_t action = 0;
+    std::string params = "paramsTest";
+    authManager->authResponseContext_ = nullptr;
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_002
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    int32_t action = 1;
+    std::string params = "paramsTest1";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_003
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t action = 2;
+    std::string params = "paramsTest2";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_004
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t action = 3;
+    std::string params = "paramsTest3";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_005
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t action = 4;
+    std::string params = "paramsTest4";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_006
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_006, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager->timer_ = std::make_shared<DmTimer>();
+    int32_t action = 5;
+    std::string params = "5";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthManager::OnUserOperation_007
+ * @tc.desc: Set authResponseContext_ is not nullptr Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t action = 1111;
+    std::string params = "paramsTest1111";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

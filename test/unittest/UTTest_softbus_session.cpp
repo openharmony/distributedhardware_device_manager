@@ -104,6 +104,24 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: SendData_003
+ * @tc.desc: set jsonObject[TAG_MSG_TYPE] is string and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level0)
+{
+    std::string message = R"(
+    {
+        "MSG_TYPE": "messageTest"
+    }
+    )";
+    int32_t sessionId = 0;
+    int32_t ret = softbusSession->SendData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
  * @tc.name: SoftbusSession_001
  * @tc.desc: set SoftbusSession to make a new pointer, and it not nullptr
  * @tc.type: FUNC
@@ -177,6 +195,25 @@ HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize
 HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSize.Level0)
 {
     int ret = softbusSession->UnRegisterSessionCallback();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: OnSessionOpened_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
+{
+    softbusSession->RegisterSessionCallback(discoveryMgr);
+    int sessionId = 1;
+    int result = 0;
+    void *data = nullptr;
+    unsigned int dataLen = 1;
+    softbusSession->OnBytesReceived(sessionId, data, dataLen);
+    int ret = softbusSession->OnSessionOpened(sessionId, result);
+    softbusSession->OnSessionClosed(sessionId);
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
