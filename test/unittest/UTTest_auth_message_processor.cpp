@@ -889,6 +889,31 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Leve
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseMessage_006
+ * @tc.desc: Return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "REPLY": 1,
+        "ITF_VER": "1.1.2",
+        "MSG_TYPE": "104"
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

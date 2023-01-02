@@ -209,7 +209,22 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceChanged_002, testing::ext::TestSize.L
  */
 HWTEST_F(DmDeviceStateManagerTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
-    int ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    int32_t ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: RegisterSoftbusStateCallback_002
+ * @tc.desc: call RegisterSoftbusStateCallback and return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, RegisterSoftbusStateCallback_002, testing::ext::TestSize.Level0)
+{
+    dmDeviceStateManager->softbusConnector_ = nullptr;
+    EXPECT_EQ(dmDeviceStateManager->softbusConnector_, nullptr);
+    int32_t ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
     EXPECT_EQ(ret, DM_OK);
 }
 

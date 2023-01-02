@@ -79,6 +79,23 @@ HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: CreateGroup_003
+ * @tc.desc: Set deviceGroupManager_ is nullptr return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 159357;
+    int32_t authType = 1;
+    std::string userId = "userIdTest";
+    nlohmann::json jsonOutObj;
+    hiChainConnector->deviceGroupManager_ = nullptr;
+    int32_t ret = hiChainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
  * @tc.name: IsGroupInfoInvalid_001
  * @tc.desc: GroupType is GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP, group.groupVisibility is not GROUP_VISIBILITY_PUBLIC.
              Group.return true
@@ -275,6 +292,29 @@ HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: AddMember_004
+ * @tc.desc: set deviceId and connectInfo = null;
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, AddMember_004, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceIdTest";
+    std::string connectInfo = R"(
+    {
+        "DEVICEID" : "deviceId",
+        "pinCode" : 1,
+        "groupId" : "groupId",
+        "REQUESTID" : "requestId",
+        "GROUPNAME" : "groupName"
+    }
+    )";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hichainConnector->AddMember(deviceId, connectInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
  * @tc.name: onRequest_001
  * @tc.desc:set operationCode != GroupOperationCode::MEMBER_JOIN(3);  return nullptr;
  * @tc.require: AR000GHSJK
@@ -334,6 +374,22 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0
     std::string reqDeviceId = "234566";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr));
+    std::string ret = hichainConnector->GetConnectPara(deviceId, reqDeviceId);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: GetConnectPara_003
+ * @tc.desc: hiChainConnectorCallback_ is nullptr return ""
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetConnectPara_003, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceIdTest";
+    std::string reqDeviceId = "11369";
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->hiChainConnectorCallback_ = nullptr;
     std::string ret = hichainConnector->GetConnectPara(deviceId, reqDeviceId);
     EXPECT_EQ(ret, "");
 }
@@ -693,6 +749,20 @@ HWTEST_F(HichainConnectorTest, IsDevicesInGroup_001, testing::ext::TestSize.Leve
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     bool ret = hichainConnector->IsDevicesInGroup(hostDevice, peerDevice);
     EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: UnRegisterHiChainCallback_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, UnRegisterHiChainCallback_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hichainConnector->UnRegisterHiChainCallback();
+    EXPECT_EQ(hichainConnector->hiChainConnectorCallback_, nullptr);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
