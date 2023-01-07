@@ -262,28 +262,32 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
-
-    jsCallback_ = std::make_unique<DmNapiStateJsCallback>(bundleName_, subscribeId, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsCallback_.get());
+    DmNapiStateJsCallback *jsfoundCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsfoundCallback);
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
+        LOGI("OnDeviceFound uv_queue_work in bundleName_ %s.",callback->bundleName_.c_str());
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
             LOGE("OnDeviceFound, deviceManagerNapi not find for bunderName %s", callback->bundleName_.c_str());
             return;
         }
         deviceManagerNapi->OnDeviceFound(callback->subscribeId_, callback->deviceInfo_);
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
+        delete callback;
+        callback = nullptr;
+        LOGE("OnDeviceFound uv_queue_work end.");
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
-        if (work != nullptr) {
-            delete work;
-        }
+        delete work;
+        work = nullptr;
+        delete jsfoundCallback;
+        jsfoundCallback = nullptr;
     }
+    LOGI("OnDeviceFound end.");
 }
 
 void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
@@ -436,9 +440,9 @@ DeviceManagerNapi::~DeviceManagerNapi()
     }
 }
 
-DeviceManagerNapi *DeviceManagerNapi::GetDeviceManagerNapi(std::string &buldleName)
+DeviceManagerNapi *DeviceManagerNapi::GetDeviceManagerNapi(std::string &bundleName)
 {
-    auto iter = g_deviceManagerMap.find(buldleName);
+    auto iter = g_deviceManagerMap.find(bundleName);
     if (iter == g_deviceManagerMap.end()) {
         return nullptr;
     }
