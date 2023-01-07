@@ -284,8 +284,8 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         LOGE("Failed to execute OnDeviceFound work queue");
         delete work;
         work = nullptr;
-        delete jsfoundCallback;
-        jsfoundCallback = nullptr;
+        delete jsFoundCallback;
+        jsFoundCallback = nullptr;
     }
     LOGI("OnDeviceFound end.");
 }
