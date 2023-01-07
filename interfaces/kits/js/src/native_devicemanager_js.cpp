@@ -262,8 +262,8 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
-    DmNapiStateJsCallback *jsfoundCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsfoundCallback);
+    DmNapiStateJsCallback *jsFoundCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsFoundCallback);
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
