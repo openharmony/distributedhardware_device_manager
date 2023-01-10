@@ -263,11 +263,19 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
-    LOGI("OnDeviceFound new work end.");
-    DmNapiStateJsCallback *jsFoundCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
-    work->data = reinterpret_cast<void *>(jsFoundCallback);
+
+    DmNapiStateJsCallback *jsCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
+    work->data = reinterpret_cast<void *>(jsCallback);
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+        if (work == nullptr) {
+            return;
+        }
+        if (work->data == nullptr) {
+            delete work;
+            work = nullptr;
+            return;
+        }
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         LOGI("OnDeviceFound uv_queue_work in bundleName_ %s.",callback->bundleName_.c_str());
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -276,18 +284,18 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         } else {
             deviceManagerNapi->OnDeviceFound(callback->subscribeId_, callback->deviceInfo_);
         }
-        delete work;
-        work = nullptr;
         delete callback;
         callback = nullptr;
+        delete work;
+        work = nullptr;
         LOGI("OnDeviceFound uv_queue_work end.");
     });
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
+        delete jsCallback;
+        jsCallback = nullptr;
         delete work;
         work = nullptr;
-        delete jsFoundCallback;
-        jsFoundCallback = nullptr;
     }
     LOGI("OnDeviceFound end.");
 }
