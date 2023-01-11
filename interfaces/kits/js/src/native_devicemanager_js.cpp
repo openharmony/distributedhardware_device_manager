@@ -254,20 +254,22 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
 
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
+    LOGI("OnDeviceFound napi_get_uv_event_loop end.");
     if (loop == nullptr) {
         return;
     }
-    LOGI("OnDeviceFound napi_get_uv_event_loop end.");
+
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
-
+    LOGI("OnDeviceFound new work end.");
     DmNapiStateJsCallback *jsCallback = new DmNapiStateJsCallback(bundleName_, subscribeId, 0, deviceInfo);
     work->data = reinterpret_cast<void *>(jsCallback);
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+        LOGI("OnDeviceFound uv_queue_work in.");
         if (work == nullptr) {
             return;
         }
@@ -367,8 +369,10 @@ int32_t DmNapiDiscoveryCallback::GetRefCount()
 void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
                                               int32_t reason)
 {
+    LOGI("OnAuthResult in.");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
+    LOGI("OnAuthResult napi_get_uv_event_loop end.");
     if (loop == nullptr) {
         return;
     }
@@ -377,11 +381,12 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
         return;
     }
-
+    LOGI("OnAuthResult new work end.");
     jsCallback_ = std::make_unique<DmNapiAuthJsCallback>(bundleName_, deviceId, token, status, reason);
     work->data = reinterpret_cast<void *>(jsCallback_.get());
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+        LOGI("OnAuthResult uv_queue_work in.");
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -392,6 +397,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         if (work != nullptr) {
             delete work;
         }
+        LOGI("OnAuthResult uv_queue_work end.");
     });
     if (ret != 0) {
         LOGE("Failed to execute OnAuthResult work queue");
@@ -399,6 +405,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
             delete work;
         }
     }
+    LOGI("OnAuthResult end.");
 }
 
 void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
