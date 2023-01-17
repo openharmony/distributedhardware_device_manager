@@ -523,11 +523,11 @@ bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std
         for (const auto &peerGroupInfo : peerGroupInfoList) {
             if (hostGroupInfo.groupId == peerGroupInfo.groupId && hostGroupInfo.groupName == peerGroupInfo.groupName) {
                 LOGE("these are authenticated");
-                return false;
+                return true;
             }
         }
     }
-    return true;
+    return false;
 }
 
 bool HiChainConnector::IsGroupInfoInvalid(GroupInfo &group)

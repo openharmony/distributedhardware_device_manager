@@ -298,6 +298,9 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     if (IsBool(json, TAG_IDENTICAL_ACCOUNT)) {
         authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT].get<bool>();
     }
+    if (IsInt32(json, TAG_REPLY)) {
+        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    }
 }
 
 void AuthMessageProcessor::SetRequestContext(std::shared_ptr<DmAuthRequestContext> authRequestContext)

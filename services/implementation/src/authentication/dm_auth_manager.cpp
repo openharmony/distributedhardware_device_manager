@@ -471,7 +471,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
-    if (!ret) {
+    if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
     } else {
@@ -524,15 +524,18 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
     }
-    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        return;
-    }
+
     if (authResponseContext_->isIdenticalAccount) { // identicalAccount joinLNN indirectly, no need to verify
         if (IsIdenticalAccount()) {
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
             authRequestContext_->reason = DM_OK;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            return;
+        }
+    }
+    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
+        if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, authRequestContext_->deviceId)) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
         }
