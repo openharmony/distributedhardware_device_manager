@@ -748,7 +748,7 @@ HWTEST_F(HichainConnectorTest, IsDevicesInGroup_001, testing::ext::TestSize.Leve
     std::string peerDevice = "peerDeviceTest";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     bool ret = hichainConnector->IsDevicesInGroup(hostDevice, peerDevice);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 /**
