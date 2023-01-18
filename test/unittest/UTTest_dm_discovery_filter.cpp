@@ -33,47 +33,47 @@ void DmDiscoveryFilterTest::TearDownTestCase()
 namespace {
 
 /**
- * @tc.name: FilterByCredible_001
+ * @tc.name: FilterByDeviceState_001
  * @tc.desc: Return true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDiscoveryFilterTest, FilterByCredible_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmDiscoveryFilterTest, FilterByDeviceState_001, testing::ext::TestSize.Level0)
 {
     DmDiscoveryFilter filter;
     int32_t value = 0;
     bool isOnline = false;
-    bool ret = filter.FilterByCredible(value, isOnline);
+    bool ret = filter.FilterByDeviceState(value, isOnline);
     EXPECT_EQ(ret, true);
 }
 
 /**
- * @tc.name: FilterByCredible_002
+ * @tc.name: FilterByDeviceState_002
  * @tc.desc: Return false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDiscoveryFilterTest, FilterByCredible_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmDiscoveryFilterTest, FilterByDeviceState_002, testing::ext::TestSize.Level0)
 {
     DmDiscoveryFilter filter;
     int32_t value = 1;
     bool isOnline = false;
-    bool ret = filter.FilterByCredible(value, isOnline);
+    bool ret = filter.FilterByDeviceState(value, isOnline);
     EXPECT_EQ(ret, false);
 }
 
 /**
- * @tc.name: FilterByCredible_003
+ * @tc.name: FilterByDeviceState_003
  * @tc.desc: Return true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmDiscoveryFilterTest, FilterByCredible_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmDiscoveryFilterTest, FilterByDeviceState_003, testing::ext::TestSize.Level0)
 {
     DmDiscoveryFilter filter;
     int32_t value = 2;
     bool isOnline = false;
-    bool ret = filter.FilterByCredible(value, isOnline);
+    bool ret = filter.FilterByDeviceState(value, isOnline);
     EXPECT_EQ(ret, true);
 }
 

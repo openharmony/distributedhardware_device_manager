@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,6 +29,7 @@ DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbus
                                        std::shared_ptr<IDeviceManagerServiceListener> listener)
     : softbusConnector_(softbusConnector), listener_(listener)
 {
+    hiChainConnector_ = std::make_shared<HiChainConnector>();
     LOGI("DmDiscoveryManager constructor");
 }
 
@@ -119,6 +121,13 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
     filterPara.range = info.range;
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    filterPara.isTrusted = !(hiChainConnector_->IsDeviceInGroup(localDeviceId, info.deviceId));
+    filterPara.trustedType = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    if (filterPara.isTrusted) {
+        filterPara.trustedType = hiChainConnector_->GetGroupType(info.deviceId);
+    }
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
     }

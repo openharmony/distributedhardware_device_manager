@@ -268,6 +268,21 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
     return true;
 }
 
+int32_t HiChainConnector::GetGroupType(const std::string &deviceId)
+{
+    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    int32_t ret = GetRelatedGroups(deviceId, deviceList);
+    if (ret != DM_OK) {
+        return GROUP_TYPE_PEER_TO_PEER_GROUP;
+    }
+
+    if (groupList.size() > 0) {
+        return groupList.front().groupType;
+    }
+
+    return GROUP_TYPE_PEER_TO_PEER_GROUP;
+}
+
 int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::string &connectInfo)
 {
     LOGI("HiChainConnector::AddMember");

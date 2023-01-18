@@ -17,6 +17,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 
@@ -28,8 +29,8 @@ const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
 
 enum DmDiscoveryDeviceFilter {
-    DM_OFFLINE_DEVICE = 0,
-    DM_ONLINE_DEVICE = 1,
+    DM_INVALID_DEVICE = 0,
+    DM_VALID_DEVICE = 1,
     DM_ALL_DEVICE = 2
 };
 
@@ -78,20 +79,20 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
         filterOp_ = FILTERS_TYPE_OR;
         DmDeviceFilters deviceFilters;
         deviceFilters.type = "credible";
-        deviceFilters.value = DM_OFFLINE_DEVICE;
+        deviceFilters.value = DM_INVALID_DEVICE;
         filters_.push_back(deviceFilters);
         return DM_OK;
     }
     return ParseFilterJson(filterOptions);
 }
 
-bool DmDiscoveryFilter::FilterByCredible(int32_t value, bool isOnline)
+bool DmDiscoveryFilter::FilterByDeviceState(int32_t value, bool deviceState)
 {
-    if (value == DM_OFFLINE_DEVICE) {
-        return !isOnline;
+    if (value == DM_INVALID_DEVICE) {
+        return !deviceState;
     }
-    if (value == DM_ONLINE_DEVICE) {
-        return isOnline;
+    if (value == DM_VALID_DEVICE) {
+        return deviceState;
     }
     return (value == DM_ALL_DEVICE);
 }
@@ -101,14 +102,31 @@ bool DmDiscoveryFilter::FilterByRange(int32_t value, int32_t range)
     return ((range > 0) && (range <= value));
 }
 
+bool DmDiscoveryFilter::FilterByTrustedType(int32_t value, bool trustedType)
+{
+    if (value == IDENTICAL_ACCOUNT) {
+        return (trustedType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP);
+    }
+    if (value == PEER_TO_PEER) {
+        return (trustedType == GROUP_TYPE_PEER_TO_PEER_GROUP);
+    }
+    return (value == ACROSS_ACCOUNT);
+}
+
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
 {
     LOGI("DmDiscoveryFilter::FilterByType: type: %s, value: %d", filters.type.c_str(), filters.value);
     if (filters.type == "credible") {
-        return FilterByCredible(filters.value, filterPara.isOnline);
+        return FilterByDeviceState(filters.value, filterPara.isOnline);
     }
     if (filters.type == "range") {
         return FilterByRange(filters.value, filterPara.range);
+    }
+    if (filters.type == "isTrusted") {
+        return FilterByDeviceState(filters.value, filterPara.isTrusted);
+    }
+    if (filters.type == "trustedType") {
+        return FilterByTrustedType(filters.value, filterPara.trustedType);
     }
     return false;
 }
@@ -136,8 +154,8 @@ bool DmDiscoveryFilter::FilterAnd(const std::vector<DmDeviceFilters> &filters, c
 bool DmDiscoveryFilter::IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
     const DmDeviceFilterPara &filterPara)
 {
-    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d", filterOp.c_str(),
-        filterPara.isOnline, filterPara.range);
+    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, trustedType: %d",
+        filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted, filterPara.trustedType);
     if (filterOp == FILTERS_TYPE_OR) {
         return FilterOr(filters, filterPara);
     }

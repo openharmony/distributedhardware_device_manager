@@ -755,6 +755,7 @@ void DeviceManagerNapi::DeviceInfoToJsArray(const napi_env &env, const std::vect
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
     SetValueInt32(env, "deviceType", (int)vecDevInfo[idx].deviceTypeId, result);
+    SetValueInt32(env, "trustedType", (int)vecDevInfo[idx].trustedType, result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

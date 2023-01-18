@@ -389,6 +389,37 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &deviceList)
+{
+    LOGI("GetGroupType begin");
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+
+    if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
+        LOGE("softbusConnector_  or hiChainConnector_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+
+    for (auto it = deviceList.begin(); it != deviceList.end(); ++it) {
+        std::string udid;
+        int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
+        if (ret != DM_OK) {
+            LOGE("GetUdidByNetworkId failed");
+            return ERR_DM_FAILED;
+        }
+
+        int32_t groupType = hiChainConnector_->GetGroupType(udid);
+        if (groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            it->trustedType = IDENTICAL_ACCOUNT;
+        } else {
+            it->trustedType = PEER_TO_PEER;
+        }
+    }
+    return DM_OK;
+}
+
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();

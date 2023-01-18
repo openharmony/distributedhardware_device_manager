@@ -149,6 +149,13 @@ public:
     int32_t GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
 
     /**
+     * @tc.name: HiChainConnector::GetGroupType
+     * @tc.desc: Get GroupType of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    bool GetGroupType(const std::string &deviceId);
+
+    /**
      * @tc.name: HiChainConnector::DeleteTimeOutGroup
      * @tc.desc: Delete TimeOut Group of the HiChain Connector
      * @tc.type: FUNC
