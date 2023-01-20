@@ -153,7 +153,7 @@ public:
      * @tc.desc: Get GroupType of the HiChain Connector
      * @tc.type: FUNC
      */
-    bool GetGroupType(const std::string &deviceId);
+    int32_t GetGroupType(const std::string &deviceId);
 
     /**
      * @tc.name: HiChainConnector::DeleteTimeOutGroup

@@ -102,7 +102,7 @@ bool DmDiscoveryFilter::FilterByRange(int32_t value, int32_t range)
     return ((range > 0) && (range <= value));
 }
 
-bool DmDiscoveryFilter::FilterByTrustedType(int32_t value, bool trustedType)
+bool DmDiscoveryFilter::FilterByTrustedType(int32_t value, int32_t trustedType)
 {
     if (value == IDENTICAL_ACCOUNT) {
         return (trustedType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP);
