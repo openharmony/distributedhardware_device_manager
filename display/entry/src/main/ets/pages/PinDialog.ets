@@ -71,6 +71,7 @@ struct dialogPlusPage {
     console.log('setUserOperation: ' + operation)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
+      return;
     }
     dmClass.setUserOperation(operation, "extra")
   }
