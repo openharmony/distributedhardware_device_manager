@@ -74,12 +74,13 @@ struct dialogPlusPage {
     console.log('setUserOperation: ' + operation)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
+      return;
     }
     dmClass.setUserOperation(operation, "extra")
   }
 
   run() {
-      console.info('seconds:' + that.seconds )
+      console.info('devicemanagerui confirmDialog run seconds:' + that.seconds )
       that.seconds--;
       if (that.seconds == 0) {
           clearInterval(that.times);
