@@ -80,7 +80,7 @@ struct dialogPlusPage {
   }
 
   run() {
-      console.info('devicemanagerui confirmDialog run seconds:' + that.seconds )
+      console.info('devicemanagerui confirmdialog run seconds:' + that.seconds )
       that.seconds--;
       if (that.seconds == 0) {
           clearInterval(that.times);
