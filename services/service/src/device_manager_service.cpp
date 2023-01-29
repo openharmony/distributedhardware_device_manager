@@ -97,7 +97,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("GetTrustedDeviceList failed");
         return ret;
     }
-    if (IsDMServiceImplReady() && deviceList.size() > 0) {
+    if (IsDMServiceImplSoLoaded() && deviceList.size() > 0) {
         return dmServiceImpl_->GetGroupType(deviceList);
     }
     return DM_OK;

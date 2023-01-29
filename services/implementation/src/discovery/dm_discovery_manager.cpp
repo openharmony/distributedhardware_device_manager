@@ -123,7 +123,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     filterPara.range = info.range;
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    filterPara.isTrusted = !(hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId));
+    filterPara.isTrusted = hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId);
     filterPara.trustedType = GROUP_TYPE_PEER_TO_PEER_GROUP;
     if (filterPara.isTrusted) {
         filterPara.trustedType = hiChainConnector_->GetGroupType(info.deviceId);
