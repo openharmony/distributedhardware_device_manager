@@ -419,7 +419,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
             it->authForm = PEER_TO_PEER;
         } else {
             it->authForm = INVALID_TYPE;
-        } 
+        }
     }
     return DM_OK;
 }
