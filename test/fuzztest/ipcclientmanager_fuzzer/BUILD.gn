@@ -84,7 +84,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
   ]
 
   deps = [
-    "${ability_runtime_services_path}/abilitymgr:abilityms",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",

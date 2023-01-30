@@ -63,7 +63,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-      "${ability_runtime_services_path}/abilitymgr:abilityms",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//base/security/device_auth/services:deviceauth_sdk",
