@@ -53,11 +53,12 @@ typedef enum DmDeviceState {
     DEVICE_INFO_CHANGED = 3,
 } DmDeviceState;
 
-typedef enum DmTrustedType {
-    IDENTICAL_ACCOUNT = 0,
-    PEER_TO_PEER = 1,
+typedef enum DmAuthForm {
+    INVALID_TYPE = -1,
+    PEER_TO_PEER = 0,
+    IDENTICAL_ACCOUNT = 1,
     ACROSS_ACCOUNT = 2,
-} DmTrustedType;
+} DmAuthForm;
 
 typedef struct DmDeviceInfo {
     char deviceId[DM_MAX_DEVICE_ID_LEN];
@@ -65,7 +66,7 @@ typedef struct DmDeviceInfo {
     uint16_t deviceTypeId;
     char networkId[DM_MAX_DEVICE_ID_LEN];
     int32_t range;
-    DmTrustedType trustedType;
+    DmAuthForm authForm;
 } DmDeviceInfo;
 
 typedef struct DmAuthParam {

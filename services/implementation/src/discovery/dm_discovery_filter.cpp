@@ -102,15 +102,18 @@ bool DmDiscoveryFilter::FilterByRange(int32_t value, int32_t range)
     return ((range > 0) && (range <= value));
 }
 
-bool DmDiscoveryFilter::FilterByTrustedType(int32_t value, int32_t trustedType)
+bool DmDiscoveryFilter::FilterByAuthForm(int32_t value, int32_t authForm)
 {
     if (value == IDENTICAL_ACCOUNT) {
-        return (trustedType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP);
+        return (authForm == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP);
     }
     if (value == PEER_TO_PEER) {
-        return (trustedType == GROUP_TYPE_PEER_TO_PEER_GROUP);
+        return (authForm == GROUP_TYPE_PEER_TO_PEER_GROUP);
     }
-    return (value == ACROSS_ACCOUNT);
+    if (value == ACROSS_ACCOUNT) {
+        return (authForm == GROUP_TYPE_ACROSS_ACCOUNT_GROUP);
+    }
+    return (value == INVALID_TYPE);
 }
 
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
@@ -125,8 +128,8 @@ bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDev
     if (filters.type == "isTrusted") {
         return FilterByDeviceState(filters.value, filterPara.isTrusted);
     }
-    if (filters.type == "trustedType") {
-        return FilterByTrustedType(filters.value, filterPara.trustedType);
+    if (filters.type == "authForm") {
+        return FilterByAuthForm(filters.value, filterPara.authForm);
     }
     return false;
 }
@@ -154,8 +157,8 @@ bool DmDiscoveryFilter::FilterAnd(const std::vector<DmDeviceFilters> &filters, c
 bool DmDiscoveryFilter::IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
     const DmDeviceFilterPara &filterPara)
 {
-    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, trustedType: %d",
-        filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted, filterPara.trustedType);
+    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, authForm: %d",
+        filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted, filterPara.authForm);
     if (filterOp == FILTERS_TYPE_OR) {
         return FilterOr(filters, filterPara);
     }

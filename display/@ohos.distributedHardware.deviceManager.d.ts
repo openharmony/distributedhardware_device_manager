@@ -62,7 +62,7 @@ declare namespace deviceManager {
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
-    trustedType: TrustedType;
+    authForm: AuthForm;
   }
 
   /**
@@ -72,20 +72,27 @@ declare namespace deviceManager {
    * @systemapi this method can be used only by system applications.
    * @since 10
    */
-  enum TrustedType {
+  enum AuthForm {
+    /**
+     * Indicates invalid trusted device type.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    INVALID_TYPE = -1,
+
+    /**
+     * Indicates peer to peer trusted device type without account.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    PEER_TO_PEER = 0,
+
     /**
      * Indicates identical account trusted device type.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
-    IDENTICAL_ACCOUNT = 0,
-
-    /**
-     * Indicates peer to peer account trusted device type.
-     * @syscap SystemCapability.DistributedHardware.DeviceManager
-     * @since 10
-     */
-    PEER_TO_PEER = 1,
+    IDENTICAL_ACCOUNT = 1,
 
     /**
      * Indicates across account trusted device type.

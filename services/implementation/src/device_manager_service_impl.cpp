@@ -412,11 +412,13 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
 
         int32_t groupType = hiChainConnector_->GetGroupType(udid);
         if (groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
-            it->trustedType = IDENTICAL_ACCOUNT;
+            it->authForm = IDENTICAL_ACCOUNT;
         } else if (groupType == GROUP_TYPE_ACROSS_ACCOUNT_GROUP) {
-            it->trustedType = ACROSS_ACCOUNT;
+            it->authForm = ACROSS_ACCOUNT;
+        } else if (groupType == GROUP_TYPE_PEER_TO_PEER_GROUP) {
+            it->authForm = PEER_TO_PEER;
         } else {
-            it->trustedType = PEER_TO_PEER;
+            it->authForm = INVALID_TYPE;
         } 
     }
     return DM_OK;

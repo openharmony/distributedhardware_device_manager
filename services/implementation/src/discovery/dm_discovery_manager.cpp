@@ -124,9 +124,9 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     filterPara.isTrusted = hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId);
-    filterPara.trustedType = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    filterPara.authForm = GROUP_TYPE_INVALID_GROUP;
     if (filterPara.isTrusted) {
-        filterPara.trustedType = hiChainConnector_->GetGroupType(info.deviceId);
+        filterPara.authForm = hiChainConnector_->GetGroupType(info.deviceId);
     }
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);

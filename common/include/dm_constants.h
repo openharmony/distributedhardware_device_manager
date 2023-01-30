@@ -99,6 +99,7 @@ constexpr const char* TAG_AUTH_TOKEN = "authToken";
 const int32_t AUTH_TYPE_PIN = 1;
 const int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
 const int32_t DEVICE_UUID_LENGTH = 65;
+const int32_t GROUP_TYPE_INVALID_GROUP = -1;
 const int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;
 const int32_t GROUP_TYPE_PEER_TO_PEER_GROUP = 256;
 const int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP = 1282;
