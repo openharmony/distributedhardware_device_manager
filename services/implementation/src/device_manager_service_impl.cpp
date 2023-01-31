@@ -392,11 +392,6 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
 int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &deviceList)
 {
     LOGI("GetGroupType begin");
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
-
     if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
         LOGE("softbusConnector_  or hiChainConnector_ is nullptr");
         return ERR_DM_POINT_NULL;
