@@ -393,7 +393,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
 {
     LOGI("GetGroupType begin");
     if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
-        LOGE("softbusConnector_  or hiChainConnector_ is nullptr");
+        LOGE("softbusConnector_ or hiChainConnector_ is nullptr");
         return ERR_DM_POINT_NULL;
     }
 
@@ -405,16 +405,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
             return ERR_DM_FAILED;
         }
 
-        int32_t groupType = hiChainConnector_->GetGroupType(udid);
-        if (groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
-            it->authForm = IDENTICAL_ACCOUNT;
-        } else if (groupType == GROUP_TYPE_ACROSS_ACCOUNT_GROUP) {
-            it->authForm = ACROSS_ACCOUNT;
-        } else if (groupType == GROUP_TYPE_PEER_TO_PEER_GROUP) {
-            it->authForm = PEER_TO_PEER;
-        } else {
-            it->authForm = INVALID_TYPE;
-        }
+        it->authForm = hiChainConnector_->GetGroupType(udid);
     }
     return DM_OK;
 }

@@ -268,19 +268,37 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
     return true;
 }
 
-int32_t HiChainConnector::GetGroupType(const std::string &deviceId)
+DmAuthForm HiChainConnector::GetGroupType(const std::string &deviceId)
 {
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
     int32_t ret = GetRelatedGroups(deviceId, groupList);
     if (ret != DM_OK) {
-        return GROUP_TYPE_INVALID_GROUP;
+        return DmAuthForm::INVALID_TYPE;
     }
 
     if (groupList.size() > 0) {
-        return groupList.front().groupType;
+        AuthFormPriority highestPriority = AuthFormPriority::PRIORITY_PEER_TO_PEER;
+        for (auto it = groupList.begin(); it != groupList.end(); ++it) {
+            if (g_authFormPriorityMap.count(it->groupType) <= 0) {
+                return DmAuthForm::INVALID_TYPE;
+            }
+            AuthFormPriority priority = g_authFormPriorityMap[it->groupType];
+            if (priority > highestPriority) {
+                highestPriority = priority;
+            }
+        }
+        if (highestPriority == AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT) {
+            return DmAuthForm::IDENTICAL_ACCOUNT;
+        }
+        if (highestPriority == AuthFormPriority::PRIORITY_ACROSS_ACCOUNT) {
+            return DmAuthForm::ACROSS_ACCOUNT;
+        }
+        if (highestPriority == AuthFormPriority::PRIORITY_PEER_TO_PEER) {
+            return DmAuthForm::PEER_TO_PEER;
+        }
     }
 
-    return GROUP_TYPE_INVALID_GROUP;
+    return DmAuthForm::INVALID_TYPE;
 }
 
 int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::string &connectInfo)
