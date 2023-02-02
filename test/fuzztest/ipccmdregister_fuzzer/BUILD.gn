@@ -87,8 +87,6 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "ipc_cmd_register_fuzzer.cpp",
   ]
 
-  deps = [ "${ability_runtime_services_path}/abilitymgr:abilityms" ]
-
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"IpcCmdRegisterFuzzTest\"",

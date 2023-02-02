@@ -649,7 +649,6 @@ ohos_static_library("device_manager_test_common") {
 
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-    "${ability_runtime_services_path}/abilitymgr:abilityms",
     "//base/security/device_auth/services:deviceauth_sdk",
   ]
 

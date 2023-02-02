@@ -16,7 +16,6 @@
 #include "dm_ability_manager.h"
 
 #include "ability_manager_client.h"
-#include "ability_record.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
