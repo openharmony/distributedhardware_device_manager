@@ -24,9 +24,6 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/notify",
-        "${utils_path}/include",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
@@ -54,7 +51,6 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "${utils_path}:devicemanagerutils_mini",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
         "//commonlibrary/utils_lite:utils",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
@@ -74,7 +70,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
-        "${utils_path}/include",
       ]
       include_dirs += [
         "//commonlibrary/utils_lite/include",
@@ -96,7 +91,6 @@ if (defined(ohos_lite)) {
         "src/notify/device_manager_notify.cpp",
       ]
       deps = [
-        "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//commonlibrary/utils_lite:utils",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
