@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -55,7 +56,7 @@ enum class AuthFormPriority {
 static std::unordered_map<int32_t, AuthFormPriority> g_authFormPriorityMap = {
     {GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT},
     {GROUP_TYPE_ACROSS_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_ACROSS_ACCOUNT},
-    {GROUP_TYPE_PEER_TO_PEER_GROUP, AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT}
+    {GROUP_TYPE_PEER_TO_PEER_GROUP, AuthFormPriority::PRIORITY_PEER_TO_PEER}
 };
 
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
@@ -233,6 +234,7 @@ private:
     static std::shared_ptr<IHiChainConnectorCallback> hiChainConnectorCallback_;
     static std::shared_ptr<IDmGroupResCallback> hiChainResCallback_;
     static int32_t networkStyle_;
+    std::mutex lock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

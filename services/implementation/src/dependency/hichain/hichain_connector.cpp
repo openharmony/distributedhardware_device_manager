@@ -273,13 +273,21 @@ DmAuthForm HiChainConnector::GetGroupType(const std::string &deviceId)
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
     int32_t ret = GetRelatedGroups(deviceId, groupList);
     if (ret != DM_OK) {
+        LOGE("HiChainConnector::GetGroupType get related groups failed");
         return DmAuthForm::INVALID_TYPE;
     }
 
-    if (groupList.size() > 0) {
-        AuthFormPriority highestPriority = AuthFormPriority::PRIORITY_PEER_TO_PEER;
+    if (groupList.size() <= 0) {
+        LOGE("HiChainConnector::GetGroupType group list is empty");
+        return DmAuthForm::INVALID_TYPE;
+    }
+
+    AuthFormPriority highestPriority = AuthFormPriority::PRIORITY_PEER_TO_PEER;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
         for (auto it = groupList.begin(); it != groupList.end(); ++it) {
             if (g_authFormPriorityMap.count(it->groupType) <= 0) {
+                LOGE("HiChainConnector::GetGroupType unsupported auth form");
                 return DmAuthForm::INVALID_TYPE;
             }
             AuthFormPriority priority = g_authFormPriorityMap[it->groupType];
@@ -287,15 +295,15 @@ DmAuthForm HiChainConnector::GetGroupType(const std::string &deviceId)
                 highestPriority = priority;
             }
         }
-        if (highestPriority == AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT) {
-            return DmAuthForm::IDENTICAL_ACCOUNT;
-        }
-        if (highestPriority == AuthFormPriority::PRIORITY_ACROSS_ACCOUNT) {
-            return DmAuthForm::ACROSS_ACCOUNT;
-        }
-        if (highestPriority == AuthFormPriority::PRIORITY_PEER_TO_PEER) {
-            return DmAuthForm::PEER_TO_PEER;
-        }
+    }
+    if (highestPriority == AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT) {
+        return DmAuthForm::IDENTICAL_ACCOUNT;
+    }
+    if (highestPriority == AuthFormPriority::PRIORITY_ACROSS_ACCOUNT) {
+        return DmAuthForm::ACROSS_ACCOUNT;
+    }
+    if (highestPriority == AuthFormPriority::PRIORITY_PEER_TO_PEER) {
+        return DmAuthForm::PEER_TO_PEER;
     }
 
     return DmAuthForm::INVALID_TYPE;
