@@ -49,7 +49,8 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector_ = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-std::shared_ptr<DmDiscoveryManager> discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_, hiChainConnector_);
+std::shared_ptr<DmDiscoveryManager> discoveryMgr_ =
+    std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_, hiChainConnector_);
 
 /**
  * @tc.name: DmDiscoveryManager_001
@@ -59,7 +60,8 @@ std::shared_ptr<DmDiscoveryManager> discoveryMgr_ = std::make_shared<DmDiscovery
  */
 HWTEST_F(DmDiscoveryManagerTest, DmDiscoveryManager_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDiscoveryManager> Test = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_);
+    std::shared_ptr<DmDiscoveryManager> Test =
+        std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_, hiChainConnector_);
     ASSERT_NE(Test, nullptr);
 }
 
@@ -71,7 +73,8 @@ HWTEST_F(DmDiscoveryManagerTest, DmDiscoveryManager_001, testing::ext::TestSize.
  */
 HWTEST_F(DmDiscoveryManagerTest, DmDiscoveryManager_002, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmDiscoveryManager> Test = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_);
+    std::shared_ptr<DmDiscoveryManager> Test =
+        std::make_shared<DmDiscoveryManager>(softbusConnector_, listener_, hiChainConnector_);
     Test.reset();
     EXPECT_EQ(Test, nullptr);
 }

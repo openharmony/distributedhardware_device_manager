@@ -89,8 +89,8 @@ private:
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
-    std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
     std::shared_ptr<DmTimer> timer_;

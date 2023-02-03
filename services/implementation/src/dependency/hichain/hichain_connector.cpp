@@ -288,7 +288,7 @@ DmAuthForm HiChainConnector::GetGroupType(const std::string &deviceId)
             LOGE("HiChainConnector::GetGroupType unsupported auth form");
             return DmAuthForm::INVALID_TYPE;
         }
-        AuthFormPriority priority = g_authFormPriorityMap[it->groupType];
+        AuthFormPriority priority = g_authFormPriorityMap.at(it->groupType);
         if (priority > highestPriority) {
             highestPriority = priority;
         }
