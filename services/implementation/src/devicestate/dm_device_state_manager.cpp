@@ -199,7 +199,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
-        saveInfo.authForm = GetAuthForm(info.networkId);
+        saveInfo.authForm = GetAuthForm(deviceId);
         listener_->OnDeviceStateChange(pkgName, state, saveInfo);
     }
 }
@@ -385,7 +385,7 @@ DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId) {
     }
 
     std::string udid;
-    if (SoftbusConnector::GetUdidByNetworkId(networkId, udid) == DM_OK) {
+    if (SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), udid) == DM_OK) {
         return hiChainConnector_->GetGroupType(udid);
     }
 
