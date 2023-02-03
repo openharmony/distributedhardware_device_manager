@@ -54,7 +54,8 @@ std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<Device
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DmDeviceStateManager> deviceStateMgr =
     std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector);
-std::shared_ptr<DmDiscoveryManager> discoveryMgr = std::make_shared<DmDiscoveryManager>(softbusConnector, listener);
+std::shared_ptr<DmDiscoveryManager> discoveryMgr =
+    std::make_shared<DmDiscoveryManager>(softbusConnector, listener, hiChainConnector);
 std::shared_ptr<DmPublishManager> publishMgr = std::make_shared<DmPublishManager>(softbusConnector, listener);
 /**
  * @tc.name: DeviceOnLine_001

@@ -277,32 +277,28 @@ DmAuthForm HiChainConnector::GetGroupType(const std::string &deviceId)
         return DmAuthForm::INVALID_TYPE;
     }
 
-    if (groupList.size() <= 0) {
+    if (groupList.size() == 0) {
         LOGE("HiChainConnector::GetGroupType group list is empty");
         return DmAuthForm::INVALID_TYPE;
     }
 
     AuthFormPriority highestPriority = AuthFormPriority::PRIORITY_PEER_TO_PEER;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        for (auto it = groupList.begin(); it != groupList.end(); ++it) {
-            if (g_authFormPriorityMap.count(it->groupType) <= 0) {
-                LOGE("HiChainConnector::GetGroupType unsupported auth form");
-                return DmAuthForm::INVALID_TYPE;
-            }
-            AuthFormPriority priority = g_authFormPriorityMap[it->groupType];
-            if (priority > highestPriority) {
-                highestPriority = priority;
-            }
+    for (auto it = groupList.begin(); it != groupList.end(); ++it) {
+        if (g_authFormPriorityMap.count(it->groupType) == 0) {
+            LOGE("HiChainConnector::GetGroupType unsupported auth form");
+            return DmAuthForm::INVALID_TYPE;
+        }
+        AuthFormPriority priority = g_authFormPriorityMap[it->groupType];
+        if (priority > highestPriority) {
+            highestPriority = priority;
         }
     }
+
     if (highestPriority == AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT) {
         return DmAuthForm::IDENTICAL_ACCOUNT;
-    }
-    if (highestPriority == AuthFormPriority::PRIORITY_ACROSS_ACCOUNT) {
+    } else if (highestPriority == AuthFormPriority::PRIORITY_ACROSS_ACCOUNT) {
         return DmAuthForm::ACROSS_ACCOUNT;
-    }
-    if (highestPriority == AuthFormPriority::PRIORITY_PEER_TO_PEER) {
+    } else if (highestPriority == AuthFormPriority::PRIORITY_PEER_TO_PEER) {
         return DmAuthForm::PEER_TO_PEER;
     }
 

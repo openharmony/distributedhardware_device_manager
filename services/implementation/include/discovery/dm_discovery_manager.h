@@ -37,7 +37,8 @@ class DmDiscoveryManager final : public ISoftbusDiscoveryCallback,
                                  public std::enable_shared_from_this<DmDiscoveryManager> {
 public:
     DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                       std::shared_ptr<IDeviceManagerServiceListener> listener);
+                       std::shared_ptr<IDeviceManagerServiceListener> listener,
+                       std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDiscoveryManager();
 
     /**

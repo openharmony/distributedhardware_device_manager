@@ -55,7 +55,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (discoveryMgr_ == nullptr) {
-        discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener);
+        discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
     }
     if (publishMgr_ == nullptr) {
         publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener);
@@ -401,7 +401,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         std::string udid;
         int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
         if (ret != DM_OK) {
-            LOGE("GetUdidByNetworkId failed");
+            LOGE("GetUdidByNetworkId failed ret: %d", ret);
             return ERR_DM_FAILED;
         }
 

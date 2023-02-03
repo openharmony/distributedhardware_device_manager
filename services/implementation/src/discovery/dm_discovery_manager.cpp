@@ -26,10 +26,10 @@ constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                                       std::shared_ptr<IDeviceManagerServiceListener> listener)
-    : softbusConnector_(softbusConnector), listener_(listener)
+                                       std::shared_ptr<IDeviceManagerServiceListener> listener,
+                                       std::shared_ptr<HiChainConnector> hiChainConnector)
+    : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
-    hiChainConnector_ = std::make_shared<HiChainConnector>();
     LOGI("DmDiscoveryManager constructor");
 }
 
