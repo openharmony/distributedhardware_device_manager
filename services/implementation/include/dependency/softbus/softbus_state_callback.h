@@ -20,8 +20,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class ISoftbusStateCallback {
 public:
-    virtual void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info) = 0;
-    virtual void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info) = 0;
+    virtual void OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info) = 0;
+    virtual void OnDeviceOffline(const std::string &pkgName, DmDeviceInfo &info) = 0;
     virtual void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info) = 0;
     virtual void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info) = 0;
 };

@@ -96,28 +96,28 @@ public:
      * @tc.desc: Post Device Online of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
+    void PostDeviceOnline(const std::string &pkgName, DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::PostDeviceOffline
      * @tc.desc: Post Device Offline of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
+    void PostDeviceOffline(const std::string &pkgName, DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::OnDeviceOnline
      * @tc.desc: OnDevice Online of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info);
+    void OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::OnDeviceOffline
      * @tc.desc: OnDevice Offline of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
+    void OnDeviceOffline(const std::string &pkgName, DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::OnDeviceChanged
@@ -195,6 +195,7 @@ private:
     void ThreadLoop();
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
+    DmAuthForm GetAuthForm(const std::string &networkId);
 private:
 #if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;

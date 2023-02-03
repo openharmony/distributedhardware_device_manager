@@ -296,7 +296,7 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
     return DM_OK;
 }
 
-void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
+void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
 {
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOnline failed, instance not init or init failed.");
@@ -311,7 +311,7 @@ void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
     dmServiceImpl_->HandleDeviceOnline(info);
 }
 
-void DeviceManagerService::HandleDeviceOffline(const DmDeviceInfo &info)
+void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
 {
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOffline failed, instance not init or init failed.");

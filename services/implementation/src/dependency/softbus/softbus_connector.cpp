@@ -400,7 +400,7 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
     dmDeviceInfo.range = deviceInfo.range;
 }
 
-void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
+void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
 {
     LOGI("start handle device online event.");
     for (auto &iter : stateCallbackMap_) {
@@ -432,7 +432,7 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
     discoveryDeviceInfoMap_.erase(deviceId);
 }
 
-void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
+void SoftbusConnector::HandleDeviceOffline(DmDeviceInfo &info)
 {
     LOGI("start handle device offline event.");
     for (auto &iter : stateCallbackMap_) {

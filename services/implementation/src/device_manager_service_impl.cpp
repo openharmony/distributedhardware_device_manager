@@ -247,14 +247,14 @@ int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceOnline(const DmDeviceInfo &info)
+void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
 {
     if (softbusConnector_ != nullptr) {
         softbusConnector_->HandleDeviceOnline(info);
     }
 }
 
-void DeviceManagerServiceImpl::HandleDeviceOffline(const DmDeviceInfo &info)
+void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
 {
     if (softbusConnector_ != nullptr) {
         softbusConnector_->HandleDeviceOffline(info);

@@ -66,9 +66,9 @@ public:
 
     int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
-    void HandleDeviceOnline(const DmDeviceInfo &info);
+    void HandleDeviceOnline(DmDeviceInfo &info);
 
-    void HandleDeviceOffline(const DmDeviceInfo &info);
+    void HandleDeviceOffline(DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
 
