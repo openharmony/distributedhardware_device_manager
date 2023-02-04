@@ -614,6 +614,7 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
     SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
+    SetValueInt32(env_, "authForm", (int)deviceInfo.authForm, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);

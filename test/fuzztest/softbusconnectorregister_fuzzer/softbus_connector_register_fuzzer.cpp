@@ -31,8 +31,8 @@ class SoftbusStateCallbackFuzzTest : public ISoftbusStateCallback {
 public:
     virtual ~SoftbusStateCallbackFuzzTest() {}
 
-    void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info) override {}
-    void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info) override {}
+    void OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info) override {}
+    void OnDeviceOffline(const std::string &pkgName, DmDeviceInfo &info) override {}
     void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info) override {}
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info) override {}
 };
