@@ -104,16 +104,7 @@ bool DmDiscoveryFilter::FilterByRange(int32_t value, int32_t range)
 
 bool DmDiscoveryFilter::FilterByAuthForm(int32_t value, int32_t authForm)
 {
-    if (value == IDENTICAL_ACCOUNT) {
-        return (authForm == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP);
-    }
-    if (value == PEER_TO_PEER) {
-        return (authForm == GROUP_TYPE_PEER_TO_PEER_GROUP);
-    }
-    if (value == ACROSS_ACCOUNT) {
-        return (authForm == GROUP_TYPE_ACROSS_ACCOUNT_GROUP);
-    }
-    return (value == INVALID_TYPE);
+    return (value == authForm);
 }
 
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
