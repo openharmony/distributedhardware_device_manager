@@ -385,7 +385,7 @@ DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId) {
         return DmAuthForm::INVALID_TYPE;
     }
 
-    if (networkId.empty) {
+    if (networkId.empty()) {
         LOGE("networkId is empty");
         return DmAuthForm::INVALID_TYPE;
     }
