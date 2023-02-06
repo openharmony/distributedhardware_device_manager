@@ -130,7 +130,7 @@ public:
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     bool HaveDeviceInMap(std::string deviceId);
     void HandleDeviceOnline(DmDeviceInfo &info);
-    void HandleDeviceOffline(DmDeviceInfo &info);
+    void HandleDeviceOffline(const DmDeviceInfo &info);
 
 private:
     int32_t Init();

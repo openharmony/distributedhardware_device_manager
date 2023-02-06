@@ -103,7 +103,7 @@ public:
      * @tc.desc: Post Device Offline of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void PostDeviceOffline(const std::string &pkgName, DmDeviceInfo &info);
+    void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::OnDeviceOnline
@@ -117,7 +117,7 @@ public:
      * @tc.desc: OnDevice Offline of the Dm Device State Manager
      * @tc.type: FUNC
      */
-    void OnDeviceOffline(const std::string &pkgName, DmDeviceInfo &info);
+    void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDeviceStateManager::OnDeviceChanged

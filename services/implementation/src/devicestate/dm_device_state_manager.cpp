@@ -94,12 +94,11 @@ void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, DmDevice
     LOGI("DmDeviceStateManager::PostDeviceOnline out");
 }
 
-void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, DmDeviceInfo &info)
+void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("DmDeviceStateManager::PostDeviceOffline in");
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_STATE_OFFLINE;
-        info.authForm = GetAuthForm(info.networkId);
         listener_->OnDeviceStateChange(pkgName, state, info);
     }
     LOGI("DmDeviceStateManager::PostDeviceOffline out");
@@ -135,7 +134,7 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, DmDeviceIn
     LOGI("DmDeviceStateManager::OnDeviceOnline out");
 }
 
-void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, DmDeviceInfo &info)
+void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("OnDeviceOffline function is called with pkgName: %s", pkgName.c_str());
     StartOffLineTimer(info);
@@ -199,7 +198,6 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
-        saveInfo.authForm = GetAuthForm(deviceId);
         listener_->OnDeviceStateChange(pkgName, state, saveInfo);
     }
 }

@@ -135,7 +135,7 @@ public:
      * @tc.desc: Handle Device Offline to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceOffline(DmDeviceInfo &info);
+    virtual void HandleDeviceOffline(const DmDeviceInfo &info);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened

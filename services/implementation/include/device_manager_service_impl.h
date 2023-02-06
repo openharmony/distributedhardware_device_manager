@@ -68,7 +68,7 @@ public:
 
     void HandleDeviceOnline(DmDeviceInfo &info);
 
-    void HandleDeviceOffline(DmDeviceInfo &info);
+    void HandleDeviceOffline(const DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
 

@@ -432,7 +432,7 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
     discoveryDeviceInfoMap_.erase(deviceId);
 }
 
-void SoftbusConnector::HandleDeviceOffline(DmDeviceInfo &info)
+void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
 {
     LOGI("start handle device offline event.");
     for (auto &iter : stateCallbackMap_) {

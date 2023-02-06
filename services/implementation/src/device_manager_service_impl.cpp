@@ -254,7 +254,7 @@ void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
     }
 }
 
-void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
+void DeviceManagerServiceImpl::HandleDeviceOffline(const DmDeviceInfo &info)
 {
     if (softbusConnector_ != nullptr) {
         softbusConnector_->HandleDeviceOffline(info);

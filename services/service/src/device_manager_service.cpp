@@ -311,7 +311,7 @@ void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
     dmServiceImpl_->HandleDeviceOnline(info);
 }
 
-void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
+void DeviceManagerService::HandleDeviceOffline(const DmDeviceInfo &info)
 {
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOffline failed, instance not init or init failed.");
