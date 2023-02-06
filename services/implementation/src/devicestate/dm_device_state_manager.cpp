@@ -378,7 +378,8 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
     LOGI("RunTask complete");
 }
 
-DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId) {
+DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
+{
     LOGI("GetAuthForm start");
     if (hiChainConnector_ == nullptr) {
         LOGE("hiChainConnector_ is nullptr");
