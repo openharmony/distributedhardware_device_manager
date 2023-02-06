@@ -47,7 +47,7 @@ public:
     bool IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
         const DmDeviceFilterPara &filterPara);
 private:
-    bool FilterByDeviceState(int32_t value, bool deviceState);
+    bool FilterByDeviceState(int32_t value, bool isActive);
     bool FilterByRange(int32_t value, int32_t range);
     bool FilterByAuthForm(int32_t value, int32_t authForm);
     bool FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara);

@@ -86,13 +86,13 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
     return ParseFilterJson(filterOptions);
 }
 
-bool DmDiscoveryFilter::FilterByDeviceState(int32_t value, bool deviceState)
+bool DmDiscoveryFilter::FilterByDeviceState(int32_t value, bool isActive)
 {
     if (value == DM_INVALID_DEVICE) {
-        return !deviceState;
+        return !isActive;
     }
     if (value == DM_VALID_DEVICE) {
-        return deviceState;
+        return isActive;
     }
     return (value == DM_ALL_DEVICE);
 }
