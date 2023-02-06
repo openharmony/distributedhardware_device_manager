@@ -128,7 +128,7 @@ public:
      * @tc.desc: Handle Device Online to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceOnline(const DmDeviceInfo &info);
+    virtual void HandleDeviceOnline(DmDeviceInfo &info);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::HandleDeviceOffline
@@ -195,6 +195,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
+
+    /**
+     * @tc.name: DeviceManagerService::GetGroupType
+     * @tc.desc: GetGroupType
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
 
     /**
      * @tc.name: DeviceManagerService::LoadHardwareFwkService

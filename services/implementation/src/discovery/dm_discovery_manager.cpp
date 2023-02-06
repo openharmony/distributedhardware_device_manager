@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -25,8 +26,9 @@ constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const int32_t DISCOVERY_TIMEOUT = 120;
 
 DmDiscoveryManager::DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                                       std::shared_ptr<IDeviceManagerServiceListener> listener)
-    : softbusConnector_(softbusConnector), listener_(listener)
+                                       std::shared_ptr<IDeviceManagerServiceListener> listener,
+                                       std::shared_ptr<HiChainConnector> hiChainConnector)
+    : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
 {
     LOGI("DmDiscoveryManager constructor");
 }
@@ -119,6 +121,13 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
     filterPara.range = info.range;
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    filterPara.isTrusted = hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId);
+    filterPara.authForm = GROUP_TYPE_INVALID_GROUP;
+    if (filterPara.isTrusted) {
+        filterPara.authForm = hiChainConnector_->GetGroupType(info.deviceId);
+    }
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
     }

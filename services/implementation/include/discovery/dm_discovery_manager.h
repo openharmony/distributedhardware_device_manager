@@ -21,6 +21,7 @@
 #include "dm_discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
+#include "hichain_connector.h"
 #include "softbus_connector.h"
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,7 +37,8 @@ class DmDiscoveryManager final : public ISoftbusDiscoveryCallback,
                                  public std::enable_shared_from_this<DmDiscoveryManager> {
 public:
     DmDiscoveryManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-                       std::shared_ptr<IDeviceManagerServiceListener> listener);
+                       std::shared_ptr<IDeviceManagerServiceListener> listener,
+                       std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDiscoveryManager();
 
     /**
@@ -88,6 +90,7 @@ private:
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DmDiscoveryContext> discoveryContextMap_;
     std::shared_ptr<DmTimer> timer_;

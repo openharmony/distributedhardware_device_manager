@@ -55,7 +55,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (discoveryMgr_ == nullptr) {
-        discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener);
+        discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
     }
     if (publishMgr_ == nullptr) {
         publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener);
@@ -247,7 +247,7 @@ int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceOnline(const DmDeviceInfo &info)
+void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
 {
     if (softbusConnector_ != nullptr) {
         softbusConnector_->HandleDeviceOnline(info);
@@ -385,6 +385,27 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
             LOGE("NotifyEvent failed");
             return ERR_DM_INPUT_PARA_INVALID;
         };
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &deviceList)
+{
+    LOGI("GetGroupType begin");
+    if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
+        LOGE("softbusConnector_ or hiChainConnector_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+
+    for (auto it = deviceList.begin(); it != deviceList.end(); ++it) {
+        std::string udid;
+        int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
+        if (ret != DM_OK) {
+            LOGE("GetUdidByNetworkId failed ret: %d", ret);
+            return ERR_DM_FAILED;
+        }
+
+        it->authForm = hiChainConnector_->GetGroupType(udid);
     }
     return DM_OK;
 }

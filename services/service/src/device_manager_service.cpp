@@ -95,8 +95,12 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
     if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
+        return ret;
     }
-    return ret;
+    if (deviceList.size() > 0 && IsDMServiceImplReady()) {
+        return dmServiceImpl_->GetGroupType(deviceList);
+    }
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
@@ -292,7 +296,7 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
     return DM_OK;
 }
 
-void DeviceManagerService::HandleDeviceOnline(const DmDeviceInfo &info)
+void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
 {
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOnline failed, instance not init or init failed.");

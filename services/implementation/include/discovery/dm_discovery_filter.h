@@ -38,6 +38,8 @@ struct DmDeviceFilterOption {
 struct DmDeviceFilterPara {
     bool isOnline;
     int32_t range;
+    bool isTrusted;
+    int32_t authForm;
 };
 
 class DmDiscoveryFilter {
@@ -45,8 +47,9 @@ public:
     bool IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
         const DmDeviceFilterPara &filterPara);
 private:
-    bool FilterByCredible(int32_t value, bool isOnline);
+    bool FilterByDeviceState(int32_t value, bool isActive);
     bool FilterByRange(int32_t value, int32_t range);
+    bool FilterByAuthForm(int32_t value, int32_t authForm);
     bool FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara);
     bool FilterOr(const std::vector<DmDeviceFilters> &filters, const DmDeviceFilterPara &filterPara);
     bool FilterAnd(const std::vector<DmDeviceFilters> &filters, const DmDeviceFilterPara &filterPara);

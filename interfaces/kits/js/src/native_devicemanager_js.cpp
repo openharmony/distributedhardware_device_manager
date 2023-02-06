@@ -614,6 +614,7 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
     SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
+    SetValueInt32(env_, "authForm", (int)deviceInfo.authForm, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
@@ -755,6 +756,7 @@ void DeviceManagerNapi::DeviceInfoToJsArray(const napi_env &env, const std::vect
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
     SetValueInt32(env, "deviceType", (int)vecDevInfo[idx].deviceTypeId, result);
+    SetValueInt32(env, "authForm", (int)vecDevInfo[idx].authForm, result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

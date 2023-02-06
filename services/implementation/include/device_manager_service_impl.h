@@ -66,7 +66,7 @@ public:
 
     int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
 
-    void HandleDeviceOnline(const DmDeviceInfo &info);
+    void HandleDeviceOnline(DmDeviceInfo &info);
 
     void HandleDeviceOffline(const DmDeviceInfo &info);
 
@@ -87,6 +87,8 @@ public:
     int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
+
+    int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
 
     void LoadHardwareFwkService();
 private:

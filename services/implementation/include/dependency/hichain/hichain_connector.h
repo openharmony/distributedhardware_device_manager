@@ -20,10 +20,13 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "device_auth.h"
 #include "device_auth_defines.h"
+#include "dm_constants.h"
+#include "dm_device_info.h"
 #include "hichain_connector_callback.h"
 #include "nlohmann/json.hpp"
 #include "single_instance.h"
@@ -41,6 +44,18 @@ struct GroupInfo {
     GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0), userId("")
     {
     }
+};
+
+enum class AuthFormPriority {
+    PRIORITY_PEER_TO_PEER = 0,
+    PRIORITY_ACROSS_ACCOUNT = 1,
+    PRIORITY_IDENTICAL_ACCOUNT = 2,
+};
+
+static const std::unordered_map<int32_t, AuthFormPriority> g_authFormPriorityMap = {
+    {GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT},
+    {GROUP_TYPE_ACROSS_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_ACROSS_ACCOUNT},
+    {GROUP_TYPE_PEER_TO_PEER_GROUP, AuthFormPriority::PRIORITY_PEER_TO_PEER}
 };
 
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
@@ -147,6 +162,13 @@ public:
      * @tc.type: FUNC
      */
     int32_t GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
+
+    /**
+     * @tc.name: HiChainConnector::GetGroupType
+     * @tc.desc: Get GroupType of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    DmAuthForm GetGroupType(const std::string &deviceId);
 
     /**
      * @tc.name: HiChainConnector::DeleteTimeOutGroup

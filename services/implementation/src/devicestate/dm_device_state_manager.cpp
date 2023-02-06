@@ -83,11 +83,12 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
     }
 }
 
-void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
+void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DmDeviceStateManager::PostDeviceOnline in");
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_STATE_ONLINE;
+        info.authForm = GetAuthForm(info.networkId);
         listener_->OnDeviceStateChange(pkgName, state, info);
     }
     LOGI("DmDeviceStateManager::PostDeviceOnline out");
@@ -103,7 +104,7 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
     LOGI("DmDeviceStateManager::PostDeviceOffline out");
 }
 
-void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &info)
+void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
     RegisterOffLineTimer(info);
@@ -373,6 +374,27 @@ void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
         OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
     LOGI("RunTask complete");
+}
+
+DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
+{
+    LOGI("GetAuthForm start");
+    if (hiChainConnector_ == nullptr) {
+        LOGE("hiChainConnector_ is nullptr");
+        return DmAuthForm::INVALID_TYPE;
+    }
+
+    if (networkId.empty()) {
+        LOGE("networkId is empty");
+        return DmAuthForm::INVALID_TYPE;
+    }
+
+    std::string udid;
+    if (SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), udid) == DM_OK) {
+        return hiChainConnector_->GetGroupType(udid);
+    }
+
+    return DmAuthForm::INVALID_TYPE;
 }
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const int32_t eventId,

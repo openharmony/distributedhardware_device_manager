@@ -56,6 +56,50 @@ declare namespace deviceManager {
      * The distance of dicovered device, in centimeters(cm).
      */
     range: number;
+
+    /**
+     * Indicates the device's trusted type
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    authForm: AuthForm;
+  }
+
+  /**
+   * Device trusted type definitions
+   * @enum {number}
+   * @syscap SystemCapability.DistributedHardware.DeviceManager
+   * @systemapi this method can be used only by system applications.
+   * @since 10
+   */
+  enum AuthForm {
+    /**
+     * Indicates invalid trusted device type.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    INVALID_TYPE = -1,
+
+    /**
+     * Indicates peer to peer trusted device type without account.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    PEER_TO_PEER = 0,
+
+    /**
+     * Indicates identical account trusted device type.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    IDENTICAL_ACCOUNT = 1,
+
+    /**
+     * Indicates across account trusted device type.
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 10
+     */
+    ACROSS_ACCOUNT = 2
   }
 
   /**

@@ -129,7 +129,7 @@ public:
     int32_t StopDiscovery(uint16_t subscribeId);
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     bool HaveDeviceInMap(std::string deviceId);
-    void HandleDeviceOnline(const DmDeviceInfo &info);
+    void HandleDeviceOnline(DmDeviceInfo &info);
     void HandleDeviceOffline(const DmDeviceInfo &info);
 
 private:
