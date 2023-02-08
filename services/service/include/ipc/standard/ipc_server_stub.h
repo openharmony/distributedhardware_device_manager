@@ -140,7 +140,7 @@ private:
 private:
     bool registerToService_;
     ServiceRunningState state_;
-    std::mutex listenerLock_;
+    mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
     std::map<std::string, sptr<IRemoteObject>> dmListener_;
 };
