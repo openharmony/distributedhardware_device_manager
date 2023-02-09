@@ -48,6 +48,31 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t SLEEP_TIME_MS = 50000; // 50ms
 
+constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
+constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED = "DM_INIT_DEVICE_MANAGER_FAILED";
+constexpr const char* START_DEVICE_DISCOVERY_SUCCESS = "START_DEVICE_DISCOVERY_SUCCESS";
+constexpr const char* START_DEVICE_DISCOVERY_FAILED = "START_DEVICE_DISCOVERY_FAILED";
+constexpr const char* GET_LOCAL_DEVICE_INFO_SUCCESS = "GET_LOCAL_DEVICE_INFO_SUCCESS";
+constexpr const char* GET_LOCAL_DEVICE_INFO_FAILED = "GET_LOCAL_DEVICE_INFO_FAILED";
+constexpr const char* DM_SEND_REQUEST_SUCCESS = "DM_SEND_REQUEST_SUCCESS";
+constexpr const char* DM_SEND_REQUEST_FAILED = "DM_SEND_REQUEST_FAILED";
+constexpr const char* UNAUTHENTICATE_DEVICE_SUCCESS = "UNAUTHENTICATE_DEVICE_SUCCESS";
+constexpr const char* UNAUTHENTICATE_DEVICE_FAILED = "UNAUTHENTICATE_DEVICE_FAILED";
+constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS_MSG = "init devicemanager success.";
+constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED_MSG = "init devicemanager failed.";
+constexpr const char* START_DEVICE_DISCOVERY_SUCCESS_MSG = "device manager discovery success.";
+constexpr const char* START_DEVICE_DISCOVERY_FAILED_MSG = "device manager discovery failed.";
+constexpr const char* GET_LOCAL_DEVICE_INFO_SUCCESS_MSG = "get local device info success.";
+constexpr const char* GET_LOCAL_DEVICE_INFO_FAILED_MSG = "get local device info failed.";
+constexpr const char* DM_SEND_REQUEST_SUCCESS_MSG = "send request success.";
+constexpr const char* DM_SEND_REQUEST_FAILED_MSG = "send request failed.";
+constexpr const char* UNAUTHENTICATE_DEVICE_SUCCESS_MSG = "unauthenticate device success.";
+constexpr const char* UNAUTHENTICATE_DEVICE_FAILED_MSG = "unauthenticate device failed.";
+constexpr const char* DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
+constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
+constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
+constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
+
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
     static DeviceManagerImpl instance;

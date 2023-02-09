@@ -25,6 +25,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* TAG_REPLY = "REPLY";
+constexpr const char* TAG_NET_ID = "NETID";
+constexpr const char* TAG_TARGET = "TARGET";
+constexpr const char* TAG_APP_NAME = "APPNAME";
+constexpr const char* TAG_GROUPIDS = "GROUPIDLIST";
+constexpr const char* TAG_APP_DESCRIPTION = "APPDESC";
+constexpr const char* TAG_LOCAL_DEVICE_ID = "LOCALDEVICEID";
+constexpr const char* TAG_INDEX = "INDEX";
+constexpr const char* TAG_SLICE_NUM = "SLICE";
+constexpr const char* TAG_TOKEN = "TOKEN";
+constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
+constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
+constexpr const char* TAG_IDENTICAL_ACCOUNT = "IDENTICALACCOUNT";
+constexpr const char* APP_THUMBNAIL = "appThumbnail";
+constexpr const char* QR_CODE_KEY = "qrCode";
+constexpr const char* TAG_AUTH_TOKEN = "authToken";
+constexpr const char* NFC_CODE_KEY = "nfcCode";
+
 class DmAuthManager;
 struct DmAuthRequestContext;
 struct DmAuthResponseContext;
