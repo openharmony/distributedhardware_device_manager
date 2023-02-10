@@ -1163,6 +1163,7 @@ void DeviceManagerNapi::DmDeviceInfotoJsDeviceInfo(const napi_env &env, const Dm
     napi_create_object(env, &result);
 
     SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
     SetValueInt32(env, "deviceType", (int)vecDevInfo.deviceTypeId, result);
 }
