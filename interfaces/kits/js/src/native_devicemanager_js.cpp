@@ -754,6 +754,7 @@ void DeviceManagerNapi::DeviceInfoToJsArray(const napi_env &env, const std::vect
     napi_create_object(env, &result);
 
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
     SetValueInt32(env, "deviceType", (int)vecDevInfo[idx].deviceTypeId, result);
     SetValueInt32(env, "authForm", (int)vecDevInfo[idx].authForm, result);
@@ -1162,6 +1163,7 @@ void DeviceManagerNapi::DmDeviceInfotoJsDeviceInfo(const napi_env &env, const Dm
     napi_create_object(env, &result);
 
     SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
     SetValueInt32(env, "deviceType", (int)vecDevInfo.deviceTypeId, result);
 }
