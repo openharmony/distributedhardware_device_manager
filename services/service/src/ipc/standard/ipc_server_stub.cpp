@@ -203,6 +203,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
 
 const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
 {
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
     return dmListener_;
 }
 
@@ -212,6 +213,7 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) co
         LOGE("Invalid parameter, pkgName is empty.");
         return nullptr;
     }
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(pkgName);
     if (iter == dmListener_.end()) {
         return nullptr;
