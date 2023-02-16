@@ -41,6 +41,14 @@ const int32_t FIELD_EXPIRE_TIME_VALUE = 7;
 
 constexpr const char* DEVICE_ID = "DEVICE_ID";
 constexpr const char* FIELD_CREDENTIAL = "credential";
+constexpr const char* ADD_HICHAIN_GROUP_SUCCESS = "ADD_HICHAIN_GROUP_SUCCESS";
+constexpr const char* ADD_HICHAIN_GROUP_FAILED = "ADD_HICHAIN_GROUP_FAILED";
+constexpr const char* DM_CREATE_GROUP_SUCCESS = "DM_CREATE_GROUP_SUCCESS";
+constexpr const char* DM_CREATE_GROUP_FAILED = "DM_CREATE_GROUP_FAILED";
+constexpr const char* ADD_HICHAIN_GROUP_SUCCESS_MSG = "dm add member to group success.";
+constexpr const char* ADD_HICHAIN_GROUP_FAILED_MSG = "dm add member to group failed.";
+constexpr const char* DM_CREATE_GROUP_SUCCESS_MSG = "dm create group success.";
+constexpr const char* DM_CREATE_GROUP_FAILED_MSG = "dm create group failed.";
 
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 {

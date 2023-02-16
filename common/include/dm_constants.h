@@ -59,29 +59,15 @@ enum {
     ERR_DM_PUBLISH_REPEATED = -20030,
 };
 
-constexpr const char* TAG_REPLY = "REPLY";
-constexpr const char* TAG_NET_ID = "NETID";
-constexpr const char* TAG_TARGET = "TARGET";
-constexpr const char* TAG_APP_NAME = "APPNAME";
-constexpr const char* TAG_GROUPIDS = "GROUPIDLIST";
-constexpr const char* TAG_APP_DESCRIPTION = "APPDESC";
-constexpr const char* TAG_LOCAL_DEVICE_ID = "LOCALDEVICEID";
-constexpr const char* TAG_INDEX = "INDEX";
-constexpr const char* TAG_SLICE_NUM = "SLICE";
-constexpr const char* TAG_TOKEN = "TOKEN";
 constexpr const char* TAG_GROUP_ID = "groupId";
 constexpr const char* TAG_GROUP_NAME = "GROUPNAME";
 constexpr const char* TAG_REQUEST_ID = "REQUESTID";
 constexpr const char* TAG_DEVICE_ID = "DEVICEID";
 constexpr const char* TAG_AUTH_TYPE = "AUTHTYPE";
 constexpr const char* TAG_CRYPTO_SUPPORT = "CRYPTOSUPPORT";
-constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
-constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
-constexpr const char* TAG_IDENTICAL_ACCOUNT = "IDENTICALACCOUNT";
 constexpr const char* TAG_VER = "ITF_VER";
 constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* DM_ITF_VER = "1.1";
-constexpr const char* APP_THUMBNAIL = "appThumbnail";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 const static char *DM_CAPABILITY_OSD = "osdCapability";
@@ -91,9 +77,6 @@ constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* TOKEN = "token";
 constexpr const char* PIN_TOKEN = "pinToken";
 constexpr const char* PIN_CODE_KEY = "pinCode";
-constexpr const char* NFC_CODE_KEY = "nfcCode";
-constexpr const char* QR_CODE_KEY = "qrCode";
-constexpr const char* TAG_AUTH_TOKEN = "authToken";
 
 // HiChain
 const int32_t AUTH_TYPE_PIN = 1;
@@ -108,10 +91,6 @@ const int64_t MIN_REQUEST_ID = 1000000000;
 const int64_t MAX_REQUEST_ID = 9999999999;
 
 // ACE
-const int32_t ACE_X = 50;
-const int32_t ACE_Y = 300;
-const int32_t ACE_WIDTH = 580;
-const int32_t ACE_HEIGHT = 520;
 constexpr const char* EVENT_CONFIRM = "EVENT_CONFIRM";
 constexpr const char* EVENT_CANCEL = "EVENT_CANCEL";
 constexpr const char* EVENT_INIT = "EVENT_INIT";
@@ -119,7 +98,6 @@ constexpr const char* EVENT_CONFIRM_CODE = "0";
 constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
 
-constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

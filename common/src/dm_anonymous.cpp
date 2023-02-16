@@ -19,6 +19,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+
 std::string GetAnonyString(const std::string &value)
 {
     const int32_t INT32_SHORT_ID_LENGTH = 20;

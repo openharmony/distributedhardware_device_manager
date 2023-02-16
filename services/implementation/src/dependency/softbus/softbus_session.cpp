@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
+constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 
 SoftbusSession::SoftbusSession()
 {
