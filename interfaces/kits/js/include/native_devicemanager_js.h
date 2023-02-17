@@ -375,7 +375,7 @@ private:
     static void CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void CallCreAsyncWork(napi_env env, CreAsyncCallbackInfo *creAsyncCallbackInfo);
     static void CallRequestCreInfoStatus(napi_env env, napi_status &status,
-                                                CreAsyncCallbackInfo *creAsyncCallbackInfo);
+                                         CreAsyncCallbackInfo *creAsyncCallbackInfo);
     static void CallGetTrustedDeviceListStatusSync(napi_env env, napi_status &status,
                                                    DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void CallGetTrustedDeviceListStatus(napi_env env, napi_status &status,

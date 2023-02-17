@@ -1529,7 +1529,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
 }
 
 void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &status,
-                                                CreAsyncCallbackInfo *creAsyncCallbackInfo)
+                                                 CreAsyncCallbackInfo *creAsyncCallbackInfo)
 {
     LOGI("DeviceManager::RequestCredential Info:%s", creAsyncCallbackInfo->returnJsonStr.c_str());
     napi_value callResult = nullptr;
@@ -1539,7 +1539,7 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
 
     if (creAsyncCallbackInfo->status == 0) {
         if (creAsyncCallbackInfo->returnJsonStr != "") {
-            LOGI("creAsyncCallbackInfo returnJsonStr is OK");        
+            LOGI("creAsyncCallbackInfo returnJsonStr is OK");
         } else {
             LOGE("creAsyncCallbackInfo returnJsonStr is null");
         }
@@ -2369,7 +2369,7 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
-    if(RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
+    if (RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
         LOGE("RegisterCredentialCallback failed!");
         return result;
     }
@@ -2417,7 +2417,7 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo_.callback);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
-    if(RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
+    if (RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
         LOGE("RegisterCredentialCallback failed!");
         return result;
     }
