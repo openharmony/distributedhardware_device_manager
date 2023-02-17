@@ -447,6 +447,39 @@ declare namespace deviceManager {
     unPublishDeviceDiscovery(publishId: number): void;
 
     /**
+     * Request credential information.
+     *
+     * @since 10
+     * @param requestInfo Request credential params.
+     * @param callback Indicates the callback to be invoked upon requestCredential
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @systemapi this method can be used only by system applications.
+     */  
+    requestCredential(requestInfo: string, callback: AsyncCallback<{registerInfo: string}>): void;
+
+    /**
+     * Import credential information.
+     *
+     * @since 10
+     * @param credentialInfo Import credential params.
+     * @param callback Indicates the callback to be invoked upon importCredential
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @systemapi this method can be used only by system applications.
+     */  
+    importCredential(credentialInfo: string, callback: AsyncCallback<{resultInfo: string}>): void;
+
+    /**
+     * delete credential information.
+     *
+     * @since 10
+     * @param queryInfo delete credential params.
+     * @param callback Indicates the callback to be invoked upon deleteCredential
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @systemapi this method can be used only by system applications.
+     */  
+    deleteCredential(queryInfo: string, callback: AsyncCallback<{resultInfo: string}>): void;
+
+    /**
      * Authenticate the specified device.
      *
      * @param deviceInfo deviceInfo of device to authenticate
