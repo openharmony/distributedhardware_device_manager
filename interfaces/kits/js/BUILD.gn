@@ -19,7 +19,6 @@ ohos_shared_library("devicemanager") {
     "include",
     "${common_path}/include",
     "${common_path}/include/ipc",
-    "${utils_path}/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/ipc/standard",
@@ -31,12 +30,12 @@ ohos_shared_library("devicemanager") {
   ]
 
   sources = [
+    "${common_path}/src/dm_error_message.cpp",
     "src/dm_native_event.cpp",
     "src/native_devicemanager_js.cpp",
   ]
 
   deps = [
-    "${utils_path}:devicemanagerutils",
     "//foundation/arkui/napi:ace_napi",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
   ]
