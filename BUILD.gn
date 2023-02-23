@@ -28,7 +28,7 @@ if (defined(ohos_lite)) {
   } else {
     lite_component("device_manager") {
       features = [ "utils:devicemanagerutils" ]
-      }
+    }
     lite_component("device_manager_fwk") {
       features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
     }
