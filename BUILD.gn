@@ -27,10 +27,10 @@ if (defined(ohos_lite)) {
     }
   } else {
     lite_component("device_manager") {
-      features = [
-        "utils:devicemanagerutils",
-        "interfaces/inner_kits/native_cpp:devicemanagersdk",
-      ]
+      features = [ "utils:devicemanagerutils" ]
+      }
+    lite_component("device_manager_fwk") {
+      features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
     }
     group("device_manager_test") {
       testonly = true
@@ -41,13 +41,17 @@ if (defined(ohos_lite)) {
   group("device_manager") {
     deps = [
       "ext:ext_modules",
-      "interfaces/inner_kits/native_cpp:devicemanagersdk",
-      "interfaces/kits:devicemanager_native_js",
       "sa_profile:dm_sa_profile",
       "services/etc:ohos.para.dac",
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "utils:devicemanagerutils",
+    ]
+  }
+  group("device_manager_fwk") {
+    deps = [
+      "interfaces/inner_kits/native_cpp:devicemanagersdk",
+      "interfaces/kits:devicemanager_native_js",
     ]
   }
   group("device_manager_test") {
