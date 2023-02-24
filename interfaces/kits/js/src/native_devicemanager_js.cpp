@@ -188,8 +188,9 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
 AuthAsyncCallbackInfo DeviceManagerNapi::authAsyncCallbackInfo_;
 AuthAsyncCallbackInfo DeviceManagerNapi::verifyAsyncCallbackInfo_;
-CreAsyncCallbackInfo DeviceManagerNapi::creAsyncCallbackInfo_;
+CredentialAsyncCallbackInfo DeviceManagerNapi::creAsyncCallbackInfo_;
 std::mutex DeviceManagerNapi::creLocks_;
+std::mutex DeviceManagerNapi::creMapLocks_;
 
 void DmNapiInitCallback::OnRemoteDied()
 {
@@ -561,22 +562,26 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
         return;
     }
 
-    jsCallback_ = std::make_unique<DmNapiCreJsCallback>(bundleName_, action, credentialResult);
-    work->data = reinterpret_cast<void *>(jsCallback_.get());
+    DmNapiCredentialJsCallback *jsCallback = new DmNapiCredentialJsCallback(bundleName_, action, credentialResult);
+    work->data = reinterpret_cast<void *>(jsCallback);
 
     int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DmNapiCreJsCallback *callback = reinterpret_cast<DmNapiCreJsCallback *>(work->data);
+        DmNapiCredentialJsCallback *callback = reinterpret_cast<DmNapiCredentialJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
             LOGE("OnCredentialResult, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
-            return;
-        }
-        deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
+        } else {
+			deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
+		}
+		delete callback;
+        callback = nullptr;
         delete work;
         work = nullptr;
     });
     if (ret != 0) {
         LOGE("Failed to execute OnCredentialResult work queue");
+        delete jsCallback;
+        jsCallback = nullptr;
         delete work;
         work = nullptr;
     }
@@ -719,7 +724,10 @@ void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &c
     } else {
         LOGE("handler is nullptr");
     }
-    g_creCallbackMap.erase(bundleName_);
+    {
+        std::lock_guard<std::mutex> autoLock(creMapLocks_);
+        g_creCallbackMap.erase(bundleName_);
+    }
 }
 
 void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
@@ -1529,7 +1537,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
 }
 
 void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &status,
-                                                 CreAsyncCallbackInfo *creAsyncCallbackInfo)
+                                                 CredentialAsyncCallbackInfo *creAsyncCallbackInfo)
 {
     LOGI("DeviceManager::RequestCredential Info:%s", creAsyncCallbackInfo->returnJsonStr.c_str());
     napi_value callResult = nullptr;
@@ -1538,9 +1546,7 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
     napi_create_object(env, &result);
 
     if (creAsyncCallbackInfo->status == 0) {
-        if (creAsyncCallbackInfo->returnJsonStr != "") {
-            LOGI("creAsyncCallbackInfo returnJsonStr is OK");
-        } else {
+        if (creAsyncCallbackInfo->returnJsonStr == "") {
             LOGE("creAsyncCallbackInfo returnJsonStr is null");
         }
         SetValueUtf8String(env, "registerInfo", creAsyncCallbackInfo->returnJsonStr, result);
@@ -1747,35 +1753,35 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackI
     napi_queue_async_work(env, deviceInfoListAsyncCallbackInfo->asyncWork);
 }
 
-void DeviceManagerNapi::CallCreAsyncWork(napi_env env, CreAsyncCallbackInfo *creAsyncCallbackInfo)
+void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data) {
+    CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(creAsyncCallbackInfo->bundleName,
+        creAsyncCallbackInfo->reqInfo, creAsyncCallbackInfo->returnJsonStr);
+    if (ret != 0) {
+        LOGE("CallCredentialAsyncWork for bundleName %s failed, ret %d",
+            creAsyncCallbackInfo->bundleName.c_str(), ret);
+        creAsyncCallbackInfo->status = -1;
+        creAsyncCallbackInfo->ret = ret;
+    } else {
+        creAsyncCallbackInfo->status = 0;
+    }
+    LOGI("CallCredentialAsyncWork status %d", creAsyncCallbackInfo->status);
+}
+
+void DeviceManagerNapi::AsyncAfterTaskCallback(napi_env env, napi_status status, void *data) {
+    (void)status;
+    CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
+    CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
+    napi_delete_async_work(env, creAsyncCallbackInfo->asyncWork);
+    delete creAsyncCallbackInfo;
+}
+
+void DeviceManagerNapi::CallCredentialAsyncWork(napi_env env, CredentialAsyncCallbackInfo *creAsyncCallbackInfo)
 {
     napi_value resourceName;
     napi_create_string_latin1(env, "RequestCreInfo", NAPI_AUTO_LENGTH, &resourceName);
 
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            CreAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CreAsyncCallbackInfo *>(data);
-            int32_t ret = DeviceManager::GetInstance().RequestCredential(creAsyncCallbackInfo->bundleName,
-                creAsyncCallbackInfo->reqInfo, creAsyncCallbackInfo->returnJsonStr);
-            if (ret != 0) {
-                LOGE("CallCreAsyncWork for bundleName %s failed, ret %d",
-                    creAsyncCallbackInfo->bundleName.c_str(), ret);
-                creAsyncCallbackInfo->status = -1;
-                creAsyncCallbackInfo->ret = ret;
-            } else {
-                creAsyncCallbackInfo->status = 0;
-            }
-            LOGI("CallCreAsyncWork status %d", creAsyncCallbackInfo->status);
-        },
-        [](napi_env env, napi_status status, void *data) {
-            (void)status;
-            CreAsyncCallbackInfo *creAsyncCallbackInfo =
-                reinterpret_cast<CreAsyncCallbackInfo *>(data);
-            CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
-            napi_delete_async_work(env, creAsyncCallbackInfo->asyncWork);
-            delete creAsyncCallbackInfo;
-        },
+    napi_create_async_work(env, nullptr, resourceName, AsyncTaskCallback, AsyncAfterTaskCallback,
         (void *)creAsyncCallbackInfo, &creAsyncCallbackInfo->asyncWork);
     napi_queue_async_work(env, creAsyncCallbackInfo->asyncWork);
 }
@@ -2311,28 +2317,30 @@ napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info
     char type[DM_NAPI_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
 
-    auto *creAsyncCallbackInfo = new CreAsyncCallbackInfo();
+    auto *creAsyncCallbackInfo = new CredentialAsyncCallbackInfo();
     creAsyncCallbackInfo->env = env;
     creAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
     creAsyncCallbackInfo->reqInfo = type;
 
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo->callback);
-    CallCreAsyncWork(env, creAsyncCallbackInfo);
+    CallCredentialAsyncWork(env, creAsyncCallbackInfo);
     napi_get_undefined(env, &result);
     return result;
 }
 
-int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, std::string &pkgName)
+int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::string &pkgName)
 {
     std::shared_ptr<DmNapiCredentialCallback> creCallback = nullptr;
-    auto iter = g_creCallbackMap.find(pkgName);
-    if (iter == g_creCallbackMap.end()) {
-        creCallback = std::make_shared<DmNapiCredentialCallback>(env, pkgName);
-        g_creCallbackMap[pkgName] = creCallback;
-    } else {
-        creCallback = iter->second;
+    {
+        std::lock_guard<std::mutex> autoLock(creMapLocks_);
+        auto iter = g_creCallbackMap.find(pkgName);
+        if (iter == g_creCallbackMap.end()) {
+            creCallback = std::make_shared<DmNapiCredentialCallback>(env, pkgName);
+            g_creCallbackMap[pkgName] = creCallback;
+        } else {
+            creCallback = iter->second;
+        }
     }
-
     int32_t ret = DeviceManager::GetInstance().RegisterCredentialCallback(pkgName,
         creCallback);
     if (ret != 0) {
@@ -2643,7 +2651,10 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     g_publishCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_authCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_verifyAuthCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_creCallbackMap.erase(deviceManagerWrapper->bundleName_);
+    {
+        std::lock_guard<std::mutex> autoLock(creMapLocks_);
+        g_creCallbackMap.erase(deviceManagerWrapper->bundleName_);
+    }
     napi_get_undefined(env, &result);
     return result;
 }
