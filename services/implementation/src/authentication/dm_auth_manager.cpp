@@ -448,6 +448,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     LOGI("DmAuthManager::StartNegotiate session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    authRequestContext_->localDeviceId = localDeviceId;
     authResponseContext_->localDeviceId = localDeviceId;
     authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     authResponseContext_->authType = authRequestContext_->authType;
@@ -477,6 +478,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     }
+    authResponseContext_->localDeviceId = localDeviceId;
 
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authResponseContext_->authType];
     if (authentication == nullptr) {
@@ -535,7 +537,8 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         }
     }
     if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, authRequestContext_->deviceId)) {
+        if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId,
+                                                authRequestContext_->localDeviceId)) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
         }
