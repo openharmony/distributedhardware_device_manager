@@ -53,7 +53,9 @@
         "build": {
             "group_type": {
                 "base_group": [],
-                "fwk_group": [],
+                "fwk_group": [
+                    "//foundation/distributedhardware/device_manager:device_manager_fwk"
+                ],
                 "service_group": [
                     "//foundation/distributedhardware/device_manager:device_manager",
                     "//foundation/distributedhardware/device_manager/sa_profile:device_manager.cfg",
