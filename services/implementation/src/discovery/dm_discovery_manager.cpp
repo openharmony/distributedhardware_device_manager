@@ -109,7 +109,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
     return softbusConnector_->StopDiscovery(subscribeId);
 }
 
-void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info)
+void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
     auto iter = discoveryContextMap_.find(pkgName);
@@ -121,13 +121,15 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDevic
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
     filterPara.range = info.range;
+    filterPara.deviceType = info.deviceTypeId;
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     filterPara.isTrusted = hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId);
-    filterPara.authForm = GROUP_TYPE_INVALID_GROUP;
+    info.authForm = DmAuthForm::INVALID_TYPE;
     if (filterPara.isTrusted) {
-        filterPara.authForm = hiChainConnector_->GetGroupType(info.deviceId);
+        info.authForm = hiChainConnector_->GetGroupType(info.deviceId);
     }
+    filterPara.authForm = info.authForm;
     if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
     }

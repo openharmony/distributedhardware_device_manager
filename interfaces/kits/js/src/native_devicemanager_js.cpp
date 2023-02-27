@@ -633,6 +633,7 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &
     SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
+    SetValueInt32(env_, "authForm", (int)deviceInfo.authForm, device);
     SetValueInt32(env_, "range", deviceInfo.range, device);
 
     napi_set_named_property(env_, result, "device", device);

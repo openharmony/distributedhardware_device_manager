@@ -107,6 +107,11 @@ bool DmDiscoveryFilter::FilterByAuthForm(int32_t value, int32_t authForm)
     return (value == authForm);
 }
 
+bool DmDiscoveryFilter::FilterByDeviceType(int32_t value, int32_t deviceType)
+{
+    return (value == deviceType);
+}
+
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
 {
     LOGI("DmDiscoveryFilter::FilterByType: type: %s, value: %d", filters.type.c_str(), filters.value);
@@ -121,6 +126,9 @@ bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDev
     }
     if (filters.type == "authForm") {
         return FilterByAuthForm(filters.value, filterPara.authForm);
+    }
+    if (filters.type == "deviceType") {
+        return FilterByDeviceType(filters.value, filterPara.deviceType);
     }
     return false;
 }
@@ -148,8 +156,9 @@ bool DmDiscoveryFilter::FilterAnd(const std::vector<DmDeviceFilters> &filters, c
 bool DmDiscoveryFilter::IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
     const DmDeviceFilterPara &filterPara)
 {
-    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, authForm: %d",
-        filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted, filterPara.authForm);
+    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, authForm: %d, " +
+        "deviceType: %d", filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted,
+        filterPara.authForm, filterPara.deviceType);
     if (filterOp == FILTERS_TYPE_OR) {
         return FilterOr(filters, filterPara);
     }

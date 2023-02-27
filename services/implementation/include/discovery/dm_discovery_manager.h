@@ -61,7 +61,7 @@ public:
      * @tc.desc: OnDevice Found of the Dm Discovery Manager
      * @tc.type: FUNC
      */
-    void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info);
+    void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info);
 
     /**
      * @tc.name: DmDiscoveryManager::OnDiscoverySuccess
