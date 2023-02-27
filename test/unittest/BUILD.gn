@@ -586,7 +586,7 @@ config("device_manager_test_common_public_config") {
     "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
     "//foundation/distributedhardware/device_manager/test/unittest/mock",
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
-    "//base/security/device_auth/interfaces/innerkits",
+    "//base/security/device_auth/interfaces/inner_api",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/dependency/multipleuser",

@@ -57,7 +57,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedhardware/device_manager/ext/mini/services/service/include/dispatch",
     "//foundation/distributedhardware/device_manager/ext/mini/common/include",
-    "//base/security/device_auth/interfaces/innerkits",
+    "//base/security/device_auth/interfaces/inner_api",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "//commonlibrary/utils_lite/include",
