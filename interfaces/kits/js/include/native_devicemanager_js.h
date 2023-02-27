@@ -32,7 +32,7 @@
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 #define DM_NAPI_BUF_LENGTH (256)
-#define DM_NAPI_CREDENTIAL_BUF_LENGTH (1024)
+#define DM_NAPI_CREDENTIAL_BUF_LENGTH (5600)
 
 struct AsyncCallbackInfo {
     napi_env env = nullptr;

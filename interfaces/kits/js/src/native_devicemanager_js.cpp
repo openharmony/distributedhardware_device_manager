@@ -2433,8 +2433,8 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
     NAPI_ASSERT(env, typeLen > 0, "typeLen == 0");
-    NAPI_ASSERT(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char type[DM_NAPI_BUF_LENGTH] = {0};
+    NAPI_ASSERT(env, typeLen < DM_NAPI_CREDENTIAL_BUF_LENGTH, "typeLen >= MAXLEN");
+    char type[DM_NAPI_CREDENTIAL_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
     std::string queryInfo = type;
     int32_t ret = DeviceManager::GetInstance().DeleteCredential(deviceManagerWrapper->bundleName_, queryInfo);
