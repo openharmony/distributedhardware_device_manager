@@ -337,6 +337,7 @@ private:
     static napi_value GetTrustedDeviceListPromise(napi_env env,
                                                   DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
+    static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

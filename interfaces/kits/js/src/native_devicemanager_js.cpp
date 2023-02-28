@@ -70,8 +70,8 @@ std::map<std::string, std::shared_ptr<DmNapiAuthenticateCallback>> g_authCallbac
 std::map<std::string, std::shared_ptr<DmNapiVerifyAuthCallback>> g_verifyAuthCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCallbackMap;
 
-std::mutex initCallbackMapMutex;
-std::mutex deviceManagerMapMutex;
+std::mutex g_initCallbackMapMutex;
+std::mutex g_deviceManagerMapMutex;
 
 enum DMBussinessErrorCode {
     // Permission verify failed.
@@ -186,7 +186,8 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
     return error;
 }
 
-void DeleteUvWork(uv_work_t *work) {
+void DeleteUvWork(uv_work_t *work)
+{
     if (work) {
         delete work;
         work = nullptr;
@@ -194,12 +195,31 @@ void DeleteUvWork(uv_work_t *work) {
     }
 }
 
-void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *pJsCallbackPtr) {
+void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *pJsCallbackPtr)
+{
     if (pJsCallbackPtr) {
         delete pJsCallbackPtr;
         pJsCallbackPtr = nullptr;
         LOGI("delete DmNapiStateJsCallback callbackPtr!");
     }
+}
+
+void DeleteAsyncCallbackInfo(DeviceInfoListAsyncCallbackInfo *pAsynCallbackInfo)
+{
+    if (pAsynCallbackInfo) {
+        delete pAsynCallbackInfo;
+        pAsynCallbackInfo = nullptr;
+    }
+}
+
+bool IsFunctionType(napi_env env, napi_value value)
+{
+    napi_valuetype eventHandleType = napi_undefined;
+    napi_typeof(env, value, &eventHandleType);
+    if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
+        return false;
+    }
+    return true;
 }
 } // namespace
 
@@ -589,7 +609,8 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         if (deviceManagerNapi == nullptr) {
             LOGE("OnAuthResult, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
         } else {
-            deviceManagerNapi->OnAuthResult(callback->deviceId_, callback->token_, callback->status_, callback->reason_);
+            deviceManagerNapi->OnAuthResult(callback->deviceId_, callback->token_,
+                callback->status_, callback->reason_);
         }
         delete callback;
         callback = nullptr;
@@ -654,7 +675,7 @@ DeviceManagerNapi::~DeviceManagerNapi()
 
 DeviceManagerNapi *DeviceManagerNapi::GetDeviceManagerNapi(std::string &bundleName)
 {
-    std::lock_guard<std::mutex> autoLock(deviceManagerMapMutex);
+    std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     auto iter = g_deviceManagerMap.find(bundleName);
     if (iter == g_deviceManagerMap.end()) {
         return nullptr;
@@ -1847,16 +1868,12 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
     deviceInfoListAsyncCallbackInfo->env = env;
     deviceInfoListAsyncCallbackInfo->devList = devList;
     deviceInfoListAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
-    LOGI("GetTrustedDeviceList for argc %d", argc);
     if (argc == 0) {
         return GetTrustedDeviceListPromise(env, deviceInfoListAsyncCallbackInfo);
     } else if (argc == 1) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-        napi_valuetype eventHandleType = napi_undefined;
-        napi_typeof(env, argv[0], &eventHandleType);
-        if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
-            delete deviceInfoListAsyncCallbackInfo;
-            deviceInfoListAsyncCallbackInfo = nullptr;
+        if (!IsFunctionType(env, argv[0])) {
+            DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
             return nullptr;
         }
         return CallDeviceList(env, info, deviceInfoListAsyncCallbackInfo);
@@ -1864,18 +1881,12 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         napi_valuetype valueType;
         napi_typeof(env, argv[0], &valueType);
-        LOGI("GetTrustedDeviceList for argc %d Type = %d", argc, (int)valueType);
         if (!CheckArgsType(env, valueType == napi_string, "extra", "string")) {
-            delete deviceInfoListAsyncCallbackInfo;
-            deviceInfoListAsyncCallbackInfo = nullptr;
+            DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
             return nullptr;
         }
-        napi_valuetype eventHandleType = napi_undefined;
-        napi_typeof(env, argv[1], &eventHandleType);
-        LOGI("GetTrustedDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
-        if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
-            delete deviceInfoListAsyncCallbackInfo;
-            deviceInfoListAsyncCallbackInfo = nullptr;
+        if (!IsFunctionType(env, argv[1])) {
+            DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
             return nullptr;
         }
         char extra[20];
@@ -1883,12 +1894,11 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         deviceInfoListAsyncCallbackInfo->extra = extra;
         napi_create_reference(env, argv[1], 1, &deviceInfoListAsyncCallbackInfo->callback);
         CallAsyncWork(env, deviceInfoListAsyncCallbackInfo);
-        napi_get_undefined(env, &result);
-        return result;
     }
     napi_get_undefined(env, &result);
     return result;
 }
+
 napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetLocalDeviceInfoSync in");
@@ -2463,11 +2473,11 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         return result;
     }
     {
-        std::lock_guard<std::mutex> autoLock(deviceManagerMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
         g_deviceManagerMap.erase(deviceManagerWrapper->bundleName_);
     }
     {
-        std::lock_guard<std::mutex> autoLock(initCallbackMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
         g_initCallbackMap.erase(deviceManagerWrapper->bundleName_);
     }
     g_deviceStateCallbackMap.erase(deviceManagerWrapper->bundleName_);
@@ -2479,6 +2489,41 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     NAPI_CALL(env, napi_remove_wrap(env, thisVar, (void**)&deviceManagerWrapper));
     LOGI("ReleaseDeviceManager out");
     return result;
+}
+
+void DeviceManagerNapi::HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data)
+{
+    (void)status;
+    AsyncCallbackInfo *asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data);
+    napi_value result[DM_NAPI_ARGS_TWO] = {0};
+    if (asyncCallbackInfo->status == 0) {
+        napi_value ctor = nullptr;
+        napi_value argv = nullptr;
+        napi_get_reference_value(env, sConstructor_, &ctor);
+        napi_create_string_utf8(env, asyncCallbackInfo->bundleName, NAPI_AUTO_LENGTH, &argv);
+        napi_status ret = napi_new_instance(env, ctor, DM_NAPI_ARGS_ONE, &argv, &result[1]);
+        if (ret != napi_ok) {
+                LOGE("Create DeviceManagerNapi for bundleName %s failed", asyncCallbackInfo->bundleName);
+        } else {
+                LOGI("InitDeviceManager for bundleName %s success", asyncCallbackInfo->bundleName);
+                napi_get_undefined(env, &result[0]);
+        }
+    } else {
+        LOGI("InitDeviceManager for bundleName %s failed", asyncCallbackInfo->bundleName);
+        result[0] = CreateBusinessError(env, asyncCallbackInfo->ret, false);
+    }
+    napi_value callback = nullptr;
+    napi_value callResult = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback, &callback));
+    if (callback != nullptr) {
+        NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO,
+            &result[0], &callResult));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, asyncCallbackInfo->callback));
+    }
+
+    napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+    delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 }
 
 void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo)
@@ -2494,47 +2539,14 @@ void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbac
             std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
             int32_t ret = DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
             if (ret == 0) {
-                std::lock_guard<std::mutex> autoLock(initCallbackMapMutex);
+                std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
                 g_initCallbackMap[bundleName] = initCallback;
                 asyCallbackInfo->status = 0;
             } else {
                 asyCallbackInfo->status = 1;
                 asyCallbackInfo->ret = ret;
             }
-        },
-        [](napi_env env, napi_status status, void *data) {
-            (void)status;
-            AsyncCallbackInfo *asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data);
-            napi_value result[DM_NAPI_ARGS_TWO] = {0};
-            if (asyncCallbackInfo->status == 0) {
-                napi_value ctor = nullptr;
-                napi_value argv = nullptr;
-                napi_get_reference_value(env, sConstructor_, &ctor);
-                napi_create_string_utf8(env, asyncCallbackInfo->bundleName, NAPI_AUTO_LENGTH, &argv);
-                napi_status ret = napi_new_instance(env, ctor, DM_NAPI_ARGS_ONE, &argv, &result[1]);
-                if (ret != napi_ok) {
-                    LOGE("Create DeviceManagerNapi for bundleName %s failed", asyncCallbackInfo->bundleName);
-                } else {
-                    LOGI("InitDeviceManager for bundleName %s success", asyncCallbackInfo->bundleName);
-                    napi_get_undefined(env, &result[0]);
-                }
-            } else {
-                LOGI("InitDeviceManager for bundleName %s failed", asyncCallbackInfo->bundleName);
-                result[0] = CreateBusinessError(env, asyncCallbackInfo->ret, false);
-            }
-            napi_value callback = nullptr;
-            napi_value callResult = nullptr;
-            NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback, &callback));
-            if (callback != nullptr) {
-                NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO,
-                    &result[0], &callResult));
-                NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, asyncCallbackInfo->callback));
-            }
-
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
-        },
-        (void *)asCallbackInfo, &asCallbackInfo->asyncWork);
+        }, HandleCreateDmCallBackCompletedCB, (void *)asCallbackInfo, &asCallbackInfo->asyncWork);
     napi_queue_async_work(env, asCallbackInfo->asyncWork);
 }
 
@@ -2601,7 +2613,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     }
 
     obj->bundleName_ = std::string(bundleName);
-    std::lock_guard<std::mutex> autoLock(deviceManagerMapMutex);
+    std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     g_deviceManagerMap[obj->bundleName_] = obj;
     NAPI_CALL(env, napi_wrap(
         env, thisVar, reinterpret_cast<void *>(obj),
