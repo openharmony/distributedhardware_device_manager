@@ -571,9 +571,9 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
         if (deviceManagerNapi == nullptr) {
             LOGE("OnCredentialResult, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
         } else {
-			deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
-		}
-		delete callback;
+            deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
+        }
+        delete callback;
         callback = nullptr;
         delete work;
         work = nullptr;
@@ -1753,7 +1753,8 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackI
     napi_queue_async_work(env, deviceInfoListAsyncCallbackInfo->asyncWork);
 }
 
-void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data) {
+void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data)
+{
     CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
     int32_t ret = DeviceManager::GetInstance().RequestCredential(creAsyncCallbackInfo->bundleName,
         creAsyncCallbackInfo->reqInfo, creAsyncCallbackInfo->returnJsonStr);
@@ -1768,7 +1769,8 @@ void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data) {
     LOGI("CallCredentialAsyncWork status %d", creAsyncCallbackInfo->status);
 }
 
-void DeviceManagerNapi::AsyncAfterTaskCallback(napi_env env, napi_status status, void *data) {
+void DeviceManagerNapi::AsyncAfterTaskCallback(napi_env env, napi_status status, void *data)
+{
     (void)status;
     CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
     CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
