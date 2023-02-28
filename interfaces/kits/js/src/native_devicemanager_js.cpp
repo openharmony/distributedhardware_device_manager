@@ -2211,8 +2211,6 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
     if (ret != 0) {
         LOGE("AuthenticateDevice for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
-        napi_delete_reference(env, authAsyncCallbackInfo_.callback);
-        return result;
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2262,8 +2260,6 @@ napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info in
     if (ret != 0) {
         LOGE("VerifyAuthInfo for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
-        napi_delete_reference(env, verifyAsyncCallbackInfo_.callback);
-        return result;
     }
 
     napi_get_undefined(env, &result);
