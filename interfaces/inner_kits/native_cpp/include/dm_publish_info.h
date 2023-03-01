@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,14 +22,25 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+/**
+ * @brief Device Publish Info.
+ */
 typedef struct {
-    /** Service ID */
+    /**
+     * Service ID.
+     */
     int32_t publishId;
-    /** Discovery mode for service publishing. For details, see {@link Discovermode}. */
+    /**
+     * Discovery mode for service publishing. For details, see {@link Discovermode}.
+     */
     DmDiscoverMode mode;
-    /** Service publishing frequency. For details, see {@link ExchangeFreq}. */
+    /**
+     * Service publishing frequency. For details, see {@link ExchangeFreq}.
+     */
     DmExchangeFreq freq;
-    /** Discovery ranging. For details, see {@link PublishInfo}. */
+    /**
+     * Discovery ranging. For details, see {@link PublishInfo}.
+     */
     bool ranging;
 } DmPublishInfo;
 } // namespace DistributedHardware

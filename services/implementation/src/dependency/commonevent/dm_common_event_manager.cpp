@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "dm_common_event_manager.h"
 
+#include <pthread.h>
 #include <thread>
 
 #include "dm_constants.h"
@@ -25,6 +26,8 @@ namespace OHOS {
 namespace DistributedHardware {
 using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
+
+constexpr const char* DEAL_THREAD = "common_event";
 
 std::string DmEventSubscriber::GetSubscriberEventName() const
 {
@@ -126,6 +129,10 @@ void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         return;
     }
     std::thread dealThread(callback_, userId);
+    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
+    if (ret != DM_OK) {
+        LOGE("dealThread setname failed.");
+    }
     dealThread.detach();
 }
 

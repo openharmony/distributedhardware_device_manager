@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #include "dm_device_state_manager.h"
 
+#include <pthread.h>
+
 #include "dm_adapter_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -25,6 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
 const uint32_t DM_EVENT_WAIT_TIMEOUT = 2;
+constexpr const char* THREAD_LOOP = "ThreadLoop";
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
     : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
@@ -347,6 +350,10 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 void DmDeviceStateManager::ThreadLoop()
 {
     LOGI("ThreadLoop begin");
+    int32_t ret = pthread_setname_np(pthread_self(), THREAD_LOOP);
+    if (ret != DM_OK) {
+        LOGE("ThreadLoop setname failed.");
+    }
     while (eventTask_.threadRunning_) {
         std::shared_ptr<NotifyEvent> task = nullptr;
         {
