@@ -183,6 +183,17 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
     }
     return error;
 }
+
+bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi **pDeviceManagerWrapper)
+{
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(pDeviceManagerWrapper));
+    if (pDeviceManagerWrapper == nullptr) {
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        LOGE(" DeviceManagerNapi object is nullptr!");
+        return true;
+    }
+    return false;
+}
 } // namespace
 
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
@@ -2318,7 +2329,10 @@ napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info
     }
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
 
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
@@ -2385,7 +2399,10 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo_.callback);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     if (RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
         LOGE("RegisterCredentialCallback failed!");
         return result;
@@ -2433,7 +2450,10 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     creAsyncCallbackInfo_.env = env;
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo_.callback);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     if (RegisterCredentialCallback(env, deviceManagerWrapper->bundleName_) != 0) {
         LOGE("RegisterCredentialCallback failed!");
         return result;
