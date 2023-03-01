@@ -395,7 +395,6 @@ private:
     napi_ref wrapper_;
     static thread_local napi_ref sConstructor_;
     std::string bundleName_;
-    static std::mutex creLocks_;
     static std::mutex creMapLocks_;
     static AuthAsyncCallbackInfo authAsyncCallbackInfo_;
     static AuthAsyncCallbackInfo verifyAsyncCallbackInfo_;

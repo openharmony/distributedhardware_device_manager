@@ -200,7 +200,6 @@ thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
 AuthAsyncCallbackInfo DeviceManagerNapi::authAsyncCallbackInfo_;
 AuthAsyncCallbackInfo DeviceManagerNapi::verifyAsyncCallbackInfo_;
 CredentialAsyncCallbackInfo DeviceManagerNapi::creAsyncCallbackInfo_;
-std::mutex DeviceManagerNapi::creLocks_;
 std::mutex DeviceManagerNapi::creMapLocks_;
 
 void DmNapiInitCallback::OnRemoteDied()
@@ -2376,7 +2375,6 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
 napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info info)
 {
     LOGI("ImportCredential in");
-    std::lock_guard<std::mutex> autoLock(creLocks_);
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
@@ -2428,7 +2426,6 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
 napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info info)
 {
     LOGI("DeleteCredential in");
-    std::lock_guard<std::mutex> autoLock(creLocks_);
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
