@@ -711,6 +711,12 @@ void DeviceManagerNapi::OnPublishResult(int32_t publishId, int32_t publishResult
 void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &credentialResult)
 {
     LOGI("OnCredentialResult for action: %d, credentialResult: %s", action, credentialResult.c_str());
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env_, &scope);
+    if (scope == nullptr) {
+        LOGE("scope is nullptr");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueUtf8String(env_, "resultInfo", credentialResult, result);
@@ -724,6 +730,7 @@ void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &c
     } else {
         LOGE("handler is nullptr");
     }
+    napi_close_handle_scope(env_, scope);
     {
         std::lock_guard<std::mutex> autoLock(creMapLocks_);
         g_creCallbackMap.erase(bundleName_);
