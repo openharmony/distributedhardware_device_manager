@@ -225,7 +225,7 @@ bool IsFunctionType(napi_env env, napi_value value)
 bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi **pDeviceManagerWrapper)
 {
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(pDeviceManagerWrapper));
-    if (pDeviceManagerWrapper == nullptr) {
+    if (*pDeviceManagerWrapper == nullptr) {
         CreateBusinessError(env, ERR_DM_POINT_NULL);
         LOGE(" DeviceManagerNapi object is nullptr!");
         return true;
