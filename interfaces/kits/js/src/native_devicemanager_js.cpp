@@ -221,6 +221,18 @@ bool IsFunctionType(napi_env env, napi_value value)
     }
     return true;
 }
+
+bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar)
+{
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (deviceManagerWrapper == nullptr) {
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        LOGE(" DeviceManagerNapi object is nullptr!");
+        return true;
+    }
+    return false;
+}
 } // namespace
 
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
@@ -1408,9 +1420,13 @@ napi_value DeviceManagerNapi::GetAuthenticationParamSync(napi_env env, napi_call
     size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value resultParam = nullptr;
+    napi_value result = nullptr;
 
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     DmAuthParam authParam;
@@ -1450,13 +1466,17 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     napi_get_value_string_utf8(env, argv[1], type, typeLen + 1, &typeLen);
 
     std::string params = type;
+    napi_value result = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().SetUserOperation(deviceManagerWrapper->bundleName_, action, params);
     if (ret != 0) {
         LOGE("SetUserOperation for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
     }
-    napi_value result = nullptr;
     napi_get_undefined(env, &result);
     return result;
 }
@@ -1817,7 +1837,10 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         LOGE("napi_create_array fail");
     }
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     std::string extra = "";
@@ -1859,6 +1882,10 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
     std::vector<DmDeviceInfo> devList;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
 
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     auto *deviceInfoListAsyncCallbackInfo = new DeviceInfoListAsyncCallbackInfo();
@@ -1908,7 +1935,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
     size_t argc = 0;
 
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceInfo(deviceManagerWrapper->bundleName_, deviceInfo);
@@ -1931,7 +1961,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
     size_t argc = 0;
     DmDeviceInfo deviceInfo;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     auto *deviceInfoAsyncCallbackInfo = new DeviceInfoAsyncCallbackInfo();
@@ -1987,6 +2020,10 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
     DmDeviceInfo deviceInfo;
     JsToDmDeviceInfo(env, argv[0], deviceInfo);
     LOGI("UnAuthenticateDevice deviceId = %s", GetAnonyString(deviceInfo.deviceId).c_str());
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().UnAuthenticateDevice(deviceManagerWrapper->bundleName_, deviceInfo);
@@ -2023,6 +2060,10 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     napi_value thisVar = nullptr;
     size_t argcNum = 0;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     if (argcNum == DM_NAPI_ARGS_ONE) {
@@ -2082,6 +2123,10 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
     if (!CheckArgsVal(env, subscribeId <= DM_NAPI_SUB_ID_MAX, "subscribeId", "Wrong argument. subscribeId Too Big")) {
         return nullptr;
     }
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_,
@@ -2111,6 +2156,10 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
         return nullptr;
     }
 
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
 
@@ -2155,6 +2204,10 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
     int32_t publishId = 0;
     napi_get_value_int32(env, argv[0], &publishId);
 
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishId);
@@ -2201,6 +2254,10 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
     authAsyncCallbackInfo_.env = env;
     napi_create_reference(env, argv[PARAM_INDEX_TWO], 1, &authAsyncCallbackInfo_.callback);
 
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
 
@@ -2251,6 +2308,10 @@ napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info in
     verifyAsyncCallbackInfo_.env = env;
     napi_create_reference(env, argv[1], 1, &verifyAsyncCallbackInfo_.callback);
 
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
 
@@ -2291,6 +2352,11 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
     napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
 
     std::string eventType = type;
+    napi_value result = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
 
@@ -2316,7 +2382,6 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
         CreateDmCallback(env, deviceManagerWrapper->bundleName_, eventType);
     }
 
-    napi_value result = nullptr;
     napi_get_undefined(env, &result);
     return result;
 }
@@ -2389,7 +2454,12 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
     char type[DM_NAPI_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
 
+    napi_value result = nullptr;
     std::string eventType = type;
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
 
@@ -2397,7 +2467,6 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
     deviceManagerWrapper->Off(eventType);
     ReleaseDmCallback(deviceManagerWrapper->bundleName_, eventType);
 
-    napi_value result = nullptr;
     napi_get_undefined(env, &result);
     return result;
 }
@@ -2462,6 +2531,10 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     napi_value result = nullptr;
 
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    if (IsDeviceManagerNapiNull(env, thisVar)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     LOGI("ReleaseDeviceManager for bundleName %s", deviceManagerWrapper->bundleName_.c_str());
