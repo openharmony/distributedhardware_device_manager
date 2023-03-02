@@ -447,7 +447,7 @@ declare namespace deviceManager {
     unPublishDeviceDiscovery(publishId: number): void;
 
     /**
-     * Request credential information.
+     * Request credential registerInfo.
      *
      * @since 10
      * @param requestInfo Request credential params.
@@ -455,7 +455,7 @@ declare namespace deviceManager {
      * @throws {BusinessError} 401 - Input parameter error.
      * @systemapi this method can be used only by system applications.
      */  
-    requestCredential(requestInfo: string, callback: AsyncCallback<{registerInfo: string}>): void;
+    requestCredentialRegisterInfo(requestInfo: string, callback: AsyncCallback<{registerInfo: string}>): void;
 
     /**
      * Import credential information.
