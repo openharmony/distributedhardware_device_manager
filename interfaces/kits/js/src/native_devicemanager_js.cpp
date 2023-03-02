@@ -187,11 +187,6 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
 bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi **pDeviceManagerWrapper)
 {
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(pDeviceManagerWrapper));
-    if (pDeviceManagerWrapper == nullptr) {
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
-        LOGE(" DeviceManagerNapi object is nullptr!");
-        return true;
-    }
     if (pDeviceManagerWrapper == nullptr || *pDeviceManagerWrapper == nullptr) {
         CreateBusinessError(env, ERR_DM_POINT_NULL);
         LOGE(" DeviceManagerNapi object is nullptr!");
