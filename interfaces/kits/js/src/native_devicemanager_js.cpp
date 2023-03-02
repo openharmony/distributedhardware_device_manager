@@ -741,6 +741,7 @@ void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &c
         LOGE("handler is nullptr");
     }
     napi_close_handle_scope(env_, scope);
+    DeviceManager::GetInstance().UnRegisterCredentialCallback(bundleName_);
     {
         std::lock_guard<std::mutex> autoLock(creMapLocks_);
         g_creCallbackMap.erase(bundleName_);
@@ -2418,7 +2419,6 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
         LOGE("ImportCredential for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
     }
-    DeviceManager::GetInstance().UnRegisterCredentialCallback(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
     return result;
 }
@@ -2468,7 +2468,6 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
         LOGE("DeleteCredential for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
     }
-    DeviceManager::GetInstance().UnRegisterCredentialCallback(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
     return result;
 }
