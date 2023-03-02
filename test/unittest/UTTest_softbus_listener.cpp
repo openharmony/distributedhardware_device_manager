@@ -59,72 +59,6 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::
 }
 
 /**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: return false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, OnSoftBusDeviceOnline_001, testing::ext::TestSize.Level0)
-{
-    bool ret = false;
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftBusDeviceOnline(info);
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: OnSoftBusDeviceOnline_001
- * @tc.desc: return true
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, OnSoftBusDeviceOnline_002, testing::ext::TestSize.Level0)
-{
-    bool ret = true;
-    NodeBasicInfo info = {
-            .networkId = "123456",
-            .deviceName = "deviceNameTest",
-            .deviceTypeId = 1
-        };
-    softbusListener->OnSoftBusDeviceOnline(&info);
-    sleep(1);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceOffline_001
- * @tc.desc: return false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOffline_001, testing::ext::TestSize.Level0)
-{
-    bool ret = false;
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftbusDeviceOffline(info);
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: OnSoftbusDeviceOffline_002
- * @tc.desc: return true
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOffline_002, testing::ext::TestSize.Level0)
-{
-    bool ret = true;
-    NodeBasicInfo info = {
-            .networkId = "123456",
-            .deviceName = "123456",
-            .deviceTypeId = 1
-        };
-    softbusListener->OnSoftbusDeviceOffline(&info);
-    sleep(1);
-    EXPECT_EQ(ret, true);
-}
-
-/**
  * @tc.name: OnParameterChgCallback_001
  * @tc.desc: return true
  * @tc.type: FUNC
@@ -132,12 +66,14 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOffline_002, testing::ext::TestSize
  */
 HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize.Level0)
 {
-    bool ret = true;
     const char *key = "123";
     const char *value = "1";
     void *context = nullptr;
     softbusListener->OnParameterChgCallback(key, value, context);
-    EXPECT_EQ(ret, true);
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftBusDeviceOnline(info);
+    softbusListener->OnSoftbusDeviceOffline(info);
+    EXPECT_EQ(softbusListener->publishStatus, SoftbusListener::STATUS_UNKNOWN);
 }
 
 /**
@@ -148,12 +84,19 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize
  */
 HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_002, testing::ext::TestSize.Level0)
 {
-    bool ret = true;
     const char *key = "222";
     const char *value = "0";
     void *context = nullptr;
     softbusListener->OnParameterChgCallback(key, value, context);
-    EXPECT_EQ(ret, true);
+    NodeBasicInfo info = {
+            .networkId = "123456",
+            .deviceName = "123456",
+            .deviceTypeId = 1
+        };
+    softbusListener->OnSoftBusDeviceOnline(&info);
+    softbusListener->OnSoftbusDeviceOffline(&info);
+    sleep(1);
+    EXPECT_EQ(softbusListener->publishStatus, SoftbusListener::STATUS_UNKNOWN);
 }
 } // namespace
 } // namespace DistributedHardware
