@@ -564,7 +564,7 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
     DmNapiCredentialJsCallback *jsCallback = new DmNapiCredentialJsCallback(bundleName_, action, credentialResult);
     if (jsCallback == nullptr) {
         delete work;
-        work = nullptr;;
+        work = nullptr;
         return;
     }
     work->data = reinterpret_cast<void *>(jsCallback);
