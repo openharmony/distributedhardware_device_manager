@@ -2822,7 +2822,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("authenticateDevice", AuthenticateDevice),
         DECLARE_NAPI_FUNCTION("verifyAuthInfo", VerifyAuthInfo),
         DECLARE_NAPI_FUNCTION("setUserOperation", SetUserOperationSync),
-        DECLARE_NAPI_FUNCTION("requestCredential", RequestCredential),
+        DECLARE_NAPI_FUNCTION("requestCredentialRegisterInfo", RequestCredential),
         DECLARE_NAPI_FUNCTION("importCredential", ImportCredential),
         DECLARE_NAPI_FUNCTION("deleteCredential", DeleteCredential),
         DECLARE_NAPI_FUNCTION("getFaParam", GetAuthenticationParamSync),
