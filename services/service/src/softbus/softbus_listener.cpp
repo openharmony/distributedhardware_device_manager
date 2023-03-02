@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "dm_mutex.h"
 #include "dm_thread.h"
 #else
+#include <pthread.h>
 #include <thread>
 #include <mutex>
 #endif
@@ -40,6 +41,8 @@ const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 constexpr const char* DISCOVER_STATUS_KEY = "persist.distributed_hardware.device_manager.discover_status";
 constexpr const char* DISCOVER_STATUS_ON = "1";
 constexpr const char* DISCOVER_STATUS_OFF = "0";
+constexpr const char* DEVICE_ONLINE = "deviceOnLine";
+constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
 IPublishCb SoftbusListener::softbusPublishCallback_ = {
@@ -237,6 +240,10 @@ void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
     deviceOnLine.DmCreatThread();
 #else
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
+    int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
+    if (ret != DM_OK) {
+        LOGE("deviceOnLine setname failed.");
+    }
     deviceOnLine.detach();
 #endif
 }
@@ -255,6 +262,10 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     deviceOffLine.DmCreatThread();
 #else
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
+    int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
+    if (ret != DM_OK) {
+        LOGE("deviceOffLine setname failed.");
+    }
     deviceOffLine.detach();
 #endif
 }

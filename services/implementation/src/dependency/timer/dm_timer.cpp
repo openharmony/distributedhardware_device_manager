@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,14 @@
 #include "dm_log.h"
 #include "dm_timer.h"
 
+#include <pthread.h>
 #include <thread>
 
 namespace OHOS {
 namespace DistributedHardware {
+
+constexpr const char* TIMER_RUNNING = "TimerRunning";
+
 Timer::Timer(std::string name, int32_t time, TimerCallback callback)
     : timerName_(name), expire_(steadyClock::now()), state_(true), timeOut_(time), callback_(callback) {};
 
@@ -95,6 +99,10 @@ int32_t DmTimer::DeleteAll()
 
 int32_t DmTimer::TimerRunning()
 {
+    int32_t ret = pthread_setname_np(pthread_self(), TIMER_RUNNING);
+    if (ret != DM_OK) {
+        LOGE("TimerRunning setname failed.");
+    }
     std::thread([this] () {
         {
             timerState_ = true;

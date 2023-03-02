@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,21 +22,39 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+/**
+ * @brief Device manager discover mode.
+ */
 typedef enum DmDiscoverMode {
-    /* Passive */
+    /**
+     * Passive.
+     */
     DM_DISCOVER_MODE_PASSIVE = 0x55,
-    /* Proactive */
+    /**
+     * Proactive.
+     */
     DM_DISCOVER_MODE_ACTIVE = 0xAA
 } DmDiscoverMode;
 
+/**
+ * @brief Service subscription medium.
+ */
 typedef enum DmExchangeMedium {
-    /** Automatic medium selection */
+    /**
+     * Automatic medium selection.
+     */
     DM_AUTO = 0,
-    /** Bluetooth */
+    /**
+     * Bluetooth
+     */
     DM_BLE = 1,
-    /** Wi-Fi */
+    /**
+     * Wi-Fi
+     */
     DM_COAP = 2,
-    /** USB */
+    /**
+     * USB
+     */
     DM_USB = 3,
     DM_MEDIUM_BUTT
 } DmExchangeMedium;
@@ -47,31 +65,56 @@ typedef enum DmExchangeMedium {
  * This enumeration applies only to Bluetooth and is not supported currently.
  */
 typedef enum DmExchangeFreq {
-    /** Low */
+    /**
+     * Low
+     */
     DM_LOW = 0,
-    /** Medium */
+    /**
+     * Medium
+     */
     DM_MID = 1,
-    /** High */
+    /**
+     * High
+     */
     DM_HIGH = 2,
-    /** Super-high */
+    /**
+     * Super-high
+     */
     DM_SUPER_HIGH = 3,
     DM_FREQ_BUTT
 } DmExchangeFreq;
 
+/**
+ * @brief Service subscribe info for device discover.
+ */
 typedef struct DmSubscribeInfo {
-    /** Service ID */
+    /**
+     * Service ID.
+     */
     uint16_t subscribeId;
-    /** Discovery mode for service subscription. For details, see {@link DmDiscoverMode}. */
+    /**
+     * Discovery mode for service subscription. For details, see {@link DmDiscoverMode}.
+     */
     DmDiscoverMode mode;
-    /** Service subscription medium. For details, see {@link DmExchangeMedium}. */
+    /**
+     * Service subscription medium. For details, see {@link DmExchangeMedium}.
+     */
     DmExchangeMedium medium;
-    /** Service subscription frequency. For details, see {@link DmExchangeFreq}. */
+    /**
+     * Service subscription frequency. For details, see {@link DmExchangeFreq}.
+     */
     DmExchangeFreq freq;
-    /** only find the device with the same account */
+    /**
+    * only find the device with the same account.
+     */
     bool isSameAccount;
-    /** find the sleeping devices */
+    /**
+     * find the sleeping devices.
+     */
     bool isWakeRemote;
-    /** Service subscription capability. */
+    /**
+     * Service subscription capability.
+     */
     char capability[DM_MAX_DEVICE_CAPABILITY_LEN];
 } DmSubscribeInfo;
 } // namespace DistributedHardware
