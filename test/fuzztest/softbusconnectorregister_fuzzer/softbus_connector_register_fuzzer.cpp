@@ -41,7 +41,7 @@ class SoftbusDiscoveryCallbackFuzzTest : public ISoftbusDiscoveryCallback {
 public:
     virtual ~SoftbusDiscoveryCallbackFuzzTest() {}
 
-    void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info) override {}
+    void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info) override {}
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) override {}
     void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason) override {}
 };
