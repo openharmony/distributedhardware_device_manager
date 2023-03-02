@@ -2323,7 +2323,7 @@ napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info
     }
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(deviceManagerWrapper));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     if (deviceManagerWrapper == nullptr) {
         LOGE(" DeviceManagerNapi object is nullptr!");
         return result;
@@ -2393,7 +2393,7 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo_.callback);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(deviceManagerWrapper));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     if (deviceManagerWrapper == nullptr) {
         LOGE(" DeviceManagerNapi object is nullptr!");
         return result;
@@ -2443,7 +2443,7 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     creAsyncCallbackInfo_.env = env;
     napi_create_reference(env, argv[1], 1, &creAsyncCallbackInfo_.callback);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(deviceManagerWrapper));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
     if (deviceManagerWrapper == nullptr) {
         LOGE(" DeviceManagerNapi object is nullptr!");
         return result;
