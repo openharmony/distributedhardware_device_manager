@@ -208,7 +208,6 @@ if (defined(ohos_lite)) {
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
-      "//base/security/device_auth/services:deviceauth_sdk",
     ]
 
     if (os_account_part_exists) {
@@ -224,6 +223,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
+      "device_auth:deviceauth_sdk",
       "dsoftbus:softbus_client",
       "init:libbegetutil",
       "ipc:ipc_core",
