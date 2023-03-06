@@ -44,7 +44,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
-        "//base/security/device_auth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/inner_api",
         "//third_party/json/include",
         "${utils_path}/include",
         "${utils_path}/include/dfx",
@@ -57,7 +57,7 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs += [
-        "//base/security/device_auth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/inner_api",
         "//base/startup/init/interfaces/innerkits/include/syspara",
         "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
@@ -138,7 +138,7 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs += [
-        "//base/security/device_auth/interfaces/innerkits",
+        "//base/security/device_auth/interfaces/inner_api",
         "//base/startup/init/interfaces/innerkits/include/syspara",
         "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
