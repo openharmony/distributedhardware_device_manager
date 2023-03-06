@@ -66,6 +66,8 @@ ohos_unittest("UTTest_pin_auth") {
   sources = [ "UTTest_pin_auth.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_pin_auth }}}
@@ -79,6 +81,8 @@ ohos_unittest("UTTest_pin_auth_ui") {
   sources = [ "UTTest_pin_auth_ui.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_pin_auth_ui }}}
@@ -90,6 +94,8 @@ ohos_unittest("UTTest_ipc_cmd_register") {
   sources = [ "UTTest_ipc_cmd_register.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_cmd_register }}}
@@ -104,6 +110,8 @@ ohos_unittest("UTTest_dm_common_event_manager") {
   sources = [ "UTTest_dm_common_event_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_common_event_manager }}}
@@ -115,6 +123,8 @@ ohos_unittest("device_manager_impl_test") {
   sources = [ "device_manager_impl_test.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest device_manager_impl_test }}}
@@ -126,6 +136,8 @@ ohos_unittest("UTTest_dm_credential_manager") {
   sources = [ "UTTest_dm_credential_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_credential_manager }}}
@@ -137,6 +149,8 @@ ohos_unittest("UTTest_device_manager_service") {
   sources = [ "UTTest_device_manager_service.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_service }}}
@@ -148,6 +162,8 @@ ohos_unittest("UTTest_hichain_connector") {
   sources = [ "UTTest_hichain_connector.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_hichain_connector }}}
@@ -179,6 +195,7 @@ ohos_unittest("UTTest_softbus_connector") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "device_auth:deviceauth_sdk",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
   ]
@@ -195,6 +212,7 @@ ohos_unittest("UTTest_softbus_listener") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "device_auth:deviceauth_sdk",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
   ]
@@ -211,6 +229,7 @@ ohos_unittest("UTTest_softbus_session") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "device_auth:deviceauth_sdk",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
   ]
@@ -225,6 +244,8 @@ ohos_unittest("UTTest_dm_adapter_manager") {
   sources = [ "UTTest_dm_adapter_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_adapter_manager }}}
@@ -239,6 +260,8 @@ ohos_unittest("UTTest_dm_anonymous") {
   ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_anonymous }}}
@@ -250,6 +273,8 @@ ohos_unittest("UTTest_dm_timer") {
   sources = [ "UTTest_dm_timer.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_timer }}}
@@ -261,6 +286,8 @@ ohos_unittest("UTTest_ipc_client_manager") {
   sources = [ "UTTest_ipc_client_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_client_manager }}}
@@ -272,6 +299,8 @@ ohos_unittest("UTTest_ipc_client_proxy") {
   sources = [ "UTTest_ipc_client_proxy.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_client_proxy }}}
@@ -283,6 +312,8 @@ ohos_unittest("UTTest_ipc_client_stub") {
   sources = [ "UTTest_ipc_client_stub.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_client_stub }}}
@@ -294,6 +325,8 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
   sources = [ "UTTest_ipc_server_client_proxy.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_server_client_proxy }}}
@@ -305,6 +338,8 @@ ohos_unittest("UTTest_ipc_server_listener") {
   sources = [ "UTTest_ipc_server_listener.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_server_listener }}}
@@ -316,6 +351,8 @@ ohos_unittest("UTTest_ipc_server_stub") {
   sources = [ "UTTest_ipc_server_stub.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_server_stub }}}
@@ -327,6 +364,8 @@ ohos_unittest("UTTest_device_manager_impl") {
   sources = [ "UTTest_device_manager_impl.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_impl }}}
@@ -338,6 +377,8 @@ ohos_unittest("UTTest_multiple_user_connector") {
   sources = [ "UTTest_multiple_user_connector.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_multiple_user_connector }}}
@@ -349,6 +390,8 @@ ohos_unittest("UTTest_permission_manager") {
   sources = [ "UTTest_permission_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_permission_manager }}}
@@ -360,6 +403,8 @@ ohos_unittest("UTTest_device_manager_notify") {
   sources = [ "UTTest_device_manager_notify.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_notify }}}
@@ -371,6 +416,8 @@ ohos_unittest("UTTest_ipc_client_server_proxy") {
   sources = [ "UTTest_ipc_client_server_proxy.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_ipc_client_server_proxy }}}
@@ -384,6 +431,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "device_auth:deviceauth_sdk",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
   ]
@@ -400,6 +448,8 @@ ohos_unittest("UTTest_dm_dfx") {
   sources = [ "UTTest_dm_dfx.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_dfx }}}
@@ -411,6 +461,8 @@ ohos_unittest("UTTest_dm_discovery_filter") {
   sources = [ "UTTest_dm_discovery_filter.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_discovery_filter }}}
@@ -428,6 +480,8 @@ ohos_unittest("UTTest_device_manager_service_impl") {
   ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_service_impl }}}
@@ -443,6 +497,8 @@ ohos_unittest("UTTest_device_manager_service_listener") {
   ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_service_listener }}}
@@ -454,6 +510,8 @@ ohos_unittest("UTTest_auth_message_processor") {
   sources = [ "UTTest_auth_message_processor.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UTTest_auth_message_processor }}}
@@ -465,6 +523,8 @@ ohos_unittest("UTTest_auth_response_state") {
   sources = [ "UTTest_auth_response_state.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UTTest_auth_response_state }}}
@@ -476,6 +536,8 @@ ohos_unittest("UTTest_auth_request_state") {
   sources = [ "UTTest_auth_request_state.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UTTest_auth_request_state }}}
@@ -487,6 +549,8 @@ ohos_unittest("ipc_client_manager_test") {
   sources = [ "ipc_client_manager_test.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest ipc_client_manager_test }}}
@@ -498,6 +562,8 @@ ohos_unittest("UTTest_dm_auth_manager") {
   sources = [ "UTTest_dm_auth_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UTTest_dm_auth_manager }}}
@@ -521,7 +587,10 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hitrace_native:hitrace_meter" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "hitrace_native:hitrace_meter",
+  ]
 }
 
 ## UnitTest UTTest_dm_discovery_manager }}}
@@ -545,7 +614,10 @@ ohos_unittest("UTTest_dm_publish_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hitrace_native:hitrace_meter" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "hitrace_native:hitrace_meter",
+  ]
 }
 
 ## UnitTest UTTest_dm_publish_manager }}}

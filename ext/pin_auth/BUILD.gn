@@ -141,6 +141,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "device_auth:deviceauth_sdk",
       "init:libbegetutil",
     ]
 
