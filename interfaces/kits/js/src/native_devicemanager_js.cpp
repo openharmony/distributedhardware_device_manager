@@ -2238,9 +2238,7 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
         return nullptr;
     }
 
-    napi_valuetype eventHandleType = napi_undefined;
-    napi_typeof(env, argv[PARAM_INDEX_TWO], &eventHandleType);
-    if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
+    if (!IsFunctionType(env, argv[PARAM_INDEX_TWO])) {
         return nullptr;
     }
 
