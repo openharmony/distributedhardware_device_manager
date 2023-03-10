@@ -301,6 +301,9 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
     }
+    if (IsString(json, TAG_LOCAL_DEVICE_ID)) {
+        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
+    }
 }
 
 void AuthMessageProcessor::SetRequestContext(std::shared_ptr<DmAuthRequestContext> authRequestContext)
