@@ -15,40 +15,39 @@
 
 import Ability from '@ohos.app.ability.UIAbility';
 
-var TAG = "DeviceManagerUI_MainAbility:";
+let TAG = 'DeviceManagerUI_MainAbility:';
 
 export default class MainAbility extends Ability {
-    onCreate(want, launchParam) {
-        console.log(TAG + "MainAbility onCreate, ability name is " + want.abilityName + ".");
-        globalThis.context = this.context;
-        globalThis.allBundleInfo = [];
-        globalThis.allUserPermissions = []
-        globalThis.allGroups = []
-    }
+  onCreate(want, launchParam): void {
+    console.log(TAG + 'MainAbility onCreate, ability name is ' + want.abilityName + '.');
+    globalThis.context = this.context;
+    globalThis.allBundleInfo = [];
+    globalThis.allUserPermissions = [];
+    globalThis.allGroups = [];
+  }
 
-    onWindowStageCreate(windowStage) {
-        // Main window is created, set main page for this ability
-        console.log(TAG + "MainAbility onWindowStageCreate.");
+  onWindowStageCreate(windowStage): void {
+    // Main window is created, set main page for this ability
+    console.log(TAG + 'MainAbility onWindowStageCreate.');
+    windowStage.setUIContent(this.context, 'pages/authority-management', null);
+  }
 
-        windowStage.setUIContent(this.context, "pages/authority-management", null);
-    }
+  onForeground(): void {
+    // Ability has brought to foreground
+    console.log(TAG + 'MainAbility onForeground.');
+  }
 
-    onForeground() {
-        // Ability has brought to foreground
-        console.log(TAG + "MainAbility onForeground.");
-    }
+  onBackground(): void {
+    // Ability has back to background
+    console.log(TAG + 'MainAbility onBackground.');
+  }
 
-    onBackground() {
-        // Ability has back to background
-        console.log(TAG + "MainAbility onBackground.");
-    }
+  onDestroy(): void {
+    console.log(TAG + 'MainAbility onDestroy.');
+  }
 
-    onDestroy() {
-        console.log(TAG + "MainAbility onDestroy.");
-    }
-
-    onWindowStageDestroy() {
-        // Main window is destroyed, release UI related resources
-        console.log(TAG + "MainAbility onWindowStageDestroy.");
-    }
+  onWindowStageDestroy(): void {
+    // Main window is destroyed, release UI related resources
+    console.log(TAG + 'MainAbility onWindowStageDestroy.');
+  }
 };
