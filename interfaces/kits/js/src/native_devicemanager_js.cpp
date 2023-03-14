@@ -188,38 +188,38 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
 
 void DeleteUvWork(uv_work_t *work)
 {
-    if (work) {
-        delete work;
-        work = nullptr;
-        LOGI("delete work!");
+    if (work == nullptr) {
+        return;
     }
+    delete work;
+    work = nullptr;
+    LOGI("delete work!");
 }
 
 void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *pJsCallbackPtr)
 {
-    if (pJsCallbackPtr) {
-        delete pJsCallbackPtr;
-        pJsCallbackPtr = nullptr;
-        LOGI("delete DmNapiStateJsCallback callbackPtr!");
+    if (pJsCallbackPtr == nullptr) {
+        return;
     }
+    delete pJsCallbackPtr;
+    pJsCallbackPtr = nullptr;
+    LOGI("delete DmNapiStateJsCallback callbackPtr!");
 }
 
 void DeleteAsyncCallbackInfo(DeviceInfoListAsyncCallbackInfo *pAsynCallbackInfo)
 {
-    if (pAsynCallbackInfo) {
-        delete pAsynCallbackInfo;
-        pAsynCallbackInfo = nullptr;
+    if (pAsynCallbackInfo == nullptr) {
+        return;
     }
+    delete pAsynCallbackInfo;
+    pAsynCallbackInfo = nullptr;
 }
 
 bool IsFunctionType(napi_env env, napi_value value)
 {
     napi_valuetype eventHandleType = napi_undefined;
     napi_typeof(env, value, &eventHandleType);
-    if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
-        return false;
-    }
-    return true;
+    return CheckArgsType(env, eventHandleType == napi_function, "callback", "function");
 }
 
 bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi **pDeviceManagerWrapper)
