@@ -164,7 +164,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiDeviceStateCallback : public OHOS::DistributedHardware::DeviceStateCallback {
@@ -181,7 +180,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiDiscoveryCallback : public OHOS::DistributedHardware::DiscoveryCallback {
@@ -202,7 +200,6 @@ private:
     napi_env env_;
     std::atomic<int32_t> refCount_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiStateJsCallback> jsCallback_;
 };
 
 class DmNapiPublishCallback : public OHOS::DistributedHardware::PublishCallback {
@@ -221,7 +218,6 @@ private:
     napi_env env_;
     std::atomic<int32_t> refCount_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiPublishJsCallback> jsCallback_;
 };
 
 class DmNapiDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback {
@@ -235,7 +231,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiAuthJsCallback> jsCallback_;
 };
 
 class DmNapiCredentialCallback : public OHOS::DistributedHardware::CredentialCallback {
@@ -262,7 +257,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiAuthJsCallback> jsCallback_;
 };
 
 class DmNapiVerifyAuthCallback : public OHOS::DistributedHardware::VerifyAuthCallback {
@@ -276,7 +270,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiVerifyJsCallback> jsCallback_;
 };
 
 class DeviceManagerNapi : public DmNativeEvent {
@@ -313,7 +306,7 @@ public:
     static napi_value JsOff(napi_env env, napi_callback_info info);
     static napi_value GetAuthenticationParamSync(napi_env env, napi_callback_info info);
     static void HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo);
-    static DeviceManagerNapi *GetDeviceManagerNapi(std::string &buldleName);
+    static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);
@@ -390,9 +383,9 @@ private:
     static napi_value GetTrustedDeviceListPromise(napi_env env,
                                                   DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
+    static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
 private:
     napi_env env_;
-    napi_ref wrapper_;
     static thread_local napi_ref sConstructor_;
     std::string bundleName_;
     static std::mutex creMapLocks_;
