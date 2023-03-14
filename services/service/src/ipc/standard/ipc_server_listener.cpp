@@ -46,8 +46,8 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
-    for (auto iter : listeners) {
+    const std::map<std::string, sptr<IRemoteObject>> &listeners = IpcServerStub::GetInstance().GetDmListener();
+    for (const auto &iter : listeners) {
         auto pkgName = iter.first;
         auto remote = iter.second;
         req->SetPkgName(pkgName);

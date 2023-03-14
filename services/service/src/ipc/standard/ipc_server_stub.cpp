@@ -247,9 +247,9 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
+    const std::map<std::string, sptr<IRemoteObject>> &listeners = IpcServerStub::GetInstance().GetDmListener();
     std::string pkgName;
-    for (auto iter : listeners) {
+    for (const auto &iter : listeners) {
         if (iter.second == remote.promote()) {
             pkgName = iter.first;
             break;
