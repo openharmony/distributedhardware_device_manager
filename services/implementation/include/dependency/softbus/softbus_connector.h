@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -151,6 +152,7 @@ private:
     static std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
+    static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
 };

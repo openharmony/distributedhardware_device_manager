@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDe
 std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::stateCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
+std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 
@@ -407,16 +408,6 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
         iter.second->OnDeviceOnline(iter.first, info);
     }
 
-    {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
-#endif
-
-        if (discoveryDeviceInfoMap_.empty()) {
-            return;
-        }
-    }
-
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, info.networkId, NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
     if (ret != DM_OK) {
@@ -425,11 +416,6 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
     }
     std::string deviceId = reinterpret_cast<char *>(udid);
     LOGI("device online, deviceId: %s.", GetAnonyString(deviceId).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
-#endif
-
-    discoveryDeviceInfoMap_.erase(deviceId);
 }
 
 void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
@@ -481,11 +467,12 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
             std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
 #endif
 
+            discoveryDeviceIdQueue_.emplace(deviceId);
             discoveryDeviceInfoMap_[deviceId] = infoPtr;
             // Remove the earliest element when reached the max size
-            if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
-                auto iter = discoveryDeviceInfoMap_.begin();
-                discoveryDeviceInfoMap_.erase(iter->second->devId);
+            if (discoveryDeviceIdQueue_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
+                discoveryDeviceInfoMap_.erase(discoveryDeviceIdQueue_.front());
+                discoveryDeviceIdQueue_.pop();
             }
         }
     }
