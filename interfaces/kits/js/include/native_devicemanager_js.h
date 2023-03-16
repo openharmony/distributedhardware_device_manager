@@ -210,7 +210,6 @@ public:
 private:
     napi_env env_;
     std::string bundleName_;
-    std::unique_ptr<DmNapiAuthJsCallback> jsCallback_;
 };
 
 class DmNapiAuthenticateCallback : public OHOS::DistributedHardware::AuthenticateCallback {
@@ -270,7 +269,7 @@ public:
     static napi_value JsOff(napi_env env, napi_callback_info info);
     static napi_value GetAuthenticationParamSync(napi_env env, napi_callback_info info);
     static void HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo);
-    static DeviceManagerNapi *GetDeviceManagerNapi(std::string &buldleName);
+    static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);

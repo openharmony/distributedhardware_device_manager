@@ -634,48 +634,6 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
 }
 
-void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::string &credentialResult)
-{
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(env_, &loop);
-    if (loop == nullptr) {
-        return;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
-        return;
-    }
-
-    DmNapiCredentialJsCallback *jsCallback = new DmNapiCredentialJsCallback(bundleName_, action, credentialResult);
-    if (jsCallback == nullptr) {
-        delete work;
-        work = nullptr;
-        return;
-    }
-    work->data = reinterpret_cast<void *>(jsCallback);
-
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DmNapiCredentialJsCallback *callback = reinterpret_cast<DmNapiCredentialJsCallback *>(work->data);
-        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
-        if (deviceManagerNapi == nullptr) {
-            LOGE("OnCredentialResult, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
-        } else {
-            deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
-        }
-        delete callback;
-        callback = nullptr;
-        delete work;
-        work = nullptr;
-    });
-    if (ret != 0) {
-        LOGE("Failed to execute OnCredentialResult work queue");
-        delete jsCallback;
-        jsCallback = nullptr;
-        delete work;
-        work = nullptr;
-    }
-}
 
 void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
 {
@@ -751,7 +709,6 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
     SetValueUtf8String(env_, "networkId", deviceInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceInfo.deviceName, device);
     SetValueInt32(env_, "deviceType", (int)deviceInfo.deviceTypeId, device);
-    SetValueInt32(env_, "authForm", (int)deviceInfo.authForm, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
