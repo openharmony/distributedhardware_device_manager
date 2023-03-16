@@ -60,6 +60,7 @@ void DmNativeEvent::Off(std::string &eventType)
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         LOGE("eventType %s not find", eventType.c_str());
+        napi_close_handle_scope(env_, scope);
         return;
     }
     auto listener = iter->second;
@@ -82,6 +83,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         LOGE("eventType %s not find", eventType.c_str());
+        napi_close_handle_scope(env_, scope);
         return;
     }
     auto listener = iter->second;
@@ -89,6 +91,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     napi_status status = napi_get_reference_value(env_, thisVarRef_, &thisVar);
     if (status != napi_ok) {
         LOGE("napi_get_reference_value thisVar for %s failed, status = %d", eventType.c_str(), status);
+        napi_close_handle_scope(env_, scope);
         return;
     }
 
@@ -96,6 +99,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     status = napi_get_reference_value(env_, listener->handlerRef, &handler);
     if (status != napi_ok) {
         LOGE("napi_get_reference_value handler for %s failed, status = %d", eventType.c_str(), status);
+        napi_close_handle_scope(env_, scope);
         return;
     }
 
@@ -103,6 +107,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     status = napi_call_function(env_, thisVar, handler, argc, argv, &callResult);
     if (status != napi_ok) {
         LOGE("napi_call_function for %s failed, status = %d", eventType.c_str(), status);
+        napi_close_handle_scope(env_, scope);
         return;
     }
     napi_close_handle_scope(env_, scope);
