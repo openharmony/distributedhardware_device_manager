@@ -634,7 +634,6 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
 }
 
-
 void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
 {
     uv_loop_s *loop = nullptr;
@@ -1593,10 +1592,10 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
         array[0] = CreateBusinessError(env, deviceInfoListAsyncCallbackInfo->ret, false);
     }
 
-    napi_get_reference_value(env, deviceInfoListAsyncCallbackInfo->callback, &handler);
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceInfoListAsyncCallbackInfo->callback, &handler));
     if (handler != nullptr) {
-        napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0], &callResult);
-        napi_delete_reference(env, deviceInfoListAsyncCallbackInfo->callback);
+        NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0], &callResult));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceInfoListAsyncCallbackInfo->callback));
     } else {
         LOGE("handler is nullptr");
     }
@@ -2122,8 +2121,8 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_,
-                                                                   static_cast<int16_t>(subscribeId));
+    int32_t ret =
+        DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_, (int16_t)subscribeId);
     if (ret != 0) {
         LOGE("StopDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
