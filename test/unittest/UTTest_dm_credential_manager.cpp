@@ -235,7 +235,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_002, testing::ext::TestSize.L
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -308,7 +308,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_005, testing::ext::TestSize.L
     {
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -342,7 +342,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_006, testing::ext::TestSize.L
         "processType" : 0,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -393,7 +393,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_003, testing::ext::TestS
     {
         "processType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -424,7 +424,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_004, testing::ext::TestS
     {
         "processType" : 1,
         "authType" : 1,
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -476,7 +476,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestS
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -554,7 +554,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::Test
     {
         "processType" : 2,
         "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -610,6 +610,64 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 2,
+        "credentialData" :
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "456",
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_007
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_007, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : "x",
+        "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "456",
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->ImportRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportRemoteCredential_008
+ * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_008, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "userId" : "",
         "credentialData" :
         [
             {
@@ -727,7 +785,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 1,
-        "peerCredentialInfo" : 
+        "peerCredentialInfo" :
         [
             {
                 "peerDeviceId" : "devD"
@@ -752,6 +810,96 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 2,
+        "peerCredentialInfo" :
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_008
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_008, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_009
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_009, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 2,
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_0010
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0010, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 1,
+        "userId": "123",
+        "peerCredentialInfo" :
+        [
+            {
+                "peerDeviceId" : "devD"
+            }
+        ]
+    }
+    )";
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->DeleteRemoteCredential(credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteRemoteCredential_0011
+ * @tc.desc: delete remote credential and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0011, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 2,
+        "authType" : 2,
+        "peerUserId": "123",
         "peerCredentialInfo" :
         [
             {
@@ -884,7 +1032,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -906,13 +1054,8 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    int64_t requestId = 1;
-    int32_t action = 2;
-    std::string resultInfo = "resultInfoTest";
     nlohmann::json jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->requestId_ = 2;
-    dmCreMgr->OnGroupResult(requestId, action, resultInfo);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -952,15 +1095,270 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    int64_t requestId = 1;
-    int32_t action = 2;
-    std::string resultInfo = "resultInfoTest";
     nlohmann::json jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->requestId_ = 1;
-    dmCreMgr->OnGroupResult(requestId, action, resultInfo);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_003
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" , 1,
+        "authType" : 1,
+        "userId" : "123",
+        "version" : "1.2.3",
+        "deviceId" : "aaa",
+        "devicePk" : "0000",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_004
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_004, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 1,
+        "authType" : 1,
+        "version" : "1.2.3",
+        "deviceId" : "aaa",
+        "devicePk" : "0000",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_005
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_005, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 1,
+        "authType" : 1,
+        "userId" : "123",
+        "deviceId" : "aaa",
+        "devicePk" : "0000",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_006
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_006, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 1,
+        "authType" : 1,
+        "userId" : "123",
+        "version" : "1.2.3",
+        "devicePk" : "0000",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_007
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_007, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 1,
+        "authType" : 1,
+        "userId" : "123",
+        "version" : "1.2.3",
+        "deviceId" : "aaa",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetCredentialData_008
+ * @tc.desc: get nonsymmetry credential data and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.Level0)
+{
+    std::string credentialInfo = R"(
+    {
+        "processType" : 1,
+        "authType" : 1,
+        "userId" : "123",
+        "version" : "1.2.3",
+        "deviceId" : "aaa",
+        "devicePk" : "0000",
+        "credentialData" :
+        [
+            {
+                "credentialType" : 2,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "",
+                "pkInfoSignature" : "",
+                "pkInfo" : "",
+                "peerDeviceId" : ""
+            }
+        ]
+    }
+    )";
+    CredentialData credentialData;
+    credentialData.credentialType = 2;
+    credentialData.credentialId = "104";
+    credentialData.serverPk = "";
+    credentialData.pkInfoSignature = "";
+    credentialData.pkInfo = "";
+    credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
+    credentialData.peerDeviceId = "";
+    nlohmann::json jsonOutObj;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
