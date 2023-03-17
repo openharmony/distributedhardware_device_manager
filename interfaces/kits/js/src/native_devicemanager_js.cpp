@@ -697,7 +697,7 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
                                             const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "action", (int)action, result);
@@ -711,14 +711,14 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
 {
     LOGI("OnDeviceFound for subscribeId %d, range : %d", (int32_t)subscribeId, deviceInfo.range);
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
@@ -733,14 +733,14 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceFound", DM_NAPI_ARGS_ONE, &result);
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
 {
     LOGI("OnDiscoveryFailed for subscribeId %d", (int32_t)subscribeId);
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
@@ -748,14 +748,14 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
     OnEvent("discoverFail", DM_NAPI_ARGS_ONE, &result);
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceManagerNapi::OnPublishResult(int32_t publishId, int32_t publishResult)
 {
     LOGI("OnPublishResult for publishId %d, publishResult %d", publishId, publishResult);
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "publishId", publishId, result);
@@ -767,7 +767,7 @@ void DeviceManagerNapi::OnPublishResult(int32_t publishId, int32_t publishResult
         SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
         OnEvent("publishFail", DM_NAPI_ARGS_ONE, &result);
     }
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
@@ -775,7 +775,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
 {
     LOGI("OnAuthResult for status: %d, reason: %d", status, reason);
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value thisVar = nullptr;
     napi_get_reference_value(env_, thisVarRef_, &thisVar);
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
@@ -797,15 +797,15 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
 
     napi_value callResult = nullptr;
     napi_value handler = nullptr;
-    NAPI_CALL_RETURN_VOID(env_, napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler));
+    napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler);
     if (handler != nullptr) {
-        NAPI_CALL_RETURN_VOID(env_, napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult));
-        NAPI_CALL_RETURN_VOID(env_, napi_delete_reference(env_, authAsyncCallbackInfo_.callback));
+        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
+            &result[0], &callResult);
+        napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
     } else {
         LOGE("handler is nullptr");
     }
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
     g_authCallbackMap.erase(bundleName_);
 }
 
@@ -813,7 +813,7 @@ void DeviceManagerNapi::OnVerifyResult(const std::string &deviceId, int32_t resu
 {
     LOGI("OnVerifyResult for resultCode: %d, flag: %d", resultCode, flag);
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value thisVar = nullptr;
     napi_get_reference_value(env_, thisVarRef_, &thisVar);
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
@@ -830,15 +830,15 @@ void DeviceManagerNapi::OnVerifyResult(const std::string &deviceId, int32_t resu
 
     napi_value callResult = nullptr;
     napi_value handler = nullptr;
-    NAPI_CALL_RETURN_VOID(env_, napi_get_reference_value(env_, verifyAsyncCallbackInfo_.callback, &handler));
+    napi_get_reference_value(env_, verifyAsyncCallbackInfo_.callback, &handler);
     if (handler != nullptr) {
-        NAPI_CALL_RETURN_VOID(env_, napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult));
-        NAPI_CALL_RETURN_VOID(env_, napi_delete_reference(env_, verifyAsyncCallbackInfo_.callback));
+        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
+            &result[0], &callResult);
+        napi_delete_reference(env_, verifyAsyncCallbackInfo_.callback);
     } else {
         LOGE("handler is nullptr");
     }
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
     g_verifyAuthCallbackMap.erase(bundleName_);
 }
 
@@ -1552,12 +1552,12 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 {
     LOGI("OnCall for paramJson");
     napi_handle_scope scope;
-    NAPI_CALL_RETURN_VOID(env_, napi_open_handle_scope(env_, &scope));
+    napi_open_handle_scope(env_, &scope);
     napi_value result;
     napi_create_object(env_, &result);
     SetValueUtf8String(env_, "param", paramJson, result);
     OnEvent(DM_NAPI_EVENT_UI_STATE_CHANGE, DM_NAPI_ARGS_ONE, &result);
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status &status,
@@ -2569,11 +2569,11 @@ void DeviceManagerNapi::HandleCreateDmCallBackCompletedCB(napi_env env, napi_sta
     }
     napi_value callback = nullptr;
     napi_value callResult = nullptr;
-    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback, &callback));
+    napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
     if (callback != nullptr) {
-        NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult));
-        NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, asyncCallbackInfo->callback));
+        napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO,
+            &result[0], &callResult);
+        napi_delete_reference(env, asyncCallbackInfo->callback);
     }
 
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -2631,10 +2631,10 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
         return nullptr;
     }
     asCallbackInfo->env = env;
-    NAPI_CALL(env, napi_get_value_string_utf8(env, argv[0], asCallbackInfo->bundleName, DM_NAPI_BUF_LENGTH - 1,
-                               &asCallbackInfo->bundleNameLen));
+    napi_get_value_string_utf8(env, argv[0], asCallbackInfo->bundleName, DM_NAPI_BUF_LENGTH - 1,
+                               &asCallbackInfo->bundleNameLen);
 
-    NAPI_CALL(env, napi_create_reference(env, argv[1], 1, &asCallbackInfo->callback));
+    napi_create_reference(env, argv[1], 1, &asCallbackInfo->callback);
 
     HandleCreateDmCallBack(env, asCallbackInfo);
 
