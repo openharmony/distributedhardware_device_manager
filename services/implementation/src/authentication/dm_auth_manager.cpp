@@ -79,7 +79,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         LOGE("AuthenticateDevice failed, authType is illegal");
         return ERR_DM_AUTH_FAILED;
     }
-    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
+    if (pkgName.empty() || deviceId.empty()) {
         LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -94,6 +94,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
+
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.", pkgName.c_str());
