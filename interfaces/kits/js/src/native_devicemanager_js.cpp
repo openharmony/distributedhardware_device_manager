@@ -799,8 +799,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
     napi_value handler = nullptr;
     napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler);
     if (handler != nullptr) {
-        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult);
+        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
         napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
     } else {
         LOGE("handler is nullptr");
@@ -832,8 +831,7 @@ void DeviceManagerNapi::OnVerifyResult(const std::string &deviceId, int32_t resu
     napi_value handler = nullptr;
     napi_get_reference_value(env_, verifyAsyncCallbackInfo_.callback, &handler);
     if (handler != nullptr) {
-        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult);
+        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
         napi_delete_reference(env_, verifyAsyncCallbackInfo_.callback);
     } else {
         LOGE("handler is nullptr");
@@ -2571,8 +2569,7 @@ void DeviceManagerNapi::HandleCreateDmCallBackCompletedCB(napi_env env, napi_sta
     napi_value callResult = nullptr;
     napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
     if (callback != nullptr) {
-        napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO,
-            &result[0], &callResult);
+        napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO, &result[0], &callResult);
         napi_delete_reference(env, asyncCallbackInfo->callback);
     }
 
