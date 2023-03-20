@@ -730,9 +730,10 @@ int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
         }
         if (group.groupType == GROUP_TYPE_PEER_TO_PEER_GROUP) {
             DeleteGroup(group.groupId);
+            return DM_OK;
         }
     }
-    return DM_OK;
+    return ERR_DM_FAILED;
 }
 
 void HiChainConnector::DeleteRedundanceGroup(std::string &userId)
