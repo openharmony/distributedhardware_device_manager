@@ -2667,7 +2667,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     obj->bundleName_ = std::string(bundleName);
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     g_deviceManagerMap[obj->bundleName_] = obj;
-    NAPI_CALL(env, napi_wrap(
+    napi_wrap(
         env, thisVar, reinterpret_cast<void *>(obj),
         [](napi_env env, void *data, void *hint) {
             (void)env;
@@ -2677,8 +2677,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
             deviceManager = nullptr;
             LOGI("delete deviceManager");
         },
-        nullptr, nullptr));
-
+        nullptr, nullptr);
     return thisVar;
 }
 
