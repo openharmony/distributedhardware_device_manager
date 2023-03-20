@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -725,12 +725,14 @@ int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     for (auto &group : peerGroupInfoList) {
-        if (deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME, group.groupId.c_str(), localDeviceId)) {
+        if (!(deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME, group.groupId.c_str(), localDeviceId))) {
+            continue;
+        }
+        if (group.groupType == GROUP_TYPE_PEER_TO_PEER_GROUP) {
             DeleteGroup(group.groupId);
-            return DM_OK;
         }
     }
-    return ERR_DM_FAILED;
+    return DM_OK;
 }
 
 void HiChainConnector::DeleteRedundanceGroup(std::string &userId)
