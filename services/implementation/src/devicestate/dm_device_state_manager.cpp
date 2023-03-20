@@ -115,6 +115,11 @@ void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, DmDeviceIn
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(decisionInfosMutex_);
+#endif
     if (decisionAdapter == nullptr) {
         LOGE("OnDeviceOnline decision adapter is null");
         PostDeviceOnline(pkgName, info);
@@ -145,6 +150,11 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(decisionInfosMutex_);
+#endif
     if (decisionAdapter == nullptr) {
         LOGE("OnDeviceOffline decision adapter is null");
         PostDeviceOffline(pkgName, info);
@@ -221,6 +231,11 @@ void DmDeviceStateManager::RegisterDevStateCallback(const std::string &pkgName, 
     }
     LOGI("DmDeviceStateManager::RegisterDevStateCallback pkgName = %s, extra = %s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(decisionInfosMutex_);
+#endif
     if (decisionInfos_.count(pkgName) == 0) {
         decisionInfos_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
     }
@@ -234,6 +249,11 @@ void DmDeviceStateManager::UnRegisterDevStateCallback(const std::string &pkgName
     }
     LOGI("DmDeviceStateManager::UnRegisterDevStateCallback pkgName = %s, extra = %s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(extra).c_str());
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(decisionInfosMutex_);
+#endif
     if (decisionInfos_.count(pkgName) > 0) {
         auto iter = decisionInfos_.find(pkgName);
         if (iter != decisionInfos_.end()) {

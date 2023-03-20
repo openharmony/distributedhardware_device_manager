@@ -200,6 +200,7 @@ private:
 #if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;
+    std::mutex decisionInfosMutex_;
 #endif
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;

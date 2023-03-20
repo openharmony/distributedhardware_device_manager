@@ -209,7 +209,7 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
 
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
 {
-    LOGE("start ParseAuthRequestMessage");
+    LOGI("start ParseAuthRequestMessage");
     int32_t sliceNum = 0;
     int32_t idx = 0;
     if (!IsInt32(json, TAG_INDEX) || !IsInt32(json, TAG_SLICE_NUM)) {
