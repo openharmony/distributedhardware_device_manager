@@ -28,7 +28,6 @@ struct dialogPlusPage {
   @State inputPinCode: string = ''
   @State ok: string = '确定'
   @State cancel: string = '取消'
-  @State win: any = ""
   @State ACTION_CANCEL_PINCODE_INPUT: number = 4
   @State ACTION_DONE_PINCODE_INPUT: number = 5
 
@@ -36,7 +35,6 @@ struct dialogPlusPage {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     that = this
     this.initStatue()
-    this.win = globalThis.extensionWin
   }
 
   aboutToDisappear() {
@@ -116,7 +114,7 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    this.win.destroy()
+    globalThis.extensionWin.destroy()
     globalThis.extensionContext.terminateSelf()
   }
 

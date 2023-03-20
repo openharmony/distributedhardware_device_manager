@@ -24,13 +24,11 @@ struct dialogPlusPage {
   @State allow: string = '允许'
   @State cancel: string = '取消'
   @State isShow: boolean = true
-  @State win: any = ""
   @State ACTION_CANCEL_PINCODE_DISPLAY: number = 3
 
   aboutToAppear(){
     this.initStatue()
     console.log("aboutToAppear execute")
-    this.win = globalThis.extensionWin
     this.pinCode = globalThis.abilityWant.parameters["PinCode"]
   }
 
@@ -77,7 +75,7 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    this.win.destroy()
+    globalThis.extensionWin.destroy()
     globalThis.extensionContext.terminateSelf()
   }
 
