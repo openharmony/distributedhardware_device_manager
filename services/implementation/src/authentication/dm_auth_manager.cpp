@@ -95,7 +95,6 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
-
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.", pkgName.c_str());
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
@@ -104,11 +103,6 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("AuthenticateDevice failed, the discoveryDeviceInfoMap_ not have this device");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (extra.empty()) {
-        LOGE("AuthenticateDevice failed, extra is empty");
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
