@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,14 +42,15 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
-        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    }
-    LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
+        return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
+    }
+    LOGI("SendCmd cmdCode: %d", cmdCode);
+
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
