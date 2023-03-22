@@ -23,7 +23,6 @@ struct dialogPlusPage {
   @State seconds: number = 60
   @State cancel: string = '取消({{seconds}}秒)'
   @State times: number = 0
-  @State win: any = ""
   @State ACTION_ALLOW_AUTH: number = 0
   @State ACTION_CANCEL_AUTH: number = 1
   @State ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
@@ -93,7 +92,6 @@ struct dialogPlusPage {
 
   onPageShow(){
     this.initStatue()
-    this.win = globalThis.extensionWin
     that = this
     if(this.times)
        return;
@@ -105,7 +103,7 @@ struct dialogPlusPage {
       dmClass.release()
       dmClass = null
     }
-    this.win.destroy()
+    globalThis.extensionWin.destroy()
     globalThis.windowNum --
     console.info("windowNum:" + globalThis.windowNum)
     if(globalThis.windowNum == 0) {

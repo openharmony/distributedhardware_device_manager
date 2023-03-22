@@ -211,6 +211,10 @@ int32_t DeviceManagerServiceImpl::GetFaParam(std::string &pkgName, DmAuthParam &
 int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
     const std::string &params)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (pkgName.empty() || params.empty()) {
         LOGE("DeviceManagerServiceImpl::SetUserOperation error: Invalid parameter, pkgName: %s, extra: %s",
             pkgName.c_str(), params.c_str());
@@ -278,6 +282,10 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
 
 int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (reqJsonStr.empty()) {
         LOGE("reqJsonStr is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -291,6 +299,10 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
             pkgName.c_str(), credentialInfo.c_str());
@@ -305,6 +317,10 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
             pkgName.c_str(), deleteInfo.c_str());
