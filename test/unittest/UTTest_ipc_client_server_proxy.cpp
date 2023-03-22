@@ -81,7 +81,7 @@ HWTEST_F(IpcClientServerProxyTest, SendCmd_002, testing::ext::TestSize.Level0)
     sptr<IRemoteObject> remoteObject = nullptr;
     auto instance = new IpcClientServerProxy(remoteObject);
     int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

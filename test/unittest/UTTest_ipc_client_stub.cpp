@@ -167,7 +167,7 @@ HWTEST_F(IpcClientStubTest, SendCmd_002, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcRsp> rsp = nullptr;
     sptr<IpcClientStub> instance = new IpcClientStub();
     int ret = instance->SendCmd(cmdCode, req, rsp);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

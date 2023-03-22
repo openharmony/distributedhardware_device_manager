@@ -497,7 +497,7 @@ HWTEST_F(IpcServerListenerTest, SendAll_007, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     int ret = ipcServerListener->SendAll(cmdCode, req, rsp);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 } // namespace
 } // namespace DistributedHardware

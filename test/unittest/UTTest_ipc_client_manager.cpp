@@ -575,7 +575,7 @@ HWTEST_F(IpcClientManagerTest, SendRequest_006, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     int ret = instance->SendRequest(IPC_MSG_BUTT, req, rsp);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

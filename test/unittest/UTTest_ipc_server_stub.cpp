@@ -195,7 +195,7 @@ HWTEST_F(IpcServerStubTest, SendCmd_003, testing::ext::TestSize.Level0)
     // 1. Call IpcServerStub SendCmd
     int32_t ret = IpcServerStub::GetInstance().SendCmd(cmdCode, req, rsp);
     // 2. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

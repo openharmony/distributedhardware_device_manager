@@ -1163,7 +1163,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_008, testing::ext::TestSize.Level0)
     MessageParcel reply;
     MessageParcel data;
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

@@ -117,7 +117,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     MessageParcel data;
     MessageParcel reply;

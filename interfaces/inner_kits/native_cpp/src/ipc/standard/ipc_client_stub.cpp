@@ -44,7 +44,7 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     LOGI("SendCmd cmdCode: %d", cmdCode);
     MessageParcel data;
