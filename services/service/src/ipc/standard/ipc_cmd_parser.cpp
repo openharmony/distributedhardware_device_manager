@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -439,15 +439,32 @@ ON_IPC_CMD(VERIFY_AUTHENTICATION, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(GET_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string networkId = data.ReadString();
+    DmDeviceInfo deviceInfo;
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
+
+    if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
+        LOGE("write deviceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
     DmDeviceInfo localDeviceInfo;
-    int32_t result = 0;
-    result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);
+    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);
 
     if (!reply.WriteRawData(&localDeviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write subscribeInfo failed");
+        LOGE("write localDeviceInfo failed");
     }
 
     if (!reply.WriteInt32(result)) {

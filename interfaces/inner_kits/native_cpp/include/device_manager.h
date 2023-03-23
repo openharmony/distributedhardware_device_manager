@@ -62,6 +62,13 @@ public:
      */
     virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &deviceInfo) = 0;
     /**
+     * @tc.name: DeviceManagerImpl::GetDeviceInfo
+     * @tc.desc: Get local device information by networkId
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceInfo(const std::string &pkgName, const std::string networkId,
+        DmDeviceInfo &deviceInfo) = 0;
+    /**
      * @brief Register device status callback.
      * @param pkgName  package name.
      * @param extra    extra info.This parameter can be null.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -446,6 +446,29 @@ declare namespace deviceManager {
      * @systemapi this method can be used only by system applications.
      */
     getLocalDeviceInfo(): Promise<DeviceInfo>;
+
+    /**
+     * Obtains device info
+     *
+     * @since 10
+     * @param networkId device network id.
+     * @param callback Indicates the callback to be invoked upon getDeviceInfo
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @return Returns local device info.
+     * @systemapi this method can be used only by system applications.
+     */
+    getDeviceInfo(networkId: string, callback: AsyncCallback<DeviceInfo>): void;
+
+    /**
+     * Obtains device info
+     *
+     * @since 10
+     * @param networkId device network id.
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @return Returns local device info.
+     * @systemapi this method can be used only by system applications.
+     */
+    getDeviceInfo(networkId: string): Promise<DeviceInfo>;
 
     /**
      * Start to discover device.

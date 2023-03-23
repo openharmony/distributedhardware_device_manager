@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2919,6 +2919,167 @@ void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbac
     napi_queue_async_work(env, asCallbackInfo->asyncWork);
 }
 
+void DeviceManagerNapi::CallGetDeviceInfo(napi_env env, NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo)
+{
+    napi_value resourceName;
+    napi_create_string_latin1(env, "GetLocalDeviceInfo", NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_async_work(
+        env, nullptr, resourceName,
+        GetDeviceInfoCB,
+        CompleteGetDeviceInfoCB,
+        (void *)networkIdAsyncCallbackInfo, &networkIdAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work(env, networkIdAsyncCallbackInfo->asyncWork);
+}
+
+void DeviceManagerNapi::GetDeviceInfoCB(napi_env env, void *data)
+{
+    if (!data) {
+        LOGE("Invalid async callback data");
+        return;
+    }
+    (void)env;
+    NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo = reinterpret_cast<NetworkIdAsyncCallbackInfo *>(data);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceInfo(networkIdAsyncCallbackInfo->bundleName,
+                                                             networkIdAsyncCallbackInfo->networkId,
+                                                             networkIdAsyncCallbackInfo->deviceInfo);
+    if (ret != 0) {
+        LOGE("GetDeviceInfoCB for bundleName %s networkId %s failed, ret %d",
+             networkIdAsyncCallbackInfo->bundleName.c_str(),
+             GetAnonyString(networkIdAsyncCallbackInfo->networkId).c_str(), ret);
+        networkIdAsyncCallbackInfo->status = -1;
+        networkIdAsyncCallbackInfo->ret = ret;
+    } else {
+        networkIdAsyncCallbackInfo->status = 0;
+        LOGI("GetDeviceInfoCB status %d", networkIdAsyncCallbackInfo->status);
+    }
+}
+
+void DeviceManagerNapi::CompleteGetDeviceInfoCB(napi_env env, napi_status status, void *data)
+{
+    if (!data) {
+        LOGE("Invalid async callback data");
+        return;
+    }
+    (void)status;
+    NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo = reinterpret_cast<NetworkIdAsyncCallbackInfo *>(data);
+    if (networkIdAsyncCallbackInfo->deferred != nullptr) {
+        CallGetDeviceInfoPromise(env, status, networkIdAsyncCallbackInfo);    // promise
+    } else {
+        CallGetDeviceInfoCB(env, status, networkIdAsyncCallbackInfo);         // callback
+    }
+    napi_delete_async_work(env, networkIdAsyncCallbackInfo->asyncWork);
+    delete networkIdAsyncCallbackInfo;
+}
+
+// promise function
+void DeviceManagerNapi::CallGetDeviceInfoPromise(napi_env env, napi_status &status,
+                                                 NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo)
+{
+    napi_value result[DM_NAPI_ARGS_TWO] = {0};
+
+    LOGI("DeviceManager::CallGetDeviceInfoSync deviceName:%s deviceTypeId:%d ",
+         networkIdAsyncCallbackInfo->deviceInfo.deviceName,
+         networkIdAsyncCallbackInfo->deviceInfo.deviceTypeId);
+
+    if (networkIdAsyncCallbackInfo->status == 0) {
+        DeviceInfotoJsByNetworkId(env, networkIdAsyncCallbackInfo->deviceInfo, result[1]);
+        napi_resolve_deferred(env, networkIdAsyncCallbackInfo->deferred, result[1]);
+    } else {
+        result[0] = CreateBusinessError(env, networkIdAsyncCallbackInfo->ret, false);
+        napi_reject_deferred(env, networkIdAsyncCallbackInfo->deferred, result[0]);
+    }
+}
+
+// callback function
+void DeviceManagerNapi::CallGetDeviceInfoCB(napi_env env, napi_status &status,
+                                            NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo)
+{
+    napi_value result[DM_NAPI_ARGS_TWO] = {0};
+    LOGI("DeviceManager::CallGetDeviceInfo deviceName:%s deviceTypeId:%d ",
+         networkIdAsyncCallbackInfo->deviceInfo.deviceName,
+         networkIdAsyncCallbackInfo->deviceInfo.deviceTypeId);
+    napi_value callResult = nullptr;
+    napi_value handler = nullptr;
+
+    if (networkIdAsyncCallbackInfo->status == 0) {
+        DeviceInfotoJsByNetworkId(env, networkIdAsyncCallbackInfo->deviceInfo, result[1]);
+    } else {
+        result[0] = CreateBusinessError(env, networkIdAsyncCallbackInfo->ret, false);
+    }
+
+    napi_get_reference_value(env, networkIdAsyncCallbackInfo->callback, &handler);
+    if (handler != nullptr) {
+        napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
+        napi_delete_reference(env, networkIdAsyncCallbackInfo->callback);
+    } else {
+        LOGE("handler is nullptr");
+    }
+}
+
+void DeviceManagerNapi::DeviceInfotoJsByNetworkId(const napi_env &env, const DmDeviceInfo &nidDevInfo,
+                                                  napi_value &result)
+{
+    napi_create_object(env, &result);
+
+    SetValueUtf8String(env, "deviceName", nidDevInfo.deviceName, result);
+    SetValueInt32(env, "deviceType", (int)nidDevInfo.deviceTypeId, result);
+}
+
+napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info info)
+{
+    LOGI("GetDeviceInfo in");
+    napi_value result = nullptr;
+    size_t argc = 2;
+    napi_value argv[2] = {nullptr};
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    DmDeviceInfo deviceInfo;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, ((argc >= DM_NAPI_ARGS_ONE) && (argc <= DM_NAPI_ARGS_TWO)), "requires 1 or 2 parameter");
+
+    napi_valuetype networkIdValueType = napi_undefined;
+    napi_typeof(env, argv[0], &networkIdValueType);
+    if (!CheckArgsType(env, networkIdValueType == napi_string, "networkId", "string")) {
+        return nullptr;
+    }
+
+    size_t networkIdLen = 0;
+    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &networkIdLen);
+    NAPI_ASSERT(env, networkIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
+    char networkIdValue[DM_NAPI_BUF_LENGTH] = {0};
+    napi_get_value_string_utf8(env, argv[0], networkIdValue, networkIdLen + 1, &networkIdLen);
+
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    auto *networkIdAsyncCallbackInfo = new NetworkIdAsyncCallbackInfo();
+    networkIdAsyncCallbackInfo->env = env;
+    networkIdAsyncCallbackInfo->deviceInfo = deviceInfo;
+    networkIdAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
+    networkIdAsyncCallbackInfo->networkId = std::string(networkIdValue);
+
+    if (argc == DM_NAPI_ARGS_ONE) {    // promise
+        napi_deferred deferred;
+        napi_value promise = 0;
+        napi_create_promise(env, &deferred, &promise);
+        networkIdAsyncCallbackInfo->deferred = deferred;
+        CallGetDeviceInfo(env, networkIdAsyncCallbackInfo);
+        return promise;
+    } else if (argc == DM_NAPI_ARGS_TWO) {    // callback
+        napi_valuetype eventHandleType = napi_undefined;
+        napi_typeof(env, argv[1], &eventHandleType);
+        if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
+            delete networkIdAsyncCallbackInfo;
+            networkIdAsyncCallbackInfo = nullptr;
+            return nullptr;
+        }
+        napi_create_reference(env, argv[1], 1, &networkIdAsyncCallbackInfo->callback);
+        CallGetDeviceInfo(env, networkIdAsyncCallbackInfo);
+        napi_get_undefined(env, &result);
+        return result;
+    }
+    napi_get_undefined(env, &result);
+    return result;
+}
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("CreateDeviceManager in");
@@ -3012,6 +3173,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("unPublishDeviceDiscovery", UnPublishDeviceDiscoverySync),
         DECLARE_NAPI_FUNCTION("getLocalDeviceInfoSync", GetLocalDeviceInfoSync),
         DECLARE_NAPI_FUNCTION("getLocalDeviceInfo", GetLocalDeviceInfo),
+        DECLARE_NAPI_FUNCTION("getDeviceInfo", GetDeviceInfo),
         DECLARE_NAPI_FUNCTION("unAuthenticateDevice", UnAuthenticateDevice),
         DECLARE_NAPI_FUNCTION("authenticateDevice", AuthenticateDevice),
         DECLARE_NAPI_FUNCTION("verifyAuthInfo", VerifyAuthInfo),

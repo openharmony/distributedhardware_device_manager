@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,6 +101,20 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return dmServiceImpl_->GetGroupType(deviceList);
     }
     return DM_OK;
+}
+
+int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
+{
+    if (networkId.empty()) {
+        LOGE("Invalid parameter, networkId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::GetDeviceInfo begin by networkId : %s.", GetAnonyString(networkId).c_str());
+    int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
+    if (ret != DM_OK) {
+        LOGE("Get DeviceInfo By NetworkId failed, ret : %d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetLocalDeviceInfo(const std::string &pkgName, DmDeviceInfo &info) override;
+    /**
+     * @tc.name: DeviceManagerImpl::GetDeviceInfo
+     * @tc.desc: Get local device information by networkId
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceInfo(const std::string &pkgName, const std::string networkId,
+                                  DmDeviceInfo &deviceInfo) override;
     /**
      * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
      * @tc.desc: Register device development status callback

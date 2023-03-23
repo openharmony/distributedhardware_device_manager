@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,6 +52,8 @@ public:
                                  std::vector<DmDeviceInfo> &deviceList);
 
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
+
+    int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
 
     int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid);
 
