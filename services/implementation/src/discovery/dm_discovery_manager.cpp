@@ -112,6 +112,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
+    std::lock_guard<std::mutex> autoLock(locks_);
     auto iter = discoveryContextMap_.find(pkgName);
     if (iter == discoveryContextMap_.end()) {
         LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
@@ -146,7 +147,10 @@ void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t s
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
     LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId = %d", subscribeId);
-    discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
+    }
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
 
@@ -154,18 +158,21 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
     (void)name;
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
-    if (discoveryQueue_.empty()) {
-        LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
-        return;
-    }
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (discoveryQueue_.empty()) {
+            LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
+            return;
+        }
 
-    std::string pkgName = discoveryQueue_.front();
-    auto iter = discoveryContextMap_.find(pkgName);
-    if (iter == discoveryContextMap_.end()) {
-        LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
-        return;
+        std::string pkgName = discoveryQueue_.front();
+        auto iter = discoveryContextMap_.find(pkgName);
+        if (iter == discoveryContextMap_.end()) {
+            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            return;
+        }
+        StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
     }
-    StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

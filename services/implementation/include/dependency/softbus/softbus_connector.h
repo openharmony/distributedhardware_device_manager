@@ -155,6 +155,7 @@ private:
     static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
+    static std::mutex stateCallbackMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

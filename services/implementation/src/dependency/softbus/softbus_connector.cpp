@@ -46,6 +46,7 @@ std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
+std::mutex SoftbusConnector::stateCallbackMutex_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -113,12 +114,18 @@ int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pk
 int32_t SoftbusConnector::RegisterSoftbusStateCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusStateCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
     stateCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::UnRegisterSoftbusStateCallback(const std::string &pkgName)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
     stateCallbackMap_.erase(pkgName);
     return DM_OK;
 }
@@ -404,10 +411,14 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
 void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
 {
     LOGI("start handle device online event.");
-    for (auto &iter : stateCallbackMap_) {
-        iter.second->OnDeviceOnline(iter.first, info);
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
+        for (auto &iter : stateCallbackMap_) {
+            iter.second->OnDeviceOnline(iter.first, info);
+        }
     }
-
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, info.networkId, NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
     if (ret != DM_OK) {
@@ -421,6 +432,10 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
 void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
 {
     LOGI("start handle device offline event.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
+
     for (auto &iter : stateCallbackMap_) {
         iter.second->OnDeviceOffline(iter.first, info);
     }

@@ -221,6 +221,7 @@ void DeviceManagerNotify::UnRegisterCredentialCallback(const std::string &pkgNam
 void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManagerNotify::OnRemoteDied");
+    std::lock_guard<std::mutex> autoLock(lock_);
     for (auto iter : dmInitCallback_) {
         LOGI("DeviceManagerNotify::OnRemoteDied, pkgName:%s", iter.first.c_str());
         if (iter.second != nullptr) {
@@ -505,7 +506,10 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
         return;
     }
     tempCbk->OnVerifyAuthResult(deviceId, resultCode, flag);
-    verifyAuthCallback_.erase(pkgName);
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        verifyAuthCallback_.erase(pkgName);
+    }
 }
 
 void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
