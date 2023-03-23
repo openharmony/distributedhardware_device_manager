@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,9 +29,13 @@ IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     int32_t ret = DM_OK;
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT || pBaseReq == nullptr) {
-        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+    if (pBaseReq == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
 
     if (setIpcRequestFuncMap_.count(cmdCode) == 0) {
@@ -55,7 +59,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
@@ -72,7 +76,7 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {

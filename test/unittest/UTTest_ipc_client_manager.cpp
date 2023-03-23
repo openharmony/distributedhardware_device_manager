@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -575,7 +575,7 @@ HWTEST_F(IpcClientManagerTest, SendRequest_006, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     int ret = instance->SendRequest(IPC_MSG_BUTT, req, rsp);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -591,7 +591,7 @@ HWTEST_F(IpcClientManagerTest, SendRequest_007, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
     instance->dmInterface_ = nullptr;
     int ret = instance->SendRequest(-1, req, rsp);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,13 +115,14 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
 
 int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
+        return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
+    }
+
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;

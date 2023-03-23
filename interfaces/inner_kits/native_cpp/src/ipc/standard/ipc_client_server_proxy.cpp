@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {

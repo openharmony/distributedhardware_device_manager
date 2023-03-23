@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_001, testing::ext::TestSize.Level0)
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -595,7 +595,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_001, testing::ext::TestSize.Level0)
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -1150,7 +1150,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_007, testing::ext::TestSize.Level0)
     MessageParcel reply;
     MessageParcel data;
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -1163,7 +1163,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_008, testing::ext::TestSize.Level0)
     MessageParcel reply;
     MessageParcel data;
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
