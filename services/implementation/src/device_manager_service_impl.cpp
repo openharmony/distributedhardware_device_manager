@@ -165,7 +165,7 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
         LOGI("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || deviceId.empty() || extra.empty()) {
+    if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
