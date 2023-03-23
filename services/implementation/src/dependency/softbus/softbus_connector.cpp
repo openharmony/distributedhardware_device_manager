@@ -467,10 +467,10 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
             std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
 #endif
 
-            discoveryDeviceInfoMap_[deviceId] = infoPtr;
             if (discoveryDeviceInfoMap_.find(deviceId) == discoveryDeviceInfoMap_.end()) {
                 discoveryDeviceIdQueue_.emplace(deviceId);
             }
+            discoveryDeviceInfoMap_[deviceId] = infoPtr;
 
             // Remove the earliest element when reached the max size
             if (discoveryDeviceIdQueue_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
