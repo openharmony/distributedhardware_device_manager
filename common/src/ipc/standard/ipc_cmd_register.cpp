@@ -30,11 +30,11 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 {
     int32_t ret = DM_OK;
     if (pBaseReq == nullptr) {
-        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
 

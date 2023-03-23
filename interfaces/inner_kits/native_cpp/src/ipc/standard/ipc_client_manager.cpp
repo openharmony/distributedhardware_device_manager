@@ -138,10 +138,10 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (req == nullptr || rsp == nullptr) {
-        LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("IpcClientManager::SendRequest in");
