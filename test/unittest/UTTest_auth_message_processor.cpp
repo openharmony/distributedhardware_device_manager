@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -355,6 +355,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_TOKEN] = "1234";
     jsonThumbnail[TAG_TARGET] = "12345";
     jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_LOCAL_DEVICE_ID] = "localdeviceTest";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -410,6 +411,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::Te
     jsonThumbnail[TAG_TARGET] = "12345";
     jsonThumbnail[TAG_APP_NAME] = "123456";
     jsonThumbnail[TAG_APP_THUMBNAIL] = "jsontest";
+    jsonThumbnail[TAG_LOCAL_DEVICE_ID] = "localdeviceTest";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, ERR_DM_AUTH_MESSAGE_INCOMPLETE);
 }
@@ -816,6 +818,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Leve
         "APPNAME": "Distributed Calc",
         "AUTHTYPE":1,
         "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
+        "LOCALDEVICEID": "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest",
         "DEVICETYPE": "",
         "HOST": "com.example.distributedcalc",
         "INDEX": 0,
