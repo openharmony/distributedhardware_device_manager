@@ -112,11 +112,15 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
-    std::lock_guard<std::mutex> autoLock(locks_);
-    auto iter = discoveryContextMap_.find(pkgName);
-    if (iter == discoveryContextMap_.end()) {
-        LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
-        return;
+    DmDiscoveryContext discoveryContext;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        auto iter = discoveryContextMap_.find(pkgName);
+        if (iter == discoveryContextMap_.end()) {
+            LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            return;
+        }
+        discoveryContext = iter->second;
     }
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
@@ -131,8 +135,8 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
         info.authForm = hiChainConnector_->GetGroupType(info.deviceId);
     }
     filterPara.authForm = info.authForm;
-    if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
-        listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
+    if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
+        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
     }
     return;
 }
@@ -158,6 +162,7 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
     (void)name;
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
+    uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         if (discoveryQueue_.empty()) {
@@ -171,8 +176,9 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
             LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
             return;
         }
-        StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
+        subscribeId = discoveryContextMap_[pkgName].subscribeId;
     }
+    StopDeviceDiscovery(pkgName, subscribeId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
