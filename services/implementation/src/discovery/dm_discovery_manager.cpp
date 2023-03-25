@@ -163,6 +163,7 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
     (void)name;
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
     uint16_t subscribeId = 0;
+    std::string pkgName = "";
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         if (discoveryQueue_.empty()) {
@@ -170,7 +171,7 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
             return;
         }
 
-        std::string pkgName = discoveryQueue_.front();
+        pkgName = discoveryQueue_.front();
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
             LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
