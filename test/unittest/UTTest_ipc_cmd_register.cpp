@@ -1007,10 +1007,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_002, testing::ext::TestSize.Level0)
     data.WriteRawData(&dmDeviceInfo, deviceSize);
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
-    int result = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    result = reply.ReadInt32();
-    // 4. check result is DM_OK
     // check ret is DEVICEMANAGER_IPC_NOT_REGISTER_FUNC
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1077,9 +1074,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_004, testing::ext::TestSize.Level0)
     data.WriteRawData(nullptr, deviceSize);
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
-    int result = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    result = reply.ReadInt32();
     // check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1110,9 +1105,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_005, testing::ext::TestSize.Level0)
     data.WriteRawData(nullptr, deviceSize);
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
-    int result = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    result = reply.ReadInt32();
     // 4.check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1134,9 +1127,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_006, testing::ext::TestSize.Level0)
     size_t deviceSize = sizeof(DmDeviceInfo);
     data.WriteRawData(&deviceInfo, deviceSize);
     int ret = 0;
-    int result = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    result = reply.ReadInt32();
     ASSERT_EQ(ret, DM_OK);
 }
 
