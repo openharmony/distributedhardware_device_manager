@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,19 +49,24 @@ void DmDiscoveryManager::CfgDiscoveryTimer()
 
 int32_t DmDiscoveryManager::CheckDiscoveryQueue(const std::string &pkgName)
 {
-    if (discoveryQueue_.empty()) {
-        return DM_OK;
-    }
-
-    if (pkgName == discoveryQueue_.front()) {
-        LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
-        return ERR_DM_DISCOVERY_REPEATED;
-    } else {
+    uint16_t subscribeId = 0;
+    std::string frontPkgname = "";
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (discoveryQueue_.empty()) {
+            return DM_OK;
+        }
+        frontPkgname = discoveryQueue_.front();
+        if (pkgName == frontPkgname) {
+            LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
+            return ERR_DM_DISCOVERY_REPEATED;
+        }
         LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
-            discoveryQueue_.front().c_str());
-        StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
-        return DM_OK;
+            frontPkgname.c_str());
+        subscribeId = discoveryContextMap_[discoveryQueue_.front()].subscribeId;
     }
+    StopDeviceDiscovery(frontPkgname, subscribeId);
+    return DM_OK;
 }
 
 int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
@@ -76,10 +81,12 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
         return ERR_DM_DISCOVERY_REPEATED;
     }
 
-    std::lock_guard<std::mutex> autoLock(locks_);
-    discoveryQueue_.push(pkgName);
-    DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
-    discoveryContextMap_.emplace(pkgName, context);
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryQueue_.push(pkgName);
+        DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
+        discoveryContextMap_.emplace(pkgName, context);
+    }
     softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
                                                         std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
     CfgDiscoveryTimer();
@@ -92,14 +99,16 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::lock_guard<std::mutex> autoLock(locks_);
-    if (!discoveryQueue_.empty()) {
-        discoveryQueue_.pop();
-    }
-    if (!discoveryContextMap_.empty()) {
-        discoveryContextMap_.erase(pkgName);
-        softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
-        timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (!discoveryQueue_.empty()) {
+            discoveryQueue_.pop();
+        }
+        if (!discoveryContextMap_.empty()) {
+            discoveryContextMap_.erase(pkgName);
+            softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
+            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+        }
     }
     return softbusConnector_->StopDiscovery(subscribeId);
 }
@@ -107,17 +116,22 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
-    auto iter = discoveryContextMap_.find(pkgName);
-    if (iter == discoveryContextMap_.end()) {
-        LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
-        return;
+    DmDiscoveryContext dmDiscoveryContext;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        auto iter = discoveryContextMap_.find(pkgName);
+        if (iter == discoveryContextMap_.end()) {
+            LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            return;
+        }
+        dmDiscoveryContext = iter->second;
     }
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
     filterPara.range = info.range;
-    if (filter.IsValidDevice(iter->second.filterOp, iter->second.filters, filterPara)) {
-        listener_->OnDeviceFound(pkgName, iter->second.subscribeId, info);
+    if (filter.IsValidDevice(dmDiscoveryContext.filterOp, dmDiscoveryContext.filters, filterPara)) {
+        listener_->OnDeviceFound(pkgName, dmDiscoveryContext.subscribeId, info);
     }
     return;
 }
@@ -132,25 +146,34 @@ void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t s
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
     LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId = %d", subscribeId);
-    discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
+    }
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
 
 void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
 {
     LOGI("DmDiscoveryManager::HandleDiscoveryTimeout");
-    if (discoveryQueue_.empty()) {
-        LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
-        return;
-    }
+    std::string pkgName = "";
+    uint16_t subscribeId = 0;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (discoveryQueue_.empty()) {
+            LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
+            return;
+        }
+        pkgName = discoveryQueue_.front();
 
-    std::string pkgName = discoveryQueue_.front();
-    auto iter = discoveryContextMap_.find(pkgName);
-    if (iter == discoveryContextMap_.end()) {
-        LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
-        return;
+        auto iter = discoveryContextMap_.find(pkgName);
+        if (iter == discoveryContextMap_.end()) {
+            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            return;
+        }
+        subscribeId = discoveryContextMap_[pkgName].subscribeId;
     }
-    StopDeviceDiscovery(pkgName, discoveryContextMap_[pkgName].subscribeId);
+    StopDeviceDiscovery(pkgName, subscribeId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

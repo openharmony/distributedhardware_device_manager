@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,10 @@ std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDe
 std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::stateCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
+std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
+std::mutex SoftbusConnector::stateCallbackMutex_;
+std::mutex SoftbusConnector::discoveryCallbackMutex_;
+std::mutex SoftbusConnector::publishCallbackMutex_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -65,12 +69,20 @@ SoftbusConnector::~SoftbusConnector()
 int32_t SoftbusConnector::RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusDiscoveryCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     discoveryCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::UnRegisterSoftbusDiscoveryCallback(const std::string &pkgName)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
     discoveryCallbackMap_.erase(pkgName);
     return DM_OK;
 }
@@ -79,8 +91,7 @@ int32_t SoftbusConnector::RegisterSoftbusPublishCallback(const std::string &pkgN
     const std::shared_ptr<ISoftbusPublishCallback> callback)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::mutex registerCallback;
-    std::lock_guard<std::mutex> lock(registerCallback);
+    std::lock_guard<std::mutex> lock(publishCallbackMutex_);
 #endif
 
     publishCallbackMap_.emplace(pkgName, callback);
@@ -90,8 +101,7 @@ int32_t SoftbusConnector::RegisterSoftbusPublishCallback(const std::string &pkgN
 int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pkgName)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::mutex unRegisterCallback;
-    std::lock_guard<std::mutex> lock(unRegisterCallback);
+    std::lock_guard<std::mutex> lock(publishCallbackMutex_);
 #endif
 
     publishCallbackMap_.erase(pkgName);
@@ -101,12 +111,20 @@ int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pk
 int32_t SoftbusConnector::RegisterSoftbusStateCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusStateCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
+
     stateCallbackMap_.emplace(pkgName, callback);
     return DM_OK;
 }
 
 int32_t SoftbusConnector::UnRegisterSoftbusStateCallback(const std::string &pkgName)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
+
     stateCallbackMap_.erase(pkgName);
     return DM_OK;
 }
@@ -262,6 +280,7 @@ std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 
 bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 {
+    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
     auto iter = discoveryDeviceInfoMap_.find(deviceId);
     if (iter == discoveryDeviceInfoMap_.end()) {
         LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
@@ -272,12 +291,17 @@ bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 
 int32_t SoftbusConnector::GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress)
 {
-    auto iter = discoveryDeviceInfoMap_.find(deviceId);
-    if (iter == discoveryDeviceInfoMap_.end()) {
-        LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
-        return ERR_DM_FAILED;
+    DeviceInfo *deviceInfo = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+        auto iter = discoveryDeviceInfoMap_.find(deviceId);
+        if (iter == discoveryDeviceInfoMap_.end()) {
+            LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
+            return ERR_DM_FAILED;
+        }
+        deviceInfo = iter->second.get();
     }
-    DeviceInfo *deviceInfo = iter->second.get();
+
     if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
         LOGE("deviceInfo address num not valid, addrNum %d", deviceInfo->addrNum);
         return ERR_DM_FAILED;
@@ -311,12 +335,17 @@ ConnectionAddr *SoftbusConnector::GetConnectAddrByType(DeviceInfo *deviceInfo, C
 
 ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, std::string &connectAddr)
 {
-    auto iter = discoveryDeviceInfoMap_.find(deviceId);
-    if (iter == discoveryDeviceInfoMap_.end()) {
-        LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
-        return nullptr;
+    DeviceInfo *deviceInfo = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+        auto iter = discoveryDeviceInfoMap_.find(deviceId);
+        if (iter == discoveryDeviceInfoMap_.end()) {
+            LOGE("deviceInfo not found by deviceId %s", GetAnonyString(deviceId).c_str());
+            return nullptr;
+        }
+        deviceInfo = iter->second.get();
     }
-    DeviceInfo *deviceInfo = iter->second.get();
+
     if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
         LOGE("deviceInfo addrNum not valid, addrNum %d", deviceInfo->addrNum);
         return nullptr;
@@ -376,12 +405,18 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
 void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
 {
     LOGI("HandleDeviceOnline: start handle device online event.");
-    for (auto &iter : stateCallbackMap_) {
-        iter.second->OnDeviceOnline(iter.first, info);
+    {
+        std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+        for (auto &iter : stateCallbackMap_) {
+            iter.second->OnDeviceOnline(iter.first, info);
+        }
     }
 
-    if (discoveryDeviceInfoMap_.empty()) {
-        return;
+    {
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+        if (discoveryDeviceInfoMap_.empty()) {
+            return;
+        }
     }
     uint8_t udid[UDID_BUF_LEN] = {0};
     int32_t ret =
@@ -392,14 +427,20 @@ void SoftbusConnector::HandleDeviceOnline(const DmDeviceInfo &info)
     }
     std::string deviceId = reinterpret_cast<char *>(udid);
     LOGI("device online, deviceId: %s", GetAnonyString(deviceId).c_str());
-    discoveryDeviceInfoMap_.erase(deviceId);
+    {
+        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+        discoveryDeviceInfoMap_.erase(deviceId);
+    }
 }
 
 void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
 {
     LOGI("HandleDeviceOffline: start handle device offline event.");
-    for (auto &iter : stateCallbackMap_) {
-        iter.second->OnDeviceOffline(iter.first, info);
+    {
+        std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+        for (auto &iter : stateCallbackMap_) {
+            iter.second->OnDeviceOffline(iter.first, info);
+        }
     }
 }
 
@@ -407,8 +448,7 @@ void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult r
 {
     LOGI("Callback In, publishId %d, result %d", publishId, result);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::mutex publishResult;
-    std::lock_guard<std::mutex> lock(publishResult);
+    std::lock_guard<std::mutex> lock(publishCallbackMutex_);
 #endif
 
     for (auto &iter : publishCallbackMap_) {
@@ -438,18 +478,24 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
             LOGE("save discovery device info failed");
             return;
         }
-        discoveryDeviceInfoMap_[deviceId] = infoPtr;
-        // Remove the earliest element when reached the max size
-        if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
-            auto iter = discoveryDeviceInfoMap_.begin();
-            discoveryDeviceInfoMap_.erase(iter->second->devId);
+        {
+            std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+            discoveryDeviceInfoMap_[deviceId] = infoPtr;
+            // Remove the earliest element when reached the max size
+            if (discoveryDeviceInfoMap_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
+                auto iter = discoveryDeviceInfoMap_.begin();
+                discoveryDeviceInfoMap_.erase(iter->second->devId);
+            }
         }
     }
 
     DmDeviceInfo dmDeviceInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDeviceInfo);
-    for (auto &iter : discoveryCallbackMap_) {
-        iter.second->OnDeviceFound(iter.first, dmDeviceInfo);
+    {
+        std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+        for (auto &iter : discoveryCallbackMap_) {
+            iter.second->OnDeviceFound(iter.first, dmDeviceInfo);
+        }
     }
 }
 
@@ -457,13 +503,16 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
 {
     LOGI("In, subscribeId %d, result %d", subscribeId, result);
     uint16_t originId = (uint16_t)(((uint32_t)subscribeId) & SOFTBUS_SUBSCRIBE_ID_MASK);
-    if (result == REFRESH_LNN_SUCCESS) {
-        for (auto &iter : discoveryCallbackMap_) {
-            iter.second->OnDiscoverySuccess(iter.first, originId);
-        }
-    } else {
-        for (auto &iter : discoveryCallbackMap_) {
-            iter.second->OnDiscoveryFailed(iter.first, originId, result);
+    {
+        std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+        if (result == REFRESH_LNN_SUCCESS) {
+            for (auto &iter : discoveryCallbackMap_) {
+                iter.second->OnDiscoverySuccess(iter.first, originId);
+            }
+        } else {
+            for (auto &iter : discoveryCallbackMap_) {
+                iter.second->OnDiscoveryFailed(iter.first, originId, result);
+            }
         }
     }
 }
