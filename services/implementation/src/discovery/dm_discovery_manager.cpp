@@ -51,19 +51,26 @@ void DmDiscoveryManager::CfgDiscoveryTimer()
 
 int32_t DmDiscoveryManager::CheckDiscoveryQueue(const std::string &pkgName)
 {
-    if (discoveryQueue_.empty()) {
-        return DM_OK;
-    }
+    uint16_t subscribeId = 0;
+    std::string frontPkgName = "";
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (discoveryQueue_.empty()) {
+            return DM_OK;
+        }
 
-    if (pkgName == discoveryQueue_.front()) {
-        LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
-        return ERR_DM_DISCOVERY_REPEATED;
-    } else {
+        frontPkgName = discoveryQueue_.front();
+        if (pkgName == frontPkgName) {
+            LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
+            return ERR_DM_DISCOVERY_REPEATED;
+        }
+
         LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
             discoveryQueue_.front().c_str());
-        StopDeviceDiscovery(discoveryQueue_.front(), discoveryContextMap_[discoveryQueue_.front()].subscribeId);
-        return DM_OK;
+        subscribeId = discoveryContextMap_[frontPkgName].subscribeId;
     }
+    StopDeviceDiscovery(frontPkgName, subscribeId);
+    return DM_OK;
 }
 
 int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
@@ -82,10 +89,10 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
         discoveryQueue_.push(pkgName);
         DmDiscoveryContext context = {pkgName, extra, subscribeInfo.subscribeId, dmFilter.filterOp_, dmFilter.filters_};
         discoveryContextMap_.emplace(pkgName, context);
-        softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
-            std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
-        CfgDiscoveryTimer();
     }
+    softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
+        std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
+    CfgDiscoveryTimer();
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
