@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,17 +15,20 @@
 import deviceManager from '@ohos.distributedHardware.deviceManager';
 var that;
 let dmClass;
+
+const ACTION_ALLOW_AUTH: number = 0
+const ACTION_CANCEL_AUTH: number = 1
+const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
+const ACTION_ALLOW_AUTH_FOREVER: number = 6
+
 @Entry
 @Component
 struct dialogPlusPage {
   @State message: string = '是否允许对端连接本机'
-  @State allow: string = '允许'
+  @State allow: string = '仅本次信任'
+  @State allowForever: string = '始终信任'
   @State seconds: number = 60
-  @State cancel: string = '取消({{seconds}}秒)'
   @State times: number = 0
-  @State ACTION_ALLOW_AUTH: number = 0
-  @State ACTION_CANCEL_AUTH: number = 1
-  @State ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
 
   initStatue() {
     console.log('initStatue' + "windowNum:" + globalThis.windowNum)
@@ -43,7 +46,7 @@ struct dialogPlusPage {
   }
 
   onAllow() {
-    console.log("aalow")
+    console.log("allow")
     if (dmClass) {
       console.log('deviceManager exist')
     } else {
@@ -51,21 +54,35 @@ struct dialogPlusPage {
       return
     }
     console.log("onAllow execute" + JSON.stringify(globalThis.abilityWant.parameters))
-    console.log("aalow" + this.ACTION_ALLOW_AUTH)
-    this.setUserOperation(this.ACTION_ALLOW_AUTH)
+    console.log("allow" + ACTION_ALLOW_AUTH)
+    this.setUserOperation(ACTION_ALLOW_AUTH)
     this.destruction()
   }
 
-  onCancel() {
-    console.log("cancle")
+  onAllowForever() {
+    console.log("allow forever")
     if (dmClass) {
       console.log('deviceManager exist')
     } else {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("cancle" + this.ACTION_CANCEL_AUTH)
-    this.setUserOperation(this.ACTION_CANCEL_AUTH);
+    console.log("onAllowForever execute" + JSON.stringify(globalThis.abilityWant.parameters))
+    console.log("allow forever" + ACTION_ALLOW_AUTH_FOREVER)
+    this.setUserOperation(ACTION_ALLOW_AUTH_FOREVER)
+    this.destruction()
+  }
+
+  onCancel() {
+    console.log("cancel")
+    if (dmClass) {
+      console.log('deviceManager exist')
+    } else {
+      console.log('createDeviceManager is null')
+      return
+    }
+    console.log("cancel" + ACTION_CANCEL_AUTH)
+    this.setUserOperation(ACTION_CANCEL_AUTH);
     this.destruction()
   }
 
@@ -79,15 +96,15 @@ struct dialogPlusPage {
   }
 
   run() {
-      console.info('devicemanagerui confirmdialog run seconds:' + that.seconds )
-      that.seconds--;
-      if (that.seconds == 0) {
-          clearInterval(that.times);
-          that.times = 0;
-          that.setUserOperation(that.ACTION_AUTH_CONFIRM_TIMEOUT)
-          that.destruction();
-          console.info('click cancel times run out');
-      }
+    console.info('devicemanagerui confirmdialog run seconds:' + that.seconds )
+    that.seconds--;
+    if (that.seconds == 0) {
+      clearInterval(that.times)
+      that.times = 0
+      that.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT)
+      that.destruction()
+      console.info('click cancel times run out')
+    }
   }
 
   onPageShow(){
@@ -113,38 +130,33 @@ struct dialogPlusPage {
 
 
   build() {
-    Row() {
-        Column() {
-            Text(this.message)
-              .fontSize(35)
-              .fontWeight(FontWeight.Bold)
-            Row() {}.height('2%')
-            Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-              Row() {
-                Button("取消" + "(" + this.seconds + "秒)")
-                  .fontSize(25)
-                  .backgroundColor(0xffffff)
-                  .fontColor(0x0000ff)
-                  .margin({left: '5%'})
-                  .height(50)
-                  .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-                  .fontWeight(FontWeight.Normal)
-                  .onClick(() => {
-                    this.onCancel()
-                  }).width('55%')
-                Button(this.allow)
-                  .fontSize(25)
-                  .height(50)
-                  .margin({left: '5%'})
-                  .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-                  .fontWeight(FontWeight.Normal)
-                  .onClick(() => {
-                    this.onAllow()
-                  }).width('30%')
-              }.width('100%')
-            }.width('100%')
-        }.width('100%')
-      }.width('100%')
+    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center, direction: FlexDirection.Column }) {
+      Text(this.message)
+        .fontSize(24)
+        .height(50)
+      Button(this.allowForever)
+        .margin({top: 8, bottom: 8})
+        .height(40)
+        .onClick(() => {
+          this.onAllowForever()
+        })
+      Button(this.allow)
+        .margin({top: 8, bottom: 8})
+        .height(40)
+        .onClick(() => {
+          this.onAllow()
+        })
+      Button("取消(" + this.seconds + "秒)")
+        .margin({top: 8, bottom: 8})
+        .backgroundColor(0xffffff)
+        .fontColor(0x0000ff)
+        .height(40)
+        .onClick(() => {
+          this.onCancel()
+        })
+    }
+    .padding(12)
     .height('100%')
+    .width('100%')
   }
 }

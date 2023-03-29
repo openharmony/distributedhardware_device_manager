@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,8 @@ enum UiAction {
     USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT = 2,
     USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY = 3,
     USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT = 4,
-    USER_OPERATION_TYPE_DONE_PINCODE_INPUT = 5
+    USER_OPERATION_TYPE_DONE_PINCODE_INPUT = 5,
+    USER_OPERATION_TYPE_ALLOW_AUTH_FOREVER = 6,
 };
 
 class DmAbilityManager {

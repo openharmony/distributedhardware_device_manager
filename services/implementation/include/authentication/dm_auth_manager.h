@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -402,6 +402,7 @@ private:
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
     int32_t authTimes_ = 0;
+    int32_t action_ = USER_OPERATION_TYPE_CANCEL_AUTH;
     std::shared_ptr<IAuthentication> authPtr_;
 };
 } // namespace DistributedHardware

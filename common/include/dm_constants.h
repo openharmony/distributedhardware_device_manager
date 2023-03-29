@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,6 +77,9 @@ constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* TOKEN = "token";
 constexpr const char* PIN_TOKEN = "pinToken";
 constexpr const char* PIN_CODE_KEY = "pinCode";
+const int32_t CHECK_AUTH_FOREVER_POS = 0;
+constexpr const char AUTH_FOREVER = '1';
+constexpr const char AUTH_ONCE = '0';
 
 // HiChain
 const int32_t AUTH_TYPE_PIN = 1;
