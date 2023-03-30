@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "ipc_authenticate_device_req.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
+#include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
@@ -125,6 +126,28 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
             deviceInfoVec.emplace_back(*pDmDeviceinfo);
         }
         pRsp->SetDeviceVec(deviceInfoVec);
+    }
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(networkId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
+    DmDeviceInfo *deviceInfo =
+        static_cast<DmDeviceInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceInfo))));
+    if (deviceInfo != nullptr) {
+        pRsp->SetDeviceInfo(*deviceInfo);
     }
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;

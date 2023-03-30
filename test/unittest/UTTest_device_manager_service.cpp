@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -757,7 +757,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplSoLoaded_001, testing::ext::Te
 
 /**
  * @tc.name: IsDMServiceImplReady_001
- * @tc.desc: The return value is is true
+ * @tc.desc: The return value is true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -766,6 +766,34 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplReady_001, testing::ext::TestS
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
     EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: GetDeviceInfo_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "";
+    DmDeviceInfo info;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: GetDeviceInfo_002
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkIdTest";
+    DmDeviceInfo info;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

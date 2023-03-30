@@ -190,6 +190,32 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     return ret;
 }
 
+int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
+{
+    int32_t nodeInfoCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
+        return ERR_DM_FAILED;
+    }
+    for (int32_t i = 0; i < nodeInfoCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        if (networkId == nodeBasicInfo->networkId) {
+            LOGI("GetDeviceInfo name : %s.", nodeBasicInfo->deviceName);
+            if (memcpy_s(info.deviceName, sizeof(info.deviceName), nodeBasicInfo->deviceName,
+                std::min(sizeof(info.deviceName), sizeof(nodeBasicInfo->deviceName))) != DM_OK) {
+                LOGE("GetDeviceInfo deviceName copy deviceName data failed.");
+            }
+            info.deviceTypeId = nodeBasicInfo->deviceTypeId;
+            break;
+        }
+    }
+    FreeNodeInfo(nodeInfo);
+    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", info.deviceName, info.deviceTypeId);
+    return ret;
+}
+
 int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
     NodeBasicInfo nodeBasicInfo;

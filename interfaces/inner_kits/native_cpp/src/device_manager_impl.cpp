@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
+#include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
@@ -163,6 +164,37 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
 
     deviceList = rsp->GetDeviceVec();
     LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::string networkId,
+                                         DmDeviceInfo &deviceInfo)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::GetDeviceInfo start, pkgName: %s networKId : %s", pkgName.c_str(),
+         GetAnonyString(networkId).c_str());
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceInfo error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceInfo error, failed ret: %d", ret);
+        return ERR_DM_IPC_RESPOND_FAILED;
+    }
+
+    deviceInfo = rsp->GetDeviceInfo();
+    LOGI("DeviceManagerImpl::GetDeviceInfo completed, pkgname = %s networKId = %s deviceName = %s",
+         req->GetPkgName().c_str(), GetAnonyString(req->GetNetWorkId()).c_str(), deviceInfo.deviceName);
     return DM_OK;
 }
 

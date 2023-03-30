@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,6 +67,22 @@ struct DeviceInfoAsyncCallbackInfo {
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
     std::string extra;
     // OHOS::DistributedHardware::DmFilterOptions filter;
+    napi_ref callback = nullptr;
+    napi_value thisVar = nullptr;
+    napi_deferred deferred = nullptr;
+    int32_t status = -1;
+    int32_t ret = 0;
+};
+
+struct NetworkIdAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+
+    std::string bundleName;
+    std::string networkId;
+    size_t bundleNameLen = 0;
+    OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
+
     napi_ref callback = nullptr;
     napi_value thisVar = nullptr;
     napi_deferred deferred = nullptr;
@@ -292,6 +308,7 @@ public:
     static napi_value GetTrustedDeviceList(napi_env env, napi_callback_info info);
     static napi_value GetLocalDeviceInfoSync(napi_env env, napi_callback_info info);
     static napi_value GetLocalDeviceInfo(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceInfo(napi_env env, napi_callback_info info);
     static napi_value UnAuthenticateDevice(napi_env env, napi_callback_info info);
     static napi_value StartDeviceDiscoverSync(napi_env env, napi_callback_info info);
     static napi_value StopDeviceDiscoverSync(napi_env env, napi_callback_info info);
@@ -349,6 +366,9 @@ public:
     static int32_t RegisterCredentialCallback(napi_env env, const std::string &pkgName);
     static void AsyncAfterTaskCallback(napi_env env, napi_status status, void *data);
     static void AsyncTaskCallback(napi_env env, void *data);
+    static void DeviceInfotoJsByNetworkId(const napi_env &env,
+                                          const OHOS::DistributedHardware::DmDeviceInfo &nidDevInfo,
+                                          napi_value &result);
     void OnDeviceStateChange(DmNapiDevStateChangeAction action,
                              const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo);
@@ -384,6 +404,14 @@ private:
                                                   DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
+    // get deviceInfo by networkId
+    static void CallGetDeviceInfo(napi_env env, NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);
+    static void GetDeviceInfoCB(napi_env env, void *data);
+    static void CompleteGetDeviceInfoCB(napi_env env, napi_status status, void *data);
+    static void CallGetDeviceInfoPromise(napi_env env, napi_status &status,
+                                         NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);
+    static void CallGetDeviceInfoCB(napi_env env, napi_status &status,
+                                    NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;
