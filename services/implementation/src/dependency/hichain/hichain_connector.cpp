@@ -728,8 +728,8 @@ int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
         if (!(deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME, group.groupId.c_str(), localDeviceId))) {
             continue;
         }
-        if ((!group.groupName.empty()) && (group.groupName[CHECK_AUTH_FOREVER_POS] == AUTH_FOREVER)) {
-            LOGI("HiChainConnector::DeleteTimeOutGroup forever group");
+        if ((!group.groupName.empty()) && (group.groupName[CHECK_AUTH_ALWAYS_POS] == AUTH_ALWAYS)) {
+            LOGI("HiChainConnector::DeleteTimeOutGroup always trusted group");
             continue;
         }
         if (group.groupType == GROUP_TYPE_PEER_TO_PEER_GROUP) {

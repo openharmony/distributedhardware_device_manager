@@ -557,7 +557,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     }
     LOGI("DmAuthManager::StartAuthProcess");
     action_ = action;
-    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH || action_ == USER_OPERATION_TYPE_ALLOW_AUTH_FOREVER) {
+    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH || action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         authResponseContext_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
     } else {
         authResponseContext_->reply = action_;
@@ -746,8 +746,8 @@ std::string DmAuthManager::GenerateGroupName()
     std::string sLocalDeviceId = localDeviceId;
     uint32_t interceptLength = sLocalDeviceId.size() / DEVICE_ID_HALF;
     std::string groupName = "";
-    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_FOREVER) {
-        groupName += AUTH_FOREVER;
+    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        groupName += AUTH_ALWAYS;
     } else {
         groupName += AUTH_ONCE;
     }
@@ -855,7 +855,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
         case USER_OPERATION_TYPE_CANCEL_AUTH:
-        case USER_OPERATION_TYPE_ALLOW_AUTH_FOREVER:
+        case USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS:
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:

@@ -77,8 +77,8 @@ constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* TOKEN = "token";
 constexpr const char* PIN_TOKEN = "pinToken";
 constexpr const char* PIN_CODE_KEY = "pinCode";
-const int32_t CHECK_AUTH_FOREVER_POS = 0;
-constexpr const char AUTH_FOREVER = '1';
+const int32_t CHECK_AUTH_ALWAYS_POS = 0;
+constexpr const char AUTH_ALWAYS = '1';
 constexpr const char AUTH_ONCE = '0';
 
 // HiChain

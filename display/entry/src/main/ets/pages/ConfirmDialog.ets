@@ -19,14 +19,14 @@ let dmClass;
 const ACTION_ALLOW_AUTH: number = 0
 const ACTION_CANCEL_AUTH: number = 1
 const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
-const ACTION_ALLOW_AUTH_FOREVER: number = 6
+const ACTION_ALLOW_AUTH_ALWAYS: number = 6
 
 @Entry
 @Component
 struct dialogPlusPage {
   @State message: string = '是否允许对端连接本机'
   @State allow: string = '仅本次信任'
-  @State allowForever: string = '始终信任'
+  @State allowAlways: string = '始终信任'
   @State seconds: number = 60
   @State times: number = 0
 
@@ -59,17 +59,17 @@ struct dialogPlusPage {
     this.destruction()
   }
 
-  onAllowForever() {
-    console.log("allow forever")
+  onAllowAlways() {
+    console.log("allow always")
     if (dmClass) {
       console.log('deviceManager exist')
     } else {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("onAllowForever execute" + JSON.stringify(globalThis.abilityWant.parameters))
-    console.log("allow forever" + ACTION_ALLOW_AUTH_FOREVER)
-    this.setUserOperation(ACTION_ALLOW_AUTH_FOREVER)
+    console.log("onAllowAlways execute" + JSON.stringify(globalThis.abilityWant.parameters))
+    console.log("allow always" + ACTION_ALLOW_AUTH_ALWAYS)
+    this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
     this.destruction()
   }
 
@@ -134,11 +134,11 @@ struct dialogPlusPage {
       Text(this.message)
         .fontSize(24)
         .height(50)
-      Button(this.allowForever)
+      Button(this.allowAlways)
         .margin({top: 8, bottom: 8})
         .height(40)
         .onClick(() => {
-          this.onAllowForever()
+          this.onAllowAlways()
         })
       Button(this.allow)
         .margin({top: 8, bottom: 8})
