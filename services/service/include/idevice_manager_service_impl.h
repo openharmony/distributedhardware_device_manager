@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -209,6 +209,22 @@ public:
      * @tc.type: FUNC
      */
     virtual void LoadHardwareFwkService();
+
+    /**
+     * @tc.name: DeviceManagerService::GetEncryptedUuidByNetworkId
+     * @tc.desc: GenerateEncryptedUuid
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
+    std::string &uuid);
+
+    /**
+     * @tc.name: DeviceManagerService::GenerateEncryptedUuid
+     * @tc.desc: GenerateEncryptedUuid
+     * @tc.type: FUNC
+     */
+    virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
+    const std::string &appId, std::string &encryptedUuid);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

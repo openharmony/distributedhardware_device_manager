@@ -112,6 +112,11 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     void LoadHardwareFwkService();
+
+    int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);
+
+    int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,
+        std::string &encryptedUuid);
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;

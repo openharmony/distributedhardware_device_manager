@@ -249,6 +249,23 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) = 0;
+
+    /**
+     * @brief Get encrypted uuid.
+     * @param networkId device networkId.
+     * @return Returns encrypted uuid.
+     */
+    virtual int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
+        std::string &uuid) = 0;
+
+    /**
+     * @brief Get encrypted uuid.
+     * @param uuid device uuid.
+     * @param tokenId tokenId.
+     * @return Returns encrypted uuid.
+     */
+    virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,
+        std::string &encryptedUuid) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
