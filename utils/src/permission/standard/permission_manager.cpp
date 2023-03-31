@@ -38,6 +38,23 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
+const std::string PermissionManager::GetAppId()
+{
+    AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
+    LOGI("PermissionManager::tokenCaller ID == %d", tokenId);
+    if (AccessTokenKit::GetTokenTypeFlag(tokenId) != TOKEN_HAP) {
+        return "";
+    }
+    HapTokenInfo tokenInfo;
+    auto result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
+    if (result != RET_SUCCESS) {
+        LOGE("GetHapTokenInfo, tokenId = %d, result = %d, ", tokenId, result);
+        return "";
+    }
+
+    return tokenInfo.appID;
+}
+
 bool PermissionManager::CheckPermission(void)
 {
     LOGI("Enter PermissionManager::CheckPermission");
