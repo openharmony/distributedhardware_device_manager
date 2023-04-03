@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
-const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 20;
+const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 100;
 
 constexpr const char* WIFI_IP = "WIFI_IP";
 constexpr const char* WIFI_PORT = "WIFI_PORT";
