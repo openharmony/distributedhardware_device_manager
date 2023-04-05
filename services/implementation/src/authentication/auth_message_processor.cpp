@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,6 +57,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_REQUESTER] = authRequestContext_->deviceName;
     jsonObj[TAG_DEVICE_ID] = authRequestContext_->deviceId;
     jsonObj[TAG_DEVICE_TYPE] = authRequestContext_->deviceTypeId;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authRequestContext_->localDeviceId;
     jsonObj[TAG_AUTH_TYPE] = authRequestContext_->authType;
     jsonObj[TAG_TOKEN] = authRequestContext_->token;
     jsonObj[TAG_VISIBILITY] = authRequestContext_->groupVisibility;
@@ -209,7 +210,7 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
 
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
 {
-    LOGE("start ParseAuthRequestMessage");
+    LOGI("start ParseAuthRequestMessage");
     int32_t sliceNum = 0;
     int32_t idx = 0;
     if (!IsInt32(json, TAG_INDEX) || !IsInt32(json, TAG_SLICE_NUM)) {
@@ -221,10 +222,12 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     sliceNum = json[TAG_SLICE_NUM].get<int32_t>();
     if (idx == 0) {
         if (!IsString(json, TAG_DEVICE_ID) || !IsInt32(json, TAG_AUTH_TYPE) || !IsString(json, TAG_APP_DESCRIPTION) ||
-            !IsString(json, TAG_TOKEN) || !IsString(json, TAG_TARGET) || !IsString(json, TAG_APP_NAME)) {
+            !IsString(json, TAG_TOKEN) || !IsString(json, TAG_TARGET) || !IsString(json, TAG_APP_NAME) ||
+            !IsString(json, TAG_LOCAL_DEVICE_ID)) {
             LOGE("AuthMessageProcessor::ParseAuthRequestMessage err json string, second.");
             return ERR_DM_FAILED;
         }
+        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
         authResponseContext_->deviceId = json[TAG_DEVICE_ID].get<std::string>();
         authResponseContext_->authType = json[TAG_AUTH_TYPE].get<int32_t>();
         authResponseContext_->appDesc = json[TAG_APP_DESCRIPTION].get<std::string>();

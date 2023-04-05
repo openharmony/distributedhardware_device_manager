@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -504,7 +504,10 @@ void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const s
         return;
     }
     tempCbk->OnVerifyAuthResult(deviceId, resultCode, flag);
-    verifyAuthCallback_.erase(pkgName);
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        verifyAuthCallback_.erase(pkgName);
+    }
 }
 
 void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -311,6 +311,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_TOKEN] = "1234";
     jsonThumbnail[TAG_TARGET] = "12345";
     jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_LOCAL_DEVICE_ID] = "localdeviceTest";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
 }
