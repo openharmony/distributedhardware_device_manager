@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,18 +77,21 @@ constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* TOKEN = "token";
 constexpr const char* PIN_TOKEN = "pinToken";
 constexpr const char* PIN_CODE_KEY = "pinCode";
+constexpr int32_t CHECK_AUTH_ALWAYS_POS = 0;
+constexpr const char AUTH_ALWAYS = '1';
+constexpr const char AUTH_ONCE = '0';
 
 // HiChain
-const int32_t AUTH_TYPE_PIN = 1;
-const int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
-const int32_t DEVICE_UUID_LENGTH = 65;
-const int32_t GROUP_TYPE_INVALID_GROUP = -1;
-const int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;
-const int32_t GROUP_TYPE_PEER_TO_PEER_GROUP = 256;
-const int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP = 1282;
-const int32_t GROUP_VISIBILITY_PUBLIC = -1;
-const int64_t MIN_REQUEST_ID = 1000000000;
-const int64_t MAX_REQUEST_ID = 9999999999;
+constexpr int32_t AUTH_TYPE_PIN = 1;
+constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
+constexpr int32_t DEVICE_UUID_LENGTH = 65;
+constexpr int32_t GROUP_TYPE_INVALID_GROUP = -1;
+constexpr int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;
+constexpr int32_t GROUP_TYPE_PEER_TO_PEER_GROUP = 256;
+constexpr int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP = 1282;
+constexpr int32_t GROUP_VISIBILITY_PUBLIC = -1;
+constexpr int64_t MIN_REQUEST_ID = 1000000000;
+constexpr int64_t MAX_REQUEST_ID = 9999999999;
 
 // ACE
 constexpr const char* EVENT_CONFIRM = "EVENT_CONFIRM";

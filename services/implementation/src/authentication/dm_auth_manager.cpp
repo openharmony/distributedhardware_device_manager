@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -556,7 +556,13 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
         return ERR_DM_AUTH_NOT_START;
     }
     LOGI("DmAuthManager::StartAuthProcess");
-    authResponseContext_->reply = action;
+    action_ = action;
+    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH || action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        authResponseContext_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
+    } else {
+        authResponseContext_->reply = action_;
+    }
+
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
         authResponseState_->TransitionTo(std::make_shared<AuthResponseGroupState>());
@@ -739,8 +745,14 @@ std::string DmAuthManager::GenerateGroupName()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
     uint32_t interceptLength = sLocalDeviceId.size() / DEVICE_ID_HALF;
-    std::string groupName = authResponseContext_->targetPkgName + sLocalDeviceId.substr(0, interceptLength)
-                            + authResponseContext_->localDeviceId.substr(0, interceptLength);
+    std::string groupName = "";
+    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        groupName += AUTH_ALWAYS;
+    } else {
+        groupName += AUTH_ONCE;
+    }
+    groupName += authResponseContext_->targetPkgName + sLocalDeviceId.substr(0, interceptLength)
+        + authResponseContext_->localDeviceId.substr(0, interceptLength);
     return groupName;
 }
 
@@ -843,6 +855,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
         case USER_OPERATION_TYPE_CANCEL_AUTH:
+        case USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS:
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
