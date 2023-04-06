@@ -17,7 +17,7 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 let dmClass;
 var gThis;
 
-const ACTION_ALLOW_AUTH: number = 0
+const ACTION_ALLOW_AUTH_ONCE: number = 0
 const ACTION_CANCEL_AUTH: number = 1
 const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
 const ACTION_ALLOW_AUTH_ALWAYS: number = 6
@@ -26,7 +26,7 @@ const ACTION_ALLOW_AUTH_ALWAYS: number = 6
 @Component
 struct dialogPlusPage {
   @State message: string = '是否允许对端连接本机'
-  @State allow: string = '仅本次信任'
+  @State allowOnce: string = '仅本次信任'
   @State allowAlways: string = '始终信任'
   @State seconds: number = 60
   @State times: number = 0
@@ -47,28 +47,26 @@ struct dialogPlusPage {
     })
   }
 
-  onAllow() {
-    console.log("allow")
-    if (dmClass) {
-      console.log('deviceManager exist')
-    } else {
+  onAllowOnce() {
+    console.log("allow once")
+    if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("onAllow execute" + JSON.stringify(globalThis.abilityWant.parameters))
-    console.log("allow" + ACTION_ALLOW_AUTH)
-    this.setUserOperation(ACTION_ALLOW_AUTH)
+
+    console.log("onAllowOnce execute" + JSON.stringify(globalThis.abilityWant.parameters))
+    console.log("allow once" + ACTION_ALLOW_AUTH_ONCE)
+    this.setUserOperation(ACTION_ALLOW_AUTH_ONCE)
     this.destruction()
   }
 
   onAllowAlways() {
     console.log("allow always")
-    if (dmClass) {
-      console.log('deviceManager exist')
-    } else {
+    if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
+
     console.log("onAllowAlways execute" + JSON.stringify(globalThis.abilityWant.parameters))
     console.log("allow always" + ACTION_ALLOW_AUTH_ALWAYS)
     this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
@@ -77,12 +75,11 @@ struct dialogPlusPage {
 
   onCancel() {
     console.log("cancel")
-    if (dmClass) {
-      console.log('deviceManager exist')
-    } else {
+    if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
+
     console.log("cancel" + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH)
     this.destruction()
@@ -151,10 +148,10 @@ struct dialogPlusPage {
         .fontColor(this.selectIndex == 0 ? 0xffffff : 0x0000ff)
         .height(40)
         .width('100%')
-      Button(this.allow)
+      Button(this.allowOnce)
         .margin({top: 4, bottom: 4, left: 16, right: 16})
         .onClick(() => {
-          this.onAllow()
+          this.onAllowOnce()
         })
         .onTouch((event: TouchEvent) => {
           if (event.type === TouchType.Down) {
