@@ -534,6 +534,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
         if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId,
                                                 authRequestContext_->localDeviceId)) {
+            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
         }
