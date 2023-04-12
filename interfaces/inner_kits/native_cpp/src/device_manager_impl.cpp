@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,10 @@
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
+#include "ipc_generate_encrypted_uuid_req.h"
+
 #include "ipc_get_dmfaparam_rsp.h"
+#include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
@@ -800,6 +803,68 @@ int32_t DeviceManagerImpl::OnDmServiceDied()
         LOGE("OnDmServiceDied failed, ret: %d", ret);
         return ERR_DM_FAILED;
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
+    std::string &uuid)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("DeviceManagerImpl::GetEncryptedUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s",
+            pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("GetEncryptedUuidByNetworkId start, pkgName: %s", pkgName.c_str());
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_ENCRYPTED_UUID_BY_NETWOEKID, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GetEncryptedUuidByNetworkId Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
+        return ret;
+    }
+    uuid = rsp->GetUuid();
+    LOGI("GetEncryptedUuidByNetworkId complete, uuid: %s", GetAnonyString(uuid).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
+    const std::string &appId, std::string &encryptedUuid)
+{
+    if (pkgName.empty() || uuid.empty()) {
+        LOGE("DeviceManagerImpl::GenerateEncryptedUuid error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("GenerateEncryptedUuid start, pkgName: %s", pkgName.c_str());
+
+    std::shared_ptr<IpcGenerateEncryptedUuidReq> req = std::make_shared<IpcGenerateEncryptedUuidReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetUuid(uuid);
+    req->SetAppId(appId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GENERATE_ENCRYPTED_UUID, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GenerateEncryptedUuid Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
+        return ret;
+    }
+    encryptedUuid = rsp->GetUuid();
+    LOGI("GenerateEncryptedUuid complete, encryptedUuid: %s", GetAnonyString(encryptedUuid).c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

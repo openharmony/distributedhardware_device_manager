@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -476,6 +476,26 @@ void DeviceManagerService::LoadHardwareFwkService()
     if (deviceList.size() > 0) {
         dmServiceImpl_->LoadHardwareFwkService();
     }
+}
+
+int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
+    std::string &uuid)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("GetEncryptedUuidByNetworkId failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
+}
+
+int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
+    const std::string &appId, std::string &encryptedUuid)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("GenerateEncryptedUuid failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

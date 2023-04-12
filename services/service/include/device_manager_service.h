@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -110,6 +110,11 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     void LoadHardwareFwkService();
+
+    int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);
+
+    int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,
+        std::string &encryptedUuid);
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;
