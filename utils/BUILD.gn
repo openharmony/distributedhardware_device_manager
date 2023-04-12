@@ -31,7 +31,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
         "//third_party/json/include",
-        "//third_party/openssl/include",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -57,6 +56,7 @@ if (defined(ohos_lite)) {
       deps = [
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls:mbedtls_shared",
+        "//third_party/openssl:libcrypto_shared",
       ]
 
       external_deps = [
@@ -83,7 +83,6 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//third_party/json/include",
-        "//third_party/openssl/include",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -111,6 +110,7 @@ if (defined(ohos_lite)) {
       deps = [
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
+        "//third_party/openssl:libcrypto_shared",
       ]
     }
   }
@@ -130,7 +130,6 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
       "//third_party/mbedtls/include/mbedtls",
       "//third_party/json/include",
-      "//third_party/openssl/include",
     ]
   }
 
