@@ -21,7 +21,6 @@
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_generate_encrypted_uuid_req.h"
-
 #include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"

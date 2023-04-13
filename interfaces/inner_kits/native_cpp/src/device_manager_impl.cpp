@@ -24,7 +24,6 @@
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_generate_encrypted_uuid_req.h"
-
 #include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
