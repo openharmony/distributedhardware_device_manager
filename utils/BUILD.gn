@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -24,6 +24,7 @@ if (defined(ohos_lite)) {
     static_library("devicemanagerutils_mini") {
       include_dirs = [
         "${utils_path}/include",
+        "${utils_path}/include/crypto",
         "${utils_path}/include/dfx",
         "${utils_path}/include/dfx/lite",
         "${utils_path}/include/permission/lite",
@@ -37,12 +38,14 @@ if (defined(ohos_lite)) {
         "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
+        "//third_party/openssl/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
 
       sources = [
+        "${utils_path}/src/crypto/dm_crypto.cpp",
         "${utils_path}/src/dfx/lite/dm_hidumper.cpp",
         "${utils_path}/src/dfx/lite/dm_hisysevent.cpp",
         "${utils_path}/src/dfx/lite/dm_hitrace.cpp",
@@ -81,6 +84,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
         "include",
+        "include/crypto",
         "include/fwkload/lite",
         "include/permission/lite",
       ]
@@ -90,6 +94,7 @@ if (defined(ohos_lite)) {
         "//commonlibrary/utils_lite/include",
         "//utils/system/safwk/native/include",
         "//third_party/json/include",
+        "//third_party/openssl/include",
         "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
@@ -108,6 +113,7 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dm_error_message.cpp",
         "${common_path}/src/dm_log.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
+        "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
         "src/permission/lite/permission_manager.cpp",
@@ -134,6 +140,7 @@ if (defined(ohos_lite)) {
   config("devicemanagerutils_config") {
     include_dirs = [
       "include",
+      "include/crypto",
       "include/fwkload/standard",
       "include/permission/standard",
       "${common_path}/include",
@@ -143,12 +150,13 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
       "${innerkits_path}/native_cpp/include",
-      "//third_party/mbedtls/include/mbedtls",
       "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_base/include",
-      "//third_party/json/include",
       "//foundation/ability/ability_base/interfaces/kits/native/want/include",
       "//foundation/ability/ability_base/interfaces/kits/native/uri/include",
       "//foundation/ability/ability_base/interfaces/inner_api/base/include",
+      "//third_party/mbedtls/include/mbedtls",
+      "//third_party/json/include",
+      "//third_party/openssl/include",
     ]
   }
 
@@ -161,6 +169,7 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dm_error_message.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
     ]
     if (support_jsapi) {
@@ -178,7 +187,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
+    deps = [
+      "//third_party/mbedtls:mbedtls_shared",
+      "//third_party/openssl:libcrypto_shared",
+    ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",

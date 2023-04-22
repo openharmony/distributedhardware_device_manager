@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,21 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PERMISSION_MANAGER_H
-#define OHOS_DM_PERMISSION_MANAGER_H
-
+#ifndef OHOS_DM_CRYPTO_H
+#define OHOS_DM_CRYPTO_H
 #include <string>
-#include "single_instance.h"
+#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {
-class PermissionManager {
-    DECLARE_SINGLE_INSTANCE(PermissionManager);
-
+class Crypto {
 public:
-    const std::string GetAppId();
-    bool CheckPermission(void);
+    static std::string Sha256(const std::string &text, bool isUpper = false);
+    static std::string Sha256(const void *data, size_t size, bool isUpper = false);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PERMISSION_MANAGER_H
+#endif // OHOS_DM_CRYPTO_H

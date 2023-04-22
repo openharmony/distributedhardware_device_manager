@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -674,6 +674,44 @@ ON_IPC_READ_RESPONSE(SERVER_CREDENTIAL_RESULT, MessageParcel &reply, std::shared
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+
+ON_IPC_CMD(GET_ENCRYPTED_UUID_BY_NETWOEKID, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string networkId = data.ReadString();
+    std::string uuid;
+
+    int32_t result = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(uuid)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GENERATE_ENCRYPTED_UUID, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string uuid = data.ReadString();
+    std::string appId = data.ReadString();
+    std::string encryptedUuid;
+
+    int32_t result = DeviceManagerService::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(encryptedUuid)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware
