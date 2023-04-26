@@ -279,6 +279,8 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     for (auto &iter : stateTimerInfoMap_) {
         if ((iter.first == deviceId) && (timer_ != nullptr)) {
             timer_->DeleteTimer(iter.second.timerName);
+            stateTimerInfoMap_.erase(iter.first);
+            break;
         }
     }
     if (stateTimerInfoMap_.find(deviceId) == stateTimerInfoMap_.end()) {
