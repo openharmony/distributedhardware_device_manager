@@ -85,8 +85,6 @@ if (defined(ohos_lite)) {
 
       deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
-      external_deps = [ "ipc:ipc_single" ]
-
       defines = [
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
