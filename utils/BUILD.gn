@@ -112,7 +112,6 @@ if (defined(ohos_lite)) {
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
       ]
-
     }
   }
 } else {
