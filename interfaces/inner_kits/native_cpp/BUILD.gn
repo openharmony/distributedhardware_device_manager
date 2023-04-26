@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
-        "//commonlibrary/utils_lite/include
+        "//commonlibrary/utils_lite/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
@@ -153,7 +153,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
-      "utils_lite:utils",
     ]
 
     subsystem_name = "distributedhardware"
