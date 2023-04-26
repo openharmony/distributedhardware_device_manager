@@ -13,9 +13,8 @@
 
 import("//foundation/arkui/ace_engine/build/ace_gen_sa_dialog_js.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-
 gen_sa_dialog_js("dialog_js_files_etc") {
-  project_path = "//foundation/distributedhardware/device_manager/common/include/show_confirm_dialog/dialog_ui/js"
+  project_path = "${common_path}/include/show_confirm_dialog/dialog_ui/js"
   dialog_name = "config_dialog_service"
   part_name = "device_manager"
   subsystem_name = "distributedhardware"

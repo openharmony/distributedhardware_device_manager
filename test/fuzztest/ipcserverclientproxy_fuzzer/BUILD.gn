@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,20 +19,15 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("IpcServerClientProxyFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/ipcserverclientproxy_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/fuzztest/ipcserverclientproxy_fuzzer"
 
   include_dirs = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
-    "//third_party/node/src",
-    "//foundation/arkui/napi/native_engine",
-    "//foundation/arkui/napi/interfaces/kits",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
+    "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/notify",
-    "//third_party/json/include",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
@@ -48,29 +43,19 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/deviceinfo",
     "${servicesimpl_path}/include/devicestate",
-    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-    "//foundation/communication/softbus_lite/interfaces/kits/transport",
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
-    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//foundation/distributedhardware/device_manager/test/unittest/mock",
-    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
-    "//base/security/device_auth/interfaces/inner_api",
+    "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-    "//commonlibrary/utils_lite/include",
     "//third_party/bounds_checking_function/include",
-    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
-    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
     "//third_party/json/include",
-    "//foundation/arkui/napi/interfaces/inner_api/napi",
-    "//foundation/arkui/napi/interfaces/inner_api",
     "//third_party/jsframework/runtime/main/extend",
     "//third_party/jsframework/runtime/main/extend/systemplugin",
     "//third_party/node/benchmark",
     "//third_party/libuv/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
+    "//third_party/node/src",
+    "//third_party/json/include",
   ]
+
   cflags = [
     "-g",
     "-O0",
@@ -78,11 +63,11 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "//foundation/distributedhardware/device_manager/services/service/src/ipc/standard/ipc_server_client_proxy.cpp",
+    "${devicemanager_path}/services/service/src/ipc/standard/ipc_server_client_proxy.cpp",
     "ipc_server_client_proxy_fuzzer.cpp",
   ]
 
-  deps = [ "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice" ]
+  deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -90,11 +75,16 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "c_utils:utils",
+    "device_auth:deviceauth_sdk",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "safwk:system_ability_fwk",
+  ]
 
   public_deps = [
-    "//commonlibrary/c_utils/base:utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]

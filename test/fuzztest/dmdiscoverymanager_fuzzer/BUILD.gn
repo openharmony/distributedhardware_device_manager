@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,11 +19,11 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/dmdiscoverymanager_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/fuzztest/dmdiscoverymanager_fuzzer"
 
   include_dirs = [
     "${utils_path}/include",
-    "//utils/system/safwk/native/include",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
@@ -38,6 +38,7 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
+
   sources = [ "dm_discovery_manager_fuzzer.cpp" ]
 
   deps = [
@@ -51,7 +52,10 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "safwk:system_ability_fwk",
+  ]
 }
 
 ###############################################################################

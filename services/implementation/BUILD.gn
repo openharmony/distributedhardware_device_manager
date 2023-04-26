@@ -23,8 +23,8 @@ if (defined(ohos_lite)) {
   if (ohos_kernel_type == "liteos_m") {
     static_library("devicemanagerservice_mini") {
       include_dirs = [
-        "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
-        "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/notify",
+        "${innerkits_path}/native_cpp/include",
+        "${innerkits_path}/native_cpp/include/notify",
         "${servicesimpl_path}/include",
         "${servicesimpl_path}/include/config",
         "${servicesimpl_path}/include/adapter",
@@ -40,39 +40,20 @@ if (defined(ohos_lite)) {
         "${servicesimpl_path}/include/dependency/softbus",
         "${servicesimpl_path}/include/dependency/mini",
         "${servicesimpl_path}/include/dependency/timer",
+        "${servicesimpl_path}/include/dispatch",
         "${servicesimpl_path}/include/eventbus",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
-        "//base/security/device_auth/interfaces/inner_api",
-        "//third_party/json/include",
         "${utils_path}/include",
         "${utils_path}/include/dfx",
         "${utils_path}/include/dfx/lite",
         "${utils_path}/include/permission/lite",
         "foundation/multimedia/image_framework/mock/native/include",
-        "${servicesimpl_path}/include/dispatch",
         "${ext_path}/pin_auth/include",
         "${ext_path}/pin_auth/include/lite",
-      ]
-
-      include_dirs += [
-        "//base/security/device_auth/interfaces/inner_api",
-        "//base/startup/init/interfaces/innerkits/include/syspara",
-        "//commonlibrary/utils_lite/include",
-        "//utils/system/safwk/native/include",
         "//third_party/json/include",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
         "//third_party/bounds_checking_function/include",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-        "//foundation/communication/dsoftbus/interfaces/kits/common",
-        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-        "//foundation/communication/dsoftbus/interfaces/kits/transport",
-        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-        "//foundation/distributedhardware/device_manager/services/implementation/include/dependency/multipleuser",
-        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
-        "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       ]
 
       sources = [
@@ -114,16 +95,20 @@ if (defined(ohos_lite)) {
       ldflags = dm_ldflags
 
       deps = [
-        "${devicemanager_path}/interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
+        "${innerkits_path}/native_cpp:devicemanagersdk_mini",
         "${utils_path}:devicemanagerutils_mini",
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//base/security/device_auth/services:deviceauth",
-        "//base/startup/init/interfaces/innerkits:libbegetutil",
-        "//commonlibrary/utils_lite:utils",
-        "//foundation/communication/dsoftbus/sdk:softbus_client",
-        "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
         "//third_party/mbedtls",
+      ]
+
+      external_deps = [
+        "device_auth:deviceauth_sdk",
+        "dsoftbus:softbus_client",
+        "hilog_lite:hilog_static",
+        "init:libbegetutil",
+        "ipc:ipc_single",
+        "safwk:system_ability_fwk",
+        "utils_lite:utils",
       ]
     }
   }
@@ -157,14 +142,9 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/dfx",
       "${utils_path}/include/dfx/standard",
       "${utils_path}/include/permission/standard",
-      "//base/security/device_auth/interfaces/inner_api",
       "//third_party/json/include",
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
-      "//base/global/resource_management/interfaces/inner_api/include",
     ]
 
     if (os_account_part_exists) {
@@ -228,6 +208,7 @@ if (defined(ohos_lite)) {
       "dsoftbus:softbus_client",
       "init:libbegetutil",
       "ipc:ipc_core",
+      "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
     ]
 

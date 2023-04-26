@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,11 +18,12 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("PinAuthFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/pinauth_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/fuzztest/pinauth_fuzzer"
 
   include_dirs = [
-    "${devicemanager_path}/ext/pin_auth/include",
-    "${devicemanager_path}/ext/pin_auth/include/standard",
+    "${ext_path}/pin_auth/include",
+    "${ext_path}/pin_auth/include/standard",
     "${common_path}/include",
     "${ext_path}/pin_auth/include/ability",
     "${servicesimpl_path}/include/dependency/timer",
@@ -50,17 +51,6 @@ ohos_fuzztest("PinAuthFuzzTest") {
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "//third_party/json/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//base/notification/common_event_service/frameworks/core/include",
-    "//base/notification/common_event_service/interfaces/innerkits/native/include",
-    "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
-    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//base/global/resource_management/interfaces/inner_api/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
   ]
 
   cflags = [
@@ -71,17 +61,17 @@ ohos_fuzztest("PinAuthFuzzTest") {
   ]
 
   sources = [
-    "${devicemanager_path}/ext/pin_auth/src/ability/standard/dm_ability_manager.cpp",
-    "${devicemanager_path}/ext/pin_auth/src/pin_auth.cpp",
-    "${devicemanager_path}/ext/pin_auth/src/standard/pin_auth_ui.cpp",
+    "${ext_path}/pin_auth/src/ability/standard/dm_ability_manager.cpp",
+    "${ext_path}/pin_auth/src/pin_auth.cpp",
+    "${ext_path}/pin_auth/src/standard/pin_auth_ui.cpp",
     "pinauth_fuzzer.cpp",
   ]
 
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
-    "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${services_path}:devicemanagerservice",
   ]
 
   defines = [
@@ -92,8 +82,13 @@ ohos_fuzztest("PinAuthFuzzTest") {
 
   external_deps = [
     "ability_base:want",
+    "common_event_service:cesfwk_core",
+    "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",
     "init:libbegetutil",
+    "ipc:ipc_single",
+    "resource_management:resmgr_napi_core",
+    "safwk:system_ability_fwk",
   ]
 }
 

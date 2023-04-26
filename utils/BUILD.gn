@@ -30,18 +30,9 @@ if (defined(ohos_lite)) {
         "${utils_path}/include/permission/lite",
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
-      ]
-
-      include_dirs += [
-        "//base/security/device_auth/interfaces/inner_api",
-        "//base/startup/init/interfaces/innerkits/include/syspara",
-        "//commonlibrary/utils_lite/include",
-        "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//third_party/openssl/include",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
-        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
 
       sources = [
@@ -64,18 +55,25 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//base/startup/init/interfaces/innerkits:libbegetutil",
-        "//commonlibrary/utils_lite:utils",
-        "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/mbedtls",
         "//third_party/mbedtls:mbedtls_shared",
+      ]
+
+      external_deps = [
+        "device_auth:deviceauth_sdk",
+        "hilog_lite:hilog_static",
+        "init:libbegetutil",
+        "safwk:system_ability_fwk",
+        "utils_lite:utils",
       ]
     }
   } else {
     shared_library("devicemanagerutils") {
       include_dirs = [
+        "include",
+        "include/crypto",
+        "include/fwkload/lite",
+        "include/permission/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
@@ -83,28 +81,11 @@ if (defined(ohos_lite)) {
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
-        "include",
-        "include/crypto",
-        "include/fwkload/lite",
-        "include/permission/lite",
-      ]
-      include_dirs += [
-        "//base/security/device_auth/interfaces/inner_api",
-        "//base/startup/init/interfaces/innerkits/include/syspara",
-        "//commonlibrary/utils_lite/include",
-        "//utils/system/safwk/native/include",
         "//third_party/json/include",
         "//third_party/openssl/include",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
         "//third_party/bounds_checking_function/include",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-        "//foundation/communication/dsoftbus/interfaces/kits/common",
-        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-        "//foundation/communication/dsoftbus/interfaces/kits/transport",
-        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
       ]
+
       sources = [
         "${common_path}/src/dfx/lite/dm_hidumper.cpp",
         "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
@@ -118,22 +99,19 @@ if (defined(ohos_lite)) {
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
         "src/permission/lite/permission_manager.cpp",
       ]
+
       defines = [
         "LITE_DEVICE",
         "hI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerutils\"",
         "lOG_DOMAIN=0xD004100",
       ]
+
       deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//base/startup/init/interfaces/innerkits:libbegetutil",
-        "//commonlibrary/utils_lite:utils",
-        "//foundation/communication/dsoftbus/sdk:softbus_client",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
       ]
+
     }
   }
 } else {
@@ -150,10 +128,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
       "${innerkits_path}/native_cpp/include",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_base/include",
-      "//foundation/ability/ability_base/interfaces/kits/native/want/include",
-      "//foundation/ability/ability_base/interfaces/kits/native/uri/include",
-      "//foundation/ability/ability_base/interfaces/inner_api/base/include",
       "//third_party/mbedtls/include/mbedtls",
       "//third_party/json/include",
       "//third_party/openssl/include",
@@ -172,6 +146,7 @@ if (defined(ohos_lite)) {
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
     ]
+
     if (support_jsapi) {
       sources += [
         "src/fwkload/standard/dm_distributed_hardware_load.cpp",
@@ -193,14 +168,18 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
       "access_token:libaccesstoken_sdk",
+      "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
+
     if (support_jsapi) {
       external_deps += [ "bundle_framework:appexecfwk_core" ]
     }

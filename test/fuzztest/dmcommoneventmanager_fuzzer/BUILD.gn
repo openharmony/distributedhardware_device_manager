@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,18 +19,17 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("DmCommonEventManagerFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/dmcommoneventmanager_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/fuzztest/dmcommoneventmanager_fuzzer"
 
   include_dirs = [
     "${utils_path}/include",
-    "//utils/system/safwk/native/include",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/dependency/commonevent",
-    "//base/notification/common_event_service/interfaces/inner_api",
   ]
 
   cflags = [
@@ -39,6 +38,7 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
+
   sources = [
     "${servicesimpl_path}/src/dependency/commonevent/dm_common_event_manager.cpp",
     "dm_common_event_manager_fuzzer.cpp",
@@ -47,7 +47,7 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
   deps = [
     "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 
   defines = [
@@ -64,6 +64,7 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
     "dsoftbus:softbus_client",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
