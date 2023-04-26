@@ -159,7 +159,7 @@ ohos_unittest("UTTest_device_manager_service") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = ["device_auth:deviceauth_sdk",]
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_service }}}
@@ -182,6 +182,8 @@ ohos_unittest("UTTest_softbus_connector") {
   module_out_path = module_out_path
 
   sources = [
+    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
+    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/softbus/softbus_listener.cpp",
@@ -196,8 +198,6 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "UTTest_softbus_connector.cpp",
   ]
 
@@ -498,8 +498,8 @@ ohos_unittest("UTTest_device_manager_service_listener") {
   module_out_path = module_out_path
 
   sources = [
-    "${services_path}/src/device_manager_service_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
+    "${services_path}/src/device_manager_service_listener.cpp",
     "UTTest_device_manager_service_listener.cpp",
   ]
 
@@ -579,6 +579,8 @@ ohos_unittest("UTTest_dm_discovery_manager") {
   module_out_path = module_out_path
 
   sources = [
+    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
+    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/softbus/softbus_listener.cpp",
@@ -587,8 +589,6 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "UTTest_dm_discovery_manager.cpp",
   ]
 
@@ -607,6 +607,8 @@ ohos_unittest("UTTest_dm_publish_manager") {
   module_out_path = module_out_path
 
   sources = [
+    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
+    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
     "${services_path}/src/device_manager_service_listener.cpp",
     "${services_path}/src/softbus/softbus_listener.cpp",
@@ -614,8 +616,6 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "UTTest_dm_publish_manager.cpp",
   ]
 
@@ -699,8 +699,8 @@ ohos_static_library("device_manager_test_common") {
   public_configs = [ ":device_manager_test_common_public_config" ]
 
   public_deps = [
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
+    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
@@ -712,9 +712,7 @@ ohos_static_library("device_manager_test_common") {
     "//third_party/googletest:gtest",
   ]
 
-  deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
-  ]
+  deps = [ "${ability_runtime_innerkits_path}/ability_manager:ability_manager" ]
 
   if (os_account_part_exists) {
     cflags_cc += [ "-DOS_ACCOUNT_PART_EXISTS" ]
@@ -724,9 +722,9 @@ ohos_static_library("device_manager_test_common") {
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
