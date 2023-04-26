@@ -66,7 +66,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
         "//third_party/bounds_checking_function/include",

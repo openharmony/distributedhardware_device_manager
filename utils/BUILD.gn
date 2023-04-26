@@ -112,6 +112,10 @@ if (defined(ohos_lite)) {
         "//third_party/mbedtls:mbedtls_shared",
       ]
 
+      external_deps = [
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+      ]
     }
   }
 } else {
