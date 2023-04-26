@@ -81,6 +81,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
         "//third_party/json/include",
         "//third_party/openssl/include",
         "//third_party/bounds_checking_function/include",
@@ -112,10 +113,6 @@ if (defined(ohos_lite)) {
         "//third_party/mbedtls:mbedtls_shared",
       ]
 
-      external_deps = [
-        "ipc:ipc_core",
-        "ipc:ipc_single",
-      ]
     }
   }
 } else {
