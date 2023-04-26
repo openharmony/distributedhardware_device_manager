@@ -68,6 +68,9 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
+        "//commonlibrary/utils_lite/include
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
         "//third_party/bounds_checking_function/include",
@@ -140,6 +143,9 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
+      "access_token:libaccesstoken_sdk",
+      "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
@@ -147,6 +153,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
+      "utils_lite:utils",
     ]
 
     subsystem_name = "distributedhardware"
