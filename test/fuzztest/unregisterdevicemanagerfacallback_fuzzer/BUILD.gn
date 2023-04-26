@@ -19,8 +19,7 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("UnRegisterDeviceManagerFaCallbackFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file =
-      "${devicemanager_path}/test/fuzztest/unregisterdevicemanagerfacallback_fuzzer"
+  fuzz_config_file = "${devicemanager_path}/test/fuzztest/unregisterdevicemanagerfacallback_fuzzer"
 
   include_dirs = [
     "${utils_path}/include",
