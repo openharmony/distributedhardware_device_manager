@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -49,11 +49,6 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include/ipc",
       "${innerkits_path}/native_cpp/include/ipc/standard",
       "//third_party/json/include",
-      "//commonlibrary/c_utils/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/notification/common_event_service/frameworks/core/include",
-      "//base/notification/common_event_service/interfaces/innerkits/native/include",
-      "//base/security/device_auth/interfaces/inner_api",
     ]
 
     sources = [
@@ -64,10 +59,9 @@ if (defined(ohos_lite)) {
     deps = [
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${services_path}:devicemanagerservice",
+      "${servicesimpl_path}:devicemanagerserviceimpl",
       "${utils_path}:devicemanagerutils",
-      "//base/security/device_auth/services:deviceauth_sdk",
-      "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
-      "//foundation/distributedhardware/device_manager/services/service:devicemanagerservice",
     ]
 
     external_deps = [
@@ -77,6 +71,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
+      "device_auth:deviceauth_sdk",
       "dsoftbus:softbus_client",
       "hiviewdfx_hilog_native:libhilog",
       "init:libbeget_proxy",

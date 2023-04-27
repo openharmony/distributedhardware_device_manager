@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,23 +18,23 @@ if (defined(ohos_lite)) {
 }
 
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-innerkits_path_mini = "${devicemanager_path}/interfaces/inner_kits"
+
+innerkits_path_mini = "${innerkits_path}"
 kits_path = "${devicemanager_path}/interfaces/kits"
 
 if (ohos_kernel_type == "liteos_m") {
   static_library("devicemanager_native_js") {
     include_dirs = [
-      "//third_party/node/src",
-      "//third_party/json/include",
       "${common_path}/include",
-      "//commonlibrary/c_utils/base/include",
       "${kits_path}/js_mini/include",
       "${utils_path}/include",
+      "${innerkits_path_mini}/native_cpp/include",
       "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/base",
       "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/jsi",
       "//foundation/arkui/ace_engine_lite/interfaces/inner_api/builtin/async",
       "//foundation/arkui/ace_engine_lite/frameworks/include/context",
-      "${innerkits_path_mini}/native_cpp/include",
+      "//third_party/node/src",
+      "//third_party/json/include",
     ]
 
     sources = [

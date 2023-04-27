@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,7 +14,8 @@
 import("//build/ohos.gni")
 
 ohos_prebuilt_etc("ohos.para.dac") {
-  source = "//foundation/distributedhardware/device_manager/services/etc/devicemanager.para.dac"
+  source = "devicemanager.para.dac"
+  subsystem_name = "distributedhardware"
   part_name = "device_manager"
   module_install_dir = "etc/param"
 }

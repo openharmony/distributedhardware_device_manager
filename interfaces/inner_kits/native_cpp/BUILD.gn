@@ -28,12 +28,8 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/model",
         "${servicesimpl_path}/include/dispatch",
-      ]
-      include_dirs += [
-        "//commonlibrary/utils_lite/include",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
-        "//third_party/bounds_checking_function/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+        "//third_party/bounds_checking_function/include",
         "//third_party/json/include",
       ]
 
@@ -50,11 +46,13 @@ if (defined(ohos_lite)) {
         "LOG_DOMAIN=0xD004100",
       ]
 
-      deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
-        "//commonlibrary/utils_lite:utils",
-        "//foundation/systemabilitymgr/samgr_lite/samgr",
-        "//third_party/bounds_checking_function:libsec_static",
+      deps = [ "//third_party/bounds_checking_function:libsec_static" ]
+
+      external_deps = [
+        "hilog_lite:hilog_static",
+        "ipc:ipc_single",
+        "napi:ace_napi",
+        "utils_lite:utils",
       ]
     }
   } else {
@@ -70,16 +68,15 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
-      ]
-      include_dirs += [
         "//commonlibrary/utils_lite/include",
-        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits/hilog",
-        "//third_party/bounds_checking_function/include",
         "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
+        "//third_party/bounds_checking_function/include",
         "//third_party/json/include",
       ]
+
       sources = [
         "src/device_manager.cpp",
         "src/device_manager_impl.cpp",
@@ -90,13 +87,9 @@ if (defined(ohos_lite)) {
         "src/ipc/lite/ipc_cmd_parser.cpp",
         "src/notify/device_manager_notify.cpp",
       ]
-      deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//commonlibrary/utils_lite:utils",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-        "//third_party/bounds_checking_function:libsec_shared",
-      ]
+
+      deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
       defines = [
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
@@ -150,11 +143,13 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "access_token:libaccesstoken_sdk",
       "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
 

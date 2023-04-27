@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -24,13 +24,6 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include/notify",
     "${services_path}/include/dependency/softbus",
-    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-    "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
   ]
 
   cflags = []
@@ -41,11 +34,16 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   deps = [
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//foundation/arkui/napi:ace_napi",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "../../../../distributed_hardware_fwk/utils:distributedhardwareutils",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "dsoftbus:softbus_client",
+    "ipc:ipc_single",
+    "napi:ace_napi",
   ]
 }
 

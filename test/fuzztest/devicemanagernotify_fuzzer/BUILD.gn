@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,16 +19,14 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "//foundation/distributedhardware/device_manager/test/fuzztest/devicemanagernotify_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/fuzztest/devicemanagernotify_fuzzer"
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/notify",
-    "//third_party/json/include",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
@@ -47,29 +45,29 @@ ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/deviceinfo/",
     "${servicesimpl_path}/include/devicestate",
-    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-    "//foundation/communication/softbus_lite/interfaces/kits/transport",
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
-    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
-    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-    "//foundation/distributedhardware/device_manager/test/unittest/mock",
-    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
-    "//base/security/device_auth/interfaces/inner_api",
+    "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
+    "//third_party/json/include",
   ]
+
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
+
   sources = [ "device_manager_notify_fuzzer.cpp" ]
 
   deps = [
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
-    "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
+  ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ipc:ipc_single",
   ]
 
   defines = [

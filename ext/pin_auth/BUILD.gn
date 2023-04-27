@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -49,11 +49,6 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include/ipc",
       "${innerkits_path}/native_cpp/include/ipc/lite",
       "//third_party/json/include",
-      "//commonlibrary/c_utils/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/notification/ces_lite/frameworks/core/include",
-      "//base/notification/ces_lite/interfaces/innerkits/native/include",
-      "//base/security/device_auth/interfaces/inner_api",
     ]
 
     sources = [
@@ -66,13 +61,20 @@ if (defined(ohos_lite)) {
       "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//commonlibrary/utils_lite:utils",
-      "//foundation/communication/dsoftbus/sdk:softbus_client",
-      "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
       "//third_party/mbedtls:mbedtls_shared",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "common_event_service:cesfwk_core",
+      "common_event_service:cesfwk_innerkits",
+      "device_auth:deviceauth_sdk",
+      "dsoftbus:softbus_client",
+      "hilog_lite:hilog_shared",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+      "utils_lite:utils",
     ]
 
     defines = [
@@ -113,18 +115,6 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include/ipc",
       "${innerkits_path}/native_cpp/include/ipc/standard",
       "//third_party/json/include",
-      "//commonlibrary/c_utils/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/notification/common_event_service/frameworks/core/include",
-      "//base/notification/common_event_service/interfaces/innerkits/native/include",
-      "//base/security/device_auth/interfaces/inner_api",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include",
-      "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
-      "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
-      "//foundation/communication/dsoftbus/interfaces/kits/common",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-      "//base/global/resource_management/interfaces/inner_api/include",
-      "//foundation/communication/dsoftbus/interfaces/kits/transport",
     ]
 
     sources = [
@@ -136,13 +126,19 @@ if (defined(ohos_lite)) {
     deps = [
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
-      "//foundation/distributedhardware/device_manager/services/implementation:devicemanagerserviceimpl",
+      "${servicesimpl_path}:devicemanagerserviceimpl",
     ]
 
     external_deps = [
       "ability_base:want",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "c_utils:utils",
       "device_auth:deviceauth_sdk",
       "init:libbegetutil",
+      "ipc:ipc_single",
+      "resource_management:resmgr_napi_core",
+      "safwk:system_ability_fwk",
     ]
 
     defines = [
