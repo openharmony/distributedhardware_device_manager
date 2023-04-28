@@ -43,18 +43,20 @@ DmNativeEvent::~DmNativeEvent()
 void DmNativeEvent::On(std::string &eventType, JSIValue handle, JSIValue thisVal)
 {
     LOGI("DmNativeEvent::On in for event: %s", eventType.c_str());
-    std::shared_ptr<DmEventListener> listener= std::make_shared<DmEventListener>();
+    std::shared_ptr<DmEventListener> listener = std::make_shared<DmEventListener>();
     
     listener->eventType = eventType;
     listener->handlerRef = JSI::AcquireValue(handle);
     
     listener->thisVarRef_ = JSI::AcquireValue(thisVal);
+    std::lock_guard<std::mutex> lock(eventmapMutex_);
     eventMap_[eventType] = listener;
 }
 
 void DmNativeEvent::Off(std::string &eventType)
 {
     LOGI("DmNativeEvent Off in for event: %s", eventType.c_str());
+    std::lock_guard<std::mutex> lock(eventmapMutex_);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         LOGE("eventType %s not find", eventType.c_str());
@@ -62,7 +64,7 @@ void DmNativeEvent::Off(std::string &eventType)
     }
     std::shared_ptr<DmEventListener> listener = iter->second;
     JSI::ReleaseValue(listener->handlerRef);
-     
+
     JSI::ReleaseValue(listener->thisVarRef_);
     eventMap_.erase(eventType);
 }
@@ -70,13 +72,17 @@ void DmNativeEvent::Off(std::string &eventType)
 void DmNativeEvent::OnEvent(const std::string &eventType, uint8_t argsSize, const JSIValue *data)
 {
     LOGI("OnEvent for %s", eventType.c_str());
-
-    auto iter = eventMap_.find(eventType);
-    if (iter == eventMap_.end()) {
-        LOGE("eventType %s not find", eventType.c_str());
-        return;
+    std::shared_ptr<DmEventListener> listener = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventmapMutex_);
+        auto iter = eventMap_.find(eventType);
+        if (iter == eventMap_.end()) {
+            LOGE("eventType %s not find", eventType.c_str());
+            return;
+        }
+        listener = iter->second;
     }
-    auto listener = iter->second;
+
     if (!JSI::ValueIsFunction(listener->handlerRef)) {
         LOGI("OnEvent for %s handlerRef is null", eventType.c_str());
         return;

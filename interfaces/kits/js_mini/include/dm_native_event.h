@@ -17,6 +17,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include "jsi.h"
 #include "dm_device_info.h"
@@ -46,6 +47,7 @@ public:
     virtual void OnEvent(const std::string &eventType, uint8_t argsSize, const JSIValue *data);
     static void OnEventAsyncWorkFunc(void *data);
 protected:
+    std::mutex eventmapMutex_;
     static std::map<std::string, std::shared_ptr<DmEventListener>> eventMap_;
 };
 }
