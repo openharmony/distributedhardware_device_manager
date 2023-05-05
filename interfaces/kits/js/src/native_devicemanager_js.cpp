@@ -2211,10 +2211,13 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         }
         napi_valuetype valueType1 = napi_undefined;
         napi_typeof(env, argv[1], &valueType1);
-        if (!CheckArgsType(env, valueType1 == napi_string, "filterOptions", "string")) {
+        if (CheckArgsType(env, valueType1 == napi_undefined, "filterOptions", "undefined")) {
+            extra = "";
+        } else if (CheckArgsType(env, valueType1 == napi_string, "filterOptions", "string")) {
+            JsToDmDiscoveryExtra(env, argv[1], extra);
+        } else {
             return nullptr;
         }
-        JsToDmDiscoveryExtra(env, argv[1], extra);
     }
     std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
     auto iter = g_DiscoveryCallbackMap.find(deviceManagerWrapper->bundleName_);

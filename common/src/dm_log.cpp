@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t LOG_MAX_LEN = 512;
+const std::string DHDM_LOG_TITLE_TAG = "DHDM";
 
 static void DmLogOut(DmLogLevel logLevel, const char *logBuf)
 {
@@ -48,7 +49,7 @@ static void DmLogOut(DmLogLevel logLevel, const char *logBuf)
         default:
             break;
     }
-    (void)HiLogPrint(LOG_CORE, hiLogLevel, LOG_DOMAIN, "", "%{public}s", logBuf);
+    (void)HiLogPrint(LOG_CORE, hiLogLevel, LOG_DOMAIN, DHDM_LOG_TITLE_TAG.c_str(), "%{public}s", logBuf);
 #else
     switch (logLevel) {
         case DM_LOG_DEBUG:
