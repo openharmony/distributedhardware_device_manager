@@ -1,7 +1,7 @@
 {
     "name": "@ohos/device_manager",
     "description": "device manager service",
-    "version": "3.1",
+    "version": "4.0",
     "license": "Apache License 2.0",
     "repository": "https://gitee.com/openharmony/device_manager",
     "publishAs": "code-segment",
@@ -16,8 +16,8 @@
         "syscap":[ "SystemCapability.DistributedHardware.DeviceManager" ],
         "features":["device_manager_no_interaction_auth"],
         "adapted_system_type": [ "standard", "small" ],
-        "rom": "2M",
-        "ram": "16M",
+        "rom": "2048KB",
+        "ram": "16384KB",
         "hisysevent_config": [
             "//foundation/distributedhardware/device_manager/hisysevent.yaml"
           ],

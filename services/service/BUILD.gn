@@ -75,7 +75,7 @@ if (defined(ohos_lite)) {
 
       if (os_account_part_exists) {
         defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-        include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+        include_dirs += [ "${os_account_path }/interfaces/innerkits/osaccount/native/include" ]
       }
 
       ldflags = dm_ldflags

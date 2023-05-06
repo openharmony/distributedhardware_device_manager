@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -89,7 +89,7 @@ if (defined(ohos_lite)) {
 
       if (os_account_part_exists) {
         defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-        include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+        include_dirs += [ "${os_account_path }/interfaces/innerkits/osaccount/native/include" ]
       }
 
       ldflags = dm_ldflags
@@ -148,7 +148,7 @@ if (defined(ohos_lite)) {
     ]
 
     if (os_account_part_exists) {
-      include_dirs += [ "//base/account/os_account/interfaces/innerkits/osaccount/native/include" ]
+      include_dirs += [ "${os_account_path }/interfaces/innerkits/osaccount/native/include" ]
     }
   }
 
@@ -192,7 +192,7 @@ if (defined(ohos_lite)) {
 
     if (os_account_part_exists) {
       defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-      deps += [ "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits" ]
+      deps += [ "${os_account_path }/frameworks/osaccount/native:os_account_innerkits" ]
     }
 
     if (!device_manager_no_interaction_auth) {
