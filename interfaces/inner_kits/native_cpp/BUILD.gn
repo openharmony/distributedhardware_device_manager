@@ -68,8 +68,11 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
+        "${interfaces_path}/c/ipc/include",
+        "${interfaces_path}/ipc_core/include",
         "${samgr_lite_path}/kits/samgr",
         "${samgr_lite_path}/kits/registry",
+        "${utils_lite_path}/include",
         "//third_party/bounds_checking_function/include",
         "//third_party/json/include",
       ]
@@ -146,7 +149,9 @@ if (defined(ohos_lite)) {
       "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "ipc:ipc_napi_common",
       "ipc:ipc_single",
+      "ipc:libdbinder",
       "samgr:samgr_proxy",
     ]
 

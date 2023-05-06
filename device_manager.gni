@@ -27,6 +27,8 @@ ace_engine_lite_path = "//foundation/arkui/ace_engine_lite"
 access_token_path = "//base/security/access_token/interfaces/innerkits"
 os_account_path = "//base/account/os_account"
 samgr_lite_path = "//foundation/systemabilitymgr/samgr_lite/interfaces"
+interfaces_path = "//foundation/communication/ipc/interfaces/innerkits"
+utils_lite_path = "//commonlibrary/utils_lite"
 
 #--------------------------softbus----------------------------------#
 
