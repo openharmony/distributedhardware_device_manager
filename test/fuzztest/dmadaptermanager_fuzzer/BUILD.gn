@@ -34,7 +34,6 @@ ohos_fuzztest("DmAdapterManagerFuzzTest") {
     "${servicesimpl_path}/include/config",
     "${innerkits_path}/native_cpp/include",
     "${servicesimpl_path}/include/authentication",
-    "//commonlibrary/c_utils/base/include/",
     "//third_party/node/benchmark",
     "//third_party/node/src",
   ]
