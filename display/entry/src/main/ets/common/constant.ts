@@ -1,9 +1,9 @@
-export const Constant = {
-  DIALOG_HEIGHT_PROPORTION: 0.8,
-  HALF: 0.5,
-  TOP_OFFSET_PROPORTION: 6,
-  SHARE_WIDTH_PHONE: 360,
-  SHARE_HEIGHT_PHONE: 355,
-  SHARE_WIDTH_PAD: 519,
-  SHARE_HEIGHT_PAD: 256,
+export default class Constant {
+  static readonly DIALOG_HEIGHT_PROPORTION = 0.8;
+  static readonly HALF = 0.5;
+  static readonly TOP_OFFSET_PROPORTION = 6;
+  static readonly SHARE_WIDTH_PHONE = 360;
+  static readonly SHARE_HEIGHT_PHONE = 355;
+  static readonly SHARE_WIDTH_PAD = 519;
+  static readonly SHARE_HEIGHT_PAD = 256;
 };

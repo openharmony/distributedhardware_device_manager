@@ -2,7 +2,7 @@ import extension from '@ohos.app.ability.ServiceExtensionAbility';
 import window from '@ohos.window';
 import display from '@ohos.display';
 import deviceInfo from '@ohos.deviceInfo';
-import { Constant } from '../common/constant';
+import Constant from '../common/constant';
 import type Want from '@ohos.app.ability.Want';
 
 const TAG = '[DeviceManagerUI:PinCode]==>';
@@ -70,4 +70,4 @@ export default class ServiceExtAbility extends extension {
       console.info(TAG + 'window create failed');
     }
   }
-}
+};
