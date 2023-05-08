@@ -1,9 +1,9 @@
 import extension from '@ohos.app.ability.ServiceExtensionAbility';
-import Want from '@ohos.app.ability.Want';
 import window from '@ohos.window';
 import display from '@ohos.display';
 import deviceInfo from '@ohos.deviceInfo';
 import constant from '../common/constant';
+import type Want from '@ohos.app.ability.Want';
 
 const TAG = '[DeviceManagerUI:Confirm]==>';
 
@@ -52,8 +52,8 @@ export default class ServiceExtAbility extends extension {
   }
 
 
-  private async createWindow(name: string, windowType: number, rect:
-    { left: number; top: number; width: number; height: number; }): Promise<void> {
+  private async createWindow(name: string, windowType: window.WindowType,
+    rect: { left: number; top: number; width: number; height: number; }): Promise<void> {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
