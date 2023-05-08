@@ -27,7 +27,7 @@ export default class ServiceExtAbility extends extension {
       let dialogRect: { left: number; top: number; width: number; height: number; } = {
         left: (dis.width - (globalThis.style.shareWidth * density)) * constant.HALF,
         top: (dis.height - (globalThis.style.shareHeight * density)) * constant.HALF -
-        (globalThis.style.shareHeight * density) / constant.TOP_OFFSET_PROPORTION,
+          (globalThis.style.shareHeight * density) / constant.TOP_OFFSET_PROPORTION,
         width: globalThis.style.shareWidth * density,
         height: globalThis.style.shareHeight * density * constant.DIALOG_HEIGHT_PROPORTION
       };
