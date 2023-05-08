@@ -632,13 +632,17 @@ ohos_unittest("UTTest_dm_publish_manager") {
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
   include_dirs = [
+    "${access_token_path}/nativetoken/include",
+    "${access_token_path}/token_setproc/include",
+    "${access_token_path}/accesstoken/include",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${common_path}/include/ipc/model",
+    "${ext_path}/pin_auth/include",
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/notify",
-    "${common_path}/include",
-    "${common_path}/include/ipc",
-    "${common_path}/include/ipc/model",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
@@ -659,18 +663,14 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/dependency/multipleuser",
     "${devicemanager_path}/test/unittest/mock/",
-    "${ext_path}/pin_auth/include",
-    "//base/security/access_token/interfaces/innerkits/nativetoken/include",
-    "//base/security/access_token/interfaces/innerkits/token_setproc/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//third_party/json/include",
   ]
 
   if (os_account_part_exists) {
     include_dirs += [
-      "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
-      "//base/account/os_account/frameworks/common/database/include",
-      "//base/account/os_account/frameworks/common/account_error/include",
+      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+      "${os_account_path }/frameworks/common/database/include",
+      "${os_account_path }/frameworks/common/account_error/include",
     ]
   }
 
@@ -699,15 +699,15 @@ ohos_static_library("device_manager_test_common") {
   public_configs = [ ":device_manager_test_common_public_config" ]
 
   public_deps = [
+    "${access_token_path}/accesstoken:libaccesstoken_sdk",
+    "${access_token_path}/nativetoken:libnativetoken",
+    "${access_token_path}/token_setproc:libtoken_setproc",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",
-    "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
-    "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
-    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest",
   ]
@@ -716,7 +716,9 @@ ohos_static_library("device_manager_test_common") {
 
   if (os_account_part_exists) {
     cflags_cc += [ "-DOS_ACCOUNT_PART_EXISTS" ]
-    deps += [ "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits" ]
+    deps += [
+      "${os_account_path }/frameworks/osaccount/native:os_account_innerkits",
+    ]
   }
 
   external_deps = [

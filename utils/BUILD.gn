@@ -81,7 +81,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
-        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "${interfaces_path}/c/ipc/include",
         "//third_party/json/include",
         "//third_party/bounds_checking_function/include",
       ]
