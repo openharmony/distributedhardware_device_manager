@@ -15,7 +15,7 @@
 
 import Ability from '@ohos.app.ability.UIAbility';
 
-let TAG = 'DeviceManagerUI_MainAbility:';
+const TAG = 'DeviceManagerUI_MainAbility:';
 
 export default class MainAbility extends Ability {
   onCreate(want, launchParam): void {

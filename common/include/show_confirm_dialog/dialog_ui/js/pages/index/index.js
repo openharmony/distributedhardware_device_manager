@@ -15,38 +15,40 @@
 
 import router from '@ohos.router'
 
-var timel = null;
-var EVENT_CONFIRM = "EVENT_CONFIRM";
-var EVENT_CANCEL = "EVENT_CANCEL";
-var EVENT_INIT = "EVENT_INIT";
-var EVENT_CONFIRM_CODE = "0";
-var EVENT_CANCEL_CODE = "1";
-var EVENT_INIT_CODE = "2";
+let timel = null;
+const EVENT_CONFIRM = 'EVENT_CONFIRM';
+const EVENT_CANCEL = 'EVENT_CANCEL';
+const EVENT_INIT = 'EVENT_INIT';
+const EVENT_CONFIRM_CODE = '0';
+const EVENT_CANCEL_CODE = '1';
+const EVENT_INIT_CODE = '2';
+const MS_PER_SECOND = 1000;
+
 export default {
-    data: {
-        seconds:60,
-    },
-    onInit() {
-        callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
-    },
-    onShow() {
-        timel = setInterval(this.run,1000)
-    },
-    run() {
-        this.seconds--;
-        if (this.seconds == 0) {
-            clearInterval(timel);
-            timel = null;
-            console.info('click cancel');
-            callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
-        }
-    },
-    onConfirm() {
-        console.info('click confirm');
-        callNativeHandler(EVENT_CONFIRM, EVENT_CONFIRM_CODE);
-    },
-    onCancel() {
-        console.info('click cancel');
-        callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
+  data: {
+    seconds:60,
+  },
+  onInit() {
+    callNativeHandler(EVENT_INIT, EVENT_INIT_CODE);
+  },
+  onShow() {
+    timel = setInterval(this.run, MS_PER_SECOND);
+  },
+  run() {
+    this.seconds--;
+    if (this.seconds === 0) {
+      clearInterval(timel);
+      timel = null;
+      console.info('click cancel');
+      callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
     }
+  },
+  onConfirm() {
+    console.info('click confirm');
+    callNativeHandler(EVENT_CONFIRM, EVENT_CONFIRM_CODE);
+  },
+  onCancel() {
+    console.info('click cancel');
+    callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
+  }
 }
