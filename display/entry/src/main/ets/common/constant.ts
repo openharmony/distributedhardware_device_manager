@@ -1,4 +1,4 @@
-export default {
+export const Constant = {
   DIALOG_HEIGHT_PROPORTION: 0.8,
   HALF: 0.5,
   TOP_OFFSET_PROPORTION: 6,

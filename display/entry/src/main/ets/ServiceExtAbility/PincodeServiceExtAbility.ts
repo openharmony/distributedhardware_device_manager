@@ -1,8 +1,8 @@
 import extension from '@ohos.app.ability.ServiceExtensionAbility';
-import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
 import display from '@ohos.display';
 import deviceInfo from '@ohos.deviceInfo';
-import constant from '../common/constant';
+import { Constant } from '../common/constant';
 import type Want from '@ohos.app.ability.Want';
 
 const TAG = '[DeviceManagerUI:PinCode]==>';
@@ -25,11 +25,11 @@ export default class ServiceExtAbility extends extension {
       // 获取像素密度系数
       let density: number = dis.densityPixels;
       let dialogRect: { left: number; top: number; width: number; height: number; } = {
-        left: (dis.width - (globalThis.style.shareWidth * density)) * constant.HALF,
-        top: (dis.height - (globalThis.style.shareHeight * density)) * constant.HALF -
-          (globalThis.style.shareHeight * density) / constant.TOP_OFFSET_PROPORTION,
+        left: (dis.width - (globalThis.style.shareWidth * density)) * Constant.HALF,
+        top: (dis.height - (globalThis.style.shareHeight * density)) * Constant.HALF -
+          (globalThis.style.shareHeight * density) / Constant.TOP_OFFSET_PROPORTION,
         width: globalThis.style.shareWidth * density,
-        height: globalThis.style.shareHeight * density * constant.DIALOG_HEIGHT_PROPORTION
+        height: globalThis.style.shareHeight * density * Constant.DIALOG_HEIGHT_PROPORTION
       };
       this.createWindow('picker Dialog:' + startId, window.WindowType.TYPE_FLOAT, dialogRect);
     });
@@ -40,12 +40,12 @@ export default class ServiceExtAbility extends extension {
     globalThis.style = {};
     if (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') {
       // 页面的默认类型是手机
-      globalThis.style.shareWidth = constant.SHARE_WIDTH_PHONE;
-      globalThis.style.shareHeight = constant.SHARE_HEIGHT_PHONE;
+      globalThis.style.shareWidth = Constant.SHARE_WIDTH_PHONE;
+      globalThis.style.shareHeight = Constant.SHARE_HEIGHT_PHONE;
     } else {
       // pad类型
-      globalThis.style.shareWidth = constant.SHARE_WIDTH_PAD;
-      globalThis.style.shareHeight = constant.SHARE_HEIGHT_PAD;
+      globalThis.style.shareWidth = Constant.SHARE_WIDTH_PAD;
+      globalThis.style.shareHeight = Constant.SHARE_HEIGHT_PAD;
     }
   }
 
