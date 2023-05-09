@@ -29,10 +29,9 @@ export default class MainAbility extends Ability {
     globalThis.allGroups = [];
   }
 
-  onWindowStageCreate(windowStage: window.Window): void {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     console.log(TAG + 'MainAbility onWindowStageCreate.');
-    windowStage.setUIContent(this.context, 'pages/authority-management', null);
   }
 
   onForeground(): void {
