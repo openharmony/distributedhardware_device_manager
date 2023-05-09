@@ -14,6 +14,7 @@
  */
 
 import Ability from '@ohos.app.ability.UIAbility';
+import AbilityConstant from "./@ohos.app.ability.AbilityConstant";
 import window from '@ohos.window';
 import type Want from '@ohos.app.ability.Want';
 
