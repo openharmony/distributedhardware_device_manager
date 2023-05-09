@@ -19,7 +19,7 @@ export default class ServiceExtAbility extends extension {
     // 每次startAbility拉起页面的时候, 都传递want
     globalThis.abilityWant = want;
     // 每次调用startAbility时可以在这里创建窗口
-    display.getDefaultDisplay().then(dis => {
+    display.getDefaultDisplay().then((dis: display.Display) => {
       // 获取像素密度系数
       let density: number = dis.densityPixels;
       let dialogRect: { left: number; top: number; width: number; height: number; } = {

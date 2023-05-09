@@ -14,11 +14,13 @@
  */
 
 import Ability from '@ohos.app.ability.UIAbility';
+import window from '@ohos.window';
+import type Want from '@ohos.app.ability.Want';
 
 const TAG = 'DeviceManagerUI_MainAbility:';
 
 export default class MainAbility extends Ability {
-  onCreate(want, launchParam): void {
+  onCreate(want: Want, param: AbilityConstant.LaunchParam): void {
     console.log(TAG + 'MainAbility onCreate, ability name is ' + want.abilityName + '.');
     globalThis.context = this.context;
     globalThis.allBundleInfo = [];
@@ -26,7 +28,7 @@ export default class MainAbility extends Ability {
     globalThis.allGroups = [];
   }
 
-  onWindowStageCreate(windowStage): void {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     console.log(TAG + 'MainAbility onWindowStageCreate.');
     windowStage.setUIContent(this.context, 'pages/authority-management', null);

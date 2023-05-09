@@ -21,7 +21,7 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'onRequest execute' + JSON.stringify(globalThis.abilityWant.parameters));
 
     // 每次调用startAbility时可以在这里创建窗口
-    display.getDefaultDisplay().then(dis => {
+    display.getDefaultDisplay().then((dis: display.Display) => {
       // 获取像素密度系数
       let density: number = dis.densityPixels;
       let dialogRect: { left: number; top: number; width: number; height: number; } = {
