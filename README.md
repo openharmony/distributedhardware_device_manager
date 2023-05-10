@@ -258,12 +258,8 @@ var deviceInfo ={
     deviceType: 0
 };
 let extraInfo = {
-    "appIcon": new Uint8Array(), // App icon. This parameter is optional.
-    "appThumbnail": new Uint8Array(), // App thumbnail. This parameter is optional.
-    "appName": "xxxxxxxx", // App name.
-    "appDescription": "xxxxxxxx", // App description.
-    "business": '0',
-    "displayOwner": 0,
+    "appOperation": "xxxxxxxx", // App operation. Support for user customization.
+    "customDescription": "xxxxxxxx", // Custom description. Support for user customization.
 }
 let authParam = {
     "authType": 1,

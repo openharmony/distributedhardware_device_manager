@@ -329,7 +329,6 @@ ON_IPC_SET_REQUEST(AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, Messag
     std::string extra = pReq->GetExtra();
     int32_t authType = pReq->GetAuthType();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
-    std::string deviceId = deviceInfo.deviceId;
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -339,8 +338,8 @@ ON_IPC_SET_REQUEST(AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, Messag
         LOGE("write extra failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteString(deviceId)) {
-        LOGE("write extra failed");
+    if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
+        LOGE("write deviceInfo failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(authType)) {

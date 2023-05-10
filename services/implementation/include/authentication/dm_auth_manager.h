@@ -70,7 +70,7 @@ typedef struct DmAuthRequestContext {
     std::string localDeviceId;
     std::string deviceId;
     std::string deviceName;
-    std::string deviceTypeId;
+    int32_t deviceTypeId;
     int32_t sessionId;
     int32_t groupVisibility;
     bool cryptoSupport;
@@ -78,9 +78,9 @@ typedef struct DmAuthRequestContext {
     std::string cryptoVer;
     std::string hostPkgName;
     std::string targetPkgName;
-    std::string appName;
+    std::string appOperation;
     std::string appDesc;
-    std::string appIcon;
+    std::string customDesc;
     std::string appThumbnail;
     std::string token;
     int32_t reason;
@@ -91,6 +91,8 @@ typedef struct DmAuthResponseContext {
     int32_t authType;
     std::string deviceId;
     std::string localDeviceId;
+    std::string deviceName;
+    int32_t deviceTypeId;
     int32_t msgType;
     int32_t sessionId;
     bool cryptoSupport;
@@ -103,8 +105,9 @@ typedef struct DmAuthResponseContext {
     std::string groupName;
     std::string hostPkgName;
     std::string targetPkgName;
-    std::string appName;
+    std::string appOperation;
     std::string appDesc;
+    std::string customDesc;
     std::string appIcon;
     std::string appThumbnail;
     std::string token;
@@ -132,7 +135,7 @@ public:
      * @tc.desc: Authenticate Device of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
                                const std::string &extra);
 
     /**

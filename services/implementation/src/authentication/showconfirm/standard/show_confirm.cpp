@@ -33,14 +33,13 @@ ShowConfirm::~ShowConfirm()
 void ShowConfirm::ShowConfirmDialog(const std::string &params, std::shared_ptr<DmAuthManager> authManager,
                                     std::shared_ptr<DmAbilityManager> dmAbilityMgr)
 {
-    (void)params;
     (void)authManager;
-    LOGI("ShowConfirm hap start");
+    LOGI("ShowConfirm hap start.");
     if (dmAbilityMgr == nullptr) {
         LOGE("ShowConfirm::dmAbilityManager is null");
         return;
     }
-    AbilityStatus status = dmAbilityMgr->StartAbility();
+    AbilityStatus status = dmAbilityMgr->StartAbility(params);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
         LOGE("ShowConfirm::start ui service fail");
         return;

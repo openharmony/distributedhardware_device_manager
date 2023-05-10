@@ -68,6 +68,7 @@ export default class ServiceExtAbility extends extension {
       globalThis.extensionWin = win;
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
+      await win.setCornerRadius(Constant.SHARE_RADIUS);
       await win.loadContent('pages/ConfirmDialog');
       await win.show();
       globalThis.windowNum++;

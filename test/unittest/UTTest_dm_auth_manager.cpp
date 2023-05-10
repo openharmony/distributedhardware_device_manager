@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -514,9 +514,10 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 0;
-    std::string deviceId = "113456";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "113456");
     std::string extra = "extraTest";
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
 }
 
@@ -532,9 +533,10 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "";
     int32_t authType = 1;
-    std::string deviceId = "113456";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "113456");
     std::string extra = "extraTest";
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -550,10 +552,11 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_003, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
-    std::string deviceId = "234568";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "234568");
     std::string extra = "extraTest";
     authManager->listener_ = nullptr;
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -569,10 +572,11 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 4;
-    std::string deviceId = "deviceIdTest";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "deviceIdTest");
     std::string extra = "extraTest";
     authManager->authenticationMap_.emplace(authType, nullptr);
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }
 
@@ -588,11 +592,12 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_005, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
-    std::string deviceId = "deviceIdTest";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "deviceIdTest");
     std::string extra = "extraTest";
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
     authManager->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 
@@ -608,7 +613,8 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_006, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
-    std::string deviceId = "deviceIdTest";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "deviceIdTest");
     std::string extra = "extraTest";
     const int32_t sessionId = 1;
     authManager->authRequestState_ = nullptr;
@@ -618,7 +624,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_006, testing::ext::TestSize.Level
     authManager->RespNegotiate(sessionId);
     authManager->SendAuthRequest(sessionId);
     authManager->StartRespAuthProcess();
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -634,14 +640,15 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_007, testing::ext::TestSize.Level
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
-    std::string deviceId = "deviceIdTest";
+    DmDeviceInfo dmDeviceInfo;
+    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "deviceIdTest");
     std::string extra = "extraTest";
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     authManager->authRequestState_ = nullptr;
     authManager->authResponseState_ = nullptr;
     authManager->timer_ = nullptr;
-    authManager->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
-    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    authManager->softbusConnector_->discoveryDeviceInfoMap_.emplace(dmDeviceInfo.deviceId, infoPtr);
+    int32_t ret = authManager->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
