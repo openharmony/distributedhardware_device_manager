@@ -31,11 +31,8 @@ export default class ServiceExtAbility extends extension {
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    // 每次startAbility拉起页面的时候, 都传递want
     globalThis.abilityWant = want;
-    // 每次调用startAbility时可以在这里创建窗口
     display.getDefaultDisplay().then((dis: display.Display) => {
-      // 获取像素密度系数
       let density: number = dis.densityPixels;
       let dialogRect: { left: number; top: number; width: number; height: number; } = {
         left: (dis.width - (globalThis.style.shareWidth * density)) * Constant.HALF,
@@ -48,15 +45,12 @@ export default class ServiceExtAbility extends extension {
     });
   }
 
-
   getShareStyle(): void {
     globalThis.style = {};
     if (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') {
-      // 页面的默认类型是手机
       globalThis.style.shareWidth = Constant.SHARE_WIDTH_PHONE;
       globalThis.style.shareHeight = Constant.SHARE_HEIGHT_PHONE;
     } else {
-      // pad类型
       globalThis.style.shareWidth = Constant.SHARE_WIDTH_PAD;
       globalThis.style.shareHeight = Constant.SHARE_HEIGHT_PAD;
     }
@@ -65,7 +59,6 @@ export default class ServiceExtAbility extends extension {
   onDestroy(): void {
     console.log(TAG + 'ServiceExtAbility destroyed');
   }
-
 
   private async createWindow(name: string, windowType: window.WindowType,
     rect: { left: number; top: number; width: number; height: number; }): Promise<void> {
@@ -77,7 +70,7 @@ export default class ServiceExtAbility extends extension {
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/ConfirmDialog');
       await win.show();
-      globalThis.windowNum ++;
+      globalThis.windowNum++;
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');
