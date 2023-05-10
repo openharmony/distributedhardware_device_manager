@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -3248,9 +3248,9 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_002, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData": [{ "credentialType": 1, "credentialId": "104",
-    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
-    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+        "credentialData": [{ "credentialType": 1, "credentialId": "104",
+        "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+        "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
@@ -3275,9 +3275,9 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_003, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData": [{ "credentialType": 1, "credentialId": "104",
-    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
-    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+        "credentialData": [{ "credentialType": 1, "credentialId": "104",
+        "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+        "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
@@ -3302,9 +3302,9 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential_004, testing::ext::TestSize.Lev
 {
     std::string packName = "com.ohos.test";
     std::string credentialInfo = R"({"processType":1,"authType":1,"userId":"123",
-    "credentialData": [{ "credentialType": 1, "credentialId": "104",
-    "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
-    "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
+        "credentialData": [{ "credentialType": 1, "credentialId": "104",
+        "authCode":"10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+        "serverPk":"","pkInfoSignature":"","pkInfo":"","peerDeviceId":"" }]})";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))

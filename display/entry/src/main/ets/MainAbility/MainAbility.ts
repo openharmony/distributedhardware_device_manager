@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,14 @@
  */
 
 import Ability from '@ohos.app.ability.UIAbility';
+import type AbilityConstant from '@ohos.app.ability.AbilityConstant';
+import type window from '@ohos.window';
+import type Want from '@ohos.app.ability.Want';
 
-let TAG = 'DeviceManagerUI_MainAbility:';
+const TAG = 'DeviceManagerUI_MainAbility:';
 
 export default class MainAbility extends Ability {
-  onCreate(want, launchParam): void {
+  onCreate(want: Want, param: AbilityConstant.LaunchParam): void {
     console.log(TAG + 'MainAbility onCreate, ability name is ' + want.abilityName + '.');
     globalThis.context = this.context;
     globalThis.allBundleInfo = [];
@@ -26,10 +29,9 @@ export default class MainAbility extends Ability {
     globalThis.allGroups = [];
   }
 
-  onWindowStageCreate(windowStage): void {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     console.log(TAG + 'MainAbility onWindowStageCreate.');
-    windowStage.setUIContent(this.context, 'pages/authority-management', null);
   }
 
   onForeground(): void {

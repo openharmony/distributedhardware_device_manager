@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-import AbilityStage from '@ohos.app.ability.AbilityStage';
-
-export default class MyAbilityStage extends AbilityStage {
-  onCreate() {
-    console.log('[Demo] MyAbilityStage onCreate');
-  }
-}
+export default class Constant {
+  static readonly DIALOG_HEIGHT_PROPORTION = 0.8;
+  static readonly HALF = 0.5;
+  static readonly TOP_OFFSET_PROPORTION = 6;
+  static readonly SHARE_WIDTH_PHONE = 360;
+  static readonly SHARE_HEIGHT_PHONE = 355;
+  static readonly SHARE_WIDTH_PAD = 519;
+  static readonly SHARE_HEIGHT_PAD = 256;
+};

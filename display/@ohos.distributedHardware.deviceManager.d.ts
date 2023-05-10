@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { AsyncCallback, Callback } from './@ohos.base';
+import type { AsyncCallback, Callback } from './@ohos.base';
 
 /**
  * Providers interfaces to create a {@link deviceManager} instances.
@@ -566,12 +566,12 @@ declare namespace deviceManager {
     unAuthenticateDevice(deviceInfo: DeviceInfo): void;
 
     /**
-    * verify auth info, such as pin code.
-    *
-    * @param authInfo device auth info o verify
-    * @param callback Indicates the callback to be invoked upon verifyAuthInfo
-    * @systemapi this method can be used only by system applications.
-    */
+     * verify auth info, such as pin code.
+     *
+     * @param authInfo device auth info o verify
+     * @param callback Indicates the callback to be invoked upon verifyAuthInfo
+     * @systemapi this method can be used only by system applications.
+     */
     verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback<{ deviceId: string, level: number }>): void;
 
     /**
@@ -592,14 +592,14 @@ declare namespace deviceManager {
     setUserOperation(operateAction: number, params: string): void;
 
     /**
-    * Register a callback from deviceManager service so that the devicemanager ui can be notified when ui statue
-    * changes.
-    *
-    * @since 9
-    * @param callback Indicates the devicemanager ui state to register.
-    * @throws {BusinessError} 401 - Input parameter error.
-    * @systemapi this method can be used only by system applications.
-    */
+     * Register a callback from deviceManager service so that the devicemanager ui can be notified when ui statue
+     * changes.
+     *
+     * @since 9
+     * @param callback Indicates the devicemanager ui state to register.
+     * @throws {BusinessError} 401 - Input parameter error.
+     * @systemapi this method can be used only by system applications.
+     */
     on(type: 'uiStateChange', callback: Callback<{ param: string }>): void;
 
     /**
