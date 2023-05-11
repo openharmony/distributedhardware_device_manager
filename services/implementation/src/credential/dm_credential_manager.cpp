@@ -243,7 +243,10 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
     }
     LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %s",
         GetAnonyString(pkgName).c_str());
-    credentialVec_.push_back(pkgName);
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        credentialVec_.push_back(pkgName);
+    }
     return hiChainConnector_->RegisterHiChainGroupCallback(std::shared_ptr<IDmGroupResCallback>(shared_from_this()));
 }
 
@@ -255,9 +258,12 @@ int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkg
     }
     LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName = %s",
         GetAnonyString(pkgName).c_str());
-    std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);
-    if (iter != credentialVec_.end()) {
-        credentialVec_.erase(iter);
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);
+        if (iter != credentialVec_.end()) {
+            credentialVec_.erase(iter);
+        }
     }
     return hiChainConnector_->UnRegisterHiChainGroupCallback();
 }
