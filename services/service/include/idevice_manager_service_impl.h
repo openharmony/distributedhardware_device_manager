@@ -78,7 +78,7 @@ public:
      * @tc.desc: Authenticate Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+    virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
                                        const std::string &extra);
 
     /**

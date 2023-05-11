@@ -74,6 +74,8 @@ const static char *DM_CAPABILITY_OSD = "osdCapability";
 
 // Auth
 constexpr const char* AUTH_TYPE = "authType";
+constexpr const char* APP_OPERATION = "appOperation";
+constexpr const char* CUSTOM_DESCRIPTION = "customDescription";
 constexpr const char* TOKEN = "token";
 constexpr const char* PIN_TOKEN = "pinToken";
 constexpr const char* PIN_CODE_KEY = "pinCode";

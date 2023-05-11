@@ -324,12 +324,8 @@ var deviceInfo ={
     deviceType: 0
 };
 let extraInfo = {
-    "appIcon": new Uint8Array(), // app图标，可选参数，可不填
-    "appThumbnail": new Uint8Array(), // app缩略图，可选参数，可不填
-    "appName": "xxxxxxxx", // 对端设备应用名称
-    "appDescription": "xxxxxxxx", // app描述
-    "business": '0',
-    "displayOwner": 0,
+    "appOperation": "xxxxxxxx", // 业务操作 支持用户自定义
+    "customDescription": "xxxxxxxx", // 业务描述 支持用户自定义
 }
 let authParam = {
     "authType": 1,

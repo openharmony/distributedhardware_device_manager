@@ -40,7 +40,7 @@ enum UiAction {
 
 class DmAbilityManager {
 public:
-    AbilityStatus StartAbility();
+    AbilityStatus StartAbility(const std::string &params);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

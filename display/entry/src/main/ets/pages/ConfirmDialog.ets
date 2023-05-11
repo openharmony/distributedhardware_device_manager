@@ -25,12 +25,17 @@ const ACTION_ALLOW_AUTH_ALWAYS: number = 6
 @Entry
 @Component
 struct dialogPlusPage {
-  @State message: string = '是否允许对端连接本机'
+  @State message: string = '是否信任此设备？'
   @State allowOnce: string = '仅本次信任'
   @State allowAlways: string = '始终信任'
+  @State peerAppOperation: string = '想要连接本机。'
+  @State peerCustomDescription: string = ''
+  @State peerDeviceName: string = ''
+  @State peerDeviceType: number = 0
   @State seconds: number = 60
   @State times: number = 0
   @State selectIndex: number = 0
+  @State isAvailableType: boolean = false
 
   initStatue() {
     console.log('initStatue' + "windowNum:" + globalThis.windowNum)
@@ -108,6 +113,27 @@ struct dialogPlusPage {
 
   onPageShow() {
     console.log("onPageShow")
+
+    if (globalThis.abilityWant.parameters.deviceName != null) {
+      this.peerDeviceName = globalThis.abilityWant.parameters.deviceName
+      console.log("peerDeviceName is " + this.peerDeviceName)
+    }
+
+    if (globalThis.abilityWant.parameters.deviceType != null) {
+        this.peerDeviceType = globalThis.abilityWant.parameters.deviceType
+        console.log("peerDeviceType is " + this.peerDeviceType)
+    }
+
+    if (globalThis.abilityWant.parameters.appOperation != null) {
+      this.peerAppOperation = globalThis.abilityWant.parameters.appOperation
+      console.log("peerAppOperation is " + this.peerAppOperation)
+    }
+
+    if (globalThis.abilityWant.parameters.customDescription != null) {
+      this.peerCustomDescription = globalThis.abilityWant.parameters.customDescription
+      console.log("peerCustomDescription is " + this.peerCustomDescription)
+    }
+
     this.initStatue()
     gThis = this
     if(this.times) {
@@ -129,13 +155,57 @@ struct dialogPlusPage {
     }
   }
 
+  getImages(peerdeviceType): Resource {
+    console.info("peerdeviceType is " + peerdeviceType)
+    if (peerdeviceType == deviceManager.DeviceType.SPEAKER) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_soundx')
+    } else if (peerdeviceType == deviceManager.DeviceType.PHONE) {
+      this.isAvailableType = true
+      return $r('app.media.ic_public_devices_phone')
+    } else if (peerdeviceType == deviceManager.DeviceType.TABLET) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_pad')
+    } else if (peerdeviceType == deviceManager.DeviceType.WEARABLE) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_watch')
+    } else if (peerdeviceType == deviceManager.DeviceType.CAR) {
+      this.isAvailableType = true
+      return $r('app.media.ic_public_car')
+    } else if (peerdeviceType == deviceManager.DeviceType.TV) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_smartscreen')
+    } else {
+      this.isAvailableType = false
+      return $r('app.media.icon')
+    }
+  }
+
   build() {
     Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center, direction: FlexDirection.Column }) {
-      Text(this.message)
-        .fontSize(24)
-        .height(50)
+      Image(this.getImages(this.peerDeviceType))
+      .width(24)
+      .height(24)
+      .margin({bottom: 16})
+      .visibility(this.isAvailableType == false? Visibility.None : Visibility.Visible)
+      Text(this.peerDeviceName + this.peerAppOperation + this.message)
+        .textAlign(TextAlign.Start)
+        .fontSize(16)
+        .maxLines(3)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .width('100%')
+        .opacity(0.9)
+      Text(this.peerCustomDescription)
+        .textAlign(TextAlign.Start)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .fontSize(14)
+        .maxLines(3)
+        .constraintSize({ maxHeight: 45 })
+        .margin({bottom: 16})
+        .width('100%')
+        .opacity(0.6)
       Button(this.allowAlways)
-        .margin({top: 4, bottom: 4})
+        .margin({bottom: 2})
         .onClick(() => {
           this.onAllowAlways()
         })
@@ -146,10 +216,10 @@ struct dialogPlusPage {
         })
         .backgroundColor(this.selectIndex == 0 ? 0x0000ff : 0xffffff)
         .fontColor(this.selectIndex == 0 ? 0xffffff : 0x0000ff)
-        .height(40)
+        .height(30)
         .width('100%')
       Button(this.allowOnce)
-        .margin({top: 4, bottom: 4, left: 16, right: 16})
+        .margin({bottom: 2, left: 16, right: 16})
         .onClick(() => {
           this.onAllowOnce()
         })
@@ -160,10 +230,10 @@ struct dialogPlusPage {
         })
         .backgroundColor(this.selectIndex == 1 ? 0x0000ff : 0xffffff)
         .fontColor(this.selectIndex == 1 ? 0xffffff : 0x0000ff)
-        .height(40)
+        .height(30)
         .width('100%')
       Button("不信任(" + this.seconds + "秒)")
-        .margin({top: 4, bottom: 4, left: 16, right: 16})
+        .margin({left: 16, right: 16})
         .backgroundColor(this.selectIndex == 2 ? 0x0000ff : 0xffffff)
         .fontColor(this.selectIndex == 2 ? 0xffffff : 0x0000ff)
         .onClick(() => {
@@ -174,10 +244,10 @@ struct dialogPlusPage {
             this.selectIndex = 2
           }
         })
-        .height(40)
+        .height(30)
         .width('100%')
     }
-    .padding(24)
+    .padding({top:12, bottom:12, left: 16, right: 16})
     .height('100%')
     .width('100%')
     .borderRadius(24)

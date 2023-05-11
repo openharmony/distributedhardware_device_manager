@@ -20,5 +20,6 @@ export default class Constant {
   static readonly SHARE_WIDTH_PHONE = 360;
   static readonly SHARE_HEIGHT_PHONE = 355;
   static readonly SHARE_WIDTH_PAD = 519;
-  static readonly SHARE_HEIGHT_PAD = 256;
+  static readonly SHARE_HEIGHT_PAD = 355;
+  static readonly SHARE_RADIUS = 24;
 };

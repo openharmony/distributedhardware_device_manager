@@ -351,11 +351,13 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_INDEX] = 0;
     jsonThumbnail[TAG_DEVICE_ID] = "123";
     jsonThumbnail[TAG_AUTH_TYPE] = 1;
-    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_CUSTOM_DESCRIPTION] = "123";
     jsonThumbnail[TAG_TOKEN] = "1234";
     jsonThumbnail[TAG_TARGET] = "12345";
-    jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_APP_OPERATION] = "123456";
     jsonThumbnail[TAG_LOCAL_DEVICE_ID] = "localdeviceTest";
+    jsonThumbnail[TAG_REQUESTER] = "AJ125S25S3E65F1A24T";
+    jsonThumbnail[TAG_DEVICE_TYPE] = 1;
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -379,10 +381,10 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::Te
     jsonThumbnail[TAG_INDEX] = 0;
     jsonThumbnail[TAG_DEVICE_ID] = 123;
     jsonThumbnail[TAG_AUTH_TYPE] = 1;
-    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_CUSTOM_DESCRIPTION] = "123";
     jsonThumbnail[TAG_TOKEN] = "1234";
     jsonThumbnail[TAG_TARGET] = "12345";
-    jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_APP_OPERATION] = "123456";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -406,12 +408,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::Te
     jsonThumbnail[TAG_INDEX] = 0;
     jsonThumbnail[TAG_DEVICE_ID] = "123";
     jsonThumbnail[TAG_AUTH_TYPE] = 1;
-    jsonThumbnail[TAG_APP_DESCRIPTION] = "123";
+    jsonThumbnail[TAG_CUSTOM_DESCRIPTION] = "123";
     jsonThumbnail[TAG_TOKEN] = "1234";
     jsonThumbnail[TAG_TARGET] = "12345";
-    jsonThumbnail[TAG_APP_NAME] = "123456";
+    jsonThumbnail[TAG_APP_OPERATION] = "123456";
     jsonThumbnail[TAG_APP_THUMBNAIL] = "jsontest";
     jsonThumbnail[TAG_LOCAL_DEVICE_ID] = "localdeviceTest";
+    jsonThumbnail[TAG_REQUESTER] = "iknbghkkj266SSjsjjdan21526";
+    jsonThumbnail[TAG_DEVICE_TYPE] = 1;
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, ERR_DM_AUTH_MESSAGE_INCOMPLETE);
 }
@@ -814,17 +818,19 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Leve
     std::string message = R"(
     {
         "APPDESC": "Distributed Calc",
+        "CUSTOMDESC": "customDescription",
         "APPICON": "",
         "APPNAME": "Distributed Calc",
+        "APPOPERATION": "appoperrationTest",
         "AUTHTYPE":1,
         "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
         "LOCALDEVICEID": "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest",
-        "DEVICETYPE": "",
+        "DEVICETYPE": 1,
         "HOST": "com.example.distributedcalc",
         "INDEX": 0,
         "ITF_VER": "1.1",
         "MSG_TYPE": 100,
-        "REQUESTER": "",
+        "REQUESTER": "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest",
         "SLICE": 1,
         "TARGET": "com.example.distributedcalc",
         "THUMSIZE": 0,

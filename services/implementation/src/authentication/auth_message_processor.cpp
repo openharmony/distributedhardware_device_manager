@@ -26,10 +26,7 @@ const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
 
 constexpr const char* TAG_HOST = "HOST";
-constexpr const char* TAG_REQUESTER = "REQUESTER";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
-constexpr const char* TAG_DEVICE_TYPE = "DEVICETYPE";
-constexpr const char* TAG_APP_ICON = "APPICON";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
 constexpr const char* TAG_THUMBNAIL_SIZE = "THUMSIZE";
 
@@ -65,9 +62,8 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         jsonObj[TAG_TARGET] = authRequestContext_->targetPkgName;
         jsonObj[TAG_HOST] = authRequestContext_->hostPkgName;
     }
-    jsonObj[TAG_APP_NAME] = authRequestContext_->appName;
-    jsonObj[TAG_APP_DESCRIPTION] = authRequestContext_->appDesc;
-    jsonObj[TAG_APP_ICON] = authRequestContext_->appIcon;
+    jsonObj[TAG_APP_OPERATION] = authRequestContext_->appOperation;
+    jsonObj[TAG_CUSTOM_DESCRIPTION] = authRequestContext_->customDesc;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     jsonStrVec.push_back(jsonObj.dump());
 
@@ -208,6 +204,21 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
     }
 }
 
+bool AuthMessageProcessor::IsVaildAuthReqMessage(nlohmann::json &json)
+{
+    if (!IsString(json, TAG_DEVICE_ID) || !IsInt32(json, TAG_AUTH_TYPE) || !IsString(json, TAG_REQUESTER) ||
+        !IsString(json, TAG_TOKEN) || !IsString(json, TAG_TARGET)) {
+        LOGE("AuthMessageProcessor::IsVaildAuthReqMessage err json string, first.");
+        return false;
+    }
+    if (!IsString(json, TAG_LOCAL_DEVICE_ID) || !IsInt32(json, TAG_DEVICE_TYPE) ||
+        !IsString(json, TAG_CUSTOM_DESCRIPTION) || !IsString(json, TAG_APP_OPERATION)) {
+        LOGE("AuthMessageProcessor::IsVaildAuthReqMessage err json string, second.");
+        return false;
+    }
+    return true;
+}
+
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
 {
     LOGI("start ParseAuthRequestMessage");
@@ -220,19 +231,19 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     idx = json[TAG_INDEX].get<int32_t>();
     sliceNum = json[TAG_SLICE_NUM].get<int32_t>();
     if (idx == 0) {
-        if (!IsString(json, TAG_DEVICE_ID) || !IsInt32(json, TAG_AUTH_TYPE) || !IsString(json, TAG_APP_DESCRIPTION) ||
-            !IsString(json, TAG_TOKEN) || !IsString(json, TAG_TARGET) || !IsString(json, TAG_APP_NAME) ||
-            !IsString(json, TAG_LOCAL_DEVICE_ID)) {
+        if (!IsVaildAuthReqMessage(json)) {
             LOGE("AuthMessageProcessor::ParseAuthRequestMessage err json string, second.");
             return ERR_DM_FAILED;
         }
         authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
         authResponseContext_->deviceId = json[TAG_DEVICE_ID].get<std::string>();
         authResponseContext_->authType = json[TAG_AUTH_TYPE].get<int32_t>();
-        authResponseContext_->appDesc = json[TAG_APP_DESCRIPTION].get<std::string>();
+        authResponseContext_->customDesc = json[TAG_CUSTOM_DESCRIPTION].get<std::string>();
+        authResponseContext_->deviceName = json[TAG_REQUESTER].get<std::string>();
         authResponseContext_->token = json[TAG_TOKEN].get<std::string>();
         authResponseContext_->targetPkgName = json[TAG_TARGET].get<std::string>();
-        authResponseContext_->appName = json[TAG_APP_NAME].get<std::string>();
+        authResponseContext_->appOperation = json[TAG_APP_OPERATION].get<std::string>();
+        authResponseContext_->deviceTypeId = json[TAG_DEVICE_TYPE].get<int32_t>();
         authResponseContext_->appThumbnail = "";
     }
 

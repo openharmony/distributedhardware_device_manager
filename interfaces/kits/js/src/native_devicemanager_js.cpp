@@ -1196,27 +1196,21 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     JsObjectToInt(env, object, "authType", authTypeTemp);
     authType = authTypeTemp;
 
-    uint8_t *appIconBufferPtr = nullptr;
-    int32_t appIconBufferLen = 0;
-    JsToDmBuffer(env, object, "appIcon", &appIconBufferPtr, appIconBufferLen);
+    char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
+    std::string appOperationStr = appOperation;
 
-    uint8_t *appThumbnailBufferPtr = nullptr;
-    int32_t appThumbnailBufferLen = 0;
-    JsToDmBuffer(env, object, "appThumbnail", &appThumbnailBufferPtr, appThumbnailBufferLen);
-    if (appIconBufferPtr != nullptr) {
-        free(appIconBufferPtr);
-        appIconBufferPtr = nullptr;
-    }
-    if (appThumbnailBufferPtr != nullptr) {
-        free(appThumbnailBufferPtr);
-        appThumbnailBufferPtr = nullptr;
-    }
+    char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
+    std::string customDescriptionStr = customDescription;
 
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = authType;
+    jsonObj[APP_OPERATION] = appOperationStr;
+    jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
     JsToJsonObject(env, object, "extraInfo", jsonObj);
     extra = jsonObj.dump();
-    LOGI("appIconLen %d, appThumbnailLen %d", appIconBufferLen, appThumbnailBufferLen);
+    LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
 }
 
 void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,

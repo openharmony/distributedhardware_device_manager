@@ -49,10 +49,9 @@ const int32_t DM_AUTH_TYPE_MAX = 4;
 const int32_t DM_AUTH_TYPE_MIN = 1;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 
-constexpr const char* APP_NAME_KEY = "appName";
-constexpr const char* APP_ICON_KEY = "appIcon";
+constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
-constexpr const char* APP_DESCRIPTION_KEY = "appDescription";
+constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* VERIFY_FAILED = "verifyFailed";
 
@@ -71,17 +70,17 @@ DmAuthManager::~DmAuthManager()
     LOGI("DmAuthManager destructor");
 }
 
-int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-                                          const std::string &extra)
+int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+                                          const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %d", authType);
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
         LOGE("AuthenticateDevice failed, authType is illegal");
         return ERR_DM_AUTH_FAILED;
     }
-    if (pkgName.empty() || deviceId.empty()) {
+    if (pkgName.empty() || std::string(dmDeviceInfo.deviceId).empty()) {
         LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(std::string(dmDeviceInfo.deviceId)).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
@@ -91,19 +90,22 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     if (authentication == nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
+                                AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
+        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
+                                AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
-    if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
+    if (!softbusConnector_->HaveDeviceInMap(std::string(dmDeviceInfo.deviceId))) {
         LOGE("AuthenticateDevice failed, the discoveryDeviceInfoMap_ not have this device");
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
+                                AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -120,23 +122,22 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authRequestContext_->hostPkgName = pkgName;
     authRequestContext_->authType = authType;
-    authRequestContext_->deviceId = deviceId;
+    authRequestContext_->deviceName = dmDeviceInfo.deviceName;
+    authRequestContext_->deviceId = dmDeviceInfo.deviceId;
+    authRequestContext_->deviceTypeId = dmDeviceInfo.deviceTypeId;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
             authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].get<std::string>();
         }
-        if (IsString(jsonObject, APP_NAME_KEY)) {
-            authRequestContext_->appName = jsonObject[APP_NAME_KEY].get<std::string>();
+        if (IsString(jsonObject, APP_OPERATION_KEY)) {
+            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].get<std::string>();
         }
-        if (IsString(jsonObject, APP_DESCRIPTION_KEY)) {
-            authRequestContext_->appDesc = jsonObject[APP_DESCRIPTION_KEY].get<std::string>();
+        if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
+            authRequestContext_->customDesc = jsonObject[CUSTOM_DESCRIPTION_KEY].get<std::string>();
         }
         if (IsString(jsonObject, APP_THUMBNAIL)) {
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
-        }
-        if (IsString(jsonObject, APP_ICON_KEY)) {
-            authRequestContext_->appIcon = jsonObject[APP_ICON_KEY].get<std::string>();
         }
     }
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
@@ -810,7 +811,10 @@ void DmAuthManager::ShowConfigDialog()
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
     jsonObj[TAG_TOKEN] = authResponseContext_->token;
     jsonObj[TARGET_PKG_NAME_KEY] = authResponseContext_->targetPkgName;
-    jsonObj.dump();
+    jsonObj[TAG_CUSTOM_DESCRIPTION] = authResponseContext_->customDesc;
+    jsonObj[TAG_APP_OPERATION] = authResponseContext_->appOperation;
+    jsonObj[TAG_DEVICE_TYPE] = authResponseContext_->deviceTypeId;
+    jsonObj[TAG_REQUESTER] = authResponseContext_->deviceName;
     const std::string params = jsonObj.dump();
     std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
     showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
