@@ -1324,6 +1324,12 @@ void DeviceManagerNapi::JsToDmAuthInfo(const napi_env &env, const napi_value &ob
 
 void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
 {
+    napi_valuetype valueType1 = napi_undefined;
+    napi_typeof(env, object, &valueType1);
+    if (valueType1 == napi_undefined) {
+        extra = "";
+        return;
+    }
     char filterOption[DM_NAPI_BUF_LENGTH] = {0};
     size_t typeLen = 0;
     NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, nullptr, 0, &typeLen));
@@ -2205,7 +2211,8 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         }
         napi_valuetype valueType1 = napi_undefined;
         napi_typeof(env, argv[1], &valueType1);
-        if (!CheckArgsType(env, valueType1 == napi_string, "filterOptions", "string")) {
+        if (!(CheckArgsType(env, (valueType1 == napi_undefined || valueType1 == napi_string), "filterOptions",
+            "string or undefined"))) {
             return nullptr;
         }
         JsToDmDiscoveryExtra(env, argv[1], extra);
