@@ -3,7 +3,7 @@
     "description": "device manager service",
     "version": "3.0",
     "license": "Apache License 2.0",
-    "repository": "https://gitee.com/openharmony/device_manager",
+    "repository": "https://gitee.com/openharmony/distributedhardware_device_manager",
     "publishAs": "code-segment",
     "segment": {
         "destPath": "foundation/distributedhardware/device_manager"
