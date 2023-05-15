@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,8 @@
 #include <vector>
 
 #include "ipc_remote_broker.h"
+#include "ipc_req.h"
+#include "ipc_rsp.h"
 #include "iremote_stub.h"
 #include "single_instance.h"
 #include "system_ability.h"
@@ -105,11 +107,25 @@ public:
     const std::map<std::string, sptr<IRemoteObject>> &GetDmListener();
 
     /**
+     * @tc.name: IpcServerStub::SendALL
+     * @tc.desc: SendALL of the IpcServerStub
+     * @tc.type: FUNC
+     */
+    int32_t SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
+
+    /**
      * @tc.name: IpcServerStub::GetDmListener
      * @tc.desc: Get DmListener of the IpcServerStub
      * @tc.type: FUNC
      */
     const sptr<IpcRemoteBroker> GetDmListener(std::string pkgName) const;
+
+    /**
+     * @tc.name: IpcServerStub::GetDmListenerPkgName
+     * @tc.desc: Get DmListener PkgName of the IpcServerStub
+     * @tc.type: FUNC
+     */
+    const std::string GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const;
 
     /**
      * @tc.name: IpcServerStub::Dump
