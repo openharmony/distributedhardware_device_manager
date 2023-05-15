@@ -71,7 +71,7 @@ DmAuthManager::~DmAuthManager()
 }
 
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
-                                     const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+    const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
 {
     LOGI("DmAuthManager::CheckAuthParamVaild start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
