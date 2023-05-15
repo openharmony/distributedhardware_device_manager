@@ -390,6 +390,9 @@ public:
      */
     bool IsIdenticalAccount();
 private:
+    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
+        const std::string &extra);
+private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;

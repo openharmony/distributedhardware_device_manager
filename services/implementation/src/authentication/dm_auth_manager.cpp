@@ -70,43 +70,55 @@ DmAuthManager::~DmAuthManager()
     LOGI("DmAuthManager destructor");
 }
 
-int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-                                          const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
+                                     const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
 {
-    LOGI("DmAuthManager::AuthenticateDevice start auth type %d", authType);
+    LOGI("DmAuthManager::CheckAuthParamVaild start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
-        LOGE("AuthenticateDevice failed, authType is illegal");
+        LOGE("CheckAuthParamVaild failed, authType is illegal.");
         return ERR_DM_AUTH_FAILED;
     }
     if (pkgName.empty() || std::string(dmDeviceInfo.deviceId).empty()) {
-        LOGE("DmAuthManager::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
+        LOGE("DmAuthManager::CheckAuthParamVaild failed, pkgName is %s, deviceId is %s, extra is %s.",
             pkgName.c_str(), GetAnonyString(std::string(dmDeviceInfo.deviceId)).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
     if (listener_ == nullptr) {
-        LOGE("DmAuthManager::AuthenticateDevice is empty nullptr");
+        LOGE("DmAuthManager::CheckAuthParamVaild listener is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authentication == nullptr) {
-        LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authType);
+        LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
         listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
                                 AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
-        LOGE("DmAuthManager::AuthenticateDevice %s is request authentication.", pkgName.c_str());
+        LOGE("DmAuthManager::CheckAuthParamVaild %s is request authentication.", pkgName.c_str());
         listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
                                 AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
     if (!softbusConnector_->HaveDeviceInMap(std::string(dmDeviceInfo.deviceId))) {
-        LOGE("AuthenticateDevice failed, the discoveryDeviceInfoMap_ not have this device");
+        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
         listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
                                 AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return DM_OK;
+}
+
+int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+                                          const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+{
+    LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
+    int32_t ret = CheckAuthParamVaild(pkgName, authType, dmDeviceInfo, extra);
+    if (ret != DM_OK) {
+        LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        return ret;
     }
 
     authPtr_ = authenticationMap_[authType];

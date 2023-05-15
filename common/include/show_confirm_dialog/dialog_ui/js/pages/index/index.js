@@ -13,8 +13,6 @@
     limitations under the License.
 */
 
-import router from '@ohos.router'
-
 let timel = null;
 const EVENT_CONFIRM = 'EVENT_CONFIRM';
 const EVENT_CANCEL = 'EVENT_CANCEL';
@@ -51,4 +49,4 @@ export default {
     console.info('click cancel');
     callNativeHandler(EVENT_CANCEL, EVENT_CANCEL_CODE);
   }
-}
+};
