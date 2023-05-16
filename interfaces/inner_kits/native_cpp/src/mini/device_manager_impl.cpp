@@ -14,6 +14,7 @@
  */
 #include "command_dispatch.h"
 #include "dm_log.h"
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "ipc_def.h"
@@ -166,7 +167,8 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     req->SetExtra(extra);
     req->SetSubscribeInfo(subscribeInfo);
 
-    if (CommandDispatch::GetInstance().MessageSendCmd(START_DEVICE_DISCOVER, req, rsp) != DM_OK) {
+    if (CommandDispatch::GetInstance().MessageSendCmd(::START_DEVICE_DISCOVER,
+        req, rsp) != DM_OK) {
         return DEVICEMANAGER_MESSAGE_FAILED;
     }
     int32_t ret = rsp->GetErrCode();

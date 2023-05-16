@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
+#include "ipc_server_client_proxy_fuzzer.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <string>
+
+#include "device_manager_ipc_interface_code.h"
 #include "ipc_server_client_proxy.h"
-#include "ipc_server_client_proxy_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {

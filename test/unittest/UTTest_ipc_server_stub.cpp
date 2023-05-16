@@ -19,6 +19,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "dm_device_info.h"
 #include "ipc_server_stub.h"

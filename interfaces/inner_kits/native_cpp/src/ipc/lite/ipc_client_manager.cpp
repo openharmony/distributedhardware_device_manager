@@ -15,6 +15,7 @@
 
 #include "ipc_client_manager.h"
 
+#include "device_manager_ipc_interface_code.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_client_stub.h"

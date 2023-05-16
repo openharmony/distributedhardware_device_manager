@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -143,7 +144,8 @@ ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessagePar
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply,
+    std::shared_ptr<IpcRsp> pBaseRsp)
 {
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo *deviceInfo =

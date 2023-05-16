@@ -15,6 +15,7 @@
 
 #include "UTTest_ipc_client_manager.h"
 
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_device_info.h"
 #include "ipc_client_stub.h"

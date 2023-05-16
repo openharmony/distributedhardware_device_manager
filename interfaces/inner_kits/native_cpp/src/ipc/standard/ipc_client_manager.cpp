@@ -15,6 +15,7 @@
 
 #include "ipc_client_manager.h"
 
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "device_manager_impl.h"
 #include "dm_constants.h"

@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 #include <list>
+
+#include "device_manager_ipc_interface_code.h"
 #include "single_instance.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"

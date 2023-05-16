@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
+#include "ipc_client_manager_fuzzer.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <string>
+
+#include "device_manager_ipc_interface_code.h"
 #include "ipc_client_manager.h"
-#include "ipc_client_manager_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {

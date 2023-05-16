@@ -15,6 +15,7 @@
 
 #include "device_manager_impl.h"
 #include <unistd.h>
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
