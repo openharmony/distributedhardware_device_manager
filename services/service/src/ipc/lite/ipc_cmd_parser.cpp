@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -59,7 +59,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply, std::shared_ptr<I
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::static_pointer_cast<IpcNotifyDeviceFoundReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -89,7 +89,7 @@ ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, IpcIo &reply, std::shared_ptr<IpcRsp> 
 }
 
 ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::static_pointer_cast<IpcNotifyDiscoverResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -116,7 +116,7 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, IpcIo &reply, std::shared_ptr<IpcRs
 }
 
 ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::static_pointer_cast<IpcNotifyAuthResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -147,7 +147,7 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> p
 }
 
 ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
         std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(pBaseReq);
@@ -279,7 +279,7 @@ ON_IPC_SERVER_CMD(SERVER_USER_AUTH_OPERATION, IpcIo &req, IpcIo &reply)
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::static_pointer_cast<IpcNotifyDMFAResultReq>(pBaseReq);
     std::string packagname = pReq->GetPkgName();

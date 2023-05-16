@@ -34,8 +34,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request,
-    uint8_t *buffer, size_t buffLen)
+ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
 {
     std::shared_ptr<IpcRegisterListenerReq> pReq = std::static_pointer_cast<IpcRegisterListenerReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -63,7 +63,7 @@ ON_IPC_READ_RESPONSE(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shared
 }
 
 ON_IPC_SET_REQUEST(UNREGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request,
-    uint8_t *buffer, size_t buffLen)
+                   uint8_t *buffer, size_t buffLen)
 {
     std::string pkgName = pBaseReq->GetPkgName();
 
@@ -85,7 +85,7 @@ ON_IPC_READ_RESPONSE(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shar
 }
 
 ON_IPC_SET_REQUEST(GET_TRUST_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcGetTrustDeviceReq> pReq = std::static_pointer_cast<IpcGetTrustDeviceReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -125,7 +125,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp
 }
 
 ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     IpcIoInit(&request, buffer, buffLen, 0);
     return DM_OK;
@@ -147,7 +147,7 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, IpcIo &reply, std::shared_ptr<IpcRsp
 }
 
 ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcStartDiscoveryReq> pReq = std::static_pointer_cast<IpcStartDiscoveryReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -177,7 +177,7 @@ ON_IPC_READ_RESPONSE(START_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp
 }
 
 ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcStopDiscoveryReq> pReq = std::static_pointer_cast<IpcStopDiscoveryReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -202,7 +202,7 @@ ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp>
 }
 
 ON_IPC_SET_REQUEST(AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcAuthenticateDeviceReq> pReq = std::static_pointer_cast<IpcAuthenticateDeviceReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -233,7 +233,7 @@ ON_IPC_READ_RESPONSE(AUTHENTICATE_DEVICE, IpcIo &reply, std::shared_ptr<IpcRsp> 
 }
 
 ON_IPC_SET_REQUEST(VERIFY_AUTHENTICATION, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcVerifyAuthenticateReq> pReq = std::static_pointer_cast<IpcVerifyAuthenticateReq>(pBaseReq);
     std::string authPara = pReq->GetAuthPara();
@@ -256,7 +256,7 @@ ON_IPC_READ_RESPONSE(VERIFY_AUTHENTICATION, IpcIo &reply, std::shared_ptr<IpcRsp
 }
 
 ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-    size_t buffLen)
+                   size_t buffLen)
 {
     std::shared_ptr<IpcGetOperationReq> pReq = std::static_pointer_cast<IpcGetOperationReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();

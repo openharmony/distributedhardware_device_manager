@@ -144,8 +144,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessagePar
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply,
-    std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo *deviceInfo =
