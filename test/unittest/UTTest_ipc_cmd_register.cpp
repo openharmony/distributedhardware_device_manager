@@ -892,7 +892,8 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_018, testing::ext::TestSize.Level0)
  */
 HWTEST_F(IpcCmdRegisterTest, ReadResponse_019, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = UNREGISTER_DEV_STATE_CALLBACK; MessageParcel reply;
+    int32_t cmdCode = UNREGISTER_DEV_STATE_CALLBACK;
+    MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     ASSERT_EQ(ret, DM_OK);
