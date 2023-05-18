@@ -132,6 +132,8 @@ public:
     bool HaveDeviceInMap(std::string deviceId);
     void HandleDeviceOnline(DmDeviceInfo &info);
     void HandleDeviceOffline(const DmDeviceInfo &info);
+    std::string GetLocalDeviceName();
+    int32_t GetLocalDeviceTypeId();
 
 private:
     int32_t Init();

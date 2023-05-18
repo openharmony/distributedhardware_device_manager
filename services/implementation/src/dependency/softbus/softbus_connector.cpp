@@ -525,5 +525,27 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
         }
     }
 }
+
+std::string SoftbusConnector::GetLocalDeviceName()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        return "";
+    }
+    return nodeBasicInfo.deviceName;
+}
+
+int32_t SoftbusConnector::GetLocalDeviceTypeId()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        return ret;
+    }
+    return nodeBasicInfo.deviceTypeId;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

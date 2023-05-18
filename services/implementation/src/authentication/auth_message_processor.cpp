@@ -51,10 +51,10 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_INDEX] = 0;
-    jsonObj[TAG_REQUESTER] = authRequestContext_->deviceName;
+    jsonObj[TAG_REQUESTER] = authRequestContext_->localdeviceName;
     jsonObj[TAG_DEVICE_ID] = authRequestContext_->deviceId;
     jsonObj[TAG_LOCAL_DEVICE_ID] = authRequestContext_->localDeviceId;
-    jsonObj[TAG_DEVICE_TYPE] = authRequestContext_->deviceTypeId;
+    jsonObj[TAG_DEVICE_TYPE] = authRequestContext_->localdeviceTypeId;
     jsonObj[TAG_AUTH_TYPE] = authRequestContext_->authType;
     jsonObj[TAG_TOKEN] = authRequestContext_->token;
     jsonObj[TAG_VISIBILITY] = authRequestContext_->groupVisibility;

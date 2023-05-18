@@ -112,7 +112,7 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 }
 
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-                                          const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+    const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
     int32_t ret = CheckAuthParamVaild(pkgName, authType, dmDeviceInfo, extra);
@@ -134,9 +134,9 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authRequestContext_->hostPkgName = pkgName;
     authRequestContext_->authType = authType;
-    authRequestContext_->deviceName = dmDeviceInfo.deviceName;
+    authRequestContext_->localdeviceName = softbusConnector_->GetLocalDeviceName();
+    authRequestContext_->localdeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
     authRequestContext_->deviceId = dmDeviceInfo.deviceId;
-    authRequestContext_->deviceTypeId = dmDeviceInfo.deviceTypeId;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
