@@ -17,6 +17,7 @@
 
 #include <utility>         // for pair
 
+#include "device_manager_ipc_interface_code.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_def.h"

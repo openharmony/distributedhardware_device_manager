@@ -19,6 +19,7 @@
 
 #include "device_manager.h"
 #include "device_manager_impl.h"
+#include "device_manager_ipc_interface_code.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "mock/mock_ipc_client_stub.h"

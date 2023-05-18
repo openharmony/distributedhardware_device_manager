@@ -21,7 +21,7 @@
 /* SAID: 4802 */
 namespace OHOS {
 namespace DistributedHardware {
-enum class DMIpcCmdInterfaceCode : int32_t {
+enum DMIpcCmdInterfaceCode {
     REGISTER_DEVICE_MANAGER_LISTENER = 0,
     UNREGISTER_DEVICE_MANAGER_LISTENER,
     GET_TRUST_DEVICE_LIST,

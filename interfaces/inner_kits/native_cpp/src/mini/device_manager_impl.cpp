@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 #include "command_dispatch.h"
 #include "dm_log.h"
+#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "ipc_def.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
+#include "ipc_server_client_proxy_fuzzer.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <string>
+
+#include "device_manager_ipc_interface_code.h"
 #include "ipc_server_client_proxy.h"
-#include "ipc_server_client_proxy_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {

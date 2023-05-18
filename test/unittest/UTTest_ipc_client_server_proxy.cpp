@@ -21,6 +21,7 @@
 #include "device_manager.h"
 #include "single_instance.h"
 #include "device_manager_impl.h"
+#include "device_manager_ipc_interface_code.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"

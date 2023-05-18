@@ -17,6 +17,7 @@
 
 #include <unistd.h>
 
+#include "device_manager_ipc_interface_code.h"
 #include "ipc_client_manager.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_get_trustdevice_rsp.h"
