@@ -68,6 +68,8 @@ enum DmMsgType : int32_t {
 typedef struct DmAuthRequestContext {
     int32_t authType;
     std::string localDeviceId;
+    std::string localdeviceName;
+    int32_t localdeviceTypeId;
     std::string deviceId;
     std::string deviceName;
     int32_t deviceTypeId;
