@@ -47,20 +47,13 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        LOGE("IpcServerListener::SendAll cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
-    const std::map<std::string, sptr<IRemoteObject>> &listeners = IpcServerStub::GetInstance().GetDmListener();
-    for (const auto &iter : listeners) {
-        auto pkgName = iter.first;
-        auto remote = iter.second;
-        req->SetPkgName(pkgName);
-        sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
-        if (listener == nullptr) {
-            LOGE("cannot get listener for package:%s.", pkgName.c_str());
-            return ERR_DM_FAILED;
-        }
-        listener->SendCmd(cmdCode, req, rsp);
+    int32_t ret = IpcServerStub::GetInstance().SendALL(cmdCode, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("IpcServerListener::SendAll failed!");
+        return ret;
     }
     return DM_OK;
 }
