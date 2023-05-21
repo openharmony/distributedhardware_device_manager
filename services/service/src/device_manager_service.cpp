@@ -209,9 +209,9 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
 }
 
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-                                                 const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+                                                 const std::string &deviceId, const std::string &extra)
 {
-    if (pkgName.empty() || std::string(dmDeviceInfo.deviceId).empty()) {
+    if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -219,7 +219,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("AuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
+    return dmServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)

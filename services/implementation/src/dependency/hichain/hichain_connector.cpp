@@ -772,6 +772,7 @@ void HiChainConnector::DealRedundanceGroup(const std::string &userId, int32_t au
 int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const std::string &userId,
     nlohmann::json &jsonOutObj)
 {
+    LOGI("HiChainConnector::CreateGroup start.");
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::CreateGroup group manager is null, requestId %lld.", requestId);
         return ERR_DM_INPUT_PARA_INVALID;
@@ -796,7 +797,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    LOGI("[DM] createParams:%s", jsonObj.dump().c_str());
+
     int32_t ret = deviceGroupManager_->createGroup(osAccountUserId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     if (ret != DM_OK) {
         LOGE("[HICHAIN]fail to create group with ret:%d, requestId:%lld.", ret, requestId);

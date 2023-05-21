@@ -543,7 +543,7 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
-        return ret;
+        return DmDeviceType::DEVICE_TYPE_UNKNOWN;
     }
     return nodeBasicInfo.deviceTypeId;
 }

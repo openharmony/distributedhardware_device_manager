@@ -29,11 +29,14 @@ constexpr const char* TAG_REPLY = "REPLY";
 constexpr const char* TAG_NET_ID = "NETID";
 constexpr const char* TAG_TARGET = "TARGET";
 constexpr const char* TAG_APP_OPERATION = "APPOPERATION";
+constexpr const char* TAG_APP_NAME = "APPNAME";
+constexpr const char* TAG_APP_DESCRIPTION = "APPDESC";
 constexpr const char* TAG_GROUPIDS = "GROUPIDLIST";
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 constexpr const char* TAG_DEVICE_TYPE = "DEVICETYPE";
 constexpr const char* TAG_REQUESTER = "REQUESTER";
 constexpr const char* TAG_LOCAL_DEVICE_ID = "LOCALDEVICEID";
+constexpr const char* TAG_LOCAL_DEVICE_TYPE = "LOCALDEVICETYPE";
 constexpr const char* TAG_INDEX = "INDEX";
 constexpr const char* TAG_SLICE_NUM = "SLICE";
 constexpr const char* TAG_TOKEN = "TOKEN";
@@ -72,7 +75,7 @@ private:
     void ParseRespNegotiateMessage(const nlohmann::json &json);
     void CreateResponseFinishMessage(nlohmann::json &json);
     void ParseResponseFinishMessage(nlohmann::json &json);
-    bool IsVaildAuthReqMessage(nlohmann::json &json);
+    void GetAuthReqMessage(nlohmann::json &json);
 
 private:
     std::weak_ptr<DmAuthManager> authMgr_;

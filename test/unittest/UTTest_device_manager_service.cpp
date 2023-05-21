@@ -255,9 +255,8 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 1;
-    DmDeviceInfo dmDeviceInfo;
-    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "2345");
-    int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
+    std::string deviceId = "2345";
+    int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -272,9 +271,8 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSiz
     std::string pkgName;
     std::string extra = "jdddd";
     int32_t authType = 0;
-    DmDeviceInfo dmDeviceInfo;
-    strcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, "2345");
-    int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
+    std::string deviceId = " 2345";
+    int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -289,8 +287,8 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
     int32_t authType = 0;
-    DmDeviceInfo dmDeviceInfo;
-    int ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
+    std::string deviceId;
+    int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

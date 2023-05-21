@@ -71,16 +71,16 @@ DmAuthManager::~DmAuthManager()
 }
 
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
-    const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+    const std::string &deviceId, const std::string &extra)
 {
     LOGI("DmAuthManager::CheckAuthParamVaild start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
         LOGE("CheckAuthParamVaild failed, authType is illegal.");
         return ERR_DM_AUTH_FAILED;
     }
-    if (pkgName.empty() || std::string(dmDeviceInfo.deviceId).empty()) {
+    if (pkgName.empty() || deviceId.empty()) {
         LOGE("DmAuthManager::CheckAuthParamVaild failed, pkgName is %s, deviceId is %s, extra is %s.",
-            pkgName.c_str(), GetAnonyString(std::string(dmDeviceInfo.deviceId)).c_str(), extra.c_str());
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
@@ -90,32 +90,29 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
     }
     if (authentication == nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
-        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
-                                AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
-                                AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_AUTH_BUSINESS_BUSY);
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
-    if (!softbusConnector_->HaveDeviceInMap(std::string(dmDeviceInfo.deviceId))) {
+    if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
-        listener_->OnAuthResult(pkgName, std::string(dmDeviceInfo.deviceId), "",
-                                AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
 }
 
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-    const DmDeviceInfo &dmDeviceInfo, const std::string &extra)
+    const std::string &deviceId, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
-    int32_t ret = CheckAuthParamVaild(pkgName, authType, dmDeviceInfo, extra);
+    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
         return ret;
@@ -134,9 +131,9 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authRequestContext_->hostPkgName = pkgName;
     authRequestContext_->authType = authType;
-    authRequestContext_->localdeviceName = softbusConnector_->GetLocalDeviceName();
-    authRequestContext_->localdeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
-    authRequestContext_->deviceId = dmDeviceInfo.deviceId;
+    authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
+    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
+    authRequestContext_->deviceId = deviceId;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
@@ -738,7 +735,6 @@ void DmAuthManager::UpdateInputDialogDisplay(bool isShow)
     LOGI("DmAuthManager::UpdateInputDialogDisplay start");
     nlohmann::json jsonObj;
     jsonObj[VERIFY_FAILED] = isShow;
-    jsonObj.dump();
     std::string paramJson = jsonObj.dump();
     std::string pkgName = "com.ohos.devicemanagerui";
     listener_->OnUiCall(pkgName, paramJson);
@@ -825,7 +821,7 @@ void DmAuthManager::ShowConfigDialog()
     jsonObj[TARGET_PKG_NAME_KEY] = authResponseContext_->targetPkgName;
     jsonObj[TAG_CUSTOM_DESCRIPTION] = authResponseContext_->customDesc;
     jsonObj[TAG_APP_OPERATION] = authResponseContext_->appOperation;
-    jsonObj[TAG_DEVICE_TYPE] = authResponseContext_->deviceTypeId;
+    jsonObj[TAG_LOCAL_DEVICE_TYPE] = authResponseContext_->deviceTypeId;
     jsonObj[TAG_REQUESTER] = authResponseContext_->deviceName;
     const std::string params = jsonObj.dump();
     std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
