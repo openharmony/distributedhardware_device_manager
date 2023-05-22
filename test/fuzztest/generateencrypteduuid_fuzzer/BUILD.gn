@@ -48,11 +48,6 @@ ohos_fuzztest("GenerateEncryptedUuidFuzzTest") {
     "DH_LOG_TAG=\"GenerateEncryptedUuidFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "safwk:system_ability_fwk",
-  ]
 }
 
 ###############################################################################

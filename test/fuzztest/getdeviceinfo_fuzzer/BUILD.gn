@@ -19,8 +19,7 @@ import("../../../device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("GetDeviceInfoFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file =
-      "${devicemanager_path}/test/fuzztest/getdeviceinfo_fuzzer"
+  fuzz_config_file = "${devicemanager_path}/test/fuzztest/getdeviceinfo_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",
@@ -49,13 +48,7 @@ ohos_fuzztest("GetDeviceInfoFuzzTest") {
     "LOG_DOMAIN=0xD004100",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-    "device_auth:deviceauth_sdk",
-    "ipc:ipc_single",
-    "napi:ace_napi",
-    "safwk:system_ability_fwk",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 ###############################################################################

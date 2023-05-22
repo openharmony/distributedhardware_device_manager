@@ -22,7 +22,7 @@ namespace DistributedHardware {
 
 void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint16_t)) || (size > DM_MAX_DEVICE_ID_LEN)) {
         return;
     }
 
@@ -38,7 +38,7 @@ void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
     if (ret != EOK) {
         return;
     }
-    deviceInfo.deviceTypeId  = *(reinterpret_cast<const char*>(data));
+    deviceInfo.deviceTypeId  = *(reinterpret_cast<const uint16_t*>(data));
     DeviceManagerImpl::GetInstance().GetDeviceInfo(pkgName, networkId, deviceInfo);
 }
 }
