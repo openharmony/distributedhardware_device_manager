@@ -1,0 +1,12 @@
+{
+    "process": "device_manager",
+    "systemability": [
+        {
+            "name": 4802,
+            "libpath": "libdevicemanagerservice.z.so",
+            "run-on-create": true,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
