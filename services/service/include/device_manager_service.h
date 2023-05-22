@@ -71,7 +71,7 @@ public:
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
                                const std::string &extra);
 
-    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     int32_t VerifyAuthentication(const std::string &authParam);
 
@@ -85,7 +85,7 @@ public:
 
     void HandleDeviceOnline(DmDeviceInfo &info);
 
-    void HandleDeviceOffline(const DmDeviceInfo &info);
+    void HandleDeviceOffline(DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
 

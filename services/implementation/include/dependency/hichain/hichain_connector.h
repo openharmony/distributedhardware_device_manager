@@ -212,6 +212,13 @@ public:
      */
     int32_t deleteMultiMembers(const int32_t groupType, const std::string &userId,
                             const nlohmann::json &jsonDeviceList);
+
+    /**
+     * @tc.name: HiChainConnector::getTrustDevicesUdid
+     * @tc.desc: Get TrustDevicesUdid Info of the HiChain Connector
+     * @tc.type: FUNC
+     */
+    std::vector<std::string> getAllTrustDeviceUdid(const std::string &localDeviceId);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
@@ -227,6 +234,7 @@ private:
     int32_t GetGroupId(const std::string &userId, const int32_t groupType, std::string &groupId);
     int32_t ParseRemoteCredential(const int32_t groupType, const std::string &userId,
     const nlohmann::json &jsonDeviceList, std::string &params, int32_t &osAccountUserId);
+    int32_t getTrustDevicesByJsonObject(const char* jsonStr, std::vector<std::string> &deviceLists);
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;

@@ -428,12 +428,12 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
 int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
 {
-    if (pkgName.empty() || (deviceInfo.deviceId[0] == '\0')) {
+    if (pkgName.empty() || (deviceInfo.networkId[0] == '\0')) {
         LOGE("UnAuthenticateDevice error: Invalid para. pkgName %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("UnAuthenticateDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
-        GetAnonyString(std::string(deviceInfo.deviceId)).c_str());
+    LOGI("UnAuthenticateDevice start, pkgName: %s, networkId: %s", pkgName.c_str(),
+        GetAnonyString(std::string(deviceInfo.networkId)).c_str());
     std::shared_ptr<IpcUnAuthenticateDeviceReq> req = std::make_shared<IpcUnAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);

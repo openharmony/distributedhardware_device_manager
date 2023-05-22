@@ -18,6 +18,7 @@
 #include <securec.h>
 #include <unistd.h>
 
+#include "dm_crypto.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -44,9 +45,12 @@ std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
+std::unordered_map<std::string, std::string> SoftbusConnector::trustDeviceUdidhash2UdidMap_ = {};
+std::unordered_map<std::string, std::string> SoftbusConnector::trustDeviceUdid2UdidhashMap_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::stateCallbackMutex_;
+std::mutex SoftbusConnector::trustDeviceUdidLocks_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -235,45 +239,6 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
     return ret;
 }
 
-bool SoftbusConnector::IsDeviceOnLine(const std::string &deviceId)
-{
-    NodeBasicInfo *info = nullptr;
-    int32_t infoNum = 0;
-    LOGI("start, deviceId: %s.", GetAnonyString(deviceId).c_str());
-    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &info, &infoNum);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
-        return false;
-    }
-    bool bDeviceOnline = false;
-    for (int32_t i = 0; i < infoNum; ++i) {
-        NodeBasicInfo *nodeBasicInfo = info + i;
-        if (nodeBasicInfo == nullptr) {
-            LOGE("[SOFTBUS]nodeBasicInfo is empty for index: %d, infoNum: %d.", i, infoNum);
-            continue;
-        }
-        std::string networkId = nodeBasicInfo->networkId;
-        if (networkId == deviceId) {
-            LOGI("[SOFTBUS]DM_IsDeviceOnLine device: %s online.", GetAnonyString(deviceId).c_str());
-            bDeviceOnline = true;
-            break;
-        }
-        uint8_t udid[UDID_BUF_LEN] = {0};
-        ret = GetNodeKeyInfo(DM_PKG_NAME, networkId.c_str(), NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
-        if (ret != DM_OK) {
-            LOGE("[SOFTBUS]DM_IsDeviceOnLine GetNodeKeyInfo failed, ret: %d.", ret);
-            break;
-        }
-        if (strcmp(reinterpret_cast<char *>(udid), deviceId.c_str()) == DM_OK) {
-            LOGI("DM_IsDeviceOnLine device: %s online.", GetAnonyString(deviceId).c_str());
-            bDeviceOnline = true;
-            break;
-        }
-    }
-    FreeNodeInfo(info);
-    return bDeviceOnline;
-}
-
 std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 {
     return softbusSession_;
@@ -419,14 +384,8 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
             iter.second->OnDeviceOnline(iter.first, info);
         }
     }
-    uint8_t udid[UDID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, info.networkId, NodeDeviceInfoKey::NODE_KEY_UDID, udid, sizeof(udid));
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %d.", ret);
-        return;
-    }
-    std::string deviceId = reinterpret_cast<char *>(udid);
-    LOGI("device online, deviceId: %s.", GetAnonyString(deviceId).c_str());
+
+    LOGI("device online, deviceId: %s.", GetAnonyString(std::string(info.deviceId)).c_str());
 }
 
 void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
@@ -439,6 +398,8 @@ void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
     for (auto &iter : stateCallbackMap_) {
         iter.second->OnDeviceOffline(iter.first, info);
     }
+
+    LOGI("device offline, deviceId: %s.", GetAnonyString(std::string(info.deviceId)).c_str());
 }
 
 void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult result)
@@ -469,7 +430,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
     std::string deviceId = device->devId;
     LOGI("[SOFTBUS]notify found device: %s found, range: %d.", GetAnonyString(deviceId).c_str(), device->range);
-    if (!IsDeviceOnLine(deviceId)) {
+    if (!device->isOnline) {
         std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
         DeviceInfo *srcInfo = infoPtr.get();
         int32_t ret = memcpy_s(srcInfo, sizeof(DeviceInfo), device, sizeof(DeviceInfo));
@@ -502,7 +463,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 #endif
 
     for (auto &iter : discoveryCallbackMap_) {
-        iter.second->OnDeviceFound(iter.first, dmDeviceInfo);
+        iter.second->OnDeviceFound(iter.first, dmDeviceInfo, device->isOnline);
     }
 }
 
@@ -524,6 +485,31 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
             iter.second->OnDiscoveryFailed(iter.first, originId, result);
         }
     }
+}
+
+std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidhash)
+{
+    if (trustDeviceUdidhash2UdidMap_.count(udidhash) == 0) {
+        return "";
+    }
+    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
+    return trustDeviceUdidhash2UdidMap_[udidhash];
+}
+
+std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
+{
+    if (trustDeviceUdid2UdidhashMap_.count(udid) == 1) {
+        return trustDeviceUdid2UdidhashMap_[udid];
+    }
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::DiscGetDeviceIdHash(udid, (uint8_t *)udidHash) != DM_OK) {
+        LOGE("get deviceId by udid failed.");
+        return "";
+    }
+    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
+    trustDeviceUdid2UdidhashMap_[udid] = udidHash;
+    trustDeviceUdidhash2UdidMap_[udidHash] = udid;
+    return udidHash;
 }
 
 std::string SoftbusConnector::GetLocalDeviceName()

@@ -299,11 +299,6 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
     (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), nodeBasicInfo.networkId,
-        std::min(sizeof(dmDeviceInfo.deviceId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
-    }
-
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
         std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");

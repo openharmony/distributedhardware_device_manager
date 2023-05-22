@@ -61,7 +61,7 @@ public:
      * @tc.desc: OnDevice Found of the Dm Discovery Manager
      * @tc.type: FUNC
      */
-    void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info);
+    void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline);
 
     /**
      * @tc.name: DmDiscoveryManager::OnDiscoverySuccess
@@ -86,6 +86,8 @@ public:
 private:
     void CfgDiscoveryTimer();
     int32_t CheckDiscoveryQueue(const std::string &pkgName);
+    int32_t GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
+    bool &isTrusted, DmAuthForm &authForm);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

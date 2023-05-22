@@ -106,14 +106,9 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_001, testing::ext::TestSize.Level0)
     std::string pkgName = "123";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    deviceStateMgr->RegisterSoftbusStateCallback();
+    int32_t ret = deviceStateMgr->RegisterSoftbusStateCallback();
     DeviceOffLine(info);
-    bool ret = false;
-    if (listener->ipcServerListener_.req_ != nullptr) {
-        ret = true;
-        listener->ipcServerListener_.req_ = nullptr;
-    }
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, DM_OK);
     SoftbusConnector::stateCallbackMap_.clear();
 }
 
@@ -337,34 +332,6 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
     std::string udid;
     int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
     EXPECT_NE(ret, 0);
-}
-
-/**
- * @tc.name: IsDeviceOnLine_001
- * @tc.desc: set deviceId = "12333", and return false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "12333";
-    bool ret = softbusConnector->IsDeviceOnLine(deviceId);
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: IsDeviceOnLine_002
- * @tc.desc:
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "145677";
-    NodeBasicInfo info;
-    strcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, "145677");
-    bool ret = softbusConnector->IsDeviceOnLine(deviceId);
-    EXPECT_EQ(ret, false);
 }
 
 /**

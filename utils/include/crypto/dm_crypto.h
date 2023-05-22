@@ -24,6 +24,7 @@ class Crypto {
 public:
     static std::string Sha256(const std::string &text, bool isUpper = false);
     static std::string Sha256(const void *data, size_t size, bool isUpper = false);
+    static int32_t DiscGetDeviceIdHash(const std::string &deviceId, unsigned char *hashStr);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

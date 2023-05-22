@@ -17,6 +17,7 @@
 #include "dm_discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
 #include "parameter.h"
 
@@ -116,7 +117,7 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
     return softbusConnector_->StopDiscovery(subscribeId);
 }
 
-void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info)
+void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline)
 {
     LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
     DmDiscoveryContext discoveryContext;
@@ -131,21 +132,51 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
     }
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
-    filterPara.isOnline = softbusConnector_->IsDeviceOnLine(info.deviceId);
+    filterPara.isOnline = isOnline;
     filterPara.range = info.range;
     filterPara.deviceType = info.deviceTypeId;
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    filterPara.isTrusted = hiChainConnector_->IsDevicesInGroup(localDeviceId, info.deviceId);
     info.authForm = DmAuthForm::INVALID_TYPE;
-    if (filterPara.isTrusted) {
-        info.authForm = hiChainConnector_->GetGroupType(info.deviceId);
-    }
+    GetAuthForm(localDeviceId, info.deviceId, filterPara.isTrusted, info.authForm);
     filterPara.authForm = info.authForm;
     if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
     }
     return;
+}
+
+int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
+    bool &isTrusted, DmAuthForm &authForm)
+{
+    if (localDeviceId.empty() || deviceId.empty()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (hiChainConnector_ == nullptr || softbusConnector_ == nullptr) {
+        return ERR_DM_POINT_NULL;
+    }
+    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(deviceId);
+    if (!udid.empty()) {
+        isTrusted = true;
+        authForm = hiChainConnector_->GetGroupType(udid);
+        return DM_OK;
+    }
+
+    std::vector<std::string> trustDeviceUdidList = hiChainConnector_->getAllTrustDeviceUdid(localDeviceId);
+    if (trustDeviceUdidList.empty()) {
+        return DM_OK;
+    }
+    std::string udidHash;
+    for (auto udid : trustDeviceUdidList) {
+        udidHash = softbusConnector_->GetDeviceUdidHashByUdid(udid);
+        if (udidHash == deviceId) {
+            isTrusted = true;
+            authForm = hiChainConnector_->GetGroupType(udid);
+            LOGI("get auth info success.");
+        }
+    }
+
+    return DM_OK;
 }
 
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)

@@ -86,7 +86,7 @@ public:
      * @tc.desc: UnAuthenticate Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::VerifyAuthentication
@@ -135,7 +135,7 @@ public:
      * @tc.desc: Handle Device Offline to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceOffline(const DmDeviceInfo &info);
+    virtual void HandleDeviceOffline(DmDeviceInfo &info);
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
@@ -225,6 +225,13 @@ public:
      */
     virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid);
+
+    /**
+     * @tc.name: DeviceManagerService::GetLocalDeviceUdidHash
+     * @tc.desc: GetLocalDeviceUdidHash
+     * @tc.type: FUNC
+     */
+    virtual const std::string &GetLocalDeviceUdidHash();
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

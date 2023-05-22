@@ -54,7 +54,7 @@ public:
     int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
                                const std::string &extra);
 
-    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     int32_t VerifyAuthentication(const std::string &authParam);
 
@@ -68,7 +68,7 @@ public:
 
     void HandleDeviceOnline(DmDeviceInfo &info);
 
-    void HandleDeviceOffline(const DmDeviceInfo &info);
+    void HandleDeviceOffline(DmDeviceInfo &info);
 
     int OnSessionOpened(int sessionId, int result);
 
@@ -97,8 +97,11 @@ public:
 
     int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid);
+
+    const std::string &GetLocalDeviceUdidHash();
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
+    std::string GetUdidHashByNetworkId(const std::string &networkId);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -109,6 +112,7 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
+    std::string localDeviceUdidHash_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

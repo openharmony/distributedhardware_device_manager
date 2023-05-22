@@ -145,7 +145,7 @@ public:
      * @tc.desc: UnAuthenticate Device of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     /**
      * @tc.name: DmAuthManager::VerifyAuthentication

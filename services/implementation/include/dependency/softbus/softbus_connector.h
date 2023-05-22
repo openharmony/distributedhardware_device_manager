@@ -86,13 +86,6 @@ public:
     static ConnectionAddr *GetConnectAddr(const std::string &deviceId, std::string &connectAddr);
 
     /**
-     * @tc.name: SoftbusConnector::IsDeviceOnLine
-     * @tc.desc: Judge Device OnLine of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static bool IsDeviceOnLine(const std::string &deviceId);
-
-    /**
      * @tc.name: SoftbusConnector::GetUdidByNetworkId
      * @tc.desc: Get Udid By NetworkId of the SoftbusConnector
      * @tc.type: FUNC
@@ -132,6 +125,8 @@ public:
     bool HaveDeviceInMap(std::string deviceId);
     void HandleDeviceOnline(DmDeviceInfo &info);
     void HandleDeviceOffline(const DmDeviceInfo &info);
+    static std::string GetDeviceUdidHashByUdid(const std::string &udid);
+    static std::string GetDeviceUdidByUdidHash(const std::string &udidhash);
     std::string GetLocalDeviceName();
     int32_t GetLocalDeviceTypeId();
 
@@ -155,9 +150,12 @@ private:
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
+    static std::unordered_map<std::string, std::string> trustDeviceUdidhash2UdidMap_;
+    static std::unordered_map<std::string, std::string> trustDeviceUdid2UdidhashMap_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex stateCallbackMutex_;
+    static std::mutex trustDeviceUdidLocks_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
