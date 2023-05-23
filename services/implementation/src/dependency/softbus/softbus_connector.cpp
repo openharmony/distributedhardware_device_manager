@@ -506,6 +506,7 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
         LOGE("get deviceId by udid failed.");
         return "";
     }
+    LOGI("get deviceId by udid.");
     std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
     trustDeviceUdid2UdidhashMap_[udid] = udidHash;
     trustDeviceUdidhash2UdidMap_[udidHash] = udid;

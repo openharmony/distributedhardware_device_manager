@@ -131,7 +131,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     }
 
     std::string deviceId = dmServiceImpl_->GetLocalDeviceUdidHash();
-    if(memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId failed.");
     }
     return DM_OK;
