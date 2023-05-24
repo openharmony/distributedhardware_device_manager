@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_sa_profile("dm_sa_profile") {
-  sources = [ "device_manager.json" ]
+  sources = [ "4802.json" ]
 
   part_name = "device_manager"
 }
