@@ -772,9 +772,11 @@ ON_IPC_SET_REQUEST(GET_ENCRYPTED_UUID_BY_NETWOEKID, std::shared_ptr<IpcReq> pBas
     std::string pkgName = pReq->GetPkgName();
     std::string netWorkId = pReq->GetNetworkId();
     if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(netWorkId)) {
+        LOGE("write netWorkId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -795,12 +797,15 @@ ON_IPC_SET_REQUEST(GENERATE_ENCRYPTED_UUID, std::shared_ptr<IpcReq> pBaseReq, Me
     std::string uuid = pReq->GetUuid();
     std::string appId = pReq->GetAppId();
     if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(uuid)) {
+        LOGE("write uuid failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(appId)) {
+        LOGE("write appId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

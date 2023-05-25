@@ -719,7 +719,7 @@ ON_IPC_CMD(GET_ENCRYPTED_UUID_BY_NETWOEKID, MessageParcel &data, MessageParcel &
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteString(uuid)) {
-        LOGE("write result failed");
+        LOGE("write uuid failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -738,7 +738,7 @@ ON_IPC_CMD(GENERATE_ENCRYPTED_UUID, MessageParcel &data, MessageParcel &reply)
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteString(encryptedUuid)) {
-        LOGE("write result failed");
+        LOGE("write encryptedUuid failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
