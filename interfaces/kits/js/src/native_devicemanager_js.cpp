@@ -1275,34 +1275,31 @@ void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &ob
         std::string strProName = JsObjectToString(env, jsProName);
         napi_get_named_property(env, jsonField, strProName.c_str(), &jsProValue);
         napi_typeof(env, jsProValue, &jsValueType);
+        int32_t numberValue = 0;
+        bool boolValue = false;
+        std::string stringValue = "";
         switch (jsValueType) {
-            case napi_string: {
-                std::string natValue = JsObjectToString(env, jsProValue);
-                LOGI("Property name = %s, string, value = %s", strProName.c_str(), natValue.c_str());
-                jsonObj[strProName] = natValue;
+            case napi_string:
+                stringValue = JsObjectToString(env, jsProValue);
+                LOGI("Property name = %s, string, value = %s", strProName.c_str(), stringValue.c_str());
+                jsonObj[strProName] = stringValue;
                 break;
-            }
-            case napi_boolean: {
-                bool elementValue = false;
-                napi_get_value_bool(env, jsProValue, &elementValue);
-                LOGI("Property name = %s, boolean, value = %d.", strProName.c_str(), elementValue);
-                jsonObj[strProName] = elementValue;
+            case napi_boolean:
+                napi_get_value_bool(env, jsProValue, &boolValue);
+                LOGI("Property name = %s, boolean, value = %d.", strProName.c_str(), boolValue);
+                jsonObj[strProName] = boolValue;
                 break;
-            }
-            case napi_number: {
-                int32_t elementValue = 0;
-                if (napi_get_value_int32(env, jsProValue, &elementValue) != napi_ok) {
+            case napi_number:
+                if (napi_get_value_int32(env, jsProValue, &numberValue) != napi_ok) {
                     LOGE("Property name = %s, Property int32_t parse error", strProName.c_str());
                 } else {
-                    jsonObj[strProName] = elementValue;
-                    LOGI("Property name = %s, number, value = %d.", strProName.c_str(), elementValue);
+                    jsonObj[strProName] = numberValue;
+                    LOGI("Property name = %s, number, value = %d.", strProName.c_str(), numberValue);
                 }
                 break;
-            }
-            default: {
+            default:
                 LOGE("Property name = %s, value type not support.", strProName.c_str());
                 break;
-            }
         }
     }
 }
@@ -2771,10 +2768,6 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
-        size_t requireArgc = 1;
-        if (!CheckArgsCount(env, argc >= requireArgc, "Wrong number of arguments, required 1")) {
-            return nullptr;
-        }
         napi_valuetype eventValueType = napi_undefined;
         napi_typeof(env, argv[0], &eventValueType);
         if (!CheckArgsType(env, eventValueType == napi_string, "type", "string")) {
@@ -2785,12 +2778,10 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         if (!CheckArgsType(env, (valueType == napi_string || valueType == napi_object), "extra", "string or object")) {
             return nullptr;
         }
-        if (argc > requireArgc) {
-            napi_valuetype eventHandleType = napi_undefined;
-            napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
-            if (!CheckArgsType(env, eventValueType == napi_function, "callback", "function")) {
-                return nullptr;
-            }
+        napi_valuetype eventHandleType = napi_undefined;
+        napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
+        if (!CheckArgsType(env, eventValueType == napi_function, "callback", "function")) {
+            return nullptr;
         }
         return JsOffFrench(env, 1, thisVar, argv);
     } else {

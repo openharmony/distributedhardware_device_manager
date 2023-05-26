@@ -62,66 +62,76 @@ DmConfigManager &DmConfigManager::GetInstance()
     return instance;
 }
 
+void DmConfigManager::ParseAdapterConfig()
+{
+    nlohmann::json adapterJsonObject = nlohmann::json::parse(adapterJsonConfigString, nullptr, false);
+    if (adapterJsonObject.is_discarded()) {
+        LOGE("adapter json config string parse error");
+        return;
+    }
+    if (!IsArray(adapterJsonObject, ADAPTER_LOAD_JSON_KEY)) {
+        LOGE("adapter json config string key not exist");
+        return;
+    }
+    auto soLoadInfo = adapterJsonObject[ADAPTER_LOAD_JSON_KEY].get<std::vector<AdapterSoLoadInfo>>();
+    for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
+        if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
+            soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
+            soLoadInfo[i].soPath.size() == 0) {
+            LOGE("adapter json config string exist invalid members");
+            continue;
+        }
+        soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
+        soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
+        LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
+        LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
+        LOGI("soAdapterLoadInfo version is: %s", soLoadInfo[i].version.c_str());
+        LOGI("soAdapterLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
+        LOGI("soAdapterLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
+        LOGI("soAdapterLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
+    }
+}
+
+void DmConfigManager::ParseAuthConfig()
+{
+    nlohmann::json authJsonObject = nlohmann::json::parse(authJsonConfigString, nullptr, false);
+    if (authJsonObject.is_discarded()) {
+        LOGE("auth json config string parse error!\n");
+        return;
+    }
+    if (!IsArray(authJsonObject, AUTH_LOAD_JSON_KEY)) {
+        LOGE("auth json config string key not exist!\n");
+        return;
+    }
+    auto soLoadInfo = authJsonObject[AUTH_LOAD_JSON_KEY].get<std::vector<AuthSoLoadInfo>>();
+    for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
+        if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
+            soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
+            soLoadInfo[i].soPath.size() == 0) {
+            LOGE("adapter json config string exist invalid members");
+            continue;
+        }
+        soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
+        soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
+        LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
+        LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
+        LOGI("soAuthLoadInfo version is: %s", soLoadInfo[i].version.c_str());
+        LOGI("soAuthLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
+        LOGI("soAuthLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
+        LOGI("soAuthLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
+        LOGI("soAuthLoadInfo authType is: %d", soLoadInfo[i].authType);
+    }
+}
+
 DmConfigManager::DmConfigManager()
 {
     LOGI("DmConfigManager constructor");
     do {
-        nlohmann::json adapterJsonObject = nlohmann::json::parse(adapterJsonConfigString, nullptr, false);
-        if (adapterJsonObject.is_discarded()) {
-            LOGE("adapter json config string parse error");
-            break;
-        }
-        if (!IsArray(adapterJsonObject, ADAPTER_LOAD_JSON_KEY)) {
-            LOGE("adapter json config string key not exist");
-            break;
-        }
-        auto soLoadInfo = adapterJsonObject[ADAPTER_LOAD_JSON_KEY].get<std::vector<AdapterSoLoadInfo>>();
-        for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
-            if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
-                soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
-                soLoadInfo[i].soPath.size() == 0) {
-                LOGE("adapter json config string exist invalid members");
-                continue;
-            }
-            soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
-            soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
-            LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
-            LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
-            LOGI("soAdapterLoadInfo version is: %s", soLoadInfo[i].version.c_str());
-            LOGI("soAdapterLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
-            LOGI("soAdapterLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
-            LOGI("soAdapterLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
-        }
+        ParseAdapterConfig();
     } while (0);
 
     do {
-        nlohmann::json authJsonObject = nlohmann::json::parse(authJsonConfigString, nullptr, false);
-        if (authJsonObject.is_discarded()) {
-            LOGE("auth json config string parse error!\n");
-            break;
-        }
-        if (!IsArray(authJsonObject, AUTH_LOAD_JSON_KEY)) {
-            LOGE("auth json config string key not exist!\n");
-            break;
-        }
-        auto soLoadInfo = authJsonObject[AUTH_LOAD_JSON_KEY].get<std::vector<AuthSoLoadInfo>>();
-        for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
-            if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
-                soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
-                soLoadInfo[i].soPath.size() == 0) {
-                LOGE("adapter json config string exist invalid members");
-                continue;
-            }
-            soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
-            soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
-            LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
-            LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
-            LOGI("soAuthLoadInfo version is: %s", soLoadInfo[i].version.c_str());
-            LOGI("soAuthLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
-            LOGI("soAuthLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
-            LOGI("soAuthLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
-            LOGI("soAuthLoadInfo authType is: %d", soLoadInfo[i].authType);
-        }
+        ParseAuthConfig();
     } while (0);
 }
 

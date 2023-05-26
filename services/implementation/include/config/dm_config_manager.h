@@ -82,6 +82,8 @@ public:
 
 private:
     DmConfigManager();
+    void ParseAdapterConfig();
+    void ParseAuthConfig();
 
 private:
 #if !defined(__LITEOS_M__)
