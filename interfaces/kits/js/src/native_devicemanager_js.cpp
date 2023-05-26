@@ -2768,6 +2768,9 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
+        if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+            return nullptr;
+        }
         napi_valuetype eventValueType = napi_undefined;
         napi_typeof(env, argv[0], &eventValueType);
         if (!CheckArgsType(env, eventValueType == napi_string, "type", "string")) {
@@ -2778,16 +2781,17 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         if (!CheckArgsType(env, (valueType == napi_string || valueType == napi_object), "extra", "string or object")) {
             return nullptr;
         }
-        napi_valuetype eventHandleType = napi_undefined;
-        napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
-        if (!CheckArgsType(env, eventValueType == napi_function, "callback", "function")) {
-            return nullptr;
+        if (argc > DM_NAPI_ARGS_ONE) {
+            napi_valuetype eventHandleType = napi_undefined;
+            napi_typeof(env, argv[DM_NAPI_ARGS_TWO], &eventHandleType);
+            if (!CheckArgsType(env, eventValueType == napi_function, "callback", "function")) {
+                return nullptr;
+            }
         }
         return JsOffFrench(env, 1, thisVar, argv);
     } else {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-        size_t requireArgc = 1;
-        if (!CheckArgsCount(env, argc >= requireArgc, "Wrong number of arguments, required 1")) {
+        if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
             return nullptr;
         }
         napi_valuetype eventValueType = napi_undefined;
@@ -2795,7 +2799,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         if (!CheckArgsType(env, eventValueType == napi_string, "type", "string")) {
             return nullptr;
         }
-        if (argc > requireArgc) {
+        if (argc > DM_NAPI_ARGS_ONE) {
             napi_valuetype eventHandleType = napi_undefined;
             napi_typeof(env, argv[1], &eventHandleType);
             if (!CheckArgsType(env, eventValueType == napi_function, "callback", "function")) {
