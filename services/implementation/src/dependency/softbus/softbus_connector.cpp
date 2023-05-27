@@ -31,6 +31,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 100;
+const int32_t SOFTBUS_TRUSTDEVICE_UUIDHASH_INFO_MAX_SIZE = 100;
 
 constexpr const char* WIFI_IP = "WIFI_IP";
 constexpr const char* WIFI_PORT = "WIFI_PORT";
@@ -45,7 +46,6 @@ std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
-std::unordered_map<std::string, std::string> SoftbusConnector::trustDeviceUdidhash2UdidMap_ = {};
 std::unordered_map<std::string, std::string> SoftbusConnector::trustDeviceUdid2UdidhashMap_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
@@ -487,20 +487,15 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
     }
 }
 
-std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidhash)
-{
-    if (trustDeviceUdidhash2UdidMap_.count(udidhash) == 0) {
-        return "";
-    }
-    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
-    return trustDeviceUdidhash2UdidMap_[udidhash];
-}
-
 std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
 {
-    if (trustDeviceUdid2UdidhashMap_.count(udid) == 1) {
-        return trustDeviceUdid2UdidhashMap_[udid];
+    {
+        std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
+        if (trustDeviceUdid2UdidhashMap_.count(udid) == 1) {
+            return trustDeviceUdid2UdidhashMap_[udid];
+        }
     }
+
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
     if (Crypto::DiscGetDeviceIdHash(udid, (uint8_t *)udidHash) != DM_OK) {
         LOGE("get deviceId by udid failed.");
@@ -509,8 +504,19 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
     LOGI("get deviceId by udid.");
     std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
     trustDeviceUdid2UdidhashMap_[udid] = udidHash;
-    trustDeviceUdidhash2UdidMap_[udidHash] = udid;
     return udidHash;
+}
+
+void SoftbusConnector::DeleteUdid2UdidHashFormMap(const std::string &udid)
+{
+    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
+    if (trustDeviceUdid2UdidhashMap_.count(udid) == 0) {
+        return;
+    }
+    size_t mapSize = trustDeviceUdid2UdidhashMap_.size();
+    if (mapSize >= SOFTBUS_TRUSTDEVICE_UUIDHASH_INFO_MAX_SIZE) {
+        trustDeviceUdid2UdidhashMap_.erase(udid);
+    }
 }
 
 std::string SoftbusConnector::GetLocalDeviceName()

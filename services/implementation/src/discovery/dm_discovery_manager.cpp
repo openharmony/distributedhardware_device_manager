@@ -155,12 +155,6 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
     if (hiChainConnector_ == nullptr || softbusConnector_ == nullptr) {
         return ERR_DM_POINT_NULL;
     }
-    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(deviceId);
-    if (!udid.empty()) {
-        isTrusted = true;
-        authForm = hiChainConnector_->GetGroupType(udid);
-        return DM_OK;
-    }
 
     std::vector<std::string> trustDeviceUdidList = hiChainConnector_->getAllTrustDeviceUdid(localDeviceId);
     if (trustDeviceUdidList.empty()) {

@@ -278,6 +278,12 @@ void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
             LOGE("get deviceId failed");
         }
         softbusConnector_->HandleDeviceOffline(info);
+
+        std::string udid;
+        int32_t ret = softbusConnector_->GetUdidByNetworkId(info.networkId, udid);
+        if (ret == DM_OK) {
+            softbusConnector_->DeleteUdid2UdidHashFormMap(udid);
+        }
     }
 }
 

@@ -187,6 +187,9 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
         return ERR_DM_FAILED;
     }
+    if (softbusConnector_ != nullptr) {
+        softbusConnector_->DeleteUdid2UdidHashFormMap(deviceUdid);
+    }
     return DM_OK;
 }
 
