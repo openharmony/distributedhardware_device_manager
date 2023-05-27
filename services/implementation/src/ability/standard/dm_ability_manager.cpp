@@ -53,8 +53,8 @@ AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
         if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
             customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].get<std::string>();
         }
-        if (IsInt32(jsonObject, TAG_DEVICE_TYPE)) {
-            deviceType = jsonObject[TAG_DEVICE_TYPE].get<std::int32_t>();
+        if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
+            deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].get<std::int32_t>();
         }
     }
 

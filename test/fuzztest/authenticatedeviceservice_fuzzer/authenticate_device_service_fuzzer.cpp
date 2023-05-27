@@ -27,11 +27,11 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
-    DmDeviceInfo deviceInfo;
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
     int32_t authType = 123;
     DmAuthParam authParam;
 
-    DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceInfo, extra);
+    DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().VerifyAuthentication(pkgName);
     DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
     DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);

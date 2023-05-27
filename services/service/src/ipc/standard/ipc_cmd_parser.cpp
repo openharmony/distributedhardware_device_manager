@@ -406,18 +406,11 @@ ON_IPC_CMD(AUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
-
-    DmDeviceInfo dmDeviceInfo;
-    size_t deviceSize = sizeof(DmDeviceInfo);
-    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
-    if (deviceInfo != nullptr && memcpy_s(&dmDeviceInfo, deviceSize, deviceInfo, deviceSize) != 0) {
-        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
-        return ERR_DM_IPC_COPY_FAILED;
-    }
-
+    std::string deviceId = data.ReadString();
     int32_t authType = data.ReadInt32();
+
     int32_t result = DM_OK;
-    result = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, dmDeviceInfo, extra);
+    result = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;

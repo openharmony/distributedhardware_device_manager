@@ -68,11 +68,11 @@ enum DmMsgType : int32_t {
 typedef struct DmAuthRequestContext {
     int32_t authType;
     std::string localDeviceId;
-    std::string localdeviceName;
-    int32_t localdeviceTypeId;
+    std::string localDeviceName;
+    int32_t localDeviceTypeId;
     std::string deviceId;
     std::string deviceName;
-    int32_t deviceTypeId;
+    std::string deviceTypeId;
     int32_t sessionId;
     int32_t groupVisibility;
     bool cryptoSupport;
@@ -82,6 +82,7 @@ typedef struct DmAuthRequestContext {
     std::string targetPkgName;
     std::string appOperation;
     std::string appDesc;
+    std::string appName;
     std::string customDesc;
     std::string appThumbnail;
     std::string token;
@@ -137,7 +138,7 @@ public:
      * @tc.desc: Authenticate Device of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
+    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
 
     /**
@@ -392,7 +393,7 @@ public:
      */
     bool IsIdenticalAccount();
 private:
-    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
+    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

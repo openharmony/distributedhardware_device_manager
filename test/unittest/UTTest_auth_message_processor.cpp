@@ -386,7 +386,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::Te
     jsonThumbnail[TAG_TARGET] = "12345";
     jsonThumbnail[TAG_APP_OPERATION] = "123456";
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**

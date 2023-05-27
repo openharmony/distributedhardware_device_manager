@@ -51,7 +51,7 @@ public:
 
     int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
 
-    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const DmDeviceInfo &dmDeviceInfo,
+    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                const std::string &extra);
 
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
