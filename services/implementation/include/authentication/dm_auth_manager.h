@@ -395,6 +395,8 @@ public:
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    void ProcessSourceMsg();
+    void ProcessSinkMsg();
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;

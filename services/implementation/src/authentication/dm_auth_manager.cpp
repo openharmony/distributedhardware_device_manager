@@ -260,6 +260,70 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
     LOGI("DmAuthManager::OnSessionOpened sessionId = %d", sessionId);
 }
 
+void DmAuthManager::ProcessSourceMsg()
+{
+    authRequestContext_ = authMessageProcessor_->GetRequestContext();
+    authRequestState_->SetAuthContext(authRequestContext_);
+    LOGI("OnDataReceived for source device, authResponseContext msgType = %d, authRequestState stateType = %d",
+        authResponseContext_->msgType, authRequestState_->GetStateType());
+
+    switch (authResponseContext_->msgType) {
+        case MSG_TYPE_RESP_AUTH:
+            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestReplyState>());
+            }
+            break;
+        case MSG_TYPE_RESP_NEGOTIATE:
+            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE) {
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateDoneState>());
+            }
+            break;
+        case MSG_TYPE_REQ_AUTH_TERMINATE:
+            if (authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
+                isFinishOfLocal_ = false;
+                authResponseContext_->state = authRequestState_->GetStateType();
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void DmAuthManager::ProcessSinkMsg()
+{
+    authResponseState_->SetAuthContext(authResponseContext_);
+    LOGI("OnDataReceived for sink device, authResponseContext msgType = %d, authResponseState stateType = %d",
+        authResponseContext_->msgType, authResponseState_->GetStateType());
+
+    switch (authResponseContext_->msgType) {
+        case MSG_TYPE_NEGOTIATE:
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
+                timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
+            } else {
+                LOGE("Device manager auth state error");
+            }
+            break;
+        case MSG_TYPE_REQ_AUTH:
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
+                timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
+            } else {
+                LOGE("Device manager auth state error");
+            }
+            break;
+        case MSG_TYPE_REQ_AUTH_TERMINATE:
+            if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
+                isFinishOfLocal_ = false;
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string message)
 {
     if (authResponseContext_ == nullptr || authMessageProcessor_ == nullptr) {
@@ -277,64 +341,10 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
 
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         // source device auth process
-        authRequestContext_ = authMessageProcessor_->GetRequestContext();
-        authRequestState_->SetAuthContext(authRequestContext_);
-        LOGI("OnDataReceived for source device, authResponseContext msgType = %d, authRequestState stateType = %d",
-            authResponseContext_->msgType, authRequestState_->GetStateType());
-
-        switch (authResponseContext_->msgType) {
-            case MSG_TYPE_RESP_AUTH:
-                if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
-                    authRequestState_->TransitionTo(std::make_shared<AuthRequestReplyState>());
-                }
-                break;
-            case MSG_TYPE_RESP_NEGOTIATE:
-                if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE) {
-                    authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateDoneState>());
-                }
-                break;
-            case MSG_TYPE_REQ_AUTH_TERMINATE:
-                if (authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_FINISH) {
-                    isFinishOfLocal_ = false;
-                    authResponseContext_->state = authRequestState_->GetStateType();
-                    authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-                }
-                break;
-            default:
-                break;
-        }
+        ProcessSourceMsg();
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         // sink device auth process
-        authResponseState_->SetAuthContext(authResponseContext_);
-        LOGI("OnDataReceived for sink device, authResponseContext msgType = %d, authResponseState stateType = %d",
-            authResponseContext_->msgType, authResponseState_->GetStateType());
-
-        switch (authResponseContext_->msgType) {
-            case MSG_TYPE_NEGOTIATE:
-                if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
-                    timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
-                    authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
-                } else {
-                    LOGE("Device manager auth state error");
-                }
-                break;
-            case MSG_TYPE_REQ_AUTH:
-                if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
-                    timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
-                    authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
-                } else {
-                    LOGE("Device manager auth state error");
-                }
-                break;
-            case MSG_TYPE_REQ_AUTH_TERMINATE:
-                if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
-                    isFinishOfLocal_ = false;
-                    authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
-                }
-                break;
-            default:
-                break;
-        }
+        ProcessSinkMsg();
     } else {
         LOGE("DmAuthManager::OnDataReceived failed, authRequestState_ or authResponseState_ is invalid.");
     }
