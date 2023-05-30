@@ -126,7 +126,7 @@ public:
     void HandleDeviceOnline(DmDeviceInfo &info);
     void HandleDeviceOffline(const DmDeviceInfo &info);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
-    void DeleteUdid2UdidHashFormMap(const std::string &udid);
+    void EraseUdidFromMap(const std::string &udid);
     std::string GetLocalDeviceName();
     int32_t GetLocalDeviceTypeId();
 
@@ -150,11 +150,11 @@ private:
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
-    static std::unordered_map<std::string, std::string> trustDeviceUdid2UdidhashMap_;
+    static std::unordered_map<std::string, std::string> deviceUdidMap_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex stateCallbackMutex_;
-    static std::mutex trustDeviceUdidLocks_;
+    static std::mutex deviceUdidLocks_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DmSoftbusAdapterCrypto {
 public:
-    static int32_t DiscGetDeviceIdHash(const std::string &deviceId, unsigned char *hashStr);
+    static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
 };
 }; // namespace DistributedHardware
 }; // namespace OHOS

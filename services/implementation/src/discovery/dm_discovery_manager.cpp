@@ -156,7 +156,7 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
         return ERR_DM_POINT_NULL;
     }
 
-    std::vector<std::string> trustDeviceUdidList = hiChainConnector_->getAllTrustDeviceUdid(localDeviceId);
+    std::vector<std::string> trustDeviceUdidList = hiChainConnector_->GetTrustedDevices(localDeviceId);
     if (trustDeviceUdidList.empty()) {
         return DM_OK;
     }

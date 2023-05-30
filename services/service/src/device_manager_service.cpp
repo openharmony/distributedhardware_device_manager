@@ -131,7 +131,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         char udidHash[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-        if (DmSoftbusAdapterCrypto::DiscGetDeviceIdHash(localDeviceId,
+        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId,
             (uint8_t *)udidHash) == DM_OK) {
             localDeviceId_ = udidHash;
         }

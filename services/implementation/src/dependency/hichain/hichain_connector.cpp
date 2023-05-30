@@ -934,7 +934,7 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
     return DM_OK;
 }
 
-std::vector<std::string> HiChainConnector::getAllTrustDeviceUdid(const std::string &localDeviceId)
+std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &localDeviceId)
 {
     LOGI("get trustdevices udid.");
     std::vector<GroupInfo> groups;
@@ -955,18 +955,18 @@ std::vector<std::string> HiChainConnector::getAllTrustDeviceUdid(const std::stri
         uint32_t devNum = 0;
         ret = deviceGroupManager_->getTrustedDevices(userId, DM_PKG_NAME, group.groupId.c_str(),
         &devicesJson, &devNum);
-        if (devicesJson == nullptr) {
-            LOGE("failed to get trusted devicesJson, ret:%d", ret);
+        if (ret != 0 || devicesJson == nullptr) {
+            LOGE("[HICHAIN]failed to get trusted devicesJson, ret:%d", ret);
             return {};
         }
-        getTrustDevicesByJsonObject(devicesJson, trustedDevices);
+        GetTrustedDevicesUdid(devicesJson, trustedDevices);
         deviceGroupManager_->destroyInfo(&devicesJson);
     }
     LOGI("getTrustDevicesUdid finish!");
     return trustedDevices;
 }
 
-int32_t HiChainConnector::getTrustDevicesByJsonObject(const char* jsonStr, std::vector<std::string> &deviceLists)
+int32_t HiChainConnector::GetTrustedDevicesUdid(const char* jsonStr, std::vector<std::string> &udidList)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(jsonStr, nullptr, false);
     if (jsonObject.is_discarded()) {
@@ -978,7 +978,7 @@ int32_t HiChainConnector::getTrustDevicesByJsonObject(const char* jsonStr, std::
             continue;
         }
         std::string udid = (*it1)[FIELD_AUTH_ID];
-        deviceLists.push_back(udid);
+        udidList.push_back(udid);
     }
     return DM_OK;
 }

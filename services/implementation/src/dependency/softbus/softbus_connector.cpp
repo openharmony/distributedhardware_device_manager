@@ -46,11 +46,11 @@ std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> SoftbusConnector::
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
-std::unordered_map<std::string, std::string> SoftbusConnector::trustDeviceUdid2UdidhashMap_ = {};
+std::unordered_map<std::string, std::string> SoftbusConnector::deviceUdidMap_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::stateCallbackMutex_;
-std::mutex SoftbusConnector::trustDeviceUdidLocks_;
+std::mutex SoftbusConnector::deviceUdidLocks_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -490,32 +490,32 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
 std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
 {
     {
-        std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
-        if (trustDeviceUdid2UdidhashMap_.count(udid) == 1) {
-            return trustDeviceUdid2UdidhashMap_[udid];
+        std::lock_guard<std::mutex> lock(deviceUdidLocks_);
+        if (deviceUdidMap_.count(udid) == 1) {
+            return deviceUdidMap_[udid];
         }
     }
 
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::DiscGetDeviceIdHash(udid, (uint8_t *)udidHash) != DM_OK) {
+    if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)udidHash) != DM_OK) {
         LOGE("get deviceId by udid failed.");
         return "";
     }
     LOGI("get deviceId by udid.");
-    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
-    trustDeviceUdid2UdidhashMap_[udid] = udidHash;
+    std::lock_guard<std::mutex> lock(deviceUdidLocks_);
+    deviceUdidMap_[udid] = udidHash;
     return udidHash;
 }
 
-void SoftbusConnector::DeleteUdid2UdidHashFormMap(const std::string &udid)
+void SoftbusConnector::EraseUdidFromMap(const std::string &udid)
 {
-    std::lock_guard<std::mutex> lock(trustDeviceUdidLocks_);
-    if (trustDeviceUdid2UdidhashMap_.count(udid) == 0) {
+    std::lock_guard<std::mutex> lock(deviceUdidLocks_);
+    if (deviceUdidMap_.count(udid) == 0) {
         return;
     }
-    size_t mapSize = trustDeviceUdid2UdidhashMap_.size();
+    size_t mapSize = deviceUdidMap_.size();
     if (mapSize >= SOFTBUS_TRUSTDEVICE_UUIDHASH_INFO_MAX_SIZE) {
-        trustDeviceUdid2UdidhashMap_.erase(udid);
+        deviceUdidMap_.erase(udid);
     }
 }
 

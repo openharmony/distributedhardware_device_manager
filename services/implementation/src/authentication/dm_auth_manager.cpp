@@ -188,7 +188,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         return ERR_DM_FAILED;
     }
     if (softbusConnector_ != nullptr) {
-        softbusConnector_->DeleteUdid2UdidHashFormMap(deviceUdid);
+        softbusConnector_->EraseUdidFromMap(deviceUdid);
     }
     return DM_OK;
 }
