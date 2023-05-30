@@ -225,13 +225,6 @@ public:
      */
     virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid);
-
-    /**
-     * @tc.name: DeviceManagerService::GetLocalDeviceUdidHash
-     * @tc.desc: GetLocalDeviceUdidHash
-     * @tc.type: FUNC
-     */
-    virtual const std::string &GetLocalDeviceUdidHash();
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

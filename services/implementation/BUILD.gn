@@ -158,6 +158,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagerserviceimpl") {
     sources = [
+      "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "src/ability/standard/dm_ability_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",
       "src/authentication/auth_message_processor.cpp",
@@ -192,6 +193,7 @@ if (defined(ohos_lite)) {
       "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
+      "//third_party/mbedtls:mbedtls_shared",
     ]
 
     if (os_account_part_exists) {

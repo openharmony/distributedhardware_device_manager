@@ -23,7 +23,6 @@
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
-#include "parameter.h"
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
@@ -76,10 +75,6 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         LOGI("get current account user id success");
         MultipleUserConnector::SetSwitchOldUserId(userId);
     }
-
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    localDeviceUdidHash_ = softbusConnector_->GetDeviceUdidHashByUdid(localDeviceId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (commonEventManager_ == nullptr) {
         commonEventManager_ = std::make_shared<DmCommonEventManager>();
@@ -299,11 +294,6 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
         return "";
     }
     return softbusConnector_->GetDeviceUdidHashByUdid(udid);
-}
-
-const std::string &DeviceManagerServiceImpl::GetLocalDeviceUdidHash()
-{
-    return localDeviceUdidHash_;
 }
 
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)

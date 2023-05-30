@@ -22,6 +22,8 @@
 #include "dm_constants.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
+#include "parameter.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
 
@@ -125,14 +127,18 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         LOGE("GetLocalDeviceInfo failed");
         return ret;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    if (localDeviceId_.empty()) {
+        char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+        char udidHash[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+        if (DmSoftbusAdapterCrypto::DiscGetDeviceIdHash(localDeviceId,
+            (uint8_t *)udidHash) == DM_OK) {
+            localDeviceId_ = udidHash;
+        }
     }
 
-    std::string deviceId = dmServiceImpl_->GetLocalDeviceUdidHash();
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId failed.");
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
+        LOGE("get deviceId failed");
     }
     return DM_OK;
 }

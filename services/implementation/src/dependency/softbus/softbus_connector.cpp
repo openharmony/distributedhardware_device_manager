@@ -18,11 +18,11 @@
 #include <securec.h>
 #include <unistd.h>
 
-#include "dm_crypto.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -497,7 +497,7 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
     }
 
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::DiscGetDeviceIdHash(udid, (uint8_t *)udidHash) != DM_OK) {
+    if (DmSoftbusAdapterCrypto::DiscGetDeviceIdHash(udid, (uint8_t *)udidHash) != DM_OK) {
         LOGE("get deviceId by udid failed.");
         return "";
     }

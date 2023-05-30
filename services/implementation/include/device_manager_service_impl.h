@@ -98,7 +98,6 @@ public:
     int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid);
 
-    const std::string &GetLocalDeviceUdidHash();
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -112,7 +111,6 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
-    std::string localDeviceUdidHash_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

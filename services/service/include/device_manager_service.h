@@ -125,6 +125,7 @@ private:
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
+    std::string localDeviceId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
