@@ -106,9 +106,14 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_001, testing::ext::TestSize.Level0)
     std::string pkgName = "123";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    int32_t ret = deviceStateMgr->RegisterSoftbusStateCallback();
+    deviceStateMgr->RegisterSoftbusStateCallback();
     DeviceOffLine(info);
-    EXPECT_EQ(ret, DM_OK);
+    bool ret = false;
+    if (listener->ipcServerListener_.req_ != nullptr) {
+        ret = true;
+        listener->ipcServerListener_.req_ = nullptr;
+    }
+    EXPECT_EQ(ret, true);
     SoftbusConnector::stateCallbackMap_.clear();
 }
 
