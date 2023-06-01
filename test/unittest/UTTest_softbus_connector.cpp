@@ -340,34 +340,6 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: IsDeviceOnLine_001
- * @tc.desc: set deviceId = "12333", and return false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "12333";
-    bool ret = softbusConnector->IsDeviceOnLine(deviceId);
-    EXPECT_EQ(ret, false);
-}
-
-/**
- * @tc.name: IsDeviceOnLine_002
- * @tc.desc:
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, IsDeviceOnLine_002, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "145677";
-    NodeBasicInfo info;
-    strcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, "145677");
-    bool ret = softbusConnector->IsDeviceOnLine(deviceId);
-    EXPECT_EQ(ret, false);
-}
-
-/**
  * @tc.name: GetSoftbusSession_001
  * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC

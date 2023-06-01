@@ -22,6 +22,8 @@
 #include "dm_constants.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
+#include "parameter.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
 
@@ -123,8 +125,22 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
         LOGE("GetLocalDeviceInfo failed");
+        return ret;
     }
-    return ret;
+    if (localDeviceId_.empty()) {
+        char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+        char udidHash[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId,
+            (uint8_t *)udidHash) == DM_OK) {
+            localDeviceId_ = udidHash;
+        }
+    }
+
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(localDeviceId_).c_str());
+    }
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
@@ -222,11 +238,11 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     return dmServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 
-int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
+int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
-    LOGI("DeviceManagerService::UnAuthenticateDevice begin for pkgName = %s, deviceId = %s",
-        pkgName.c_str(), GetAnonyString(deviceId).c_str());
-    if (pkgName.empty() || deviceId.empty()) {
+    LOGI("DeviceManagerService::UnAuthenticateDevice begin for pkgName = %s, networkId = %s",
+        pkgName.c_str(), GetAnonyString(networkId).c_str());
+    if (pkgName.empty() || networkId.empty()) {
         LOGE("DeviceManagerService::UnAuthenticateDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -234,7 +250,7 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
         LOGE("UnAuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->UnAuthenticateDevice(pkgName, deviceId);
+    return dmServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
 }
 
 int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
@@ -325,7 +341,7 @@ void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
     dmServiceImpl_->HandleDeviceOnline(info);
 }
 
-void DeviceManagerService::HandleDeviceOffline(const DmDeviceInfo &info)
+void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
 {
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOffline failed, instance not init or init failed.");

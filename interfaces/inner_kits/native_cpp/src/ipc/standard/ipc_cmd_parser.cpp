@@ -366,12 +366,12 @@ ON_IPC_SET_REQUEST(UNAUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, Mess
     std::shared_ptr<IpcUnAuthenticateDeviceReq> pReq = std::static_pointer_cast<IpcUnAuthenticateDeviceReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
-    std::string deviceId = deviceInfo.deviceId;
+    std::string networkId = deviceInfo.networkId;
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteString(deviceId)) {
+    if (!data.WriteString(networkId)) {
         LOGE("write extra failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }

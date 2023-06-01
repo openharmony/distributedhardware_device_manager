@@ -264,33 +264,33 @@ void DmDeviceStateManager::UnRegisterDevStateCallback(const std::string &pkgName
 
 void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
-    std::string deviceId;
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(deviceInfo.deviceId, deviceId);
+    std::string deviceUdid;
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(deviceInfo.networkId, deviceUdid);
     if (ret != DM_OK) {
         LOGE("fail to get udid by networkId");
         return;
     }
-    LOGI("Register offline timer for deviceId: %s", GetAnonyString(deviceId).c_str());
+    LOGI("Register offline timer for deviceUdid: %s", GetAnonyString(deviceUdid).c_str());
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
 #else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
 #endif
     for (auto &iter : stateTimerInfoMap_) {
-        if ((iter.first == deviceId) && (timer_ != nullptr)) {
+        if ((iter.first == deviceUdid) && (timer_ != nullptr)) {
             timer_->DeleteTimer(iter.second.timerName);
             stateTimerInfoMap_.erase(iter.first);
             break;
         }
     }
-    if (stateTimerInfoMap_.find(deviceId) == stateTimerInfoMap_.end()) {
-        std::string timerName = std::string(STATE_TIMER_PREFIX) + GetAnonyString(deviceId);
+    if (stateTimerInfoMap_.find(deviceUdid) == stateTimerInfoMap_.end()) {
+        std::string timerName = std::string(STATE_TIMER_PREFIX) + GetAnonyString(deviceUdid);
         StateTimerInfo stateTimer = {
             .timerName = timerName,
-            .networkId = deviceInfo.deviceId,
+            .networkId = deviceInfo.networkId,
             .isStart = false,
         };
-        stateTimerInfoMap_[deviceId] = stateTimer;
+        stateTimerInfoMap_[deviceUdid] = stateTimer;
     }
 }
 
@@ -301,7 +301,7 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 #else
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
 #endif
-    std::string networkId = deviceInfo.deviceId;
+    std::string networkId = deviceInfo.networkId;
     LOGI("Start offline timer for networkId: %s", GetAnonyString(networkId).c_str());
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();

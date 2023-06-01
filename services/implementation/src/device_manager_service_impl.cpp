@@ -174,18 +174,18 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 
-int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
+int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGI("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || deviceId.empty()) {
-        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s",
-            pkgName.c_str(), GetAnonyString(deviceId).c_str());
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, networkId is %s",
+            pkgName.c_str(), GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return authMgr_->UnAuthenticateDevice(pkgName, deviceId);
+    return authMgr_->UnAuthenticateDevice(pkgName, networkId);
 }
 
 int32_t DeviceManagerServiceImpl::VerifyAuthentication(const std::string &authParam)
@@ -254,16 +254,53 @@ int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &
 
 void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
 {
-    if (softbusConnector_ != nullptr) {
-        softbusConnector_->HandleDeviceOnline(info);
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return;
+    }
+
+    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+        deviceId.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    }
+    softbusConnector_->HandleDeviceOnline(info);
+}
+
+void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
+{
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return;
+    }
+
+    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+        deviceId.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    }
+    softbusConnector_->HandleDeviceOffline(info);
+
+    std::string udid;
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(info.networkId, udid);
+    if (ret == DM_OK) {
+        softbusConnector_->EraseUdidFromMap(udid);
     }
 }
 
-void DeviceManagerServiceImpl::HandleDeviceOffline(const DmDeviceInfo &info)
+std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
 {
-    if (softbusConnector_ != nullptr) {
-        softbusConnector_->HandleDeviceOffline(info);
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return "";
     }
+    std::string udid;
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        return "";
+    }
+    return softbusConnector_->GetDeviceUdidHashByUdid(udid);
 }
 
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
@@ -421,7 +458,11 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
             LOGE("GetUdidByNetworkId failed ret: %d", ret);
             return ERR_DM_FAILED;
         }
-
+        std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
+        if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+            deviceId.length()) != 0) {
+            LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+        }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }
     return DM_OK;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SOFTBUS_DISCOVERY_CALLBACK_H
-#define OHOS_DM_SOFTBUS_DISCOVERY_CALLBACK_H
+#ifndef OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H
+#define OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H
+
+#include <string>
 
 namespace OHOS {
 namespace DistributedHardware {
-class ISoftbusDiscoveryCallback {
+class DmSoftbusAdapterCrypto {
 public:
-    virtual void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline) = 0;
-    virtual void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) = 0;
-    virtual void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason) = 0;
+    static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
 };
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_DISCOVERY_CALLBACK_H
+}; // namespace DistributedHardware
+}; // namespace OHOS
+#endif // OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H

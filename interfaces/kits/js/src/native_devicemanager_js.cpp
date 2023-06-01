@@ -1182,6 +1182,7 @@ void DeviceManagerNapi::JsToDmDeviceInfo(const napi_env &env, const napi_value &
 {
     JsObjectToString(env, object, "deviceId", info.deviceId, sizeof(info.deviceId));
     JsObjectToString(env, object, "deviceName", info.deviceName, sizeof(info.deviceName));
+    JsObjectToString(env, object, "networkId", info.networkId, sizeof(info.networkId));
     int32_t deviceType = -1;
     JsObjectToInt(env, object, "deviceType", deviceType);
     info.deviceTypeId = static_cast<DmDeviceType>(deviceType);

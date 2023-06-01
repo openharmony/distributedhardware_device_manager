@@ -159,14 +159,14 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     return DM_OK;
 }
 
-int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId)
+int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_FAILED;
     }
     std::string deviceUdid;
-    int32_t ret = SoftbusConnector::GetUdidByNetworkId(deviceId.c_str(), deviceUdid);
+    int32_t ret = SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), deviceUdid);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
         return ERR_DM_FAILED;
@@ -177,12 +177,15 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     if (groupList.size() > 0) {
         std::string groupId = "";
         groupId = groupList.front().groupId;
-        LOGI("DmAuthManager::UnAuthenticateDevice groupId = %s, deviceId = %s, deviceUdid = %s",
-            GetAnonyString(groupId).c_str(), GetAnonyString(deviceId).c_str(), GetAnonyString(deviceUdid).c_str());
+        LOGI("DmAuthManager::UnAuthenticateDevice groupId = %s, networkId = %s, deviceUdid = %s",
+            GetAnonyString(groupId).c_str(), GetAnonyString(networkId).c_str(), GetAnonyString(deviceUdid).c_str());
         hiChainConnector_->DeleteGroup(groupId);
     } else {
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
         return ERR_DM_FAILED;
+    }
+    if (softbusConnector_ != nullptr) {
+        softbusConnector_->EraseUdidFromMap(deviceUdid);
     }
     return DM_OK;
 }

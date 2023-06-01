@@ -934,5 +934,53 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
     }
     return DM_OK;
 }
+
+std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &localDeviceUdid)
+{
+    LOGI("get localDeviceUdid: %s trusted devices.", GetAnonyString(localDeviceUdid).c_str());
+    std::vector<GroupInfo> groups;
+    int32_t ret = GetRelatedGroups(localDeviceUdid, groups);
+    if (ret != DM_OK) {
+        LOGE("failed to get groupInfo, ret:%d", ret);
+        return {};
+    }
+
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (userId < 0) {
+        LOGE("get current process account user id failed");
+        return {};
+    }
+    std::vector<std::string> trustedDevices;
+    for (const auto &group : groups) {
+        char *devicesJson = nullptr;
+        uint32_t devNum = 0;
+        ret = deviceGroupManager_->getTrustedDevices(userId, DM_PKG_NAME, group.groupId.c_str(),
+        &devicesJson, &devNum);
+        if (ret != 0 || devicesJson == nullptr) {
+            LOGE("[HICHAIN]failed to get trusted devicesJson, ret:%d", ret);
+            return {};
+        }
+        GetTrustedDevicesUdid(devicesJson, trustedDevices);
+        deviceGroupManager_->destroyInfo(&devicesJson);
+    }
+    return trustedDevices;
+}
+
+int32_t HiChainConnector::GetTrustedDevicesUdid(const char* jsonStr, std::vector<std::string> &udidList)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(jsonStr, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("credentialInfo string not a json type.");
+        return ERR_DM_FAILED;
+    }
+    for (nlohmann::json::iterator it1 = jsonObject.begin(); it1 != jsonObject.end(); it1++) {
+        if (!IsString((*it1), FIELD_AUTH_ID)) {
+            continue;
+        }
+        std::string udid = (*it1)[FIELD_AUTH_ID];
+        udidList.push_back(udid);
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

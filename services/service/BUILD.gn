@@ -179,6 +179,7 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
@@ -196,6 +197,8 @@ if (defined(ohos_lite)) {
       "DH_LOG_TAG=\"devicemanagerservice\"",
       "LOG_DOMAIN=0xD004100",
     ]
+
+    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
 
     external_deps = [
       "c_utils:utils",

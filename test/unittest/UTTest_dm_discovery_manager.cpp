@@ -145,7 +145,8 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level
     DmDeviceInfo info;
     info.deviceId[0] = '\0';
     info.deviceName[0] = '\0';
-    discoveryMgr_->OnDeviceFound(pkgName, info);
+    bool isOnline = false;
+    discoveryMgr_->OnDeviceFound(pkgName, info, isOnline);
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq =
         std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
@@ -181,7 +182,8 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level
     DmDiscoveryContext context { pkgName, filterOptions, aaa, dmFilter.filterOp_, dmFilter.filters_ };
     discoveryMgr_->discoveryContextMap_[pkgName] = context;
     DmDeviceInfo info;
-    discoveryMgr_->OnDeviceFound(pkgName, info);
+    bool isOnline = false;
+    discoveryMgr_->OnDeviceFound(pkgName, info, isOnline);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret1, 1);
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq =

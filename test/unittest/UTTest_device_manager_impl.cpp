@@ -329,9 +329,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_101, testing::ext::TestSize
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     DmDeviceInfo deviceInfo;
-    deviceInfo.deviceId[0] = '1';
-    deviceInfo.deviceId[1] = '2';
-    deviceInfo.deviceId[2] = '\0';
+    deviceInfo.networkId[0] = '1';
+    deviceInfo.networkId[1] = '2';
+    deviceInfo.networkId[2] = '\0';
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. InitDeviceManager return DM_OK
@@ -1928,9 +1928,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_003, testing::ext::TestSize
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     DmDeviceInfo deviceInfo;
-    deviceInfo.deviceId[0] = '1';
-    deviceInfo.deviceId[1] = '2';
-    deviceInfo.deviceId[2] = '\0';
+    deviceInfo.networkId[0] = '1';
+    deviceInfo.networkId[1] = '2';
+    deviceInfo.networkId[2] = '\0';
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
@@ -1965,9 +1965,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_004, testing::ext::TestSize
     std::string packName = "com.ohos.helloworld";
     // set dmDeviceInfo null
     DmDeviceInfo deviceInfo;
-    deviceInfo.deviceId[0] = '1';
-    deviceInfo.deviceId[1] = '2';
-    deviceInfo.deviceId[2] = '\0';
+    deviceInfo.networkId[0] = '1';
+    deviceInfo.networkId[1] = '2';
+    deviceInfo.networkId[2] = '\0';
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -2001,9 +2001,9 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_005, testing::ext::TestSize
     std::string packName = "com.ohos.helloworld";
     // set dmDeviceInfo null
     DmDeviceInfo deviceInfo;
-    deviceInfo.deviceId[0] = '1';
-    deviceInfo.deviceId[1] = '2';
-    deviceInfo.deviceId[2] = '\0';
+    deviceInfo.networkId[0] = '1';
+    deviceInfo.networkId[1] = '2';
+    deviceInfo.networkId[2] = '\0';
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
