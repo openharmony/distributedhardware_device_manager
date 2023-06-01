@@ -138,7 +138,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     }
 
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
-        LOGE("get deviceId failed");
+        LOGE("get deviceId: %s failed", GetAnonyString(localDeviceId_).c_str());
     }
     return DM_OK;
 }

@@ -254,37 +254,44 @@ int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &
 
 void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
 {
-    if (softbusConnector_ != nullptr) {
-        std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-        if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-            deviceId.length()) != 0) {
-            LOGE("get deviceId failed");
-        }
-        softbusConnector_->HandleDeviceOnline(info);
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return;
     }
+
+    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+        deviceId.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    }
+    softbusConnector_->HandleDeviceOnline(info);
 }
 
 void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
 {
-    if (softbusConnector_ != nullptr) {
-        std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-        if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-            deviceId.length()) != 0) {
-            LOGE("get deviceId failed");
-        }
-        softbusConnector_->HandleDeviceOffline(info);
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return;
+    }
 
-        std::string udid;
-        int32_t ret = softbusConnector_->GetUdidByNetworkId(info.networkId, udid);
-        if (ret == DM_OK) {
-            softbusConnector_->EraseUdidFromMap(udid);
-        }
+    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+        deviceId.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    }
+    softbusConnector_->HandleDeviceOffline(info);
+
+    std::string udid;
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(info.networkId, udid);
+    if (ret == DM_OK) {
+        softbusConnector_->EraseUdidFromMap(udid);
     }
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
 {
     if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
         return "";
     }
     std::string udid;
@@ -454,7 +461,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
         if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
             deviceId.length()) != 0) {
-            LOGE("get deviceId failed");
+            LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }

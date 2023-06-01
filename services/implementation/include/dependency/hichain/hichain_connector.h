@@ -214,11 +214,11 @@ public:
                             const nlohmann::json &jsonDeviceList);
 
     /**
-     * @tc.name: HiChainConnector::getTrustDevicesUdid
+     * @tc.name: HiChainConnector::GetTrustedDevices
      * @tc.desc: Get TrustDevicesUdid Info of the HiChain Connector
      * @tc.type: FUNC
      */
-    std::vector<std::string> GetTrustedDevices(const std::string &localDeviceId);
+    std::vector<std::string> GetTrustedDevices(const std::string &localDeviceUdid);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);

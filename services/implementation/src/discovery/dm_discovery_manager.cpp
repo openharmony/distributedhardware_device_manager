@@ -17,7 +17,6 @@
 #include "dm_discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_crypto.h"
 #include "dm_log.h"
 #include "parameter.h"
 
@@ -149,10 +148,14 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
 int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
     bool &isTrusted, DmAuthForm &authForm)
 {
+    LOGI("Get localDeviceId: %s anth form.", GetAnonyString(localDeviceId).c_str());
+    isTrusted = false;
     if (localDeviceId.empty() || deviceId.empty()) {
+        LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (hiChainConnector_ == nullptr || softbusConnector_ == nullptr) {
+        LOGE("hiChainConnector_ or softbusConnector_ is nullpter.");
         return ERR_DM_POINT_NULL;
     }
 
@@ -166,7 +169,7 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
         if (udidHash == deviceId) {
             isTrusted = true;
             authForm = hiChainConnector_->GetGroupType(udid);
-            LOGI("get auth info success.");
+            LOGI("deviceId: %s is trusted!", GetAnonyString(deviceId).c_str());
         }
     }
 

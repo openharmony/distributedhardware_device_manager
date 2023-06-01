@@ -385,7 +385,7 @@ void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
         }
     }
 
-    LOGI("device online, deviceId: %s.", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("device online, deviceId: %s.", GetAnonyString(info.deviceId).c_str());
 }
 
 void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
@@ -399,7 +399,7 @@ void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
         iter.second->OnDeviceOffline(iter.first, info);
     }
 
-    LOGI("device offline, deviceId: %s.", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("device offline, deviceId: %s.", GetAnonyString(info.deviceId).c_str());
 }
 
 void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult result)
@@ -429,7 +429,8 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
         return;
     }
     std::string deviceId = device->devId;
-    LOGI("[SOFTBUS]notify found device: %s found, range: %d.", GetAnonyString(deviceId).c_str(), device->range);
+    LOGI("[SOFTBUS]notify found device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str(),
+        device->range, device->isOnline);
     if (!device->isOnline) {
         std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
         DeviceInfo *srcInfo = infoPtr.get();
@@ -491,17 +492,19 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
 {
     {
         std::lock_guard<std::mutex> lock(deviceUdidLocks_);
-        if (deviceUdidMap_.count(udid) == 1) {
+        auto iter = deviceUdidMap_.find(udid);
+        if (iter != deviceUdidMap_.end()) {
             return deviceUdidMap_[udid];
         }
     }
 
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
     if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)udidHash) != DM_OK) {
-        LOGE("get deviceId by udid failed.");
+        LOGE("get udidhash by udid: %s failed.", GetAnonyString(udid).c_str());
         return "";
     }
-    LOGI("get deviceId by udid.");
+    LOGI("get udidhash: %s by udid: %s.", GetAnonyString(udidHash).c_str(),
+        GetAnonyString(udid).c_str());
     std::lock_guard<std::mutex> lock(deviceUdidLocks_);
     deviceUdidMap_[udid] = udidHash;
     return udidHash;
@@ -510,7 +513,8 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
 void SoftbusConnector::EraseUdidFromMap(const std::string &udid)
 {
     std::lock_guard<std::mutex> lock(deviceUdidLocks_);
-    if (deviceUdidMap_.count(udid) == 0) {
+    auto iter = deviceUdidMap_.find(udid);
+    if (iter == deviceUdidMap_.end()) {
         return;
     }
     size_t mapSize = deviceUdidMap_.size();

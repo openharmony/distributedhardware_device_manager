@@ -934,11 +934,11 @@ int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std:
     return DM_OK;
 }
 
-std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &localDeviceId)
+std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &localDeviceUdid)
 {
-    LOGI("get trustdevices udid.");
+    LOGI("get localDeviceUdid: %s trusted devices.", GetAnonyString(localDeviceUdid).c_str());
     std::vector<GroupInfo> groups;
-    int32_t ret = GetRelatedGroups(localDeviceId, groups);
+    int32_t ret = GetRelatedGroups(localDeviceUdid, groups);
     if (ret != DM_OK) {
         LOGE("failed to get groupInfo, ret:%d", ret);
         return {};
@@ -962,7 +962,6 @@ std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &
         GetTrustedDevicesUdid(devicesJson, trustedDevices);
         deviceGroupManager_->destroyInfo(&devicesJson);
     }
-    LOGI("getTrustDevicesUdid finish!");
     return trustedDevices;
 }
 
