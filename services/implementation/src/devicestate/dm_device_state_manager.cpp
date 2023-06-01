@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -253,6 +253,8 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
     for (auto &iter : stateTimerInfoMap_) {
         if ((iter.first == deviceId) && (timer_ != nullptr)) {
             timer_->DeleteTimer(iter.second.timerName);
+            stateTimerInfoMap_.erase(iter.first);
+            break;
         }
     }
     if (stateTimerInfoMap_.find(deviceId) == stateTimerInfoMap_.end()) {
