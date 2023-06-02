@@ -2045,10 +2045,13 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListByTwoArgs(napi_env env, napi_c
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-    if (!IsNapiStringType(env, argv[0], "extra")) {
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    if (!CheckArgsType(env, valueType == napi_string, "extra", "string")) {
         DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
-        return result;
+        return nullptr;
     }
+
     if (!IsFunctionType(env, argv[1])) {
         DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
         return result;
