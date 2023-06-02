@@ -126,18 +126,6 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::CheckSpecialProcPermissions()
-{
-    int32_t ret = CheckAPIAccessPrmission();
-    if (ret != DM_OK) {
-        LOGI("The caller does not declare the DM permission.");
-        if (CheckAPIAccessPrmission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
-            return ret;
-        }
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
 {
     if (pkgName.empty()) {
@@ -992,6 +980,18 @@ int32_t DeviceManagerImpl::CheckAPIAccessPrmission(const std::string &permission
         return ret;
     }
     LOGI("CheckAPIAccessPrmission completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CheckSpecialProcPermissions()
+{
+    int32_t ret = CheckAPIAccessPrmission();
+    if (ret != DM_OK) {
+        LOGI("The caller does not declare the DM permission.");
+        if (CheckAPIAccessPrmission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
+            return ret;
+        }
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

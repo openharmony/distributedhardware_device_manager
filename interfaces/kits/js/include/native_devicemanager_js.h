@@ -403,6 +403,8 @@ private:
                                        DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
     static napi_value GetTrustedDeviceListPromise(napi_env env,
                                                   DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+    static napi_value GetTrustedDeviceListByTwoArgs(napi_env env, napi_callback_info info,
+                                                    DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     // get deviceInfo by networkId

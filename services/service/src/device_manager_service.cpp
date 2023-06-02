@@ -593,17 +593,6 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
     return dmServiceImpl_->GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
 }
 
-int32_t DeviceManagerService::CheckSpecialProcPermissions()
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not declare the DM permission.");
-        if (CheckApiPrimission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
-            return ERR_DM_NO_PERMISSION;
-        }
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid)
 {
@@ -622,6 +611,17 @@ int32_t DeviceManagerService::CheckApiPrimission(const std::string &permission)
     if (!PermissionManager::GetInstance().CheckPermission(permission)) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::CheckSpecialProcPermissions()
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGI("The caller does not declare the DM permission.");
+        if (CheckApiPrimission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
+            return ERR_DM_NO_PERMISSION;
+        }
     }
     return DM_OK;
 }
