@@ -23,7 +23,7 @@
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
-#include "permission_manager.h"
+#include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "common_event_support.h"
@@ -109,10 +109,6 @@ void DeviceManagerServiceImpl::Release()
 int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
     const std::string &extra)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("StartDeviceDiscovery failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -122,10 +118,6 @@ int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgNam
 
 int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("StopDeviceDiscovery failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -135,10 +127,6 @@ int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName
 
 int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("PublishDeviceDiscovery failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -148,10 +136,6 @@ int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgN
 
 int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("UnPublishDeviceDiscovery failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -162,10 +146,6 @@ int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pk
 int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
              pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
@@ -176,10 +156,6 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
 
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty() || networkId.empty()) {
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, networkId is %s",
             pkgName.c_str(), GetAnonyString(networkId).c_str());
@@ -190,10 +166,6 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
 
 int32_t DeviceManagerServiceImpl::VerifyAuthentication(const std::string &authParam)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     return authMgr_->VerifyAuthentication(authParam);
 }
 
@@ -212,10 +184,6 @@ int32_t DeviceManagerServiceImpl::GetFaParam(std::string &pkgName, DmAuthParam &
 int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
     const std::string &params)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty() || params.empty()) {
         LOGE("DeviceManagerServiceImpl::SetUserOperation error: Invalid parameter, pkgName: %s, extra: %s",
             pkgName.c_str(), params.c_str());
@@ -320,10 +288,6 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
 
 int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (reqJsonStr.empty()) {
         LOGE("reqJsonStr is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -337,10 +301,6 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
             pkgName.c_str(), credentialInfo.c_str());
@@ -355,10 +315,6 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
             pkgName.c_str(), deleteInfo.c_str());
@@ -491,7 +447,7 @@ int32_t DeviceManagerServiceImpl::GetEncryptedUuidByNetworkId(const std::string 
         return ret;
     }
 
-    std::string appId = Crypto::Sha256(PermissionManager::GetInstance().GetAppId());
+    std::string appId = Crypto::Sha256(AppManager::GetInstance().GetAppId());
     LOGI("appId = %s, uuid = %s.", GetAnonyString(appId).c_str(), GetAnonyString(uuid).c_str());
     uuid = Crypto::Sha256(appId + "_" + uuid);
     LOGI("encryptedUuid = %s.", GetAnonyString(uuid).c_str());

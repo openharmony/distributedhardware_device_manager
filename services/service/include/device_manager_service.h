@@ -111,6 +111,8 @@ public:
 
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
+    int32_t CheckApiPrimission(const std::string &permission);
+
     void LoadHardwareFwkService();
 
     int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);
@@ -125,7 +127,9 @@ private:
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
-    std::string localDeviceId_;
+
+private:
+    int32_t CheckSpecialProcPermissions();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

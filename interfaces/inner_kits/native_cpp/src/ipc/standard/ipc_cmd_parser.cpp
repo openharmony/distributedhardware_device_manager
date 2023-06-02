@@ -28,6 +28,7 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_permission_req.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_event_req.h"
@@ -478,6 +479,27 @@ ON_IPC_SET_REQUEST(REGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq
 ON_IPC_READ_RESPONSE(REGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(CHECK_API_ACCESS_PRIMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcGetPermissionReq> pReq =
+    std::static_pointer_cast<IpcGetPermissionReq>(pBaseReq);
+    std::string permission = pReq->GetPermission();
+
+    if (!data.WriteString(permission)) {
+        LOGE("write permission failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(CHECK_API_ACCESS_PRIMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    int32_t ret = reply.ReadInt32();
+    pBaseRsp->SetErrCode(ret);
     return DM_OK;
 }
 

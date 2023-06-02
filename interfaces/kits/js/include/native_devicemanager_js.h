@@ -413,6 +413,7 @@ private:
                                          NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);
     static void CallGetDeviceInfoCB(napi_env env, napi_status &status,
                                     NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);
+    static bool IsSystemApp();
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

@@ -23,7 +23,9 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "ipc_skeleton.h"
 #include "js_native_api.h"
+#include "tokenid_kit.h"
 #include "nlohmann/json.hpp"
 
 using namespace OHOS::DistributedHardware;
@@ -77,6 +79,8 @@ std::mutex g_deviceManagerMapMutex;
 enum DMBussinessErrorCode {
     // Permission verify failed.
     ERR_NO_PERMISSION = 201,
+    //The caller is not a system application.
+    ERR_NOT_SYSTEM_APP = 202,
     // Input parameter error.
     ERR_INVALID_PARAMS = 401,
     // Failed to execute the function.
@@ -92,6 +96,7 @@ enum DMBussinessErrorCode {
 };
 
 const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
 const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
@@ -179,6 +184,9 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
             break;
         case ERR_DM_INIT_FAILED:
             error = CreateErrorForCall(env, DM_ERR_OBTAIN_SERVICE, ERR_MESSAGE_OBTAIN_SERVICE, isAsync);
+            break;
+        case ERR_NOT_SYSTEM_APP:
+            error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
             break;
         default:
             error = CreateErrorForCall(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
@@ -1343,6 +1351,12 @@ void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_val
     LOGI("JsToDmDiscoveryExtra, extra :%s, typeLen : %d", extra.c_str(), typeLen);
 }
 
+bool DeviceManagerNapi::IsSystemApp()
+{
+    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+    return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+}
+
 void DeviceManagerNapi::DmDeviceInfotoJsDeviceInfo(const napi_env &env, const DmDeviceInfo &vecDevInfo,
                                                    napi_value &result)
 {
@@ -1489,6 +1503,10 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
 napi_value DeviceManagerNapi::GetAuthenticationParamSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetAuthenticationParamSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value resultParam = nullptr;
@@ -1515,6 +1533,10 @@ napi_value DeviceManagerNapi::GetAuthenticationParamSync(napi_env env, napi_call
 napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_info info)
 {
     LOGI("SetUserOperationSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
@@ -1546,6 +1568,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     int32_t ret = DeviceManager::GetInstance().SetUserOperation(deviceManagerWrapper->bundleName_, action, params);
     if (ret != 0) {
         LOGE("SetUserOperation for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+        CreateBusinessError(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -1959,6 +1982,10 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetTrustedDeviceListSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2007,7 +2034,10 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListPromise(napi_env env,
 
 napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_info info)
 {
-    LOGI("GetTrustedDeviceList in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2061,6 +2091,10 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
 napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetLocalDeviceInfoSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     DmDeviceInfo deviceInfo;
@@ -2088,6 +2122,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
 napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_info info)
 {
     LOGI("GetLocalDeviceInfo in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2137,6 +2175,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
 napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_info info)
 {
     LOGI("UnAuthenticateDevice");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
@@ -2185,6 +2227,10 @@ bool DeviceManagerNapi::StartArgCheck(napi_env env, napi_value &argv,
 napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callback_info info)
 {
     LOGI("StartDeviceDiscoverSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     std::string extra = "";
     DmSubscribeInfo subInfo;
     napi_value result = nullptr;
@@ -2238,6 +2284,10 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
 napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback_info info)
 {
     LOGI("StopDeviceDiscoverSync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
@@ -2275,6 +2325,10 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
 napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
 {
     LOGI("PublishDeviceDiscoverySync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
@@ -2319,6 +2373,10 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
 napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
 {
     LOGI("UnPublishDeviceDiscoverySync in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
@@ -2352,9 +2410,10 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
 
 napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_info info)
 {
-    const int32_t PARAM_INDEX_ONE = 1;
-    const int32_t PARAM_INDEX_TWO = 2;
-    LOGI("AuthenticateDevice in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
 
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE,  "Wrong number of arguments, required 3")) {
@@ -2410,7 +2469,10 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
 
 napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info info)
 {
-    LOGI("VerifyAuthInfo in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
 
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO,  "Wrong number of arguments, required 2")) {
@@ -2463,6 +2525,10 @@ napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info in
 napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info info)
 {
     LOGI("RequestCredential in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
 
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
@@ -2531,6 +2597,10 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
 napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info info)
 {
     LOGI("ImportCredential in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
@@ -2582,6 +2652,10 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
 napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info info)
 {
     LOGI("DeleteCredential in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
@@ -2679,6 +2753,15 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
 
 napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
 {
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     size_t argc = 0;
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
@@ -2763,6 +2846,15 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
 
 napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 {
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     size_t argc = 0;
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
@@ -2814,6 +2906,10 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("ReleaseDeviceManager in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value result = nullptr;
@@ -3021,7 +3117,10 @@ void DeviceManagerNapi::DeviceInfotoJsByNetworkId(const napi_env &env, const DmD
 
 napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info info)
 {
-    LOGI("GetDeviceInfo in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     napi_value result = nullptr;
     size_t argc = 2;
     napi_value argv[2] = {nullptr};
@@ -3077,6 +3176,10 @@ napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info inf
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("CreateDeviceManager in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
 
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {

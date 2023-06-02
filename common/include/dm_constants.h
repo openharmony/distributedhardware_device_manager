@@ -71,7 +71,8 @@ constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 const static char *DM_CAPABILITY_OSD = "osdCapability";
-
+constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
+constexpr const char* PERMISSION_DISTRIBUTED_DATASYNC = "ohos.permission.DISTRIBUTED_DATASYNC";
 // Auth
 constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* APP_OPERATION = "appOperation";

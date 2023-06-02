@@ -320,6 +320,17 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(CHECK_API_ACCESS_PRIMISSION, MessageParcel &data, MessageParcel &reply)
+{
+    std::string permission = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().CheckApiPrimission(permission);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();

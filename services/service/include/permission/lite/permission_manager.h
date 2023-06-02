@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,20 @@
  * limitations under the License.
  */
 
-#include "permission_manager.h"
+#ifndef OHOS_DM_PERMISSION_LITE_PERMISSION_MANAGER_H
+#define OHOS_DM_PERMISSION_LITE_PERMISSION_MANAGER_H
+
+#include <string>
+#include "single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
+class PermissionManager {
+    DECLARE_SINGLE_INSTANCE(PermissionManager);
 
-bool PermissionManager::CheckPermission(void)
-{
-    return true;
-}
+public:
+    bool CheckPermission(const std::string &permissionName);
+};
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_DM_PERMISSION_LITE_PERMISSION_MANAGER_H

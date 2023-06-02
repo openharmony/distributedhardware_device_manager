@@ -220,6 +220,13 @@ public:
     virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
         const std::string &appId, std::string &encryptedUuid) override;
 
+	/**
+     * @tc.name: DeviceManagerImpl::CheckAPIAccessPrmission
+     * @tc.desc: check permission for device manager API
+     * @tc.type: FUNC
+     */
+    virtual int32_t CheckAPIAccessPrmission() override;
+
     int32_t OnDmServiceDied();
 private:
     DeviceManagerImpl() = default;
@@ -228,7 +235,8 @@ private:
     DeviceManagerImpl &operator=(const DeviceManagerImpl &) = delete;
     DeviceManagerImpl(DeviceManagerImpl &&) = delete;
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
-
+    int32_t CheckAPIAccessPrmission(const std::string &permissionName);
+    int32_t CheckSpecialProcPermissions();
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
