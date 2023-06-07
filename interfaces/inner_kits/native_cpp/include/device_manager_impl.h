@@ -235,6 +235,7 @@ private:
     DeviceManagerImpl &operator=(const DeviceManagerImpl &) = delete;
     DeviceManagerImpl(DeviceManagerImpl &&) = delete;
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
+
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =

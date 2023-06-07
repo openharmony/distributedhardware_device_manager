@@ -28,9 +28,11 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
+namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
+}
 
-bool PermissionManager::CheckPermission()
+bool PermissionManager::CheckPermission(void)
 {
     LOGI("Enter PermissionManager::CheckPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();

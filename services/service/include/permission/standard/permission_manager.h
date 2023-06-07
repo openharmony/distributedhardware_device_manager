@@ -18,7 +18,6 @@
 
 #include "single_instance.h"
 #include <string>
-#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,7 +25,7 @@ class PermissionManager {
     DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    bool CheckPermission(const std::string &permissionName = DM_SERVICE_ACCESS_PERMISSION);
+    bool CheckPermission(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

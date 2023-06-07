@@ -129,7 +129,7 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
     }
     LOGI("UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
 
-    ret = ipcClientProxy_->UnInit(pkgName);
+    int32_t ret = ipcClientProxy_->UnInit(pkgName);
     if (ret != DM_OK) {
         LOGE("UnInitDeviceManager error, proxy unInit failed ret: %d", ret);
         return ERR_DM_FAILED;
@@ -253,7 +253,6 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
         LOGE("UnRegisterDevStateCallback Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
     LOGI("UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
     std::string extra = "";

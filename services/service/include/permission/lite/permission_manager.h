@@ -25,7 +25,7 @@ class PermissionManager {
     DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    bool CheckPermission();
+    bool CheckPermission(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
