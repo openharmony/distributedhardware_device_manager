@@ -1979,7 +1979,8 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     std::vector<OHOS::DistributedHardware::DmDeviceInfo> devList;
     if (argc == DM_NAPI_ARGS_ZERO) {
         std::string extra = "";
-        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
+        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra,
+            devList);
         if (ret != 0) {
             LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
             CreateBusinessError(env, ret);
@@ -1998,7 +1999,8 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, isRefresh,
             devList);
         if (ret != 0) {
-            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(),
+                ret);
             CreateBusinessError(env, ret);
             return result;
         }
