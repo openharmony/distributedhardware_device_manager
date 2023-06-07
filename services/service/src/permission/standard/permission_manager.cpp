@@ -28,7 +28,9 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
-bool PermissionManager::CheckPermission(const std::string &permissionName)
+constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
+
+bool PermissionManager::CheckPermission()
 {
     LOGI("Enter PermissionManager::CheckPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
@@ -39,7 +41,7 @@ bool PermissionManager::CheckPermission(const std::string &permissionName)
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        int32_t ret = AccessTokenKit::VerifyAccessToken(tokenCaller, permissionName);
+        int32_t ret = AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_PERMISSION);
         if (ret == PermissionState::PERMISSION_GRANTED) {
             return true;
         }

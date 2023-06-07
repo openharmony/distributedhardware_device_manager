@@ -798,6 +798,17 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: CheckApiPrimission_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, CheckApiPrimission_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPrimission();
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

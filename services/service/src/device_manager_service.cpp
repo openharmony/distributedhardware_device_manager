@@ -89,9 +89,6 @@ void DeviceManagerService::UninitDMServiceListener()
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
     LOGI("DeviceManagerService::GetTrustedDeviceList begin for pkgName = %s, extra = %s", pkgName.c_str(),
         extra.c_str());
     if (pkgName.empty()) {
@@ -128,9 +125,6 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
     LOGI("DeviceManagerService::GetLocalDeviceInfo begin.");
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
@@ -338,9 +332,6 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 
 int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -356,9 +347,6 @@ int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgNam
 
 int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
     if (pkgName.empty()) {
         LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -582,10 +570,6 @@ void DeviceManagerService::LoadHardwareFwkService()
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
-
     if (!IsDMServiceImplReady()) {
         LOGE("GetEncryptedUuidByNetworkId failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -596,9 +580,6 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
 int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid)
 {
-    if (CheckSpecialProcPermissions() != DM_OK) {
-        return ERR_DM_NO_PERMISSION;
-    }
     if (!IsDMServiceImplReady()) {
         LOGE("GenerateEncryptedUuid failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -606,22 +587,11 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
     return dmServiceImpl_->GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
 }
 
-int32_t DeviceManagerService::CheckApiPrimission(const std::string &permission)
-{
-    if (!PermissionManager::GetInstance().CheckPermission(permission)) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::CheckSpecialProcPermissions()
+int32_t DeviceManagerService::CheckApiPrimission()
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGI("The caller does not declare the DM permission.");
-        if (CheckApiPrimission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
-            return ERR_DM_NO_PERMISSION;
-        }
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
     }
     return DM_OK;
 }

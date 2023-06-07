@@ -31,7 +31,6 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_get_permission_req.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_event_req.h"
@@ -117,10 +116,6 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     DmTraceEnd();
     LOGI("InitDeviceManager success");
-    ret = CheckSpecialProcPermissions();
-    if (ret != DM_OK) {
-        return ret;
-    }
     SysEventWrite(std::string(DM_INIT_DEVICE_MANAGER_SUCCESS), DM_HISYEVENT_BEHAVIOR,
         std::string(DM_INIT_DEVICE_MANAGER_SUCCESS_MSG));
     return DM_OK;
@@ -133,10 +128,7 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("UnInitDeviceManager start, pkgName: %s", pkgName.c_str());
-    int32_t ret = CheckSpecialProcPermissions();
-    if (ret != DM_OK) {
-        return ret;
-    }
+
     ret = ipcClientProxy_->UnInit(pkgName);
     if (ret != DM_OK) {
         LOGE("UnInitDeviceManager error, proxy unInit failed ret: %d", ret);
@@ -246,11 +238,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    int32_t ret = CheckSpecialProcPermissions();
-    if (ret != DM_OK) {
-        return ret;
-    }
-
     LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     if (!extra.empty()) {
@@ -265,11 +252,6 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
     if (pkgName.empty()) {
         LOGE("UnRegisterDevStateCallback Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    int32_t ret = CheckSpecialProcPermissions();
-    if (ret != DM_OK) {
-        return ret;
     }
 
     LOGI("UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
@@ -959,39 +941,21 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
 
 int32_t DeviceManagerImpl::CheckAPIAccessPrmission()
 {
-    return CheckAPIAccessPrmission(DM_SERVICE_ACCESS_PERMISSION);
-}
-
-int32_t DeviceManagerImpl::CheckAPIAccessPrmission(const std::string &permissionName)
-{
-    std::shared_ptr<IpcGetPermissionReq> req = std::make_shared<IpcGetPermissionReq>();
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
-    req->SetPermission(permissionName);
     int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PRIMISSION, req, rsp);
     if (ret != DM_OK) {
-        LOGE("CheckAPIAccessPrmission Send Request failed ret: %d", ret);
+        LOGE("Send Request failed ret: %d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("CheckAPIAccessPrmission Failed with ret %d", ret);
+        LOGE("Check permission failed with ret: %d", ret);
         return ret;
     }
-    LOGI("CheckAPIAccessPrmission completed");
-    return DM_OK;
-}
-
-int32_t DeviceManagerImpl::CheckSpecialProcPermissions()
-{
-    int32_t ret = CheckAPIAccessPrmission();
-    if (ret != DM_OK) {
-        LOGI("The caller does not declare the DM permission.");
-        if (CheckAPIAccessPrmission(PERMISSION_DISTRIBUTED_DATASYNC) != DM_OK) {
-            return ret;
-        }
-    }
+    LOGI("The caller declare the DM permission!");
     return DM_OK;
 }
 } // namespace DistributedHardware

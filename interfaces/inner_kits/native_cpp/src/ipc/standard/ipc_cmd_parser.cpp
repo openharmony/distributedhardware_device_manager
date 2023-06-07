@@ -28,7 +28,6 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_get_permission_req.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_event_req.h"
@@ -484,15 +483,7 @@ ON_IPC_READ_RESPONSE(REGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::sha
 
 ON_IPC_SET_REQUEST(CHECK_API_ACCESS_PRIMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcGetPermissionReq> pReq =
-    std::static_pointer_cast<IpcGetPermissionReq>(pBaseReq);
-    std::string permission = pReq->GetPermission();
-
-    if (!data.WriteString(permission)) {
-        LOGE("write permission failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-
+    LOGI("send permission request!");
     return DM_OK;
 }
 

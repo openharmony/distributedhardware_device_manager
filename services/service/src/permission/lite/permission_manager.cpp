@@ -19,7 +19,7 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
-bool PermissionManager::CheckPermission(const std::string &permissionName)
+bool PermissionManager::CheckPermission()
 {
     return true;
 }

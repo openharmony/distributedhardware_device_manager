@@ -25,7 +25,7 @@ class PermissionManager {
     DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    bool CheckPermission(const std::string &permissionName);
+    bool CheckPermission();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
