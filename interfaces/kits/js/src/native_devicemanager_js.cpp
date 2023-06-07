@@ -1993,6 +1993,11 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2011,7 +2016,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
 
     std::string extra = "";
     std::vector<OHOS::DistributedHardware::DmDeviceInfo> devList;
-    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
+    ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
     if (ret != 0) {
         LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -2070,6 +2075,11 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2112,6 +2122,11 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     DmDeviceInfo deviceInfo;
@@ -2124,7 +2139,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
         return result;
     }
 
-    int32_t ret = DeviceManager::GetInstance().GetLocalDeviceInfo(deviceManagerWrapper->bundleName_, deviceInfo);
+    ret = DeviceManager::GetInstance().GetLocalDeviceInfo(deviceManagerWrapper->bundleName_, deviceInfo);
     if (ret != 0) {
         LOGE("GetLocalDeviceInfoSync for failed, ret %d", ret);
         CreateBusinessError(env, ret);
@@ -2141,6 +2156,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
     LOGI("GetLocalDeviceInfo in");
     if (!IsSystemApp()) {
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
+    if (DeviceManager::GetInstance().CheckAPIAccessPrmission() != 0) {
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2160,7 +2179,6 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
     deviceInfoAsyncCallbackInfo->env = env;
     deviceInfoAsyncCallbackInfo->deviceInfo = deviceInfo;
     deviceInfoAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
-    LOGI("GetLocalDeviceInfo for argc %d", argc);
     if (argc == 0) {
         std::string extra = "";
         deviceInfoAsyncCallbackInfo->extra = extra;
@@ -2172,9 +2190,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
         return promise;
     } else if (argc == 1) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-        napi_valuetype eventHandleType = napi_undefined;
-        napi_typeof(env, argv[0], &eventHandleType);
-        if (!CheckArgsType(env, eventHandleType == napi_function, "callback", "function")) {
+        if (!IsFunctionType(env, argv[0])) {
             delete deviceInfoAsyncCallbackInfo;
             deviceInfoAsyncCallbackInfo = nullptr;
             return nullptr;
@@ -2884,10 +2900,14 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
     size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value result = nullptr;
-
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2895,7 +2915,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         return result;
     }
     LOGI("ReleaseDeviceManager for bundleName %s", deviceManagerWrapper->bundleName_.c_str());
-    int32_t ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
+    ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -2921,7 +2941,6 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     }
     napi_get_undefined(env, &result);
     NAPI_CALL(env, napi_remove_wrap(env, thisVar, (void**)&deviceManagerWrapper));
-    LOGI("ReleaseDeviceManager out");
     return result;
 }
 
