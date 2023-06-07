@@ -220,10 +220,6 @@ int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     LOGI("DmAuthManager::OnSessionOpened sessionId = %d result = %d", sessionId, result);
-    if (result != DM_OK) {
-        LOGE("DmAuthManager::OnSessionOpened failed sessionId = %d result = %d", sessionId, result);
-        return;
-    }
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
