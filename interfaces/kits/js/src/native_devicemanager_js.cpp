@@ -1975,13 +1975,32 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         return result;
     }
 
-    std::string extra = "";
     std::vector<OHOS::DistributedHardware::DmDeviceInfo> devList;
-    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
-    if (ret != 0) {
-        LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        return result;
+    if (argc == DM_NAPI_ARGS_ZERO) {
+        std::string extra = "";
+        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
+        if (ret != 0) {
+            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+            CreateBusinessError(env, ret);
+            return result;
+        }
+    } else if (argc == DM_NAPI_ARGS_ONE) {
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+        napi_valuetype valueType;
+        napi_typeof(env, argv[0], &valueType);
+        if (!CheckArgsType(env, valueType == napi_boolean, "refreshList", "bool")) {
+            return nullptr;
+        }
+        bool isRefresh = false;
+        napi_get_value_bool(env, argv[0], &isRefresh);
+        std::string extra = "";
+        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, isRefresh,
+            devList);
+        if (ret != 0) {
+            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+            CreateBusinessError(env, ret);
+            return result;
+        }
     }
     LOGI("DeviceManager::GetTrustedDeviceListSync");
     if (devList.size() > 0) {

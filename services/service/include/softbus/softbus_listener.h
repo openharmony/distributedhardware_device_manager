@@ -94,6 +94,7 @@ public:
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
+    int32_t ShiftLNNGear();
 
 private:
     int32_t Init();

@@ -44,8 +44,28 @@ public:
         extra_ = extra;
     }
 
+    /**
+     * @tc.name: IpcGetTrustDeviceReq::GetRefresh
+     * @tc.desc: Ipc GetTrust Device Request Get Wakeup
+     * @tc.type: FUNC
+     */
+    const bool &GetRefresh() const
+    {
+        return isRefresh_;
+    }
+
+    /**
+     * @tc.name: IpcGetTrustDeviceReq::SetRefresh
+     * @tc.desc: Ipc GetTrust Device Request Set Wakeup
+     * @tc.type: FUNC
+     */
+    void SetRefresh(bool isRefresh)
+    {
+        isRefresh_ = isRefresh;
+    }
 private:
-    std::string extra_;
+    std::string extra_ = "";
+    bool isRefresh_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

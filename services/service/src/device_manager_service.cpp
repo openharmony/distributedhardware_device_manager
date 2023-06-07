@@ -105,6 +105,24 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     return DM_OK;
 }
 
+int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
+{
+    LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %s, callerId = %s, isRefresh = %d", pkgName.c_str(),
+        callerId.c_str(), isRefresh);
+    if (pkgName.empty() || callerId.empty()) {
+        LOGE("Invalid parameter, parameter is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (isRefresh) {
+        int32_t ret = softbusListener_->ShiftLNNGear();
+        if (ret != DM_OK) {
+            LOGE("ShiftLNNGear error, failed ret: %d", ret);
+            return ret;
+        }
+    }
+    return DM_OK;
+}
+
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     if (networkId.empty()) {
