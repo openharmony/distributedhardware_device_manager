@@ -921,17 +921,14 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
     // set extra null
     std::string extra= "";
     // set callback not null
-    std::shared_ptr<DeviceStateCallback> callback =std::make_shared<DeviceStateCallbackTest>();
-    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
-    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
-    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
-    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
+    std::shared_ptr<DeviceStateCallback> dsCallback =std::make_shared<DeviceStateCallbackTest>();
+    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
-    int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, dsCallback);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
-    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
 /**

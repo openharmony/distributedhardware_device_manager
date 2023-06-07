@@ -2159,7 +2159,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
         return nullptr;
     }
     if (DeviceManager::GetInstance().CheckAPIAccessPrmission() != 0) {
-        CreateBusinessError(env, ret);
+        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
         return nullptr;
     }
     napi_value result = nullptr;
