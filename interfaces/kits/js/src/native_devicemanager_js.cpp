@@ -44,6 +44,7 @@ const std::string DM_NAPI_EVENT_DEVICE_SERVICE_DIE = "serviceDie";
 const std::string DEVICE_MANAGER_NAPI_CLASS_NAME = "DeviceManager";
 const std::string DM_NAPI_EVENT_UI_STATE_CHANGE = "uiStateChange";
 
+const int32_t DM_NAPI_ARGS_ZERO = 0;
 const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
@@ -2002,6 +2003,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
             return result;
         }
     }
+
     LOGI("DeviceManager::GetTrustedDeviceListSync");
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
