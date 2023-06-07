@@ -17,7 +17,6 @@
 #define OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 
 #include "single_instance.h"
-#include <string>
 
 namespace OHOS {
 namespace DistributedHardware {
