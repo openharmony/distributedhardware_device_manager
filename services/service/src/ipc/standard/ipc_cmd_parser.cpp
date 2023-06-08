@@ -294,6 +294,8 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
+    bool isRefresh = data.ReadBool();
+    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh);
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     int32_t infoNum = (int32_t)(deviceList.size());

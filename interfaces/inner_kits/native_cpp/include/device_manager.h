@@ -55,6 +55,16 @@ public:
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
         std::vector<DmDeviceInfo> &deviceList) = 0;
     /**
+     * @brief Get device info list of trusted devices.
+     * @param pkgName    package name.
+     * @param extra      extra info.This parameter can be null.
+     * @param isRefresh  refresh the list quickly.
+     * @param deviceList device info list.
+     * @return Returns a list of trusted devices.
+     */
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        bool isRefresh, std::vector<DmDeviceInfo> &deviceList) = 0;
+    /**
      * @brief Get local device information.
      * @param pkgName    package name.
      * @param deviceInfo device info.

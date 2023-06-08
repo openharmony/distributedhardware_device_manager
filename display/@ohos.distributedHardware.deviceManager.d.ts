@@ -403,6 +403,16 @@ declare namespace deviceManager {
     /**
      * Obtains a list of trusted devices.
      *
+     * @since 10
+     * @param isRefresh Quickly refresh the list, and make nearby devices with the same account go online.
+     * @return Returns a list of trusted devices.
+     * @systemapi this method can be used only by system applications.
+     */
+    getTrustedDeviceListSync(isRefresh: boolean): Array<DeviceInfo>;
+
+    /**
+     * Obtains a list of trusted devices.
+     *
      * @since 8
      * @param callback Indicates the callback to be invoked upon getTrustedDeviceList
      * @return Returns a list of trusted devices.
