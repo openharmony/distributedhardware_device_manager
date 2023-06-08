@@ -170,6 +170,37 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                                bool isRefresh, std::vector<DmDeviceInfo> &deviceList)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("GetTrustedDeviceList start, pkgName: %s, extra: %s, isRefresh: %d", pkgName.c_str(), extra.c_str(),
+        isRefresh);
+
+    std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
+    std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
+    req->SetPkgName(pkgName);
+    req->SetExtra(extra);
+    req->SetRefresh(isRefresh);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetTrustedDeviceList error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetTrustedDeviceList error, failed ret: %d", ret);
+        return ret;
+    }
+    deviceList = rsp->GetDeviceVec();
+    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::string networkId,
                                          DmDeviceInfo &deviceInfo)
 {

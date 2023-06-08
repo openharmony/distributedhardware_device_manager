@@ -50,6 +50,13 @@ public:
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                          std::vector<DmDeviceInfo> &deviceList) override;
     /**
+     * @tc.name: DeviceManagerImpl::GetTrustedDeviceList
+     * @tc.desc: Get device list of trusted devices
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        bool isRefresh, std::vector<DmDeviceInfo> &deviceList) override;
+    /**
      * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
      * @tc.desc: Get local device information
      * @tc.type: FUNC
