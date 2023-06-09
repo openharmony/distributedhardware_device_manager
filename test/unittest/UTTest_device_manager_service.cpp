@@ -30,13 +30,16 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
 {
+    const int32_t PERMS_NUM = 3;
+    const int32_t PERMS_INDEX_TWO = 2;
     uint64_t tokenId;
-    const char *perms[2];
+    const char *perms[PERMS_NUM];
     perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
     perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[PERMS_INDEX_TWO] = "ohos.permission.ACCESS_SERVICE_DM";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = 2,
+        .permsNum = PERMS_NUM,
         .aclsNum = 0,
         .dcaps = NULL,
         .perms = perms,
@@ -793,6 +796,17 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
     std::string networkId = "networkIdTest";
     DmDeviceInfo info;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: CheckApiPermission_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission();
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace

@@ -36,14 +36,10 @@ if (defined(ohos_lite)) {
 
       sources = [
         "${utils_path}/src/crypto/dm_crypto.cpp",
-        "${utils_path}/src/dfx/lite/dm_hidumper.cpp",
-        "${utils_path}/src/dfx/lite/dm_hisysevent.cpp",
-        "${utils_path}/src/dfx/lite/dm_hitrace.cpp",
         "${utils_path}/src/dm_anonymous.cpp",
         "${utils_path}/src/dm_error_message.cpp",
         "${utils_path}/src/dm_log.cpp",
         "${utils_path}/src/dm_random.cpp",
-        "${utils_path}/src/permission/lite/permission_manager.cpp",
       ]
 
       defines = [
@@ -73,7 +69,7 @@ if (defined(ohos_lite)) {
         "include",
         "include/crypto",
         "include/fwkload/lite",
-        "include/permission/lite",
+        "include/appInfo/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
@@ -94,10 +90,10 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dm_error_message.cpp",
         "${common_path}/src/dm_log.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
+        "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
-        "src/permission/lite/permission_manager.cpp",
       ]
 
       defines = [
@@ -120,7 +116,7 @@ if (defined(ohos_lite)) {
       "include",
       "include/crypto",
       "include/fwkload/standard",
-      "include/permission/standard",
+      "include/appInfo/standard",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
@@ -142,15 +138,13 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dm_error_message.cpp",
       "${common_path}/src/dm_log.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
     ]
 
     if (support_jsapi) {
-      sources += [
-        "src/fwkload/standard/dm_distributed_hardware_load.cpp",
-        "src/permission/standard/permission_manager.cpp",
-      ]
+      sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
     }
 
     public_configs = [ ":devicemanagerutils_config" ]

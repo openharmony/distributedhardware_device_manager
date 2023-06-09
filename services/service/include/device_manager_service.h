@@ -113,6 +113,8 @@ public:
 
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
+    int32_t CheckApiPermission();
+
     void LoadHardwareFwkService();
 
     int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);

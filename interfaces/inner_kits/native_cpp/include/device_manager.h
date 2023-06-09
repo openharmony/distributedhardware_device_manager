@@ -276,6 +276,13 @@ public:
      */
     virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,
         std::string &encryptedUuid) = 0;
+
+    /**
+     * @tc.name: DeviceManagerImpl::CheckAPIAccessPermission
+     * @tc.desc: check permission for device manager API
+     * @tc.type: FUNC
+     */
+    virtual int32_t CheckAPIAccessPermission() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -486,6 +486,19 @@ ON_IPC_READ_RESPONSE(REGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::sha
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(CHECK_API_ACCESS_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    LOGI("send permission request!");
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(CHECK_API_ACCESS_PERMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    int32_t ret = reply.ReadInt32();
+    pBaseRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(UNREGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcRegisterDevStateCallbackReq> pReq =

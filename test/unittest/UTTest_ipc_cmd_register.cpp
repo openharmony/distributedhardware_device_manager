@@ -576,6 +576,19 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_026, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: SetRequest_027
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcCmdRegisterTest, SetRequest_027, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_API_ACCESS_PERMISSION;
+    MessageParcel data;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: ReadResponse_001
  * @tc.desc: 1. set cmdCode 9999
  *              set MessageParcel reply null
@@ -949,6 +962,20 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_022, testing::ext::TestSize.Level0)
 HWTEST_F(IpcCmdRegisterTest, ReadResponse_023, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_CREDENTIAL_CALLBACK;
+    MessageParcel reply;
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ReadResponse_024
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcCmdRegisterTest, ReadResponse_024, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_API_ACCESS_PERMISSION;
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);

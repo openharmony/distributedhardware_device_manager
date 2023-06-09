@@ -223,7 +223,7 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("DeviceManagerImpl::GetDeviceInfo error, failed ret: %d", ret);
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
 
     deviceInfo = rsp->GetDeviceInfo();
@@ -250,7 +250,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
         LOGI("DeviceManagerImpl::GetLocalDeviceInfo error, failed ret: %d", ret);
         SysEventWrite(std::string(GET_LOCAL_DEVICE_INFO_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(GET_LOCAL_DEVICE_INFO_FAILED_MSG));
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
 
     info = rsp->GetLocalDeviceInfo();
@@ -495,6 +495,14 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
         LOGE("RegisterDeviceManagerFaCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+
+    int32_t ret = CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("The caller: %s does not have permission to call RegisterDeviceManagerFaCallback.",
+            pkgName.c_str());
+        return ret;
+    }
+
     LOGI("dRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     LOGI("DeviceManagerImpl::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
@@ -507,6 +515,14 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+
+    int32_t ret = CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("The caller: %s does not have permission to call UnRegisterDeviceManagerFaCallback.",
+            pkgName.c_str());
+        return ret;
+    }
+
     LOGI("UnRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
@@ -953,6 +969,26 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
     }
     encryptedUuid = rsp->GetUuid();
     LOGI("GenerateEncryptedUuid complete, encryptedUuid: %s", GetAnonyString(encryptedUuid).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CheckAPIAccessPermission()
+{
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PERMISSION, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Check permission failed with ret: %d", ret);
+        return ret;
+    }
+    LOGI("The caller declare the DM permission!");
     return DM_OK;
 }
 } // namespace DistributedHardware

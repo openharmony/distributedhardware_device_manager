@@ -107,6 +107,7 @@ if (defined(ohos_lite)) {
         "include",
         "include/softbus",
         "include/ipc/lite",
+        "include/permission/lite",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
@@ -115,7 +116,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include/dfx/lite",
         "${utils_path}/include",
         "${utils_path}/include/fwkload/lite",
-        "${utils_path}/include/permission/lite",
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/ipc",
         "${innerkits_path}/native_cpp/include/ipc/lite",
@@ -163,6 +163,7 @@ if (defined(ohos_lite)) {
       "include/softbus",
       "include/ipc",
       "include/ipc/standard",
+      "include/permission/standard",
       "${common_path}/include",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
@@ -187,6 +188,7 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_server_client_proxy.cpp",
       "src/ipc/standard/ipc_server_listener.cpp",
       "src/ipc/standard/ipc_server_stub.cpp",
+      "src/permission/standard/permission_manager.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
 
@@ -201,6 +203,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/mbedtls:mbedtls_shared" ]
 
     external_deps = [
+      "access_token:libaccesstoken_sdk",
       "c_utils:utils",
       "dsoftbus:softbus_client",
       "hiviewdfx_hilog_native:libhilog",

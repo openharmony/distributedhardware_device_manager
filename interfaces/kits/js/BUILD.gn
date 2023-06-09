@@ -41,7 +41,9 @@ ohos_shared_library("devicemanager") {
   ]
 
   external_deps = [
+    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
