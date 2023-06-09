@@ -498,6 +498,8 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
 
     int32_t ret = CheckAPIAccessPermission();
     if (ret != DM_OK) {
+        LOGE("The caller: %s does not have permission to call RegisterDeviceManagerFaCallback.",
+            pkgName.c_str());
         return ret;
     }
 
@@ -516,6 +518,8 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
 
     int32_t ret = CheckAPIAccessPermission();
     if (ret != DM_OK) {
+        LOGE("The caller: %s does not have permission to call UnRegisterDeviceManagerFaCallback.",
+            pkgName.c_str());
         return ret;
     }
 

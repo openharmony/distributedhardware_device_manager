@@ -2068,7 +2068,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListPromise(napi_env env,
     return promise;
 }
 
-napi_value DeviceManagerNapi::GetTrustedDeviceListByTwoArgs(napi_env env, napi_callback_info info,
+napi_value DeviceManagerNapi::GetTrustedDeviceListByFilter(napi_env env, napi_callback_info info,
     DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo)
 {
     napi_value result = nullptr;
@@ -2133,7 +2133,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         }
         return CallDeviceList(env, info, deviceInfoListAsyncCallbackInfo);
     } else if (argc == DM_NAPI_ARGS_TWO) {
-        return GetTrustedDeviceListByTwoArgs(env, info, deviceInfoListAsyncCallbackInfo);
+        return GetTrustedDeviceListByFilter(env, info, deviceInfoListAsyncCallbackInfo);
     }
     napi_get_undefined(env, &result);
     return result;
