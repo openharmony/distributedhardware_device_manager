@@ -496,7 +496,7 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    int32_t ret = CheckAPIAccessPrmission();
+    int32_t ret = CheckAPIAccessPermission();
     if (ret != DM_OK) {
         return ret;
     }
@@ -514,7 +514,7 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    int32_t ret = CheckAPIAccessPrmission();
+    int32_t ret = CheckAPIAccessPermission();
     if (ret != DM_OK) {
         return ret;
     }
@@ -968,12 +968,12 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::CheckAPIAccessPrmission()
+int32_t DeviceManagerImpl::CheckAPIAccessPermission()
 {
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PRIMISSION, req, rsp);
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PERMISSION, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;

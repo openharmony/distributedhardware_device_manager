@@ -3772,21 +3772,21 @@ HWTEST_F(DeviceManagerImplTest, NotifyEvent_004, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: CheckAPIAccessPrmission_001
+ * @tc.name: CheckAPIAccessPermission_001
  * @tc.desc: 1. InitDeviceManager
- *           2. call DeviceManagerImpl::CheckAPIAccessPrmission
+ *           2. call DeviceManagerImpl::CheckAPIAccessPermission
  *           3. check ret is DM_OK
  *           4. UnInitDeviceManager
  * deviceTypeId
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerImplTest, CheckAPIAccessPrmission_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, CheckAPIAccessPermission_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
     std::shared_ptr<CredentialCallbackTest> callback = std::make_shared<CredentialCallbackTest>();
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }

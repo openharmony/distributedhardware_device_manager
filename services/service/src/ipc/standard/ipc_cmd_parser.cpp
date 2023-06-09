@@ -322,9 +322,9 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(CHECK_API_ACCESS_PRIMISSION, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(CHECK_API_ACCESS_PERMISSION, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = DeviceManagerService::GetInstance().CheckApiPrimission();
+    int32_t result = DeviceManagerService::GetInstance().CheckApiPermission();
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;

@@ -1994,7 +1994,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;
@@ -2085,7 +2085,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListByTwoArgs(napi_env env, napi_c
         DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
         return result;
     }
-    char extra[20];
+    char extra[DM_NAPI_BUF_LENGTH];
     JsObjectToString(env, argv[0], "extra", extra, sizeof(extra));
     deviceInfoListAsyncCallbackInfo->extra = extra;
     napi_create_reference(env, argv[1], 1, &deviceInfoListAsyncCallbackInfo->callback);
@@ -2099,7 +2099,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;
@@ -2146,7 +2146,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;
@@ -2182,7 +2182,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    if (DeviceManager::GetInstance().CheckAPIAccessPrmission() != 0) {
+    if (DeviceManager::GetInstance().CheckAPIAccessPermission() != 0) {
         CreateBusinessError(env, ERR_DM_NO_PERMISSION);
         return nullptr;
     }
@@ -2788,7 +2788,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;
@@ -2835,7 +2835,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
 
 napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[])
 {
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;
@@ -2924,7 +2924,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPrmission();
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
         return nullptr;

@@ -581,7 +581,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_026, testing::ext::TestSize.Level0)
  */
 HWTEST_F(IpcCmdRegisterTest, SetRequest_027, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = CHECK_API_ACCESS_PRIMISSION;
+    int32_t cmdCode = CHECK_API_ACCESS_PERMISSION;
     MessageParcel data;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
@@ -975,7 +975,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_023, testing::ext::TestSize.Level0)
  */
 HWTEST_F(IpcCmdRegisterTest, ReadResponse_024, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = CHECK_API_ACCESS_PRIMISSION;
+    int32_t cmdCode = CHECK_API_ACCESS_PERMISSION;
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);

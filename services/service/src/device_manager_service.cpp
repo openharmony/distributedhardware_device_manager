@@ -605,7 +605,7 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
     return dmServiceImpl_->GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
 }
 
-int32_t DeviceManagerService::CheckApiPrimission()
+int32_t DeviceManagerService::CheckApiPermission()
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller does not have permission to call");

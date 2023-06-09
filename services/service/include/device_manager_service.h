@@ -113,7 +113,7 @@ public:
 
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
-    int32_t CheckApiPrimission();
+    int32_t CheckApiPermission();
 
     void LoadHardwareFwkService();
 

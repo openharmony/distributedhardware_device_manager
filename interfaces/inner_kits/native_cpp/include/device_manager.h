@@ -278,11 +278,11 @@ public:
         std::string &encryptedUuid) = 0;
 
 	/**
-     * @tc.name: DeviceManagerImpl::CheckAPIAccessPrmission
+     * @tc.name: DeviceManagerImpl::CheckAPIAccessPermission
      * @tc.desc: check permission for device manager API
      * @tc.type: FUNC
      */
-    virtual int32_t CheckAPIAccessPrmission() = 0;
+    virtual int32_t CheckAPIAccessPermission() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

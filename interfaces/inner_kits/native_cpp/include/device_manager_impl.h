@@ -228,11 +228,11 @@ public:
         const std::string &appId, std::string &encryptedUuid) override;
 
 	/**
-     * @tc.name: DeviceManagerImpl::CheckAPIAccessPrmission
+     * @tc.name: DeviceManagerImpl::CheckAPIAccessPermission
      * @tc.desc: check permission for device manager API
      * @tc.type: FUNC
      */
-    virtual int32_t CheckAPIAccessPrmission() override;
+    virtual int32_t CheckAPIAccessPermission() override;
 
     int32_t OnDmServiceDied();
 private:
