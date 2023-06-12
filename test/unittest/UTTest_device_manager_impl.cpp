@@ -737,6 +737,48 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_005, testing::ext::TestSize
 }
 
 /**
+ * @tc.name: GetTrustedDeviceList_006
+ * @tc.desc: 1. set packName null
+ *              set extra null
+ *              set deviceList null
+ *              set isRefresh true
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_006, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::string extra = "";
+    bool  isRefresh = true;
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, isRefresh, deviceList);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: GetTrustedDeviceList_007
+ * @tc.desc: 1. set packName not null
+ *              set extra null
+ *              set deviceList null
+ *              set isRefresh true
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_007, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string extra = "";
+    bool  isRefresh = true;
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, isRefresh, deviceList);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc: 1. set packName null
  *              set extra null
