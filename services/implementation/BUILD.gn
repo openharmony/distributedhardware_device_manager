@@ -215,9 +215,7 @@ if (defined(ohos_lite)) {
 
     if (os_account_part_exists) {
       defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-      external_deps += [
-        "os_account:os_account_innerkits",
-      ]
+      external_deps += [ "os_account:os_account_innerkits" ]
     }
 
     subsystem_name = "distributedhardware"

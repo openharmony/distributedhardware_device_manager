@@ -734,9 +734,7 @@ ohos_static_library("device_manager_test_common") {
 
   if (os_account_part_exists) {
     cflags_cc += [ "-DOS_ACCOUNT_PART_EXISTS" ]
-    external_deps += [
-      "os_account:os_account_innerkits",
-    ]
+    external_deps += [ "os_account:os_account_innerkits" ]
   }
 
   subsystem_name = "distributedhardware"
