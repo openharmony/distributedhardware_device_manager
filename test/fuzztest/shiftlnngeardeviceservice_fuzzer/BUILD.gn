@@ -20,7 +20,7 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
   module_out_path = "device_manager/devicemanager"
   fuzz_config_file =
-      "${devicemanager_path}/test/fuzztest/shiftlnngeardeviceservicefuzzer_fuzzer"
+      "${devicemanager_path}/test/fuzztest/shiftlnngeardeviceservice_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",

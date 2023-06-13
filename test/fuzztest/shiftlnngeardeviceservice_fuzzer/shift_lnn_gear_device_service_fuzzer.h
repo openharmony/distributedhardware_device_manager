@@ -16,6 +16,6 @@
 #ifndef SHIFT_LNN_GEAR_DEVICE_SERVICE_FUZZER_H
 #define SHIFT_LNN_GEAR_DEVICE_SERVICE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "shiftlnngeardeviceservicefuzzer_fuzzer"
+#define FUZZ_PROJECT_NAME "shiftlnngeardeviceservice_fuzzer"
 
 #endif // SHIFT_LNN_GEAR_DEVICE_SERVICE_FUZZER_H

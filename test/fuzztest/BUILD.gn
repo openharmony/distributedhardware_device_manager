@@ -45,7 +45,7 @@ group("fuzztest") {
     "registerdevicemanagerfacallback_fuzzer:fuzztest",
     "registerdevstatecallback_fuzzer:fuzztest",
     "setuseroperation_fuzzer:fuzztest",
-    "shiftlnngeardeviceservicefuzzer_fuzzer::fuzztest",
+    "shiftlnngeardeviceservice_fuzzer:fuzztest",
     "softbusconnector_fuzzer:fuzztest",
     "softbusconnectorpublish_fuzzer:fuzztest",
     "softbusconnectorregister_fuzzer:fuzztest",

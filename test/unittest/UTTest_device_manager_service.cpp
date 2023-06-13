@@ -258,7 +258,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_001, testing::ext::TestSize.Leve
     std::string pkgName;
     std::string callerId = "com.ohos.test";
     bool isRefresh = true;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, callerId, isRefresh);
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -273,7 +273,8 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string callerId;
     bool isRefresh = true;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, callerId, isRefresh);
+    std::vector<DmDeviceInfo> deviceList;
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -289,7 +290,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string callerId = "com.ohos.test";
     bool isRefresh = true;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, callerId, isRefresh);
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -304,7 +305,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_004, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string callerId = "com.ohos.test";
     bool isRefresh = false;
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, callerId, isRefresh);
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
     EXPECT_EQ(ret, DM_OK);
 }
 
