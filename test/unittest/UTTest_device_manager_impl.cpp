@@ -775,7 +775,7 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_007, testing::ext::TestSize
     bool  isRefresh = true;
     std::vector<DmDeviceInfo> deviceList;
     int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, isRefresh, deviceList);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**

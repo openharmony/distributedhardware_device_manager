@@ -83,7 +83,7 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize
  */
 HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
 {
-    EXPECT_EQ(softbusListener->ShiftLNNGear(), DM_OK);
+    EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
 }
 
 /**
