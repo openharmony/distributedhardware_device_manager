@@ -67,7 +67,6 @@ ohos_fuzztest("PinAuthFuzzTest") {
   ]
 
   deps = [
-    "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
@@ -81,6 +80,7 @@ ohos_fuzztest("PinAuthFuzzTest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",

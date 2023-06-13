@@ -41,13 +41,15 @@
                 "os_account",
                 "safwk",
                 "samgr",
-                "startup_l2"
+                "startup_l2",
+                "resource_management"
             ],
             "third_party": [
                 "json",
                 "node",
                 "googletest",
-                "mbedtls"
+                "mbedtls",
+                "openssl"
             ]
         },
         "build": {

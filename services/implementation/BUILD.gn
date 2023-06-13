@@ -190,24 +190,17 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
     ]
-
-    if (os_account_part_exists) {
-      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-      deps += [
-        "${os_account_path }/frameworks/osaccount/native:os_account_innerkits",
-      ]
-    }
 
     if (!device_manager_no_interaction_auth) {
     }
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:ability_manager",
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
       "common_event_service:cesfwk_core",
@@ -219,6 +212,13 @@ if (defined(ohos_lite)) {
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
     ]
+
+    if (os_account_part_exists) {
+      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+      external_deps += [
+        "os_account:os_account_innerkits",
+      ]
+    }
 
     subsystem_name = "distributedhardware"
 

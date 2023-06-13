@@ -57,7 +57,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${ability_runtime_innerkits_path}/ability_manager:ability_manager",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${services_path}:devicemanagerservice",
       "${servicesimpl_path}:devicemanagerserviceimpl",
@@ -66,6 +65,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:ability_manager",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",
