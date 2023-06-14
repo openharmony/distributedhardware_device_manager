@@ -77,6 +77,16 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize
 }
 
 /**
+ * @tc.name: ShiftLNNGear_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
+{
+    EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
+}
+
+/**
  * @tc.name: OnParameterChgCallback_002
  * @tc.desc: return true
  * @tc.type: FUNC

@@ -248,6 +248,68 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestS
 }
 
 /**
+ * @tc.name: ShiftLNNGear_001
+ * @tc.desc:Set the pkgName to null, callerId not to null, and isRefresh to true; Return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string callerId = "com.ohos.test";
+    bool isRefresh = true;
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ShiftLNNGear_002
+ * @tc.desc:Set the callerId to null, pkgNamenot not to null, and isRefresh to true; Return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string callerId;
+    bool isRefresh = true;
+    std::vector<DmDeviceInfo> deviceList;
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+
+/**
+ * @tc.name: ShiftLNNGear_003
+ * @tc.desc:Set the callerId and pkgNamenot not to null, and isRefresh to true; Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string callerId = "com.ohos.test";
+    bool isRefresh = true;
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ShiftLNNGear_004
+ * @tc.desc:Set the callerId and pkgNamenot not to null, and isRefresh to false; Return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string callerId = "com.ohos.test";
+    bool isRefresh = false;
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: AuthenticateDevice_001
  * @tc.desc: Set unsupport authType = 0 and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
