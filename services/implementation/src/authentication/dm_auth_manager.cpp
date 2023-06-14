@@ -253,6 +253,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authMessageProcessor_->SetRequestContext(authRequestContext_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
         } else {
+            softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
             LOGE("DmAuthManager::OnSessionOpened but request state is wrong");
         }
     }
