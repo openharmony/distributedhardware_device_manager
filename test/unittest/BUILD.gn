@@ -712,17 +712,9 @@ ohos_static_library("device_manager_test_common") {
     "//third_party/googletest:gtest",
   ]
 
-  deps = [ "${ability_runtime_innerkits_path}/ability_manager:ability_manager" ]
-
-  if (os_account_part_exists) {
-    cflags_cc += [ "-DOS_ACCOUNT_PART_EXISTS" ]
-    deps += [
-      "${os_account_path }/frameworks/osaccount/native:os_account_innerkits",
-    ]
-  }
-
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
@@ -739,6 +731,11 @@ ohos_static_library("device_manager_test_common") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (os_account_part_exists) {
+    cflags_cc += [ "-DOS_ACCOUNT_PART_EXISTS" ]
+    external_deps += [ "os_account:os_account_innerkits" ]
+  }
 
   subsystem_name = "distributedhardware"
 

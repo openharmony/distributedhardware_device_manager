@@ -15,7 +15,7 @@
         "subsystem": "distributedhardware",
         "syscap":[ "SystemCapability.DistributedHardware.DeviceManager" ],
         "features":["device_manager_no_interaction_auth"],
-        "adapted_system_type": [ "standard", "small" ],
+        "adapted_system_type": [ "standard", "mini" ],
         "rom": "2048KB",
         "ram": "16384KB",
         "hisysevent_config": [
@@ -41,13 +41,15 @@
                 "os_account",
                 "safwk",
                 "samgr",
-                "startup_l2"
+                "startup_l2",
+                "resource_management"
             ],
             "third_party": [
                 "json",
                 "node",
                 "googletest",
-                "mbedtls"
+                "mbedtls",
+                "openssl"
             ]
         },
         "build": {
