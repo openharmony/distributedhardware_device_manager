@@ -227,7 +227,9 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authResponseState_->SetAuthManager(shared_from_this());
             authResponseState_->Enter();
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-            timer_ = std::make_shared<DmTimer>();
+            if (timer_ == nullptr) {
+                timer_ = std::make_shared<DmTimer>();
+            }
             timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), AUTHENTICATE_TIMEOUT,
                 [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
