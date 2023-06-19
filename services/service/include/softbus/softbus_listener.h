@@ -93,6 +93,9 @@ public:
     ~SoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);
+    int32_t GetLocalDeviceNetworkId(std::string &networkId);
+    int32_t GetLocalDeviceName(std::string &deviceName);
+    int32_t GetLocalDeviceType(int32_t &deviceType);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
     int32_t ShiftLNNGear();
 

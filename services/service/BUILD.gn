@@ -171,6 +171,8 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/model",
       "${common_path}/include/ipc/standard",
       "${innerkits_path}/native_cpp/include",
+      "${utils_path}/include/appInfo/standard",
+      "${utils_path}/include/crypto",
       "//third_party/json/include",
     ]
   }
@@ -200,7 +202,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004100",
     ]
 
-    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
+    deps = [
+      "${utils_path}:devicemanagerutils",
+      "//third_party/mbedtls:mbedtls_shared",
+    ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",

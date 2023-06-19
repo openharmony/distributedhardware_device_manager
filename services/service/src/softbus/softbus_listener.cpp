@@ -228,6 +228,42 @@ int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
     return ret;
 }
 
+int32_t SoftbusListener::GetLocalDeviceNetworkId(std::string &networkId)
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        return ERR_DM_FAILED;
+    }
+    networkId = nodeBasicInfo.networkId;
+    return ret;
+}
+
+int32_t SoftbusListener::GetLocalDeviceName(std::string &deviceName)
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        return ERR_DM_FAILED;
+    }
+    deviceName = nodeBasicInfo.deviceName;
+    return ret;
+}
+
+int32_t SoftbusListener::GetLocalDeviceType(int32_t &deviceType)
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        return ERR_DM_FAILED;
+    }
+    deviceType = nodeBasicInfo.deviceTypeId;
+    return ret;
+}
+
 int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     uint8_t mUdid[UDID_BUF_LEN] = {0};
