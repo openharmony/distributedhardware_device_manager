@@ -346,19 +346,20 @@ private:
     static void ReleasePublishCallback(std::string &bundleName);
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
-    static void CallAsyncWorkSync(napi_env env, DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
+    static void CallAsyncWorkSync(napi_env env,
+        DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static void CallAsyncWork(napi_env env, DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static void CallCredentialAsyncWork(napi_env env, CredentialAsyncCallbackInfo *creAsyncCallbackInfo);
     static void CallRequestCreInfoStatus(napi_env env, napi_status &status,
-                                         CredentialAsyncCallbackInfo *creAsyncCallbackInfo);
+        CredentialAsyncCallbackInfo *creAsyncCallbackInfo);
     static void CallGetAvailableDeviceListStatusSync(napi_env env, napi_status &status,
-                                                   DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
+        DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static void CallGetAvailableDeviceListStatus(napi_env env, napi_status &status,
-                                               DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+        DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static napi_value CallDeviceList(napi_env env, napi_callback_info info,
-                                     DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
+        DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static napi_value GetAvailableDeviceListPromise(napi_env env,
-                                                  DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+        DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartNumArgCheck(napi_env env, napi_value &argv, int32_t &subscribeId);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     static bool IsSystemApp();
