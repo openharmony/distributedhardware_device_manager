@@ -398,7 +398,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
-    isAddingMember = false;
+    isAddingMember_ = false;
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         authTimes_++;
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
