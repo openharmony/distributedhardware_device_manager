@@ -28,6 +28,10 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_device_networkId_rsp.h"
+#include "ipc_get_local_deviceId_rsp.h"
+#include "ipc_get_local_device_name_rsp.h"
+#include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_event_req.h"
@@ -179,6 +183,82 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
     if (localDeviceInfo != nullptr) {
         pRsp->SetLocalDeviceInfo(*localDeviceInfo);
     }
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NETWORKID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NETWORKID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNetworkIdRsp>(pBaseRsp);
+    std::string networkId = reply.ReadString();
+    pRsp->SetLocalDeviceNetworkId(networkId);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICEID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICEID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetLocalDeviceIdRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceIdRsp>(pBaseRsp);
+    std::string deviceId = reply.ReadString();
+    pRsp->SetLocalDeviceId(deviceId);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNameRsp>(pBaseRsp);
+    std::string deviceName = reply.ReadString();
+    pRsp->SetLocalDeviceName(deviceName);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_TYPE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_TYPE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetLocalDeviceTypeRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceTypeRsp>(pBaseRsp);
+    int32_t deviceType = reply.ReadInt32();
+    pRsp->SetLocalDeviceType(deviceType);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }

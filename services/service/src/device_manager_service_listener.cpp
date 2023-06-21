@@ -16,8 +16,10 @@
 #include "device_manager_service_listener.h"
 
 #include "device_manager_ipc_interface_code.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_crypto.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
@@ -28,6 +30,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+std::mutex DeviceManagerServiceListener::dmListenerMapLock_;
+std::mutex DeviceManagerServiceListener::udidHashMapLock_;
+std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ = {};
+std::map<std::string, std::string> DeviceManagerServiceListener::udidHashMap_ = {};
+
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
@@ -141,6 +148,72 @@ void DeviceManagerServiceListener::OnCredentialResult(const std::string &pkgName
     pReq->SetCredentialAction(action);
     pReq->SetCredentialResult(resultInfo);
     ipcServerListener_.SendRequest(SERVER_CREDENTIAL_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::RegisterDmListener(const std::string &pkgName, const std::string &appId)
+{
+    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
+    dmListenerMap_[pkgName] = appId;
+}
+
+void DeviceManagerServiceListener::UnRegisterDmListener(const std::string &pkgName)
+{
+    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
+    dmListenerMap_.erase(pkgName);
+}
+
+void DeviceManagerServiceListener::DeleteDeviceIdFromMap(const std::string &deviceId)
+{
+    std::lock_guard<std::mutex> lock(udidHashMapLock_);
+    auto iter = udidHashMap_.find(deviceId);
+    if (iter == udidHashMap_.end()) {
+        return;
+    }
+    udidHashMap_.erase(deviceId);
+}
+void DeviceManagerServiceListener::SetUdidHashMap(const std::string &udidHash, const std::string &deviceId)
+{
+    std::lock_guard<std::mutex> lock(udidHashMapLock_);
+    udidHashMap_[deviceId] = udidHash;
+}
+
+std::string DeviceManagerServiceListener::GetDeviceId(const std::string &udidHash)
+{
+    std::lock_guard<std::mutex> lock(udidHashMapLock_);
+    for (auto iter = udidHashMap_.begin(); iter != udidHashMap_.end(); iter++) {
+        if (udidHash == iter->second) {
+            return iter->first;
+        }
+    }
+    return "";
+}
+
+std::string DeviceManagerServiceListener::GetUdidHash(const std::string &deviceId)
+{
+    std::lock_guard<std::mutex> lock(udidHashMapLock_);
+    return udidHashMap_.count(deviceId) > 0 ?  udidHashMap_[deviceId] : "";
+}
+
+std::string DeviceManagerServiceListener::GetAppId(const std::string &pkgName)
+{
+    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
+    return dmListenerMap_.count(pkgName) > 0 ? dmListenerMap_[pkgName] : "";
+}
+
+std::string DeviceManagerServiceListener::CalcDeviceId(const std::string &pkgName, const std::string &udidHash)
+{
+    std::string appId = GetAppId(pkgName);
+    LOGI("CalcDeviceId, appId : %s, udidHash : %s.", GetAnonyString(appId).c_str(), GetAnonyString(udidHash).c_str());
+    if (appId.empty()) {
+        return udidHash;
+    }
+    std::string deviceId = GetDeviceId(udidHash);
+    if (deviceId.empty()) {
+        deviceId = Crypto::Sha256(appId + udidHash);
+        SetUdidHashMap(udidHash, deviceId);
+        return deviceId;
+    }
+    return deviceId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

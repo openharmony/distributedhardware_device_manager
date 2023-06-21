@@ -283,6 +283,34 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t CheckAPIAccessPermission() = 0;
+
+    /**
+     * @brief Get local device netWorkId.
+     * @param pkgName package name.
+     * @return Returns local device networkId.
+     */
+    virtual int32_t GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId) = 0;
+
+    /**
+     * @brief Get local deviceId.
+     * @param pkgName package name.
+     * @return Returns local deviceId.
+     */
+    virtual int32_t GetLocalDeviceId(const std::string &pkgName, std::string &networkId) = 0;
+
+    /**
+     * @brief Get local device name.
+     * @param pkgName package name.
+     * @return Returns device name.
+     */
+    virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) = 0;
+
+    /**
+     * @brief Get local device type.
+     * @param pkgName package name.
+     * @return Returns device type.
+     */
+    virtual int32_t GetLocalDeviceType(const std::string &pkgName, int32_t &deviceType) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

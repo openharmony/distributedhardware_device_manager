@@ -18,6 +18,7 @@
 
 #include <map>
 #include <string>
+#include <mutex>
 
 #include "dm_device_info.h"
 #include "idevice_manager_service_listener.h"
@@ -52,9 +53,23 @@ public:
     void OnUiCall(std::string &pkgName, std::string &paramJson);
 
     void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo);
+
+    void DeleteDeviceIdFromMap(const std::string &deviceId);
+    void RegisterDmListener(const std::string &pkgName, const std::string &appId);
+    void UnRegisterDmListener(const std::string &pkgName);
+    std::string GetAppId(const std::string &pkgName);
+    std::string CalcDeviceId(const std::string &udidHash, const std::string &appId);
+    void SetUdidHashMap(const std::string &udidHash, const std::string &deviceId);
+    std::string GetDeviceId(const std::string &udidHash);
+    std::string GetUdidHash(const std::string &deviceId);
+
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
+    static std::mutex dmListenerMapLock_;
+    static std::map<std::string, std::string> dmListenerMap_;
+    static std::mutex udidHashMapLock_;
+    static std::map<std::string, std::string> udidHashMap_;
 #endif
 };
 } // namespace DistributedHardware

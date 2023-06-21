@@ -42,6 +42,10 @@ public:
 
     int32_t InitSoftbusListener();
 
+    void RegisterDeviceManagerListener(const std::string &pkgName);
+
+    void UnRegisterDeviceManagerListener(const std::string &pkgName);
+    
     void UninitSoftbusListener();
 
     int32_t InitDMServiceListener();
@@ -54,6 +58,14 @@ public:
     int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh);
 
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
+
+    int32_t GetLocalDeviceNetworkId(std::string &networkId);
+
+    int32_t GetLocalDeviceId(const std::string &pkgName, std::string &deviceId);
+
+    int32_t GetLocalDeviceType(int32_t &deviceType);
+
+    int32_t GetLocalDeviceName(std::string &deviceName);
 
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
 

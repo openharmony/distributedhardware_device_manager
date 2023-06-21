@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <functional>
 
+#include "app_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_hidumper.h"
@@ -84,6 +85,16 @@ void DeviceManagerService::UninitDMServiceListener()
 {
     listener_ = nullptr;
     LOGI("DeviceManagerServiceListener uninit.");
+}
+
+void DeviceManagerService::RegisterDeviceManagerListener(const std::string &pkgName)
+{
+    listener_->RegisterDmListener(pkgName, AppManager::GetInstance().GetAppId());
+}
+
+void DeviceManagerService::UnRegisterDeviceManagerListener(const std::string &pkgName)
+{
+    listener_->UnRegisterDmListener(pkgName);
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -162,6 +173,55 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(localDeviceId_).c_str());
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetLocalDeviceNetworkId(std::string &networkId)
+{
+    LOGI("DeviceManagerService::GetLocalDeviceNetworkId begin.");
+    int32_t ret = softbusListener_->GetLocalDeviceNetworkId(networkId);
+    if (ret != DM_OK) {
+        LOGE("GetLocalDeviceNetworkId failed");
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::string &deviceId)
+{
+    LOGI("DeviceManagerService::GetLocalDeviceId begin.");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    char udidHash[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, (uint8_t *)udidHash);
+    if (ret != DM_OK) {
+        LOGE("get udidhash by udid: %s failed.", GetAnonyString(localDeviceId).c_str());
+        deviceId = "";
+        return ret;
+    }
+    deviceId = listener_->CalcDeviceId(pkgName, static_cast<std::string>(udidHash));
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetLocalDeviceName(std::string &deviceName)
+{
+    LOGI("DeviceManagerService::GetLocalDeviceName begin.");
+    int32_t ret = softbusListener_->GetLocalDeviceName(deviceName);
+    if (ret != DM_OK) {
+        LOGE("GetLocalDeviceName failed");
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetLocalDeviceType(int32_t &deviceType)
+{
+    LOGI("DeviceManagerService::GetLocalDeviceType begin.");
+    int32_t ret = softbusListener_->GetLocalDeviceType(deviceType);
+    if (ret != DM_OK) {
+        LOGE("GetLocalDeviceType failed");
+        return ret;
     }
     return DM_OK;
 }

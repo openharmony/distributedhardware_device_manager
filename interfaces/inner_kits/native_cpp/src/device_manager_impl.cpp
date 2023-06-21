@@ -31,6 +31,10 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_device_networkId_rsp.h"
+#include "ipc_get_local_deviceId_rsp.h"
+#include "ipc_get_local_device_name_rsp.h"
+#include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_event_req.h"
@@ -989,6 +993,101 @@ int32_t DeviceManagerImpl::CheckAPIAccessPermission()
         return ret;
     }
     LOGI("The caller declare the DM permission!");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId)
+{
+    LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId start, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> rsp = std::make_shared<IpcGetLocalDeviceNetworkIdRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NETWORKID, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetLocalDeviceNetWorkId error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId error, failed ret: %d", ret);
+        return ERR_DM_IPC_RESPOND_FAILED;
+    }
+
+    networkId = rsp->GetLocalDeviceNetworkId();
+    LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId end, pkgName : %s, networkId : %s", pkgName.c_str(),
+        GetAnonyString(networkId).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::string &deviceId)
+{
+    LOGI("DeviceManagerImpl::GetLocalDeviceId start, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceIdRsp> rsp = std::make_shared<IpcGetLocalDeviceIdRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICEID, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetLocalDeviceId error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceId error, failed ret: %d", ret);
+        return ERR_DM_IPC_RESPOND_FAILED;
+    }
+
+    deviceId = rsp->GetLocalDeviceId();
+    LOGI("DeviceManagerImpl::GetDeviceName end, pkgName : %s, deviceId : %s", pkgName.c_str(),
+        GetAnonyString(deviceId).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::string &deviceName)
+{
+    LOGI("DeviceManagerImpl::GetLocalDeviceName start, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetLocalDeviceName error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceName error, failed ret: %d", ret);
+        return ERR_DM_IPC_RESPOND_FAILED;
+    }
+
+    deviceName = rsp->GetLocalDeviceName();
+    LOGI("DeviceManagerImpl::GetLocalDeviceName end, pkgName : %s, deviceName : %s", pkgName.c_str(),
+        GetAnonyString(deviceName).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32_t &deviceType)
+{
+    LOGI("DeviceManagerImpl::GetLocalDeviceType start, pkgName : %s", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceTypeRsp> rsp = std::make_shared<IpcGetLocalDeviceTypeRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_TYPE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetLocalDeviceType error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceType error, failed ret: %d", ret);
+        return ERR_DM_IPC_RESPOND_FAILED;
+    }
+
+    deviceType = rsp->GetLocalDeviceType();
+    LOGI("DeviceManagerImpl::GetLocalDeviceType end, pkgName : %s, deviceType : %d", pkgName.c_str(), deviceType);
     return DM_OK;
 }
 } // namespace DistributedHardware

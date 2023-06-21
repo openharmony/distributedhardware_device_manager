@@ -235,6 +235,12 @@ public:
     virtual int32_t CheckAPIAccessPermission() override;
 
     int32_t OnDmServiceDied();
+
+    virtual int32_t GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId) override;
+    virtual int32_t GetLocalDeviceId(const std::string &pkgName, std::string &networkId) override;
+    virtual int32_t GetLocalDeviceType(const std::string &pkgName, int32_t &deviceType) override;
+    virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) override;
+    
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
