@@ -422,6 +422,7 @@ private:
     int32_t authTimes_ = 0;
     int32_t action_ = USER_OPERATION_TYPE_CANCEL_AUTH;
     std::shared_ptr<IAuthentication> authPtr_;
+    bool isAddingMember_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

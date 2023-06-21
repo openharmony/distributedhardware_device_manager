@@ -398,6 +398,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
+    isAddingMember = false;
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         authTimes_++;
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
@@ -656,11 +657,13 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
-    int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
-    if (ret == ERR_DM_DOING_ADD_MEMBER) {
-        LOGE("DmAuthManager::AddMember doing.");
+    if (isAddingMember_) {
+        LOGE("HiChainConnector::AddMember doing add member.");
         UpdateInputDialogDisplay();
+        return ERR_DM_FAILED;
     }
+    isAddingMember_ = true;
+    int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %d", ret);
         return ERR_DM_FAILED;
@@ -699,6 +702,7 @@ void DmAuthManager::AuthenticateFinish()
         return;
     }
     LOGI("DmAuthManager::AuthenticateFinish start");
+    isAddingMember_ = false;
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
             UpdateInputDialogDisplay(false);

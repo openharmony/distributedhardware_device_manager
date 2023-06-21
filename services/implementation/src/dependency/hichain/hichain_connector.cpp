@@ -80,7 +80,6 @@ void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 std::shared_ptr<IHiChainConnectorCallback> HiChainConnector::hiChainConnectorCallback_ = nullptr;
 std::shared_ptr<IDmGroupResCallback> HiChainConnector::hiChainResCallback_ = nullptr;
 int32_t HiChainConnector::networkStyle_ = PIN_CODE_NETWORK;
-bool HiChainConnector::isAddingMember_ = false;
 bool g_createGroupFlag = false;
 bool g_deleteGroupFlag = false;
 bool g_groupIsRedundance = false;
@@ -353,11 +352,6 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    if (isAddingMember_) {
-        LOGE("HiChainConnector::AddMember doing add member.");
-        return ERR_DM_DOING_ADD_MEMBER;
-    }
-    isAddingMember_ = true;
     int32_t ret = deviceGroupManager_->addMemberToGroup(userId, requestId, DM_PKG_NAME, tmpStr.c_str());
     if (ret != 0) {
         LOGE("[HICHAIN]fail to add number to hichain group with ret:%d.", ret);
@@ -375,7 +369,6 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
-        isAddingMember_ = false;
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_SUCCESS_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
@@ -423,7 +416,6 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
-        isAddingMember_ = false;
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_FAILED_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
