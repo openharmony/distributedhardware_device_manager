@@ -32,7 +32,7 @@ struct dialogPlusPage {
   @State ACTION_DONE_PINCODE_INPUT: number = 5
 
   aboutToAppear(){
-    console.log(TAG + 'aboutToDisappear aboutToDisappear')
+    console.log(TAG + 'aboutToAppear aboutToAppear')
     that = this
     this.initStatue()
   }
@@ -61,6 +61,11 @@ struct dialogPlusPage {
       dmClass.on('uiStateChange', (data) => {
         console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
         var tmpStr = JSON.parse(data.param)
+        if (tmpStr.addingMember !== undefined) {
+          this.errorTips = '正在认证中，请稍候……'
+          this.errorTipsVisible = Visibility.Visible
+          return
+        }
         this.isShow = tmpStr.verifyFailed
         console.log("uiStateChange executed, dialog closed" + this.isShow)
         if (!this.isShow) {
@@ -73,7 +78,6 @@ struct dialogPlusPage {
         }
     })
     });
-
   }
 
   onDone() {

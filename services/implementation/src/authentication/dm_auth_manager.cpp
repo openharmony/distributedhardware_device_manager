@@ -54,6 +54,7 @@ constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* VERIFY_FAILED = "verifyFailed";
+constexpr const char* ADDING_MEMBER = "addingMember";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -656,6 +657,10 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
     int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
+    if (ret == ERR_DM_DOING_ADD_MEMBER) {
+        LOGE("DmAuthManager::AddMember doing.");
+        UpdateInputDialogDisplay();
+    }
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %d", ret);
         return ERR_DM_FAILED;
@@ -751,6 +756,16 @@ void DmAuthManager::UpdateInputDialogDisplay(bool isShow)
     LOGI("DmAuthManager::UpdateInputDialogDisplay start");
     nlohmann::json jsonObj;
     jsonObj[VERIFY_FAILED] = isShow;
+    std::string paramJson = jsonObj.dump();
+    std::string pkgName = "com.ohos.devicemanagerui";
+    listener_->OnUiCall(pkgName, paramJson);
+}
+
+void DmAuthManager::UpdateInputDialogDisplay()
+{
+    LOGI("DmAuthManager::UpdateInputDialogDisplay start");
+    nlohmann::json jsonObj;
+    jsonObj[ADDING_MEMBER] = true;
     std::string paramJson = jsonObj.dump();
     std::string pkgName = "com.ohos.devicemanagerui";
     listener_->OnUiCall(pkgName, paramJson);

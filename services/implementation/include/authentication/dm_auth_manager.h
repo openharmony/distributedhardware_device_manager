@@ -324,6 +324,13 @@ public:
     void UpdateInputDialogDisplay(bool isShow);
 
     /**
+     * @tc.name: DmAuthManager::UpdateInputDialogDisplay
+     * @tc.desc: Update InputDialog Display of the DeviceManager Authenticate Manager
+     * @tc.type: FUNC
+     */
+    void UpdateInputDialogDisplay();
+
+    /**
      * @tc.name: DmAuthManager::GeneratePincode
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
