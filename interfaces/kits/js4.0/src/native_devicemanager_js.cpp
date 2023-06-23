@@ -1745,7 +1745,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env,
                 reinterpret_cast<DeviceBasicInfoListAsyncCallbackInfo *>(data);
             int32_t ret = 0;
             ret = DeviceManager::GetInstance().GetAvailableDeviceList(devBasicInfoListAsyncCallbackInfo->bundleName,
-                                                                    devBasicInfoListAsyncCallbackInfo->devList);
+                devBasicInfoListAsyncCallbackInfo->devList);
             if (ret != 0) {
                 LOGE("CallAsyncWork for bundleName %s failed, ret %d",
                     devBasicInfoListAsyncCallbackInfo->bundleName.c_str(), ret);
