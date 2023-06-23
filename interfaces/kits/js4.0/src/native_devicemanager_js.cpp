@@ -308,7 +308,7 @@ void DmNapiDeviceStatusCallback::OnDeviceOnline(const DmDeviceBasicInfo &deviceB
     DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, 0, 0, deviceBasicInfo);
     if (jsCallback == nullptr) {
         DeleteUvWork(work);
-        return; 
+        return;
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
@@ -752,12 +752,12 @@ DeviceManagerNapi *DeviceManagerNapi::GetDeviceManagerNapi(std::string &bundleNa
 }
 
 void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
-                                            const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
+    const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
-    napi_create_object(env_, &result);  
+    napi_create_object(env_, &result);
     SetValueInt32(env_, "action", (int)action, result);
 
     napi_value device = nullptr;
@@ -943,8 +943,8 @@ void DeviceManagerNapi::SetValueInt32(const napi_env &env, const std::string &fi
     napi_set_named_property(env, result, fieldStr.c_str(), value);
 }
 
-void DeviceManagerNapi::DeviceBasicInfoToJsArray(const napi_env &env, const std::vector<DmDeviceBasicInfo> &vecDevInfo,
-                                            const int32_t idx, napi_value &arrayResult)
+void DeviceManagerNapi::DeviceBasicInfoToJsArray(const napi_env &env,
+    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx, napi_value &arrayResult)
 {
     napi_value result = nullptr;
     napi_create_object(env, &result);
