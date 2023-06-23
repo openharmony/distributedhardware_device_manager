@@ -621,9 +621,6 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         g_deviceStatusCallbackMap[bundleName] = callback;
         return;
     }
-    if (eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
-
-    }
     if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL) {
         auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
         g_DiscoveryCallbackMap.erase(bundleName);
@@ -904,7 +901,7 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 }
 
 void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_status &status,
-                                                       DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
+    DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
 {
     for (unsigned int i = 0; i < deviceBasicInfoListAsyncCallbackInfo->devList.size(); i++) {
         LOGI("DeviceManager::GetAvailableDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
@@ -921,7 +918,7 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
     if (!isArray) {
         LOGE("napi_create_array fail");
     }
-    if (deviceBasicInfoListAsyncCallbackInfo->status == 0) { 
+    if (deviceBasicInfoListAsyncCallbackInfo->status == 0) {
         if (deviceBasicInfoListAsyncCallbackInfo->devList.size() > 0) {
             for (size_t i = 0; i != deviceBasicInfoListAsyncCallbackInfo->devList.size(); ++i) {
                 DeviceBasicInfoToJsArray(env, deviceBasicInfoListAsyncCallbackInfo->devList, i, array[1]);
@@ -983,7 +980,7 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env,
                 reinterpret_cast<DeviceBasicInfoListAsyncCallbackInfo *>(data);
             int32_t ret = 0;
             ret = DeviceManager::GetInstance().GetAvailableDeviceList(devBasicInfoListAsyncCallbackInfo->bundleName,
-                                                                    devBasicInfoListAsyncCallbackInfo->devList);
+                devBasicInfoListAsyncCallbackInfo->devList);
             if (ret != 0) {
                 LOGE("CallAsyncWorkSync for bundleName %s failed, ret %d",
                      devBasicInfoListAsyncCallbackInfo->bundleName.c_str(), ret);
