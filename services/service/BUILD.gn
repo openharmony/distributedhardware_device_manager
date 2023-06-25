@@ -211,7 +211,7 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
       "dsoftbus:softbus_client",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_core",

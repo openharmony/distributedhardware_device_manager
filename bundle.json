@@ -13,14 +13,14 @@
     "component": {
         "name": "device_manager",
         "subsystem": "distributedhardware",
-        "syscap":[ "SystemCapability.DistributedHardware.DeviceManager" ],
-        "features":["device_manager_no_interaction_auth"],
-        "adapted_system_type": [ "standard", "mini" ],
+        "syscap": ["SystemCapability.DistributedHardware.DeviceManager"],
+        "features": ["device_manager_no_interaction_auth"],
+        "adapted_system_type": ["standard", "mini"],
         "rom": "2048KB",
         "ram": "16384KB",
         "hisysevent_config": [
             "//foundation/distributedhardware/device_manager/hisysevent.yaml"
-          ],
+        ],
         "deps": {
             "components": [
                 "ability_base",
@@ -34,7 +34,7 @@
                 "dsoftbus",
                 "hisysevent_native",
                 "hitrace_native",
-                "hiviewdfx_hilog_native",
+                "hilog",
                 "init",
                 "ipc",
                 "napi",
@@ -64,8 +64,7 @@
                     "//foundation/distributedhardware/device_manager/sa_profile:dm_sa_profile"
                 ]
             },
-            "inner_kits": [
-                {
+            "inner_kits": [{
                 "type": "so",
                 "name": "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
                 "header": {
@@ -78,8 +77,7 @@
                     ],
                     "header_base": "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include"
                 }
-                }
-            ],
+            }],
             "test": [
                 "//foundation/distributedhardware/device_manager:device_manager_test"
             ]

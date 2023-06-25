@@ -145,9 +145,9 @@ if (defined(ohos_lite)) {
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
+      "hilog:libhilog",
       "hisysevent_native:libhisysevent",
       "hitrace_native:hitrace_meter",
-      "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "ipc:ipc_napi_common",
       "ipc:ipc_single",
