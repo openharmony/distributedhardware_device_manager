@@ -2201,7 +2201,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         DiscoveryCallback = iter->second;
     }
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_,
-            static_cast<uint16_t>(subscribeId), extra, DiscoveryCallback);
+        static_cast<uint16_t>(subscribeId), extra, DiscoveryCallback);
     if (ret != 0) {
         LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -2464,7 +2464,8 @@ napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info in
     }
     std::string authParam;
     JsToDmAuthInfo(env, argv[0], authParam);
-    int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(deviceManagerWrapper->bundleName_, authParam, verifyCallback);
+    int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(deviceManagerWrapper->bundleName_,
+        authParam, verifyCallback);
     if (ret != 0) {
         LOGE("VerifyAuthInfo for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
