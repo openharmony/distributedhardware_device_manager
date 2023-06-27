@@ -62,6 +62,7 @@ public:
     void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &deviceInfo);
+    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
     void OnDiscoverySuccess(const std::string &pkgName, uint16_t subscribeId);
     void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);

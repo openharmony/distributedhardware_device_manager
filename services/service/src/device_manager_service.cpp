@@ -429,6 +429,46 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
     return dmServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
 }
 
+int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+    const std::string &bindParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGI("The caller does not have permission to call BindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("DeviceManagerService::BindDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("BindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    std::string udidHash = listener_->GetUdidHash(deviceId);
+    return dmServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
+}
+
+int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGI("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::UnBindDevice begin for pkgName = %s, deviceId = %s",
+        pkgName.c_str(), GetAnonyString(deviceId).c_str());
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    std::string udidHash = listener_->GetUdidHash(deviceId);
+    listener_->DeleteDeviceIdFromMap(deviceId);
+    return dmServiceImpl_->UnBindDevice(pkgName, udidHash);
+}
+
 int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -754,6 +794,15 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
 int32_t DeviceManagerService::CheckApiPermission()
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::CheckNewApiPermission()
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }

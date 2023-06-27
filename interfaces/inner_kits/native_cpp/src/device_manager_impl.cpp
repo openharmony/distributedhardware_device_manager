@@ -24,6 +24,7 @@
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
+#include "ipc_bind_device_req.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
@@ -37,6 +38,8 @@
 #include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_get_availabledevice_req.h"
+#include "ipc_get_availabledevice_rsp.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_req.h"
@@ -45,8 +48,10 @@
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_start_discovery_req.h"
+#include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
+#include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
@@ -1218,6 +1223,64 @@ int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::
     deviceType = info.deviceTypeId;
     LOGI("DeviceManagerImpl::GetDeviceType end, pkgName : %s, networkId : %s, deviceType = %d", pkgName.c_str(),
         GetAnonyString(networkId).c_str(), deviceType);
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
+    const std::string &bindParam, std::shared_ptr<AuthenticateCallback> callback)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("BindDevice error: Invalid para. pkgName : %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("BindDevice start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, callback);
+    std::shared_ptr<IpcBindDeviceReq> req = std::make_shared<IpcBindDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetBindParam(bindParam);
+    req->SetBindType(bindType);
+    req->SetDeviceId(deviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(BIND_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("BindDevice error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("BindDevice error: Failed with ret %d", ret);
+        return ret;
+    }
+    DmTraceEnd();
+    LOGI("BindDevice end, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("UnBindDevice error: Invalid para. pkgName %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("UnBindDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
+        GetAnonyString(std::string(deviceId)).c_str());
+    std::shared_ptr<IpcUnBindDeviceReq> req = std::make_shared<IpcUnBindDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceId(deviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Failed with ret %d", ret);
+        return ret;
+    }
+
+    LOGI("UnBindDevice end, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -60,6 +60,11 @@ IRefreshCallback SoftbusConnector::softbusDiscoveryCallback_ = {
     .OnDiscoverResult = SoftbusConnector::OnSoftbusDiscoveryResult,
 };
 
+IRefreshCallback SoftbusConnector::softbusDiscoveryByIdCallback_ = {
+    .OnDeviceFound = SoftbusConnector::OnSoftbusDeviceDiscovery,
+    .OnDiscoverResult = SoftbusConnector::OnSoftbusDiscoveryResult,
+};
+
 SoftbusConnector::SoftbusConnector()
 {
     softbusSession_ = std::make_shared<SoftbusSession>();
@@ -489,6 +494,11 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 }
 
+void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
+{
+    return;
+}
+
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
     uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
@@ -564,6 +574,10 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
         return DmDeviceType::DEVICE_TYPE_UNKNOWN;
     }
     return nodeBasicInfo.deviceTypeId;
+}
+std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
+{
+    return "udidHash";
 }
 } // namespace DistributedHardware
 } // namespace OHOS

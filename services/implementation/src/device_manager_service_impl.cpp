@@ -174,6 +174,28 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
     return authMgr_->UnAuthenticateDevice(pkgName, networkId);
 }
 
+int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
+    const std::string &bindParam)
+{
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, udidHash is %s, bindParam is %s",
+             pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return authMgr_->AuthenticateDevice(pkgName, authType, udidHash, bindParam);
+}
+
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+{
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %s, udidHash is %s",
+            pkgName.c_str(), GetAnonyString(udidHash).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return authMgr_->UnBindDevice(pkgName, udidHash);
+}
+
 int32_t DeviceManagerServiceImpl::VerifyAuthentication(const std::string &authParam)
 {
     return authMgr_->VerifyAuthentication(authParam);
@@ -264,6 +286,21 @@ void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
     if (ret == DM_OK) {
         softbusConnector_->EraseUdidFromMap(udid);
     }
+}
+
+std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
+{
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return "";
+    }
+    std::string udid = "";
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        return "";
+    }
+    return softbusConnector_->GetDeviceUdidHashByUdid(udid);
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)

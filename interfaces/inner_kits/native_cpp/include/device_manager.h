@@ -347,6 +347,26 @@ public:
      * @return Returns device type.
      */
     virtual int32_t GetDeviceType(const std::string &pkgName, const std::string &networkId, int32_t &deviceType) = 0;
+
+    /**
+     * @brief Bind the specified device.
+     * @param pkgName    package name.
+     * @param bindType   bindType of device to bind.
+     * @param deviceInfo device id of device to bind.
+     * @param extra      extra info.This parameter can be null.
+     * @param callback   callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
+        const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
+    
+    /**
+     * @brief UnBind the specified device.
+     * @param pkgName    package name.
+     * @param deviceId device id to UnBindDevice.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

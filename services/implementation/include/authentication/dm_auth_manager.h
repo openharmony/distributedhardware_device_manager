@@ -149,6 +149,14 @@ public:
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     /**
+     * @brief UnBind device.
+     * @param pkgName package name.
+     * @param deviceId device id.
+     * @return Return 0 if success.
+     */
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
+
+    /**
      * @tc.name: DmAuthManager::VerifyAuthentication
      * @tc.desc: Verify Authentication of the DeviceManager Authenticate Manager
      * @tc.type: FUNC

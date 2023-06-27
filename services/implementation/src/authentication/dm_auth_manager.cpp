@@ -191,6 +191,30 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     return DM_OK;
 }
 
+int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_FAILED;
+    }
+    std::string udid;
+    udid = SoftbusConnector::GetDeviceUdidByUdidHash(udidHash);
+
+    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    hiChainConnector_->GetRelatedGroups(udid, groupList);
+    if (groupList.size() > 0) {
+        std::string groupId = "";
+        groupId = groupList.front().groupId;
+        LOGI("DmAuthManager::UnBindDevice groupId = %s, udidHash = %s, udid = %s",
+            GetAnonyString(groupId).c_str(), GetAnonyString(udidHash).c_str(), GetAnonyString(udid).c_str());
+        hiChainConnector_->DeleteGroup(groupId);
+    } else {
+        LOGE("DmAuthManager::UnBindDevice groupList.size = 0");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
 int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
 {
     LOGI("DmAuthManager::VerifyAuthentication");

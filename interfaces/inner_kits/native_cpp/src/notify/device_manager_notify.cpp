@@ -353,6 +353,12 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
     tempCbk->OnDeviceFound(subscribeId, deviceInfo);
 }
 
+void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
+                                        const DmDeviceBasicInfo &deviceBasicInfo)
+{
+    return;
+}
+
 void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason)
 {
     if (pkgName.empty()) {

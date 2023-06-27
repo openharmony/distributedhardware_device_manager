@@ -51,6 +51,13 @@ public:
     static void OnSoftbusDeviceFound(const DeviceInfo *device);
 
     /**
+     * @tc.name: SoftbusConnector::OnSoftbusDeviceDiscovery
+     * @tc.desc: OnSoftbus DeviceDiscovery of the SoftbusConnector
+     * @tc.type: FUNC
+     */
+    static void OnSoftbusDeviceDiscovery(const DeviceInfo *device);
+
+    /**
      * @tc.name: SoftbusConnector::OnSoftbusDiscoveryResult
      * @tc.desc: OnSoftbus Discovery Result of the SoftbusConnector
      * @tc.type: FUNC
@@ -105,6 +112,14 @@ public:
      * @tc.type: FUNC
      */
     static void JoinLnn(const std::string &deviceId);
+
+    /**
+     * @tc.name: SoftbusConnector::GetDeviceUdidByUdidHash
+     * @tc.desc: Get Udid By DeviceId of the SoftbusConnector
+     * @tc.type: FUNC
+     */
+    static std::string GetDeviceUdidByUdidHash(const std::string &udidHash);
+    
 public:
     SoftbusConnector();
     ~SoftbusConnector();
@@ -144,6 +159,7 @@ private:
     };
     static PulishStatus publishStatus;
     static IRefreshCallback softbusDiscoveryCallback_;
+    static IRefreshCallback softbusDiscoveryByIdCallback_;
     static IPublishCb softbusPublishCallback_;
     std::shared_ptr<SoftbusSession> softbusSession_;
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;

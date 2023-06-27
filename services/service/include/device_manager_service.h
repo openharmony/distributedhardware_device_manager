@@ -93,6 +93,11 @@ public:
 
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
+    int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &bindParam);
+
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
+
     int32_t VerifyAuthentication(const std::string &authParam);
 
     int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
@@ -132,6 +137,8 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     int32_t CheckApiPermission();
+
+    int32_t CheckNewApiPermission();
 
     void LoadHardwareFwkService();
 

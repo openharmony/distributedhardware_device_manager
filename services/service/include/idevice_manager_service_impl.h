@@ -97,6 +97,21 @@ public:
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::BindDevice
+     * @tc.desc: Bind Device of the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &bindParam);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::UnBindDevice
+     * @tc.desc: UnBindDevice Device of the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
+
+    /**
      * @tc.name: IDeviceManagerServiceImpl::VerifyAuthentication
      * @tc.desc: Verify Authentication of the device manager service impl
      * @tc.type: FUNC
@@ -210,6 +225,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
+
+    /**
+     * @tc.name: DeviceManagerService::GetUdidHashByNetWorkId
+     * @tc.desc: GetUdidHashByNetWorkId
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
 
     /**
      * @tc.name: DeviceManagerService::LoadHardwareFwkService
