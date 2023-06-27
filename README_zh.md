@@ -119,6 +119,8 @@ foundation/distributedhardware/distributedhardware_device_manager
 
 ## 接口说明
 
+该部分接口暂时可继续使用，但是暂停维护，建议使用新接口进行开发。
+
 当前版本设备管理服务不具备权限管理的能力，接口中的system api仅供系统调用，后续版本会进行严格的权限管控。
 接口参见[**interface_sdk-js仓库的**](https://gitee.com/openharmony/interface_sdk-js/) *ohos.distributedHardware.deviceManager.d.ts*
 
@@ -353,6 +355,248 @@ try {
     console.error("unAuthenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
 }
 ```
+
+## 接口说明
+
+接口参见[**interface_sdk-js仓库的**](https://gitee.com/openharmony/interface_sdk-js/) *ohos.distributedDeviceManager.d.ts*
+
+- 公共接口：
+
+  使用DeviceManager相关接口之前，需要通过createDeviceManager接口创建DeviceManager实例；
+
+  不使用DeviceManager接口的时候需要释放对应的DeviceManager实例。
+
+| 原型                                                         | 描述                            |
+| ------------------------------------------------------------ | ------------------------------- |
+| createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 创建一个设备管理器实例。 |
+| releaseDeviceManager(): void;                      | 设备管理实例不再使用后，通过该方法释放DeviceManager实例。           |
+
+- 示例如下
+
+```js
+try {
+    // 创建DeviceManager实例：
+    deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
+    if (err) {
+      console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+      return;
+    }
+    console.info("createDeviceManager success, value =" + data);
+    this.dmClass = data;
+    });
+} catch(err) {
+    console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+}
+```
+- 公共接口：
+
+  提供可信设备列表获取、可信设备状态监听、周边设备发现、设备认证等相关接口，该部分接口支持三方应用调用。
+  接口使用时需申请ohos.permission.DISTRIBUTED_SOFTBUS_CENTER权限。
+
+  开始设备发现、停止发现设备接口要配对使用，使用同一个subscribeId。
+
+  | 原型                                                         | 描述                 |
+| ------------------------------------------------------------ | -------------------- |
+| getAvailableDeviceListSync(): Array&lt;DeviceBasicInfo&gt;;                                                                | 同步获取所有可信设备列表。 |
+| getAvailableDeviceList(callback:AsyncCallback&lt;Array&lt;DeviceBasicInfo&gt;&gt;): void;                                  | 获取所有可信设备列表。使用callback异步回调。 |
+| getAvailableDeviceList(): Promise&lt;Array&lt;DeviceBasicInfo&gt;&gt;;                                                     | 获取所有可信设备列表。使用Promise异步回调。 |
+| getLocalDeviceNetworkIdSync(): string;                                                                                     | 同步获取本地设备网络标识。 |
+| getLocalDeviceNameSync(): string;                                                                                          | 同步获取本地设备名称。     |
+| getLocalDeviceTypeSync(): number;                                                                                          | 同步获取本地设备类型。     |
+| getLocalDeviceIdSync(): string;                                                                                            | 同步获取本地设备id。       |
+| getDeviceNameSync(networkId: string): string;                                                                              | 通过指定设备的网络标识同步获取该设备名称。    |
+| getDeviceTypeSync(networkId: string): number;                                                                              | 通过指定设备的网络标识同步获取该设备类型。    |
+| startDeviceDiscovery(subscribeId: number, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
+| stopDeviceDiscovery(subscribeId: number): void;                                                                            | 停止发现周边设备。         |
+| bindDevice(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
+| unbindDevice(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
+| on(type: 'deviceStatusChange', callback: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;         | 注册设备状态回调。               |
+| off(type: 'deviceStatusChange', callback?: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;       | 取消注册设备状态回调。            |
+| on(type: 'discoverSuccess', callback: Callback&lt;{ subscribeId: number, device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
+| off(type: 'discoverSuccess', callback?: Callback&lt;{ subscribeId: number, device: DeviceBasicInfo }&gt;): void;                 | 取消注册设备发现成功回调。            |
+| on(type: 'deviceNameChange', callback: Callback&lt;{ deviceName: string }&gt;): void;                                            | 注册设备名称变更回调监听。        |
+| off(type: 'deviceNameChange', callback?: Callback&lt;{ deviceName: string }&gt;): void;                                          | 取消注册设备名称变更回调监听。    |
+| on(type: 'discoverFail', callback: Callback&lt;{ subscribeId: number, reason: number }&gt;): void;                         | 注册设备发现失败回调监听。        |
+| off(type: 'discoverFail', callback?: Callback&lt;{ subscribeId: number, reason: number }&gt;): void;                       | 取消注册设备发现失败回调。        |
+| on(type: 'serviceDie', callback: () =&gt; void): void;                                                                     | 注册设备管理服务死亡监听。        |
+| off(type: 'serviceDie', callback?: () =&gt; void): void;                                                                   | 取消注册设备管理服务死亡监听。    |
+
+- 示例如下：
+
+```js
+try {
+  // 注册设备管理服务死亡监听。
+  dmClass.on('serviceDie', data => this.log("serviceDie on:" + JSON.stringify(data)))
+  // 注册设备状态回调。
+  dmClass.on('deviceStatusChange', data => this.log("deviceStatusChange on:" + JSON.stringify(data)))
+} catch (err) {
+  this.log("on err:" + err.code + "," + err.message);
+}
+
+// 同步获取所有可信设备列表。
+try {
+  let trustList = dmClass.getAvailableDeviceListSync();
+  this.log("trustList:" + JSON.stringify(this.trustList));
+} catch(err) {
+  this.log("getAvailableDeviceList failed: " + JSON.stringify(err));
+}
+// 同步获取本地设备类型。
+var data = dmClass.getLocalDeviceTypeSync();
+
+// 同步获取本地设备名称。
+var data = dmClass.getLocalDeviceNameSync();
+
+// 发现周边设备。
+try {
+  // 注册发现设备成功回调监听。
+  dmClass.on('discoverSuccess', (data) => {
+  if (data == null) {
+    this.log("discoverSuccess error data = null")
+    return;
+  }
+  console.info(TAG + "discoverSuccess:" + JSON.stringify(data));
+  console.info(TAG + "subscribeId:" + JSON.stringify(data.subscribeId));
+  });
+  // 注册设备发现失败回调监听。
+  dmClass.on('discoverFail', (data) => {
+    if (!data) {
+      this.log("discoverFail error data=null")
+      return;
+    }
+    console.info(TAG + "discoverFail on:" + JSON.stringify(data));
+  });
+  this.log("startDeviceDiscovery");
+  dmClass.startDeviceDiscovery(subscribeId);
+} catch (err) {
+  this.log("startDeviceDiscovery err:" + err.code + "," + err.message);
+}
+
+// 停止发现周边设备。
+try {
+  dmClass.stopDeviceDiscovery(subscribeId);
+  // 取消注册设备发现成功回调。
+  dmClass.off('discoverSuccess');
+  // 取消注册设备发现失败回调。
+  dmClass.off('discoverFail');
+} catch (err) {
+  this.log("err:" + err.code + "," + err.message);
+}
+
+// 设备认证
+var extraInfo = {
+  "appOperation": "xxxxxxxx",  // 业务操作 支持用户自定义
+  "customDescription": "xxxxxxxx",    // 业务描述 支持用户自定义
+}
+var bindParam = {
+  "bindType": 1,
+  "extraInfo": extraInfo
+}
+try {
+  var deviceId = "xxxxxxxx";
+  dmClass.bindDevice(deviceId, bindParam, (err, data) => {
+  if (err) {
+    console.info(TAG + "bindDevice err:" + JSON.stringify(err));
+  } else {
+    console.info(TAG + "bindDevice result:" + JSON.stringify(data));
+    let token = data.pinTone;
+  }
+  });
+} catch (err) {
+  this.log("bindDevice err:" + err.code + "," + err.message);
+}
+// 设备取消认证
+try {
+  var deviceId = "xxxxxxxx";
+  let result = dmClass.unbindDevice(deviceId, '');
+  this.log("UnBindDevice last device: " + JSON.stringify(deviceId) + " and result = "
+    + result);
+  } catch (err) {
+    this.log("unbindDevice err:" + err.code + "," + err.message);
+}
+
+try {
+  // 取消注册设备管理服务死亡监听。
+  dmClass.off('serviceDie');
+  // 取消注册设备状态回调。
+  dmClass.off('deviceStatusChange', JSON.stringify(mFilterOption), data => this.log("deviceStatusChange off:" + JSON.stringify(data)));
+  // 释放DeviceManager实例。
+  dmClass.releaseDeviceManager();
+} catch (err) {
+  this.log("err:" + err.code + "," + err.message);
+}
+```
+
+- 系统接口：
+
+  提供发布设备发现、导入凭据组网等相关接口，该部分接口不支持三方应用调用。
+  系统接口使用时需申请ohos.permission.ACCESSS_SERVICE_DM权限。
+
+| 原型                                                         | 描述                 |
+| ------------------------------------------------------------ | -------------------- |
+| publishDeviceDiscovery(publishInfo: PublishInfo): void;                                                                    | 发布设备发现。发布状态持续两分钟，超过两分钟会停止发布。   |
+| unPublishDeviceDiscovery(publishId: number): void;                                                                         | 停止发布设备发现。                                      |
+| verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback&lt;{deviceId: string, level: number}&gt;): void;                | 验证认证信息。                    |
+| setUserOperation(operateAction: number, params: string): void;                                                             | 设置用户ui操作行为。              |
+| requestCredentialRegisterInfo(requestInfo: string, callback: AsyncCallback&lt;{registerInfo: string}&gt;): void;                 | 获取凭据的注册信息。              |
+| importCredential(credentialInfo: string, callback: AsyncCallback&lt;{resultInfo: string}&gt;): void;                             | 导入凭据信息。                   |
+| deleteCredential(queryInfo: string, callback: AsyncCallback&lt;{resultInfo: string}&gt;): void;                                  | 删除凭据信息。                   |
+| on(type: 'uiStateChange', callback: Callback&lt;{ param: string}&gt;): void;                                               | ui状态变更回调。                 |
+| off(type: 'uiStateChange', callback?: Callback&lt;{ param: string}&gt;): void;                                             | 取消ui状态变更回调。             |
+| on(type: 'publishSuccess', callback: Callback&lt;{ publishId: number }&gt;): void;                                         | 注册发布设备成功回调监听。        |
+| off(type: 'publishSuccess', callback?: Callback&lt;{ publishId: number }&gt;): void;                                       | 取消注册设备发布成功回调。        |
+| on(type: 'publishFail', callback: Callback&lt;{ publishId: number, reason: number }&gt;): void;                            | 注册设备发布失败回调监听。        |
+| off(type: 'publishFail', callback?: Callback&lt;{ publishId: number, reason: number }&gt;): void;                          | 取消注册设备发布失败回调。        |
+
+- 示例如下：
+
+```js
+// 开始发布设备发现
+dmClass.on('publishSuccess', (data) => {
+  if (data == null) {
+    this.log("publishSuccess error data=null")
+    return;
+  }
+  this.logList.push("publishSuccess:" + JSON.stringify(data));
+  this.log("startDeviceDiscovery");
+});
+dmClass.on('publishFailed', (data) => {
+  this.log("publishFailed on:" + JSON.stringify(data));
+});
+var publisjInfo = {
+  "publishId": subscribeId,
+  "mode": 0xAA,
+  "freq": 2,
+  "ranging": true
+};
+try {
+  this.log("publisjInfo :" + JSON.stringify(publisjInfo));
+  dmClass.publishDeviceDiscovery(publisjInfo);
+} catch (err) {
+  this.log("publishDeviceDiscovery err:" + err.code + "," + err.message);
+}
+
+// 设置用户ui操作行为
+/*  operateAction = 0 - 允许授权
+    operateAction = 1 - 取消授权
+    operateAction = 2 - 授权框用户操作超时
+    operateAction = 3 - 取消pin码框展示
+    operateAction = 4 - 取消pin码输入框展示
+    operateAction = 5 - pin码输入框确定操作
+*/
+dmClass.setUserOperation(operation, "extra")
+dmClass.on('uiStateChange', (data) => {
+    console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+    var tmpStr = JSON.parse(data.param)
+    this.isShow = tmpStr.verifyFailed
+    console.log("uiStateChange executed, dialog closed" + this.isShow)
+    if (!this.isShow) {
+        this.destruction()
+    }
+});
+```
+
+详细接口说明请参考[**API文档**](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-distributedDeviceManager.md)
+
 ## 系统弹框ServiceExtensionAbility
 
 当前版本只支持PIN码认证，需要提供PIN码认证的授权提示界面、PIN码显示界面、PIN码输入界面；
