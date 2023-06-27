@@ -179,7 +179,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 
 - 公共接口：
 
-  调用以下接口，需要申请ohos.permission.DISTRIBUTED_SOFTBUS_CENTER权限才能正常调用。
+  调用以下接口，需要申请ohos.permission.DISTRIBUTED_DATASYNC权限才能正常调用。
 
   使用DeviceManager相关接口之前，需要通过createDeviceManager接口创建DeviceManager实例；
 
