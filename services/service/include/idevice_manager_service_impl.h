@@ -53,6 +53,14 @@ public:
                                          const std::string &extra);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::StartDeviceDiscovery
+     * @tc.desc: Start Device Discovery of the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+                                 const std::string &filterOptions);
+                                 
+   /**
      * @tc.name: IDeviceManagerServiceImpl::StopDeviceDiscovery
      * @tc.desc: Stop Device Discovery of the device manager service impl
      * @tc.type: FUNC

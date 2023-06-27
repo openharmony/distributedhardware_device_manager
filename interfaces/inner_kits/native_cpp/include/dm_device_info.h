@@ -165,6 +165,29 @@ typedef struct DmDeviceInfo {
 } DmDeviceInfo;
 
 /**
+ * @brief Device Basic Information.
+ */
+typedef struct 
+DmDeviceBasicInfo {
+    /**
+     * Device Id of the device.
+     */
+    char deviceId[DM_MAX_DEVICE_ID_LEN];
+    /**
+     * Device name of the device.
+     */
+    char deviceName[DM_MAX_DEVICE_NAME_LEN];
+    /**
+     * Device type of the device.
+     */
+    uint16_t deviceTypeId;
+    /**
+     * NetworkId of the device.
+     */
+    char networkId[DM_MAX_DEVICE_ID_LEN];
+} DmDeviceBasicInfo;
+
+/**
  * @brief Device Authentication param.
  */
 typedef struct DmAuthParam {

@@ -186,6 +186,27 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     return ret;
 }
 
+int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
+{
+    SubscribeInfo subscribeInfo;
+    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
+    subscribeInfo.subscribeId = subscribeId;
+    subscribeInfo.mode = static_cast<DiscoverMode>(DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE);
+    subscribeInfo.medium = static_cast<ExchangeMedium>(DmExchangeMedium::DM_AUTO);
+    subscribeInfo.freq = static_cast<ExchangeFreq>(DmExchangeFreq::DM_SUPER_HIGH);
+    subscribeInfo.isSameAccount = false;
+    subscribeInfo.isWakeRemote = false;
+    subscribeInfo.capability = DM_CAPABILITY_OSD;
+    LOGI("StartDiscovery by subscribeId begin, subscribeId: %d, mode: 0x%x, medium: %d.",
+        subscribeId, subscribeInfo.mode, subscribeInfo.medium);
+    int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryByIdCallback_);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
+        return ERR_DM_DISCOVERY_FAILED;
+    }
+    return ret;
+}
+
 int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
 {
     LOGI("StopDiscovery begin, subscribeId: %d.", (int32_t)subscribeId);

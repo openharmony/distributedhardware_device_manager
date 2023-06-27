@@ -117,6 +117,38 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     return DM_OK;
 }
 
+int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
+    std::vector<DmDeviceBasicInfo> &deviceBasicInfoList)
+{
+    LOGI("DeviceManagerService::GetAvailableDeviceList begin for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t ret = softbusListener_->GetAvailableDeviceList(deviceBasicInfoList);
+    if (ret != DM_OK) {
+        LOGE("GetAvailableDeviceList failed");
+        return ret;
+    }
+
+    if (deviceBasicInfoList.size() > 0 && IsDMServiceImplReady()) {
+        for (auto it = deviceBasicInfoList.begin(); it != deviceBasicInfoList.end(); ++it) {
+            std::string udidHash = "";
+            ret = dmServiceImpl_->GetUdidHashByNetWorkId(it->networkId, udidHash);
+            if (ret != DM_OK) {
+                LOGE("DeviceManagerService::GetAvailableDeviceList get UdidHash by network failed.");
+                return ret;
+            }
+            std::string deviceId = listener_->CalcDeviceId(pkgName, udidHash);
+            if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+                deviceId.length()) != 0) {
+                LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+            }
+        }
+    }
+    return DM_OK;
+}
+
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
 {
     LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %s, callerId = %s, isRefresh = %d", pkgName.c_str(),
@@ -279,6 +311,27 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+}
+
+int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+                                                   const std::string &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call StartDeviceDiscovery.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("StartDeviceDiscovery begin for pkgName = %s, filterOptions = %s, subscribeId = %d",
+        pkgName.c_str(), filterOptions.c_str(), subscribeId);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("StartDeviceDiscovery failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
 }
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)

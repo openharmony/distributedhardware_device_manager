@@ -27,6 +27,7 @@
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
+#include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
@@ -96,6 +97,41 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
 }
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SERVER_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> pReq = std::static_pointer_cast<IpcNotifyDeviceDiscoveryReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    uint16_t subscribeId = pReq->GetSubscribeId();
+    DmDeviceBasicInfo deviceBasicInfo = pReq->GetDeviceBasicInfo();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt16((int16_t)subscribeId)) {
+        LOGE("write subscribeId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
+        LOGE("write deviceBasicInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_DEVICE_DISCOVERY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
@@ -322,9 +358,48 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(GET_AVAILABLE_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::vector<DmDeviceBasicInfo> deviceList;
+    int32_t result = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceList);
+    int32_t infoNum = (int32_t)(deviceList.size());
+    DmDeviceBasicInfo deviceBasicInfo;
+    if (!reply.WriteInt32(infoNum)) {
+        LOGE("write infoNum failed");
+        return ERR_DM_IPC_WRITE_FAILED; 
+    }
+    if (!deviceList.empty()) {
+        for (; !deviceList.empty();) {
+            deviceBasicInfo = deviceList.back();
+            deviceList.pop_back();
+
+            if (!reply.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
+                LOGE("write subscribeInfo failed");
+                return ERR_DM_IPC_WRITE_FAILED;
+            }
+        }
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(CHECK_API_ACCESS_PERMISSION, MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = DeviceManagerService::GetInstance().CheckApiPermission();
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(CHECK_API_ACCESS_NEWPERMISSION, MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = DeviceManagerService::GetInstance().CheckNewApiPermission();
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -366,6 +441,19 @@ ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
     if (subscribeInfo != nullptr) {
         result = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, *subscribeInfo, extra);
     }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(START_DEVICE_DISCOVERY, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string filterOption = data.ReadString();
+    uint16_t subscribeId = data.ReadUint16();
+    int32_t result = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOption);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -801,6 +889,33 @@ ON_IPC_CMD(GENERATE_ENCRYPTED_UUID, MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteString(encryptedUuid)) {
         LOGE("write encryptedUuid failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(BIND_DEVICE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string bindParam = data.ReadString();
+    std::string deviceId = data.ReadString();
+    int32_t bindType = data.ReadInt32();
+    int32_t result = DM_OK;
+    result = DeviceManagerService::GetInstance().BindDevice(pkgName, bindType, deviceId, bindParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNBIND_DEVICE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string deviceId = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

@@ -30,6 +30,7 @@ IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
+constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -54,5 +55,29 @@ bool PermissionManager::CheckPermission(void)
     LOGE("DM service access is denied, please apply for corresponding permissions");
     return false;
 }
+
+bool PermissionManager::CheckNewPermission(void)
+{
+    LOGI("Enter PermissionManager::CheckNewPermission");
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        return false;
+    }
+    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
+
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        int32_t ret = AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_NEWPERMISSION);
+        if (ret == PermissionState::PERMISSION_GRANTED) {
+            return true;
+        }
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_SHELL) {
+        LOGI("PermissionManager::tokenTypeFlag is shell");
+        return true;
+    }
+    LOGE("DM service access is denied, please apply for corresponding new permissions");
+    return false;
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -120,6 +120,7 @@ public:
     int32_t PublishDiscovery(const DmPublishInfo &dmPublishInfo);
     int32_t UnPublishDiscovery(int32_t publishId);
     int32_t StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo);
+    int32_t StartDiscovery(const uint16_t subscribeId);
     int32_t StopDiscovery(uint16_t subscribeId);
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     bool HaveDeviceInMap(std::string deviceId);

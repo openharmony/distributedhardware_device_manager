@@ -116,6 +116,16 @@ int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgNam
     return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
 }
 
+int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+    const std::string &filterOptions)
+{
+    if (pkgName.empty()) {
+        LOGE("StartDeviceDiscovery failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+}
+
 int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
     if (pkgName.empty()) {

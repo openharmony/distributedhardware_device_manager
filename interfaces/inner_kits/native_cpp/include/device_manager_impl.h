@@ -56,6 +56,13 @@ public:
      */
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
         bool isRefresh, std::vector<DmDeviceInfo> &deviceList) override;
+	/**
+     * @tc.name: DeviceManagerImpl::GetAvailableDeviceList
+     * @tc.desc: Get device list of trusted devices
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetAvailableDeviceList(const std::string &pkgName,
+    	std::vector<DmDeviceBasicInfo> &deviceList) override;
     /**
      * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
      * @tc.desc: Get local device information
@@ -89,6 +96,14 @@ public:
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                          const std::string &extra,
+                                         std::shared_ptr<DiscoveryCallback> callback) override;
+    /**
+     * @tc.name: DeviceManagerImpl::StartDeviceDiscovery
+     * @tc.desc: Initiate device discovery
+     * @tc.type: FUNC
+     */
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+                                         const std::string &filterOptions,
                                          std::shared_ptr<DiscoveryCallback> callback) override;
     /**
      * @tc.name: DeviceManagerImpl::StopDeviceDiscovery
@@ -240,7 +255,10 @@ public:
     virtual int32_t GetLocalDeviceId(const std::string &pkgName, std::string &networkId) override;
     virtual int32_t GetLocalDeviceType(const std::string &pkgName, int32_t &deviceType) override;
     virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) override;
-    
+    virtual int32_t GetDeviceName(const std::string &pkgName, const std::string &networkId,
+        std::string &deviceName) override;
+    virtual int32_t GetDeviceType(const std::string &pkgName,
+        const std::string &networkId, int32_t &deviceType) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

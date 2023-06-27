@@ -45,6 +45,9 @@ public:
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
 
+    int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+                                 const std::string &filterOptions);
+
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
 
     int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);

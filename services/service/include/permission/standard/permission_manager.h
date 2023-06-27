@@ -25,6 +25,7 @@ class PermissionManager {
 
 public:
     bool CheckPermission(void);
+    bool CheckNewPermission(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
