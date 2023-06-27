@@ -238,7 +238,8 @@ try {
   // 注册设备管理服务死亡监听。
   dmClass.on('serviceDie', data => console.log("serviceDie on:" + JSON.stringify(data)))
   // 注册设备状态回调。
-  dmClass.on('deviceStatusChange', data => console.log("deviceStatusChange on:" + JSON.stringify(data)))
+  dmClass.on('deviceStatusChange', data =>
+    console.log("deviceStatusChange on:" + JSON.stringify(data)))
 } catch (err) {
   console.log("on err:" + err.code + "," + err.message);
 }
@@ -328,7 +329,8 @@ try {
   // 取消注册设备管理服务死亡监听。
   dmClass.off('serviceDie');
   // 取消注册设备状态回调。
-  dmClass.off('deviceStatusChange', JSON.stringify(mFilterOption), data => console.log("deviceStatusChange off:" + JSON.stringify(data)));
+  dmClass.off('deviceStatusChange', JSON.stringify(mFilterOption), data =>
+    console.log("deviceStatusChange off:" + JSON.stringify(data)));
   // 释放DeviceManager实例。
   dmClass.releaseDeviceManager();
 } catch (err) {
