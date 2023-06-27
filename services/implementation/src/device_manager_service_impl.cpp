@@ -303,21 +303,6 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
     return softbusConnector_->GetDeviceUdidHashByUdid(udid);
 }
 
-std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
-{
-    if (softbusConnector_ == nullptr) {
-        LOGE("softbusConnector_ is nullpter!");
-        return "";
-    }
-    std::string udid;
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
-    if (ret != DM_OK) {
-        LOGE("GetUdidByNetworkId failed ret: %d", ret);
-        return "";
-    }
-    return softbusConnector_->GetDeviceUdidHashByUdid(udid);
-}
-
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 {
     return SoftbusSession::OnSessionOpened(sessionId, result);
@@ -468,6 +453,22 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId)
+{
+    if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
+        LOGE("softbusConnector_ or hiChainConnector_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    std::string udid = "";
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId, udid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        return ERR_DM_FAILED;
+    }
+    deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
     return DM_OK;
 }
 
