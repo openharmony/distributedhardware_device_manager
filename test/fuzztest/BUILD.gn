@@ -45,6 +45,7 @@ group("fuzztest") {
     "ondatareceived_fuzzer:fuzztest",
     "onerror_fuzzer:fuzztest",
     "onfinish_fuzzer:fuzztest",
+    "onparameterchgcallback_fuzzer:fuzztest",
     "onrequest_fuzzer:fuzztest",
     "onsessionopened_fuzzer:fuzztest",
     "onsoftbusdevicefound_fuzzer:fuzztest",
