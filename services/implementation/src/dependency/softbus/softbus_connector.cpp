@@ -494,7 +494,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 }
 
-void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
+void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
 {
     return;
 }
