@@ -167,7 +167,7 @@ typedef struct DmDeviceInfo {
 /**
  * @brief Device Basic Information.
  */
-typedef struct 
+typedef struct
 DmDeviceBasicInfo {
     /**
      * Device Id of the device.

@@ -197,7 +197,7 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_FAILED;
     }
-    std::string udid;
+    std::string udid = "";
     udid = SoftbusConnector::GetDeviceUdidByUdidHash(udidHash);
 
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;

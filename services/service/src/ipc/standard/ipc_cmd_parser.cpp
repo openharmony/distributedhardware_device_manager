@@ -367,7 +367,7 @@ ON_IPC_CMD(GET_AVAILABLE_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     DmDeviceBasicInfo deviceBasicInfo;
     if (!reply.WriteInt32(infoNum)) {
         LOGE("write infoNum failed");
-        return ERR_DM_IPC_WRITE_FAILED; 
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!deviceList.empty()) {
         for (; !deviceList.empty();) {
