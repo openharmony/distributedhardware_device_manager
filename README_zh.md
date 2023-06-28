@@ -202,10 +202,10 @@ foundation/distributedhardware/distributedhardware_device_manager
 | getLocalDeviceIdSync(): string;                                                                                            | 同步获取本地设备id。       |
 | getDeviceNameSync(networkId: string): string;                                                                              | 通过指定设备的网络标识同步获取该设备名称。    |
 | getDeviceTypeSync(networkId: string): number;                                                                              | 通过指定设备的网络标识同步获取该设备类型。    |
-| startDeviceDiscovery(subscribeId: number, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
-| stopDeviceDiscovery(subscribeId: number): void;                                                                            | 停止发现周边设备。         |
-| bindDevice(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
-| unbindDevice(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
+| startDiscovering(subscribeId: number, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
+| stopDiscovering(subscribeId: number): void;                                                                            | 停止发现周边设备。         |
+| bindTarget(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
+| unbindTarget(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
 | on(type: 'deviceStatusChange', callback: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;         | 注册设备状态回调。               |
 | off(type: 'deviceStatusChange', callback?: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;       | 取消注册设备状态回调。            |
 | on(type: 'discoverSuccess', callback: Callback&lt;{ subscribeId: number, device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
@@ -276,15 +276,15 @@ try {
     }
     console.info(TAG + "discoverFail on:" + JSON.stringify(data));
   });
-  console.log("startDeviceDiscovery");
-  dmClass.startDeviceDiscovery(subscribeId);
+  console.log("startDiscovering");
+  dmClass.startDiscovering(subscribeId);
 } catch (err) {
-  console.log("startDeviceDiscovery err:" + err.code + "," + err.message);
+  console.log("startDiscovering err:" + err.code + "," + err.message);
 }
 
 // 停止发现周边设备。
 try {
-  dmClass.stopDeviceDiscovery(subscribeId);
+  dmClass.stopDiscovering(subscribeId);
   // 取消注册设备发现成功回调。
   dmClass.off('discoverSuccess');
   // 取消注册设备发现失败回调。
@@ -304,25 +304,25 @@ var bindParam = {
 }
 try {
   var deviceId = "xxxxxxxx";
-  dmClass.bindDevice(deviceId, bindParam, (err, data) => {
+  dmClass.bindTarget(deviceId, bindParam, (err, data) => {
   if (err) {
-    console.info(TAG + "bindDevice err:" + JSON.stringify(err));
+    console.info(TAG + "bindTarget err:" + JSON.stringify(err));
   } else {
-    console.info(TAG + "bindDevice result:" + JSON.stringify(data));
+    console.info(TAG + "bindTarget result:" + JSON.stringify(data));
     let token = data.pinTone;
   }
   });
 } catch (err) {
-  console.log("bindDevice err:" + err.code + "," + err.message);
+  console.log("bindTarget err:" + err.code + "," + err.message);
 }
 // 设备取消认证
 try {
   var deviceId = "xxxxxxxx";
-  let result = dmClass.unbindDevice(deviceId, '');
-  console.log("UnBindDevice last device: " + JSON.stringify(deviceId) + " and result = "
+  let result = dmClass.unbindTarget(deviceId, '');
+  console.log("unbindTarget last device: " + JSON.stringify(deviceId) + " and result = "
     + result);
   } catch (err) {
-    console.log("unbindDevice err:" + err.code + "," + err.message);
+    console.log("unbindTarget err:" + err.code + "," + err.message);
 }
 
 try {
@@ -340,70 +340,41 @@ try {
 
 - 系统接口：
 
-  提供发布设备发现、导入凭据组网等相关接口，该部分接口不支持三方应用调用。
+  该部分接口仅支持系统应用调用。
   调用以下接口，需要申请ohos.permission.ACCESSS_SERVICE_DM权限才能正常调用。
 
 | 原型                                                         | 描述                 |
 | ------------------------------------------------------------ | -------------------- |
-| publishDeviceDiscovery(publishInfo: PublishInfo): void;                                                                    | 发布设备发现。发布状态持续两分钟，超过两分钟会停止发布。   |
-| unPublishDeviceDiscovery(publishId: number): void;                                                                         | 停止发布设备发现。                                      |
-| verifyAuthInfo(authInfo: AuthInfo, callback: AsyncCallback&lt;{deviceId: string, level: number}&gt;): void;                | 验证认证信息。                    |
-| setUserOperation(operateAction: number, params: string): void;                                                             | 设置用户ui操作行为。              |
-| requestCredentialRegisterInfo(requestInfo: string, callback: AsyncCallback&lt;{registerInfo: string}&gt;): void;                 | 获取凭据的注册信息。              |
-| importCredential(credentialInfo: string, callback: AsyncCallback&lt;{resultInfo: string}&gt;): void;                             | 导入凭据信息。                   |
-| deleteCredential(queryInfo: string, callback: AsyncCallback&lt;{resultInfo: string}&gt;): void;                                  | 删除凭据信息。                   |
-| on(type: 'uiStateChange', callback: Callback&lt;{ param: string}&gt;): void;                                               | ui状态变更回调。                 |
-| off(type: 'uiStateChange', callback?: Callback&lt;{ param: string}&gt;): void;                                             | 取消ui状态变更回调。             |
-| on(type: 'publishSuccess', callback: Callback&lt;{ publishId: number }&gt;): void;                                         | 注册发布设备成功回调监听。        |
-| off(type: 'publishSuccess', callback?: Callback&lt;{ publishId: number }&gt;): void;                                       | 取消注册设备发布成功回调。        |
-| on(type: 'publishFail', callback: Callback&lt;{ publishId: number, reason: number }&gt;): void;                            | 注册设备发布失败回调监听。        |
-| off(type: 'publishFail', callback?: Callback&lt;{ publishId: number, reason: number }&gt;): void;                          | 取消注册设备发布失败回调。        |
+| replyUiAction(action: number, params: string): void;                                                             | 回复用户ui操作行为。      |
+| on(type: 'replyResult', callback: Callback&lt;{ param: string}&gt;): void;                                               | 回复UI操作结果回调。          |
+| off(type: 'replyResult', callback?: Callback&lt;{ param: string}&gt;): void;                                             | 取消回复UI操作结果回调。       |
 
 - 示例如下：
 
 ```js
-// 开始发布设备发现
-dmClass.on('publishSuccess', (data) => {
-  if (data == null) {
-    console.log("publishSuccess error data=null")
-    return;
-  }
-  console.log("publishSuccess:" + JSON.stringify(data));
-});
-dmClass.on('publishFailed', (data) => {
-  console.log("publishFailed on:" + JSON.stringify(data));
-});
-var publisjInfo = {
-  "publishId": subscribeId,
-  "mode": 0xAA,
-  "freq": 2,
-  "ranging": true
-};
-try {
-  console.log("publisjInfo :" + JSON.stringify(publisjInfo));
-  dmClass.publishDeviceDiscovery(publisjInfo);
-} catch (err) {
-  console.log("publishDeviceDiscovery err:" + err.code + "," + err.message);
-}
-
 // 设置用户ui操作行为
-/*  operateAction = 0 - 允许授权
-    operateAction = 1 - 取消授权
-    operateAction = 2 - 授权框用户操作超时
-    operateAction = 3 - 取消pin码框展示
-    operateAction = 4 - 取消pin码输入框展示
-    operateAction = 5 - pin码输入框确定操作
+/*  action = 0 - 允许授权
+    action = 1 - 取消授权
+    action = 2 - 授权框用户操作超时
+    action = 3 - 取消pin码框展示
+    action = 4 - 取消pin码输入框展示
+    action = 5 - pin码输入框确定操作
 */
-dmClass.setUserOperation(operation, "extra")
-dmClass.on('uiStateChange', (data) => {
-    console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+try {
+  dmClass.replyUiAction(operation, "extra")
+  dmClass.on('replyResult', (data) => {
+    console.log("replyResult executed, dialog closed" + JSON.stringify(data))
     var tmpStr = JSON.parse(data.param)
     this.isShow = tmpStr.verifyFailed
-    console.log("uiStateChange executed, dialog closed" + this.isShow)
+    console.log("replyResult executed, dialog closed" + this.isShow)
     if (!this.isShow) {
         this.destruction()
     }
-});
+  });
+} catch (err) {
+  console.log("err:" + err.code + "," + err.message);
+}
+
 ```
 
 详细接口说明请参考[**API文档**](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-distributedDeviceManager.md)
