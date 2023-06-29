@@ -52,27 +52,28 @@ constexpr const char* DM_CREATE_GROUP_FAILED_MSG = "dm create group failed.";
 
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 {
-    if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end() && jsonObject.at(FIELD_GROUP_NAME).is_string()) {
         groupInfo.groupName = jsonObject.at(FIELD_GROUP_NAME).get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_ID) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_GROUP_ID) != jsonObject.end() && jsonObject.at(FIELD_GROUP_ID).is_string()) {
         groupInfo.groupId = jsonObject.at(FIELD_GROUP_ID).get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_OWNER) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_GROUP_OWNER) != jsonObject.end() && jsonObject.at(FIELD_GROUP_OWNER).is_string()) {
         groupInfo.groupOwner = jsonObject.at(FIELD_GROUP_OWNER).get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
         groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_VISIBILITY) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_GROUP_VISIBILITY) != jsonObject.end() &&
+        jsonObject.at(FIELD_GROUP_VISIBILITY).is_number_integer()) {
         groupInfo.groupVisibility = jsonObject.at(FIELD_GROUP_VISIBILITY).get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end()) {
+    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
         groupInfo.userId = jsonObject.at(FIELD_USER_ID).get<std::string>();
     }
 }
