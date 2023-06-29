@@ -50,6 +50,14 @@ public:
                                  const std::string &extra);
 
     /**
+     * @tc.name: DmDiscoveryManager::StartDeviceDiscovery
+     * @tc.desc: Start Device Discovery of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
+    int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+                                 const std::string &filterOptions);
+
+    /**
      * @tc.name: DmDiscoveryManager::StopDeviceDiscovery
      * @tc.desc: Stop Device Discovery of the Dm Discovery Manager
      * @tc.type: FUNC

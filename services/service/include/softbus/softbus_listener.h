@@ -92,6 +92,7 @@ public:
     SoftbusListener();
     ~SoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
+    int32_t GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &deviceBasicInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);
     int32_t GetLocalDeviceNetworkId(std::string &networkId);
     int32_t GetLocalDeviceName(std::string &deviceName);
@@ -103,6 +104,8 @@ private:
     int32_t Init();
     void SetPublishInfo(PublishInfo &dmPublishInfo);
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
+    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo,
+        DmDeviceBasicInfo &dmDeviceBasicInfo);
 
 private:
     enum PulishStatus {

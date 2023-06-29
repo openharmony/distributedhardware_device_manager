@@ -64,6 +64,15 @@ public:
      */
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
         bool isRefresh, std::vector<DmDeviceInfo> &deviceList) = 0;
+	/**
+     * @brief Get device info list of available devices.
+     * @param pkgName    package name.
+     * @param extra      extra info.This parameter can be null.
+     * @param deviceList device info list.
+     * @return Returns a list of available devices.
+     */
+    virtual int32_t GetAvailableDeviceList(const std::string &pkgName,
+        std::vector<DmDeviceBasicInfo> &deviceList) = 0;
     /**
      * @brief Get local device information.
      * @param pkgName    package name.
@@ -103,6 +112,16 @@ public:
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
         const std::string &extra, std::shared_ptr<DiscoveryCallback> callback) = 0;
+    /**
+     * @brief Initiate device discovery.
+     * @param pkgName       package name.
+     * @param subscribeId subscribe id to discovery device.
+     * @param extra         extra info.This parameter can be null.
+     * @param callback      discovery callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+        const std::string &filterOptions, std::shared_ptr<DiscoveryCallback> callback) = 0;
     /**
      * @brief Stop device discovery.
      * @param pkgName       package name.
@@ -311,6 +330,43 @@ public:
      * @return Returns device type.
      */
     virtual int32_t GetLocalDeviceType(const std::string &pkgName, int32_t &deviceType) = 0;
+
+    /**
+     * @brief Get device name.
+     * @param pkgName package name.
+     * @param networkId device networkId.
+     * @return Returns device name.
+     */
+    virtual int32_t GetDeviceName(const std::string &pkgName, const std::string &networkId,
+        std::string &deviceName) = 0;
+
+    /**
+     * @brief Get device type.
+     * @param pkgName package name.
+     * @param networkId device networkId.
+     * @return Returns device type.
+     */
+    virtual int32_t GetDeviceType(const std::string &pkgName, const std::string &networkId, int32_t &deviceType) = 0;
+
+    /**
+     * @brief Bind the specified device.
+     * @param pkgName    package name.
+     * @param bindType   bindType of device to bind.
+     * @param deviceInfo device id of device to bind.
+     * @param extra      extra info.This parameter can be null.
+     * @param callback   callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
+        const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) = 0;
+    
+    /**
+     * @brief UnBind the specified device.
+     * @param pkgName    package name.
+     * @param deviceId device id to UnBindDevice.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -60,6 +60,11 @@ IRefreshCallback SoftbusConnector::softbusDiscoveryCallback_ = {
     .OnDiscoverResult = SoftbusConnector::OnSoftbusDiscoveryResult,
 };
 
+IRefreshCallback SoftbusConnector::softbusDiscoveryByIdCallback_ = {
+    .OnDeviceFound = SoftbusConnector::OnSoftbusDeviceDiscovery,
+    .OnDiscoverResult = SoftbusConnector::OnSoftbusDiscoveryResult,
+};
+
 SoftbusConnector::SoftbusConnector()
 {
     softbusSession_ = std::make_shared<SoftbusSession>();
@@ -179,6 +184,27 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     LOGI("StartDiscovery begin, subscribeId: %d, mode: 0x%x, medium: %d.", subscribeInfo.subscribeId,
         subscribeInfo.mode, subscribeInfo.medium);
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
+        return ERR_DM_DISCOVERY_FAILED;
+    }
+    return ret;
+}
+
+int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
+{
+    SubscribeInfo subscribeInfo;
+    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
+    subscribeInfo.subscribeId = subscribeId;
+    subscribeInfo.mode = static_cast<DiscoverMode>(DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE);
+    subscribeInfo.medium = static_cast<ExchangeMedium>(DmExchangeMedium::DM_AUTO);
+    subscribeInfo.freq = static_cast<ExchangeFreq>(DmExchangeFreq::DM_SUPER_HIGH);
+    subscribeInfo.isSameAccount = false;
+    subscribeInfo.isWakeRemote = false;
+    subscribeInfo.capability = DM_CAPABILITY_OSD;
+    LOGI("StartDiscovery by subscribeId begin, subscribeId: %d, mode: 0x%x, medium: %d.",
+        subscribeId, subscribeInfo.mode, subscribeInfo.medium);
+    int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryByIdCallback_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
         return ERR_DM_DISCOVERY_FAILED;
@@ -468,6 +494,11 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
 }
 
+void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
+{
+    return;
+}
+
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
 {
     uint16_t originId = static_cast<uint16_t>((static_cast<uint32_t>(subscribeId)) & SOFTBUS_SUBSCRIBE_ID_MASK);
@@ -543,6 +574,10 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
         return DmDeviceType::DEVICE_TYPE_UNKNOWN;
     }
     return nodeBasicInfo.deviceTypeId;
+}
+std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
+{
+    return "udidHash";
 }
 } // namespace DistributedHardware
 } // namespace OHOS

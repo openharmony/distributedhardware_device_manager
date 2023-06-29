@@ -116,6 +116,16 @@ int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgNam
     return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
 }
 
+int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+    const std::string &filterOptions)
+{
+    if (pkgName.empty()) {
+        LOGE("StartDeviceDiscovery failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+}
+
 int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
     if (pkgName.empty()) {
@@ -162,6 +172,28 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->UnAuthenticateDevice(pkgName, networkId);
+}
+
+int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
+    const std::string &bindParam)
+{
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, udidHash is %s, bindParam is %s",
+             pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return authMgr_->AuthenticateDevice(pkgName, authType, udidHash, bindParam);
+}
+
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+{
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %s, udidHash is %s",
+            pkgName.c_str(), GetAnonyString(udidHash).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return authMgr_->UnBindDevice(pkgName, udidHash);
 }
 
 int32_t DeviceManagerServiceImpl::VerifyAuthentication(const std::string &authParam)
@@ -262,7 +294,7 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
         LOGE("softbusConnector_ is nullpter!");
         return "";
     }
-    std::string udid;
+    std::string udid = "";
     int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId failed ret: %d", ret);
@@ -421,6 +453,22 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId)
+{
+    if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
+        LOGE("softbusConnector_ or hiChainConnector_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    std::string udid = "";
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId, udid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        return ERR_DM_FAILED;
+    }
+    deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
     return DM_OK;
 }
 

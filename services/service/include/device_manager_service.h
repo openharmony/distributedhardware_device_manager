@@ -55,6 +55,9 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
 
+    int32_t GetAvailableDeviceList(const std::string &pkgName,
+                                 std::vector<DmDeviceBasicInfo> &deviceBasicInfoList);
+
     int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh);
 
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
@@ -76,6 +79,9 @@ public:
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
 
+    int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeInfo,
+                                const std::string &filterOptions);
+
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
 
     int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
@@ -86,6 +92,11 @@ public:
                                const std::string &extra);
 
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
+
+    int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &bindParam);
+
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
 
     int32_t VerifyAuthentication(const std::string &authParam);
 
@@ -126,6 +137,8 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     int32_t CheckApiPermission();
+
+    int32_t CheckNewApiPermission();
 
     void LoadHardwareFwkService();
 

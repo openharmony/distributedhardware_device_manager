@@ -24,6 +24,7 @@
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
+#include "ipc_bind_device_req.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
@@ -37,6 +38,8 @@
 #include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_get_availabledevice_req.h"
+#include "ipc_get_availabledevice_rsp.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_req.h"
@@ -45,8 +48,10 @@
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_start_discovery_req.h"
+#include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
+#include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
@@ -205,6 +210,35 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
+    std::vector<DmDeviceBasicInfo> &deviceList)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("GetAvailableDeviceList start, pkgName: %s.", pkgName.c_str());
+
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetAvailableDeviceRsp> rsp = std::make_shared<IpcGetAvailableDeviceRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_AVAILABLE_DEVICE_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetAvailableDeviceList error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("GetAvailableDeviceList error, failed ret: %d", ret);
+        return ret;
+    }
+
+    deviceList = rsp->GetDeviceVec();
+    LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::string networkId,
                                          DmDeviceInfo &deviceInfo)
 {
@@ -313,6 +347,44 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     req->SetExtra(extra);
     req->SetSubscribeInfo(subscribeInfo);
     int32_t ret = ipcClientProxy_->SendRequest(START_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartDeviceDiscovery error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartDeviceDiscovery error: Failed with ret %d", ret);
+        SysEventWrite(std::string(START_DEVICE_DISCOVERY_FAILED), DM_HISYEVENT_BEHAVIOR,
+            std::string(START_DEVICE_DISCOVERY_FAILED_MSG));
+        return ret;
+    }
+
+    DmTraceEnd();
+    LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
+        std::string(START_DEVICE_DISCOVERY_SUCCESS_MSG));
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+    const std::string &filterOptions, std::shared_ptr<DiscoveryCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
+
+    std::shared_ptr<IpcStartDevDiscoveryByIdReq> req = std::make_shared<IpcStartDevDiscoveryByIdReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOption(filterOptions);
+    req->SetSubscribeId(subscribeId);
+    int32_t ret = ipcClientProxy_->SendRequest(START_DEVICE_DISCOVERY, req, rsp);
     if (ret != DM_OK) {
         LOGE("StartDeviceDiscovery error: Send Request failed ret: %d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -1039,7 +1111,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::str
     }
 
     deviceId = rsp->GetLocalDeviceId();
-    LOGI("DeviceManagerImpl::GetDeviceName end, pkgName : %s, deviceId : %s", pkgName.c_str(),
+    LOGI("DeviceManagerImpl::GetLocalDeviceId end, pkgName : %s, deviceId : %s", pkgName.c_str(),
         GetAnonyString(deviceId).c_str());
     return DM_OK;
 }
@@ -1088,6 +1160,127 @@ int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32
 
     deviceType = rsp->GetLocalDeviceType();
     LOGI("DeviceManagerImpl::GetLocalDeviceType end, pkgName : %s, deviceType : %d", pkgName.c_str(), deviceType);
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::string &networkId,
+    std::string &deviceName)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::GetDeviceName start, pkgName: %s networKId : %s", pkgName.c_str(),
+         GetAnonyString(networkId).c_str());
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceName error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceName error, failed ret: %d", ret);
+        return ret;
+    }
+
+    DmDeviceInfo info = rsp->GetDeviceInfo();
+    deviceName = info.deviceName;
+    LOGI("DeviceManagerImpl::GetDeviceName end, pkgName : %s, networkId : %s, deviceName = %s", pkgName.c_str(),
+        GetAnonyString(networkId).c_str(), GetAnonyString(deviceName).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::string &networkId, int32_t &deviceType)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::GetDeviceType start, pkgName: %s networKId : %s", pkgName.c_str(),
+         GetAnonyString(networkId).c_str());
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceType error, Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceType error, failed ret: %d", ret);
+        return ret;
+    }
+
+    DmDeviceInfo info = rsp->GetDeviceInfo();
+    deviceType = info.deviceTypeId;
+    LOGI("DeviceManagerImpl::GetDeviceType end, pkgName : %s, networkId : %s, deviceType = %d", pkgName.c_str(),
+        GetAnonyString(networkId).c_str(), deviceType);
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
+    const std::string &bindParam, std::shared_ptr<AuthenticateCallback> callback)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("BindDevice error: Invalid para. pkgName : %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("BindDevice start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, callback);
+    std::shared_ptr<IpcBindDeviceReq> req = std::make_shared<IpcBindDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetBindParam(bindParam);
+    req->SetBindType(bindType);
+    req->SetDeviceId(deviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(BIND_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("BindDevice error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("BindDevice error: Failed with ret %d", ret);
+        return ret;
+    }
+    DmTraceEnd();
+    LOGI("BindDevice end, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("UnBindDevice error: Invalid para. pkgName %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("UnBindDevice start, pkgName: %s, deviceId: %s", pkgName.c_str(),
+        GetAnonyString(std::string(deviceId)).c_str());
+    std::shared_ptr<IpcUnBindDeviceReq> req = std::make_shared<IpcUnBindDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceId(deviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Failed with ret %d", ret);
+        return ret;
+    }
+
+    LOGI("UnBindDevice end, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -45,6 +45,9 @@ public:
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
 
+    int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+                                 const std::string &filterOptions);
+
     int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
 
     int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
@@ -55,6 +58,11 @@ public:
                                const std::string &extra);
 
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
+
+    int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
+        const std::string &bindParam);
+
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
     int32_t VerifyAuthentication(const std::string &authParam);
 
@@ -89,6 +97,8 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
+
+    int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
 
     void LoadHardwareFwkService();
 

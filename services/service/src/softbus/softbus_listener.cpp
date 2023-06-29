@@ -190,6 +190,33 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     return ret;
 }
 
+int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &deviceBasicInfoList)
+{
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
+        return ERR_DM_FAILED;
+    }
+    DmDeviceBasicInfo *info = static_cast<DmDeviceBasicInfo *>(malloc(sizeof(DmDeviceBasicInfo) * (deviceCount)));
+    if (info == nullptr) {
+        FreeNodeInfo(nodeInfo);
+        return ERR_DM_MALLOC_FAILED;
+    }
+    DmDeviceBasicInfo **pInfoList = &info;
+    for (int32_t i = 0; i < deviceCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        DmDeviceBasicInfo *deviceBasicInfo = *pInfoList + i;
+        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceBasicInfo);
+        deviceBasicInfoList.push_back(*deviceBasicInfo);
+    }
+    FreeNodeInfo(nodeInfo);
+    free(info);
+    LOGI("GetAvailableDevices success, deviceCount: %d.", deviceCount);
+    return ret;
+}
+
 int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     int32_t nodeInfoCount = 0;
@@ -362,6 +389,23 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
+    return DM_OK;
+}
+
+int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo,
+    DmDeviceBasicInfo &dmDeviceBasicInfo)
+{
+    (void)memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memcpy_s(dmDeviceBasicInfo.networkId, sizeof(dmDeviceBasicInfo.networkId), nodeBasicInfo.networkId,
+        std::min(sizeof(dmDeviceBasicInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+
+    if (memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), nodeBasicInfo.deviceName,
+        std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+    }
+    dmDeviceBasicInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     return DM_OK;
 }
 

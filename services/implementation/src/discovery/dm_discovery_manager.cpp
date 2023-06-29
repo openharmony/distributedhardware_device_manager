@@ -96,6 +96,29 @@ int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, con
     return softbusConnector_->StartDiscovery(subscribeInfo);
 }
 
+int32_t DmDiscoveryManager::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
+    const std::string &filterOptions)
+{
+    DmDeviceFilterOption dmFilter;
+    if (dmFilter.TransformToFilter(filterOptions) != DM_OK) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (CheckDiscoveryQueue(pkgName) != DM_OK) {
+        return ERR_DM_DISCOVERY_REPEATED;
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryQueue_.push(pkgName);
+        DmDiscoveryContext context = {pkgName, filterOptions, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
+        discoveryContextMap_.emplace(pkgName, context);
+    }
+    softbusConnector_->RegisterSoftbusDiscoveryCallback(pkgName,
+        std::shared_ptr<ISoftbusDiscoveryCallback>(shared_from_this()));
+    CfgDiscoveryTimer();
+    return softbusConnector_->StartDiscovery(subscribeId);
+}
+
 int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
     if (pkgName.empty()) {
