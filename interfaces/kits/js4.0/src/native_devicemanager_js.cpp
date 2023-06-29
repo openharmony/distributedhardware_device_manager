@@ -56,15 +56,7 @@ const int32_t DM_NAPI_SUB_ID_MAX = 65535;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
-const int32_t DM_NAPI_SUBSCRIBE_CAPABILITY_DDMP = 0;
-const int32_t DM_NAPI_SUBSCRIBE_CAPABILITY_OSD = 1;
-
-napi_ref deviceTypeEnumConstructor_ = nullptr;
-napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
-napi_ref discoverModeEnumConstructor_ = nullptr;
-napi_ref exchangeMediumEnumConstructor_ = nullptr;
-napi_ref exchangeFreqEnumConstructor_ = nullptr;
-napi_ref subscribeCapEnumConstructor_ = nullptr;
+napi_ref deviceStatusChangeActionEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -2850,7 +2842,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         CreateBusinessError(env, ret);
         return nullptr;
     }
-	size_t argc = 0;
+    size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value result = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
@@ -3085,7 +3077,7 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     napi_value result = nullptr;
     napi_define_class(env, "DeviceStatusChange", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &deviceStateChangeActionEnumConstructor_);
+    napi_create_reference(env, result, refCount, &deviceStatusChangeActionEnumConstructor_);
     napi_set_named_property(env, exports, "DeviceStatusChange", result);
     return exports;
 }
