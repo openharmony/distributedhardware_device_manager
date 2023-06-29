@@ -264,12 +264,7 @@ public:
     static napi_value Init(napi_env env, napi_value exports);
     static napi_value Constructor(napi_env env, napi_callback_info info);
     static napi_value EnumTypeConstructor(napi_env env, napi_callback_info info);
-    static napi_value InitDeviceTypeEnum(napi_env env, napi_value exports);
-    static napi_value InitDeviceStateChangeActionEnum(napi_env env, napi_value exports);
-    static napi_value InitDiscoverModeEnum(napi_env env, napi_value exports);
-    static napi_value InitExchangeMediumEnum(napi_env env, napi_value exports);
-    static napi_value InitExchangeFreqEnum(napi_env env, napi_value exports);
-    static napi_value InitSubscribeCapEnum(napi_env env, napi_value exports);
+    static napi_value InitDeviceStatusChangeActionEnum(napi_env env, napi_value exports);
     static napi_value CreateDeviceManager(napi_env env, napi_callback_info info);
     static napi_value ReleaseDeviceManager(napi_env env, napi_callback_info info);
     static napi_value SetUserOperationSync(napi_env env, napi_callback_info info);
@@ -286,8 +281,8 @@ public:
     static napi_value PublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
     static napi_value UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
     static napi_value GetAuthenticationParamSync(napi_env env, napi_callback_info info);
-    static napi_value BindDevice(napi_env env, napi_callback_info info);
-    static napi_value UnBindDevice(napi_env env, napi_callback_info info);
+    static napi_value BindTarget(napi_env env, napi_callback_info info);
+    static napi_value UnBindTarget(napi_env env, napi_callback_info info);
     static napi_value VerifyAuthInfo(napi_env env, napi_callback_info info);
     static napi_value RequestCredential(napi_env env, napi_callback_info info);
     static napi_value ImportCredential(napi_env env, napi_callback_info info);
@@ -334,6 +329,7 @@ public:
     static void AsyncTaskCallback(napi_env env, void *data);
     void OnDeviceStatusChange(DmNapiDevStatusChange action,
                              const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
+    void OnDeviceStatusChange(const std::string &deviceName);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason);
     void OnPublishResult(int32_t publishId, int32_t publishResult);

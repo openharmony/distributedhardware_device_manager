@@ -42,6 +42,13 @@ public:
     virtual void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info);
 
     /**
+     * @tc.name: IDeviceManagerServiceListener::OnDeviceFound
+     * @tc.desc: Device Found of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info);
+
+    /**
      * @tc.name: IDeviceManagerServiceListener::OnDiscoveryFailed
      * @tc.desc: Discovery Failed of the DeviceManager Service Listener
      * @tc.type: FUNC

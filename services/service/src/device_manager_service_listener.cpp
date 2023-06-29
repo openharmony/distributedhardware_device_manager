@@ -23,6 +23,7 @@
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
+#include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
@@ -35,18 +36,43 @@ std::mutex DeviceManagerServiceListener::udidHashMapLock_;
 std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ = {};
 std::map<std::string, std::string> DeviceManagerServiceListener::udidHashMap_ = {};
 
+void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
+    const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
+{
+    (void)memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
+                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+    }
+
+    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
+        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+    deviceBasicInfo.deviceTypeId = info.deviceTypeId;
+}
+
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
     LOGI("OnDeviceStateChange, state = %d", state);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-
-    pReq->SetPkgName(pkgName);
-    pReq->SetDeviceState(state);
-    pReq->SetDeviceInfo(info);
+    DmDeviceBasicInfo deviceBasicInfo;
+    ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, deviceBasicInfo);
     if (pkgName == std::string(DM_PKG_NAME)) {
-        ipcServerListener_.SendAll(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        for (const auto &it : PkgNameVec) {
+            std::string udIdHash = CalcDeviceId(it, info.deviceId);
+            if (memcpy_s(deviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
+                LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+            }
+            pReq->SetPkgName(it);
+            pReq->SetDeviceState(state);
+            pReq->SetDeviceInfo(info);
+            pReq->SetDeviceBasicInfo(deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        }
     } else {
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }
@@ -62,6 +88,21 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
     pReq->SetSubscribeId(subscribeId);
     pReq->SetDeviceInfo(info);
     ipcServerListener_.SendRequest(SERVER_DEVICE_FOUND, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
+                                                 DmDeviceBasicInfo &info)
+{
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> pReq = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    std::string udIdHash = CalcDeviceId(pkgName, info.deviceId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+    }
+    pReq->SetPkgName(pkgName);
+    pReq->SetSubscribeId(subscribeId);
+    pReq->SetDeviceBasicInfo(info);
+    ipcServerListener_.SendRequest(SERVER_DEVICE_DISCOVERY, pReq, pRsp);
 }
 
 void DeviceManagerServiceListener::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId,

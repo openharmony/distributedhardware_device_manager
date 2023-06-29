@@ -37,6 +37,8 @@ public:
     void UnRegisterDeathRecipientCallback(const std::string &pkgName);
     void RegisterDeviceStateCallback(const std::string &pkgName, std::shared_ptr<DeviceStateCallback> callback);
     void UnRegisterDeviceStateCallback(const std::string &pkgName);
+    void UnRegisterDeviceStatusCallback(const std::string &pkgName);
+    void RegisterDeviceStatusCallback(const std::string &pkgName, std::shared_ptr<DeviceStatusCallback> callback);
     void RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
                                    std::shared_ptr<DiscoveryCallback> callback);
     void UnRegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
@@ -58,9 +60,13 @@ public:
 public:
     void OnRemoteDied();
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
+    void OnDeviceOnline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
+    void OnDeviceOffline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
+    void OnDeviceChanged(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
+    void OnDeviceReady(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &deviceInfo);
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo);
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
@@ -77,6 +83,7 @@ private:
     std::mutex lock_;
 #endif
     std::map<std::string, std::shared_ptr<DeviceStateCallback>> deviceStateCallback_;
+    std::map<std::string, std::shared_ptr<DeviceStatusCallback>> deviceStatusCallback_;
     std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
     std::map<std::string, std::map<int32_t, std::shared_ptr<PublishCallback>>> devicePublishCallbacks_;
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;

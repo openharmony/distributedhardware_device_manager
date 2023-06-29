@@ -161,6 +161,12 @@ public:
     virtual void HandleDeviceOffline(DmDeviceInfo &info);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::HandleDeviceNameChange
+     * @tc.desc: Handle Device Name Change to the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual void HandleDeviceNameChange(DmDeviceInfo &info);
+    /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl
      * @tc.type: FUNC

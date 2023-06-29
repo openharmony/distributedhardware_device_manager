@@ -106,6 +106,12 @@ public:
     void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
 
     /**
+     * @tc.name: DmDeviceStateManager::PostDeviceChanged
+     * @tc.desc: Post Device Offline of the Dm Device State Manager
+     * @tc.type: FUNC
+     */
+    void PostDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info);
+    /**
      * @tc.name: DmDeviceStateManager::OnDeviceOnline
      * @tc.desc: OnDevice Online of the Dm Device State Manager
      * @tc.type: FUNC

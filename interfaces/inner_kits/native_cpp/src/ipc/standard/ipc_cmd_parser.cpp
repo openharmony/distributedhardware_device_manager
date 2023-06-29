@@ -243,7 +243,8 @@ ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NETWORKID, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NETWORKID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNetworkIdRsp>(pBaseRsp);
+    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> pRsp =
+        std::static_pointer_cast<IpcGetLocalDeviceNetworkIdRsp>(pBaseRsp);
     std::string networkId = reply.ReadString();
     pRsp->SetLocalDeviceNetworkId(networkId);
     pRsp->SetErrCode(reply.ReadInt32());
@@ -699,18 +700,30 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
         reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
         return DM_OK;
     }
+    DmDeviceBasicInfo dmDeviceBasicInfo;
+    size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
+    void *deviceBasicInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceBasicSize)));
+    if (deviceBasicInfo != nullptr &&
+        memcpy_s(&dmDeviceBasicInfo, deviceBasicSize, deviceBasicInfo, deviceBasicSize) != 0) {
+        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
+        return DM_OK;
+    }
     switch (deviceState) {
         case DEVICE_STATE_ONLINE:
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceInfo);
+            DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_STATE_OFFLINE:
             DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceInfo);
+            DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_INFO_CHANGED:
             DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, dmDeviceInfo);
+            DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_INFO_READY:
             DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceInfo);
+            DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceBasicInfo);
             break;
         default:
             LOGE("unknown device state:%d", deviceState);

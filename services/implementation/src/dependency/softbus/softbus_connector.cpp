@@ -399,6 +399,21 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
     dmDeviceInfo.range = deviceInfo.range;
 }
 
+void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo)
+{
+    (void)memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), deviceInfo.devId,
+                 std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+    }
+
+    if (memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), deviceInfo.devName,
+                 std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+    }
+    dmDeviceBasicInfo.deviceTypeId = deviceInfo.devType;
+}
+
 void SoftbusConnector::HandleDeviceOnline(DmDeviceInfo &info)
 {
     LOGI("start handle device online event.");
@@ -426,6 +441,18 @@ void SoftbusConnector::HandleDeviceOffline(const DmDeviceInfo &info)
     }
 
     LOGI("device offline, deviceId: %s.", GetAnonyString(info.deviceId).c_str());
+}
+
+void SoftbusConnector::HandleDeviceNameChange(const DmDeviceInfo &info)
+{
+    LOGI("start handle device name change event.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(stateCallbackMutex_);
+#endif
+
+    for (auto &iter : stateCallbackMap_) {
+        iter.second->OnDeviceChanged(iter.first, info);
+    }
 }
 
 void SoftbusConnector::OnSoftbusPublishResult(int32_t publishId, PublishResult result)
@@ -496,7 +523,47 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 
 void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
 {
-    return;
+    if (device == nullptr) {
+        LOGE("[SOFTBUS]device is null.");
+        return;
+    }
+    std::string deviceId = device->devId;
+    LOGI("[SOFTBUS]notify discover device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str());
+    if (!device->isOnline) {
+        std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+        DeviceInfo *srcInfo = infoPtr.get();
+        int32_t ret = memcpy_s(srcInfo, sizeof(DeviceInfo), device, sizeof(DeviceInfo));
+        if (ret != DM_OK) {
+            LOGE("save discovery device info failed, ret: %d.", ret);
+            return;
+        }
+        {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+
+            if (discoveryDeviceInfoMap_.find(deviceId) == discoveryDeviceInfoMap_.end()) {
+                discoveryDeviceIdQueue_.emplace(deviceId);
+            }
+            discoveryDeviceInfoMap_[deviceId] = infoPtr;
+ 
+            // Remove the earliest element when reached the max size
+            if (discoveryDeviceIdQueue_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
+                discoveryDeviceInfoMap_.erase(discoveryDeviceIdQueue_.front());
+                discoveryDeviceIdQueue_.pop();
+            }
+        }
+    }
+
+    DmDeviceBasicInfo dmDeviceBasicInfo;
+    ConvertDeviceInfoToDmDevice(*device, dmDeviceBasicInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
+#endif
+
+    for (auto &iter : discoveryCallbackMap_) {
+        iter.second->OnDeviceFound(iter.first, dmDeviceBasicInfo, device->range, device->isOnline);
+    }
 }
 
 void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
@@ -517,6 +584,18 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
             iter.second->OnDiscoveryFailed(iter.first, originId, result);
         }
     }
+}
+
+std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
+{
+    std::lock_guard<std::mutex> lock(deviceUdidLocks_);
+    for (auto &iter : deviceUdidMap_) {
+        if (iter.second == udidHash) {
+            return iter.first;
+        }
+    }
+    LOGE("fail to GetUdidByUdidHash, udidHash: %s", GetAnonyString(udidHash).c_str());
+    return udidHash;
 }
 
 std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
@@ -574,10 +653,6 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
         return DmDeviceType::DEVICE_TYPE_UNKNOWN;
     }
     return nodeBasicInfo.deviceTypeId;
-}
-std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
-{
-    return "udidHash";
 }
 } // namespace DistributedHardware
 } // namespace OHOS

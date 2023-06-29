@@ -107,19 +107,18 @@ public:
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
 
     /**
-     * @tc.name: SoftbusConnector::JoinLnn
-     * @tc.desc: Add the current device to the LNN where a specified device resides
-     * @tc.type: FUNC
-     */
-    static void JoinLnn(const std::string &deviceId);
-
-    /**
      * @tc.name: SoftbusConnector::GetDeviceUdidByUdidHash
      * @tc.desc: Get Udid By DeviceId of the SoftbusConnector
      * @tc.type: FUNC
      */
     static std::string GetDeviceUdidByUdidHash(const std::string &udidHash);
-    
+
+    /**
+     * @tc.name: SoftbusConnector::JoinLnn
+     * @tc.desc: Add the current device to the LNN where a specified device resides
+     * @tc.type: FUNC
+     */
+    static void JoinLnn(const std::string &deviceId);
 public:
     SoftbusConnector();
     ~SoftbusConnector();
@@ -141,6 +140,7 @@ public:
     bool HaveDeviceInMap(std::string deviceId);
     void HandleDeviceOnline(DmDeviceInfo &info);
     void HandleDeviceOffline(const DmDeviceInfo &info);
+    void HandleDeviceNameChange(const DmDeviceInfo &info);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
     void EraseUdidFromMap(const std::string &udid);
     std::string GetLocalDeviceName();
@@ -149,6 +149,7 @@ public:
 private:
     int32_t Init();
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
+    static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo);
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
 
 private:

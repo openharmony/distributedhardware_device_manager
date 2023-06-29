@@ -61,10 +61,29 @@ public:
     {
         dmDeviceInfo_ = dmDeviceInfo;
     }
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::GetDeviceBasicInfo
+     * @tc.desc: Ipc notification device status request Get Device Basic Info
+     * @tc.type: FUNC
+     */
+    const DmDeviceBasicInfo &GetDeviceBasicInfo() const
+    {
+        return dmDeviceBasicInfo_;
+    }
+    /**
+     * @tc.name: IpcNotifyDeviceStateReq::SetDeviceBasicInfo
+     * @tc.desc: Ipc notification device status request Set Device Basic Info
+     * @tc.type: FUNC
+     */
+    void SetDeviceBasicInfo(const DmDeviceBasicInfo &dmDeviceBasicInfo)
+    {
+        dmDeviceBasicInfo_ = dmDeviceBasicInfo;
+    }
 
 private:
     int32_t deviceState_ { 0 };
     DmDeviceInfo dmDeviceInfo_;
+    DmDeviceBasicInfo dmDeviceBasicInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

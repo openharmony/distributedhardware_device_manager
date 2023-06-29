@@ -226,6 +226,16 @@ int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     return DM_OK;
 }
 
+std::vector<std::string> IpcServerStub::GetAllPkgName()
+{
+    std::vector<std::string> PkgNameVec;
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    for (const auto &iter : dmListener_) {
+        PkgNameVec.push_back(iter.first);
+    }
+    return PkgNameVec;
+}
+
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
     if (pkgName.empty()) {

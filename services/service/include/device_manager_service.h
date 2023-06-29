@@ -112,6 +112,8 @@ public:
 
     void HandleDeviceOffline(DmDeviceInfo &info);
 
+    void HandleDeviceNameChange(DmDeviceInfo &info);
+
     int OnSessionOpened(int sessionId, int result);
 
     void OnSessionClosed(int sessionId);

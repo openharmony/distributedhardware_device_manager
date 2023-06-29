@@ -38,6 +38,8 @@ public:
 
     void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info);
 
+    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info);
+
     void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
 
     void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
@@ -63,6 +65,9 @@ public:
     std::string GetDeviceId(const std::string &udidHash);
     std::string GetUdidHash(const std::string &deviceId);
 
+private:
+    void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
+        const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

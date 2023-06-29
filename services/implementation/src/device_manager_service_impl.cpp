@@ -288,6 +288,15 @@ void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
     }
 }
 
+void DeviceManagerServiceImpl::HandleDeviceNameChange(DmDeviceInfo &info)
+{
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return;
+    }
+    softbusConnector_->HandleDeviceNameChange(info);
+}
+
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
 {
     if (softbusConnector_ == nullptr) {
@@ -440,7 +449,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
     }
 
     for (auto it = deviceList.begin(); it != deviceList.end(); ++it) {
-        std::string udid;
+        std::string udid = "";
         int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
         if (ret != DM_OK) {
             LOGE("GetUdidByNetworkId failed ret: %d", ret);
