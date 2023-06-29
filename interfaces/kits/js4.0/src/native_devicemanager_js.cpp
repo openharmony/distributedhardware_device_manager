@@ -778,7 +778,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(const std::string &deviceName)
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
-    napi_create_object(env_, &result);  
+    napi_create_object(env_, &result);
     SetValueUtf8String(env_, "deviceName", deviceName, result);
     OnEvent("deviceNameChange", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
@@ -1351,19 +1351,7 @@ bool DeviceManagerNapi::IsSystemApp()
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
 {
     LOGI("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
-        auto callback = std::make_shared<DmNapiDeviceStatusCallback>(env, bundleName);
-        std::string extra = "";
-        int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
-        if (ret != 0) {
-            LOGE("RegisterDevStatusCallback failed for bundleName %s", bundleName.c_str());
-            return;
-        }
-        g_deviceStatusCallbackMap.erase(bundleName);
-        g_deviceStatusCallbackMap[bundleName] = callback;
-        return;
-    }
-    if (eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
         if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
             return;
         }
@@ -2872,7 +2860,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         return result;
     }
     LOGI("ReleaseDeviceManager for bundleName %s", deviceManagerWrapper->bundleName_.c_str());
-    int32_t ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
+    ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);

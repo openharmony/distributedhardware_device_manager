@@ -77,7 +77,7 @@ void DeviceManagerNotify::UnRegisterDeviceStatusCallback(const std::string &pkgN
 }
 
 void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgName,
-                                                      std::shared_ptr<DeviceStatusCallback> callback)
+    std::shared_ptr<DeviceStatusCallback> callback)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");

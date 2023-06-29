@@ -64,7 +64,8 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
             std::string udIdHash = CalcDeviceId(it, info.deviceId);
-            if (memcpy_s(deviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
+            if (memcpy_s(deviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN,
+                udIdHash.c_str(), udIdHash.length()) != DM_OK) {
                 LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
             }
             pReq->SetPkgName(it);

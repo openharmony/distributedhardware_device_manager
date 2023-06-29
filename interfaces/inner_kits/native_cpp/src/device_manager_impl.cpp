@@ -314,7 +314,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
 }
 
 int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName, const std::string &extra,
-                                                    std::shared_ptr<DeviceStatusCallback> callback)
+    std::shared_ptr<DeviceStatusCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDevStatusCallback error: Invalid para");

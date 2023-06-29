@@ -217,7 +217,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
     DmDiscoveryFilter filter;
     DmDeviceFilterPara filterPara;
     filterPara.isOnline = isOnline;
-    filterPara.range = range; 
+    filterPara.range = range;
     filterPara.deviceType = info.deviceTypeId;
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
