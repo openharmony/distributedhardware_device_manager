@@ -107,6 +107,16 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
     LOGI("DmDeviceStateManager::PostDeviceOffline out");
 }
 
+void DmDeviceStateManager::PostDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    LOGI("DmDeviceStateManager::PostDeviceChanged in");
+    if (listener_ != nullptr) {
+        DmDeviceState state = DEVICE_INFO_CHANGED;
+        listener_->OnDeviceStateChange(pkgName, state, info);
+    }
+    LOGI("DmDeviceStateManager::PostDeviceChanged out");
+}
+
 void DmDeviceStateManager::OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("OnDeviceOnline function is called with pkgName: %s", pkgName.c_str());
@@ -179,7 +189,34 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 
 void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
 {
-    LOGI("OnDeviceChanged function is called back with pkgName: %s", pkgName.c_str());
+    LOGI("OnDeviceChanged function is called with pkgName: %s", pkgName.c_str());
+    DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
+    std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(decisionInfosMutex_);
+#endif
+    if (decisionAdapter == nullptr) {
+        LOGE("OnDeviceChanged decision adapter is null");
+        PostDeviceChanged(pkgName, info);
+    } else if (decisionInfos_.size() == 0) {
+        PostDeviceChanged(pkgName, info);
+    } else {
+        std::vector<DmDeviceInfo> infoList;
+        LOGI("OnDeviceChanged decision decisionInfos_ size: %d", decisionInfos_.size());
+        for (auto iter : decisionInfos_) {
+            std::string listenerPkgName = iter.first;
+            std::string extra = iter.second;
+            infoList.clear();
+            infoList.push_back(info);
+            decisionAdapter->FilterDeviceList(infoList, extra);
+            if (infoList.size() == 1) {
+                PostDeviceChanged(listenerPkgName, info);
+            }
+        }
+    }
+    LOGI("DmDeviceStateManager::OnDeviceChanged out");
 }
 
 void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info)

@@ -42,6 +42,16 @@ public:
     virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) = 0;
 };
 
+class DeviceStatusCallback {
+public:
+    virtual ~DeviceStatusCallback()
+    {
+    }
+    virtual void OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
+    virtual void OnDeviceOffline(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
+    virtual void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
+    virtual void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
+};
 class DiscoveryCallback {
 public:
     virtual ~DiscoveryCallback()
@@ -49,7 +59,8 @@ public:
     }
     virtual void OnDiscoverySuccess(uint16_t subscribeId) = 0;
     virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) = 0;
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) = 0;
+    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) {};
+    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) {};
 };
 
 class PublishCallback {

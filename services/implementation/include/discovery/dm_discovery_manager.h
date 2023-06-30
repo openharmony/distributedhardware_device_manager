@@ -72,6 +72,13 @@ public:
     void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline);
 
     /**
+     * @tc.name: DmDiscoveryManager::OnDeviceFound
+     * @tc.desc: OnDevice Found of the Dm Discovery Manager
+     * @tc.type: FUNC
+     */
+    void OnDeviceFound(const std::string &pkgName, DmDeviceBasicInfo &info, const int32_t range, bool isOnline);
+
+    /**
      * @tc.name: DmDiscoveryManager::OnDiscoverySuccess
      * @tc.desc: OnDiscovery Success of the Dm Discovery Manager
      * @tc.type: FUNC

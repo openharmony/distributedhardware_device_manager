@@ -114,6 +114,13 @@ public:
     int32_t SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
 
     /**
+     * @tc.name: IpcServerStub::GetAllPkgName
+     * @tc.desc: Get All PkgName from dmListener_
+     * @tc.type: FUNC
+     */
+    std::vector<std::string> GetAllPkgName();
+
+    /**
      * @tc.name: IpcServerStub::GetDmListener
      * @tc.desc: Get DmListener of the IpcServerStub
      * @tc.type: FUNC

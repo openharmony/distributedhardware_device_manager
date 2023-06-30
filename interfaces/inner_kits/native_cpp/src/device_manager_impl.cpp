@@ -308,10 +308,22 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     }
     LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
-    if (!extra.empty()) {
-        RegisterDevStateCallback(pkgName, extra);
-    }
+    RegisterDevStateCallback(pkgName, extra);
     LOGI("RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName, const std::string &extra,
+    std::shared_ptr<DeviceStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("RegisterDevStatusCallback error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::RegisterDevStatusCallback start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    RegisterDevStateCallback(pkgName, extra);
+    LOGI("RegisterDevStatusCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -328,6 +340,21 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
     LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::UnRegisterDevStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("UnRegisterDevStatusCallback Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("UnRegisterDevStatusCallback start, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
+    std::string extra = "";
+    UnRegisterDevStateCallback(pkgName, extra);
+    LOGI("UnRegisterDevStatusCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
 
 int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                 const std::string &extra, std::shared_ptr<DiscoveryCallback> callback)
@@ -1054,6 +1081,27 @@ int32_t DeviceManagerImpl::CheckAPIAccessPermission()
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
     int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PERMISSION, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Check permission failed with ret: %d", ret);
+        return ret;
+    }
+    LOGI("The caller declare the DM permission!");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CheckNewAPIAccessPermission()
+{
+    LOGI("CheckNewAPIAccessPermission in");
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_NEWPERMISSION, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;

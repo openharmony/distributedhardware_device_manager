@@ -46,6 +46,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
     std::string pkgName = pReq->GetPkgName();
     int32_t deviceState = pReq->GetDeviceState();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
+    DmDeviceBasicInfo deviceBasicInfo = pReq->GetDeviceBasicInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -56,6 +57,10 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
     }
     if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
         LOGE("write deviceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
+        LOGE("write deviceBasicInfo failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -411,6 +416,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
 {
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
+    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -422,6 +428,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
 ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
+    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

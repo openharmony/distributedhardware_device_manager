@@ -44,6 +44,11 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     return listener->SendCmd(cmdCode, req, rsp);
 }
 
+std::vector<std::string> IpcServerListener::GetAllPkgName()
+{
+    return IpcServerStub::GetInstance().GetAllPkgName();
+}
+
 int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {

@@ -42,6 +42,13 @@ public:
      * @tc.type: FUNC
      */
     int32_t SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
+
+    /**
+     * @tc.name: IpcServerListener::GetAllPkgName
+     * @tc.desc: Get All PkgName from stub
+     * @tc.type: FUNC
+     */
+    std::vector<std::string> GetAllPkgName();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

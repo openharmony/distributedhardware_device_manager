@@ -199,6 +199,37 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
     return DM_OK;
 }
 
+void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
+    DmDeviceBasicInfo &info, const int32_t range, bool isOnline)
+{
+    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s,isOnline %d",
+        GetAnonyString(info.deviceId).c_str(), isOnline);
+    DmDiscoveryContext discoveryContext;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        auto iter = discoveryContextMap_.find(pkgName);
+        if (iter == discoveryContextMap_.end()) {
+            LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            return;
+        }
+        discoveryContext = iter->second;
+    }
+    DmDiscoveryFilter filter;
+    DmDeviceFilterPara filterPara;
+    filterPara.isOnline = isOnline;
+    filterPara.range = range;
+    filterPara.deviceType = info.deviceTypeId;
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
+    GetAuthForm(localDeviceId, info.deviceId, filterPara.isTrusted, authForm);
+    filterPara.authForm = authForm;
+    if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
+        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
+    }
+    return;
+}
+
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)
 {
     LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId = %d reason = %d", subscribeId, failedReason);

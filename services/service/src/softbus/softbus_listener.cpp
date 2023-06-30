@@ -43,6 +43,7 @@ constexpr const char* DISCOVER_STATUS_ON = "1";
 constexpr const char* DISCOVER_STATUS_OFF = "0";
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
+constexpr const char* DEVICE_INFO_CHANGE = "deviceInfoChange";
 
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
 IPublishCb SoftbusListener::softbusPublishCallback_ = {
@@ -75,6 +76,17 @@ void DeviceOffLine(DmDeviceInfo deviceInfo)
     std::lock_guard<std::mutex> lock(lockDeviceOffLine);
 #endif
     DeviceManagerService::GetInstance().HandleDeviceOffline(deviceInfo);
+}
+
+void DeviceNameChange(DmDeviceInfo deviceInfo)
+{
+#if defined(__LITEOS_M__)
+    DmMutex lockDeviceOffLine;
+#else
+    std::mutex lockDeviceOffLine;
+    std::lock_guard<std::mutex> lock(lockDeviceOffLine);
+#endif
+    DeviceManagerService::GetInstance().HandleDeviceNameChange(deviceInfo);
 }
 
 SoftbusListener::SoftbusListener()
@@ -458,8 +470,27 @@ void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
-    (void)type;
-    (void)info;
+    LOGI("received device info change from softbus.");
+    if (info == nullptr) {
+        LOGE("NodeBasicInfo is nullptr.");
+        return;
+    }
+    if (type != NodeBasicInfoType::TYPE_DEVICE_NAME) {
+        LOGE("Device name is not change.");
+        return;
+    }
+    DmDeviceInfo dmDeviceInfo;
+    (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), info->deviceName,
+        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(info->deviceName))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+    }
+    std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
+    int32_t ret = pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_INFO_CHANGE);
+    if (ret != DM_OK) {
+        LOGE("DeviceNameChange setname failed.");
+    }
+    deviceInfoChange.detach();
     LOGD("OnSoftbusDeviceInfoChanged.");
 }
 } // namespace DistributedHardware

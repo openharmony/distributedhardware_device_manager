@@ -84,11 +84,24 @@ public:
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
                                              std::shared_ptr<DeviceStateCallback> callback) override;
     /**
+     * @tc.name: DeviceManagerImpl::RegisterDevStatusCallback
+     * @tc.desc: Register device development status callback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName, const std::string &extra,
+                                                std::shared_ptr<DeviceStatusCallback> callback) override;
+    /**
      * @tc.name: DeviceManagerImpl::UnRegisterDevStateCallback
      * @tc.desc: UnRegister device development status callback
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) override;
+    /**
+     * @tc.name: DeviceManagerImpl::UnRegisterDevStatusCallback
+     * @tc.desc: UnRegister device development status callback
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnRegisterDevStatusCallback(const std::string &pkgName) override;
     /**
      * @tc.name: DeviceManagerImpl::StartDeviceDiscovery
      * @tc.desc: Initiate device discovery
@@ -248,6 +261,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t CheckAPIAccessPermission() override;
+    virtual int32_t CheckNewAPIAccessPermission() override;
 
     int32_t OnDmServiceDied();
 

@@ -97,11 +97,25 @@ public:
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
         std::shared_ptr<DeviceStateCallback> callback) = 0;
     /**
+     * @brief Register device status callback.
+     * @param pkgName  package name.
+     * @param callback device status callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName, const std::string &extra,
+        std::shared_ptr<DeviceStatusCallback> callback) = 0;
+    /**
      * @brief Unregister device status callback.
      * @param pkgName package name.
      * @return Returns 0 if success.
      */
     virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName) = 0;
+    /**
+     * @brief Unregister device status callback.
+     * @param pkgName package name.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnRegisterDevStatusCallback(const std::string &pkgName) = 0;
     /**
      * @brief Initiate device discovery.
      * @param pkgName       package name.
@@ -367,6 +381,8 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+
+    virtual int32_t CheckNewAPIAccessPermission() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
