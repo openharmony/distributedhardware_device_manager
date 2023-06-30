@@ -38,8 +38,8 @@ namespace {
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
 const std::string DM_NAPI_EVENT_DEVICE_STATUS_CHANGE = "deviceStatusChange";
-const std::string DM_NAPI_EVENT_DEVICE_DISCOVERY_SUCCESS = "discoverySuccess";
-const std::string DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL = "discoveryFail";
+const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
+const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_FAIL = "publishFail";
 const std::string DM_NAPI_EVENT_DEVICE_SERVICE_DIE = "serviceDie";
@@ -1358,7 +1358,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         g_deviceStatusCallbackMap[bundleName] = callback;
         return;
     }
-    if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL) {
         auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
         g_DiscoveryCallbackMap.erase(bundleName);
         g_DiscoveryCallbackMap[bundleName] = callback;
@@ -1438,13 +1438,12 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
         return;
     }
 
-    if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVERY_FAIL) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL) {
         std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
         auto iter = g_DiscoveryCallbackMap.find(bundleName);
         if (iter == g_DiscoveryCallbackMap.end()) {
             return;
         }
-
         DiscoveryCallback = iter->second;
         DiscoveryCallback->DecreaseRefCount();
         if (DiscoveryCallback->GetRefCount() == 0) {
