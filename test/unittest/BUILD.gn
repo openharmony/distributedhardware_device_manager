@@ -205,8 +205,8 @@ ohos_unittest("UTTest_softbus_connector") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -222,8 +222,8 @@ ohos_unittest("UTTest_softbus_listener") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -239,8 +239,8 @@ ohos_unittest("UTTest_softbus_session") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -441,8 +441,8 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -458,7 +458,7 @@ ohos_unittest("UTTest_dm_dfx") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -596,7 +596,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -623,7 +623,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
   ]
 }
 
@@ -723,8 +723,8 @@ ohos_static_library("device_manager_test_common") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_core",
     "ipc:ipc_single",
