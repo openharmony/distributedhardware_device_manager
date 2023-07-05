@@ -10,10 +10,6 @@
     "installationFree": false,
     "pages": "$profile:main_pages",
     "uiSyntax": "ets",
-    "metadata": [{
-      "name": "ArkTSPartialUpdate",
-      "value": "true"
-    }],
     "abilities": [
       {
           "name": "com.ohos.devicemanagerui.MainAbility",
