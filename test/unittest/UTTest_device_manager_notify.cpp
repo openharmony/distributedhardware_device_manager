@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -948,6 +948,8 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_005, testing::ext::T
     // set dmInitCallback not null
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     uint16_t subscribeId = 0;
+    DmDeviceBasicInfo deviceBasicInfo;
+    callback.OnDeviceFound(subscribeId, deviceBasicInfo);
     // 2. set checkMap null
     std::shared_ptr<DiscoveryCallback> checkMap = nullptr;
     // 3. set testpkcName com.ohos.test1
@@ -974,6 +976,8 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_006, testing::ext::T
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     uint16_t subscribeId = 0;
+    DmDeviceInfo deviceInfo;
+    callback.OnDeviceFound(subscribeId, deviceInfo);
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_.count(pkgName), 0);
 }
@@ -4653,6 +4657,158 @@ HWTEST_F(DeviceManagerNotifyTest, OnVerifyAuthResult4, testing::ext::TestSize.Le
     DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
     int count = DeviceManagerNotify::GetInstance().verifyAuthCallback_.count(pkgName);
     EXPECT_EQ(count, 1);
+}
+
+/**
+ * @tc.name: UnRegisterDeviceStatusCallback1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: UnRegisterDeviceStatusCallback2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterDeviceStatusCallback1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
+}
+
+/**
+ * @tc.name: RegisterDeviceStatusCallback2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
+}
+
+/**
+ * @tc.name: OnDeviceOnline1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceOnline2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceOffline1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceOffline2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceReady1
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceReady1, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceReady2
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceReady2, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceBasicInfo);
+    auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
+    EXPECT_EQ(ptr, nullptr);
+}
+
+/**
+ * @tc.name: OnDeviceFound6
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound6, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test4";
+    uint16_t subscribeId = 0;
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
+    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(map.empty(), true);
+}
+
+/**
+ * @tc.name: OnDeviceFound7
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound7, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    DmDeviceBasicInfo deviceBasicInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
+    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(map.empty(), false);
 }
 } // namespace
 

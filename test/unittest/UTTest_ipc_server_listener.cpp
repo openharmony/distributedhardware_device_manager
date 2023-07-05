@@ -500,6 +500,17 @@ HWTEST_F(IpcServerListenerTest, SendAll_007, testing::ext::TestSize.Level0)
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
+
+/**
+ * @tc.name: GetAllPkgName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerListenerTest, GetAllPkgName_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
+    std::vector<std::string>  pkgName = ipcServerListener->GetAllPkgName();
+    ASSERT_EQ(pkgName.empty(), false);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

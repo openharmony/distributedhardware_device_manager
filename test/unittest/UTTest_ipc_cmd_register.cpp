@@ -994,7 +994,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_024, testing::ext::TestSize.Level0)
 HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_001, testing::ext::TestSize.Level0)
 {
     // 1. set cmdCode not null
-    int32_t cmdCode = 23;
+    int32_t cmdCode = 9999;
     //  set MessageParcel data null
     MessageParcel reply;
     MessageParcel data;

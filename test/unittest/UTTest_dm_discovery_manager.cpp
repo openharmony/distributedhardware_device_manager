@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -264,6 +264,71 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
         std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
     std::string ret = pReq->GetPkgName();
     EXPECT_EQ(ret, pkgName);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    uint16_t subscribeId = 1;
+    std::string filterOptions = "filterOptions";
+    int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_004
+ * @tc.desc: return ERR_DM_DISCOVERY_REPEATED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    uint16_t subscribeId = 1;
+    std::string filterOptions;
+    discoveryMgr_->discoveryQueue_.push(pkgName);
+    int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_005
+ * @tc.desc: return ERR_DM_DISCOVERY_REPEATED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    uint16_t subscribeId = 1;
+    std::string filterOptions;
+    while (discoveryMgr_->discoveryQueue_.empty()) {
+        discoveryMgr_->discoveryQueue_.pop();
+    }
+    int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+}
+
+/**
+ * @tc.name: OnDeviceFound_003
+ * @tc.desc: set pkgName not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.helloworld";
+    DmDeviceBasicInfo info;
+    int32_t range = 0;
+    bool isOnline = true;
+    discoveryMgr_->OnDeviceFound(pkgName, info, range, isOnline);
+    EXPECT_EQ(discoveryMgr_->discoveryContextMap_.empty(), false);
 }
 } // namespace
 } // namespace DistributedHardware

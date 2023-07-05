@@ -846,6 +846,38 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level0)
     int32_t ret = authManager->OnUserOperation(action, params);
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: DmAuthManager::UnBindDevice001
+ * @tc.desc: Set pkgName not null
+ *           Set udidHash not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAuthManagerTest, UnBindDevice001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::string pkgName = "com.ohos.test";
+    std::string udidHash = "udidHash";
+    int32_t ret = authManager->UnBindDevice(pkgName, udidHash);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DmAuthManager::UnBindDevice002
+ * @tc.desc: Set pkgName not null
+ *           Set udidHash not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAuthManagerTest, UnBindDevice002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+    std::string pkgName;
+    std::string udidHash = "udidHash";
+    int32_t ret = authManager->UnBindDevice(pkgName, udidHash);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

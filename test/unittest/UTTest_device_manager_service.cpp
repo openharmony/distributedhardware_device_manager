@@ -871,6 +871,218 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission();
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: RegisterDeviceManagerListener_001
+ * @tc.desc: Set pkgName null
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+}
+
+/**
+ * @tc.name: UnRegisterDeviceManagerListener_001
+ * @tc.desc: Set pkgName null
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+}
+
+/**
+ * @tc.name: GetAvailableDeviceList_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetAvailableDeviceList_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
+    int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: GetAvailableDeviceList_002
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetAvailableDeviceList_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
+    int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceNetworkId_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId;
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(networkId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceId_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceId_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string deviceId;
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceName_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceType_001
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceType_001, testing::ext::TestSize.Level0)
+{
+    int32_t deviceType = 1;
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_004
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 1;
+    std::string filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_005
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 1;
+    std::string filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: BindDevice_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, BindDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t authType = 1;
+    std::string deviceId = "1234";
+    std::string bindParam;
+    int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: BindDevice_002
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, BindDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t authType = 1;
+    std::string deviceId;
+    std::string bindParam;
+    int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: BindDevice_003
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t authType = 1;
+    std::string deviceId = "1234";
+    std::string bindParam;
+    int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnBindDevice_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string deviceId = "1234";
+    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnBindDevice_002
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string deviceId;
+    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnBindDevice_003
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string deviceId = "1234";
+    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,7 +106,7 @@ HWTEST_F(SoftbusConnectorTest, DeviceOffLine_001, testing::ext::TestSize.Level0)
     std::string pkgName = "123";
     DmDeviceInfo info;
     strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    deviceStateMgr->RegisterSoftbusStateCallback();
+    deviceStateMgr->PostDeviceChanged(pkgName, info);
     DeviceOffLine(info);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -269,6 +269,19 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
 {
     DmSubscribeInfo dmSubscribeInfo;
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+}
+
+/**
+ * @tc.name: StartDiscovery_002
+ * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusConnectorTest, StartDiscovery_002, testing::ext::TestSize.Level0)
+{
+    uint16_t subscribeId = 0;
+    int ret = softbusConnector->StartDiscovery(subscribeId);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
@@ -749,6 +762,75 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_002, testing::ext::TestSiz
     }
     EXPECT_EQ(ret, true);
     softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
+}
+
+/**
+ * @tc.name: JoinLnn_001
+ * @tc.desc: set deviceId null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    softbusConnector->JoinLnn(deviceId);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+}
+
+/**
+ * @tc.name: ConvertDeviceInfoToDmDevice_002
+ * @tc.desc: set deviceInfo not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::TestSize.Level0)
+{
+    DeviceInfo deviceInfo = {
+        .devId = "123456",
+        .devType = (DeviceType)1,
+        .devName = "11111"
+    };
+    DmDeviceBasicInfo dmDeviceBasicInfo;
+    softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dmDeviceBasicInfo);
+    EXPECT_EQ(dmDeviceBasicInfo.deviceTypeId, deviceInfo.devType);
+}
+
+/**
+ * @tc.name: OnSoftbusDeviceDiscovery_001
+ * @tc.desc: set device null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    DeviceInfo *device = nullptr;
+    softbusConnector->OnSoftbusDeviceDiscovery(device);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+}
+
+/**
+ * @tc.name: OnSoftbusDeviceDiscovery_002
+ * @tc.desc: set device not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    DeviceInfo device = {
+        .devId = "123456",
+        .devType = (DeviceType)1,
+        .devName = "11111"
+    };
+    softbusConnector->OnSoftbusDeviceDiscovery(&device);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+}
+
+/**
+ * @tc.name: GetDeviceUdidByUdidHash_001
+ * @tc.desc: set udidHash null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSize.Level0)
+{
+    std::string udidHash;
+    std::string str = softbusConnector->GetDeviceUdidByUdidHash(udidHash);
+    EXPECT_EQ(str.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware
