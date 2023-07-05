@@ -948,8 +948,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_005, testing::ext::T
     // set dmInitCallback not null
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     uint16_t subscribeId = 0;
-    DmDeviceBasicInfo deviceBasicInfo;
-    callback.OnDeviceFound(subscribeId, deviceBasicInfo);
     // 2. set checkMap null
     std::shared_ptr<DiscoveryCallback> checkMap = nullptr;
     // 3. set testpkcName com.ohos.test1
@@ -976,8 +974,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_006, testing::ext::T
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     uint16_t subscribeId = 0;
-    DmDeviceInfo deviceInfo;
-    callback.OnDeviceFound(subscribeId, deviceInfo);
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_.count(pkgName), 0);
 }

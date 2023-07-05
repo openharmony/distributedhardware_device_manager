@@ -844,6 +844,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
     uint16_t subscribeId = 0;
     std::string filterOptions;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    DmDeviceInfo deviceInfo;
+    callback->OnDeviceFound(subscribeId, deviceInfo);
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
@@ -4541,7 +4543,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStatusCallback_003, testing::ext::Tes
 {
     std::string packName = "com.ohos.test";
     std::string extra;
-    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<>(DeviceStatusCallbackTest);
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(packName, extra, callback);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -4569,7 +4571,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStatusCallback_001, testing::ext::T
  * deviceTypeId
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerImplTest, RegisterDevStatusCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, UnRegisterDevStatusCallback_002, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
     int32_t ret = DeviceManager::GetInstance().UnRegisterDevStatusCallback(packName);
@@ -4595,6 +4597,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_104, testing::ext::TestSize
     uint16_t subscribeId = 0;
     std::string filterOptions;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    DmDeviceBasicInfo deviceBasicInfo;
+    callback->OnDeviceFound(subscribeId, deviceBasicInfo);
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);

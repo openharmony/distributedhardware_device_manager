@@ -66,7 +66,6 @@ public:
     virtual void OnDiscoverySuccess(uint16_t subscribeId) override;
     virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) override;
 private:
     int *count_ = nullptr;
 };
