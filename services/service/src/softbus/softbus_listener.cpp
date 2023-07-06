@@ -471,7 +471,6 @@ void SoftbusListener::OnPublishResult(int publishId, PublishResult result)
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
     LOGI("received device info change from softbus.");
-    LOGI("yangwei name %s, networkId %s.", info->networkId, info->deviceName);
     if (info == nullptr) {
         LOGE("NodeBasicInfo is nullptr.");
         return;

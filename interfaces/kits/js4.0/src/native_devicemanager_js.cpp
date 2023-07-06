@@ -2149,6 +2149,17 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
+bool DeviceManagerNapi::JudgeParameter(napi_env env, napi_callback_info info, const int32_t num)
+{
+    GET_PARAMS(env, info, num);
+    napi_valuetype valueType1 = napi_undefined;
+    napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
+    if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
+        return false;
+    }
+    return true;
+}
+
 napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callback_info info)
 {
     LOGI("StartDeviceDiscoverSync in");
@@ -2164,17 +2175,11 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         return result;
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-        napi_valuetype valueType1 = napi_undefined;
-        napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
-        if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
+        if (!JudgeParameter(env, info, DM_NAPI_ARGS_ONE)) {
             return nullptr;
         }
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-        napi_valuetype valueType1 = napi_undefined;
-        napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
-        if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
+        if (!JudgeParameter(env, info, DM_NAPI_ARGS_TWO)) {
             return nullptr;
         }
         napi_valuetype valueType2 = napi_undefined;
