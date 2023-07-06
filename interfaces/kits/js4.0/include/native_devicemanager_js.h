@@ -358,7 +358,6 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static napi_value GetAvailableDeviceListByFilter(napi_env env, napi_callback_info info,
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
-    static bool StartNumArgCheck(napi_env env, napi_value &argv, int32_t &subscribeId);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     static bool IsSystemApp();
 private:

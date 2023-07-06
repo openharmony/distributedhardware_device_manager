@@ -115,7 +115,7 @@ public:
      * @tc.desc: Initiate device discovery
      * @tc.type: FUNC
      */
-    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName,
                                          const std::string &filterOptions,
                                          std::shared_ptr<DiscoveryCallback> callback) override;
     /**

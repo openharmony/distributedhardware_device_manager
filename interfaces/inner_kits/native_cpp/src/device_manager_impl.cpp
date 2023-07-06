@@ -15,6 +15,7 @@
 
 #include "device_manager_impl.h"
 #include <unistd.h>
+#include <random>
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
@@ -85,6 +86,14 @@ constexpr const char* DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
 constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
+
+uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
+{
+    std::random_device randDevice;
+    std::mt19937 genRand(randDevice());
+    std::uniform_int_distribution<int> disRand(randMin, randMax);
+    return disRand(genRand);
+}
 
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
@@ -394,8 +403,8 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
-    const std::string &filterOptions, std::shared_ptr<DiscoveryCallback> callback)
+int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, const std::string &filterOptions,
+    std::shared_ptr<DiscoveryCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %s", pkgName.c_str());
@@ -403,9 +412,9 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
     }
 
     LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    uint16_t subscribeId = GenRandUint(0, 65535);
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
-
     std::shared_ptr<IpcStartDevDiscoveryByIdReq> req = std::make_shared<IpcStartDevDiscoveryByIdReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);

@@ -783,7 +783,6 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
     napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
-    SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
@@ -804,7 +803,6 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
     napi_open_handle_scope(env_, &scope);
     napi_value result = nullptr;
     napi_create_object(env_, &result);
-    SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
     SetValueInt32(env_, "reason", (int)failedReason, result);
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
@@ -2152,20 +2150,6 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
-bool DeviceManagerNapi::StartNumArgCheck(napi_env env, napi_value &argv, int32_t &subscribeId)
-{
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv, &valueType);
-    if (valueType != napi_number) {
-        return false;
-    }
-    napi_get_value_int32(env, argv, &subscribeId);
-    if (!CheckArgsVal(env, subscribeId <= DM_NAPI_SUB_ID_MAX, "subscribeId", "Wrong argument. subscribeId Too Big")) {
-        return false;
-    }
-    return true;
-}
-
 napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callback_info info)
 {
     LOGI("StartDeviceDiscoverSync in");
@@ -2182,21 +2166,25 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-        if (!StartNumArgCheck(env, argv[0], subscribeId)) {
+        napi_valuetype valueType1 = napi_undefined;
+        napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
+        if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
             return nullptr;
         }
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-        if (!StartNumArgCheck(env, argv[0], subscribeId)) {
+        napi_valuetype valueType1 = napi_undefined;
+        napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
+        if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
             return nullptr;
         }
-        napi_valuetype valueType1 = napi_undefined;
-        napi_typeof(env, argv[1], &valueType1);
-        if (!(CheckArgsType(env, (valueType1 == napi_undefined || valueType1 == napi_string), "filterOptions",
+        napi_valuetype valueType2 = napi_undefined;
+        napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType1);
+        if (!(CheckArgsType(env, (valueType2 == napi_undefined || valueType2 == napi_string), "filterOptions",
             "string or undefined"))) {
             return nullptr;
         }
-        JsToDmDiscoveryExtra(env, argv[1], extra);
+        JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
     }
     std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
     auto iter = g_DiscoveryCallbackMap.find(deviceManagerWrapper->bundleName_);
@@ -2207,7 +2195,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         DiscoveryCallback = iter->second;
     }
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_,
-        static_cast<uint16_t>(subscribeId), extra, DiscoveryCallback);
+        extra, DiscoveryCallback);
     if (ret != 0) {
         LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
