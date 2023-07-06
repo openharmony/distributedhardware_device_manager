@@ -360,7 +360,7 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     static bool IsSystemApp();
-    static bool JudgeParameter(napi_env env, napi_callback_info info, const int32_t num);
+    static bool JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[]);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

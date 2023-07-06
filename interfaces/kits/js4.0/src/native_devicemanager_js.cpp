@@ -2149,9 +2149,8 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
-bool DeviceManagerNapi::JudgeParameter(napi_env env, napi_callback_info info, const int32_t num)
+bool DeviceManagerNapi::JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[])
 {
-    GET_PARAMS(env, info, num);
     napi_valuetype valueType1 = napi_undefined;
     napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
     if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
@@ -2164,10 +2163,10 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
 {
     LOGI("StartDeviceDiscoverSync in");
     std::string extra = "";
-    int32_t subscribeId = 0;
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argcNum = 0;
+    uint16_t subscribeId = 0;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2175,15 +2174,17 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
         return result;
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
-        if (!JudgeParameter(env, info, DM_NAPI_ARGS_ONE)) {
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+        if (!JudgeParameter(env, info, argv)) {
             return nullptr;
         }
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
-        if (!JudgeParameter(env, info, DM_NAPI_ARGS_TWO)) {
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+        if (!JudgeParameter(env, info, argv)) {
             return nullptr;
         }
         napi_valuetype valueType2 = napi_undefined;
-        napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType1);
+        napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType2);
         if (!(CheckArgsType(env, (valueType2 == napi_undefined || valueType2 == napi_string), "filterOptions",
             "string or undefined"))) {
             return nullptr;
