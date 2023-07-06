@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ public:
     virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
     virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
     virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) override{}
 };
 
 class DevicePublishCallbackTest : public PublishCallback {
@@ -80,6 +81,15 @@ class CredentialCallbackTest : public CredentialCallback {
 public:
     virtual ~CredentialCallbackTest() {}
     virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+};
+
+class DeviceStatusCallbackTest : public DeviceStatusCallback {
+public:
+    ~DeviceStatusCallbackTest() {}
+    void OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceOffline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo)  override {}
+    void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

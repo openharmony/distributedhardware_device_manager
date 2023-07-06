@@ -600,6 +600,17 @@ HWTEST_F(IpcServerStubTest, OnAddSystemAbility_002, testing::ext::TestSize.Level
     IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
     ASSERT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
+
+/**
+ * @tc.name: GetAllPkgName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, GetAllPkgName_001, testing::ext::TestSize.Level0)
+{
+    std::vector<std::string>  pkgName;
+    pkgName = IpcServerStub::GetInstance().GetAllPkgName();
+    ASSERT_EQ(pkgName.empty(), false);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
