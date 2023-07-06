@@ -52,7 +52,6 @@ const int32_t DM_NAPI_ARGS_ZERO = 0;
 const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
-const int32_t DM_NAPI_SUB_ID_MAX = 65535;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
@@ -2194,7 +2193,8 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     } else {
         DiscoveryCallback = iter->second;
     }
-    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_,
+    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_, tokenId,
         extra, DiscoveryCallback);
     if (ret != 0) {
         LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
@@ -2208,19 +2208,11 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
 napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback_info info)
 {
     LOGI("StopDeviceDiscoverSync in");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
-        return nullptr;
-    }
     napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_number, "subscribeId", "number")) {
-        return nullptr;
-    }
-    int32_t subscribeId = 0;
-    napi_get_value_int32(env, argv[0], &subscribeId);
-    if (!CheckArgsVal(env, subscribeId <= DM_NAPI_SUB_ID_MAX, "subscribeId", "Wrong argument. subscribeId Too Big")) {
+    napi_value thisVar = nullptr;
+    size_t argc = 0;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    if (argc != 0) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
@@ -2228,8 +2220,8 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(deviceManagerWrapper->bundleName_,
-                                                                   static_cast<int16_t>(subscribeId));
+    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(tokenId, deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("StopDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);

@@ -286,12 +286,11 @@ declare namespace distributedDeviceManager {
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @since 10
-     * @param subscribeId service subscribe id
      * @throws { BusinessError } 401 - Input parameter error.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      */
-    stopDiscovering(subscribeId: number): void;
+    stopDiscovering(): void;
 
     /**
      * Bind the specified target.

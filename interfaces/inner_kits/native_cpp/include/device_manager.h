@@ -134,7 +134,7 @@ public:
      * @param callback      discovery callback.
      * @return Returns 0 if success.
      */
-    virtual int32_t StartDeviceDiscovery(const std::string &pkgName,
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint64_t tokenId,
         const std::string &filterOptions, std::shared_ptr<DiscoveryCallback> callback) = 0;
     /**
      * @brief Stop device discovery.
@@ -143,6 +143,13 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
+    /**
+     * @brief Stop device discovery.
+     * @param pkgName package name.
+     * @param tokenId app flag to discovery device.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StopDeviceDiscovery(uint64_t tokenId, const std::string &pkgName) = 0;
     /**
      * @brief Publish device discovery.
      * @param pkgName     package name.
