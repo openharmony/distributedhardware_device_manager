@@ -51,9 +51,13 @@ foundation/distributedhardware/distributedhardware_device_manager
 │   │           │   └── standard  # standard
 │   │           └── notify        # ipc回调通知功能代码
 │   └── kits                      # 外部接口及实现存放目录
-│       └── js                    # 外部JS接口及实现存放目录
-│           ├── include           # 外部JS接口及实现头文件存放目录
-│           └── src               # 外部JS接口及实现代码
+│       ├── js                    # 外部JS接口及实现存放目录
+│       │   ├── include           # 外部JS接口及实现头文件存放目录
+│       │   └── src               # 外部JS接口及实现代码
+|       └── js4.0                 # 从Openharmony 4.0.9.2版本开始新增外部JS接口及实现存放目录
+|           ├── include           # 新增外部JS接口及实现头文件存放目录
+|           └── src               # 新增外部JS接口及实现代码
+|
 ├── sa_profile                    # SA进程配置相关文件存放目录
 ├── services
 │   ├── implementation            # devicemanagerservice服务实现核心代码
@@ -117,7 +121,9 @@ foundation/distributedhardware/distributedhardware_device_manager
 - 适用于Hi3516DV300单板等OpenHarmony设备
 
 
-## 接口说明
+## 废弃接口说明
+
+该部分接口暂时可继续使用，但是暂停维护，建议使用新接口进行开发。
 
 当前版本设备管理服务不具备权限管理的能力，接口中的system api仅供系统调用，后续版本会进行严格的权限管控。
 接口参见[**interface_sdk-js仓库的**](https://gitee.com/openharmony/interface_sdk-js/) *ohos.distributedHardware.deviceManager.d.ts*
@@ -132,24 +138,6 @@ foundation/distributedhardware/distributedhardware_device_manager
 | ------------------------------------------------------------ | ------------------------------- |
 | createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 以异步方法获取DeviceManager实例 |
 | release(): void;                                             | 释放DeviceManager实例           |
-
-- 示例如下
-
-```js
-try {
-    // 创建DeviceManager实例：
-    deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
-    if (err) {
-        console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
-        return;
-    }
-    console.info("createDeviceManager success, value =" + data);
-    this.dmClass = data;
-    });
-} catch(err) {
-    console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
-}
-```
 
 - 系统能力接口：
 
@@ -188,171 +176,221 @@ try {
 | off(type: 'publishFail', callback?: Callback&lt;{ publishId: number, reason: number  }&gt;): void; | 取消发布设备失败回调 |
 | on(type: 'uiStateChange', callback: Callback&lt;{ param: string}&gt;): void; | ui状态变更回调     |
 | off(type: 'uiStateChange', callback?: Callback&lt;{ param: string}&gt;): void; | 取消ui状态变更回调     |
+
+## 新增接口说明
+
+  从Openharmony 4.0.9.2版本开始，新增设备管理接口。
+
+接口参见[**interface_sdk-js仓库的**](https://gitee.com/openharmony/interface_sdk-js/) *ohos.distributedDeviceManager.d.ts*
+
+- 公共接口：
+
+  调用以下接口，需要申请ohos.permission.DISTRIBUTED_DATASYNC权限才能正常调用。
+
+  使用DeviceManager相关接口之前，需要通过createDeviceManager接口创建DeviceManager实例；
+
+  不使用DeviceManager接口的时候需要释放对应的DeviceManager实例。
+
+  提供可信设备列表获取、可信设备状态监听、周边设备发现、设备认证等相关接口，支持三方应用调用。
+
+| 原型                                                         | 描述                            |
+| ------------------------------------------------------------ | ------------------------------- |
+| createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 创建一个设备管理器实例。 |
+| releaseDeviceManager(): void;                      | 设备管理实例不再使用后，通过该方法释放DeviceManager实例。           |
+| getAvailableDeviceListSync(): Array&lt;DeviceBasicInfo&gt;;                                                                | 同步获取所有可信设备列表。 |
+| getAvailableDeviceList(callback:AsyncCallback&lt;Array&lt;DeviceBasicInfo&gt;&gt;): void;                                  | 获取所有可信设备列表。使用callback异步回调。 |
+| getAvailableDeviceList(): Promise&lt;Array&lt;DeviceBasicInfo&gt;&gt;;                                                     | 获取所有可信设备列表。使用Promise异步回调。 |
+| getLocalDeviceNetworkIdSync(): string;                                                                                     | 同步获取本地设备网络标识。 |
+| getLocalDeviceNameSync(): string;                                                                                          | 同步获取本地设备名称。     |
+| getLocalDeviceTypeSync(): number;                                                                                          | 同步获取本地设备类型。     |
+| getLocalDeviceIdSync(): string;                                                                                            | 同步获取本地设备id。       |
+| getDeviceNameSync(networkId: string): string;                                                                              | 通过指定设备的网络标识同步获取该设备名称。    |
+| getDeviceTypeSync(networkId: string): number;                                                                              | 通过指定设备的网络标识同步获取该设备类型。    |
+| startDiscovering(discoverParameter:string, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
+| stopDiscovering(): void;                                                                            | 停止发现周边设备。         |
+| bindTarget(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
+| unbindTarget(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
+| on(type: 'deviceStatusChange', callback: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;         | 注册设备状态回调。               |
+| off(type: 'deviceStatusChange', callback?: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;       | 取消注册设备状态回调。            |
+| on(type: 'discoverSuccess', callback: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
+| off(type: 'discoverSuccess', callback?: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                 | 取消注册设备发现成功回调。            |
+| on(type: 'deviceNameChange', callback: Callback&lt;{ deviceName: string }&gt;): void;                                            | 注册设备名称变更回调监听。        |
+| off(type: 'deviceNameChange', callback?: Callback&lt;{ deviceName: string }&gt;): void;                                          | 取消注册设备名称变更回调监听。    |
+| on(type: 'discoverFail', callback: Callback&lt;{ reason: number }&gt;): void;                         | 注册设备发现失败回调监听。        |
+| off(type: 'discoverFail', callback?: Callback&lt;{ reason: number }&gt;): void;                       | 取消注册设备发现失败回调。        |
+| on(type: 'serviceDie', callback: () =&gt; void): void;                                                                     | 注册设备管理服务死亡监听。        |
+| off(type: 'serviceDie', callback?: () =&gt; void): void;                                                                   | 取消注册设备管理服务死亡监听。    |
+
 - 示例如下：
 
 ```js
-// 注册/去注册设备上下线监听
-this.dmClass.on('deviceStateChange', (data) => {
-    console.log("deviceStateChange on:" + JSON.stringify(data));
-    switch (data.action) {
-        case deviceManager.DeviceStateChangeAction.ONLINE:
-            // 设备物理上线状态
-            break;
-        case deviceManager.DeviceStateChangeAction.READY:
-            // 设备可用状态，表示设备间信息已在分布式数据中同步完成，可以运行分布式业务
-            break;
-        case deviceManager.DeviceStateChangeAction.OFFLINE:
-            // 设备物理下线状态
-            break;
-        case deviceManager.DeviceStateChangeAction.CHANGE:
-            // 设备信息变更
-            break;
-        default:
-            break;
+try {
+    // 创建DeviceManager实例：
+    deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
+    if (err) {
+      console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+      return;
     }
-});
-this.dmClass.off('deviceStateChange')
+    console.info("createDeviceManager success, value =" + data);
+    this.dmClass = data;
+    });
+} catch(err) {
+    console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+}
 
-// 查询可信设备列表
-var array = this.dmClass.getTrustedDeviceListSync();
+try {
+  // 注册设备管理服务死亡监听。
+  dmClass.on('serviceDie', data => console.log("serviceDie on:" + JSON.stringify(data)))
+  // 注册设备状态回调。
+  dmClass.on('deviceStatusChange', data =>
+    console.log("deviceStatusChange on:" + JSON.stringify(data)))
+} catch (err) {
+  console.log("on err:" + err.code + "," + err.message);
+}
 
-// 获取本地设备信息
-var localDeviceInfo = this.dmClass.getLocalDeviceInfoSync();
+// 同步获取所有可信设备列表。
+try {
+  let trustList = dmClass.getAvailableDeviceListSync();
+  console.log("trustList:" + JSON.stringify(this.trustList));
+} catch(err) {
+  console.log("getAvailableDeviceList failed: " + JSON.stringify(err));
+}
+// 同步获取本地设备类型。
+var data = dmClass.getLocalDeviceTypeSync();
 
-// 开始设备发现（发现周边不可信设备）
-var subscribeId = 0;
-this.dmClass.on('deviceFound', (data) => {
-    if (data == null) {
-        console.log("deviceFound error data=null")
-        return;
+// 同步获取本地设备名称。
+var data = dmClass.getLocalDeviceNameSync();
+
+// 发现周边设备。
+try {
+  // 注册发现设备成功回调监听。
+  dmClass.on('discoverSuccess', (data) => {
+  if (data == null) {
+    console.log("discoverSuccess error data = null")
+    return;
+  }
+  console.info(TAG + "discoverSuccess:" + JSON.stringify(data));
+  });
+  // 注册设备发现失败回调监听。
+  dmClass.on('discoverFail', (data) => {
+    if (!data) {
+      console.log("discoverFail error data=null")
+      return;
     }
-    console.logList.push("deviceFound:" + JSON.stringify(data));
-});
-this.dmClass.on('discoverFail', (data) => {
-    console.log("discoverFail on:" + JSON.stringify(data));
-});
-
-subscribeId = Math.floor(Math.random() * 10000 + 1000)
-var info = {
-    "subscribeId": subscribeId,
-    "mode": 0xAA,
-    "medium": 0,
-    "freq": 2,
-    "isSameAccount": false,
-    "isWakeRemote": true,
-    "capability": 0
-};
-var filterOptions = {
-    "filter_op": "OR", //可选，默认"OR"
+    console.info(TAG + "discoverFail on:" + JSON.stringify(data));
+  });
+  var discoverParameter = "1";
+  var filterOptions = {
+    "filter_op": "OR", // 可选, 默认"OR"
     "filters": [
         {
             "type": "range",
-            "value": 50 // 需要过滤发现设备的距离，单位(cm)
+            "value": 50 // 需过滤发现设备的距离，单位(cm)
         }
     ]
-};
-try {
-    this.dmClass.startDeviceDiscovery(info, JSON.stringify(filterOptions));
-} catch (error) {
-    console.error("startDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+  };
+  dmClass.startDiscovering(discoverParameter, filterOptions); // 当有设备发现时，通过discoverSuccess回调通知给应用程序
+} catch (err) {
+  console.log("startDiscovering err:" + err.code + "," + err.message);
 }
 
-// 停止设备发现（需要和startDeviceDiscovery接口配对使用）
+// 停止发现周边设备。
 try {
-    this.dmClass.stopDeviceDiscovery(subscribeId);
-} catch (error) {
-    console.error("stopDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+  dmClass.stopDiscovering();
+  // 取消注册设备发现成功回调。
+  dmClass.off('discoverSuccess');
+  // 取消注册设备发现失败回调。
+  dmClass.off('discoverFail');
+} catch (err) {
+  console.log("err:" + err.code + "," + err.message);
 }
 
-// 开始发布设备发现
-var publishId = 0;
-this.dmClass.on('publishSuccess', (data) => {
-    if (data == null) {
-        console.log("publishSuccess error data=null")
-        return;
-    }
-    console.logList.push("publishSuccess:" + JSON.stringify(data));
-});
-
-this.dmClass.on('publishFailed', (data) => {
-    console.log("publishFailed on:" + JSON.stringify(data));
-});
-publishId = Math.floor(Math.random() * 10000 + 1000)
-let publishIdInfo = {
-    "publishId": publishId,
-    "mode": 0xAA,
-    "freq": 2,
-    "ranging": 1
-};
+// 设备认证
+var extraInfo = {
+  "appOperation": "xxxxxxxx",  // 业务操作 支持用户自定义
+  "customDescription": "xxxxxxxx",    // 业务描述 支持用户自定义
+}
+var bindParam = {
+  "bindType": 1,
+  "extraInfo": extraInfo
+}
 try {
-    this.dmClass.publishDeviceDiscovery(publishIdInfo);
-} catch (error) {
-    console.error("publishDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+  var deviceId = "xxxxxxxx";
+  dmClass.bindTarget(deviceId, bindParam, (err, data) => {
+  if (err) {
+    console.info(TAG + "bindTarget err:" + JSON.stringify(err));
+  } else {
+    console.info(TAG + "bindTarget result:" + JSON.stringify(data));
+    let token = data.pinTone;
+  }
+  });
+} catch (err) {
+  console.log("bindTarget err:" + err.code + "," + err.message);
+}
+// 设备取消认证
+try {
+  var deviceId = "xxxxxxxx";
+  let result = dmClass.unbindTarget(deviceId, '');
+  console.log("unbindTarget last device: " + JSON.stringify(deviceId) + " and result = "
+    + result);
+  } catch (err) {
+    console.log("unbindTarget err:" + err.code + "," + err.message);
 }
 
-// 停止发布设备发现（需要和publishDeviceDiscovery接口配对使用）
 try {
-    this.dmClass.unPublishDeviceDiscovery(publishId);
-} catch (error) {
-    console.error("unPublishDeviceDiscovery error, errCode:" + error.code + ",errMessage:" + error.message);
+  // 取消注册设备管理服务死亡监听。
+  dmClass.off('serviceDie');
+  // 取消注册设备状态回调。
+  dmClass.off('deviceStatusChange', JSON.stringify(mFilterOption), data =>
+    console.log("deviceStatusChange off:" + JSON.stringify(data)));
+  // 释放DeviceManager实例。
+  dmClass.releaseDeviceManager();
+} catch (err) {
+  console.log("err:" + err.code + "," + err.message);
 }
+```
 
+- 系统接口：
+
+  该部分接口仅支持系统应用调用。
+  调用以下接口，需要申请ohos.permission.ACCESSS_SERVICE_DM权限才能正常调用。
+
+| 原型                                                         | 描述                 |
+| ------------------------------------------------------------ | -------------------- |
+| replyUiAction(action: number, params: string): void;                                                             | 回复用户ui操作行为。      |
+| on(type: 'replyResult', callback: Callback&lt;{ param: string}&gt;): void;                                               | 回复UI操作结果回调。          |
+| off(type: 'replyResult', callback?: Callback&lt;{ param: string}&gt;): void;                                             | 取消回复UI操作结果回调。       |
+
+- 示例如下：
+
+```js
 // 设置用户ui操作行为
-/*  operateAction = 0 - 允许授权
-    operateAction = 1 - 取消授权
-    operateAction = 2 - 授权框用户操作超时
-    operateAction = 3 - 取消pin码框展示
-    operateAction = 4 - 取消pin码输入框展示
-    operateAction = 5 - pin码输入框确定操作
+/*  action = 0 - 允许授权
+    action = 1 - 取消授权
+    action = 2 - 授权框用户操作超时
+    action = 3 - 取消pin码框展示
+    action = 4 - 取消pin码输入框展示
+    action = 5 - pin码输入框确定操作
 */
-dmClass.setUserOperation(operation, "extra")
-dmClass.on('uiStateChange', (data) => {
-    console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+try {
+  dmClass.replyUiAction(operation, "extra")
+  dmClass.on('replyResult', (data) => {
+    console.log("replyResult executed, dialog closed" + JSON.stringify(data))
     var tmpStr = JSON.parse(data.param)
     this.isShow = tmpStr.verifyFailed
-    console.log("uiStateChange executed, dialog closed" + this.isShow)
+    console.log("replyResult executed, dialog closed" + this.isShow)
     if (!this.isShow) {
         this.destruction()
     }
-});
-dmClass.off('uiStateChange')
-
-// 设备认证
-var deviceInfo ={
-    "deviceId": "XXXXXXXX",
-    "deviceName": "",
-    deviceType: 0
-};
-let extraInfo = {
-    "appOperation": "xxxxxxxx", // 业务操作 支持用户自定义
-    "customDescription": "xxxxxxxx", // 业务描述 支持用户自定义
-}
-let authParam = {
-    "authType": 1,
-    "extraInfo": extraInfo
-}
-try {
-    this.dmClass.authenticateDevice(deviceInfo, authParam, (err, data) => {
-        if (err) {
-            console.logList.push("authenticateDevice err:" + JSON.stringify(err));
-            console.info("authenticateDevice err:" + JSON.stringify(err));
-            return;
-        }
-        console.logList.push("authenticateDevice result:" + JSON.stringify(data));
-        console.info("authenticateDevice result:" + JSON.stringify(data));
-        let token = data.pinToken;
-        });
-} catch (error) {
-    console.error("authenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
+  });
+} catch (err) {
+  console.log("err:" + err.code + "," + err.message);
 }
 
-try {
-    // 设备取消认证
-    this.dmClass.unAuthenticateDevice(deviceInfo);
-} catch (error) {
-    console.error("unAuthenticateDevice error, errCode:" + error.code + ",errMessage:" + error.message);
-}
 ```
+
+详细接口说明请参考[**API文档**](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-distributedDeviceManager.md)
+
 ## 系统弹框ServiceExtensionAbility
 
 当前版本只支持PIN码认证，需要提供PIN码认证的授权提示界面、PIN码显示界面、PIN码输入界面；
