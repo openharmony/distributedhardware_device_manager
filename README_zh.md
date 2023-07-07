@@ -51,9 +51,13 @@ foundation/distributedhardware/distributedhardware_device_manager
 │   │           │   └── standard  # standard
 │   │           └── notify        # ipc回调通知功能代码
 │   └── kits                      # 外部接口及实现存放目录
-│       └── js                    # 外部JS接口及实现存放目录
-│           ├── include           # 外部JS接口及实现头文件存放目录
-│           └── src               # 外部JS接口及实现代码
+│       ├── js                    # 外部JS接口及实现存放目录
+│       │   ├── include           # 外部JS接口及实现头文件存放目录
+│       │   └── src               # 外部JS接口及实现代码
+|       └── js4.0                 # 新增外部JS接口及实现存放目录
+|           ├── include           # 新增外部JS接口及实现头文件存放目录
+|           └── src               # 新增外部JS接口及实现代码
+|
 ├── sa_profile                    # SA进程配置相关文件存放目录
 ├── services
 │   ├── implementation            # devicemanagerservice服务实现核心代码
@@ -187,8 +191,6 @@ foundation/distributedhardware/distributedhardware_device_manager
 
   提供可信设备列表获取、可信设备状态监听、周边设备发现、设备认证等相关接口，支持三方应用调用。
 
-  开始设备发现、停止发现设备接口要配对使用，使用同一个subscribeId。
-
 | 原型                                                         | 描述                            |
 | ------------------------------------------------------------ | ------------------------------- |
 | createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 创建一个设备管理器实例。 |
@@ -202,18 +204,18 @@ foundation/distributedhardware/distributedhardware_device_manager
 | getLocalDeviceIdSync(): string;                                                                                            | 同步获取本地设备id。       |
 | getDeviceNameSync(networkId: string): string;                                                                              | 通过指定设备的网络标识同步获取该设备名称。    |
 | getDeviceTypeSync(networkId: string): number;                                                                              | 通过指定设备的网络标识同步获取该设备类型。    |
-| startDiscovering(subscribeId: number, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
-| stopDiscovering(subscribeId: number): void;                                                                            | 停止发现周边设备。         |
+| startDiscovering(discoverParameter:string, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
+| stopDiscovering(): void;                                                                            | 停止发现周边设备。         |
 | bindTarget(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
 | unbindTarget(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
 | on(type: 'deviceStatusChange', callback: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;         | 注册设备状态回调。               |
 | off(type: 'deviceStatusChange', callback?: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;       | 取消注册设备状态回调。            |
-| on(type: 'discoverSuccess', callback: Callback&lt;{ subscribeId: number, device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
-| off(type: 'discoverSuccess', callback?: Callback&lt;{ subscribeId: number, device: DeviceBasicInfo }&gt;): void;                 | 取消注册设备发现成功回调。            |
+| on(type: 'discoverSuccess', callback: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
+| off(type: 'discoverSuccess', callback?: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                 | 取消注册设备发现成功回调。            |
 | on(type: 'deviceNameChange', callback: Callback&lt;{ deviceName: string }&gt;): void;                                            | 注册设备名称变更回调监听。        |
 | off(type: 'deviceNameChange', callback?: Callback&lt;{ deviceName: string }&gt;): void;                                          | 取消注册设备名称变更回调监听。    |
-| on(type: 'discoverFail', callback: Callback&lt;{ subscribeId: number, reason: number }&gt;): void;                         | 注册设备发现失败回调监听。        |
-| off(type: 'discoverFail', callback?: Callback&lt;{ subscribeId: number, reason: number }&gt;): void;                       | 取消注册设备发现失败回调。        |
+| on(type: 'discoverFail', callback: Callback&lt;{ reason: number }&gt;): void;                         | 注册设备发现失败回调监听。        |
+| off(type: 'discoverFail', callback?: Callback&lt;{ reason: number }&gt;): void;                       | 取消注册设备发现失败回调。        |
 | on(type: 'serviceDie', callback: () =&gt; void): void;                                                                     | 注册设备管理服务死亡监听。        |
 | off(type: 'serviceDie', callback?: () =&gt; void): void;                                                                   | 取消注册设备管理服务死亡监听。    |
 
@@ -266,7 +268,6 @@ try {
     return;
   }
   console.info(TAG + "discoverSuccess:" + JSON.stringify(data));
-  console.info(TAG + "subscribeId:" + JSON.stringify(data.subscribeId));
   });
   // 注册设备发现失败回调监听。
   dmClass.on('discoverFail', (data) => {
@@ -276,15 +277,24 @@ try {
     }
     console.info(TAG + "discoverFail on:" + JSON.stringify(data));
   });
-  console.log("startDiscovering");
-  dmClass.startDiscovering(subscribeId);
+  var discoverParameter = "1";
+  var filterOptions = {
+    "filter_op": "OR", // 可选, 默认"OR"
+    "filters": [
+        {
+            "type": "range",
+            "value": 50 // 需过滤发现设备的距离，单位(cm)
+        }
+    ]
+  };
+  dmClass.startDiscovering(discoverParameter, filterOptions); // 当有设备发现时，通过discoverSuccess回调通知给应用程序
 } catch (err) {
   console.log("startDiscovering err:" + err.code + "," + err.message);
 }
 
 // 停止发现周边设备。
 try {
-  dmClass.stopDiscovering(subscribeId);
+  dmClass.stopDiscovering();
   // 取消注册设备发现成功回调。
   dmClass.off('discoverSuccess');
   // 取消注册设备发现失败回调。
