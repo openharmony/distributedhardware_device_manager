@@ -54,7 +54,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 │       ├── js                    # 外部JS接口及实现存放目录
 │       │   ├── include           # 外部JS接口及实现头文件存放目录
 │       │   └── src               # 外部JS接口及实现代码
-|       └── js4.0                 # 新增外部JS接口及实现存放目录
+|       └── js4.0                 # 从Openharmony 4.0.9.2版本开始新增外部JS接口及实现存放目录
 |           ├── include           # 新增外部JS接口及实现头文件存放目录
 |           └── src               # 新增外部JS接口及实现代码
 |
@@ -178,6 +178,8 @@ foundation/distributedhardware/distributedhardware_device_manager
 | off(type: 'uiStateChange', callback?: Callback&lt;{ param: string}&gt;): void; | 取消ui状态变更回调     |
 
 ## 新增接口说明
+
+  从Openharmony 4.0.9.2版本开始，新增设备管理接口。
 
 接口参见[**interface_sdk-js仓库的**](https://gitee.com/openharmony/interface_sdk-js/) *ohos.distributedDeviceManager.d.ts*
 
