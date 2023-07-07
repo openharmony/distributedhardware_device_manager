@@ -46,7 +46,7 @@ void OnErrorFuzzTest(const uint8_t* data, size_t size)
     int operationCode = static_cast<GroupOperationCode>(rd() % 6);
     int errorCode = *(reinterpret_cast<const int*>(data));
     std::string str(reinterpret_cast<const char*>(data), size);
-    const char *returnData = str.c_str();
+    const char *returnData = str.data();
     hichainConnector->onError(requestId, operationCode, errorCode, returnData);
 }
 }

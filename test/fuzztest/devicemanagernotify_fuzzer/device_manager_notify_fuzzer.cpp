@@ -76,7 +76,7 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     int32_t flag = 1;
     int32_t failedReason = 231;
     uint32_t status = 3;
-    uint32_t reason = 14; 
+    uint32_t reason = 14;
     DmDeviceInfo deviceInfo;
     DmDeviceBasicInfo deviceBasicInfo;
 
