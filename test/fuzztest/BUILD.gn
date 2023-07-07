@@ -31,6 +31,7 @@ group("fuzztest") {
     "generateencrypteduuid_fuzzer:fuzztest",
     "getdeviceinfo_fuzzer:fuzztest",
     "getfaparam_fuzzer:fuzztest",
+    "getlocaldeviceinfo_fuzzer:fuzztest",
     "gettrusteddevicelistservice_fuzzer:fuzztest",
     "getudidbynetworkid_fuzzer:fuzztest",
     "getuuidbynetworkid_fuzzer:fuzztest",

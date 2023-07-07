@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,13 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subInfo, extra, callback);
     usleep(SLEEP_TIME_US);
     DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subInfo.subscribeId);
+    usleep(SLEEP_TIME_US);
+    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subscribeId, extra, callback);
+    usleep(SLEEP_TIME_US);
+    DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
+    DeviceManager::GetInstance().CheckAPIAccessPermission();
+    DeviceManager::GetInstance().CheckNewAPIAccessPermission();
 }
 }
 }

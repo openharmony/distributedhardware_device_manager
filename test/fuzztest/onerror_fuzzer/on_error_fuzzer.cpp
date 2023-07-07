@@ -45,7 +45,8 @@ void OnErrorFuzzTest(const uint8_t* data, size_t size)
     std::random_device rd;
     int operationCode = static_cast<GroupOperationCode>(rd() % 6);
     int errorCode = *(reinterpret_cast<const int*>(data));
-    const char *returnData = reinterpret_cast<const char*>(data);
+    std::string str(reinterpret_cast<const char*>(data), size);
+    const char *returnData = str.c_str();
     hichainConnector->onError(requestId, operationCode, errorCode, returnData);
 }
 }

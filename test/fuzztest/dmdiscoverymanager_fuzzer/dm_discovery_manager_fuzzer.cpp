@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,9 +43,16 @@ void DmDiscoveryManagerFuzzTest(const uint8_t* data, size_t size)
     DmSubscribeInfo subscribeInfo;
     std::string extra(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    DmDeviceInfo info;
+    DmDeviceBasicInfo basicInfo;
+    bool isOnline = true;
+    int32_t range = *(reinterpret_cast<const int32_t*>(data));
 
     dmDiscoveryManager->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+    dmDiscoveryManager->StartDeviceDiscovery(pkgName, subscribeId, extra);
     dmDiscoveryManager->StopDeviceDiscovery(pkgName, subscribeId);
+    dmDiscoveryManager->OnDeviceFound(pkgName, info, isOnline);
+    dmDiscoveryManager->OnDeviceFound(pkgName, basicInfo, range, isOnline);
 }
 }
 }

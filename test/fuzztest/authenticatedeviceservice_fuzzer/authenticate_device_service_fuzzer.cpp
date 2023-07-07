@@ -28,16 +28,31 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string udid(reinterpret_cast<const char*>(data), size);
     int32_t authType = 123;
     DmAuthParam authParam;
+    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
+    int32_t deviceType = *(reinterpret_cast<const int32_t*>(data));
 
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
+    DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().VerifyAuthentication(pkgName);
     DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
     DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
+    DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, extra);
     DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
     DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
+    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
+    DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(pkgName);
+    DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
+    DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
+    DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
+    DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, deviceId, udid);
+    DeviceManagerService::GetInstance().CheckNewApiPermission();
+    DeviceManagerService::GetInstance().CheckApiPermission();
 }
 }
 }

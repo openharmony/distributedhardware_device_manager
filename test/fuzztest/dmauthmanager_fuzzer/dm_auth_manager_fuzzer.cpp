@@ -36,8 +36,11 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
     int32_t sessionSide = *(reinterpret_cast<const int32_t*>(data));
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    std::string pkgName(reinterpret_cast<const char*>(data), size);
+    std::string udidHash(reinterpret_cast<const char*>(data), size);
     authManager->OnSessionOpened(sessionId, sessionSide, result);
     authManager->OnSessionClosed(sessionId);
+    authManager->UnBindDevice(pkgName, udidHash);
 }
 }
 }

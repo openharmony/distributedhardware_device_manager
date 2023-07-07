@@ -32,11 +32,13 @@ void DeviceListRefreshFuzzTest(const uint8_t* data, size_t size)
 
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::vector<DmDeviceInfo> devList;
+    std::vector<DmDeviceBasicInfo> availableDevList;
     std::string bundleName(reinterpret_cast<const char*>(data), size);
     bool isRefresh = true;
     DmDeviceInfo deviceInfo;
 
     DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, isRefresh, devList);
+    DeviceManager::GetInstance().GetAvailableDeviceList(bundleName, availableDevList);
     DeviceManager::GetInstance().GetLocalDeviceInfo(bundleName, deviceInfo);
 }
 }

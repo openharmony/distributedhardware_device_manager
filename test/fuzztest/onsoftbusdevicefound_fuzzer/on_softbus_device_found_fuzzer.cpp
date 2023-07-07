@@ -35,6 +35,7 @@ void OnSoftbusDeviceFoundFuzzTest(const uint8_t* data, size_t size)
     DeviceInfo device = *(reinterpret_cast<const DeviceInfo*>(data));
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusDeviceFound(&device);
+    softbusConnector->OnSoftbusDeviceDiscovery(&device);
 }
 }
 }

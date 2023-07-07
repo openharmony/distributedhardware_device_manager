@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,14 +76,19 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     int32_t flag = 1;
     int32_t failedReason = 231;
     uint32_t status = 3;
-    uint32_t reason = 14;
+    uint32_t reason = 14; 
     DmDeviceInfo deviceInfo;
+    DmDeviceBasicInfo deviceBasicInfo;
 
     DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, deviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, deviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, deviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, subscribeId);
     DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, failedReason);
