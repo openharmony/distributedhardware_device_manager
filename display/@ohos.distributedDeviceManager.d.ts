@@ -98,11 +98,11 @@ declare namespace distributedDeviceManager {
     bindType: number;
 
     /**
-     * Extra information.
-     * Such as:
-     * targetPkgName - The name of binding target.
-     * appName - The name of application.
-     * appOperation - The operation of application.
+     * Extra information. 
+     * The type of extraInfo is key-value, The value type is string, The keys are as follows:
+     * targetPkgName - The package name of binding target.
+     * appName - The app name that try to bind the target.
+     * appOperation - The reason why the app want to bind the target package.
      * @since 10
      */
     extraInfo: { [key: string]: Object };
@@ -246,39 +246,65 @@ declare namespace distributedDeviceManager {
     getDeviceTypeSync(networkId: string): number;
 
     /**
-     * Start to discover target.
+     * Start to discover nearby devices.
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @since 10
-     * @param subscribeId subscribe id to discovery device
-     * @param filterOptions filterOptions to filter discovery device
+     * @param discoverParameter - Identifies the type of target discovered. The type of discoverParameter is key-value.
+     * Currently, only one key is supported.
+     * device - Indicates discover the nearby devices, The value is 1.
+     * @param filterOptions - FilterOptions to filter discovery device.
+     * The type of filterOptions is key-value, The keys are as follows:
+     * filter_op - Conditions for filter devices. The value type is string such as 'or' or 'and'.
+     * filters - Filter devices based on this parameter.
+     * If filter_op is 'or', discover devices that meet one of the filters;
+     * If filter_op is 'and', discover devices that meet all of the filters;
+     * The value type of filters is key-value such as:
+     * credible - Discover only devices are credible, The value can be 0 or 1.
+     * range - Discover only devices within the range, The value less than 1 m.
+     * isTrusted - Discover only devices are trusted, The value can be 0 or 1.
+     * authForm - Discover only devices are specified authenticate, The value can be 1 to 4.
+     * deviceType - Discover only devices are specified type, The value are as follows:
+     * 0 - Unknown device type.
+     * 8 - Indicates a smart camera.
+     * 10 - Indicates a smart speaker.
+     * 12 - Indicates a smart pc.
+     * 14 - Indicates a smart phone.
+     * 17 - Indicates a smart pad.
+     * 109 - Indicates a smart watch.
+     * 131 - Indicates a car.
+     * 156 - Indicates a smart TV.
      * @throws { BusinessError } 401 - Input parameter error.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600104 - Discovery invalid.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      */
-    startDiscovering(subscribeId: number, filterOptions?: string): void;
+    startDiscovering(discoverParameter:string, filterOptions?: string): void;
 
     /**
-     * Stop discovering target.
+     * Stop discovering nearby devices.
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @since 10
-     * @param subscribeId service subscribe id
      * @throws { BusinessError } 401 - Input parameter error.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      */
-    stopDiscovering(subscribeId: number): void;
+    stopDiscovering(): void;
 
     /**
      * Bind the specified target.
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @since 10
-     * @param deviceId id of device to bind
-     * @param bindParam parameters of device to bind
-     * @param callback indicates the callback to be invoked upon bindDevice
+     * @param deviceId id of device to bind.
+     * @param bindParam parameters of device to bind. The parameter type is key-value, The keys are as follows:
+     * bindType - This key is type of binding target, the value include:
+     * 1 - The bind type is pin code .
+     * 2 - The bind type is QR code.
+     * 3 - The bind type is nfc.
+     * 4 - The bind type is no_interaction.
+     * @param callback indicates the callback to be invoked upon bindDevice.
      * @throws { BusinessError } 401 - Input parameter error.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
@@ -320,7 +346,7 @@ declare namespace distributedDeviceManager {
      * @since 10
      * @param { 'deviceStatusChange' } type Device status change.
      * @param { Callback<{ action: DeviceStatusChange, device: DeviceBasicInfo }> } callback
-     *          Indicates the device status callback to register.
+     * Indicates the device status callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
@@ -333,7 +359,7 @@ declare namespace distributedDeviceManager {
      * @since 10
      * @param { 'deviceStatusChange' } type Device status change.
      * @param { Callback<{ action: DeviceStatusChange, device: DeviceBasicInfo }> } callback
-     *          Indicates the device status callback to unregister.
+     * Indicates the device status callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
@@ -346,11 +372,11 @@ declare namespace distributedDeviceManager {
      * @since 10
      * @param { 'discoverSuccess' } type Successfully discovered device.
      * @param { Callback<{ subscribeId: number, device: DeviceBasicInfo }> } callback
-     *          Indicates the device discovery callback to register.
+     * Indicates the device discovery callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
-    on(type: 'discoverSuccess', callback: Callback<{ subscribeId: number, device: DeviceBasicInfo }>): void;
+    on(type: 'discoverSuccess', callback: Callback<{ device: DeviceBasicInfo }>): void;
 
     /**
      * UnRegister the device discovery result callback.
@@ -359,11 +385,11 @@ declare namespace distributedDeviceManager {
      * @since 10
      * @param { 'discoverSuccess' } type Successfully discovered device.
      * @param { Callback<{ subscribeId: number, device: DeviceBasicInfo }> } callback
-     *          Indicates the device discovery callback to unregister.
+     * Indicates the device discovery callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
-    off(type: 'discoverSuccess', callback?: Callback<{ subscribeId: number, device: DeviceBasicInfo }>): void;
+    off(type: 'discoverSuccess', callback?: Callback<{ device: DeviceBasicInfo }>): void;
 
     /**
      * Register a device name change callback so that the application can be notified when discovery success.
@@ -395,12 +421,13 @@ declare namespace distributedDeviceManager {
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @since 10
      * @param { 'discoverFail' } type Discovery Device Failure.
-     * @param { Callback<{ subscribeId: number, reason: number }> } callback
-     *          Indicates the device found result callback to register.
+     * @param { Callback<{ subscribeId: number, reason: number }> } callback 
+     * Indicates the device found result callback to register. The return value as follows:
+     * reason - The result of discovery.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
-    on(type: 'discoverFail', callback: Callback<{ subscribeId: number, reason: number }>): void;
+    on(type: 'discoverFail', callback: Callback<{ reason: number }>): void;
 
     /**
      * UnRegister the device discovery result callback.
@@ -409,11 +436,12 @@ declare namespace distributedDeviceManager {
      * @since 10
      * @param { 'discoverFail' } type Discovery Device Failure.
      * @param { Callback<{ subscribeId: number, reason: number }> } callback
-     *          Indicates the device found result callback to unregister.
+     * Indicates the device found result callback to unregister. The return value as follows:
+     * reason - The result of discovery.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 401 - Input parameter error.
      */
-    off(type: 'discoverFail', callback?: Callback<{ subscribeId: number, reason: number }>): void;
+    off(type: 'discoverFail', callback?: Callback<{ reason: number }>): void;
 
     /**
      * Register a serviceError callback so that the application can be notified when devicemanager service died

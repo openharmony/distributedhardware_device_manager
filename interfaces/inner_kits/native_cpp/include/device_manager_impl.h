@@ -21,6 +21,8 @@
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
 #endif
+#include <map>
+#include <mutex>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -115,7 +117,7 @@ public:
      * @tc.desc: Initiate device discovery
      * @tc.type: FUNC
      */
-    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, uint64_t tokenId,
                                          const std::string &filterOptions,
                                          std::shared_ptr<DiscoveryCallback> callback) override;
     /**
@@ -124,6 +126,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) override;
+    /**
+     * @brief Stop device discovery.
+     * @param pkgName package name.
+     * @param tokenId app flag to discovery device.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StopDeviceDiscovery(uint64_t tokenId, const std::string &pkgName) override;
     /**
      * @tc.name: DeviceManagerImpl::PublishDeviceDiscovery
      * @tc.desc: Publish device discovery
@@ -289,6 +298,8 @@ private:
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
 #endif
+    std::mutex subscribIdLock;
+    std::map<uint64_t, uint16_t> subscribIdMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -15,6 +15,7 @@
 
 #include "device_manager_impl.h"
 #include <unistd.h>
+#include <random>
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
@@ -85,6 +86,14 @@ constexpr const char* DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
 constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
+
+uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
+{
+    std::random_device randDevice;
+    std::mt19937 genRand(randDevice());
+    std::uniform_int_distribution<int> disRand(randMin, randMax);
+    return disRand(genRand);
+}
 
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
@@ -394,7 +403,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId,
+int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint64_t tokenId,
     const std::string &filterOptions, std::shared_ptr<DiscoveryCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
@@ -403,9 +412,16 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
     }
 
     LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    uint16_t subscribeId = GenRandUint(0, 65535);
+    {
+        std::lock_guard<std::mutex> autoLock(subscribIdLock);
+        if (subscribIdMap_.find(tokenId) != subscribIdMap_.end()) {
+            return ERR_DM_DISCOVERY_REPEATED;
+        }
+        subscribIdMap_[tokenId] = subscribeId;
+    }
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
-
     std::shared_ptr<IpcStartDevDiscoveryByIdReq> req = std::make_shared<IpcStartDevDiscoveryByIdReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -439,6 +455,43 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_DEVICE_DISCOVER, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopDeviceDiscovery error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopDeviceDiscovery error: Failed with ret %d", ret);
+        return ret;
+    }
+
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    LOGI("StopDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StopDeviceDiscovery(uint64_t tokenId, const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    uint16_t subscribeId = 0;
+    {
+        std::lock_guard<std::mutex> autoLock(subscribIdLock);
+        if (subscribIdMap_.find(tokenId) == subscribIdMap_.end()) {
+            return ERR_DM_STOP_DISCOVERY;
+        }
+        subscribeId = subscribIdMap_[tokenId];
+        subscribIdMap_.erase(tokenId);
+    }
     std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
