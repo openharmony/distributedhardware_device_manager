@@ -13,37 +13,26 @@
  * limitations under the License.
  */
 
-#include "get_device_info_fuzzer.h"
+#include "get_local_device_info_fuzzer.h"
 
 #include "device_manager_impl.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
+void GetLocalDeviceInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t)) || (size > DM_MAX_DEVICE_ID_LEN)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
 
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string networkId(reinterpret_cast<const char*>(data), size);
-    DmDeviceInfo deviceInfo;
-    deviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    int32_t ret = memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size);
-    if (ret != EOK) {
-        return;
-    }
-    ret = memcpy_s(deviceInfo.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char *>(data)), size);
-    if (ret != EOK) {
-        return;
-    }
-    deviceInfo.deviceTypeId = *(reinterpret_cast<const uint16_t*>(data));
-    DeviceManagerImpl::GetInstance().GetDeviceInfo(pkgName, networkId, deviceInfo);
-    std::string deviceName(reinterpret_cast<const char*>(data), size);
-    DeviceManagerImpl::GetInstance().GetDeviceName(pkgName, networkId, deviceName);
     int32_t deviceTypeId = *(reinterpret_cast<const int32_t*>(data));
-    DeviceManagerImpl::GetInstance().GetDeviceType(pkgName, networkId, deviceTypeId);
+    DeviceManagerImpl::GetInstance().GetLocalDeviceNetWorkId(pkgName, networkId);
+    DeviceManagerImpl::GetInstance().GetLocalDeviceId(pkgName, networkId);
+    DeviceManagerImpl::GetInstance().GetLocalDeviceType(pkgName, deviceTypeId);
+    DeviceManagerImpl::GetInstance().GetLocalDeviceName(pkgName, networkId);
 }
 }
 }
@@ -52,7 +41,7 @@ void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::GetDeviceInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::GetLocalDeviceInfoFuzzTest(data, size);
 
     return 0;
 }

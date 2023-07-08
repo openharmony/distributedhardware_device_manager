@@ -46,6 +46,7 @@ void SoftBusConnectorPublishFuzzTest(const uint8_t* data, size_t size)
     softbusConnector->UnPublishDiscovery(publishId);
     softbusConnector->StartDiscovery(subscribeInfo);
     softbusConnector->StopDiscovery(subscribeId);
+    softbusConnector->StartDiscovery(subscribeId);
     softbusConnector->HaveDeviceInMap(deviceId);
 }
 }
