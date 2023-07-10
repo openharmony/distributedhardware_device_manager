@@ -278,7 +278,7 @@ void DmNapiInitCallback::OnRemoteDied()
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -289,7 +289,7 @@ void DmNapiInitCallback::OnRemoteDied()
         LOGI("OnRemoteDied, deviceManagerNapi bundleName %s", callback->bundleName_.c_str());
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnRemoteDied work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -317,7 +317,7 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -327,7 +327,7 @@ void DmNapiDeviceStateCallback::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOnline work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -355,7 +355,7 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -365,7 +365,7 @@ void DmNapiDeviceStateCallback::OnDeviceReady(const DmDeviceInfo &deviceInfo)
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceReady work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -393,7 +393,7 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -403,7 +403,7 @@ void DmNapiDeviceStateCallback::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOffline work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -431,7 +431,7 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -441,7 +441,7 @@ void DmNapiDeviceStateCallback::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceChanged work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -471,7 +471,7 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -481,7 +481,7 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -513,7 +513,7 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiStateJsCallback *callback = reinterpret_cast<DmNapiStateJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -523,7 +523,7 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
         }
         DeleteDmNapiStateJsCallbackPtr(callback);
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnDiscoveryFailed work queue");
         DeleteDmNapiStateJsCallbackPtr(jsCallback);
@@ -577,7 +577,7 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiPublishJsCallback *callback = reinterpret_cast<DmNapiPublishJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -588,7 +588,7 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnPublishResult work queue");
         delete jsCallback;
@@ -633,7 +633,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -645,7 +645,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnAuthResult work queue");
         delete jsCallback;
@@ -675,7 +675,7 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiCredentialJsCallback *callback = reinterpret_cast<DmNapiCredentialJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -687,7 +687,7 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
         callback = nullptr;
         delete work;
         work = nullptr;
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnCredentialResult work queue");
         delete jsCallback;
@@ -717,7 +717,7 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiVerifyJsCallback *callback = reinterpret_cast<DmNapiVerifyJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi =  DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -728,7 +728,7 @@ void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, i
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnVerifyAuthResult work queue");
         delete jsCallback;
@@ -1635,7 +1635,7 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -1646,7 +1646,7 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    });
+    }, uv_qos_user_initiated);
     if (ret != 0) {
         LOGE("Failed to execute OnCall work queue");
         delete jsCallback;
@@ -1813,7 +1813,7 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackI
             delete dInfoAsyncCallbackInfo;
         },
         (void *)deviceInfoAsyncCallbackInfo, &deviceInfoAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, deviceInfoAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, deviceInfoAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo)
@@ -1847,7 +1847,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoAsyncCallbackInfo 
             delete dInfoAsyncCallbackInfo;
         },
         (void *)deviceInfoAsyncCallbackInfo, &deviceInfoAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, deviceInfoAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, deviceInfoAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::CallAsyncWorkSync(napi_env env,
@@ -1884,7 +1884,7 @@ void DeviceManagerNapi::CallAsyncWorkSync(napi_env env,
             delete dInfoListAsyncCallbackInfo;
         },
         (void *)deviceInfoListAsyncCallbackInfo, &deviceInfoListAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, deviceInfoListAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, deviceInfoListAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo)
@@ -1920,7 +1920,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackI
             dInfoListAsyncCallbackInfo = nullptr;
         },
         (void *)deviceInfoListAsyncCallbackInfo, &deviceInfoListAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, deviceInfoListAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, deviceInfoListAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data)
@@ -1955,7 +1955,7 @@ void DeviceManagerNapi::CallCredentialAsyncWork(napi_env env, CredentialAsyncCal
 
     napi_create_async_work(env, nullptr, resourceName, AsyncTaskCallback, AsyncAfterTaskCallback,
         (void *)creAsyncCallbackInfo, &creAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, creAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, creAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info info,
@@ -3023,7 +3023,7 @@ void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbac
                 asyCallbackInfo->ret = ret;
             }
         }, HandleCreateDmCallBackCompletedCB, (void *)asCallbackInfo, &asCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::CallGetDeviceInfo(napi_env env, NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo)
@@ -3035,7 +3035,7 @@ void DeviceManagerNapi::CallGetDeviceInfo(napi_env env, NetworkIdAsyncCallbackIn
         GetDeviceInfoCB,
         CompleteGetDeviceInfoCB,
         (void *)networkIdAsyncCallbackInfo, &networkIdAsyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, networkIdAsyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, networkIdAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
 
 void DeviceManagerNapi::GetDeviceInfoCB(napi_env env, void *data)
