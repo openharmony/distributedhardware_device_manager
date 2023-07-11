@@ -833,7 +833,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
  *              set filterOptions null
  *              set callback not null
  *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           3. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ *           3. check ret is ERR_DM_DISCOVERY_REPEATED
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
