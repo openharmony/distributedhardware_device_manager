@@ -847,7 +847,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
     DmDeviceInfo deviceInfo;
     callback->OnDeviceFound(subscribeId, deviceInfo);
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
 }
 
 /**
@@ -4637,7 +4637,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_105, testing::ext::TestSize
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_IPC_SEND_REQUEST_FAILED
+ *           4. check ret is ERR_DM_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -4650,6 +4650,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    DeviceManagerImpl::GetInstance().subscribIdMap_.clear();
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
