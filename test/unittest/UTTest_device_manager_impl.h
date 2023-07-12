@@ -39,11 +39,11 @@ public:
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
-    virtual ~DeviceDiscoveryCallbackTest() {}
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) override{}
+    ~DeviceDiscoveryCallbackTest() {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) override{}
 };
 
 class DevicePublishCallbackTest : public PublishCallback {

@@ -960,24 +960,24 @@ void DmAuthManager::UserSwitchEventCallback(int32_t userId)
     int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
     MultipleUserConnector::SetSwitchOldUserId(userId);
     if (!hiChainConnector_->GetGroupInfo(oldUserId, queryParams, groupList)) {
-        LOGE("failed to get device join groups");
+        LOGE("failed to get the old user id groups");
         return;
     }
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
         int32_t ret = hiChainConnector_->DeleteGroup(oldUserId, iter->groupId);
         if (ret != DM_OK) {
-            LOGE("fail to delete group");
+            LOGE("failed to delete the old user id group");
         }
     }
 
     if (!hiChainConnector_->GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get device join groups");
+        LOGE("failed to get the user id groups");
         return;
     }
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
         int32_t ret = hiChainConnector_->DeleteGroup(userId, iter->groupId);
         if (ret != DM_OK) {
-            LOGE("fail to delete group");
+            LOGE("failed to delete the user id group");
         }
     }
 }
