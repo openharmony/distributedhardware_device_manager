@@ -195,57 +195,56 @@ foundation/distributedhardware/distributedhardware_device_manager
 
 | 原型                                                         | 描述                            |
 | ------------------------------------------------------------ | ------------------------------- |
-| createDeviceManager(bundleName: string, callback: AsyncCallback&lt;DeviceManager&gt;): void; | 创建一个设备管理器实例。 |
-| releaseDeviceManager(): void;                      | 设备管理实例不再使用后，通过该方法释放DeviceManager实例。           |
-| getAvailableDeviceListSync(): Array&lt;DeviceBasicInfo&gt;;                                                                | 同步获取所有可信设备列表。 |
-| getAvailableDeviceList(callback:AsyncCallback&lt;Array&lt;DeviceBasicInfo&gt;&gt;): void;                                  | 获取所有可信设备列表。使用callback异步回调。 |
-| getAvailableDeviceList(): Promise&lt;Array&lt;DeviceBasicInfo&gt;&gt;;                                                     | 获取所有可信设备列表。使用Promise异步回调。 |
-| getLocalDeviceNetworkIdSync(): string;                                                                                     | 同步获取本地设备网络标识。 |
-| getLocalDeviceNameSync(): string;                                                                                          | 同步获取本地设备名称。     |
-| getLocalDeviceTypeSync(): number;                                                                                          | 同步获取本地设备类型。     |
-| getLocalDeviceIdSync(): string;                                                                                            | 同步获取本地设备id。       |
-| getDeviceNameSync(networkId: string): string;                                                                              | 通过指定设备的网络标识同步获取该设备名称。    |
-| getDeviceTypeSync(networkId: string): number;                                                                              | 通过指定设备的网络标识同步获取该设备类型。    |
-| startDiscovering(discoverParameter:string, filterOptions?: string): void;                                                   | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
-| stopDiscovering(): void;                                                                            | 停止发现周边设备。         |
-| bindTarget(deviceId: string, bindParam: BindParam, callback: AsyncCallback&lt;{deviceId: string}&gt;): void;                     | 认证设备。                                             |
-| unbindTarget(deviceId: string): void;                                                                                      | 解除认证设备。                                          |
-| on(type: 'deviceStatusChange', callback: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;         | 注册设备状态回调。               |
-| off(type: 'deviceStatusChange', callback?: Callback&lt;{ action: DeviceStatusChange, device: DeviceBasicInfo }&gt;): void;       | 取消注册设备状态回调。            |
-| on(type: 'discoverSuccess', callback: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                   | 注册发现设备成功回调监听。        |
-| off(type: 'discoverSuccess', callback?: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                 | 取消注册设备发现成功回调。            |
-| on(type: 'deviceNameChange', callback: Callback&lt;{ deviceName: string }&gt;): void;                                            | 注册设备名称变更回调监听。        |
-| off(type: 'deviceNameChange', callback?: Callback&lt;{ deviceName: string }&gt;): void;                                          | 取消注册设备名称变更回调监听。    |
-| on(type: 'discoverFail', callback: Callback&lt;{ reason: number }&gt;): void;                         | 注册设备发现失败回调监听。        |
-| off(type: 'discoverFail', callback?: Callback&lt;{ reason: number }&gt;): void;                       | 取消注册设备发现失败回调。        |
-| on(type: 'serviceDie', callback: () =&gt; void): void;                                                                     | 注册设备管理服务死亡监听。        |
-| off(type: 'serviceDie', callback?: () =&gt; void): void;                                                                   | 取消注册设备管理服务死亡监听。    |
+| createDeviceManager(bundleName: string): DeviceManager;                        | 创建一个设备管理实例。设备管理实例是分布式设备管理方法的调用入口。用于获取可信设备和本地设备的相关信息。 |
+| releaseDeviceManager(deviceManager: DeviceManager): void;                      | 设备管理实例不再使用后，通过该方法释放DeviceManager实例。           |
+| getAvailableDeviceListSync(): Array&lt;DeviceBasicInfo&gt;;                                                | 同步获取所有可信设备列表。 |
+| getAvailableDeviceList(callback:AsyncCallback&lt;Array&lt;DeviceBasicInfo&gt;&gt;): void;                  | 获取所有可信设备列表。使用callback异步回调。 |
+| getAvailableDeviceList(): Promise&lt;Array&lt;DeviceBasicInfo&gt;&gt;;                                     | 获取所有可信设备列表。使用Promise异步回调。 |
+| getLocalDeviceNetworkId(): string;                                                                         | 获取本地设备网络标识。 |
+| getLocalDeviceName(): string;                                                                              | 获取本地设备名称。     |
+| getLocalDeviceType(): number;                                                                              | 获取本地设备类型。     |
+| getLocalDeviceId(): string;                                                                                | 获取本地设备id。       |
+| getDeviceName(networkId: string): string;                                                                  | 通过指定设备的网络标识获取该设备名称。    |
+| getDeviceType(networkId: string): number;                                                                  | 通过指定设备的网络标识获取该设备类型。    |
+| startDiscovering(discoverParam: {[key:&nbsp;string]:&nbsp;Object} , filterOptions?: {[key:&nbsp;string]:&nbsp;Object} ): void;  | 发现周边设备。发现状态持续两分钟，超过两分钟，会停止发现，最大发现数量99个。    |
+| stopDiscovering(): void;                                                                                   | 停止发现周边设备。         |
+| bindTarget(deviceId: string, bindParam: {[key:&nbsp;string]:&nbsp;Object} , callback: AsyncCallback&lt;{deviceId: string}>): void;          | 认证设备。                                             |
+| unbindTarget(deviceId: string): void;                                                                      | 解除认证设备。         |
+| on(type: 'deviceStateChange', callback: Callback&lt;{ action: DeviceStateChange, device: DeviceBasicInfo }&gt;): void;           | 注册设备状态回调。               |
+| off(type: 'deviceStateChange', callback?: Callback&lt;{ action: DeviceStateChange, device: DeviceBasicInfo }&gt;): void;         | 取消注册设备状态回调。           |
+| on(type: 'discoverSuccess', callback: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                  | 注册发现设备成功回调监听。        |
+| off(type: 'discoverSuccess', callback?: Callback&lt;{ device: DeviceBasicInfo }&gt;): void;                | 取消注册设备发现成功回调。            |
+| on(type: 'deviceNameChange', callback: Callback&lt;{ deviceName: string }&gt;): void;                      | 注册设备名称变更回调监听。        |
+| off(type: 'deviceNameChange', callback?: Callback&lt;{ deviceName: string }&gt;): void;                    | 取消注册设备名称变更回调监听。    |
+| on(type: 'discoverFailure', callback: Callback&lt;{ reason: number }&gt;): void;                           | 注册设备发现失败回调监听。        |
+| off(type: 'discoverFailure', callback?: Callback&lt;{ reason: number }&gt;): void;                         | 取消注册设备发现失败回调。        |
+| on(type: 'serviceDie', callback?: Callback&lt;{}&gt;): void;                                               | 注册设备管理服务死亡监听。        |
+| off(type: 'serviceDie', callback?: Callback&lt;{}&gt;): void;                                              | 取消注册设备管理服务死亡监听。    |
 
 - 示例如下：
 
 ```js
 try {
-    // 创建DeviceManager实例：
-    deviceManager.createDeviceManager("ohos.samples.helloWorld", (err, data) => {
-    if (err) {
-      console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
-      return;
-    }
-    console.info("createDeviceManager success, value =" + data);
-    this.dmClass = data;
-    });
+  let dmClass = deviceManager.createDeviceManager("ohos.samples.jshelloworld");
 } catch(err) {
-    console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
+  console.error("createDeviceManager errCode:" + err.code + ",errMessage:" + err.message);
 }
 
 try {
   // 注册设备管理服务死亡监听。
-  dmClass.on('serviceDie', data => console.log("serviceDie on:" + JSON.stringify(data)))
-  // 注册设备状态回调。
-  dmClass.on('deviceStatusChange', data =>
-    console.log("deviceStatusChange on:" + JSON.stringify(data)))
+  dmClass.on("serviceDie", () => {
+    console.info("serviceDie on");
+  });
 } catch (err) {
-  console.log("on err:" + err.code + "," + err.message);
+  console.error("serviceDie errCode:" + err.code + ",errMessage:" + err.message);
+}
+
+try {
+  dmClass.on('deviceStateChange', (data) => {
+    console.info("deviceStateChange on:" + JSON.stringify(data));
+  });
+} catch (err) {
+  console.error("deviceStateChange errCode:" + err.code + ",errMessage:" + err.message);
 }
 
 // 同步获取所有可信设备列表。
@@ -255,11 +254,11 @@ try {
 } catch(err) {
   console.log("getAvailableDeviceList failed: " + JSON.stringify(err));
 }
-// 同步获取本地设备类型。
-var data = dmClass.getLocalDeviceTypeSync();
+// 获取本地设备类型。
+var data = dmClass.getLocalDeviceType();
 
-// 同步获取本地设备名称。
-var data = dmClass.getLocalDeviceNameSync();
+// 获取本地设备名称。
+var data = dmClass.getLocalDeviceName();
 
 // 发现周边设备。
 try {
@@ -272,24 +271,19 @@ try {
   console.info(TAG + "discoverSuccess:" + JSON.stringify(data));
   });
   // 注册设备发现失败回调监听。
-  dmClass.on('discoverFail', (data) => {
-    if (!data) {
-      console.log("discoverFail error data=null")
-      return;
-    }
-    console.info(TAG + "discoverFail on:" + JSON.stringify(data));
+  dmClass.on('discoverFailure', (data) => {
+    console.info("discoverFailure on:" + JSON.stringify(data));
   });
-  var discoverParameter = "1";
-  var filterOptions = {
-    "filter_op": "OR", // 可选, 默认"OR"
-    "filters": [
-        {
-            "type": "range",
-            "value": 50 // 需过滤发现设备的距离，单位(cm)
-        }
-    ]
+  var discoverParam = {
+    'discoverTargetType': 1
   };
-  dmClass.startDiscovering(discoverParameter, filterOptions); // 当有设备发现时，通过discoverSuccess回调通知给应用程序
+  var filterOptions = {
+    'availableStatus': 1,
+    'discoverDistance': 50,
+    'authenticationStatus': 0,
+    'authorizationType': 0
+  };
+  dmClass.startDiscovering(discoverParam, filterOptions); // 当有设备发现时，通过discoverSuccess回调通知给应用程序
 } catch (err) {
   console.log("startDiscovering err:" + err.code + "," + err.message);
 }
@@ -300,25 +294,26 @@ try {
   // 取消注册设备发现成功回调。
   dmClass.off('discoverSuccess');
   // 取消注册设备发现失败回调。
-  dmClass.off('discoverFail');
+  dmClass.off('discoverFailure');
 } catch (err) {
   console.log("err:" + err.code + "," + err.message);
 }
 
 // 设备认证
-var extraInfo = {
-  "appOperation": "xxxxxxxx",  // 业务操作 支持用户自定义
-  "customDescription": "xxxxxxxx",    // 业务描述 支持用户自定义
-}
-var bindParam = {
-  "bindType": 1,
-  "extraInfo": extraInfo
+var deviceId ="XXXXXXXX";
+let bindParam = {
+  'bindType': 1,// 认证类型： 1 - 无帐号PIN码认证
+  'targetPkgName': 'xxxx',
+  'appName': 'xxxx',
+  'appOperation': 'xxxx',
+  'customDescription': 'xxxx'
 }
 try {
-  var deviceId = "xxxxxxxx";
+  // 设备认证
   dmClass.bindTarget(deviceId, bindParam, (err, data) => {
   if (err) {
     console.info(TAG + "bindTarget err:" + JSON.stringify(err));
+    return;
   } else {
     console.info(TAG + "bindTarget result:" + JSON.stringify(data));
     let token = data.pinTone;
@@ -330,7 +325,7 @@ try {
 // 设备取消认证
 try {
   var deviceId = "xxxxxxxx";
-  let result = dmClass.unbindTarget(deviceId, '');
+  let result = dmClass.unbindTarget(deviceId);
   console.log("unbindTarget last device: " + JSON.stringify(deviceId) + " and result = "
     + result);
   } catch (err) {
@@ -341,10 +336,11 @@ try {
   // 取消注册设备管理服务死亡监听。
   dmClass.off('serviceDie');
   // 取消注册设备状态回调。
-  dmClass.off('deviceStatusChange', JSON.stringify(mFilterOption), data =>
-    console.log("deviceStatusChange off:" + JSON.stringify(data)));
+  dmClass.off('deviceStateChange', (data) => {
+      console.info('deviceStateChange' + JSON.stringify(data));
+    });
   // 释放DeviceManager实例。
-  dmClass.releaseDeviceManager();
+  deviceManager.releaseDeviceManager();
 } catch (err) {
   console.log("err:" + err.code + "," + err.message);
 }
@@ -357,9 +353,9 @@ try {
 
 | 原型                                                         | 描述                 |
 | ------------------------------------------------------------ | -------------------- |
-| replyUiAction(action: number, params: string): void;                                                             | 回复用户ui操作行为。      |
-| on(type: 'replyResult', callback: Callback&lt;{ param: string}&gt;): void;                                               | 回复UI操作结果回调。          |
-| off(type: 'replyResult', callback?: Callback&lt;{ param: string}&gt;): void;                                             | 取消回复UI操作结果回调。       |
+| replyUiAction(action: number, actionResult: string): void;                                                | 回复用户ui操作行为。此接口只能被devicemanager的PIN码hap使用。      |
+| on(type: 'replyResult', callback: Callback&lt;{ param: string}&gt;): void;                                | 回复UI操作结果回调。          |
+| off(type: 'replyResult', callback?: Callback&lt;{ param: string}&gt;): void;                              | 取消回复UI操作结果回调。       |
 
 - 示例如下：
 
@@ -373,15 +369,13 @@ try {
     action = 5 - pin码输入框确定操作
 */
 try {
-  dmClass.replyUiAction(operation, "extra")
+  let action = 0;
+  dmClass.replyUiAction(action, "extra")
   dmClass.on('replyResult', (data) => {
     console.log("replyResult executed, dialog closed" + JSON.stringify(data))
     var tmpStr = JSON.parse(data.param)
-    this.isShow = tmpStr.verifyFailed
-    console.log("replyResult executed, dialog closed" + this.isShow)
-    if (!this.isShow) {
-        this.destruction()
-    }
+    var isShow = tmpStr.verifyFailed
+    console.log("replyResult executed, dialog closed" + isShow)
   });
 } catch (err) {
   console.log("err:" + err.code + "," + err.message);
