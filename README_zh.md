@@ -309,6 +309,7 @@ let bindParam = {
   'customDescription': 'xxxx'
 }
 try {
+  // 设备认证
   dmClass.bindTarget(deviceId, bindParam, (err, data) => {
   if (err) {
     console.info(TAG + "bindTarget err:" + JSON.stringify(err));
@@ -335,8 +336,9 @@ try {
   // 取消注册设备管理服务死亡监听。
   dmClass.off('serviceDie');
   // 取消注册设备状态回调。
-  dmClass.off('deviceStateChange', JSON.stringify(mFilterOption), data =>
-    console.log("deviceStateChange off:" + JSON.stringify(data)));
+  dmClass.off('deviceStateChange', (data) => {
+      console.info('deviceStateChange' + JSON.stringify(data));
+    });
   // 释放DeviceManager实例。
   deviceManager.releaseDeviceManager();
 } catch (err) {
@@ -367,13 +369,13 @@ try {
     action = 5 - pin码输入框确定操作
 */
 try {
-  let operation = 0;
-  dmClass.replyUiAction(operation, "extra")
+  let action = 0;
+  dmClass.replyUiAction(action, "extra")
   dmClass.on('replyResult', (data) => {
     console.log("replyResult executed, dialog closed" + JSON.stringify(data))
     var tmpStr = JSON.parse(data.param)
-    this.isShow = tmpStr.verifyFailed
-    console.log("replyResult executed, dialog closed" + this.isShow)
+    var isShow = tmpStr.verifyFailed
+    console.log("replyResult executed, dialog closed" + isShow)
   });
 } catch (err) {
   console.log("err:" + err.code + "," + err.message);
