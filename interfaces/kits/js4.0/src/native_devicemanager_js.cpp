@@ -2917,7 +2917,6 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
     if (!CheckArgsType(env, bundleNameValueType == napi_string, "bundleName", "string")) {
         return nullptr;
     }
-    char name[DM_NAPI_BUF_LENGTH] = nullptr;
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
     char name[DM_NAPI_BUF_LENGTH] = {0};
