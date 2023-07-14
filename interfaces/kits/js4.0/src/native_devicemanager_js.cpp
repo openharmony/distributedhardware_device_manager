@@ -47,8 +47,6 @@ const std::string DEVICE_MANAGER_NAPI_CLASS_NAME = "DeviceManager";
 const std::string DM_NAPI_EVENT_REPLY_RESULT = "replyResult";
 const std::string DM_NAPI_EVENT_DEVICE_NAME_CHANGE = "deviceNameChange";
 
-
-
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
 const int32_t DM_NAPI_ARGS_ZERO = 0;
@@ -2159,6 +2157,7 @@ bool DeviceManagerNapi::JsToDiscoverTargetType(napi_env env, const napi_value &o
         napi_get_value_int32(env, field, &discoverTargetType);
         return true;
     }
+    LOGE("discoverTargetType is invalid.");
     return false;
 }
 
@@ -2216,13 +2215,11 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
     if (argcNum == DM_NAPI_ARGS_ONE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
-            LOGE("discoverTargetType is invalid.");
             return nullptr;
         }
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
-            LOGE("discoverTargetType is invalid.");
             return nullptr;
         }
         napi_valuetype objectType = napi_undefined;
