@@ -81,7 +81,7 @@ void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
     }
     filterOp_ = FILTERS_TYPE_AND;
     DmDeviceFilters deviceFilters;
-    if (!object.contains("credible") || !object["credible"].is_string()) {
+    if (!object.contains("credible") || !object["credible"].is_number_integer()) {
         LOGE("Filters credible type invalid");
     } else {
         deviceFilters.type = "credible";
@@ -89,7 +89,7 @@ void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
         filters_.push_back(deviceFilters);
     }
 
-    if (!object.contains("range") || !object["range"].is_string()) {
+    if (!object.contains("range") || !object["range"].is_number_integer()) {
         LOGE("Filters range type invalid");
     } else {
         deviceFilters.type = "range";
@@ -97,7 +97,7 @@ void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
         filters_.push_back(deviceFilters);
     }
 
-    if (!object.contains("isTrusted") || !object["isTrusted"].is_string()) {
+    if (!object.contains("isTrusted") || !object["isTrusted"].is_number_integer()) {
         LOGE("Filters isTrusted type invalid");
     } else {
         deviceFilters.type = "isTrusted";
@@ -105,7 +105,7 @@ void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
         filters_.push_back(deviceFilters);
     }
 
-    if (!object.contains("authForm") || !object["authForm"].is_string()) {
+    if (!object.contains("authForm") || !object["authForm"].is_number_integer()) {
         LOGE("Filters authForm type invalid");
     } else {
         deviceFilters.type = "authForm";
@@ -113,7 +113,7 @@ void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
         filters_.push_back(deviceFilters);
     }
 
-    if (!object.contains("deviceType") || !object["deviceType"].is_string()) {
+    if (!object.contains("deviceType") || !object["deviceType"].is_number_integer()) {
         LOGE("Filters deviceType type invalid");
     } else {
         deviceFilters.type = "deviceType";
