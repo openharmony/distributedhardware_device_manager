@@ -419,7 +419,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
         if (subscribIdMap_.find(tokenId) != subscribIdMap_.end()) {
             return ERR_DM_DISCOVERY_REPEATED;
         }
-        subscribeId = GenRandUint(0, 65535);
+        subscribeId = GenRandUint(0, DM_MAX_RANDOM);
         subscribIdMap_[tokenId] = subscribeId;
     }
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
