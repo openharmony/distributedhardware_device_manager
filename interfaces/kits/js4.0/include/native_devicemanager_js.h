@@ -265,8 +265,8 @@ public:
     static napi_value Constructor(napi_env env, napi_callback_info info);
     static napi_value EnumTypeConstructor(napi_env env, napi_callback_info info);
     static napi_value InitDeviceStatusChangeActionEnum(napi_env env, napi_value exports);
-    static napi_value ReleaseDeviceManager(napi_env env, napi_callback_info info);
     static napi_value CreateDeviceManager(napi_env env, napi_callback_info info);
+    static napi_value ReleaseDeviceManager(napi_env env, napi_callback_info info);
     static napi_value SetUserOperationSync(napi_env env, napi_callback_info info);
     static napi_value GetAvailableDeviceListSync(napi_env env, napi_callback_info info);
     static napi_value GetAvailableDeviceList(napi_env env, napi_callback_info info);

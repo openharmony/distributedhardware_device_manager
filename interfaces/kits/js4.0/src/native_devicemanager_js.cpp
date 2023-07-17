@@ -37,7 +37,7 @@ namespace {
     napi_value thisVar = nullptr;     \
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
-const std::string DM_NAPI_EVENT_DEVICE_STATUS_CHANGE = "deviceStatusChange";
+const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
@@ -56,7 +56,7 @@ const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
-napi_ref deviceStatusChangeActionEnumConstructor_ = nullptr;
+napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -761,7 +761,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
 
     napi_set_named_property(env_, result, "device", device);
-    OnEvent("deviceStatusChange", DM_NAPI_ARGS_ONE, &result);
+    OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
 }
 
@@ -1318,7 +1318,7 @@ bool DeviceManagerNapi::IsSystemApp()
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
 {
     LOGI("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
         if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
             return;
         }
@@ -1368,7 +1368,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
 {
     LOGI("CreateDmCallback for bundleName %s eventType %s extra = %s",
          bundleName.c_str(), eventType.c_str(), extra.c_str());
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStatusCallback>(env, bundleName);
         int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
         if (ret != 0) {
@@ -1398,7 +1398,7 @@ void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 
 void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &eventType)
 {
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto iter = g_deviceStatusCallbackMap.find(bundleName);
         if (iter == g_deviceStatusCallbackMap.end()) {
             LOGE("ReleaseDmCallback: cannot find statusCallback for bundleName %s", bundleName.c_str());
@@ -2706,7 +2706,7 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
     LOGI("JsOn for bundleName %s, eventType %s ", deviceManagerWrapper->bundleName_.c_str(), eventType.c_str());
     deviceManagerWrapper->On(eventType, argv[num + 1]);
 
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         if (num == 1) {
             size_t extraLen = 0;
             napi_get_value_string_utf8(env, argv[1], nullptr, 0, &extraLen);
@@ -3050,10 +3050,10 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     };
 
     napi_value result = nullptr;
-    napi_define_class(env, "DeviceStatusChange", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+    napi_define_class(env, "DeviceStateChange", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &deviceStatusChangeActionEnumConstructor_);
-    napi_set_named_property(env, exports, "DeviceStatusChange", result);
+    napi_create_reference(env, result, refCount, &deviceStateChangeActionEnumConstructor_);
+    napi_set_named_property(env, exports, "DeviceStateChange", result);
     return exports;
 }
 
