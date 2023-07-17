@@ -2127,16 +2127,6 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
-bool DeviceManagerNapi::JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[])
-{
-    napi_valuetype valueType1 = napi_undefined;
-    napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
-    if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
-        return false;
-    }
-    return true;
-}
-
 bool DeviceManagerNapi::JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType)
 {
     napi_valuetype objectType = napi_undefined;

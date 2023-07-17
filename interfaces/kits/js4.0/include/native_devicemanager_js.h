@@ -356,7 +356,6 @@ private:
     static napi_value GetAvailableDeviceListByFilter(napi_env env, napi_callback_info info,
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool IsSystemApp();
-    static bool JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[]);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;
