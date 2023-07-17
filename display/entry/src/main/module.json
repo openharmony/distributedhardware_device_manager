@@ -28,7 +28,7 @@
           "ic_device_pc": "$media:ic_device_pc",
           "ic_device_glass": "$media:ic_device_glass",
           "label": "$string:MainAbility_label",
-          "visible": true,
+          "visible": false,
           "launchType": "standard"
       }
     ],
@@ -39,7 +39,7 @@
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
+        "visible": false,
         "type": "service"
       },
       {
@@ -48,7 +48,7 @@
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
+        "visible": false,
         "type": "service"
       },
       {
@@ -57,7 +57,7 @@
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
+        "visible": false,
         "type": "service"
       }
     ],
