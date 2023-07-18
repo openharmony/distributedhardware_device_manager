@@ -86,6 +86,7 @@ constexpr const char* DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
 constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
+const uint16_t DM_MAX_RANDOM = 65535;
 
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
@@ -412,12 +413,13 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
     }
 
     LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
-    uint16_t subscribeId = GenRandUint(0, 65535);
+    uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(subscribIdLock);
         if (subscribIdMap_.find(tokenId) != subscribIdMap_.end()) {
             return ERR_DM_DISCOVERY_REPEATED;
         }
+        subscribeId = GenRandUint(0, DM_MAX_RANDOM);
         subscribIdMap_[tokenId] = subscribeId;
     }
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));

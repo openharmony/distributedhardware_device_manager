@@ -276,8 +276,8 @@ public:
     static napi_value GetLocalDeviceType(napi_env env, napi_callback_info info);
     static napi_value GetDeviceName(napi_env env, napi_callback_info info);
     static napi_value GetDeviceType(napi_env env, napi_callback_info info);
-    static napi_value StartDeviceDiscoverSync(napi_env env, napi_callback_info info);
-    static napi_value StopDeviceDiscoverSync(napi_env env, napi_callback_info info);
+    static napi_value StartDeviceDiscover(napi_env env, napi_callback_info info);
+    static napi_value StopDeviceDiscover(napi_env env, napi_callback_info info);
     static napi_value PublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
     static napi_value UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info);
     static napi_value GetAuthenticationParamSync(napi_env env, napi_callback_info info);
@@ -289,7 +289,6 @@ public:
     static napi_value DeleteCredential(napi_env env, napi_callback_info info);
     static napi_value JsOn(napi_env env, napi_callback_info info);
     static napi_value JsOff(napi_env env, napi_callback_info info);
-    static void HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -320,10 +319,8 @@ public:
                              uint8_t **bufferPtr, int32_t &bufferLen);
     static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                nlohmann::json &jsonObj);
-    static void JsToDmTokenInfo(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                nlohmann::json &jsonObj);
-    static void JsToDmAuthExtra(const napi_env &env, const napi_value &param, nlohmann::json &jsonObj);
     static void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
+    static bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
     static int32_t RegisterCredentialCallback(napi_env env, const std::string &pkgName);
     static void AsyncAfterTaskCallback(napi_env env, napi_status status, void *data);
     static void AsyncTaskCallback(napi_env env, void *data);
@@ -358,9 +355,7 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static napi_value GetAvailableDeviceListByFilter(napi_env env, napi_callback_info info,
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
-    static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     static bool IsSystemApp();
-    static bool JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[]);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

@@ -72,6 +72,56 @@ int32_t DmDeviceFilterOption::ParseFilterJson(const std::string &str)
     return DM_OK;
 }
 
+void DmDeviceFilterOption::ParseFilterOptionJson(const std::string &str)
+{
+    nlohmann::json object = nlohmann::json::parse(str, nullptr, false);
+    if (object.is_discarded()) {
+        LOGE("FilterOptions parse error.");
+        return;
+    }
+    filterOp_ = FILTERS_TYPE_AND;
+    DmDeviceFilters deviceFilters;
+    if (!object.contains("credible") || !object["credible"].is_number_integer()) {
+        LOGE("Filters credible type invalid");
+    } else {
+        deviceFilters.type = "credible";
+        deviceFilters.value = object["credible"];
+        filters_.push_back(deviceFilters);
+    }
+
+    if (!object.contains("range") || !object["range"].is_number_integer()) {
+        LOGE("Filters range type invalid");
+    } else {
+        deviceFilters.type = "range";
+        deviceFilters.value = object["range"];
+        filters_.push_back(deviceFilters);
+    }
+
+    if (!object.contains("isTrusted") || !object["isTrusted"].is_number_integer()) {
+        LOGE("Filters isTrusted type invalid");
+    } else {
+        deviceFilters.type = "isTrusted";
+        deviceFilters.value = object["isTrusted"];
+        filters_.push_back(deviceFilters);
+    }
+
+    if (!object.contains("authForm") || !object["authForm"].is_number_integer()) {
+        LOGE("Filters authForm type invalid");
+    } else {
+        deviceFilters.type = "authForm";
+        deviceFilters.value = object["authForm"];
+        filters_.push_back(deviceFilters);
+    }
+
+    if (!object.contains("deviceType") || !object["deviceType"].is_number_integer()) {
+        LOGE("Filters deviceType type invalid");
+    } else {
+        deviceFilters.type = "deviceType";
+        deviceFilters.value = object["deviceType"];
+        filters_.push_back(deviceFilters);
+    }
+}
+
 int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions)
 {
     if (filterOptions.empty()) {
@@ -84,6 +134,20 @@ int32_t DmDeviceFilterOption::TransformToFilter(const std::string &filterOptions
         return DM_OK;
     }
     return ParseFilterJson(filterOptions);
+}
+
+void DmDeviceFilterOption::TransformFilterOption(const std::string &filterOptions)
+{
+    if (filterOptions.empty()) {
+        LOGI("DmDeviceFilterOption::filterOptions empty");
+        filterOp_ = FILTERS_TYPE_OR;
+        DmDeviceFilters deviceFilters;
+        deviceFilters.type = "credible";
+        deviceFilters.value = DM_INVALID_DEVICE;
+        filters_.push_back(deviceFilters);
+        return;
+    }
+    ParseFilterOptionJson(filterOptions);
 }
 
 bool DmDiscoveryFilter::FilterByDeviceState(int32_t value, bool isActive)

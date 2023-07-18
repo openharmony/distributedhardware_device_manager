@@ -37,7 +37,7 @@ namespace {
     napi_value thisVar = nullptr;     \
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
-const std::string DM_NAPI_EVENT_DEVICE_STATUS_CHANGE = "deviceStatusChange";
+const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
@@ -47,7 +47,8 @@ const std::string DEVICE_MANAGER_NAPI_CLASS_NAME = "DeviceManager";
 const std::string DM_NAPI_EVENT_REPLY_RESULT = "replyResult";
 const std::string DM_NAPI_EVENT_DEVICE_NAME_CHANGE = "deviceNameChange";
 
-
+const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
+const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
 const int32_t DM_NAPI_ARGS_ZERO = 0;
 const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
@@ -55,7 +56,7 @@ const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
-napi_ref deviceStatusChangeActionEnumConstructor_ = nullptr;
+napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -760,7 +761,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
 
     napi_set_named_property(env_, result, "device", device);
-    OnEvent("deviceStatusChange", DM_NAPI_ARGS_ONE, &result);
+    OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
 }
 
@@ -1308,29 +1309,6 @@ void DeviceManagerNapi::JsToDmAuthInfo(const napi_env &env, const napi_value &ob
     extra = jsonObj.dump();
 }
 
-void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
-{
-    napi_valuetype valueType1 = napi_undefined;
-    napi_typeof(env, object, &valueType1);
-    if (valueType1 == napi_undefined) {
-        extra = "";
-        return;
-    }
-    char filterOption[DM_NAPI_BUF_LENGTH] = {0};
-    size_t typeLen = 0;
-    NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, nullptr, 0, &typeLen));
-    if (!CheckArgsVal(env, typeLen > 0, "extra", "typeLen == 0")) {
-        return;
-    }
-
-    if (!CheckArgsVal(env, typeLen < DM_NAPI_BUF_LENGTH, "extra", "typeLen >= BUF_MAX_LENGTH")) {
-        return;
-    }
-    NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, filterOption, typeLen + 1, &typeLen));
-    extra = filterOption;
-    LOGI("JsToDmDiscoveryExtra, extra :%s, typeLen : %d", extra.c_str(), typeLen);
-}
-
 bool DeviceManagerNapi::IsSystemApp()
 {
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
@@ -1340,7 +1318,7 @@ bool DeviceManagerNapi::IsSystemApp()
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
 {
     LOGI("CreateDmCallback for bundleName %s eventType %s", bundleName.c_str(), eventType.c_str());
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
         if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
             return;
         }
@@ -1390,7 +1368,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
 {
     LOGI("CreateDmCallback for bundleName %s eventType %s extra = %s",
          bundleName.c_str(), eventType.c_str(), extra.c_str());
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStatusCallback>(env, bundleName);
         int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
         if (ret != 0) {
@@ -1420,7 +1398,7 @@ void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 
 void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &eventType)
 {
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto iter = g_deviceStatusCallbackMap.find(bundleName);
         if (iter == g_deviceStatusCallbackMap.end()) {
             LOGE("ReleaseDmCallback: cannot find statusCallback for bundleName %s", bundleName.c_str());
@@ -2149,24 +2127,75 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
-bool DeviceManagerNapi::JudgeParameter(napi_env env, napi_callback_info info, napi_value argv[])
+bool DeviceManagerNapi::JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType)
 {
-    napi_valuetype valueType1 = napi_undefined;
-    napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &valueType1);
-    if (!(CheckArgsType(env, valueType1 == napi_string, "discoverParameter", "string or undefined"))) {
+    napi_valuetype objectType = napi_undefined;
+    napi_typeof(env, object, &objectType);
+    if (!(CheckArgsType(env, objectType == napi_object, "discoverParameter", "object or undefined"))) {
         return false;
     }
-    return true;
+    bool hasProperty = false;
+    napi_has_named_property(env, object, "discoverTargetType", &hasProperty);
+    if (hasProperty) {
+        napi_value field = nullptr;
+        napi_valuetype valueType = napi_undefined;
+        napi_get_named_property(env, object, "discoverTargetType", &field);
+        napi_typeof(env, field, &valueType);
+        if (!CheckArgsType(env, valueType == napi_number, "discoverTargetType", "number")) {
+            return false;
+        }
+        napi_get_value_int32(env, field, &discoverTargetType);
+        return true;
+    }
+    LOGE("discoverTargetType is invalid.");
+    return false;
 }
 
-napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callback_info info)
+void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
 {
-    LOGI("StartDeviceDiscoverSync in");
+    nlohmann::json jsonObj;
+    int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "availableStatus", availableStatus);
+    if (availableStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["credible"] = availableStatus;
+    }
+
+    int32_t discoverDistance = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "discoverDistance", discoverDistance);
+    if (discoverDistance != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["range"] = discoverDistance;
+    }
+
+    int32_t authenticationStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "authenticationStatus", authenticationStatus);
+    if (authenticationStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["isTrusted"] = authenticationStatus;
+    }
+
+    int32_t authorizationType = DM_NAPI_DISCOVER_EXTRA_INIT_TWO;
+    JsObjectToInt(env, object, "authorizationType", authorizationType);
+    if (authorizationType != DM_NAPI_DISCOVER_EXTRA_INIT_TWO) {
+        jsonObj["authForm"] = authorizationType;
+    }
+
+    int32_t deviceType = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "deviceType", deviceType);
+    if (deviceType != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["deviceType"] = deviceType;
+    }
+    extra = jsonObj.dump();
+    LOGI("JsToDmDiscoveryExtra, extra :%s", extra.c_str());
+}
+
+napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_info info)
+{
+    LOGI("StartDeviceDiscover in");
     std::string extra = "";
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argcNum = 0;
-    uint16_t subscribeId = 0;
+    int32_t discoverTargetType = -1;
+    uint32_t subscribeId = 0;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2175,18 +2204,17 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-        if (!JudgeParameter(env, info, argv)) {
+        if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-        if (!JudgeParameter(env, info, argv)) {
+        if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
-        napi_valuetype valueType2 = napi_undefined;
-        napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType2);
-        if (!(CheckArgsType(env, (valueType2 == napi_undefined || valueType2 == napi_string), "filterOptions",
-            "string or undefined"))) {
+        napi_valuetype objectType = napi_undefined;
+        napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &objectType);
+        if (!(CheckArgsType(env, objectType == napi_object, "filterOptions", "object or undefined"))) {
             return nullptr;
         }
         JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
@@ -2211,9 +2239,9 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     return result;
 }
 
-napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_info info)
 {
-    LOGI("StopDeviceDiscoverSync in");
+    LOGI("StopDeviceDiscover in");
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
@@ -2332,13 +2360,13 @@ napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
     }
     napi_value result = nullptr;
     napi_valuetype deviceIdType = napi_undefined;
-    napi_typeof(env, argv[0], &deviceIdType);
+    napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &deviceIdType);
     if (!CheckArgsType(env, deviceIdType == napi_string, "deviceId", "string")) {
         return nullptr;
     }
 
     napi_valuetype bindPramType = napi_undefined;
-    napi_typeof(env, argv[1], &bindPramType);
+    napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &bindPramType);
     if (!CheckArgsType(env, bindPramType == napi_object, "bindParam", "object")) {
         return nullptr;
     }
@@ -2365,13 +2393,13 @@ napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
     }
 
     size_t deviceIdLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &deviceIdLen);
+    napi_get_value_string_utf8(env, argv[DM_NAPI_ARGS_ZERO], nullptr, 0, &deviceIdLen);
     NAPI_ASSERT(env, deviceIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
     char deviceId[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], deviceId, deviceIdLen + 1, &deviceIdLen);
+    napi_get_value_string_utf8(env, argv[DM_NAPI_ARGS_ZERO], deviceId, deviceIdLen + 1, &deviceIdLen);
 
     std::string bindParam;
-    JsToBindParam(env, argv[1], bindParam, authAsyncCallbackInfo_.authType);
+    JsToBindParam(env, argv[DM_NAPI_ARGS_ONE], bindParam, authAsyncCallbackInfo_.authType);
     int32_t ret = DeviceManager::GetInstance().BindDevice(deviceManagerWrapper->bundleName_,
         authAsyncCallbackInfo_.authType, deviceId, bindParam, bingDeviceCallback);
     if (ret != 0) {
@@ -2668,7 +2696,7 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
     LOGI("JsOn for bundleName %s, eventType %s ", deviceManagerWrapper->bundleName_.c_str(), eventType.c_str());
     deviceManagerWrapper->On(eventType, argv[num + 1]);
 
-    if (eventType == DM_NAPI_EVENT_DEVICE_STATUS_CHANGE) {
+    if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         if (num == 1) {
             size_t extraLen = 0;
             napi_get_value_string_utf8(env, argv[1], nullptr, 0, &extraLen);
@@ -2822,22 +2850,23 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("ReleaseDeviceManager in");
-    int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
-    if (ret != 0) {
-        CreateBusinessError(env, ret);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
-    size_t argc = 0;
-    napi_value thisVar = nullptr;
+    napi_valuetype argvType = napi_undefined;
+    napi_typeof(env, argv[0], &argvType);
+    if (!CheckArgsType(env, argvType == napi_object, "DeviceManager", "object")) {
+        return nullptr;
+    }
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+    if (IsDeviceManagerNapiNull(env, argv[0], &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
     LOGI("ReleaseDeviceManager for bundleName %s", deviceManagerWrapper->bundleName_.c_str());
-    ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
+    int32_t ret = DeviceManager::GetInstance().UnInitDeviceManager(deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -2862,73 +2891,15 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         g_creCallbackMap.erase(deviceManagerWrapper->bundleName_);
     }
     napi_get_undefined(env, &result);
-    NAPI_CALL(env, napi_remove_wrap(env, thisVar, (void**)&deviceManagerWrapper));
+    NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
     return result;
-}
-
-void DeviceManagerNapi::HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data)
-{
-    (void)status;
-    AsyncCallbackInfo *asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data);
-    napi_value result[DM_NAPI_ARGS_TWO] = {0};
-    if (asyncCallbackInfo->status == 0) {
-        napi_value ctor = nullptr;
-        napi_value argv = nullptr;
-        napi_get_reference_value(env, sConstructor_, &ctor);
-        napi_create_string_utf8(env, asyncCallbackInfo->bundleName, NAPI_AUTO_LENGTH, &argv);
-        napi_status ret = napi_new_instance(env, ctor, DM_NAPI_ARGS_ONE, &argv, &result[1]);
-        if (ret != napi_ok) {
-                LOGE("Create DeviceManagerNapi for bundleName %s failed", asyncCallbackInfo->bundleName);
-        } else {
-                LOGI("InitDeviceManager for bundleName %s success", asyncCallbackInfo->bundleName);
-                napi_get_undefined(env, &result[0]);
-        }
-    } else {
-        LOGI("InitDeviceManager for bundleName %s failed", asyncCallbackInfo->bundleName);
-        result[0] = CreateBusinessError(env, asyncCallbackInfo->ret, false);
-    }
-    napi_value callback = nullptr;
-    napi_value callResult = nullptr;
-    napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-    if (callback != nullptr) {
-        napi_call_function(env, nullptr, callback, DM_NAPI_ARGS_TWO, &result[0], &callResult);
-        napi_delete_reference(env, asyncCallbackInfo->callback);
-    }
-
-    napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-    delete asyncCallbackInfo;
-    asyncCallbackInfo = nullptr;
-}
-
-void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbackInfo *asCallbackInfo)
-{
-    napi_value resourceName;
-    napi_create_string_latin1(env, "createDeviceManagerCallback", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            (void)env;
-            AsyncCallbackInfo *asyCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data);
-            std::string bundleName = std::string(asyCallbackInfo->bundleName);
-            std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
-            int32_t ret = DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
-            if (ret == 0) {
-                std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
-                g_initCallbackMap[bundleName] = initCallback;
-                asyCallbackInfo->status = 0;
-            } else {
-                asyCallbackInfo->status = 1;
-                asyCallbackInfo->ret = ret;
-            }
-        }, HandleCreateDmCallBackCompletedCB, (void *)asCallbackInfo, &asCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asCallbackInfo->asyncWork);
 }
 
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("CreateDeviceManager in");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     napi_valuetype bundleNameValueType = napi_undefined;
@@ -2936,22 +2907,31 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
     if (!CheckArgsType(env, bundleNameValueType == napi_string, "bundleName", "string")) {
         return nullptr;
     }
-    napi_valuetype funcValueType = napi_undefined;
-    napi_typeof(env, argv[1], &funcValueType);
-    if (!CheckArgsType(env, funcValueType == napi_function, "callback", "function")) {
+    size_t typeLen = 0;
+    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
+    char name[DM_NAPI_BUF_LENGTH] = {0};
+    napi_get_value_string_utf8(env, argv[0], name, typeLen + 1, &typeLen);
+    std::string bundleName = name;
+    std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
+    if (ret != 0) {
+        LOGE("CreateDeviceManager for bundleName %s failed, ret %d.", name, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
-    auto *asCallbackInfo = new AsyncCallbackInfo();
-    if (asCallbackInfo == nullptr) {
-        return nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
+        g_initCallbackMap[bundleName] = initCallback;
     }
-    asCallbackInfo->env = env;
-    napi_get_value_string_utf8(env, argv[0], asCallbackInfo->bundleName, DM_NAPI_BUF_LENGTH - 1,
-                               &asCallbackInfo->bundleNameLen);
-    napi_create_reference(env, argv[1], 1, &asCallbackInfo->callback);
-    HandleCreateDmCallBack(env, asCallbackInfo);
+    napi_value ctor = nullptr;
+    napi_value napiName = nullptr;
     napi_value result = nullptr;
-    napi_get_undefined(env, &result);
+    napi_get_reference_value(env, sConstructor_, &ctor);
+    napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &napiName);
+    napi_status status = napi_new_instance(env, ctor, DM_NAPI_ARGS_ONE, &napiName, &result);
+    if (status != napi_ok) {
+        LOGE("Create DeviceManagerNapi for bundleName %s failed", name);
+    }
     return result;
 }
 
@@ -3000,17 +2980,16 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
 {
     napi_value dmClass = nullptr;
     napi_property_descriptor dmProperties[] = {
-        DECLARE_NAPI_FUNCTION("releaseDeviceManager", ReleaseDeviceManager),
         DECLARE_NAPI_FUNCTION("getAvailableDeviceListSync", GetAvailableDeviceListSync),
         DECLARE_NAPI_FUNCTION("getAvailableDeviceList", GetAvailableDeviceList),
-        DECLARE_NAPI_FUNCTION("getLocalDeviceNetworkIdSync", GetLocalDeviceNetworkId),
-        DECLARE_NAPI_FUNCTION("getLocalDeviceIdSync", GetLocalDeviceId),
-        DECLARE_NAPI_FUNCTION("getLocalDeviceNameSync", GetLocalDeviceName),
-        DECLARE_NAPI_FUNCTION("getLocalDeviceTypeSync", GetLocalDeviceType),
-        DECLARE_NAPI_FUNCTION("getDeviceNameSync", GetDeviceName),
-        DECLARE_NAPI_FUNCTION("getDeviceTypeSync", GetDeviceType),
-        DECLARE_NAPI_FUNCTION("startDeviceDiscovery", StartDeviceDiscoverSync),
-        DECLARE_NAPI_FUNCTION("stopDeviceDiscovery", StopDeviceDiscoverSync),
+        DECLARE_NAPI_FUNCTION("getLocalDeviceNetworkId", GetLocalDeviceNetworkId),
+        DECLARE_NAPI_FUNCTION("getLocalDeviceId", GetLocalDeviceId),
+        DECLARE_NAPI_FUNCTION("getLocalDeviceName", GetLocalDeviceName),
+        DECLARE_NAPI_FUNCTION("getLocalDeviceType", GetLocalDeviceType),
+        DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
+        DECLARE_NAPI_FUNCTION("getDeviceType", GetDeviceType),
+        DECLARE_NAPI_FUNCTION("startDeviceDiscovery", StartDeviceDiscover),
+        DECLARE_NAPI_FUNCTION("stopDeviceDiscovery", StopDeviceDiscover),
         DECLARE_NAPI_FUNCTION("unbindTarget", UnBindTarget),
         DECLARE_NAPI_FUNCTION("bindTarget", BindTarget),
         DECLARE_NAPI_FUNCTION("replyUiAction", SetUserOperationSync),
@@ -3019,6 +2998,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
+        DECLARE_NAPI_STATIC_FUNCTION("releaseDeviceManager", ReleaseDeviceManager),
     };
 
     LOGI("DeviceManagerNapi::Init() is called!");
@@ -3060,10 +3040,10 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     };
 
     napi_value result = nullptr;
-    napi_define_class(env, "DeviceStatusChange", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+    napi_define_class(env, "DeviceStateChange", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &deviceStatusChangeActionEnumConstructor_);
-    napi_set_named_property(env, exports, "DeviceStatusChange", result);
+    napi_create_reference(env, result, refCount, &deviceStateChangeActionEnumConstructor_);
+    napi_set_named_property(env, exports, "DeviceStateChange", result);
     return exports;
 }
 
