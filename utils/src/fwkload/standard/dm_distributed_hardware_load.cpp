@@ -35,7 +35,7 @@ void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
         return;
     }
     distributedHardwareLoadCount_++;
-    sptr<DistributedHardwareLoadCallback> distributedHardwareLoadCallback_ = new DistributedHardwareLoadCallback();
+    sptr<DistributedHardwareLoadCallback> distributedHardwareLoadCallback_(new DistributedHardwareLoadCallback());
     int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, distributedHardwareLoadCallback_);
     if (ret != DM_OK) {
         LOGE("Failed to Load systemAbility, systemAbilityId:%d, ret code:%d",
