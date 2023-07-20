@@ -35,10 +35,11 @@ void SoftBusConnectorStaticFuzzTest(const uint8_t* data, size_t size)
 
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     const char *networkId = reinterpret_cast<const char*>(data);
+    std::string uuid;
 
     SoftbusConnector::JoinLnn(deviceId);
-    SoftbusConnector::GetUdidByNetworkId(networkId, deviceId);
-    SoftbusConnector::GetUuidByNetworkId(networkId, deviceId);
+    SoftbusConnector::GetUdidByNetworkId(networkId, uuid);
+    SoftbusConnector::GetUuidByNetworkId(networkId, uuid);
     SoftbusConnector::GetDeviceUdidByUdidHash(deviceId);
 }
 }

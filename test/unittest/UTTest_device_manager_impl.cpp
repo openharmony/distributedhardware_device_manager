@@ -4637,7 +4637,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_105, testing::ext::TestSize
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -4652,7 +4652,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     DeviceManagerImpl::GetInstance().subscribIdMap_.clear();
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 } // namespace

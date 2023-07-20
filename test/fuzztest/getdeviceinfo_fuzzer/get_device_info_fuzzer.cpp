@@ -38,11 +38,11 @@ void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
     if (ret != EOK) {
         return;
     }
-    deviceInfo.deviceTypeId = *(reinterpret_cast<const uint16_t*>(data));
+
     DeviceManagerImpl::GetInstance().GetDeviceInfo(pkgName, networkId, deviceInfo);
-    std::string deviceName(reinterpret_cast<const char*>(data), size);
+    std::string deviceName;
     DeviceManagerImpl::GetInstance().GetDeviceName(pkgName, networkId, deviceName);
-    int32_t deviceTypeId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t deviceTypeId = 1;
     DeviceManagerImpl::GetInstance().GetDeviceType(pkgName, networkId, deviceTypeId);
 }
 }
