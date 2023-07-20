@@ -31,17 +31,8 @@ void OnSoftbusDeviceOfflineFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    NodeBasicInfo info;
-    if (memcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char*>(data)), size) != DM_OK) {
-        return;
-    }
-
-    if (memcpy_s(info.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char*>(data)), size) != DM_OK) {
-        return;
-    }
-
-    info.deviceTypeId = *(reinterpret_cast<const uint16_t*>(data));
-    softbusListener->OnSoftbusDeviceOffline(&info);
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOffline(info);
 }
 }
 }
