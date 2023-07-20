@@ -46,7 +46,7 @@ void DmDiscoveryManagerFuzzTest(const uint8_t* data, size_t size)
     DmDeviceInfo info;
     DmDeviceBasicInfo basicInfo;
     bool isOnline = true;
-    int32_t range = *(reinterpret_cast<const int32_t*>(data));
+    int32_t range = 1;
 
     dmDiscoveryManager->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     dmDiscoveryManager->StartDeviceDiscovery(pkgName, subscribeId, extra);

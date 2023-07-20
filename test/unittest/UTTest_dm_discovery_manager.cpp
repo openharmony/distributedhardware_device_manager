@@ -268,7 +268,7 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoverySuccess_002, testing::ext::TestSize.
 
 /**
  * @tc.name: StartDeviceDiscovery_003
- * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -278,7 +278,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_003, testing::ext::TestSiz
     uint16_t subscribeId = 1;
     std::string filterOptions = "filterOptions";
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
