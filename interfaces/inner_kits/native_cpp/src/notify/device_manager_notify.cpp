@@ -342,7 +342,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         return;
     }
     std::string networkType = "";
-    GetNetworkTypeByNetworkId(pkgName, deviceBasicInfo.networkId, networkType);
+    DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, deviceBasicInfo.networkId, networkType);
     LOGI("OnDeviceOffline networkType %s", networkType.c_str());
     tempCbk->OnDeviceOffline(deviceBasicInfo);
 }
