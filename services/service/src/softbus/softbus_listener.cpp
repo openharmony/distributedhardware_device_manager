@@ -489,7 +489,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
-    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
         LOGE("Device name change.");
         DmDeviceInfo dmDeviceInfo;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
