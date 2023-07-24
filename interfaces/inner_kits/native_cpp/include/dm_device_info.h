@@ -159,6 +159,10 @@ typedef struct DmDeviceInfo {
      */
     int32_t range;
     /**
+     * NetworkType of the device.
+     */
+    char networkType[DM_MAX_DEVICE_ID_LEN];
+    /**
      * Device authentication form.
      */
     DmAuthForm authForm;
@@ -185,6 +189,7 @@ DmDeviceBasicInfo {
      * NetworkId of the device.
      */
     char networkId[DM_MAX_DEVICE_ID_LEN];
+    char networkType[DM_MAX_DEVICE_ID_LEN];
 } DmDeviceBasicInfo;
 
 /**

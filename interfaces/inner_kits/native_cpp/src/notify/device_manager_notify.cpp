@@ -341,6 +341,9 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOffline error, registered device status callback is nullptr.");
         return;
     }
+    std::string networkType = "";
+    GetNetworkTypeByNetworkId(pkgName, deviceBasicInfo.networkId, networkType);
+    LOGI("OnDeviceOffline networkType %s", networkType.c_str());
     tempCbk->OnDeviceOffline(deviceBasicInfo);
 }
 

@@ -49,6 +49,10 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
         std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
     }
+    if (memcpy_s(deviceBasicInfo.networkType, sizeof(deviceBasicInfo.networkType), info.networkType,
+        std::min(sizeof(deviceBasicInfo.networkType), sizeof(info.networkType))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkType data failed.");
+    }
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 

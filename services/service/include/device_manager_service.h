@@ -76,6 +76,9 @@ public:
 
     int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid);
 
+    int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+        std::string &networkType);
+
     int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                  const std::string &extra);
 

@@ -207,6 +207,13 @@ public:
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        std::string &uuid) override;
     /**
+     * @tc.name: DeviceManagerImpl::GetNetworkTypeByNetworkId
+     * @tc.desc: Get NetworkType by NetworkId
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                       std::string &netWorkType) override;
+    /**
      * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
      * @tc.desc: Register development status callback
      * @tc.type: FUNC
