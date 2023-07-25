@@ -676,24 +676,6 @@ ON_IPC_CMD(GET_UUID_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string netWorkId = data.ReadString();
-    std::string networkType;
-    int32_t result = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
-
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!reply.WriteString(networkType)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
 {
     std::string packName = data.ReadString();
@@ -940,6 +922,24 @@ ON_IPC_CMD(UNBIND_DEVICE, MessageParcel &data, MessageParcel &reply)
     std::string deviceId = data.ReadString();
     int32_t result = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string netWorkId = data.ReadString();
+    int32_t networkType = -1;
+    int32_t result = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
+
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(networkType)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }

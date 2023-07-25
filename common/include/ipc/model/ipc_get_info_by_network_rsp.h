@@ -71,7 +71,7 @@ public:
      * @tc.desc: Get NetworkType for Ipc to get information through NetWorkRsp
      * @tc.type: FUNC
      */
-    const std::string GetNetworkType() const
+    int32_t GetNetworkType() const
     {
         return networkType_;
     }
@@ -81,7 +81,7 @@ public:
      * @tc.desc: Set NetworkType for Ipc to get information through NetWorkRsp
      * @tc.type: FUNC
      */
-    void SetNetworkType(const std::string &networkType)
+    void SetNetworkType(const int32_t &networkType)
     {
         networkType_ = networkType;
     }
@@ -89,7 +89,7 @@ public:
 private:
     std::string udid_;
     std::string uuid_;
-    std::string networkType_;
+    int32_t networkType_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

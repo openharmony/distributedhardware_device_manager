@@ -829,36 +829,6 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                                    std::string &netWorkType)
-{
-    if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("GetNetworkTypeByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, netWorkType: %s",
-            pkgName.c_str(), GetAnonyString(netWorkId).c_str(), netWorkType.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("GetNetworkTypeByNetworkId start, pkgName: %s", pkgName.c_str());
-
-    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
-    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
-    req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
-
-    int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKTYPE_BY_NETWORK, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("GetNetworkTypeByNetworkId Send Request failed ret: %d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("CheckAuthentication Failed with ret %d", ret);
-        return ret;
-    }
-    netWorkType = rsp->GetNetworkType();
-    return DM_OK;
-}
-
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
     if (pkgName.empty()) {
@@ -1415,6 +1385,36 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     }
 
     LOGI("UnBindDevice end, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                                    int32_t &netWorkType)
+{
+    if (pkgName.empty() || netWorkId.empty()) {
+        LOGE("GetNetworkTypeByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, netWorkType: %d",
+            pkgName.c_str(), GetAnonyString(netWorkId).c_str(), netWorkType);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("GetNetworkTypeByNetworkId start, pkgName: %s", pkgName.c_str());
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(netWorkId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKTYPE_BY_NETWORK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GetNetworkTypeByNetworkId Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckAuthentication Failed with ret %d", ret);
+        return ret;
+    }
+    netWorkType = rsp->GetNetworkType();
     return DM_OK;
 }
 } // namespace DistributedHardware

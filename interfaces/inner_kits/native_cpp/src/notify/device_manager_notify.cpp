@@ -364,6 +364,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr.");
         return;
     }
+    LOGI("yangwei DeviceManagerNotify type %d.", deviceInfo.networkType);
     tempCbk->OnDeviceChanged(deviceInfo);
 }
 

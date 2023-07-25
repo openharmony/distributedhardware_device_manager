@@ -755,7 +755,6 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
-    SetValueUtf8String(env_, "networkType", deviceBasicInfo.networkType, device);
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);

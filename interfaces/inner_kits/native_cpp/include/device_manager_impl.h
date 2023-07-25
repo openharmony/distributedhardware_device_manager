@@ -207,13 +207,6 @@ public:
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        std::string &uuid) override;
     /**
-     * @tc.name: DeviceManagerImpl::GetNetworkTypeByNetworkId
-     * @tc.desc: Get NetworkType by NetworkId
-     * @tc.type: FUNC
-     */
-    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                       std::string &netWorkType) override;
-    /**
      * @tc.name: DeviceManagerImpl::RegisterDevStateCallback
      * @tc.desc: Register development status callback
      * @tc.type: FUNC
@@ -292,6 +285,8 @@ public:
     virtual int32_t BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
         const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) override;
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) override;
+    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                       int32_t &netWorkType) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

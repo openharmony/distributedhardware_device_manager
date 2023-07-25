@@ -239,15 +239,6 @@ public:
      */
     virtual int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid) = 0;
     /**
-     * @brief Get Network Type by NetworkId.
-     * @param pkgName   package name.
-     * @param netWorkId netWork Id.
-     * @param netWorkType netWork Type.
-     * @return Returns 0 if success.
-     */
-    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName,
-        const std::string &netWorkId, std::string &netWorkType) = 0;
-    /**
      * @brief Unregister device status callback.
      * @param pkgName package name.
      * @param extra   extra info.This parameter can be null.
@@ -399,6 +390,16 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 
     virtual int32_t CheckNewAPIAccessPermission() = 0;
+
+    /**
+     * @brief Get Network Type by NetworkId.
+     * @param pkgName   package name.
+     * @param netWorkId netWork Id.
+     * @param netWorkType netWork Type.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName,
+        const std::string &netWorkId, int32_t &netWorkType) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

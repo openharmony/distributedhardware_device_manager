@@ -86,32 +86,6 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const std::string &pkgName, c
     }
 }
 
-void DmDeviceStateManager::ChangeDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
-{
-    (void)pkgName;
-    LOGI("DeleteOfflineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
-#if defined(__LITEOS_M__)
-    DmMutex mutexLock;
-#else
-    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
-    for (auto iter: remoteDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
-            if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
-                sizeof(info.deviceName)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo copy deviceName failed");
-            }
-            if (memcpy_s(iter.second.networkType, sizeof(iter.second.networkType), info.networkType,
-                sizeof(info.networkType)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo copy networkType failed");
-            }
-            iter.secnd.deviceTypeId = info.deviceTypeId;
-            LOGI("DeleteOfflineDeviceInfo complete");
-            break;
-        }
-    }
-}
-
 void DmDeviceStateManager::PostDeviceOnline(const std::string &pkgName, DmDeviceInfo &info)
 {
     LOGI("DmDeviceStateManager::PostDeviceOnline in");
@@ -136,6 +110,7 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 void DmDeviceStateManager::PostDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("DmDeviceStateManager::PostDeviceChanged in");
+    LOGI("yangwei PostDeviceChanged type %d.", info.networkType);
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_CHANGED;
         listener_->OnDeviceStateChange(pkgName, state, info);
@@ -216,6 +191,7 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("OnDeviceChanged function is called with pkgName: %s", pkgName.c_str());
+    LOGI("yangwei DmDeviceStateManager type %d.", info.networkType);
     ChangeDeviceInfo(pkgName, info);
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -498,6 +474,32 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const 
     (void)pkgName;
     LOGI("ProcNotifyEvent in, eventId: %d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
+}
+
+void DmDeviceStateManager::ChangeDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
+{
+    (void)pkgName;
+    LOGI("yangwei DmDeviceStateManager type %d.", info.networkType);
+#if defined(__LITEOS_M__)
+    DmMutex mutexLock;
+#else
+    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+    for (auto iter: remoteDeviceInfos_) {
+        if (iter.second.deviceId == info.deviceId) {
+            if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
+                sizeof(info.deviceName)) != DM_OK) {
+                    LOGE("ChangeDeviceInfo copy deviceName failed");
+            }
+            if (memcpy_s(iter.second.networkType, sizeof(iter.second.networkType), info.networkType,
+                sizeof(info.networkType)) != DM_OK) {
+                    LOGE("ChangeDeviceInfo copy networkType failed");
+            }
+            iter.second.deviceTypeId = info.deviceTypeId;
+            LOGI("DeleteOfflineDeviceInfo complete");
+            break;
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

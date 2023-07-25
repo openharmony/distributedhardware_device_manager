@@ -352,28 +352,6 @@ ON_IPC_READ_RESPONSE(GET_UUID_BY_NETWORK, MessageParcel &reply, std::shared_ptr<
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(GET_NETWORKTYPE_BY_NETWORK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string netWorkId = pReq->GetNetWorkId();
-    if (!data.WriteString(pkgName)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(netWorkId)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
-    pRsp->SetErrCode(reply.ReadInt32());
-    pRsp->SetNetworkType(reply.ReadString());
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcStartDiscoveryReq> pReq = std::static_pointer_cast<IpcStartDiscoveryReq>(pBaseReq);
@@ -722,6 +700,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
         reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
         return DM_OK;
     }
+    LOGI("yangwei ON_IPC_CMD type %d.", dmDeviceInfo.networkType);
     DmDeviceBasicInfo dmDeviceBasicInfo;
     size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
     void *deviceBasicInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceBasicSize)));
@@ -1110,6 +1089,28 @@ ON_IPC_SET_REQUEST(UNBIND_DEVICE, std::shared_ptr<IpcReq> pBaseReq, MessageParce
 ON_IPC_READ_RESPONSE(UNBIND_DEVICE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_NETWORKTYPE_BY_NETWORK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string netWorkId = pReq->GetNetWorkId();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(netWorkId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetNetworkType(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

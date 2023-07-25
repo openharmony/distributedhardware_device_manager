@@ -295,24 +295,6 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
     return DM_OK;
 }
 
-int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                                         std::string &networkType)
-{
-    if (!PermissionManager::GetInstance().CheckPermission() &&
-        !PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %s does not have permission to call GetNetworkTypeByNetworkId.",
-            pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    LOGI("DeviceManagerService::GetNetworkTypeByNetworkId begin for pkgName = %s", pkgName.c_str());
-    if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-    return DM_OK;
-}
-
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
                                                    const std::string &extra)
 {
@@ -610,6 +592,7 @@ void DeviceManagerService::HandleDeviceNameChange(DmDeviceInfo &info)
         LOGE("HandleDeviceNameChange failed, instance not init or init failed.");
         return;
     }
+    LOGI("yangwei DeviceManagerService type %d.", info.networkType);
     dmServiceImpl_->HandleDeviceNameChange(info);
 }
 
@@ -846,6 +829,24 @@ int32_t DeviceManagerService::CheckNewApiPermission()
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                                         int32_t &networkType)
+{
+    if (!PermissionManager::GetInstance().CheckPermission() &&
+        !PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call GetNetworkTypeByNetworkId.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::GetNetworkTypeByNetworkId begin for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty() || netWorkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
     return DM_OK;
 }
 } // namespace DistributedHardware
