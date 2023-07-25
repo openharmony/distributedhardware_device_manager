@@ -374,7 +374,6 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    
     LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
@@ -1389,7 +1388,7 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
 }
 
 int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                                    int32_t &netWorkType)
+                                                     int32_t &netWorkType)
 {
     if (pkgName.empty() || netWorkId.empty()) {
         LOGE("GetNetworkTypeByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, netWorkType: %d",

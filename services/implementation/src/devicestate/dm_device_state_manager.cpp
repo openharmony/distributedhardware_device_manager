@@ -222,8 +222,6 @@ void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmD
     LOGI("DmDeviceStateManager::OnDeviceChanged out");
 }
 
-
-
 void DmDeviceStateManager::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("OnDeviceReady function is called back with pkgName: %s", pkgName.c_str());
@@ -491,8 +489,8 @@ void DmDeviceStateManager::ChangeDeviceInfo(const std::string &pkgName, const Dm
                 sizeof(info.deviceName)) != DM_OK) {
                     LOGE("ChangeDeviceInfo copy deviceName failed");
             }
-            if (memcpy_s(iter.second.networkType, sizeof(iter.second.networkType), info.networkType,
-                sizeof(info.networkType)) != DM_OK) {
+            if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
+                sizeof(info.networkId)) != DM_OK) {
                     LOGE("ChangeDeviceInfo copy networkType failed");
             }
             iter.second.deviceTypeId = info.deviceTypeId;

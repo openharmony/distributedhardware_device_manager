@@ -833,7 +833,7 @@ int32_t DeviceManagerService::CheckNewApiPermission()
 }
 
 int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                                         int32_t &networkType)
+                                                        int32_t &networkType)
 {
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
