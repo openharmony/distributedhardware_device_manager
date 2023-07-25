@@ -28,11 +28,13 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string udid(reinterpret_cast<const char*>(data), size);
+    std::string udid;
+    std::string network;
+    std::string device;
     int32_t authType = 123;
     DmAuthParam authParam;
     std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t deviceType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t deviceType = 0;
 
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);
@@ -46,8 +48,8 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
     DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
-    DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(pkgName);
-    DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
+    DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(network);
+    DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, device);
     DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
     DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
     DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, deviceId, udid);
