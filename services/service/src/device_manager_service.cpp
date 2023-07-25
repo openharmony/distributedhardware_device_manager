@@ -847,6 +847,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
         return ERR_DM_INPUT_PARA_INVALID;
     }
     SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+    LOGI("yangwei service type %d.", networkType);
     return DM_OK;
 }
 } // namespace DistributedHardware

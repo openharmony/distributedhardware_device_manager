@@ -481,18 +481,18 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGI("DeviceInfo change.");
         DmDeviceInfo dmDeviceInfo;
         dmDeviceInfo.networkType = -1;
+        int32_t mNetworkType = -1;
         if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
-            int32_t mNetworkType = -1;
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
                 reinterpret_cast<uint8_t *>(&mNetworkType), LNN_COMMON_LEN) != DM_OK) {
                 LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
                 return;
             }
-            dmDeviceInfo.networkType = mNetworkType;
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", dmDeviceInfo.networkType);
         }
         LOGI("yangwei SoftbusListener type %d.", dmDeviceInfo.networkType);
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+        dmDeviceInfo.networkType = mNetworkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
