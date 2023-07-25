@@ -248,7 +248,6 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     int32_t type = -1;
     std::string workId = deviceList[0].networkId;
     GetNetworkTypeByNetworkId(pkgName, workId, type);
-    LOGI("yangwei type %d.", type);
     LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1418,7 +1417,6 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
         return ret;
     }
     netWorkType = rsp->GetNetworkType();
-    LOGI("yangwei type %d.", netWorkType);
     return DM_OK;
 }
 } // namespace DistributedHardware

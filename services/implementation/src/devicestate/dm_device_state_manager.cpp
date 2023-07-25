@@ -110,7 +110,6 @@ void DmDeviceStateManager::PostDeviceOffline(const std::string &pkgName, const D
 void DmDeviceStateManager::PostDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("DmDeviceStateManager::PostDeviceChanged in");
-    LOGI("yangwei PostDeviceChanged type %d.", info.networkType);
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_CHANGED;
         listener_->OnDeviceStateChange(pkgName, state, info);
@@ -191,7 +190,6 @@ void DmDeviceStateManager::OnDeviceOffline(const std::string &pkgName, const DmD
 void DmDeviceStateManager::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info)
 {
     LOGI("OnDeviceChanged function is called with pkgName: %s", pkgName.c_str());
-    LOGI("yangwei DmDeviceStateManager type %d.", info.networkType);
     ChangeDeviceInfo(pkgName, info);
     DmAdapterManager &adapterMgrPtr = DmAdapterManager::GetInstance();
     std::shared_ptr<IDecisionAdapter> decisionAdapter = adapterMgrPtr.GetDecisionAdapter(decisionSoName_);
@@ -477,7 +475,6 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const std::string &pkgName, const 
 void DmDeviceStateManager::ChangeDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info)
 {
     (void)pkgName;
-    LOGI("yangwei DmDeviceStateManager type %d.", info.networkType);
 #if defined(__LITEOS_M__)
     DmMutex mutexLock;
 #else

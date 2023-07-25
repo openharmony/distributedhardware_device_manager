@@ -68,7 +68,6 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
                 udIdHash.c_str(), udIdHash.length()) != DM_OK) {
                 LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
             }
-            LOGI("yangwei DeviceManagerServiceListener type %d.", info.networkType);
             pReq->SetPkgName(it);
             pReq->SetDeviceState(state);
             pReq->SetDeviceInfo(info);

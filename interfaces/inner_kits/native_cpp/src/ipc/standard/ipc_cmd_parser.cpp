@@ -700,7 +700,6 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
         reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
         return DM_OK;
     }
-    LOGI("yangwei ON_IPC_CMD type %d.", dmDeviceInfo.networkType);
     DmDeviceBasicInfo dmDeviceBasicInfo;
     size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
     void *deviceBasicInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceBasicSize)));

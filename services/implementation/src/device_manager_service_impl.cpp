@@ -299,7 +299,6 @@ void DeviceManagerServiceImpl::HandleDeviceNameChange(DmDeviceInfo &info)
         deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
-    LOGI("yangwei DeviceManagerServiceImpl type %d.", info.networkType);
     softbusConnector_->HandleDeviceNameChange(info);
 }
 

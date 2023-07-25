@@ -592,7 +592,6 @@ void DeviceManagerService::HandleDeviceNameChange(DmDeviceInfo &info)
         LOGE("HandleDeviceNameChange failed, instance not init or init failed.");
         return;
     }
-    LOGI("yangwei DeviceManagerService type %d.", info.networkType);
     dmServiceImpl_->HandleDeviceNameChange(info);
 }
 
@@ -847,7 +846,6 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
         return ERR_DM_INPUT_PARA_INVALID;
     }
     SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-    LOGI("yangwei service type %d.", networkType);
     return DM_OK;
 }
 } // namespace DistributedHardware

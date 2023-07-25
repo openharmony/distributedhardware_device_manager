@@ -449,7 +449,6 @@ void SoftbusConnector::HandleDeviceNameChange(const DmDeviceInfo &info)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(stateCallbackMutex_);
 #endif
-    LOGI("yangwei SoftbusConnector type %d.", info.networkType);
     for (auto &iter : stateCallbackMap_) {
         iter.second->OnDeviceChanged(iter.first, info);
     }

@@ -87,7 +87,6 @@ void DeviceNameChange(DmDeviceInfo deviceInfo)
     std::lock_guard<std::mutex> lock(lockDeviceOffLine);
 #endif
     DeviceManagerService::GetInstance().HandleDeviceNameChange(deviceInfo);
-    LOGI("yangwei DeviceNameChange type %d.", deviceInfo.networkType);
 }
 
 SoftbusListener::SoftbusListener()
@@ -476,13 +475,11 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
-    //type == NodeBasicInfoType::TYPE_NETWORK_INFO
-    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
         LOGI("DeviceInfo change.");
         DmDeviceInfo dmDeviceInfo;
-        dmDeviceInfo.networkType = -1;
         int32_t mNetworkType = -1;
-        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+        if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
                 reinterpret_cast<uint8_t *>(&mNetworkType), LNN_COMMON_LEN) != DM_OK) {
                 LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
@@ -490,7 +487,6 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
             }
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", dmDeviceInfo.networkType);
         }
-        LOGI("yangwei SoftbusListener type %d.", dmDeviceInfo.networkType);
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
         dmDeviceInfo.networkType = mNetworkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
