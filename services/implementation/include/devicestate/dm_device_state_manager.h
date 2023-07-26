@@ -90,7 +90,7 @@ public:
      * @tc.type: FUNC
      */
     void DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
-
+    
     /**
      * @tc.name: DmDeviceStateManager::PostDeviceOnline
      * @tc.desc: Post Device Online of the Dm Device State Manager
@@ -195,6 +195,7 @@ public:
      */
     int32_t ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
 
+    void ChangeDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
 private:
     void StartEventThread();
     void StopEventThread();

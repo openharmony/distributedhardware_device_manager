@@ -43,7 +43,7 @@ constexpr const char* DISCOVER_STATUS_ON = "1";
 constexpr const char* DISCOVER_STATUS_OFF = "0";
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
-constexpr const char* DEVICE_INFO_CHANGE = "deviceInfoChange";
+constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 
 SoftbusListener::PulishStatus SoftbusListener::publishStatus = SoftbusListener::STATUS_UNKNOWN;
 IPublishCb SoftbusListener::softbusPublishCallback_ = {
@@ -475,23 +475,41 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
-    if (type != NodeBasicInfoType::TYPE_DEVICE_NAME) {
-        LOGE("Device name is not change.");
+    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
+        LOGI("DeviceInfo %d change.", type);
+        DmDeviceInfo dmDeviceInfo;
+        int32_t networkType = -1;
+        if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
+            if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
+                reinterpret_cast<uint8_t *>(&networkType), LNN_COMMON_LEN) != DM_OK) {
+                LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+                return;
+            }
+            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
+        }
+        ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+        dmDeviceInfo.networkType = networkType;
+        std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
+        if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
+            LOGE("DeviceNameChange setname failed.");
+        }
+        deviceInfoChange.detach();
+        LOGD("OnSoftbusDeviceInfoChanged.");
         return;
     }
-    DmDeviceInfo dmDeviceInfo;
-    (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), info->deviceName,
-        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(info->deviceName))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+}
+
+int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
+{
+    int32_t tempNetworkType = -1;
+    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
+        reinterpret_cast<uint8_t *>(&tempNetworkType), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return ERR_DM_FAILED;
     }
-    std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
-    int32_t ret = pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_INFO_CHANGE);
-    if (ret != DM_OK) {
-        LOGE("DeviceNameChange setname failed.");
-    }
-    deviceInfoChange.detach();
-    LOGD("OnSoftbusDeviceInfoChanged.");
+    networkType = tempNetworkType;
+    LOGI("GetNetworkTypeByNetworkId networkType %d.", tempNetworkType);
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -326,7 +326,6 @@ public:
     static void AsyncTaskCallback(napi_env env, void *data);
     void OnDeviceStatusChange(DmNapiDevStatusChange action,
                              const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
-    void OnDeviceStatusChange(const std::string &deviceName);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason);
     void OnPublishResult(int32_t publishId, int32_t publishResult);

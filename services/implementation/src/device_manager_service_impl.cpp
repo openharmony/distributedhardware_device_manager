@@ -294,6 +294,11 @@ void DeviceManagerServiceImpl::HandleDeviceNameChange(DmDeviceInfo &info)
         LOGE("softbusConnector_ is nullpter!");
         return;
     }
+    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
+        deviceId.length()) != 0) {
+        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    }
     softbusConnector_->HandleDeviceNameChange(info);
 }
 

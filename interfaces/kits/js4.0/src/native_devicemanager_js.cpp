@@ -425,7 +425,7 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
             LOGE("OnDeviceChanged, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
         } else {
             std::string deviceName = callback->deviceBasicInfo_.deviceName;
-            deviceManagerNapi->OnDeviceStatusChange(deviceName);
+            deviceManagerNapi->OnDeviceStatusChange(DmNapiDevStatusChange::CHANGE, callback->deviceBasicInfo_);
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
@@ -762,17 +762,6 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
-    napi_close_handle_scope(env_, scope);
-}
-
-void DeviceManagerNapi::OnDeviceStatusChange(const std::string &deviceName)
-{
-    napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
-    napi_value result = nullptr;
-    napi_create_object(env_, &result);
-    SetValueUtf8String(env_, "deviceName", deviceName, result);
-    OnEvent("deviceNameChange", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
 }
 

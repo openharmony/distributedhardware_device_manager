@@ -159,6 +159,10 @@ typedef struct DmDeviceInfo {
      */
     int32_t range;
     /**
+     * NetworkType of the device.
+     */
+    int32_t networkType;
+    /**
      * Device authentication form.
      */
     DmAuthForm authForm;
@@ -232,6 +236,15 @@ typedef struct DmAuthParam {
      */
     DmAppImageInfo imageinfo;
 } DmAuthParam;
+
+typedef enum {
+    BIT_NETWORK_TYPE_UNKNOWN = 0,  /**< Unknown network type */
+    BIT_NETWORK_TYPE_WIFI,         /**< WIFI network type */
+    BIT_NETWORK_TYPE_BLE,          /**< BLE network type */
+    BIT_NETWORK_TYPE_BR,           /**< BR network type */
+    BIT_NETWORK_TYPE_P2P,          /**< P2P network type */
+    BIT_NETWORK_TYPE_COUNT,        /**< Invalid type */
+} DmNetworkType;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

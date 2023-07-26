@@ -830,5 +830,23 @@ int32_t DeviceManagerService::CheckNewApiPermission()
     }
     return DM_OK;
 }
+
+int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                                        int32_t &networkType)
+{
+    if (!PermissionManager::GetInstance().CheckPermission() &&
+        !PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call GetNetworkTypeByNetworkId.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::GetNetworkTypeByNetworkId begin for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty() || netWorkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

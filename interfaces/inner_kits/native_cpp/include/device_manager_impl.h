@@ -285,6 +285,8 @@ public:
     virtual int32_t BindDevice(const std::string &pkgName, int32_t bindType, const std::string &deviceId,
         const std::string &extra, std::shared_ptr<AuthenticateCallback> callback) override;
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) override;
+    virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
+                                       int32_t &netWorkType) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

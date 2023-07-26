@@ -88,6 +88,8 @@ public:
      */
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
 
+    static int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
+
 public:
     SoftbusListener();
     ~SoftbusListener();

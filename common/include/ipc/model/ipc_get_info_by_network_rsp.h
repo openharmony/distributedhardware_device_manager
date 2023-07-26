@@ -66,9 +66,30 @@ public:
         uuid_ = uuid;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::GetNetworkType
+     * @tc.desc: Get NetworkType for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
+    int32_t GetNetworkType() const
+    {
+        return networkType_;
+    }
+
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetNetworkType
+     * @tc.desc: Set NetworkType for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
+    void SetNetworkType(const int32_t &networkType)
+    {
+        networkType_ = networkType;
+    }
+
 private:
     std::string udid_;
     std::string uuid_;
+    int32_t networkType_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
