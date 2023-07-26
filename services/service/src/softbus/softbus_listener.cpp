@@ -476,19 +476,19 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         return;
     }
     if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
-        LOGI("DeviceInfo change.");
+        LOGI("DeviceInfo %d change.", type);
         DmDeviceInfo dmDeviceInfo;
-        int32_t mNetworkType = -1;
+        int32_t networkType = -1;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
-                reinterpret_cast<uint8_t *>(&mNetworkType), LNN_COMMON_LEN) != DM_OK) {
+                reinterpret_cast<uint8_t *>(&networkType), LNN_COMMON_LEN) != DM_OK) {
                 LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
                 return;
             }
-            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", mNetworkType);
+            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-        dmDeviceInfo.networkType = mNetworkType;
+        dmDeviceInfo.networkType = networkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
@@ -501,14 +501,14 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
 {
-    int32_t mNetworkType = -1;
+    int32_t tempNetworkType = -1;
     if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
-        reinterpret_cast<uint8_t *>(&mNetworkType), LNN_COMMON_LEN) != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+        reinterpret_cast<uint8_t *>(&tempNetworkType), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
         return ERR_DM_FAILED;
     }
-    networkType = mNetworkType;
-    LOGI("GetNetworkTypeByNetworkId networkType %d.", mNetworkType);
+    networkType = tempNetworkType;
+    LOGI("GetNetworkTypeByNetworkId networkType %d.", tempNetworkType);
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -488,10 +488,10 @@ void DmDeviceStateManager::ChangeDeviceInfo(const std::string &pkgName, const Dm
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                 sizeof(info.networkId)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo copy networkType failed");
+                    LOGE("ChangeDeviceInfo copy networkId failed");
             }
             iter.second.deviceTypeId = info.deviceTypeId;
-            LOGI("DeleteOfflineDeviceInfo complete");
+            LOGI("ChangeDeviceInfo complete");
             break;
         }
     }
