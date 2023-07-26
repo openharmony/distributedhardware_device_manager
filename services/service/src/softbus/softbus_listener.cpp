@@ -485,7 +485,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
                 return;
             }
-            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", dmDeviceInfo.networkType);
+            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", mNetworkType);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
         dmDeviceInfo.networkType = mNetworkType;

@@ -245,9 +245,6 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     }
 
     deviceList = rsp->GetDeviceVec();
-    int32_t type = -1;
-    std::string workId = deviceList[0].networkId;
-    GetNetworkTypeByNetworkId(pkgName, workId, type);
     LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
