@@ -75,7 +75,7 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_001, testing::ext::TestSize.Level0)
     MessageParcel reply;
     // 2. set set code is 999
     int code = 999;
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    sptr<IpcClientStub> instance(new IpcClientStub());
     // 3. call IpcClientStub OnRemoteRequest with parameter
     int32_t result = instance->OnRemoteRequest(code, data, reply, option);
     if (result != DM_OK) {
@@ -106,7 +106,7 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
     MessageParcel reply;
     // 2. set set code is SERVER_DEVICE_FA_NOTIFY
     int code = SERVER_DEVICE_FA_NOTIFY;
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    sptr<IpcClientStub> instance(new IpcClientStub());
     // 3. call IpcClientStub OnRemoteRequest with parameter
     int ret = instance->OnRemoteRequest(code, data, reply, option);
     // 4. check result is ERR_DM_IPC_READ_FAILED
@@ -150,7 +150,7 @@ HWTEST_F(IpcClientStubTest, SendCmd_001, testing::ext::TestSize.Level0)
     std::shared_ptr<IpcReq> req = nullptr;
     // set rsp is nullptr
     std::shared_ptr<IpcRsp> rsp = nullptr;
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    sptr<IpcClientStub> instance(new IpcClientStub());
     // 2. call IpcClientStub SendCmd with parameter
     int ret = instance->SendCmd(cmdCode, req, rsp);
     // 3. check result is ERR_DM_IPC_SEND_REQUEST_FAILED
@@ -167,7 +167,7 @@ HWTEST_F(IpcClientStubTest, SendCmd_002, testing::ext::TestSize.Level0)
     int cmdCode = IPC_MSG_BUTT;
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = nullptr;
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    sptr<IpcClientStub> instance(new IpcClientStub());
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, result);
 }
