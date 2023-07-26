@@ -482,7 +482,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
                 reinterpret_cast<uint8_t *>(&networkType), LNN_COMMON_LEN) != DM_OK) {
-                LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+                LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
