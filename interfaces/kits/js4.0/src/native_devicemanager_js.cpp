@@ -71,6 +71,23 @@ std::map<std::string, std::shared_ptr<DmNapiCredentialCallback>> g_creCallbackMa
 std::mutex g_initCallbackMapMutex;
 std::mutex g_deviceManagerMapMutex;
 
+typedef struct DmDeviceTypeIdToString {
+    DmDeviceType deviceTypeId;
+    std::string deviceTypeString;
+} DmDeviceTypeIdToString;
+
+static DmDeviceTypeIdToString g_dmDeviceTypeMap[] = {
+    {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
+    {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
+    {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
+    {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
+    {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
+    {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
+    {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
+    {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
+    {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
+};
+
 enum DMBussinessErrorCode {
     // Permission verify failed.
     ERR_NO_PERMISSION = 201,
@@ -89,6 +106,16 @@ enum DMBussinessErrorCode {
     // Publish invalid.
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
+
+const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
+const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
+const std::string DEVICE_TYPE_PAD_STRING = "PAD";
+const std::string DEVICE_TYPE_TV_STRING = "TV";
+const std::string DEVICE_TYPE_CAR_STRING = "CAR";
+const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
+const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamara";
+const std::string DEVICE_TYPE_PC_STRING = "PC";
+const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 
 const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
 const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
@@ -758,7 +785,8 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
+    std::string deviceType = GetDeviceTypeById(deviceBasicInfo.deviceTypeId);
+    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
@@ -1302,6 +1330,18 @@ bool DeviceManagerNapi::IsSystemApp()
 {
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+}
+
+std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
+{
+    std::string dmDeviceType = "";
+    uint32_t count = sizeof(g_dmDeviceTypeMap) / sizeof(DmDeviceTypeIdToString);
+    if (uint32_t i = 0; i < count; i++) {
+        if (g_dmDeviceTypeMap[i].deviceTypeId == deviceTypeId) {
+            return g_dmDeviceTypeMap[i].deviceTypeString;
+        }
+    }
+    return std::to_string(deviceTypeId);
 }
 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)

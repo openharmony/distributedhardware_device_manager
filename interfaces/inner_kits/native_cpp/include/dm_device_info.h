@@ -82,6 +82,10 @@ typedef enum DmDeviceType {
      * Indicates a smart TV.
      */
     DEVICE_TYPE_TV = 0x9C,
+    /**
+     * Indicates smart display
+    */
+    DEVICE_TYPE_SMART_DISPLAY = 0xA02,
 } DmDeviceType;
 
 /**
