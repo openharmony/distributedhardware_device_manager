@@ -18,15 +18,39 @@
 #include <unistd.h>
 #include <memory>
 
+#include "accesstoken_kit.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "device_manager_service_listener.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
+using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 void PinAuthTest::SetUp()
 {
+    const int32_t PERMS_NUM = 3;
+    const int32_t PEAMS_INDEX_TWO = 2;
+    uint64_t tokenId;
+    const char *perms[PERMS_NUM];
+    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[PEAMS_INDEX_TWO] = "ohos.permission.GET_BUNDLE_INFO_PRIVILEGED";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = PERMS_NUM,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "device_manager",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void PinAuthTest::TearDown()
