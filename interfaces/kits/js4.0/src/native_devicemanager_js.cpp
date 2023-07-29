@@ -1334,7 +1334,6 @@ bool DeviceManagerNapi::IsSystemApp()
 
 std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
 {
-    std::string dmDeviceType = "";
     uint32_t count = sizeof(g_dmDeviceTypeMap) / sizeof(DmDeviceTypeIdToString);
     if (uint32_t i = 0; i < count; i++) {
         if (g_dmDeviceTypeMap[i].deviceTypeId == deviceTypeId) {
