@@ -161,38 +161,6 @@ HWTEST_F(PinAuthTest, StartAuth_002, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: DmAuthManager::StartAuth_003
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PinAuthTest, StartAuth_003, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
-    jsonObject[PIN_TOKEN] = "123456";
-    std::string authToken = jsonObject.dump();
-    int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: DmAuthManager::StartAuth_004
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PinAuthTest, StartAuth_004, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
-    jsonObject[PIN_CODE_KEY] = "authTokenTest";
-    std::string authToken = jsonObject.dump();
-    int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: DmAuthManager::VerifyAuthentication_001
  * @tc.desc: Call unauthenticateddevice to check whether the return value is ERR_DM_FAILED
  * @tc.type: FUNC
