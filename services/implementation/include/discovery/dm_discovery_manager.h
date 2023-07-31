@@ -102,7 +102,7 @@ private:
     void CfgDiscoveryTimer();
     int32_t CheckDiscoveryQueue(const std::string &pkgName);
     int32_t GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
-        bool &isTrusted, DmAuthForm &authForm);
+    bool &isTrusted, DmAuthForm &authForm);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
