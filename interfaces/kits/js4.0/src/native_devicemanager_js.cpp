@@ -76,6 +76,16 @@ typedef struct DmDeviceTypeIdToString {
     std::string deviceTypeString;
 } DmDeviceTypeIdToString;
 
+const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
+const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
+const std::string DEVICE_TYPE_PAD_STRING = "PAD";
+const std::string DEVICE_TYPE_TV_STRING = "TV";
+const std::string DEVICE_TYPE_CAR_STRING = "CAR";
+const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
+const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamara";
+const std::string DEVICE_TYPE_PC_STRING = "PC";
+const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
+
 static DmDeviceTypeIdToString g_dmDeviceTypeMap[] = {
     {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
     {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
@@ -106,16 +116,6 @@ enum DMBussinessErrorCode {
     // Publish invalid.
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
-
-const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
-const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
-const std::string DEVICE_TYPE_PAD_STRING = "PAD";
-const std::string DEVICE_TYPE_TV_STRING = "TV";
-const std::string DEVICE_TYPE_CAR_STRING = "CAR";
-const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
-const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamara";
-const std::string DEVICE_TYPE_PC_STRING = "PC";
-const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 
 const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
 const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
@@ -1335,7 +1335,7 @@ bool DeviceManagerNapi::IsSystemApp()
 std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
 {
     uint32_t count = sizeof(g_dmDeviceTypeMap) / sizeof(DmDeviceTypeIdToString);
-    if (uint32_t i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         if (g_dmDeviceTypeMap[i].deviceTypeId == deviceTypeId) {
             return g_dmDeviceTypeMap[i].deviceTypeString;
         }
