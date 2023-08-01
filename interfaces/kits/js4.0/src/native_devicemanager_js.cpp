@@ -1340,7 +1340,7 @@ std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
             return g_dmDeviceTypeMap[i].deviceTypeString;
         }
     }
-    return std::to_string(deviceTypeId);
+    return DEVICE_TYPE_UNKNOWN_STRING;
 }
 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
