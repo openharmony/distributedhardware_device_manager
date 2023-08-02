@@ -86,7 +86,7 @@ const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
 const std::string DEVICE_TYPE_PC_STRING = "PC";
 const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 
-static const DmDeviceTypeIdToString g_dmDeviceTypeMap[] = {
+static const DmDeviceTypeIdToString DM_DEVICE_TYPE_MAP[] = {
     {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
     {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
     {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
@@ -1336,10 +1336,10 @@ bool DeviceManagerNapi::IsSystemApp()
 
 std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
 {
-    uint32_t count = sizeof(g_dmDeviceTypeMap) / sizeof(DmDeviceTypeIdToString);
+    uint32_t count = sizeof(DM_DEVICE_TYPE_MAP) / sizeof(DmDeviceTypeIdToString);
     for (uint32_t i = 0; i < count; i++) {
-        if (g_dmDeviceTypeMap[i].deviceTypeId == deviceTypeId) {
-            return g_dmDeviceTypeMap[i].deviceTypeString;
+        if (DM_DEVICE_TYPE_MAP[i].deviceTypeId == deviceTypeId) {
+            return DM_DEVICE_TYPE_MAP[i].deviceTypeString;
         }
     }
     return DEVICE_TYPE_UNKNOWN_STRING;
