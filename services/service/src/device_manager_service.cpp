@@ -39,8 +39,14 @@ DeviceManagerService::~DeviceManagerService()
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
+    char path[PATH_MAX + 1] = {0x00};
     std::string soPathName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
-    void *so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+        (realpath(soPathName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soPathName.c_str());
+        return;
+    }
+    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         dlclose(so_handle);
     }
@@ -702,11 +708,15 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
-
+    char path[PATH_MAX + 1] = {0x00};
     std::string soName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
-    void *so_handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soName.c_str());
+        return false;
+    }
+    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle == nullptr) {
-        so_handle = dlopen(soName.c_str(), RTLD_NOW);
+        so_handle = dlopen(path, RTLD_NOW);
         if (so_handle == nullptr) {
             LOGE("load libdevicemanagerserviceimpl so %s failed.", soName.c_str());
             return false;

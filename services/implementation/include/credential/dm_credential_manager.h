@@ -104,7 +104,7 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::vector<std::string> credentialVec_;
-    int64_t requestId_;
+    int64_t requestId_ = 0;
     std::mutex locks_;
     std::string pkgName_;
 private:

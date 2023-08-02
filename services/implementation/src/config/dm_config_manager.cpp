@@ -139,15 +139,27 @@ DmConfigManager::~DmConfigManager()
 {
     void *so_handle = nullptr;
     for (auto iter = soAdapterLoadInfo_.begin(); iter != soAdapterLoadInfo_.end(); iter++) {
+        char path[PATH_MAX + 1] = {0x00};
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+            (realpath(soPathName.c_str(), path) == nullptr)) {
+            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            continue;
+        }
+        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
             dlclose(so_handle);
         }
     }
     for (auto iter = soAuthLoadInfo_.begin(); iter != soAuthLoadInfo_.end(); iter++) {
+        char path[PATH_MAX + 1] = {0x00};
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+            (realpath(soPathName.c_str(), path) == nullptr)) {
+            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            continue;
+        }
+        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
             dlclose(so_handle);
         }
@@ -172,10 +184,16 @@ std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std:
         return decisionAdapterPtr_[soName];
     }
     void *so_handle = nullptr;
+    char path[PATH_MAX + 1] = {0x00};
     std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
-    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+         (realpath(soPathName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soPathName.c_str());
+        return nullptr;
+    }
+    so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle == nullptr) {
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW);
+        so_handle = dlopen(path, RTLD_NOW);
         if (so_handle == nullptr) {
             LOGE("load decision so %s failed", soName.c_str());
             return nullptr;
@@ -212,10 +230,16 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
     }
 
     void *so_handle = nullptr;
+    char path[PATH_MAX + 1] = {0x00};
     std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
-    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+        (realpath(soPathName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soPathName.c_str());
+        return nullptr;
+    }
+    so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle == nullptr) {
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW);
+        so_handle = dlopen(path, RTLD_NOW);
         if (so_handle == nullptr) {
             LOGE("load crypto so %s failed", soName.c_str());
             return nullptr;
@@ -244,10 +268,16 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
         }
 
         void *so_handle = nullptr;
+        char path[PATH_MAX + 1] = {0x00};
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+            (realpath(soPathName.c_str(), path) == nullptr)) {
+            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            continue;
+        }
+        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
         if (so_handle == nullptr) {
-            so_handle = dlopen(soPathName.c_str(), RTLD_NOW);
+            so_handle = dlopen(path, RTLD_NOW);
             if (so_handle == nullptr) {
                 LOGE("load auth so %s failed", (iter->second).soName.c_str());
                 continue;
