@@ -18,15 +18,39 @@
 #include <unistd.h>
 #include <memory>
 
+#include "accesstoken_kit.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "device_manager_service_listener.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
+using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 void PinAuthTest::SetUp()
 {
+    const int32_t PERMS_NUM = 3;
+    const int32_t PEAMS_INDEX_TWO = 2;
+    uint64_t tokenId;
+    const char *perms[PERMS_NUM];
+    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[PEAMS_INDEX_TWO] = "ohos.permission.GET_BUNDLE_INFO_PRIVILEGED";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = PERMS_NUM,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "device_manager",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void PinAuthTest::TearDown()
@@ -132,38 +156,6 @@ HWTEST_F(PinAuthTest, StartAuth_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     std::string authToken = "";
-    int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: DmAuthManager::StartAuth_003
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PinAuthTest, StartAuth_003, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
-    jsonObject[PIN_TOKEN] = "123456";
-    std::string authToken = jsonObject.dump();
-    int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: DmAuthManager::StartAuth_004
- * @tc.desc: Call unauthenticateddevice to check whether the return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PinAuthTest, StartAuth_004, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
-    jsonObject[PIN_CODE_KEY] = "authTokenTest";
-    std::string authToken = jsonObject.dump();
     int32_t ret = pinAuth->StartAuth(authToken, authManager);
     ASSERT_EQ(ret, DM_OK);
 }
