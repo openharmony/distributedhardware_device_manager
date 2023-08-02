@@ -715,6 +715,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
     dlerror();
     auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
     if (dlerror() != nullptr || func == nullptr) {
+        dlclose(so_handle);
         LOGE("Create object function is not exist.");
         return false;
     }
