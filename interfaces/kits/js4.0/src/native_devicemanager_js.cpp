@@ -82,11 +82,11 @@ const std::string DEVICE_TYPE_PAD_STRING = "PAD";
 const std::string DEVICE_TYPE_TV_STRING = "TV";
 const std::string DEVICE_TYPE_CAR_STRING = "CAR";
 const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
-const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamara";
+const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
 const std::string DEVICE_TYPE_PC_STRING = "PC";
 const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 
-static DmDeviceTypeIdToString g_dmDeviceTypeMap[] = {
+static const DmDeviceTypeIdToString g_dmDeviceTypeMap[] = {
     {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
     {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
     {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
@@ -806,7 +806,8 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
+    std::string deviceType = GetDeviceTypeById(deviceBasicInfo.deviceTypeId);
+    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("discoverSuccess", DM_NAPI_ARGS_ONE, &result);
@@ -971,7 +972,8 @@ void DeviceManagerNapi::DeviceBasicInfoToJsArray(const napi_env &env,
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
     SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
-    SetValueInt32(env, "deviceType", vecDevInfo[idx].deviceTypeId, result);
+    std::string deviceType = GetDeviceTypeById(vecDevInfo[idx].deviceTypeId);
+    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
