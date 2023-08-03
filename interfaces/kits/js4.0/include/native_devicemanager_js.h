@@ -355,6 +355,7 @@ private:
     static napi_value GetAvailableDeviceListByFilter(napi_env env, napi_callback_info info,
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool IsSystemApp();
+    static std::string GetDeviceTypeById(OHOS::DistributedHardware::DmDeviceType type);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

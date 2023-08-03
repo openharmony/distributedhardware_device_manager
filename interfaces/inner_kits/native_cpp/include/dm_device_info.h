@@ -82,6 +82,10 @@ typedef enum DmDeviceType {
      * Indicates a smart TV.
      */
     DEVICE_TYPE_TV = 0x9C,
+    /**
+     * Indicates smart display
+    */
+    DEVICE_TYPE_SMART_DISPLAY = 0xA02,
 } DmDeviceType;
 
 /**
@@ -245,6 +249,16 @@ typedef enum {
     BIT_NETWORK_TYPE_P2P,          /**< P2P network type */
     BIT_NETWORK_TYPE_COUNT,        /**< Invalid type */
 } DmNetworkType;
+
+const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
+const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
+const std::string DEVICE_TYPE_PAD_STRING = "PAD";
+const std::string DEVICE_TYPE_TV_STRING = "TV";
+const std::string DEVICE_TYPE_CAR_STRING = "CAR";
+const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
+const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
+const std::string DEVICE_TYPE_PC_STRING = "PC";
+const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

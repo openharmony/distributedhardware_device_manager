@@ -758,7 +758,8 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
+    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
@@ -778,7 +779,8 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    SetValueInt32(env_, "deviceType", (int)deviceBasicInfo.deviceTypeId, device);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
+    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("discoverSuccess", DM_NAPI_ARGS_ONE, &result);
@@ -943,7 +945,8 @@ void DeviceManagerNapi::DeviceBasicInfoToJsArray(const napi_env &env,
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
     SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
-    SetValueInt32(env, "deviceType", vecDevInfo[idx].deviceTypeId, result);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo[idx].deviceTypeId));
+    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
@@ -1302,6 +1305,27 @@ bool DeviceManagerNapi::IsSystemApp()
 {
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+}
+
+std::string DeviceManagerNapi::GetDeviceTypeById(DmDeviceType type)
+{
+    const static std::pair<DmDeviceType, std::string> mapArray[] = {
+        {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
+        {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
+        {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
+        {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
+        {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
+        {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
+        {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
+        {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
+        {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
+    };
+    for (const auto& item : mapArray) {
+        if (item.first == type) {
+            return item.second;
+        }
+    }
+    return DEVICE_TYPE_UNKNOWN_STRING;
 }
 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
