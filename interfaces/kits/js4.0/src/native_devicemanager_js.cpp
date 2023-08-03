@@ -71,33 +71,6 @@ std::map<std::string, std::shared_ptr<DmNapiCredentialCallback>> g_creCallbackMa
 std::mutex g_initCallbackMapMutex;
 std::mutex g_deviceManagerMapMutex;
 
-typedef struct DmDeviceTypeIdToString {
-    DmDeviceType deviceTypeId;
-    std::string deviceTypeString;
-} DmDeviceTypeIdToString;
-
-const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
-const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
-const std::string DEVICE_TYPE_PAD_STRING = "PAD";
-const std::string DEVICE_TYPE_TV_STRING = "TV";
-const std::string DEVICE_TYPE_CAR_STRING = "CAR";
-const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
-const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
-const std::string DEVICE_TYPE_PC_STRING = "PC";
-const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
-
-static const DmDeviceTypeIdToString DM_DEVICE_TYPE_MAP[] = {
-    {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
-    {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
-    {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
-    {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
-    {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
-    {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
-    {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
-    {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
-    {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
-};
-
 enum DMBussinessErrorCode {
     // Permission verify failed.
     ERR_NO_PERMISSION = 201,
@@ -785,7 +758,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    std::string deviceType = GetDeviceTypeById(deviceBasicInfo.deviceTypeId);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
     SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
@@ -806,7 +779,7 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
     SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
     SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
     SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    std::string deviceType = GetDeviceTypeById(deviceBasicInfo.deviceTypeId);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
     SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
 
     napi_set_named_property(env_, result, "device", device);
@@ -972,7 +945,7 @@ void DeviceManagerNapi::DeviceBasicInfoToJsArray(const napi_env &env,
     SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
     SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
     SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
-    std::string deviceType = GetDeviceTypeById(vecDevInfo[idx].deviceTypeId);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo[idx].deviceTypeId));
     SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
@@ -1334,12 +1307,22 @@ bool DeviceManagerNapi::IsSystemApp()
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
 }
 
-std::string DeviceManagerNapi::GetDeviceTypeById(uint16_t deviceTypeId)
+std::string DeviceManagerNapi::GetDeviceTypeById(DmDeviceType type)
 {
-    uint32_t count = sizeof(DM_DEVICE_TYPE_MAP) / sizeof(DmDeviceTypeIdToString);
-    for (uint32_t i = 0; i < count; i++) {
-        if (DM_DEVICE_TYPE_MAP[i].deviceTypeId == deviceTypeId) {
-            return DM_DEVICE_TYPE_MAP[i].deviceTypeString;
+    const static std::pair<DmDeviceType, std::string> mapArray[] = {
+        {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
+        {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
+        {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
+        {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
+        {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
+        {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
+        {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
+        {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
+        {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
+    };
+    for (const auto& item : mapArray) {
+        if (item.first == type) {
+            return item.second;
         }
     }
     return DEVICE_TYPE_UNKNOWN_STRING;
