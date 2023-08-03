@@ -181,6 +181,7 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
 
     std::vector<std::string> trustDeviceUdidList = hiChainConnector_->GetTrustedDevices(localDeviceId);
     if (trustDeviceUdidList.empty()) {
+        LOGI("Trusted devices is empty.");
         return DM_OK;
     }
     std::string udidHash;
