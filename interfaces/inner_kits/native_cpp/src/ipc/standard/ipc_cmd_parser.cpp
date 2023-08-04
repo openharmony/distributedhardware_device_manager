@@ -126,7 +126,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
 {
     std::shared_ptr<IpcGetTrustDeviceRsp> pRsp = std::static_pointer_cast<IpcGetTrustDeviceRsp>(pBaseRsp);
     int32_t deviceNum = reply.ReadInt32();
-    if (deviceNum > 0) {
+    if (deviceNum > 0 && deviceNum <= INT32_MAX) {
         std::vector<DmDeviceInfo> deviceInfoVec;
         DmDeviceInfo *pDmDeviceinfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
@@ -168,7 +168,7 @@ ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, MessageParcel &reply, std::share
         return ERR_DM_FAILED;
     }
     int32_t deviceNum = reply.ReadInt32();
-    if (deviceNum > 0) {
+    if (deviceNum > 0 && deviceNum <= INT32_MAX) {
         std::vector<DmDeviceBasicInfo> deviceBasicInfoVec;
         DmDeviceBasicInfo *pDmDeviceBasicinfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
