@@ -5,7 +5,7 @@
     "srcEntrance": "./ets/Application/MyAbilityStage.ts",
     "description": "$string:entry_desc",
     "mainElement": "MainAbility",
-    "deviceTypes":  ["default","tablet"],
+    "deviceTypes":  ["default","tablet", "2in1"],
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
