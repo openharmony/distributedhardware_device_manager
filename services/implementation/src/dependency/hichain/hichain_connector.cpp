@@ -942,7 +942,7 @@ std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &
     std::vector<GroupInfo> groups;
     int32_t ret = GetRelatedGroups(localDeviceUdid, groups);
     if (ret != DM_OK) {
-        LOGE("failed to get groupInfo, ret:%d", ret);
+        LOGE("failed to get groupInfo, ret: %d", ret);
         return {};
     }
 
@@ -958,7 +958,7 @@ std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &
         ret = deviceGroupManager_->getTrustedDevices(userId, DM_PKG_NAME, group.groupId.c_str(),
         &devicesJson, &devNum);
         if (ret != 0 || devicesJson == nullptr) {
-            LOGE("[HICHAIN]failed to get trusted devicesJson, ret:%d", ret);
+            LOGE("[HICHAIN]failed to get trusted devicesJson, ret: %d", ret);
             return {};
         }
         GetTrustedDevicesUdid(devicesJson, trustedDevices);
