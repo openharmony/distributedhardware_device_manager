@@ -48,9 +48,6 @@ bool PermissionManager::CheckPermission(void)
         if (ret == PermissionState::PERMISSION_GRANTED) {
             return true;
         }
-    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_SHELL) {
-        LOGI("PermissionManager::tokenTypeFlag is shell");
-        return true;
     }
     LOGE("DM service access is denied, please apply for corresponding permissions");
     return false;
@@ -71,9 +68,6 @@ bool PermissionManager::CheckNewPermission(void)
         if (ret == PermissionState::PERMISSION_GRANTED) {
             return true;
         }
-    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_SHELL) {
-        LOGI("PermissionManager::tokenTypeFlag is shell");
-        return true;
     }
     LOGE("DM service access is denied, please apply for corresponding new permissions");
     return false;
