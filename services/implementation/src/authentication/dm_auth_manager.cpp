@@ -932,9 +932,8 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
-            AuthenticateFinish();
-            break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
+            AuthenticateFinish();
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
             SetReasonAndFinish(ERR_DM_INPUT_PARA_INVALID, AuthState::AUTH_REQUEST_JOIN);
