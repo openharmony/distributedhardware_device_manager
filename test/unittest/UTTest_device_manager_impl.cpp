@@ -57,7 +57,7 @@ void DeviceManagerImplTest::SetUp()
         .dcaps = NULL,
         .perms = perms,
         .acls = NULL,
-        .processName = "device_manager",
+        .processName = "dsoftbus_service",
         .aplStr = "system_core",
     };
     tokenId = GetAccessTokenId(&infoInstance);
