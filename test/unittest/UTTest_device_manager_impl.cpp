@@ -78,6 +78,14 @@ void DeviceManagerImplTest::TearDownTestCase()
 }
 
 namespace {
+class AuthenticateCallbackTest : public AuthenticateCallback {
+public:
+    virtual ~AuthenticateCallbackTest()
+    {
+    }
+    virtual void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
+                              int32_t reason) override {}
+};
 /**
  * @tc.name: InitDeviceManager_001
  * @tc.desc: 1. set packName not null
