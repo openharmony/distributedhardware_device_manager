@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
@@ -23,16 +24,20 @@
 #include "softbus_session.h"
 #include "softbus_state_callback.h"
 #include "on_softbus_device_found_fuzzer.h"
+#include <securec.h>
 
 namespace OHOS {
 namespace DistributedHardware {
 void OnSoftbusDeviceFoundFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(DeviceInfo))) {
+    if ((data == nullptr) || (size > DM_MAX_DEVICE_ID_LEN)) {
         return;
     }
 
-    DeviceInfo device = *(reinterpret_cast<const DeviceInfo*>(data));
+    DeviceInfo device;
+    if (memcpy_s(device.devId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
+        return;
+    }
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusDeviceFound(&device);
     softbusConnector->OnSoftbusDeviceDiscovery(&device);
