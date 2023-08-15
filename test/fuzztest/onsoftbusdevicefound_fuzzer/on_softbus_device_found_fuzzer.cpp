@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <securec.h>
+
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
@@ -24,7 +26,6 @@
 #include "softbus_session.h"
 #include "softbus_state_callback.h"
 #include "on_softbus_device_found_fuzzer.h"
-#include <securec.h>
 
 namespace OHOS {
 namespace DistributedHardware {
