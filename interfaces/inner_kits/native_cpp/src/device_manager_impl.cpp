@@ -580,8 +580,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               const DmDeviceInfo &deviceInfo, const std::string &extra,
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("AuthenticateDevice Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("AuthenticateDevice error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("AuthenticateDevice start, pkgName: %s", pkgName.c_str());
@@ -690,8 +690,8 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
 int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                                 std::shared_ptr<VerifyAuthCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("VerifyAuthentication error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("VerifyAuthentication start, pkgName: %s", pkgName.c_str());

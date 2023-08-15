@@ -107,6 +107,14 @@ class VerifyAuthCallbackTest : public VerifyAuthCallback {
 public:
     void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override {}
 };
+
+class DeviceStatusCallbackTest : public DeviceStatusCallback {
+public:
+    void OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceOffline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

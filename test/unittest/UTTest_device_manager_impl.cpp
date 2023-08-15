@@ -2464,7 +2464,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_002, testing::ext::TestSize.L
     // set extra null
     std::string extra = "";
     // set callback null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
@@ -2503,7 +2503,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_003, testing::ext::TestSize.L
     // set extra null
     std::string extra = "";
     // set callback null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
@@ -2542,7 +2542,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_004, testing::ext::TestSize.L
     // set extra null
     std::string extra = "";
     // set callback null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
@@ -2581,7 +2581,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_005, testing::ext::TestSize.L
     // set extra null
     std::string extra = "";
     // set callback null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;

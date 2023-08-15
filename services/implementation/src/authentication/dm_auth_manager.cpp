@@ -847,12 +847,20 @@ bool DmAuthManager::GetIsCryptoSupport()
 
 int32_t DmAuthManager::SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState)
 {
+    if (authRequestState == nullptr) {
+        LOGE("authRequestState is nullptr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     authRequestState_ = authRequestState;
     return DM_OK;
 }
 
 int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState)
 {
+    if (authResponseState == nullptr) {
+        LOGE("authResponseState is nullptr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     authResponseState_ = authResponseState;
     return DM_OK;
 }
