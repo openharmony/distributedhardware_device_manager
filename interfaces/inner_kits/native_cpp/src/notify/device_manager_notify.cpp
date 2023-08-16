@@ -195,7 +195,7 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
 void DeviceManagerNotify::RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
                                                                std::shared_ptr<VerifyAuthCallback> callback)
 {
-     if (pkgName.empty() || callback == nullptr) {
+    if (pkgName.empty() || callback == nullptr) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
