@@ -91,7 +91,7 @@ void DeviceManagerNotify::RegisterDiscoveryCallback(const std::string &pkgName, 
                                                     std::shared_ptr<DiscoveryCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
-        LOGE("Invalid parameter, pkgName is empty.");
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);

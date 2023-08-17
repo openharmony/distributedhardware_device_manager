@@ -300,7 +300,7 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
 {
     LOGI("DeviceManagerImpl::VerifyAuthentication start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
-        LOGE("VerifyAuthentication error: Invalid para");
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
