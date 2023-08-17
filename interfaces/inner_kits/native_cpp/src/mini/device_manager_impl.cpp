@@ -212,7 +212,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 {
     LOGI("DeviceManagerImpl::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
     if (pkgName.empty() || callback == nullptr) {
-        LOGE("Invalid parameter, pkgName is empty.");
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
