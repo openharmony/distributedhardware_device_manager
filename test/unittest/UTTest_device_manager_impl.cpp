@@ -3980,7 +3980,12 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential_003, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerImplTest, RequestCredential_004, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
-    std::string reqJsonStr = R"({"version":"1.0.0.1","userId":"123"})";
+    std::string reqJsonStr = R"(
+    {
+        "version":"1.0.0.1",
+        "userId":"4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
+    }
+    )";
     std::string returnJsonStr;
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
