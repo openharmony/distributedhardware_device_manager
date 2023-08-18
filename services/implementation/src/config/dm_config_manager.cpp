@@ -148,6 +148,7 @@ DmConfigManager::~DmConfigManager()
         }
         so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
+            LOGI("DmConfigManager so_handle is not nullptr first.");
             dlclose(so_handle);
         }
     }
@@ -161,6 +162,7 @@ DmConfigManager::~DmConfigManager()
         }
         so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
+            LOGI("DmConfigManager so_handle is not nullptr second.");
             dlclose(so_handle);
         }
     }
@@ -191,13 +193,10 @@ std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std:
         LOGE("File %s canonicalization failed.", soPathName.c_str());
         return nullptr;
     }
-    so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        so_handle = dlopen(path, RTLD_NOW);
-        if (so_handle == nullptr) {
-            LOGE("load decision so %s failed", soName.c_str());
-            return nullptr;
-        }
+        LOGE("load decision so %s failed", soName.c_str());
+        return nullptr;
     }
     dlerror();
     auto func = (CreateIDecisionAdapterFuncPtr)dlsym(so_handle, (soInfoIter->second).funcName.c_str());
@@ -237,13 +236,10 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
         LOGE("File %s canonicalization failed.", soPathName.c_str());
         return nullptr;
     }
-    so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        so_handle = dlopen(path, RTLD_NOW);
-        if (so_handle == nullptr) {
-            LOGE("load crypto so %s failed", soName.c_str());
-            return nullptr;
-        }
+        LOGE("load crypto so %s failed", soName.c_str());
+        return nullptr;
     }
 
     dlerror();
@@ -275,13 +271,10 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
             LOGE("File %s canonicalization failed.", soPathName.c_str());
             continue;
         }
-        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+        so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
         if (so_handle == nullptr) {
-            so_handle = dlopen(path, RTLD_NOW);
-            if (so_handle == nullptr) {
-                LOGE("load auth so %s failed", (iter->second).soName.c_str());
-                continue;
-            }
+            LOGE("load auth so %s failed", (iter->second).soName.c_str());
+            continue;
         }
 
         dlerror();

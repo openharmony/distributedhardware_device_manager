@@ -48,6 +48,7 @@ DeviceManagerService::~DeviceManagerService()
     }
     void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
+        LOGI("DeviceManagerService so_handle is not nullptr.");
         dlclose(so_handle);
     }
 }
@@ -714,13 +715,10 @@ bool DeviceManagerService::IsDMServiceImplReady()
         LOGE("File %s canonicalization failed.", soName.c_str());
         return false;
     }
-    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        so_handle = dlopen(path, RTLD_NOW);
-        if (so_handle == nullptr) {
-            LOGE("load libdevicemanagerserviceimpl so %s failed.", soName.c_str());
-            return false;
-        }
+        LOGE("load libdevicemanagerserviceimpl so %s failed.", soName.c_str());
+        return false;
     }
     dlerror();
     auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
