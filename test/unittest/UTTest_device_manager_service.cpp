@@ -881,7 +881,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_001, testing::e
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
-    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**
@@ -893,7 +893,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_001, testing:
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**

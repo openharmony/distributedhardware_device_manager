@@ -96,11 +96,17 @@ void DeviceManagerService::UninitDMServiceListener()
 
 void DeviceManagerService::RegisterDeviceManagerListener(const std::string &pkgName)
 {
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
     listener_->RegisterDmListener(pkgName, AppManager::GetInstance().GetAppId());
 }
 
 void DeviceManagerService::UnRegisterDeviceManagerListener(const std::string &pkgName)
 {
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
     listener_->UnRegisterDmListener(pkgName);
 }
 

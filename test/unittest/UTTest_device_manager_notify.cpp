@@ -82,7 +82,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_001, testing::e
  *           2. set checkMap null
  *           3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
  *           4. Get checkMap from DeviceManagerNotify
- *           5. check checkMap null
+ *           5. check checkMap not null
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -91,8 +91,9 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_002, testing::e
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set dmInitCallback null
-    std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
     // 2. set checkMap not null
     std::shared_ptr<DmInitCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
@@ -100,7 +101,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_002, testing::e
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     // 5. check checkMap null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -464,11 +465,11 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStateCallback_001, testing::ext:
 /**
  * @tc.name: RegisterDeviceStateCallback_002
  * @tc.desc: 1. set pkgName not null
- *                     set Callback null
+ *                     set Callback not null
  *                  2. set checkMap null
  *                  3. call DeviceManagerNotifyTest RegisterDeviceStateCallback with parameter
  *                  4. Get checkMap from DeviceManagerNotify
- *                  5. check checkMap null
+ *                  5. check checkMap not null
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -476,16 +477,17 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStateCallback_002, testing::ext:
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set dmInitCallback null
-    std::shared_ptr<DeviceStateCallback> callback = nullptr;
-    // 2. set checkMap not null
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<DeviceStateCallback> callback = std::make_shared<DeviceStateCallbackTest>(count);
+    // 2. set checkMap null
     std::shared_ptr<DeviceStateCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDeviceStateCallback with parameter
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
     // 5. check checkMap null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -835,7 +837,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_001, testing::ext::T
  *           2. set checkMap null
  *           3. call DeviceManagerNotifyTest RegisterDiscoverCallback with parameter
  *           4. Get checkMap from DeviceManagerNotify
- *           5. check checkMap null
+ *           5. check checkMap mot null
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -843,8 +845,9 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_002, testing::ext::T
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set dmInitCallback null
-    std::shared_ptr<DiscoveryCallback> callback = nullptr;
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     // set subscribeId not null
     uint16_t subscribeId = 0;
     // 2. set checkMap not null
@@ -854,7 +857,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_002, testing::ext::T
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     // 5. check checkMap null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -875,7 +878,8 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_003, testing::ext::T
     // 1. set pkgName com.ohos.test
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
-    std::shared_ptr<DiscoveryCallback> callback = nullptr;
+    int count = 0;
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     // set subscribeId not null
     uint16_t subscribeId = 0;
     // 2. set checkMap null
@@ -887,7 +891,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_003, testing::ext::T
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     // 6. check checkMap not null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -1250,8 +1254,9 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_002, testing::ext
 {
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set dmInitCallback null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>(count);
     // set subscribeId not null
     std::string deviceId = "1";
     // 2. set checkMap not null
@@ -1261,7 +1266,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_002, testing::ext
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     // 5. check checkMap null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -1282,7 +1287,8 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_003, testing::ext
     // 1. set pkgName com.ohos.test
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
-    std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    int count = 0;
+    std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>(count);
     // set subscribeId not null
     std::string deviceId = "1";
     // 2. set checkMap null
@@ -1294,7 +1300,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_003, testing::ext
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     // 6. check checkMap not null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -4684,7 +4690,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback2, testing::ext:
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback1, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test4";
-    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
 }
@@ -4696,7 +4702,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback1, testing::ext::T
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback2, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
 }
@@ -4711,7 +4717,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline1, testing::ext::TestSize.Level0
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceBasicInfo);
     auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
-    EXPECT_EQ(ptr, nullptr);
+    EXPECT_NE(ptr, nullptr);
 }
 
 /**
@@ -4737,7 +4743,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline1, testing::ext::TestSize.Level
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, deviceBasicInfo);
     auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
-    EXPECT_EQ(ptr, nullptr);
+    EXPECT_NE(ptr, nullptr);
 }
 
 /**
@@ -4763,7 +4769,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceReady1, testing::ext::TestSize.Level0)
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, deviceBasicInfo);
     auto ptr = DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName];
-    EXPECT_EQ(ptr, nullptr);
+    EXPECT_NE(ptr, nullptr);
 }
 
 /**
