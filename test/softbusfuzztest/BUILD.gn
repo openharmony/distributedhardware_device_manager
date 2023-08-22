@@ -11,17 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
+group("fuzztest") {
   testonly = true
 
-  deps = []
-  if (support_jsapi) {
-    deps += [
-      "benchmarktest:benchmarktest",
-      "commonfuzztest:fuzztest",
-      "servicesfuzztest:fuzztest",
-      "softbusfuzztest:fuzztest",
-      "unittest:unittest",
-    ]
-  }
+  deps = [
+    "onbytesreceived_fuzzer:fuzztest",
+    "onparameterchgcallback_fuzzer:fuzztest",
+    "onsessionopened_fuzzer:fuzztest",
+    "onsoftbusdevicefound_fuzzer:fuzztest",
+    "onsoftbusdeviceoffline_fuzzer:fuzztest",
+    "onsoftbusdeviceonline_fuzzer:fuzztest",
+    "softbusconnector_fuzzer:fuzztest",
+    "softbusconnectorpublish_fuzzer:fuzztest",
+    "softbusconnectorregister_fuzzer:fuzztest",
+    "softbusconnectorstatic_fuzzer:fuzztest",
+    "softbussession_fuzzer:fuzztest",
+    "softbussessionobject_fuzzer:fuzztest",
+  ]
 }
