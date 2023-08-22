@@ -91,6 +91,15 @@ public:
     void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo)  override {}
     void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
 };
+
+class AuthenticateCallbackTest : public AuthenticateCallback {
+public:
+    ~AuthenticateCallbackTest()
+    {
+    }
+    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
+                      int32_t reason) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

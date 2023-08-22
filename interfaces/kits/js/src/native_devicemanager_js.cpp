@@ -1990,13 +1990,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetTrustedDeviceListSync in");
-    if (!IsSystemApp()) {
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
-    if (ret != 0) {
-        CreateBusinessError(env, ret);
+    if (!CheckPermissions(env)) {
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2014,18 +2008,11 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-
     std::vector<OHOS::DistributedHardware::DmDeviceInfo> devList;
+    int32_t ret = 0;
     if (argc == DM_NAPI_ARGS_ZERO) {
         std::string extra = "";
-        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra,
-            devList);
-        if (ret != 0) {
-            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(),
-                ret);
-            CreateBusinessError(env, ret);
-            return result;
-        }
+        ret = DeviceManager::GetInstance().GetTrustedDeviceList(devManagerWrapper->bundleName_, extra, devList);
     } else if (argc == DM_NAPI_ARGS_ONE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
         napi_valuetype valueType;
@@ -2036,17 +2023,14 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         bool isRefresh = false;
         napi_get_value_bool(env, argv[0], &isRefresh);
         std::string extra = "";
-        int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra,
-            isRefresh, devList);
-        if (ret != 0) {
-            LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(),
-                ret);
-            CreateBusinessError(env, ret);
-            return result;
-        }
+        ret = DeviceManager::GetInstance().GetTrustedDeviceList(devManagerWrapper->bundleName_, extra, isRefresh,
+            devList);
     }
-
-    LOGI("DeviceManager::GetTrustedDeviceListSync");
+    if (ret != 0) {
+        LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", devManagerWrapper->bundleName_.c_str(), ret);
+        CreateBusinessError(env, ret);
+        return result;
+    }
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
             DeviceInfoToJsArray(env, devList, (int32_t)i, result);
@@ -2274,6 +2258,21 @@ bool DeviceManagerNapi::StartArgCheck(napi_env env, napi_value &argv,
     }
     int32_t res = JsToDmSubscribeInfo(env, argv, subInfo);
     if (!CheckArgsVal(env, res == 0, "subscribeId", "Wrong subscribeId")) {
+        return false;
+    }
+    return true;
+}
+
+bool DeviceManagerNapi::CheckPermissions(napi_env env)
+{
+    LOGI("CheckPermissions in");
+    if (!IsSystemApp()) {
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return false;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != 0) {
+        CreateBusinessError(env, ret);
         return false;
     }
     return true;

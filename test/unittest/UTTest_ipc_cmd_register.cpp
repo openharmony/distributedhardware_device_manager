@@ -705,8 +705,12 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_005, testing::ext::TestSize.Level0)
     MessageParcel reply;
     reply.WriteInt32(10);
     int32_t deviceTotalSize = 10 * (int32_t)sizeof(DmDeviceInfo);
-    DmDeviceInfo *dmDeviceInfo = nullptr;
-    reply.WriteRawData(dmDeviceInfo, deviceTotalSize);
+    DmDeviceInfo dmDeviceInfo = {
+        .deviceId = "123",
+        .deviceName = "name",
+        .deviceTypeId = 1,
+    };
+    reply.WriteRawData(&dmDeviceInfo, deviceTotalSize);
     // set IpcRegisterListenerReq null
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
