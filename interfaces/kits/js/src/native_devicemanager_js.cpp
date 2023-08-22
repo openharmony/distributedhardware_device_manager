@@ -2012,7 +2012,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     int32_t ret = 0;
     if (argc == DM_NAPI_ARGS_ZERO) {
         std::string extra = "";
-        ret = DeviceManager::GetInstance().GetTrustedDeviceList(devManagerWrapper->bundleName_, extra, devList);
+        ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, devList);
     } else if (argc == DM_NAPI_ARGS_ONE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
         napi_valuetype valueType;
@@ -2023,11 +2023,11 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
         bool isRefresh = false;
         napi_get_value_bool(env, argv[0], &isRefresh);
         std::string extra = "";
-        ret = DeviceManager::GetInstance().GetTrustedDeviceList(devManagerWrapper->bundleName_, extra, isRefresh,
+        ret = DeviceManager::GetInstance().GetTrustedDeviceList(deviceManagerWrapper->bundleName_, extra, isRefresh,
             devList);
     }
     if (ret != 0) {
-        LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", devManagerWrapper->bundleName_.c_str(), ret);
+        LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
         return result;
     }
