@@ -406,6 +406,7 @@ private:
     static napi_value GetTrustedDeviceListByFilter(napi_env env, napi_callback_info info,
                                                     DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool StartArgCheck(napi_env env, napi_value &argv, OHOS::DistributedHardware::DmSubscribeInfo &subInfo);
+    static bool CheckPermissions(napi_env env);
     static void HandleCreateDmCallBackCompletedCB(napi_env env, napi_status status, void *data);
     // get deviceInfo by networkId
     static void CallGetDeviceInfo(napi_env env, NetworkIdAsyncCallbackInfo *networkIdAsyncCallbackInfo);

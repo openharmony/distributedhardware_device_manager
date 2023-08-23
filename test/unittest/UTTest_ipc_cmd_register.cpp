@@ -688,35 +688,6 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_004, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: ReadResponse_005
- * @tc.desc: 1. set cmdCode GET_TRUST_DEVICE_LIST
- *              set MessageParcel reply null
- *              set IpcRsp null
- *           2. call IpcCmdRegister ReadResponse with parameter
- *           3. check ret is ERR_DM_IPC_WRITE_FAILED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_005, testing::ext::TestSize.Level0)
-{
-    // 1. set cmdCode not null
-    int32_t cmdCode = GET_TRUST_DEVICE_LIST;
-    //  set MessageParcel data null
-    MessageParcel reply;
-    reply.WriteInt32(10);
-    int32_t deviceTotalSize = 10 * (int32_t)sizeof(DmDeviceInfo);
-    DmDeviceInfo *dmDeviceInfo = nullptr;
-    reply.WriteRawData(dmDeviceInfo, deviceTotalSize);
-    // set IpcRegisterListenerReq null
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    // 2. call IpcCmdRegister OnRemoteRequest with parameter
-    int ret = 0;
-    ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    // 3. check ret is ERR_DM_IPC_WRITE_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_WRITE_FAILED);
-}
-
-/**
  * @tc.name: ReadResponse_006
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK

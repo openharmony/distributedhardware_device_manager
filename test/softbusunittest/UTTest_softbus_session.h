@@ -12,32 +12,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTest_SOFTBUS_LISTENER_H
-#define OHOS_UTTest_SOFTBUS_LISTENER_H
+#ifndef OHOS_UTTest_DM_SOFTBUS_SESSION_H
+#define OHOS_UTTest_DM_SOFTBUS_SESSION_H
 
 #include <gtest/gtest.h>
 #include <refbase.h>
+
 #include <map>
 #include <memory>
-#include <mutex>
+#include <set>
 #include <string>
 #include <vector>
 
-#include "softbus_bus_center.h"
-#include "softbus_listener.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
+#include "device_manager_service_listener.h"
+#include "dm_device_state_manager.h"
+#include "dm_discovery_manager.h"
 #include "inner_session.h"
 #include "session.h"
+#include "softbus_session.h"
+#include "softbus_session_callback.h"
+#include "dm_auth_manager.h"
+#include "auth_response_state.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusListenerTest : public testing::Test {
+class SoftbusSessionTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp();
-    virtual void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
