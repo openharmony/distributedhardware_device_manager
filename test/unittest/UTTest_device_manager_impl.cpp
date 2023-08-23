@@ -805,7 +805,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
 {
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
-    std::string extra= "";
+    std::string extra = "";
     // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
     // set callback not null
@@ -1620,7 +1620,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_001, testing::ext::Test
     // 1. set packName null
     std::string packName = "";
     // set extra null
-    std::string extra= "";
+    std::string extra = "";
     // set callback nullptr
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
@@ -1645,7 +1645,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "";
+    std::string extra = "";
     // set callback not null
     std::shared_ptr<DeviceStateCallback> dsCallback =std::make_shared<DeviceStateCallbackTest>();
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
@@ -1673,7 +1673,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_003, testing::ext::Test
     // 1. set packName null
     std::string pkgName = "";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     // set callback nullptr
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
@@ -1698,7 +1698,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_004, testing::ext::Test
     // 1. set packName null
     std::string pkgName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     // set callback nullptr
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
@@ -1723,7 +1723,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_005, testing::ext::Test
     // 1. set packName null
     std::string pkgName = "com.ohos.test";
     // set extra null
-    std::string extra= "test1";
+    std::string extra = "test1";
     // set callback nullptr
     std::shared_ptr<DeviceStateCallback> callback = nullptr;
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
@@ -1927,7 +1927,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_004, testing::ext::TestSize
 {
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
-    std::string extra= "test";
+    std::string extra = "test";
     // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
     // set callback not null
@@ -1961,7 +1961,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_005, testing::ext::TestSize
 {
     // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
-    std::string extra= "test";
+    std::string extra = "test";
     // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
     // set callback not null

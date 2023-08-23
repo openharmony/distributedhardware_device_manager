@@ -497,7 +497,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_001, testing::ext::TestSize.L
     // set dmDeviceInfo = null
     DmDeviceInfo dmDeviceInfo;
     // set extra = null
-    std::string extra= "";
+    std::string extra = "";
     // set callback = nullptr
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
@@ -1713,7 +1713,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_006, testing::ext::Test
     // 1. set packName null
     std::string pkgName = "";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID;
@@ -1736,7 +1736,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_007, testing::ext::Test
     // 1. set packName null
     std::string packName = "";
     // set extra null
-    std::string extra= "";
+    std::string extra = "";
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra);
     // 3. check ret is DM_OK
@@ -1759,7 +1759,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_008, testing::ext::Test
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
@@ -1788,7 +1788,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_009, testing::ext::Test
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
@@ -1817,7 +1817,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_010, testing::ext::Test
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     // 2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
@@ -1841,7 +1841,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_006, testing::ext::Te
     // 1. set packName null
     std::string packName = "";
     // set extra null
-    std::string extra= "";
+    std::string extra = "";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(packName, extra);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
@@ -1862,7 +1862,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_007, testing::ext::Te
     // 1. set packName null
     std::string packName = "";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     // 2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(packName, extra);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
@@ -1885,7 +1885,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_008, testing::ext::Te
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
@@ -1914,7 +1914,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_009, testing::ext::Te
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
@@ -1943,7 +1943,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_010, testing::ext::Te
     // 1. set packName null
     std::string packName = "com.ohos.test";
     // set extra null
-    std::string extra= "test";
+    std::string extra = "test";
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     // 2. call DeviceManagerImpl::UnRegisterDevStateCallback with parameter
