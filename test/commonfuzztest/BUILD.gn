@@ -11,17 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
+group("fuzztest") {
   testonly = true
 
-  deps = []
-  if (support_jsapi) {
-    deps += [
-      "benchmarktest:benchmarktest",
-      "commonfuzztest:fuzztest",
-      "servicesfuzztest:fuzztest",
-      "softbusfuzztest:fuzztest",
-      "unittest:unittest",
-    ]
-  }
+  deps = [
+    "authenticatedevice_fuzzer:fuzztest",
+    "authenticatedeviceservice_fuzzer:fuzztest",
+    "dmauthmanager_fuzzer:fuzztest",
+    "dmcommoneventmanager_fuzzer:fuzztest",
+    "dmcredentialimpl_fuzzer:fuzztest",
+    "dmdiscoverymanager_fuzzer:fuzztest",
+    "generateencrypteduuid_fuzzer:fuzztest",
+    "getdeviceinfo_fuzzer:fuzztest",
+    "getfaparam_fuzzer:fuzztest",
+    "ondatareceived_fuzzer:fuzztest",
+    "onerror_fuzzer:fuzztest",
+    "onfinish_fuzzer:fuzztest",
+    "onrequest_fuzzer:fuzztest",
+    "pinauth_fuzzer:fuzztest",
+    "pinauthui_fuzzer:fuzztest",
+  ]
 }
