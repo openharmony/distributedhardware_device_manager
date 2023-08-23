@@ -82,10 +82,11 @@ ohos_unittest("UTTest_pin_auth_ui") {
 
   include_dirs = [
     "${ext_path}/pin_auth/include/standard",
-    "${devicemanager_path}/test/commonunittest"
+    "${devicemanager_path}/test/commonunittest",
   ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_pin_auth_ui.cpp" ]
+  sources =
+      [ "${devicemanager_path}/test/commonunittest/UTTest_pin_auth_ui.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -187,9 +188,10 @@ ohos_unittest("UTTest_hichain_connector") {
 ohos_unittest("UTTest_softbus_connector") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/softbusunittest"]
+  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
 
   sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_connector.cpp",
     "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
@@ -206,7 +208,6 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
     "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
-    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_connector.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -224,9 +225,11 @@ ohos_unittest("UTTest_softbus_connector") {
 ohos_unittest("UTTest_softbus_listener") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/softbusunittest"]
+  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
 
-  sources = [ "${devicemanager_path}/test/softbusunittest/UTTest_softbus_listener.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_listener.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -243,9 +246,11 @@ ohos_unittest("UTTest_softbus_listener") {
 ohos_unittest("UTTest_softbus_session") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/softbusunittest"]
+  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
 
-  sources = [ "${devicemanager_path}/test/softbusunittest/UTTest_softbus_session.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_session.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -291,7 +296,7 @@ ohos_unittest("UTTest_dm_anonymous") {
 ohos_unittest("UTTest_dm_timer") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_timer.cpp" ]
 
@@ -385,9 +390,9 @@ ohos_unittest("UTTest_device_manager_impl") {
   module_out_path = module_out_path
 
   sources = [
+    "UTTest_device_manager_impl.cpp",
     "UTTest_device_manager_impl_three.cpp",
     "UTTest_device_manager_impl_two.cpp",
-    "UTTest_device_manager_impl.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -401,7 +406,7 @@ ohos_unittest("UTTest_device_manager_impl") {
 ohos_unittest("UTTest_multiple_user_connector") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [ "${devicemanager_path}/test/commonunittest/UTTest_multiple_user_connector.cpp" ]
 
@@ -416,9 +421,11 @@ ohos_unittest("UTTest_multiple_user_connector") {
 ohos_unittest("UTTest_permission_manager") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_permission_manager.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_permission_manager.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -474,7 +481,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 ohos_unittest("UTTest_dm_dfx") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_dfx.cpp" ]
 
@@ -492,9 +499,11 @@ ohos_unittest("UTTest_dm_dfx") {
 ohos_unittest("UTTest_dm_discovery_filter") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_filter.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_filter.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -604,9 +613,10 @@ ohos_unittest("UTTest_dm_auth_manager") {
 ohos_unittest("UTTest_dm_discovery_manager") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_manager.cpp",
     "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
@@ -617,7 +627,6 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_manager.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -634,9 +643,10 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 ohos_unittest("UTTest_dm_publish_manager") {
   module_out_path = module_out_path
 
-  include_dirs = ["${devicemanager_path}/test/commonunittest"]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_publish_manager.cpp",
     "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
     "${services_path}/src/device_manager_service.cpp",
@@ -646,7 +656,6 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
     "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_publish_manager.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

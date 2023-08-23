@@ -680,7 +680,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.
  */
 HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestSize.Level0)
 {
-    int32_t subscribeId= 123456;
+    int32_t subscribeId = 123456;
     RefreshResult result = (RefreshResult)1;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
@@ -703,7 +703,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestS
  */
 HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_002, testing::ext::TestSize.Level0)
 {
-    int32_t subscribeId= 123456;
+    int32_t subscribeId = 123456;
     RefreshResult result = (RefreshResult)0;
     std::string pkgName = "com.ohos.helloworld";
     softbusConnector->RegisterSoftbusDiscoveryCallback(
@@ -749,7 +749,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_001, testing::ext::TestSiz
  */
 HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_002, testing::ext::TestSize.Level0)
 {
-    int32_t publishId= 123456;
+    int32_t publishId = 123456;
     std::string pkgName = "com.ohos.helloworld";
     PublishResult failReason = (PublishResult)0;
     softbusConnector->RegisterSoftbusPublishCallback(
