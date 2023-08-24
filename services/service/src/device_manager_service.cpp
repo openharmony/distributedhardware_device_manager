@@ -489,7 +489,7 @@ int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
 {
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %s does not have permission to call VerifyAuthentication.");
+        LOGE("The caller does not have permission to call VerifyAuthentication.");
         return ERR_DM_NO_PERMISSION;
     }
     if (authParam.empty()) {
