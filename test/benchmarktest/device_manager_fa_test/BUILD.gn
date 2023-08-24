@@ -21,6 +21,9 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   sources = [ "device_manager_fa_test.cpp" ]
 
   include_dirs = [
+    "${access_token_path}/nativetoken/include",
+    "${access_token_path}/token_setproc/include",
+    "${access_token_path}/accesstoken/include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include/notify",
     "${services_path}/include/dependency/softbus",
@@ -32,6 +35,9 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   }
 
   deps = [
+    "${access_token_path}/accesstoken:libaccesstoken_sdk",
+    "${access_token_path}/nativetoken:libnativetoken",
+    "${access_token_path}/token_setproc:libtoken_setproc",
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "../../../../distributed_hardware_fwk/utils:distributedhardwareutils",

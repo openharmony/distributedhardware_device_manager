@@ -19,13 +19,16 @@
 #include <securec.h>
 #include <cstdlib>
 
+#include "accesstoken_kit.h"
 #include "device_manager.h"
 #include "dm_app_image_info.h"
 #include "dm_subscribe_info.h"
 #include "device_manager_callback.h"
 #include "dm_constants.h"
+#include "nativetoken_kit.h"
 #include "system_ability_definition.h"
 #include "softbus_common.h"
+#include "token_setproc.h"
 
 using namespace std;
 using namespace OHOS;
@@ -129,6 +132,24 @@ class DeviceDiscoveryTest : public DeviceManagerFaTest {
 public:
     void SetUp(const ::benchmark::State &state) override
     {
+        uint64_t tokenId;
+        const char *perms[3];
+        perms[0] = "ohos.permission.ACCESS_SERVICE_DM";
+        perms[1] = "ohos.permission.DISTRIBUTED_DATASYNC";
+        perms[2] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+        NativeTokenInfoParams infoInstance = {
+            .dcapsNum = 0,
+            .permsNum = 3,
+            .aclsNum = 0,
+            .dcaps = NULL,
+            .perms = perms,
+            .acls = NULL,
+            .processName = "device_manager",
+            .aplStr = "system_core",
+        };
+        tokenId = GetAccessTokenId(&infoInstance);
+        SetSelfTokenID(tokenId);
+        OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     }
     void TearDown(const ::benchmark::State &state) override
     {
