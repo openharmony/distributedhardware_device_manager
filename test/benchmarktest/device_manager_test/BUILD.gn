@@ -20,7 +20,12 @@ ohos_benchmarktest("DeviceManagerTest") {
   module_out_path = module_output_path
   sources = [ "device_manager_test.cpp" ]
 
-  include_dirs = [ "${common_path}/include" ]
+  include_dirs = [
+    "${access_token_path}/nativetoken/include",
+    "${access_token_path}/token_setproc/include",
+    "${access_token_path}/accesstoken/include",
+    "${common_path}/include",
+  ]
 
   cflags = []
   if (target_cpu == "arm") {
@@ -28,6 +33,9 @@ ohos_benchmarktest("DeviceManagerTest") {
   }
 
   deps = [
+    "${access_token_path}/accesstoken:libaccesstoken_sdk",
+    "${access_token_path}/nativetoken:libnativetoken",
+    "${access_token_path}/token_setproc:libtoken_setproc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",

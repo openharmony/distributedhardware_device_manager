@@ -17,9 +17,12 @@
 #include <unistd.h>
 #include <vector>
 
+#include "accesstoken_kit.h"
 #include "device_manager.h"
 #include "dm_app_image_info.h"
 #include "dm_constants.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 using namespace std;
 using namespace OHOS;
@@ -45,6 +48,24 @@ public:
 
     void SetUp(const ::benchmark::State &state) override
     {
+        uint64_t tokenId;
+        const char *perms[3];
+        perms[0] = "ohos.permission.ACCESS_SERVICE_DM";
+        perms[1] = "ohos.permission.DISTRIBUTED_DATASYNC";
+        perms[2] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+        NativeTokenInfoParams infoInstance = {
+            .dcapsNum = 0,
+            .permsNum = 3,
+            .aclsNum = 0,
+            .dcaps = NULL,
+            .perms = perms,
+            .acls = NULL,
+            .processName = "device_manager",
+            .aplStr = "system_core",
+        };
+        tokenId = GetAccessTokenId(&infoInstance);
+        SetSelfTokenID(tokenId);
+        OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
         std::shared_ptr<BenchmarkDmInit> callback = std::make_shared<BenchmarkDmInit>();
         DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
     }
