@@ -19,7 +19,8 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("IpcServerStubFuzzTest") {
   module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "${devicemanager_path}/test/servicesfuzztest/ipcserverstub_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/servicesfuzztest/ipcserverstub_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",
@@ -80,10 +81,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "safwk:system_ability_fwk",
   ]
 
-  public_deps = [
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest",
-  ]
+  public_deps = [ "//third_party/googletest:gmock" ]
 }
 
 ###############################################################################
