@@ -518,8 +518,7 @@ int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &auth
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
-    if (!PermissionManager::GetInstance().CheckPermission() &&
-        !PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call SetUserOperation.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -769,8 +768,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
 
 int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
 {
-    if (!PermissionManager::GetInstance().CheckPermission() &&
-        !PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call NotifyEvent.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
