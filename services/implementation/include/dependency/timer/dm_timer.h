@@ -101,12 +101,8 @@ public:
      * @tc.type: FUNC
      */
     int32_t TimerRunning();
+
 private:
-    /**
-     * @tc.name: DmTimer::DeleteVector
-     * @tc.desc: Delete timer
-     * @tc.type: FUNC
-     */
     void DeleteVector(std::string name);
 
 private:

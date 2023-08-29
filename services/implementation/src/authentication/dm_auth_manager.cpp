@@ -1036,8 +1036,9 @@ void DmAuthManager::CloseAuthSession()
     softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
     timer_->DeleteAll();
     isFinishOfLocal_ = true;
+    authRequestState_ = nullptr;
     authResponseContext_ = nullptr;
-    authResponseState_ = nullptr;
+    authRequestState_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
     authTimes_ = 0;
