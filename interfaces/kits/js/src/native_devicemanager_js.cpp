@@ -2561,7 +2561,8 @@ napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info in
 
 napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info info)
 {
-    LOGI("RequestCredential in");
+    LOGI("RequestCredential function has been discarded");
+    return nullptr;
     if (!IsSystemApp()) {
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
@@ -2633,7 +2634,8 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
 
 napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info info)
 {
-    LOGI("ImportCredential in");
+    LOGE("ImportCredential function has been discarded");
+    return nullptr;
     if (!IsSystemApp()) {
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
@@ -2684,7 +2686,8 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
 
 napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info info)
 {
-    LOGI("DeleteCredential in");
+    LOGE("DeleteCredential function has been discarded");
+    return nullptr;
     if (!IsSystemApp()) {
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
