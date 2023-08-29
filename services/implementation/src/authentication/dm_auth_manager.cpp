@@ -316,6 +316,9 @@ void DmAuthManager::ProcessSourceMsg()
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
             break;
+        case MSG_TYPE_CLOSE_SESSION;
+            CloseAuthSession();
+            break;
         default:
             break;
     }
@@ -737,6 +740,8 @@ void DmAuthManager::AuthenticateFinish()
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
+        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_CLOSE_SESSION);
+        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         timer_->DeleteAll();
         isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
@@ -757,15 +762,6 @@ void DmAuthManager::AuthenticateFinish()
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
-        timer_->DeleteAll();
-        isFinishOfLocal_ = true;
-        authRequestContext_ = nullptr;
-        authResponseContext_ = nullptr;
-        authRequestState_ = nullptr;
-        authMessageProcessor_ = nullptr;
-        authPtr_ = nullptr;
-        authTimes_ = 0;
     }
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
@@ -1032,6 +1028,19 @@ bool DmAuthManager::IsIdenticalAccount()
         return false;
     }
     return true;
+}
+
+void DmAuthManager::CloseAuthSession()
+{
+    LOGI("DmAuthManager close auth session");
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
+    timer_->DeleteAll();
+    isFinishOfLocal_ = true;
+    authResponseContext_ = nullptr;
+    authResponseState_ = nullptr;
+    authMessageProcessor_ = nullptr;
+    authPtr_ = nullptr;
+    authtimes_ = 0;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
