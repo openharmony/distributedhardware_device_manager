@@ -43,7 +43,6 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "../../../../distributed_hardware_fwk/utils:distributedhardwareutils",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [

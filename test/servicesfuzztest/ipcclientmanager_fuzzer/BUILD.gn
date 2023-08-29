@@ -93,7 +93,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
   public_deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest",
   ]
 }
 

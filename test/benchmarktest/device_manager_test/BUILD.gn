@@ -39,7 +39,6 @@ ohos_benchmarktest("DeviceManagerTest") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/googletest:gtest_main",
   ]
 }
 

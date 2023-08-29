@@ -748,7 +748,6 @@ ohos_static_library("device_manager_test_common") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",
     "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest",
   ]
 
   external_deps = [
