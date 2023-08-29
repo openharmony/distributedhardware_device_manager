@@ -123,12 +123,7 @@ int32_t DmTimer::TimerRunning()
 
                 std::lock_guard<std::mutex> locker(timerMutex_);
                 timerQueue_.pop();
-                for (auto iter = timerVec_.begin(); iter != timerVec_.end(); ++iter) {
-                    if ((*iter)->timerName_ == name) {
-                        timerVec_.erase(iter);
-                        break;
-                    }
-                }
+                DeleteVector(name);
                 if (timerQueue_.empty()) {
                     break;
                 }
@@ -141,6 +136,16 @@ int32_t DmTimer::TimerRunning()
         }
     }).detach();
     return DM_OK;
+}
+
+void DmTimer::DeleteVector(std::string name)
+{
+    for (auto iter = timerVec_.begin(); iter != timerVec_.end(); ++iter) {
+        if ((*iter)->timerName_ == name) {
+            timerVec_.erase(iter);
+            break;
+        }
+    }
 }
 }
 }

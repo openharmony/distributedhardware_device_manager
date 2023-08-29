@@ -102,10 +102,18 @@ public:
      */
     int32_t TimerRunning();
 private:
+    /**
+     * @tc.name: DmTimer::DeleteVector
+     * @tc.desc: Delete timer
+     * @tc.type: FUNC
+     */
+    void DeleteVector(std::string name);
+
+private:
     mutable std::mutex timerMutex_;
     mutable std::mutex timerStateMutex_;
     std::priority_queue<std::shared_ptr<Timer>, std::vector<std::shared_ptr<Timer>>, TimerCmpare> timerQueue_;
-    std::vector<std::string, std::shared_ptr<Timer>> timerVec_;
+    std::vector<std::shared_ptr<Timer>> timerVec_;
     std::atomic<bool> timerState_ {false};
     std::condition_variable runTimerCondition_;
     std::condition_variable stopTimerCondition_;

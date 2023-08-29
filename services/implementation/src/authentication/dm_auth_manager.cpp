@@ -316,7 +316,7 @@ void DmAuthManager::ProcessSourceMsg()
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
             break;
-        case MSG_TYPE_CLOSE_SESSION;
+        case MSG_TYPE_CLOSE_SESSION:
             CloseAuthSession();
             break;
         default:
@@ -1040,7 +1040,7 @@ void DmAuthManager::CloseAuthSession()
     authResponseState_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
-    authtimes_ = 0;
+    authTimes_ = 0;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
