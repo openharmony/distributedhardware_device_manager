@@ -441,7 +441,7 @@ ohos_unittest("UTTest_device_manager_notify") {
   sources = [
     "UTTest_device_manager_notify.cpp",
     "UTTest_device_manager_notify_three.cpp",
-    "UTTest_device_manager_notify_two.cpp"
+    "UTTest_device_manager_notify_two.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
