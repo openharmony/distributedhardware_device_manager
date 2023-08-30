@@ -622,7 +622,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
-        LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
+        LOGE("js DmNapiAuthenticateCallback::OnAuthResult, No memory");
         return;
     }
 
@@ -663,7 +663,7 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
-        LOGE("DmNapiAuthenticateCallback: OnAuthResult, No memory");
+        LOGE("js DmNapiAuthenticateCallback::OnAuthResult, No memory");
         return;
     }
 

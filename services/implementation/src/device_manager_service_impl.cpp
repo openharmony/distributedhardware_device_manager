@@ -167,7 +167,7 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
     if (pkgName.empty() || networkId.empty()) {
-        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, networkId is %s",
+        LOGE("DeviceManagerServiceImpl::UnAuthenticateDevice failed, pkgName is %s, networkId is %s",
             pkgName.c_str(), GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -178,7 +178,7 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
     const std::string &bindParam)
 {
     if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, udidHash is %s, bindParam is %s",
+        LOGE("DeviceManagerServiceImpl::BindDevice failed, pkgName is %s, udidHash is %s, bindParam is %s",
              pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -260,8 +260,7 @@ void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
     }
 
     std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-        deviceId.length()) != 0) {
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
     softbusConnector_->HandleDeviceOnline(info);
@@ -275,8 +274,7 @@ void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
     }
 
     std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-        deviceId.length()) != 0) {
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
     softbusConnector_->HandleDeviceOffline(info);
@@ -295,8 +293,7 @@ void DeviceManagerServiceImpl::HandleDeviceNameChange(DmDeviceInfo &info)
         return;
     }
     std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-        deviceId.length()) != 0) {
+    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
     softbusConnector_->HandleDeviceNameChange(info);
@@ -461,8 +458,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
             return ERR_DM_FAILED;
         }
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
-        if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-            deviceId.length()) != 0) {
+        if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
             LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);

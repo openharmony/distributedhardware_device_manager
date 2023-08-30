@@ -169,7 +169,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
     std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        LOGE("DeviceManager OnDeviceFound: no register DiscoveryCallback for subscribeId %d", subscribeId);
+        LOGE("DeviceManager OnDeviceFound: no register DiscoveryCallback for subscribeId %d", (int32_t)subscribeId);
         return;
     }
     iter->second->OnDeviceFound(subscribeId, deviceInfo);
@@ -177,7 +177,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
 
 void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason)
 {
-    LOGI("DeviceManager OnDiscoveryFailed pkgName:%s, subscribeId %d, reason %d", pkgName.c_str(), subscribeId,
+    LOGI("DeviceManager OnDiscoveryFailed pkgName:%s, subscribeId %d, reason %d", pkgName.c_str(), (int32_t)subscribeId,
          failedReason);
 
     if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
@@ -187,7 +187,7 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
     std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        LOGE("DeviceManager OnDiscoveryFailed: no register DiscoveryCallback for subscribeId %d", subscribeId);
+        LOGE("DeviceManager OnDiscoveryFailed: no register DiscoveryCallback for subscribeId %d", (int32_t)subscribeId);
         return;
     }
     iter->second->OnDiscoveryFailed(subscribeId, failedReason);
@@ -195,7 +195,7 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
 
 void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DeviceManager OnDiscoverySuccess pkgName:%s, subscribeId:%d.", pkgName.c_str(), subscribeId);
+    LOGI("DeviceManager OnDiscoverySuccess pkgName:%s, subscribeId:%d.", pkgName.c_str(), (int32_t)subscribeId);
 
     if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
         LOGE("DeviceManager OnDiscoverySuccess: no register DiscoveryCallback for this package");
@@ -204,7 +204,8 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
     std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
     auto iter = discoverCallMap.find(subscribeId);
     if (iter == discoverCallMap.end()) {
-        LOGE("DeviceManager OnDiscoverySuccess: no register DiscoveryCallback for subscribeId %d", subscribeId);
+        LOGE("DeviceManager OnDiscoverySuccess: no register DiscoveryCallback for subscribeId %d",
+            (int32_t)subscribeId);
         return;
     }
     iter->second->OnDiscoverySuccess(subscribeId);

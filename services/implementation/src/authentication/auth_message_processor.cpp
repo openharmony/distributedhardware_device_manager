@@ -145,7 +145,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
     json[TAG_TOKEN] = authResponseContext_->token;
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
-        LOGI("AuthMessageProcessor::CreateSimpleMessage groupId %s", GetAnonyString(groupId).c_str());
+        LOGI("AuthMessageProcessor::CreateResponseAuthMessage groupId %s", GetAnonyString(groupId).c_str());
         nlohmann::json jsonObject = nlohmann::json::parse(groupId, nullptr, false);
         if (jsonObject.is_discarded()) {
             LOGE("DecodeRequestAuth jsonStr error");
@@ -157,7 +157,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s", GetAnonyString(groupId).c_str(),
+        LOGI("AuthMessageProcessor::CreateResponseAuthMessage %s, %s", GetAnonyString(groupId).c_str(),
             GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
@@ -297,7 +297,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         if (IsString(json, TAG_NET_ID)) {
             authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
         }
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s,%s",
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s",
             GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
     }
 }
