@@ -438,7 +438,11 @@ ohos_unittest("UTTest_permission_manager") {
 ohos_unittest("UTTest_device_manager_notify") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_device_manager_notify.cpp" ]
+  sources = [
+    "UTTest_device_manager_notify.cpp",
+    "UTTest_device_manager_notify_three.cpp",
+    "UTTest_device_manager_notify_two.cpp"
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
