@@ -29,22 +29,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerNotifyTest::SetUp()
-{
-}
+void DeviceManagerNotifyTest::SetUp() {}
 
-void DeviceManagerNotifyTest::TearDown()
-{
-}
+void DeviceManagerNotifyTest::TearDown() {}
 
-void DeviceManagerNotifyTest::SetUpTestCase()
-{
-}
+void DeviceManagerNotifyTest::SetUpTestCase() {}
 
-void DeviceManagerNotifyTest::TearDownTestCase()
-{
-}
-
+void DeviceManagerNotifyTest::TearDownTestCase() {}
 namespace {
 /**
  * @tc.name: RegisterDeathRecipientCallback_001
@@ -1827,44 +1818,37 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_003, testing::ext::T
  */
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::TestSize.Level0)
 {
-    // 1. RegisterDeathRecipientCallback with pkgName and dmInitCallback
     std::string pkgName = "com.ohos.test";
     int count[5] = {0, 0, 0, 0, 0};
     std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count[0]);
     std::shared_ptr<DmInitCallback> checkMap = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     ASSERT_NE(DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName], nullptr);
-    // 2. RegisterDeviceStateCallback with pkgName and deviceStateCallback
     std::shared_ptr<DeviceStateCallback> deviceStateCallback = std::make_shared<DeviceStateCallbackTest>(count[1]);
     std::shared_ptr<DeviceStateCallback> checkMap1 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, deviceStateCallback);
     ASSERT_NE(DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName], nullptr);
-    // 3. RegisterDiscoverCallback with pkgName and deviceStateCallback and subscribeId
     std::shared_ptr<DiscoveryCallback> deviceDiscoveryCallback = std::make_shared<DiscoveryCallbackTest>(count[2]);
     uint16_t subscribeId = 0;
     std::shared_ptr<DiscoveryCallback> checkMap2 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, deviceDiscoveryCallback);
     ASSERT_NE(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId], nullptr);
-    // 4. RegisterAuthenticateCallback with pkgName and deviceId and authenticateCallback
     std::shared_ptr<AuthenticateCallback> authenticateCallback = std::make_shared<AuthenticateCallbackTest>(count[3]);
     std::string deviceId = "1";
     std::shared_ptr<AuthenticateCallback> checkMap3 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, authenticateCallback);
     ASSERT_NE(DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId], nullptr);
-    // 5. RegisterPublishCallback with pkgName and devicePublishCallback and publishId
     std::shared_ptr<PublishCallback> devicePublishCallback = std::make_shared<PublishCallbackTest>(count[4]);
     int32_t publishId = 0;
     std::shared_ptr<PublishCallback> checkMap4 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, devicePublishCallback);
     ASSERT_NE(DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId], nullptr);
-    // 6. call DeviceManagerNotify UnRegisterPackageCallback with PkgName
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(pkgName);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    // 6. check if checkMap checkMap1 checkMap2 checkMap3 is null
     if (checkMap == nullptr && checkMap1 == nullptr && checkMap2 == nullptr && checkMap3 == nullptr &&
         checkMap4 == nullptr) {
         for (uint32_t i = 0; i < 5; i++) {
@@ -1893,7 +1877,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::T
  */
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::TestSize.Level0)
 {
-    // 1. RegisterDeathRecipientCallback with pkgName and dmInitCallback
     std::string pkgName = "com.ohos.test";
     int count = 0;
     std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
@@ -1901,14 +1884,12 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     ASSERT_NE(checkMap, nullptr);
-    // 2. RegisterDeviceStateCallback with pkgName and deviceStateCallback
     int count1 = 0;
     std::shared_ptr<DeviceStateCallback> deviceStateCallback = std::make_shared<DeviceStateCallbackTest>(count1);
     std::shared_ptr<DeviceStateCallback> checkMap1 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, deviceStateCallback);
     checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
     ASSERT_NE(checkMap1, nullptr);
-    // 3. RegisterDiscoverCallback with pkgName and deviceStateCallback and subscribeId
     int count2 = 0;
     std::shared_ptr<DiscoveryCallback> deviceDiscoveryCallback = std::make_shared<DiscoveryCallbackTest>(count2);
     uint16_t subscribeId = 0;
@@ -1916,7 +1897,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, deviceDiscoveryCallback);
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     ASSERT_NE(checkMap2, nullptr);
-    // 4. RegisterAuthenticateCallback with pkgName and deviceId and authenticateCallback
     int count3 = 0;
     std::shared_ptr<AuthenticateCallback> authenticateCallback = std::make_shared<AuthenticateCallbackTest>(count3);
     std::string deviceId = "1";
@@ -1924,7 +1904,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, authenticateCallback);
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     ASSERT_NE(checkMap3, nullptr);
-    // 5. RegisterPublishCallback with pkgName and devicePublishCallback and publishId
     int count4 = 0;
     std::shared_ptr<PublishCallback> devicePublishCallback = std::make_shared<PublishCallbackTest>(count4);
     int32_t publishId = 0;
@@ -1932,7 +1911,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, devicePublishCallback);
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][subscribeId];
     ASSERT_NE(checkMap4, nullptr);
-    // 5. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(testPkgName);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
@@ -1940,7 +1918,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    // 6. check if checkMap checkMap1 checkMap2 checkMap3 is null
     ASSERT_NE(checkMap, nullptr);
     ASSERT_NE(checkMap1, nullptr);
     ASSERT_NE(checkMap2, nullptr);
@@ -1962,7 +1939,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_005, testing::ext::T
  */
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::TestSize.Level0)
 {
-    // 1. RegisterDeathRecipientCallback with pkgName and dmInitCallback
     std::string pkgName;
     int count = 0;
     std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
@@ -1970,14 +1946,12 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     ASSERT_EQ(checkMap, nullptr);
-    // 2. RegisterDeviceStateCallback with pkgName and deviceStateCallback
     int count1 = 0;
     std::shared_ptr<DeviceStateCallback> deviceStateCallback = std::make_shared<DeviceStateCallbackTest>(count1);
     std::shared_ptr<DeviceStateCallback> checkMap1 = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, deviceStateCallback);
     checkMap1 = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
     ASSERT_EQ(checkMap1, nullptr);
-    // 3. RegisterDiscoverCallback with pkgName and deviceStateCallback and subscribeId
     int count2 = 0;
     std::shared_ptr<DiscoveryCallback> deviceDiscoveryCallback = std::make_shared<DiscoveryCallbackTest>(count2);
     uint16_t subscribeId = 0;
@@ -1985,7 +1959,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, deviceDiscoveryCallback);
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     ASSERT_EQ(checkMap2, nullptr);
-    // 4. RegisterAuthenticateCallback with pkgName and deviceId and authenticateCallback
     int count3 = 0;
     std::shared_ptr<AuthenticateCallback> authenticateCallback = std::make_shared<AuthenticateCallbackTest>(count3);
     std::string deviceId = "1";
@@ -1993,7 +1966,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, authenticateCallback);
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     ASSERT_EQ(checkMap3, nullptr);
-    // 5. RegisterPublishCallback with pkgName and devicePublishCallback and publishId
     int count4 = 0;
     std::shared_ptr<PublishCallback> devicePublishCallback = std::make_shared<PublishCallbackTest>(count4);
     int32_t publishId = 0;
@@ -2001,7 +1973,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, devicePublishCallback);
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][subscribeId];
     ASSERT_EQ(checkMap4, nullptr);
-    // 5. call DeviceManagerNotify UnRegisterPackageCallback with testPkgName
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(testPkgName);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
@@ -2009,103 +1980,11 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    // 6. check if checkMap checkMap1 checkMap2 checkMap3 is null
     ASSERT_EQ(checkMap, nullptr);
     ASSERT_EQ(checkMap1, nullptr);
     ASSERT_EQ(checkMap2, nullptr);
     ASSERT_EQ(checkMap3, nullptr);
     ASSERT_EQ(checkMap4, nullptr);
-}
-
-/*
- * Feature: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * Function: DeviceManagerNotifyTest
- * SubFunction: RegisterDeviceManagerFaCallback
- * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * EnvConditions: RegisterDeviceManagerFaCallback success.
- * CaseDescription: 1. set pkgName not null
- *                     set dmUiCallback_ not null
- *                  2. set checkMap null
- *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
- *                  4. Get checkMap from DeviceManagerNotify
- *                  5. check checkMap not null
- */
-HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_001, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName not null
-    std::string pkgName = "com.ohos.test";
-    // set dmUiCallback_ not null
-    int count = 0;
-    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
-    // 2. set checkMap null
-    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
-    // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
-    // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
-    // 5. check checkMap not null
-    ASSERT_NE(checkMap, nullptr);
-}
-
-/*
- * Feature: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * Function: DeviceManagerNotifyTest
- * SubFunction: RegisterDeviceManagerFaCallback
- * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * EnvConditions: N/A.
- * CaseDescription: 1. set pkgName not null
- *                     set dmUiCallback_ null
- *                  2. set checkMap null
- *                  3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
- *                  4. Get checkMap from DeviceManagerNotify
- *                  5. check checkMap null
- */
-HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_002, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName not null
-    std::string pkgName = "com.ohos.test";
-    // set dmInitCallback null
-    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = nullptr;
-    // 2. set checkMap not null
-    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
-    // 3. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
-    // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
-    // 5. check checkMap null
-    ASSERT_EQ(checkMap, nullptr);
-}
-
-/*
- * Feature: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * Function: DeviceManagerNotifyTest
- * SubFunction: RegisterDeviceManagerFaCallback
- * FunctionPoints: DeviceManagerNotifyTest RegisterDeviceManagerFaCallback
- * EnvConditions: N/A.
- * CaseDescription: 1. set pkgName com.ohos.test
- *                     set dmUiCallback_ not null
- *                  2. set checkMap null
- *                  3. set testpkcName com.ohos.test1
- *                  4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
- *                  5. Get checkMap from DeviceManagerNotify with testpkcName
- *                  6. check checkMap null
- */
-HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_003, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName com.ohos.test
-    std::string pkgName = "com.ohos.test";
-    // set dmInitCallback not null
-    std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = nullptr;
-    // 2. set checkMap null
-    std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
-    // 3. set testpkcName com.ohos.test1
-    std::string testPkgName = "com.ohos.test1";
-    // 4. call DeviceManagerNotifyTest RegisterDeviceManagerFaCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
-    // 5. Get checkMap from DeviceManagerNotify with testpkcName
-    checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[testPkgName];
-    // 6. check checkMap not null
-    ASSERT_EQ(checkMap, nullptr);
 }
 }
 } // namespace DistributedHardware
