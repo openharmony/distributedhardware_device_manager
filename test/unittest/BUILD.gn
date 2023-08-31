@@ -123,7 +123,9 @@ ohos_unittest("UTTest_ipc_get_device_info_rsp") {
 ohos_unittest("UTTest_dm_common_event_manager") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_common_event_manager.cpp" ]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_common_event_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -149,7 +151,9 @@ ohos_unittest("device_manager_impl_test") {
 ohos_unittest("UTTest_dm_credential_manager") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_credential_manager.cpp" ]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -175,7 +179,11 @@ ohos_unittest("UTTest_device_manager_service") {
 ohos_unittest("UTTest_hichain_connector") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_hichain_connector.cpp" ]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_hichain_connector.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -280,9 +288,11 @@ ohos_unittest("UTTest_dm_adapter_manager") {
 ohos_unittest("UTTest_dm_anonymous") {
   module_out_path = module_out_path
 
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
   sources = [
     "${common_path}/src/dm_anonymous.cpp",
-    "UTTest_dm_anonymous.cpp",
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_anonymous.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -438,7 +448,11 @@ ohos_unittest("UTTest_permission_manager") {
 ohos_unittest("UTTest_device_manager_notify") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_device_manager_notify.cpp" ]
+  sources = [
+    "UTTest_device_manager_notify.cpp",
+    "UTTest_device_manager_notify_three.cpp",
+    "UTTest_device_manager_notify_two.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -464,7 +478,9 @@ ohos_unittest("UTTest_ipc_client_server_proxy") {
 ohos_unittest("UTTest_dm_device_state_manager") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_device_state_manager.cpp" ]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_device_state_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -601,7 +617,10 @@ ohos_unittest("ipc_client_manager_test") {
 ohos_unittest("UTTest_dm_auth_manager") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_auth_manager.cpp" ]
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources =
+      [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 

@@ -880,7 +880,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback2, testing::ext:
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback1, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test4";
-    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
 }
@@ -892,9 +892,10 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback1, testing::ext::T
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback2, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), false);
+    DeviceManagerNotify::GetInstance().deviceStatusCallback_.clear();
 }
 
 /**
