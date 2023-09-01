@@ -612,8 +612,7 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(udid).c_str());
         return "";
     }
-    LOGI("get udidhash: %s by udid: %s.", GetAnonyString(udidHash).c_str(),
-        GetAnonyString(udid).c_str());
+    LOGI("get udidhash: %s by udid: %s.", GetAnonyString(udidHash).c_str(), GetAnonyString(udid).c_str());
     std::lock_guard<std::mutex> lock(deviceUdidLocks_);
     deviceUdidMap_[udid] = udidHash;
     return udidHash;

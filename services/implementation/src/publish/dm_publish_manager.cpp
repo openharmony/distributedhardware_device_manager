@@ -56,8 +56,7 @@ int32_t DmPublishManager::CheckPublishQueue(const std::string &pkgName)
         LOGE("DmPublishManager::pkgName : %s PublishDeviceDiscovery repeated", pkgName.c_str());
         return ERR_DM_PUBLISH_REPEATED;
     } else {
-        LOGI("DmPublishManager::UnPublishDeviceDiscovery the preview pkgName : %s",
-            publishQueue_.front().c_str());
+        LOGI("DmPublishManager::UnPublishDeviceDiscovery the preview pkgName : %s", publishQueue_.front().c_str());
         UnPublishDeviceDiscovery(publishQueue_.front(),
                                  publishContextMap_[publishQueue_.front()].publishInfo.publishId);
         return DM_OK;

@@ -942,7 +942,7 @@ JSIValue DeviceManagerModule::StopDeviceDiscoverSync(const JSIValue thisVal, con
 
     int16_t subscribeId = 0;
     subscribeId = static_cast<int16_t>(JSI::ValueToNumber(args[0]));
-    LOGI("subscribeId %d", subscribeId);
+    LOGI("subscribeId %d", (int32_t)subscribeId);
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
     if (ret != 0) {
         LOGE("StopDeviceDiscovery for bundleName %s failed, ret %d",

@@ -168,7 +168,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
 int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
     bool &isTrusted, DmAuthForm &authForm)
 {
-    LOGI("Get localDeviceId: %s anth form.", GetAnonyString(localDeviceId).c_str());
+    LOGI("Get localDeviceId: %s auth form.", GetAnonyString(localDeviceId).c_str());
     isTrusted = false;
     if (localDeviceId.empty() || deviceId.empty()) {
         LOGE("Invalid parameter.");

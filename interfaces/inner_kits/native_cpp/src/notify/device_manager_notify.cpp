@@ -466,7 +466,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
         auto iter = discoverCallMap.find(subscribeId);
         if (iter == discoverCallMap.end()) {
-            LOGE("OnDeviceFound error, device discovery callback not register for subscribeId %d.", subscribeId);
+            LOGE("OnDeviceFound error, no register deviceDiscoveryCallback for subscribeId %d.", (int32_t)subscribeId);
             return;
         }
         tempCbk = iter->second;
@@ -497,7 +497,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
         auto iter = discoverCallMap.find(subscribeId);
         if (iter == discoverCallMap.end()) {
-            LOGE("OnDeviceFound error, device discovery callback not register for subscribeId %d.", subscribeId);
+            LOGE("OnDeviceFound error, no register deviceDiscoveryCallback for subscribeId %d.", (int32_t)subscribeId);
             return;
         }
         tempCbk = iter->second;
@@ -516,7 +516,7 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
         return;
     }
     LOGI("DeviceManagerNotify::OnDiscoveryFailed in, pkgName:%s, subscribeId %d, failed reason %d", pkgName.c_str(),
-        subscribeId, failedReason);
+        (int32_t)subscribeId, failedReason);
     std::shared_ptr<DiscoveryCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -557,7 +557,8 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
         std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
         auto iter = discoverCallMap.find(subscribeId);
         if (iter == discoverCallMap.end()) {
-            LOGE("OnDiscoverySuccess error, device discovery callback not register for subscribeId %d.", subscribeId);
+            LOGE("OnDiscoverySuccess error, device discovery callback not register for subscribeId %d.",
+                (int32_t)subscribeId);
             return;
         }
         tempCbk = iter->second;
@@ -679,7 +680,7 @@ void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (dmUiCallback_.count(pkgName) == 0) {
-            LOGE("OnUiCall error, dm Ui callback not register for pkgName %d.", pkgName.c_str());
+            LOGE("OnUiCall error, dm Ui callback not register for pkgName %s.", pkgName.c_str());
             return;
         }
         tempCbk = dmUiCallback_[pkgName];

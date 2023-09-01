@@ -28,6 +28,18 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+int32_t SetRspErrCode(IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    pBaseRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
@@ -48,14 +60,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
+    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
@@ -78,14 +83,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, IpcIo 
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
+    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
@@ -105,14 +103,7 @@ ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, Ipc
 
 ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
+    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
@@ -136,14 +127,7 @@ ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &
 
 ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
+    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
@@ -166,14 +150,7 @@ ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, 
 
 ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
+    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SERVER_CMD(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
