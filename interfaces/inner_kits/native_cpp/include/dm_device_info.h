@@ -86,6 +86,10 @@ typedef enum DmDeviceType {
      * Indicates smart display
     */
     DEVICE_TYPE_SMART_DISPLAY = 0xA02,
+    /**
+     * Indicates 2in1
+    */
+    DEVICE_TYPE_2IN1 = 0xA2F,
 } DmDeviceType;
 
 /**
@@ -259,6 +263,7 @@ const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
 const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
 const std::string DEVICE_TYPE_PC_STRING = "PC";
 const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
+const std::string DEVICE_TYPE_2IN1_STRING = "2IN1";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
