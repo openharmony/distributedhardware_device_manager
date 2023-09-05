@@ -154,7 +154,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_002, testing::ext::TestSize.
 {
     std::string reqJsonStr = R"(
     {
-        "userId" , "123"
+        "userId":"4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
     }
     )";
     std::string returnJsonStr;
@@ -173,7 +173,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_003, testing::ext::TestSize.
 {
     std::string reqJsonStr = R"(
     {
-        "userId" : "123"
+        "userId":"4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
     }
     )";
     std::string returnJsonStr;
