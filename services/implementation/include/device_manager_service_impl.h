@@ -104,12 +104,6 @@ public:
 
     void LoadHardwareFwkService();
 
-    int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
-    std::string &uuid);
-
-    int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
-    const std::string &appId, std::string &encryptedUuid);
-
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

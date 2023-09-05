@@ -149,8 +149,7 @@ public:
     int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,
         std::string &encryptedUuid);
 
-    int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-        int32_t &networkType);
+    int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId, int32_t &networkType);
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;

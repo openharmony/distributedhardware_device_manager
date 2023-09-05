@@ -245,22 +245,6 @@ public:
      * @tc.type: FUNC
      */
     virtual void LoadHardwareFwkService();
-
-    /**
-     * @tc.name: DeviceManagerService::GetEncryptedUuidByNetworkId
-     * @tc.desc: GenerateEncryptedUuid
-     * @tc.type: FUNC
-     */
-    virtual int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
-    std::string &uuid);
-
-    /**
-     * @tc.name: DeviceManagerService::GenerateEncryptedUuid
-     * @tc.desc: GenerateEncryptedUuid
-     * @tc.type: FUNC
-     */
-    virtual int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
-    const std::string &appId, std::string &encryptedUuid);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
