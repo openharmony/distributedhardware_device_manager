@@ -487,43 +487,6 @@ void DeviceManagerServiceImpl::LoadHardwareFwkService()
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
 }
 
-int32_t DeviceManagerServiceImpl::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
-    std::string &uuid)
-{
-    if (softbusConnector_ == nullptr) {
-        LOGE("softbusConnector_ is nullptr");
-        return ERR_DM_POINT_NULL;
-    }
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("DeviceManagerService::GetEncryptedUuid for pkgName = %s", pkgName.c_str());
-    int32_t ret = softbusConnector_->GetUuidByNetworkId(networkId.c_str(), uuid);
-    if (ret != DM_OK) {
-        LOGE("GetUdidByNetworkId failed, ret : %d", ret);
-        return ret;
-    }
-
-    std::string appId = Crypto::Sha256(AppManager::GetInstance().GetAppId());
-    LOGI("appId = %s, uuid = %s.", GetAnonyString(appId).c_str(), GetAnonyString(uuid).c_str());
-    uuid = Crypto::Sha256(appId + "_" + uuid);
-    LOGI("encryptedUuid = %s.", GetAnonyString(uuid).c_str());
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
-    const std::string &appId, std::string &encryptedUuid)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    encryptedUuid = Crypto::Sha256(appId + "_" + uuid);
-    LOGI("encryptedUuid = %s.", GetAnonyString(encryptedUuid).c_str());
-    return DM_OK;
-}
-
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

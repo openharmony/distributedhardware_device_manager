@@ -21,6 +21,7 @@
 #include "app_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
@@ -791,7 +792,22 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
         LOGE("GetEncryptedUuidByNetworkId failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::GetEncryptedUuidByNetworkId for pkgName = %s", pkgName.c_str());
+    int32_t ret = SoftbusListener::GetUuidByNetworkId(networkId.c_str(), uuid);
+    if (ret != DM_OK) {
+        LOGE("GetUuidByNetworkId failed, ret : %d", ret);
+        return ret;
+    }
+
+    std::string appId = Crypto::Sha256(AppManager::GetInstance().GetAppId());
+    LOGI("appId = %s, uuid = %s.", GetAnonyString(appId).c_str(), GetAnonyString(uuid).c_str());
+    uuid = Crypto::Sha256(appId + "_" + uuid);
+    LOGI("encryptedUuid = %s.", GetAnonyString(uuid).c_str());
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
@@ -801,7 +817,13 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
         LOGE("GenerateEncryptedUuid failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    encryptedUuid = Crypto::Sha256(appId + "_" + uuid);
+    LOGI("encryptedUuid = %s.", GetAnonyString(encryptedUuid).c_str());
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::CheckApiPermission()
