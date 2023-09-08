@@ -1038,7 +1038,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_003, testing::ext::TestSize.Level0)
     data.WriteRawData(nullptr, deviceSize);
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
-    int result = 0;
+    int32_t result = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     result = reply.ReadInt32();
     // 4. check result is DEVICE_STATE_ONLINE
