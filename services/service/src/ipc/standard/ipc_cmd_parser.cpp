@@ -471,7 +471,7 @@ ON_IPC_CMD(START_DEVICE_DISCOVERY, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    uint16_t subscribeId = static_cast<uint16_t>(data.ReadInt32());
+    uint16_t subscribeId = data.ReadUint16();
     int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
