@@ -19,7 +19,8 @@ import("../../../device_manager.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("GetDeviceInfoFuzzTest") {
   module_out_path = fuzz_test_output_path
-  fuzz_config_file = "${devicemanager_path}/test/commonfuzztest/getdeviceinfo_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/commonfuzztest/getdeviceinfo_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",
