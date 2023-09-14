@@ -18,7 +18,7 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("GetTrustedDeviceListServiceFuzzTest") {
-  module_out_path = "device_manager/devicemanager"
+  module_out_path = fuzz_test_output_path
   fuzz_config_file =
       "${devicemanager_path}/test/servicesfuzztest/gettrusteddevicelistservice_fuzzer"
 
