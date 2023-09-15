@@ -101,6 +101,10 @@ public:
      * @tc.type: FUNC
      */
     int32_t TimerRunning();
+
+private:
+    void DeleteVector(std::string name);
+
 private:
     mutable std::mutex timerMutex_;
     mutable std::mutex timerStateMutex_;

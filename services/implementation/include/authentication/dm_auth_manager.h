@@ -143,7 +143,6 @@ public:
      */
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
 
-
     /**
      * @tc.name: DmAuthManager::VerifyAuthentication
      * @tc.desc: Verify Authentication of the DeviceManager Authenticate Manager
