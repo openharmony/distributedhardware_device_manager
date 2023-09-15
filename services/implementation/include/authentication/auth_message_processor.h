@@ -53,6 +53,8 @@ private:
     void CreateResponseFinishMessage(nlohmann::json &json);
     void ParseResponseFinishMessage(nlohmann::json &json);
     bool GetAuthReqMessage(nlohmann::json &json);
+    void CreateCloseSessionMessage(nlohmann::json &json);
+    void ParseCloseSessionMessage(const nlohmann::json &json);
 private:
     std::weak_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<ICryptoAdapter> cryptoAdapter_;

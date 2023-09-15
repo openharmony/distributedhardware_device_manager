@@ -50,7 +50,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
     {
         std::lock_guard<std::mutex> locker(timerMutex_);
         timerQueue_.push(timer);
-        timerMap_[name] = timer;
+        timerVec_.emplace_back(timer);
     }
 
     if (timerState_) {
@@ -75,9 +75,9 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
 
     LOGI("DmTimer DeleteTimer name %s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    for (auto iter : timerMap_) {
-        if (iter.second->timerName_ == timerName) {
-            iter.second->state_ = false;
+    for (auto iter : timerVec_) {
+        if (iter->timerName_ == timerName) {
+            iter->state_ = false;
         }
     }
     return DM_OK;
@@ -87,8 +87,9 @@ int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
-    for (auto iter : timerMap_) {
-        iter.second->state_ = false;
+    for (auto iter : timerVec_) {
+        LOGI("DmTimer DeleteAll timer.name = %s ", iter->timerName_.c_str());
+        iter->state_ = false;
     }
     return DM_OK;
 }
@@ -107,13 +108,14 @@ int32_t DmTimer::TimerRunning()
                    - timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_
                    || !timerQueue_.top()->state_) {
                 std::string name = timerQueue_.top()->timerName_;
+                LOGI("DmTimer TimerRunning timer.name = %s", name.c_str());
                 if (timerQueue_.top()->state_) {
                     timerQueue_.top()->callback_(name);
                 }
 
                 std::lock_guard<std::mutex> locker(timerMutex_);
                 timerQueue_.pop();
-                timerMap_.erase(name);
+                DeleteVector(name);
                 if (timerQueue_.empty()) {
                     break;
                 }
@@ -127,5 +129,14 @@ int32_t DmTimer::TimerRunning()
     }).detach();
     return DM_OK;
 }
+
+void DmTimer::DeleteVector(std::string name)
+{
+    for (auto iter = timerVec_.begin(); iter != timerVec_.end(); ++iter) {
+        if ((*iter)->timerName_ == name) {
+            timerVec_.erase(iter);
+            break;
+        }
+    }
 }
 }

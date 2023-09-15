@@ -290,6 +290,9 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
                     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
                 }
                 break;
+        case MSG_TYPE_CLOSE_SESSION:
+            CloseAuthSession();
+            break;
             default:
                 break;
         }
@@ -672,6 +675,8 @@ void DmAuthManager::AuthenticateFinish()
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
+        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_CLOSE_SESSION);
+        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         timer_->DeleteAll();
         isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
@@ -940,6 +945,20 @@ bool DmAuthManager::IsIdenticalAccount()
         return false;
     }
     return true;
+}
+
+void DmAuthManager::CloseAuthSession()
+{
+    LOGI("DmAuthManager close auth session");
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
+    timer_->DeleteAll();
+    isFinishOfLocal_ = true;
+    authRequestState_ = nullptr;
+    authResponseContext_ = nullptr;
+    authRequestState_ = nullptr;
+    authMessageProcessor_ = nullptr;
+    authPtr_ = nullptr;
+    authTimes_ = 0;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

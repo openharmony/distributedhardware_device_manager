@@ -63,6 +63,7 @@ enum DmMsgType : int32_t {
     MSG_TYPE_CHANNEL_CLOSED = 300,
     MSG_TYPE_SYNC_GROUP = 400,
     MSG_TYPE_AUTH_BY_PIN = 500,
+    MSG_TYPE_CLOSE_SESSION = 600,
 };
 
 typedef struct DmAuthRequestContext {
@@ -141,6 +142,7 @@ public:
      * @tc.type: FUNC
      */
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &deviceId);
+
 
     /**
      * @tc.name: DmAuthManager::VerifyAuthentication
@@ -386,6 +388,13 @@ public:
      * @tc.type: FUNC
      */
     bool IsIdenticalAccount();
+
+    /**
+     * @tc.name: DmAuthManager::CloseAuthSession
+     * @tc.desc: Close an authentication session
+     * @tc.type: FUNC
+     */
+    void CloseAuthSession();
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
