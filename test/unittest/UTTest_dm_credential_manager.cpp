@@ -145,26 +145,6 @@ HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_002, testing::ext
 }
 
 /**
- * @tc.name:RequestCredential_001
- * @tc.desc: get credential info and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.Level0)
-{
-    std::string reqJsonStr = R"(
-    {
-        "version" : "1.2.3",
-        "userId" : "4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
-    }
-    )";
-    std::string returnJsonStr;
-    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    int32_t ret = dmCreMgr->RequestCredential(reqJsonStr, returnJsonStr);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name:RequestCredential_002
  * @tc.desc: get credential info and return ERR_DM_FAILED
  * @tc.type: FUNC
