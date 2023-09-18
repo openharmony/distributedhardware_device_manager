@@ -18,8 +18,9 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DmAuthManagerFuzzTest") {
-  module_out_path = "device_manager/devicemanager"
-  fuzz_config_file = "${devicemanager_path}/test/commonfuzztest/dmauthmanager_fuzzer"
+  module_out_path = fuzz_test_output_path
+  fuzz_config_file =
+      "${devicemanager_path}/test/commonfuzztest/dmauthmanager_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",
