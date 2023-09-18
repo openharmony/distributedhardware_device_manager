@@ -155,7 +155,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.
     std::string reqJsonStr = R"(
     {
         "version" : "1.2.3",
-        "userId" : "123"
+        "userId" : "4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
     }
     )";
     std::string returnJsonStr;
