@@ -40,8 +40,12 @@ struct dialogPlusPage {
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (dmClass != null) {
-      dmClass.off('uiStateChange')
-      dmClass.release()
+      try {
+        dmClass.off('uiStateChange')
+        dmClass.release()
+      } catch (error) {
+        console.log('dmClass release failed')
+      }
       dmClass = null
     }
   }
@@ -52,7 +56,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.inputpin', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
         return
@@ -114,7 +118,11 @@ struct dialogPlusPage {
       console.log('setUserOperation: ' + 'dmClass null')
       return;
     }
-    dmClass.setUserOperation(operation, extra)
+    try {
+      dmClass.setUserOperation(operation, extra)
+    } catch (error) {
+      console.log('dmClass setUserOperation failed')
+    }
   }
 
   destruction() {

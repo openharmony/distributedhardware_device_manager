@@ -43,7 +43,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
         return
@@ -96,7 +96,11 @@ struct dialogPlusPage {
       console.log('setUserOperation: ' + 'dmClass null')
       return;
     }
-    dmClass.setUserOperation(operation, "extra")
+    try {
+      dmClass.setUserOperation(operation, "extra")
+    } catch (error) {
+      console.log('dmClass setUserOperation failed')
+    }
   }
 
   run() {
@@ -144,8 +148,12 @@ struct dialogPlusPage {
 
   destruction() {
     if (dmClass != null) {
-      dmClass.release()
-      dmClass = null
+      try {
+        dmClass.release()
+        dmClass = null
+      } catch (error) {
+        console.log('dmClass release failed')
+      }
     }
     globalThis.extensionWin.destroy()
     globalThis.windowNum--
