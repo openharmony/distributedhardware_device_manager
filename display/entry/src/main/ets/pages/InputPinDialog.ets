@@ -52,7 +52,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.inputpin', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
         return

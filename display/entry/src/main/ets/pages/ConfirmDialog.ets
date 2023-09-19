@@ -43,7 +43,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
         return
