@@ -32,8 +32,8 @@ export default class ServiceExtAbility extends extension {
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
     if (globalThis.windowNum !== 0) {
-        console.log(TAG + 'onRequest window number is not zero.');
-        return;
+      console.log(TAG + 'onRequest window number is not zero.');
+      return;
     }
     globalThis.abilityWant = want;
     console.log(TAG + 'onRequest execute' + JSON.stringify(globalThis.abilityWant.parameters));
