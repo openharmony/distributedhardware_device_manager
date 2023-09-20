@@ -22,6 +22,7 @@
 #include "dm_app_image_info.h"
 #include "dm_constants.h"
 #include "nativetoken_kit.h"
+#include "softbus_common.h"
 #include "token_setproc.h"
 
 using namespace std;
@@ -51,8 +52,8 @@ public:
         uint64_t tokenId;
         const char *perms[3];
         perms[0] = "ohos.permission.ACCESS_SERVICE_DM";
-        perms[1] = "ohos.permission.DISTRIBUTED_DATASYNC";
-        perms[2] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+        perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+        perms[2] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
         NativeTokenInfoParams infoInstance = {
             .dcapsNum = 0,
             .permsNum = 3,
