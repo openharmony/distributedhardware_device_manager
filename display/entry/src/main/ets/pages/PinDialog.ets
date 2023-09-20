@@ -46,7 +46,7 @@ struct dialogPlusPage {
   }
 
   initStatue() {
-    console.log('initStatue' + "windowNum:" + globalThis.windowNum)
+    console.log('initStatue' + "windowNum:" + globalThis.pinWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
@@ -83,8 +83,8 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    globalThis.extensionWin.destroy()
-    globalThis.extensionContext.terminateSelf()
+    globalThis.pinWin.destroy()
+    globalThis.pinContext.terminateSelf()
   }
 
   build() {

@@ -38,7 +38,7 @@ struct dialogPlusPage {
   @State isAvailableType: boolean = false
 
   initStatue() {
-    console.log('initStatue' + "windowNum:" + globalThis.windowNum)
+    console.log('initStatue' + "windowNum:" + globalThis.confirmWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
@@ -155,11 +155,11 @@ struct dialogPlusPage {
         console.log('dmClass release failed')
       }
     }
-    globalThis.extensionWin.destroy()
-    globalThis.windowNum--
-    console.info("windowNum:" + globalThis.windowNum)
-    if(globalThis.windowNum == 0) {
-      globalThis.extensionContext.terminateSelf()
+    globalThis.confirmWin.destroy()
+    globalThis.confirmWindowNum--
+    console.info("windowNum:" + globalThis.confirmWindowNum)
+    if(globalThis.confirmWindowNum == 0) {
+      globalThis.confirmContext.terminateSelf()
     }
   }
 

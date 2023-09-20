@@ -24,14 +24,14 @@ const TAG = '[DeviceManagerUI:Confirm]==>';
 
 export default class ServiceExtAbility extends extension {
   onCreate(want: Want): void {
-    globalThis.extensionContext = this.context;
-    globalThis.windowNum = 0;
+    globalThis.confirmContext = this.context;
+    globalThis.confirmWindowNum = 0;
     this.getShareStyle();
   }
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    if (globalThis.windowNum !== 0) {
+    if (globalThis.confirmWindowNum !== 0) {
       console.log(TAG + 'onRequest window number is not zero.');
       return;
     }
@@ -69,13 +69,13 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      globalThis.extensionWin = win;
+      globalThis.confirmWin = win;
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.setCornerRadius(Constant.SHARE_RADIUS);
       await win.loadContent('pages/ConfirmDialog');
       await win.show();
-      globalThis.windowNum++;
+      globalThis.confirmWindowNum++;
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

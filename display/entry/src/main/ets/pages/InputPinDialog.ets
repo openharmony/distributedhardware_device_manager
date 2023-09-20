@@ -126,8 +126,8 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    globalThis.extensionWin.destroy()
-    globalThis.extensionContext.terminateSelf()
+    globalThis.inputWin.destroy()
+    globalThis.inputContext.terminateSelf()
   }
 
   build() {
