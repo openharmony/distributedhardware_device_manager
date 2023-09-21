@@ -16,6 +16,11 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 var that;
 let dmClass;
 let TAG = "[DeviceManagerUI:InputPinDialog]==>"
+const ACTION_CANCEL_PINCODE_INPUT: number = 4
+const ACTION_DONE_PINCODE_INPUT: number = 5
+const MSG_PIN_CODE_ERROR: number = 0
+const MSG_CANCEL_PIN_CODE_INPUT: number = 3
+const MSG_DOING_AUTH: number = 4
 @Entry
 @Component
 struct dialogPlusPage {
@@ -28,8 +33,6 @@ struct dialogPlusPage {
   @State inputPinCode: string = ''
   @State ok: string = '确定'
   @State cancel: string = '取消'
-  @State ACTION_CANCEL_PINCODE_INPUT: number = 4
-  @State ACTION_DONE_PINCODE_INPUT: number = 5
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear')
@@ -56,7 +59,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.input', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
         return
@@ -65,16 +68,17 @@ struct dialogPlusPage {
       dmClass.on('uiStateChange', (data) => {
         console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
         var tmpStr = JSON.parse(data.param)
-        if (tmpStr.addingMember !== undefined) {
+        let msg: number = tmpStr.uiStateMsg
+        if (msg === MSG_DOING_AUTH) {
           this.errorTips = '正在认证中，请稍候……'
           this.errorTipsVisible = Visibility.Visible
           return
         }
-        this.isShow = tmpStr.verifyFailed
-        console.log("uiStateChange executed, dialog closed" + this.isShow)
-        if (!this.isShow) {
+        if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
           this.destruction()
-        } else {
+          return
+        }
+        if (msg === MSG_PIN_CODE_ERROR) {
           this.isTimes--
           this.errorTips = 'PIN码输入错误，请重新输入(3次：还有' + this.isTimes + '次机会)'
           this.inputPinCode = ''

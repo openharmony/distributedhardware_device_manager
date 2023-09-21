@@ -56,6 +56,7 @@
 #include "ipc_unpublish_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
+#include "ipc_register_ui_state_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -663,6 +664,7 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
 
     LOGI("dRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
+    RegisterUiStateCallback(pkgName);
     LOGI("DeviceManagerImpl::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -683,6 +685,7 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
 
     LOGI("UnRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
+    UnRegisterUiStateCallback(pkgName);
     LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -876,6 +879,57 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("UnRegisterDevStateCallback Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("RegisterUiStateCallback start, pkgName: %s", pkgName.c_str());
+
+    std::shared_ptr<IpcRegisterUiStateCallbackReq> req = std::make_shared<IpcRegisterUiStateCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_UI_STATE_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("RegisterUiStateCallback Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("RegisterUiStateCallback Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    std::shared_ptr<IpcRegisterUiStateCallbackReq> req = std::make_shared<IpcRegisterUiStateCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_UI_STATE_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("UnRegisterUiStateCallback Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnRegisterUiStateCallback Failed with ret %d", ret);
         return ret;
     }
     return DM_OK;

@@ -273,6 +273,8 @@ public:
     virtual int32_t CheckNewAPIAccessPermission() override;
 
     int32_t OnDmServiceDied();
+    int32_t RegisterUiStateCallback(const std::string &pkgName);
+    int32_t UnRegisterUiStateCallback(const std::string &pkgName);
 
     virtual int32_t GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId) override;
     virtual int32_t GetLocalDeviceId(const std::string &pkgName, std::string &networkId) override;

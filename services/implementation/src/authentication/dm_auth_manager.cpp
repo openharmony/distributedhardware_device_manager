@@ -53,8 +53,6 @@ constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
-constexpr const char* VERIFY_FAILED = "verifyFailed";
-constexpr const char* ADDING_MEMBER = "addingMember";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -64,6 +62,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     LOGI("DmAuthManager constructor");
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
     dmConfigManager.GetAuthAdapter(authenticationMap_);
+    authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
 }
 
 DmAuthManager::~DmAuthManager()
@@ -85,8 +84,8 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
-    if (listener_ == nullptr) {
-        LOGE("DmAuthManager::CheckAuthParamVaild listener is nullptr.");
+    if (listener_ == nullptr || authUiStateMgr_ == nullptr) {
+        LOGE("DmAuthManager::CheckAuthParamVaild listener or authUiStateMgr is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authentication == nullptr) {
@@ -420,7 +419,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
-    if (authResponseContext_ == nullptr) {
+    if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to OnMemberJoin because authResponseContext_ is nullptr");
         return;
     }
@@ -439,7 +438,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
                     [this] (std::string name) {
                         DmAuthManager::HandleAuthenticateTimeout(name);
                     });
-                UpdateInputDialogDisplay(true);
+                authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
             }
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
@@ -447,7 +446,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         if (status == DM_OK && authResponseContext_->requestId == requestId &&
             authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
-            UpdateInputDialogDisplay(false);
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         }
     } else {
         LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
@@ -684,9 +683,13 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
+    if (authUiStateMgr_ == nullptr) {
+        LOGE("DmAuthManager::AddMember authUiStateMgr is null.");
+        return ERR_DM_FAILED;
+    }
     if (isAddingMember_) {
-        LOGE("HiChainConnector::AddMember doing add member.");
-        UpdateInputDialogDisplay();
+        LOGE("DmAuthManager::AddMember doing add member.");
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_DOING_AUTH);
         return ERR_DM_FAILED;
     }
     isAddingMember_ = true;
@@ -725,7 +728,7 @@ int32_t DmAuthManager::JoinNetwork()
 
 void DmAuthManager::AuthenticateFinish()
 {
-    if (authResponseContext_ == nullptr) {
+    if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to AuthenticateFinish because authResponseContext_ is nullptr");
         return;
     }
@@ -733,7 +736,7 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
-            UpdateInputDialogDisplay(false);
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         }
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -758,7 +761,7 @@ void DmAuthManager::AuthenticateFinish()
         }
         if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
             authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
-            UpdateInputDialogDisplay(false);
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
@@ -776,24 +779,26 @@ void DmAuthManager::CancelDisplay()
     listener_->OnUiCall(pkgName, paramJson);
 }
 
-void DmAuthManager::UpdateInputDialogDisplay(bool isShow)
+int32_t DmAuthManager::RegisterUiStateCallback(const std::string pkgName)
 {
-    LOGI("DmAuthManager::UpdateInputDialogDisplay start");
-    nlohmann::json jsonObj;
-    jsonObj[VERIFY_FAILED] = isShow;
-    std::string paramJson = jsonObj.dump();
-    std::string pkgName = "com.ohos.devicemanagerui";
-    listener_->OnUiCall(pkgName, paramJson);
+    LOGI("DmAuthManager::RegisterUiStateCallback start");
+    if (authUiStateMgr_ == nullptr) {
+        LOGE("DmAuthManager::RegisterUiStateCallback authUiStateMgr_ is null.");
+        return ERR_DM_FAILED;
+    }
+    authUiStateMgr_->RegisterUiStateCallback(pkgName);
+    return DM_OK;
 }
 
-void DmAuthManager::UpdateInputDialogDisplay()
+int32_t DmAuthManager::UnRegisterUiStateCallback(const std::string pkgName)
 {
-    LOGI("DmAuthManager::UpdateInputDialogDisplay start");
-    nlohmann::json jsonObj;
-    jsonObj[ADDING_MEMBER] = true;
-    std::string paramJson = jsonObj.dump();
-    std::string pkgName = "com.ohos.devicemanagerui";
-    listener_->OnUiCall(pkgName, paramJson);
+    LOGI("DmAuthManager::UnRegisterUiStateCallback start");
+    if (authUiStateMgr_ == nullptr) {
+        LOGE("DmAuthManager::UnRegisterUiStateCallback authUiStateMgr_ is null.");
+        return ERR_DM_FAILED;
+    }
+    authUiStateMgr_->UnRegisterUiStateCallback(pkgName);
+    return DM_OK;
 }
 
 int32_t DmAuthManager::GeneratePincode()

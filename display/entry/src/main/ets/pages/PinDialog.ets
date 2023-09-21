@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 import deviceManager from '@ohos.distributedHardware.deviceManager';
 let dmClass;
 let TAG = "[DeviceManagerUI:PinDialog]==>"
+const ACTION_CANCEL_PINCODE_DISPLAY: number = 3
+const MSG_CANCEL_PIN_CODE_SHOW: number = 2
 @Entry
 @Component
 struct dialogPlusPage {
@@ -24,9 +26,8 @@ struct dialogPlusPage {
   @State allow: string = '允许'
   @State cancel: string = '取消'
   @State isShow: boolean = true
-  @State ACTION_CANCEL_PINCODE_DISPLAY: number = 3
 
-  aboutToAppear(){
+  aboutToAppear() {
     this.initStatue()
     console.log("aboutToAppear execute")
     this.pinCode = globalThis.abilityWant.parameters["PinCode"]
@@ -51,7 +52,7 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.pin', (err, dm) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
         return
@@ -60,9 +61,8 @@ struct dialogPlusPage {
       dmClass.on('uiStateChange', (data) => {
         console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
         var tmpStr = JSON.parse(data.param)
-        this.isShow = tmpStr.verifyFailed
-        console.log("uiStateChange executed, dialog closed" + this.isShow)
-        if (!this.isShow) {
+        let msg: number = tmpStr.uiStateMsg
+        if (msg === MSG_CANCEL_PIN_CODE_SHOW) {
           this.destruction()
         }
       })
