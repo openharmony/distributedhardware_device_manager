@@ -22,16 +22,16 @@ namespace OHOS {
 namespace DistributedHardware {
 void PremissionManagerTest::SetUp()
 {
-    const int32_t PERMS_NUM = 2;
-    const int32_t PERMS_INDEX_ZERO = 0;
-    const int32_t PERMS_INDEX_ONE = 1;
+    const int32_t permsNum= 2;
+    const int32_t indexZero = 0;
+    const int32_t indexOne = 1;
     uint64_t tokenId;
     const char *perms[PERMS_NUM];
-    perms[PERMS_INDEX_ZERO] = "ohos.permission.ACCESS_SERVICE_DM";
-    perms[PERMS_INDEX_ONE] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = PERMS_NUM,
+        .permsNum = permsNum,
         .aclsNum = 0,
         .dcaps = NULL,
         .perms = perms,
