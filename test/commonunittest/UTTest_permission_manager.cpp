@@ -26,7 +26,7 @@ void PremissionManagerTest::SetUp()
     const int32_t indexZero = 0;
     const int32_t indexOne = 1;
     uint64_t tokenId;
-    const char *perms[PERMS_NUM];
+    const char *perms[permsNum];
     perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
     perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
     NativeTokenInfoParams infoInstance = {

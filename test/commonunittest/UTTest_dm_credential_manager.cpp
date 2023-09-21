@@ -32,7 +32,7 @@ void DmCredentialManagerTest::SetUp()
     const int32_t indexZero = 0;
     const int32_t indexOne = 1;
     uint64_t tokenId;
-    const char *perms[PERMS_NUM];
+    const char *perms[permsNum];
     perms[indexZero] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
     perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
     NativeTokenInfoParams infoInstance = {
