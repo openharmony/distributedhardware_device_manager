@@ -31,11 +31,13 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 void DeviceManagerServiceTest::SetUp()
 {
     const int32_t PERMS_NUM = 3;
+    const int32_t PERMS_INDEX_ZERO = 0;
+    const int32_t PERMS_INDEX_ONE = 1;
     const int32_t PERMS_INDEX_TWO = 2;
     uint64_t tokenId;
     const char *perms[PERMS_NUM];
-    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
-    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[PERMS_INDEX_ZERO] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+    perms[PERMS_INDEX_ONE] = "ohos.permission.DISTRIBUTED_DATASYNC";
     perms[PERMS_INDEX_TWO] = "ohos.permission.ACCESS_SERVICE_DM";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,

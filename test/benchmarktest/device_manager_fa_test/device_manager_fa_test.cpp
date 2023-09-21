@@ -132,14 +132,18 @@ class DeviceDiscoveryTest : public DeviceManagerFaTest {
 public:
     void SetUp(const ::benchmark::State &state) override
     {
+        const int32_t PERMS_NUM = 3;
+        const int32_t PERMS_INDEX_ZERO = 0;
+        const int32_t PERMS_INDEX_ONE = 1;
+        const int32_t PERMS_INDEX_TWO = 2;
         uint64_t tokenId;
-        const char *perms[3];
-        perms[0] = "ohos.permission.ACCESS_SERVICE_DM";
-        perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
-        perms[2] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
+        const char *perms[PERMS_NUM];
+        perms[PERMS_INDEX_ZERO] = "ohos.permission.ACCESS_SERVICE_DM";
+        perms[PERMS_INDEX_ONE] = "ohos.permission.DISTRIBUTED_DATASYNC";
+        perms[PERMS_INDEX_TWO] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
         NativeTokenInfoParams infoInstance = {
             .dcapsNum = 0,
-            .permsNum = 3,
+            .permsNum = PERMS_NUM,
             .aclsNum = 0,
             .dcaps = NULL,
             .perms = perms,

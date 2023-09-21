@@ -28,13 +28,16 @@ namespace OHOS {
 namespace DistributedHardware {
 void DmCredentialManagerTest::SetUp()
 {
+    const int32_t PERMS_NUM = 2;
+    const int32_t PERMS_INDEX_ZERO = 0;
+    const int32_t PERMS_INDEX_ONE = 1;
     uint64_t tokenId;
-    const char *perms[2];
-    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
-    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    const char *perms[PERMS_NUM];
+    perms[PERMS_INDEX_ZERO] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+    perms[PERMS_INDEX_ONE] = "ohos.permission.DISTRIBUTED_DATASYNC";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = 2,
+        .permsNum = PERMS_NUM,
         .aclsNum = 0,
         .dcaps = NULL,
         .perms = perms,
