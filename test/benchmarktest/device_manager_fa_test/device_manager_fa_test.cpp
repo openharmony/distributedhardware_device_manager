@@ -132,7 +132,7 @@ class DeviceDiscoveryTest : public DeviceManagerFaTest {
 public:
     void SetUp(const ::benchmark::State &state) override
     {
-        const int32_t permsNum= 3;
+        const int32_t permsNum = 3;
         const int32_t indexZero = 0;
         const int32_t indexOne = 1;
         const int32_t indexTwo = 2;

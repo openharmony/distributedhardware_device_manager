@@ -28,7 +28,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DmCredentialManagerTest::SetUp()
 {
-    const int32_t permsNum= 2;
+    const int32_t permsNum = 2;
     const int32_t indexZero = 0;
     const int32_t indexOne = 1;
     uint64_t tokenId;
