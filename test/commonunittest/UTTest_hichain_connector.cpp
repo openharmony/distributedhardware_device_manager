@@ -50,6 +50,64 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
     std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector);
 
 /**
+ * @tc.name: GetRandomData_001
+ * @tc.desc: Set the randStr to GetRandomData to NULlptr and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetRandomData_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = 0;
+    ret = GetRandomData(nullptr, 10);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetRandomData_002
+ * @tc.desc: Set the len to GetRandomData to 0 and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetRandomData_002, testing::ext::TestSize.Level0)
+{
+    uint8_t randStr[10];
+    uint32_t len = 0;
+    int32_t ret = 0;
+    ret = GetRandomData(randStr, len);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetRandomData_003
+ * @tc.desc: Set the len and to GetRandomData to 0 and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetRandomData_003, testing::ext::TestSize.Level0)
+{
+    uint32_t len = 0;
+    int32_t ret = 0;
+    ret = GetRandomData(nullptr, len);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetRandomData_004
+ * @tc.desc: Set the randStr to GetRandomData to 10 ,set the len to GetRandomData to 10 and return ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetRandomData_004, testing::ext::TestSize.Level0)
+{
+    uint8_t randStr[10];
+    uint32_t len = 10;
+    int32_t ret = 0;
+    ret = GetRandomData(randStr, len);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(sizeof(randStr), len);
+}
+
+/**
  * @tc.name: CreateGroup_001
  * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
