@@ -31,7 +31,7 @@ export default class ServiceExtAbility extends extension {
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    let inputWindowNum: number = AppStorage.get('inputWindowNum')
+    let inputWindowNum: number = AppStorage.get('inputWindowNum');
     if (inputWindowNum !== 0) {
       console.log(TAG + 'onRequest window number is not zero.');
       return;

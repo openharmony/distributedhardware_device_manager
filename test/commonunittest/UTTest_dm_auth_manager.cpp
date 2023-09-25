@@ -306,7 +306,6 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     authManager->authResponseContext_ = nullptr;
     int32_t userId = 1;
-    bool isShow = false;
     authManager->UserSwitchEventCallback(userId);
     authManager->AuthenticateFinish();
     authManager->CancelDisplay();
