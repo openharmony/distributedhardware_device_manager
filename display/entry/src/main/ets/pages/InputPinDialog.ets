@@ -13,8 +13,12 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-var that;
-let dmClass;
+import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
+import Context from '@ohos.app.ability.common';
+
+let that: dialogPlusPage;
+let dmClass: deviceManager.DeviceManager | null;
 let TAG = "[DeviceManagerUI:InputPinDialog]==>"
 const ACTION_CANCEL_PINCODE_INPUT: number = 4
 const ACTION_DONE_PINCODE_INPUT: number = 5
@@ -59,16 +63,17 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.input', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
+      (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
         return
       }
       dmClass = dm
-      dmClass.on('uiStateChange', (data) => {
+      dmClass.on('uiStateChange', (data: Record<string, string>) => {
         console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
-        var tmpStr = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg
+        let tmpStr: Record<string, number> = JSON.parse(data.param)
+        let msg: number = tmpStr.uiStateMsg as number
         if (msg === MSG_DOING_AUTH) {
           this.errorTips = '正在认证中，请稍候……'
           this.errorTipsVisible = Visibility.Visible
@@ -99,8 +104,8 @@ struct dialogPlusPage {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("Done" + JSON.stringify(this.ACTION_DONE_PINCODE_INPUT))
-    this.setUserOperation(this.ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
+    console.log("Done" + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
   }
 
   onCancel() {
@@ -111,12 +116,12 @@ struct dialogPlusPage {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("cancle" + this.ACTION_CANCEL_PINCODE_INPUT)
-    this.setUserOperation(this.ACTION_CANCEL_PINCODE_INPUT, "extra")
+    console.log("cancle" + ACTION_CANCEL_PINCODE_INPUT)
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, "extra")
     this.destruction()
   }
 
-  setUserOperation(operation, extra) {
+  setUserOperation(operation: number, extra: string) {
     console.log('setUserOperation: ' + operation + 'inputPinCode'+ extra)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
@@ -130,8 +135,10 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    globalThis.inputWin.destroy()
-    globalThis.inputContext.terminateSelf()
+    let temporaryWindow: window.Window = AppStorage.get("inputWin") as window.Window
+    temporaryWindow.destroy()
+    let context: Context.UIAbilityContext = AppStorage.get("inputContext") as Context.UIAbilityContext
+    context.terminateSelf()
   }
 
   build() {

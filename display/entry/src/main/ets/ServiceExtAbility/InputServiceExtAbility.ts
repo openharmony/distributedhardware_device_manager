@@ -24,8 +24,8 @@ const TAG = '[DeviceManagerUI:Input]==>';
 
 export default class ServiceExtAbility extends extension {
   onCreate(want: Want): void {
-    globalThis.inputContext = this.context;
-    globalThis.inputWindowNum = 0;
+    AppStorage.SetOrCreate("inputContext", this.context);
+    AppStorage.SetOrCreate("inputWindowNum", 0);
     this.getShareStyle();
   }
 
@@ -35,8 +35,9 @@ export default class ServiceExtAbility extends extension {
       console.log(TAG + 'onRequest window number is not zero.');
       return;
     }
-    globalThis.abilityWant = want;
-    console.log(TAG + 'onRequest execute' + JSON.stringify(globalThis.abilityWant.parameters));
+    AppStorage.SetOrCreate("abilityWant", want);
+    let globalWant: Want = AppStorage.get("abilityWant") as Want;
+    console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
 
     display.getDefaultDisplay().then((dis: display.Display) => {
       let density: number = dis.densityPixels;
@@ -71,12 +72,14 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      globalThis.inputWin = win;
+      AppStorage.SetOrCreate("inputWin", win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/InputPinDialog');
       await win.show();
-      globalThis.inputWindowNum++;
+      let windowNum: number = AppStorage.get("inputWindowNum") as number;
+      windowNum++;
+      AppStorage.SetOrCreate("inputWindowNum", windowNum);
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

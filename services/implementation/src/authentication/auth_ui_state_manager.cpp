@@ -22,8 +22,9 @@ namespace DistributedHardware {
 constexpr const char* UI_STATE_MSG = "uiStateMsg";
 AuthUiStateManager::AuthUiStateManager(std::shared_ptr<IDeviceManagerServiceListener> listener) : listener_(listener)
 {
-
+    LOGI("AuthUiStateManager constructor");
 }
+
 void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
 {
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
@@ -33,6 +34,10 @@ void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
 void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
 {
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
+    if (pkgSet_.find(pkgName) == pkgSet_.end()) {
+        LOGE("AuthUiStateManager UnRegisterUiStateCallback pkgName is not exist.");
+        return;
+    }
     pkgSet_.erase(pkgName);
 }
 

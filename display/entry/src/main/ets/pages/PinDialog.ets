@@ -13,8 +13,13 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-let dmClass;
+import Context from '@ohos.app.ability.common';
+import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
+
+let dmClass: deviceManager.DeviceManager | null;
 let TAG = "[DeviceManagerUI:PinDialog]==>"
+
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3
 const MSG_CANCEL_PIN_CODE_SHOW: number = 2
 @Entry
@@ -30,7 +35,10 @@ struct dialogPlusPage {
   aboutToAppear() {
     this.initStatue()
     console.log("aboutToAppear execute")
-    this.pinCode = globalThis.abilityWant.parameters["PinCode"]
+    let globalWant: Want = AppStorage.get("abilityWant") as Want
+    if (globalWant != null && globalWant.parameters != undefined) {
+      this.pinCode = globalWant.parameters["PinCode"] as string
+    }
   }
 
   aboutToDisappear() {
@@ -47,21 +55,23 @@ struct dialogPlusPage {
   }
 
   initStatue() {
-    console.log('initStatue' + "windowNum:" + globalThis.pinWindowNum)
+    let globalWindowNum: number = AppStorage.get("pinWindowNum") as number
+    console.log('initStatue' + "pinWindowNum:" + globalWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.pin', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.pin',
+      (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
         console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
         return
       }
       dmClass = dm
-      dmClass.on('uiStateChange', (data) => {
+      dmClass.on('uiStateChange', (data: Record<string, string>) => {
         console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
-        var tmpStr = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg
+        let tmpStr: Record<string, number> = JSON.parse(data.param)
+        let msg: number = tmpStr.uiStateMsg as number
         if (msg === MSG_CANCEL_PIN_CODE_SHOW) {
           this.destruction()
         }
@@ -69,7 +79,7 @@ struct dialogPlusPage {
     });
   }
 
-  setUserOperation(operation) {
+  setUserOperation(operation: number) {
     console.log('setUserOperation: ' + operation)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
@@ -83,8 +93,10 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    globalThis.pinWin.destroy()
-    globalThis.pinContext.terminateSelf()
+    let temporaryWindow: window.Window = AppStorage.get("pinWin") as window.Window
+    temporaryWindow.destroy()
+    let context: Context.UIAbilityContext = AppStorage.get("pinContext") as Context.UIAbilityContext
+    context.terminateSelf()
   }
 
   build() {
@@ -108,7 +120,7 @@ struct dialogPlusPage {
             .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
             .fontWeight(FontWeight.Normal)
             .onClick(() => {
-              this.setUserOperation(this.ACTION_CANCEL_PINCODE_DISPLAY)
+              this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY)
               this.destruction()
             })
         }.width('100%')

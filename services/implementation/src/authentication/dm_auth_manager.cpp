@@ -420,7 +420,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
-        LOGE("failed to OnMemberJoin because authResponseContext_ is nullptr");
+        LOGE("failed to OnMemberJoin because authResponseContext_ or authUiStateMgr is nullptr");
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
@@ -729,7 +729,7 @@ int32_t DmAuthManager::JoinNetwork()
 void DmAuthManager::AuthenticateFinish()
 {
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
-        LOGE("failed to AuthenticateFinish because authResponseContext_ is nullptr");
+        LOGE("failed to AuthenticateFinish because authResponseContext_ or authUiStateMgr is nullptr");
         return;
     }
     LOGI("DmAuthManager::AuthenticateFinish start");

@@ -24,8 +24,8 @@ const TAG = '[DeviceManagerUI:PinCode]==>';
 
 export default class ServiceExtAbility extends extension {
   onCreate(want: Want): void {
-    globalThis.pinContext = this.context;
-    globalThis.pinWindowNum = 0;
+    AppStorage.SetOrCreate("pinContext", this.context);
+    AppStorage.SetOrCreate("pinWindowNum", 0);
     this.getShareStyle();
   }
 
@@ -35,8 +35,9 @@ export default class ServiceExtAbility extends extension {
       console.log(TAG + 'onRequest window number is not zero.');
       return;
     }
-    globalThis.abilityWant = want;
-    console.log(TAG + 'onRequest execute' + JSON.stringify(globalThis.abilityWant.parameters));
+    AppStorage.SetOrCreate("abilityWant", want);
+    let globalWant: Want = AppStorage.get("abilityWant") as Want;
+    console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
 
     display.getDefaultDisplay().then((dis: display.Display) => {
       let density: number = dis.densityPixels;
@@ -71,12 +72,14 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      globalThis.pinWin = win;
+      AppStorage.SetOrCreate("pinWin", win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/PinDialog');
       await win.show();
-      globalThis.pinWindowNum++;
+      let windowNum: number = AppStorage.get("pinWindowNum") as number;
+      windowNum++;
+      AppStorage.SetOrCreate("pinWindowNum", windowNum);
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');
