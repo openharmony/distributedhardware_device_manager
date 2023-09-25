@@ -24,19 +24,20 @@ const TAG = '[DeviceManagerUI:PinCode]==>';
 
 export default class ServiceExtAbility extends extension {
   onCreate(want: Want): void {
-    AppStorage.SetOrCreate("pinContext", this.context);
-    AppStorage.SetOrCreate("pinWindowNum", 0);
+    AppStorage.SetOrCreate('pinContext', this.context);
+    AppStorage.SetOrCreate('pinWindowNum', 0);
     this.getShareStyle();
   }
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    if (globalThis.pinWindowNum !== 0) {
+    let pinWindowNum: number = AppStorage.get('pinWindowNum');
+    if (pinWindowNum !== 0) {
       console.log(TAG + 'onRequest window number is not zero.');
       return;
     }
-    AppStorage.SetOrCreate("abilityWant", want);
-    let globalWant: Want = AppStorage.get("abilityWant") as Want;
+    AppStorage.SetOrCreate('abilityWant', want);
+    let globalWant: Want = AppStorage.get('abilityWant') as Want;
     console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
 
     display.getDefaultDisplay().then((dis: display.Display) => {
@@ -72,14 +73,14 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      AppStorage.SetOrCreate("pinWin", win);
+      AppStorage.SetOrCreate('pinWin', win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/PinDialog');
       await win.show();
-      let windowNum: number = AppStorage.get("pinWindowNum") as number;
+      let windowNum: number = AppStorage.get('pinWindowNum') as number;
       windowNum++;
-      AppStorage.SetOrCreate("pinWindowNum", windowNum);
+      AppStorage.SetOrCreate('pinWindowNum', windowNum);
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

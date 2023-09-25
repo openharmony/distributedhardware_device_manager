@@ -24,19 +24,20 @@ const TAG = '[DeviceManagerUI:Input]==>';
 
 export default class ServiceExtAbility extends extension {
   onCreate(want: Want): void {
-    AppStorage.SetOrCreate("inputContext", this.context);
-    AppStorage.SetOrCreate("inputWindowNum", 0);
+    AppStorage.SetOrCreate('inputContext', this.context);
+    AppStorage.SetOrCreate('inputWindowNum', 0);
     this.getShareStyle();
   }
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    if (globalThis.inputWindowNum !== 0) {
+    let inputWindowNum: number = AppStorage.get('inputWindowNum')
+    if (inputWindowNum !== 0) {
       console.log(TAG + 'onRequest window number is not zero.');
       return;
     }
-    AppStorage.SetOrCreate("abilityWant", want);
-    let globalWant: Want = AppStorage.get("abilityWant") as Want;
+    AppStorage.SetOrCreate('abilityWant', want);
+    let globalWant: Want = AppStorage.get('abilityWant') as Want;
     console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
 
     display.getDefaultDisplay().then((dis: display.Display) => {
@@ -72,14 +73,14 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      AppStorage.SetOrCreate("inputWin", win);
+      AppStorage.SetOrCreate('inputWin', win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/InputPinDialog');
       await win.show();
-      let windowNum: number = AppStorage.get("inputWindowNum") as number;
+      let windowNum: number = AppStorage.get('inputWindowNum') as number;
       windowNum++;
-      AppStorage.SetOrCreate("inputWindowNum", windowNum);
+      AppStorage.SetOrCreate('inputWindowNum', windowNum);
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

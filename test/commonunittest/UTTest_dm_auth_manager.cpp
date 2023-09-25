@@ -310,7 +310,6 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
     authManager->UserSwitchEventCallback(userId);
     authManager->AuthenticateFinish();
     authManager->CancelDisplay();
-    authManager->UpdateInputDialogDisplay(isShow);
     int32_t ret = authManager->JoinNetwork();
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }

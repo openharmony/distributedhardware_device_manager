@@ -41,8 +41,8 @@ struct dialogPlusPage {
   @State isAvailableType: boolean = false
 
   initStatue() {
-    let globalWindowNum: number = AppStorage.get("confirmWindowNum") as number
-    console.log('initStatue' + "windowNum:" + globalWindowNum)
+    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
+    console.log('initStatue' + 'windowNum:' + globalWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
@@ -50,7 +50,7 @@ struct dialogPlusPage {
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log("createDeviceManager err:" + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
+        console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
         return
       }
       dmClass = dm
@@ -58,41 +58,41 @@ struct dialogPlusPage {
   }
 
   onAllowOnce() {
-    console.log("allow once")
+    console.log('allow once')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    let globalWant: Want = AppStorage.get("abilityWant") as Want
-    console.log("onAllowOnce execute" + JSON.stringify(globalWant.parameters))
-    console.log("allow once" + ACTION_ALLOW_AUTH_ONCE)
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
+    console.log('onAllowOnce execute' + JSON.stringify(globalWant.parameters))
+    console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
     this.setUserOperation(ACTION_ALLOW_AUTH_ONCE)
     this.destruction()
   }
 
   onAllowAlways() {
-    console.log("allow always")
+    console.log('allow always')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    let globalWant: Want = AppStorage.get("abilityWant") as Want
-    console.log("onAllowAlways execute" + JSON.stringify(globalWant.parameters))
-    console.log("allow always" + ACTION_ALLOW_AUTH_ALWAYS)
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
+    console.log('onAllowAlways execute' + JSON.stringify(globalWant.parameters))
+    console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
     this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
     this.destruction()
   }
 
   onCancel() {
-    console.log("cancel")
+    console.log('cancel')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    console.log("cancel" + ACTION_CANCEL_AUTH)
+    console.log('cancel' + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH)
     this.destruction()
   }
@@ -104,7 +104,7 @@ struct dialogPlusPage {
       return;
     }
     try {
-      dmClass.setUserOperation(operation, "extra")
+      dmClass.setUserOperation(operation, 'extra')
     } catch (error) {
       console.log('dmClass setUserOperation failed')
     }
@@ -123,27 +123,27 @@ struct dialogPlusPage {
   }
 
   onPageShow() {
-    console.log("onPageShow")
+    console.log('onPageShow')
 
-    let globalWant: Want = AppStorage.get("abilityWant") as Want
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
     if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceName != null) {
       this.peerDeviceName = globalWant.parameters.deviceName as string
-      console.log("peerDeviceName is " + this.peerDeviceName)
+      console.log('peerDeviceName is ' + this.peerDeviceName)
     }
 
     if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceType != null) {
       this.peerDeviceType = globalWant.parameters.deviceType as number
-      console.log("peerDeviceType is " + this.peerDeviceType)
+      console.log('peerDeviceType is ' + this.peerDeviceType)
     }
 
     if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.appOperation != null) {
       this.peerAppOperation = globalWant.parameters.appOperation as string
-      console.log("peerAppOperation is " + this.peerAppOperation)
+      console.log('peerAppOperation is ' + this.peerAppOperation)
     }
 
     if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.customDescription != null) {
       this.peerCustomDescription = globalWant.parameters.customDescription as string
-      console.log("peerCustomDescription is " + this.peerCustomDescription)
+      console.log('peerCustomDescription is ' + this.peerCustomDescription)
     }
 
     this.initStatue()
@@ -163,20 +163,20 @@ struct dialogPlusPage {
         console.log('dmClass release failed')
       }
     }
-    let temporaryWindow: window.Window = AppStorage.get("confirmWin") as window.Window
+    let temporaryWindow: window.Window = AppStorage.get('confirmWin') as window.Window
     temporaryWindow.destroy()
-    let globalWindowNum: number = AppStorage.get("confirmWindowNum") as number
+    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
     globalWindowNum--
-    AppStorage.SetOrCreate("confirmWindowNum", globalWindowNum)
-    console.info("confirmWindowNum:" + globalWindowNum)
+    AppStorage.SetOrCreate('confirmWindowNum', globalWindowNum)
+    console.info('confirmWindowNum:' + globalWindowNum)
     if(globalWindowNum == 0) {
-      let context: Context.UIAbilityContext = AppStorage.get("confirmContext") as Context.UIAbilityContext
+      let context: Context.UIAbilityContext = AppStorage.get('confirmContext') as Context.UIAbilityContext
       context.terminateSelf()
     }
   }
 
   getImages(peerdeviceType: number): Resource {
-    console.info("peerdeviceType is " + peerdeviceType)
+    console.info('peerdeviceType is ' + peerdeviceType)
     if (peerdeviceType == deviceManager.DeviceType.SPEAKER) {
       this.isAvailableType = true
       return $r('app.media.ic_device_soundx')
@@ -252,7 +252,7 @@ struct dialogPlusPage {
         .fontColor(this.selectIndex == 1 ? 0xffffff : 0x0000ff)
         .height(30)
         .width('100%')
-      Button("不信任(" + this.seconds + "秒)")
+      Button('不信任(' + this.seconds + '秒)')
         .margin({left: 16, right: 16})
         .backgroundColor(this.selectIndex == 2 ? 0x0000ff : 0xffffff)
         .fontColor(this.selectIndex == 2 ? 0xffffff : 0x0000ff)

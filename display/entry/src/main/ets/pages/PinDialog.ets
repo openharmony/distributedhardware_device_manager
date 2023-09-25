@@ -18,7 +18,7 @@ import Want from '@ohos.app.ability.Want';
 import window from '@ohos.window';
 
 let dmClass: deviceManager.DeviceManager | null;
-let TAG = "[DeviceManagerUI:PinDialog]==>"
+let TAG = '[DeviceManagerUI:PinDialog]==>'
 
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3
 const MSG_CANCEL_PIN_CODE_SHOW: number = 2
@@ -27,22 +27,22 @@ const MSG_CANCEL_PIN_CODE_SHOW: number = 2
 struct dialogPlusPage {
   @State messageTitle: string = 'PIN码连接'
   @State messageTips: string = '请在设备端输入连接码进行验证'
-  @State pinCode: string = ""
+  @State pinCode: string = ''
   @State allow: string = '允许'
   @State cancel: string = '取消'
   @State isShow: boolean = true
 
   aboutToAppear() {
     this.initStatue()
-    console.log("aboutToAppear execute")
-    let globalWant: Want = AppStorage.get("abilityWant") as Want
+    console.log('aboutToAppear execute')
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
     if (globalWant != null && globalWant.parameters != undefined) {
-      this.pinCode = globalWant.parameters["PinCode"] as string
+      this.pinCode = globalWant.parameters['PinCode'] as string
     }
   }
 
   aboutToDisappear() {
-    console.log(TAG + "aboutToDisappear executed")
+    console.log(TAG + 'aboutToDisappear executed')
     if (dmClass != null) {
       try {
         dmClass.off('uiStateChange')
@@ -55,8 +55,8 @@ struct dialogPlusPage {
   }
 
   initStatue() {
-    let globalWindowNum: number = AppStorage.get("pinWindowNum") as number
-    console.log('initStatue' + "pinWindowNum:" + globalWindowNum)
+    let globalWindowNum: number = AppStorage.get('pinWindowNum') as number
+    console.log('initStatue' + 'pinWindowNum:' + globalWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
@@ -64,12 +64,12 @@ struct dialogPlusPage {
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.pin',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
+        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
         return
       }
       dmClass = dm
       dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
         let tmpStr: Record<string, number> = JSON.parse(data.param)
         let msg: number = tmpStr.uiStateMsg as number
         if (msg === MSG_CANCEL_PIN_CODE_SHOW) {
@@ -86,16 +86,16 @@ struct dialogPlusPage {
       return;
     }
     try {
-      dmClass.setUserOperation(operation, "extra")
+      dmClass.setUserOperation(operation, 'extra')
     } catch (error) {
       console.log('dmClass setUserOperation failed')
     }
   }
 
   destruction() {
-    let temporaryWindow: window.Window = AppStorage.get("pinWin") as window.Window
+    let temporaryWindow: window.Window = AppStorage.get('pinWin') as window.Window
     temporaryWindow.destroy()
-    let context: Context.UIAbilityContext = AppStorage.get("pinContext") as Context.UIAbilityContext
+    let context: Context.UIAbilityContext = AppStorage.get('pinContext') as Context.UIAbilityContext
     context.terminateSelf()
   }
 

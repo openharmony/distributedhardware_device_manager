@@ -19,7 +19,7 @@ import Context from '@ohos.app.ability.common';
 
 let that: dialogPlusPage;
 let dmClass: deviceManager.DeviceManager | null;
-let TAG = "[DeviceManagerUI:InputPinDialog]==>"
+let TAG = '[DeviceManagerUI:InputPinDialog]==>'
 const ACTION_CANCEL_PINCODE_INPUT: number = 4
 const ACTION_DONE_PINCODE_INPUT: number = 5
 const MSG_PIN_CODE_ERROR: number = 0
@@ -66,12 +66,12 @@ struct dialogPlusPage {
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
+        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}')
         return
       }
       dmClass = dm
       dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
+        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
         let tmpStr: Record<string, number> = JSON.parse(data.param)
         let msg: number = tmpStr.uiStateMsg as number
         if (msg === MSG_DOING_AUTH) {
@@ -94,8 +94,8 @@ struct dialogPlusPage {
   }
 
   onDone() {
-    console.log("Done")
-    if(this.inputPinCode == null || this.inputPinCode == "") {
+    console.log('Done')
+    if(this.inputPinCode == null || this.inputPinCode == '') {
       return;
     }
     if (dmClass) {
@@ -104,20 +104,20 @@ struct dialogPlusPage {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("Done" + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
+    console.log('Done' + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
     this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
   }
 
   onCancel() {
-    console.log("cancle")
+    console.log('cancle')
     if (dmClass) {
       console.log('deviceManager exist')
     } else {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("cancle" + ACTION_CANCEL_PINCODE_INPUT)
-    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, "extra")
+    console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT)
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra')
     this.destruction()
   }
 
@@ -135,9 +135,9 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    let temporaryWindow: window.Window = AppStorage.get("inputWin") as window.Window
+    let temporaryWindow: window.Window = AppStorage.get('inputWin') as window.Window
     temporaryWindow.destroy()
-    let context: Context.UIAbilityContext = AppStorage.get("inputContext") as Context.UIAbilityContext
+    let context: Context.UIAbilityContext = AppStorage.get('inputContext') as Context.UIAbilityContext
     context.terminateSelf()
   }
 
