@@ -42,7 +42,6 @@
 #include "ipc_notify_event_req.h"
 #include "ipc_register_dev_state_callback_req.h"
 #include "ipc_register_listener_req.h"
-#include "ipc_register_ui_state_callback_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
@@ -1116,8 +1115,7 @@ ON_IPC_READ_RESPONSE(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &reply, std::shar
 
 ON_IPC_SET_REQUEST(REGISTER_UI_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcRegisterUiStateCallbackReq> pReq =
-        std::static_pointer_cast<IpcRegisterUiStateCallbackReq>(pBaseReq);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1133,8 +1131,7 @@ ON_IPC_READ_RESPONSE(REGISTER_UI_STATE_CALLBACK, MessageParcel &reply, std::shar
 
 ON_IPC_SET_REQUEST(UNREGISTER_UI_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcRegisterUiStateCallbackReq> pReq =
-        std::static_pointer_cast<IpcRegisterUiStateCallbackReq>(pBaseReq);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         return ERR_DM_IPC_WRITE_FAILED;

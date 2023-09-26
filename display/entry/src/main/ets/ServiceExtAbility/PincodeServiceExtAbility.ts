@@ -23,6 +23,7 @@ import type Want from '@ohos.app.ability.Want';
 const TAG = '[DeviceManagerUI:PinCode]==>';
 
 export default class ServiceExtAbility extends extension {
+  isCreatingWindow: boolean = false;
   onCreate(want: Want): void {
     AppStorage.SetOrCreate('pinContext', this.context);
     AppStorage.SetOrCreate('pinWindowNum', 0);
@@ -32,8 +33,8 @@ export default class ServiceExtAbility extends extension {
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
     let pinWindowNum: number = AppStorage.get('pinWindowNum');
-    if (pinWindowNum !== 0) {
-      console.log(TAG + 'onRequest window number is not zero.');
+    if (pinWindowNum !== 0 || this.isCreatingWindow) {
+      console.log(TAG + 'onRequest window number is not zero or creating window.');
       return;
     }
     AppStorage.SetOrCreate('abilityWant', want);
@@ -81,6 +82,7 @@ export default class ServiceExtAbility extends extension {
       let windowNum: number = AppStorage.get('pinWindowNum') as number;
       windowNum++;
       AppStorage.SetOrCreate('pinWindowNum', windowNum);
+      this.isCreatingWindow = false;
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

@@ -23,6 +23,7 @@ import type Want from '@ohos.app.ability.Want';
 const TAG = '[DeviceManagerUI:Confirm]==>';
 
 export default class ServiceExtAbility extends extension {
+  isCreatingWindow: boolean = false;
   onCreate(want: Want): void {
     globalThis.confirmContext = this.context;
     globalThis.confirmWindowNum = 0;
@@ -36,10 +37,11 @@ export default class ServiceExtAbility extends extension {
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
     let confirmWindowNum: number = AppStorage.get('confirmWindowNum');
-    if (confirmWindowNum !== 0) {
-      console.log(TAG + 'onRequest window number is not zero.');
+    if (confirmWindowNum !== 0 || this.isCreatingWindow) {
+      console.log(TAG + 'onRequest window number is not zero or creating window.');
       return;
     }
+    this.isCreatingWindow = true;
     AppStorage.SetOrCreate('abilityWant', want);
     display.getDefaultDisplay().then((dis: display.Display) => {
       let density: number = dis.densityPixels;
@@ -83,6 +85,7 @@ export default class ServiceExtAbility extends extension {
       let windowNum: number = AppStorage.get('confirmWindowNum') as number;
       windowNum++;
       AppStorage.SetOrCreate('confirmWindowNum', windowNum);
+      this.isCreatingWindow = false;
       console.log(TAG + 'window create successfully');
     } catch {
       console.info(TAG + 'window create failed');

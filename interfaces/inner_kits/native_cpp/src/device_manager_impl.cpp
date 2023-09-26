@@ -56,7 +56,6 @@
 #include "ipc_unpublish_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "ipc_register_dev_state_callback_req.h"
-#include "ipc_register_ui_state_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -892,7 +891,7 @@ int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
     }
     LOGI("RegisterUiStateCallback start, pkgName: %s", pkgName.c_str());
 
-    std::shared_ptr<IpcRegisterUiStateCallbackReq> req = std::make_shared<IpcRegisterUiStateCallbackReq>();
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
 
@@ -917,7 +916,7 @@ int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    std::shared_ptr<IpcRegisterUiStateCallbackReq> req = std::make_shared<IpcRegisterUiStateCallbackReq>();
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
 
