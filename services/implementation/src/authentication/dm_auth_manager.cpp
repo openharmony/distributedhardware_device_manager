@@ -695,10 +695,10 @@ void DmAuthManager::AuthenticateFinish()
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
         usleep(USLEEP_TIME_MS); // 500ms
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
         timer_->DeleteAll();
         isFinishOfLocal_ = true;
-        authRequestState_ = nullptr;
+        authRequestContext_ = nullptr;
         authResponseContext_ = nullptr;
         authRequestState_ = nullptr;
         authMessageProcessor_ = nullptr;
