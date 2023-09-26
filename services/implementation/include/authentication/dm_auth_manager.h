@@ -387,7 +387,6 @@ public:
      */
     bool IsIdenticalAccount();
 
-
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
