@@ -85,6 +85,7 @@ export default class ServiceExtAbility extends extension {
       this.isCreatingWindow = false;
       console.log(TAG + 'window create successfully');
     } catch {
+      this.isCreatingWindow = false;
       console.info(TAG + 'window create failed');
     }
   }
