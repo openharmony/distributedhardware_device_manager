@@ -37,6 +37,7 @@ export default class ServiceExtAbility extends extension {
       console.log(TAG + 'onRequest window number is not zero or creating window.');
       return;
     }
+    this.isCreatingWindow = true;
     AppStorage.SetOrCreate('abilityWant', want);
     let globalWant: Want = AppStorage.get('abilityWant') as Want;
     console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
