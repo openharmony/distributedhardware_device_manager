@@ -93,7 +93,7 @@ int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned
 int32_t DmSoftbusAdapterCrypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     char hashResult[SHA_HASH_LEN] = {0};
-    int32_t ret = DmGenerateStrHash((const uint8_t *)udid.c_str(), strlen(udid.c_str()) + 1, (uint8_t *)hashResult);
+    int32_t ret = DmGenerateStrHash((const uint8_t *)udid.c_str(), strlen(udid.c_str()), (uint8_t *)hashResult);
     if (ret != DM_OK) {
         LOGE("GenerateStrHash failed");
         return ret;

@@ -30,16 +30,18 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
 {
-    const int32_t PERMS_NUM = 3;
-    const int32_t PERMS_INDEX_TWO = 2;
+    const int32_t permsNum = 3;
+    const int32_t indexZero = 0;
+    const int32_t indexOne = 1;
+    const int32_t indexTwo = 2;
     uint64_t tokenId;
-    const char *perms[PERMS_NUM];
-    perms[0] = OHOS_PERMISSION_DISTRIBUTED_SOFTBUS_CENTER;
-    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
-    perms[PERMS_INDEX_TWO] = "ohos.permission.ACCESS_SERVICE_DM";
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[indexTwo] = "ohos.permission.ACCESS_SERVICE_DM";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = PERMS_NUM,
+        .permsNum = permsNum,
         .aclsNum = 0,
         .dcaps = NULL,
         .perms = perms,

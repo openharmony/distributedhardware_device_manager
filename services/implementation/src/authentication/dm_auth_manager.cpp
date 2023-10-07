@@ -16,6 +16,7 @@
 #include "dm_auth_manager.h"
 
 #include <string>
+#include <unistd.h>
 
 #include "auth_message_processor.h"
 #include "dm_ability_manager.h"
@@ -48,6 +49,7 @@ const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 4;
 const int32_t DM_AUTH_TYPE_MIN = 1;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
+const int32_t USLEEP_TIME_MS = 500000; // 500ms
 
 constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -315,9 +317,6 @@ void DmAuthManager::ProcessSourceMsg()
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
             break;
-        case MSG_TYPE_CLOSE_SESSION:
-            CloseAuthSession();
-            break;
         default:
             break;
     }
@@ -513,7 +512,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
 {
-    if (authResponseContext_ == nullptr) {
+    if (authResponseContext_ == nullptr || authRequestState_ != nullptr) {
         LOGE("failed to RespNegotiate because authResponseContext_ is nullptr");
         return;
     }
@@ -743,8 +742,6 @@ void DmAuthManager::AuthenticateFinish()
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
-        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_CLOSE_SESSION);
-        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         timer_->DeleteAll();
         isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
@@ -765,6 +762,16 @@ void DmAuthManager::AuthenticateFinish()
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
+        usleep(USLEEP_TIME_MS); // 500ms
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+        timer_->DeleteAll();
+        isFinishOfLocal_ = true;
+        authRequestContext_ = nullptr;
+        authResponseContext_ = nullptr;
+        authRequestState_ = nullptr;
+        authMessageProcessor_ = nullptr;
+        authPtr_ = nullptr;
+        authTimes_ = 0;
     }
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
@@ -1033,20 +1040,6 @@ bool DmAuthManager::IsIdenticalAccount()
         return false;
     }
     return true;
-}
-
-void DmAuthManager::CloseAuthSession()
-{
-    LOGI("DmAuthManager close auth session");
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
-    timer_->DeleteAll();
-    isFinishOfLocal_ = true;
-    authRequestState_ = nullptr;
-    authResponseContext_ = nullptr;
-    authRequestState_ = nullptr;
-    authMessageProcessor_ = nullptr;
-    authPtr_ = nullptr;
-    authTimes_ = 0;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

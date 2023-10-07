@@ -108,9 +108,6 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             CreateResponseFinishMessage(jsonObj);
             break;
-        case MSG_TYPE_CLOSE_SESSION:
-            CreateCloseSessionMessage(jsonObj);
-            break;
         default:
             break;
     }
@@ -196,9 +193,6 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             ParseResponseFinishMessage(jsonObject);
-            break;
-        case MSG_TYPE_CLOSE_SESSION:
-            ParseCloseSessionMessage(jsonObject);
             break;
         default:
             break;
@@ -358,17 +352,6 @@ std::shared_ptr<DmAuthResponseContext> AuthMessageProcessor::GetResponseContext(
 std::shared_ptr<DmAuthRequestContext> AuthMessageProcessor::GetRequestContext()
 {
     return authRequestContext_;
-}
-void AuthMessageProcessor::CreateCloseSessionMessage(nlohmann::json &json)
-{
-    LOGI("Create close session message");
-}
-
-void AuthMessageProcessor::ParseCloseSessionMessage(const nlohmann::json &json)
-{
-    if (IsInt32(json, TAG_REPLY)) {
-        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
