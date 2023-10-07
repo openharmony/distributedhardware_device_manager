@@ -150,6 +150,8 @@ public:
         std::string &encryptedUuid);
 
     int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId, int32_t &networkType);
+    int32_t RegisterUiStateCallback(const std::string &pkgName);
+    int32_t UnRegisterUiStateCallback(const std::string &pkgName);
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;

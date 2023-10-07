@@ -944,5 +944,27 @@ ON_IPC_CMD(GET_NETWORKTYPE_BY_NETWORK, MessageParcel &data, MessageParcel &reply
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(REGISTER_UI_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNREGISTER_UI_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

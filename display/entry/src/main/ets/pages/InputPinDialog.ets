@@ -13,9 +13,18 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-var that;
-let dmClass;
-let TAG = "[DeviceManagerUI:InputPinDialog]==>"
+import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
+import Context from '@ohos.app.ability.common';
+
+let that: dialogPlusPage;
+let dmClass: deviceManager.DeviceManager | null;
+let TAG = '[DeviceManagerUI:InputPinDialog]==>'
+const ACTION_CANCEL_PINCODE_INPUT: number = 4
+const ACTION_DONE_PINCODE_INPUT: number = 5
+const MSG_PIN_CODE_ERROR: number = 0
+const MSG_CANCEL_PIN_CODE_INPUT: number = 3
+const MSG_DOING_AUTH: number = 4
 @Entry
 @Component
 struct dialogPlusPage {
@@ -28,8 +37,6 @@ struct dialogPlusPage {
   @State inputPinCode: string = ''
   @State ok: string = '确定'
   @State cancel: string = '取消'
-  @State ACTION_CANCEL_PINCODE_INPUT: number = 4
-  @State ACTION_DONE_PINCODE_INPUT: number = 5
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear')
@@ -40,8 +47,12 @@ struct dialogPlusPage {
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (dmClass != null) {
-      dmClass.off('uiStateChange')
-      dmClass.release()
+      try {
+        dmClass.off('uiStateChange')
+        dmClass.release()
+      } catch (error) {
+        console.log('dmClass release failed')
+      }
       dmClass = null
     }
   }
@@ -52,25 +63,27 @@ struct dialogPlusPage {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
+      (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log("createDeviceManager err:" + JSON.stringify(err) + '  --fail:' + '${dm}')
+        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}')
         return
       }
       dmClass = dm
-      dmClass.on('uiStateChange', (data) => {
-        console.log("uiStateChange executed, dialog closed" + JSON.stringify(data))
-        var tmpStr = JSON.parse(data.param)
-        if (tmpStr.addingMember !== undefined) {
+      dmClass.on('uiStateChange', (data: Record<string, string>) => {
+        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
+        let tmpStr: Record<string, number> = JSON.parse(data.param)
+        let msg: number = tmpStr.uiStateMsg as number
+        if (msg === MSG_DOING_AUTH) {
           this.errorTips = '正在认证中，请稍候……'
           this.errorTipsVisible = Visibility.Visible
           return
         }
-        this.isShow = tmpStr.verifyFailed
-        console.log("uiStateChange executed, dialog closed" + this.isShow)
-        if (!this.isShow) {
+        if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
           this.destruction()
-        } else {
+          return
+        }
+        if (msg === MSG_PIN_CODE_ERROR) {
           this.isTimes--
           this.errorTips = 'PIN码输入错误，请重新输入(3次：还有' + this.isTimes + '次机会)'
           this.inputPinCode = ''
@@ -81,8 +94,8 @@ struct dialogPlusPage {
   }
 
   onDone() {
-    console.log("Done")
-    if(this.inputPinCode == null || this.inputPinCode == "") {
+    console.log('Done')
+    if(this.inputPinCode == null || this.inputPinCode == '') {
       return;
     }
     if (dmClass) {
@@ -91,35 +104,41 @@ struct dialogPlusPage {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("Done" + JSON.stringify(this.ACTION_DONE_PINCODE_INPUT))
-    this.setUserOperation(this.ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
+    console.log('Done' + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
   }
 
   onCancel() {
-    console.log("cancle")
+    console.log('cancle')
     if (dmClass) {
       console.log('deviceManager exist')
     } else {
       console.log('createDeviceManager is null')
       return
     }
-    console.log("cancle" + this.ACTION_CANCEL_PINCODE_INPUT)
-    this.setUserOperation(this.ACTION_CANCEL_PINCODE_INPUT, "extra")
+    console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT)
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra')
     this.destruction()
   }
 
-  setUserOperation(operation, extra) {
+  setUserOperation(operation: number, extra: string) {
     console.log('setUserOperation: ' + operation + 'inputPinCode'+ extra)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
       return;
     }
-    dmClass.setUserOperation(operation, extra)
+    try {
+      dmClass.setUserOperation(operation, extra)
+    } catch (error) {
+      console.log('dmClass setUserOperation failed')
+    }
   }
 
   destruction() {
-    globalThis.extensionWin.destroy()
-    globalThis.extensionContext.terminateSelf()
+    let temporaryWindow: window.Window = AppStorage.get('inputWin') as window.Window
+    temporaryWindow.destroy()
+    let context: Context.UIAbilityContext = AppStorage.get('inputContext') as Context.UIAbilityContext
+    context.terminateSelf()
   }
 
   build() {

@@ -689,6 +689,32 @@ int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pk
     return dmServiceImpl_->UnRegisterCredentialCallback(pkgName);
 }
 
+int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::RegisterUiStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("RegisterUiStateCallback failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->RegisterUiStateCallback(pkgName);
+}
+
+int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnRegisterUiStateCallback failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->UnRegisterUiStateCallback(pkgName);
+}
+
 bool DeviceManagerService::IsDMServiceImplReady()
 {
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
