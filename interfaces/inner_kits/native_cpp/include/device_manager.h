@@ -191,7 +191,7 @@ public:
      * @param callback the callback to be invoked upon VerifyAuthentication.
      * @return Returns 0 if success.
      */
-    virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
+    [[deprecated]] virtual int32_t VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
         std::shared_ptr<VerifyAuthCallback> callback) = 0;
     /**
      * @brief Register Fa callback for device manager.
@@ -213,7 +213,7 @@ public:
      * @param faParam fa param.
      * @return Returns 0 if success.
      */
-    virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) = 0;
+    [[deprecated]] virtual int32_t GetFaParam(const std::string &pkgName, DmAuthParam &faParam) = 0;
     /**
      * @brief Set User Actions.
      * @param pkgName package name.
@@ -244,14 +244,16 @@ public:
      * @param extra   extra info.This parameter can be null.
      * @return Returns 0 if success.
      */
-    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
+    [[deprecated]] virtual int32_t RegisterDevStateCallback(const std::string &pkgName,
+        const std::string &extra) = 0;
     /**
      * @brief Unregister device status callback.
      * @param pkgName package name.
      * @param extra   extra info.This parameter can be null.
      * @return Returns 0 if success.
      */
-    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
+    [[deprecated]] virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName,
+        const std::string &extra) = 0;
     /**
      * @brief Request credential information.
      * @param pkgName       package name.
@@ -259,7 +261,7 @@ public:
      * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
      * @return Returns 0 if success.
      */
-    virtual int32_t RequestCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    [[deprecated]] virtual int32_t RequestCredential(const std::string &pkgName, const std::string &reqJsonStr,
         std::string &returnJsonStr) = 0;
     /**
      * @brief Import credential information.
@@ -269,28 +271,29 @@ public:
      * includes credentialType, credentialId, serverPk, pkInfoSignature, pkInfo, authCode, peerDeviceId.
      * @return Returns 0 if success.
      */
-    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo) = 0;
+    [[deprecated]] virtual int32_t ImportCredential(const std::string &pkgName,
+        const std::string &credentialInfo) = 0;
     /**
      * @brief Delete credential information.
      * @param pkgName    package name.
      * @param deleteInfo delete credential params. the params is json string, it includes processType, authType, userId.
      * @return Returns 0 if success.
      */
-    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo) = 0;
+    [[deprecated]] virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo) = 0;
     /**
      * @brief Register credential callback.
      * @param pkgName  package name.
      * @param callback credential callback.
      * @return Returns 0 if success.
      */
-    virtual int32_t RegisterCredentialCallback(const std::string &pkgName,
+    [[deprecated]] virtual int32_t RegisterCredentialCallback(const std::string &pkgName,
         std::shared_ptr<CredentialCallback> callback) = 0;
     /**
      * @brief UnRegister credential callback.
      * @param pkgName package name.
      * @return Returns 0 if success.
      */
-    virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
+    [[deprecated]] virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
     /**
      * @brief Notify event to device manager.
      * @param pkgName package name.
