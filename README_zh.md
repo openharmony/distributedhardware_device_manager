@@ -340,7 +340,7 @@ try {
       console.info('deviceStateChange' + JSON.stringify(data));
     });
   // 释放DeviceManager实例。
-  deviceManager.releaseDeviceManager();
+  deviceManager.releaseDeviceManager(dmClass);
 } catch (err) {
   console.log("err:" + err.code + "," + err.message);
 }
