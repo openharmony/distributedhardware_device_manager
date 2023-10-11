@@ -86,10 +86,11 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("devicemanagerext_pin_auth") {
+    stack_protector_ret = true
+  
     sanitize = {
       boundary_sanitize = true
       integer_overflow = true
-      stack_protector_ret = true
       ubsan = true
     }
 	
