@@ -47,7 +47,8 @@
                 "node",
                 "googletest",
                 "mbedtls",
-                "openssl"
+                "openssl",
+                "bounds_checking_function"
             ]
         },
         "build": {
