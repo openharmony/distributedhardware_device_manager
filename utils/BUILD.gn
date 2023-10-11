@@ -132,9 +132,9 @@ if (defined(ohos_lite)) {
   ohos_shared_library("devicemanagerutils") {
     sanitize = {
       boundary_sanitize = true
-	  integer_overflow = true
-	  ubsan = true
-	  stack_protector_ret = true
+      integer_overflow = true
+      stack_protector_ret = true
+      ubsan = true
     }
 	
     sources = [
