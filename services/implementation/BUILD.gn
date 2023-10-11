@@ -157,6 +157,13 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagerserviceimpl") {
+    sanitize = {
+      boundary_sanitize = true
+	  integer_overflow = true
+	  ubsan = true
+	  stack_protector_ret = true
+    }
+	
     sources = [
       "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "src/ability/standard/dm_ability_manager.cpp",

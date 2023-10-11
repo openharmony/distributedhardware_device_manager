@@ -116,6 +116,13 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagersdk") {
+    sanitize = {
+      boundary_sanitize = true
+	  integer_overflow = true
+	  ubsan = true
+	  stack_protector_ret = true
+    }
+	
     sources = [
       "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
       "${common_path}/src/dfx/standard/dm_hitrace.cpp",
