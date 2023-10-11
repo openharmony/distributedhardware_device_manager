@@ -131,13 +131,13 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagerutils") {
     stack_protector_ret = true
-  
+
     sanitize = {
       boundary_sanitize = true
       integer_overflow = true
       ubsan = true
     }
-	
+
     sources = [
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dfx/standard/dm_hisysevent.cpp",

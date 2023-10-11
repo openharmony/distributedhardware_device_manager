@@ -16,13 +16,13 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ohos_shared_library("distributeddevicemanager") {
   stack_protector_ret = true
-  
+
   sanitize = {
     boundary_sanitize = true
     integer_overflow = true
     ubsan = true
   }
-  
+
   include_dirs = [
     "include",
     "${common_path}/include",
