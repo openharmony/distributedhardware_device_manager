@@ -134,6 +134,9 @@ if (defined(ohos_lite)) {
 
     sanitize = {
       boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
       integer_overflow = true
       ubsan = true
     }
