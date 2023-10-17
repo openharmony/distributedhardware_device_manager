@@ -748,12 +748,6 @@ config("device_manager_test_common_public_config") {
 }
 
 ohos_static_library("device_manager_test_common") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
   testonly = true
 
   cflags_cc = []

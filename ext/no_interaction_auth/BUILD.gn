@@ -22,12 +22,6 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("devicemanagerext_no_interaction_auth") {
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-    }
-
     include_dirs = [
       "include",
       "${common_path}/include",
