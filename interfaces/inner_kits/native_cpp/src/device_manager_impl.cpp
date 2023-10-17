@@ -1511,7 +1511,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
 
     LOGI("StopDiscovering completed, pkgName: %s", pkgName.c_str());
-    return DM_OK; 
+    return DM_OK;
 }
 
 int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
@@ -1548,7 +1548,7 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
     extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
 
     LOGI("UnRegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
-    return DM_OK;  
+    return DM_OK;
 }
 
 int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
@@ -1583,7 +1583,7 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
     }
     advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
     LOGI("DeviceManagerImpl::StopAdvertising completed, pkgName: %s", pkgName.c_str());
-    return DM_OK; 
+    return DM_OK;
 }
 
 int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName,
