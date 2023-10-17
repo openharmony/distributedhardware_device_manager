@@ -289,6 +289,36 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) override;
     virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        int32_t &netWorkType) override;
+
+    // The following interfaces are provided since OpenHarmony 4.1 Version.
+    virtual int32_t StartDiscovering(const std::string &pkgName, std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions, std::shared_ptr<DiscoveryCallback> callback) override;
+
+    virtual int32_t StopDiscovering(const std::string &pkgName,
+        std::map<std::string, std::string> &discoverParam) override;
+
+    virtual int32_t RegisterDiscoveryCallback(const std::string &pkgName,
+        std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
+        std::shared_ptr<DiscoveryCallback> callback) override;
+
+    virtual int32_t UnRegisterDiscoveryCallback(const std::string &pkgName) override;
+
+    virtual int32_t StartAdvertising(const std::string &pkgName, std::map<std::string, std::string> &advertiseParam,
+        std::shared_ptr<PublishCallback> callback) override;
+
+    virtual int32_t StopAdvertising(const std::string &pkgName,
+        std::map<std::string, std::string> &advertiseParam) override;
+
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName,
+        const std::map<std::string, std::string> &filterOptions, bool isRefresh,
+        std::vector<DmDeviceBasicInfo> &deviceList) override;
+
+    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName,
+        const std::map<std::string, std::string> &extraParam,
+        std::shared_ptr<DeviceStatusCallback> callback) override;
+
+    virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) override;
+
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
@@ -297,6 +327,11 @@ private:
     DeviceManagerImpl(DeviceManagerImpl &&) = delete;
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
 
+    uint16_t AddDiscoveryCallback(const std::string &pkgName, std::shared_ptr<DiscoveryCallback> callback);
+    uint16_t RemoveDiscoveryCallback(const std::string &pkgName);
+    int32_t AddPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback);
+    int32_t RemovePublishCallback(const std::string &pkgName);
+
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
@@ -304,6 +339,12 @@ private:
 #endif
     std::mutex subscribIdLock;
     std::map<uint64_t, uint16_t> subscribIdMap_;
+
+    std::mutex subMapLock;
+    std::map<std::string, uint16_t> pkgName2SubIdMap_;
+
+    std::mutex pubMapLock;
+    std::map<std::string, uint16_t> pkgName2PubIdMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

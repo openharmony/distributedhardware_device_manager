@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "default_dm_service_impl_ext.h"
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
 #include "dm_common_event_manager.h"
@@ -28,6 +29,7 @@
 #include "dm_discovery_manager.h"
 #include "dm_publish_manager.h"
 #include "idevice_manager_service_impl.h"
+#include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
 
@@ -108,10 +110,31 @@ public:
 
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
 
+    // The following interfaces are provided since OpenHarmony 4.1 Version.
+    int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    int32_t StopDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam);
+
+    int32_t EnableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
+
+    int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
+
+    int32_t StopAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
+
+    int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
+    void LoadDMServiceAdapter(const std::shared_ptr<IDeviceManagerServiceListener> &listener);
+    void UnloadDMServiceAdapter();
+
 private:
+    std::mutex isAdapterLoadLock_;
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
     std::shared_ptr<DmDiscoveryManager> discoveryMgr_;
@@ -121,6 +144,7 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
+    std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

@@ -58,6 +58,19 @@ enum {
     ERR_DM_PUBLISH_FAILED = -20029,
     ERR_DM_PUBLISH_REPEATED = -20030,
     ERR_DM_STOP_DISCOVERY = -20031,
+
+    // The following error codes are provided since OpenHarmony 4.1 Version.
+    ERR_DM_ADAPTER_NOT_INIT = -20032,
+    ERR_DM_UNSUPPORTED_METHOD = -20033,
+    ERR_DM_BIND_COMMON_FAILED = -20034,
+    ERR_DM_BIND_INPUT_PARA_INVALID = -20035,
+    ERR_DM_BIND_PIN_CODE_ERROR = -20036,
+    ERR_DM_BIND_PEER_REJECT = -20037,
+    ERR_DM_BIND_TIMEOUT_FAILED = -20038,
+    ERR_DM_BIND_DP_ERROR = -20039,
+    ERR_DM_BIND_HICHAIN_ERROR = -20040,
+    ERR_DM_BIND_SOFTBUS_ERROR = -20041,
+    ERR_DM_BIND_USER_CANCEL_ERROR = -20042,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -104,6 +117,27 @@ constexpr const char* EVENT_CONFIRM_CODE = "0";
 constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
 
+// Connection address type
+const std::string CONN_ADDR_TYPE_BR = "BR_TYPE";
+const std::string CONN_ADDR_TYPE_BLE = "BLE_TYPE";
+const std::string CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
+
+// Parameter Key
+const std::string PARAM_KEY_T_TYPE = "T_TYPE";
+const std::string PARAM_KEY_TARGET_ID = "TARGET_ID";
+const std::string PARAM_KEY_BR_MAC = "BR_MAC";
+const std::string PARAM_KEY_BLE_MAC = "BLE_MAC";
+const std::string PARAM_KEY_WIFI_IP = "WIFI_IP";
+const std::string PARAM_KEY_WIFI_PORT = "WIFI_PORT";
+const std::string PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
+const std::string PARAM_KEY_APP_DESC = "APP_DESC";
+const std::string PARAM_KEY_CUSTOM_DATA = "CUSTOM_DATA";
+const std::string PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
+const std::string PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
+const std::string PARAM_KEY_DISC_MEDIUM = "SUBSCRIBE_ID";
+const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
+const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
+const std::string PARAM_KEY_DISC_INCLUDE_TRUST = "DISC_INCLUDE_TRUST";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

@@ -17,6 +17,7 @@
 #define OHOS_DM_DEVICE_INFO_H
 
 #include <cstdint>
+#include <map>
 #include <string>
 
 #include "dm_app_image_info.h"
@@ -174,6 +175,11 @@ typedef struct DmDeviceInfo {
      * Device authentication form.
      */
     DmAuthForm authForm;
+    /**
+     * Extra data of the device.
+     * include keys: ""CONN_ADDR_TYPE"", "BR_MAC_", "BLE_MAC", "WIFI_IP", "WIFI_PORT", "CUSTOM_DATA"
+     */
+    std::map<std::string, std::string> extraData;
 } DmDeviceInfo;
 
 /**
@@ -197,6 +203,10 @@ DmDeviceBasicInfo {
      * NetworkId of the device.
      */
     char networkId[DM_MAX_DEVICE_ID_LEN];
+    /**
+     * Extra data of the device.
+     */
+    std::map<std::string, std::string> extraData;
 } DmDeviceBasicInfo;
 
 /**

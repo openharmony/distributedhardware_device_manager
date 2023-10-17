@@ -885,5 +885,149 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
     SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
     return DM_OK;
 }
+
+int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StartDiscovering for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("StartDiscovering failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->StartDiscovering(pkgName, discoverParam, filterOptions);
+}
+
+int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StopDiscovering for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("StopDiscovering failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->StopDiscovering(pkgName, discoverParam);
+}
+
+int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::EnableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("EnableDiscoveryListener failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+}
+
+int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgName,
+    const std::map<std::string, std::string> &extraParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::DisableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("DisableDiscoveryListener failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->DisableDiscoveryListener(pkgName, extraParam);
+}
+
+int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
+    const std::map<std::string, std::string> &advertiseParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StartAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("StartAdvertising failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->StartAdvertising(pkgName, advertiseParam);
+}
+
+int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
+    const std::map<std::string, std::string> &advertiseParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StopAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("StopAdvertising failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->StopAdvertising(pkgName, advertiseParam);
+}
+
+int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName,
+    const std::map<std::string, std::string> &filterOptions, bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList)
+{
+    (void)filterOptions;
+    LOGI("DeviceManagerService::GetTrustedDeviceList for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (softbusListener_ == nullptr) {
+        LOGE("GetTrustedDeviceList failed, softbus listener has not ready.");
+        return ERR_DM_NOT_INIT;
+    }
+    ShiftLNNGear(pkgName, pkgName, isRefresh);
+    return GetAvailableDeviceList(pkgName, deviceList);
+}
+
+int32_t DeviceManagerService::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("CheckAccessToTarget failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->CheckAccessToTarget(tokenId, targetId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

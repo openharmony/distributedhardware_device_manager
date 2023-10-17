@@ -16,6 +16,7 @@
 #ifndef OHOS_DEVICE_MANAGER_H
 #define OHOS_DEVICE_MANAGER_H
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -403,6 +404,94 @@ public:
      */
     virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName,
         const std::string &netWorkId, int32_t &netWorkType) = 0;
+
+    // The following interfaces are provided since OpenHarmony 4.1 Version.
+    /**
+     * @brief Start to discover nearby devices or services.
+     * @param pkgName       package name.
+     * @param discoverParam discover parameters.
+     * @param filterOptions filter option parameters.
+     * @param callback      discovery callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StartDiscovering(const std::string &pkgName, std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions, std::shared_ptr<DiscoveryCallback> callback) = 0;
+
+    /**
+     * @brief Stop discovering nearby devices or services.
+     * @param pkgName       package name.
+     * @param discoverParam discover parameters.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StopDiscovering(const std::string &pkgName, std::map<std::string, std::string> &discoverParam) = 0;
+
+    /**
+     * @brief Registerthe discovery callback.
+     * @param pkgName       package name.
+     * @param discoverParam discover parameters.
+     * @param filterOptions filter option parameters.
+     * @param callback      discovery callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t RegisterDiscoveryCallback(const std::string &pkgName,
+        std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
+        std::shared_ptr<DiscoveryCallback> callback) = 0;
+
+    /**
+     * @brief UnRegisterthe discovery callback.
+     * @param pkgName       package name.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnRegisterDiscoveryCallback(const std::string &pkgName) = 0;
+
+    /**
+     * @brief Start to advertise the nearby devices or services.
+     * @param pkgName        package name.
+     * @param advertiseParam advertise parameters.
+     * @param callback       advertise callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StartAdvertising(const std::string &pkgName, std::map<std::string, std::string> &advertiseParam,
+        std::shared_ptr<PublishCallback> callback) = 0;
+
+    /**
+     * @brief Stop to advertise the nearby devices or services.
+     * @param pkgName        package name.
+     * @param advertiseParam advertise parameters.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t StopAdvertising(const std::string &pkgName, std::map<std::string, std::string> &advertiseParam) = 0;
+
+    /**
+     * @brief Get device info list of trusted devices.
+     * @param pkgName        package name.
+     * @param filterOptions  filter option parameters.
+     * @param isRefresh      refresh the list quickly.
+     * @param deviceList     device info list.
+     * @return Returns a list of trusted devices.
+     */
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName,
+        const std::map<std::string, std::string> &filterOptions, bool isRefresh,
+        std::vector<DmDeviceBasicInfo> &deviceList) = 0;
+
+    /**
+     * @brief Register device status callback.
+     * @param pkgName     package name.
+     * @param extraParam  extra parameters.
+     * @param callback    device status callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName,
+        const std::map<std::string, std::string> &extraParam,
+        std::shared_ptr<DeviceStatusCallback> callback) = 0;
+
+    /**
+     * @brief Check the specific caller whether has permission to access the target.
+     * @param tokenId  the caller token id.
+     * @param targetId the target id.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
