@@ -475,15 +475,15 @@ public:
         std::vector<DmDeviceBasicInfo> &deviceList) = 0;
 
     /**
-     * @brief Register device status callback.
+     * @brief Register device state callback.
      * @param pkgName     package name.
      * @param extraParam  extra parameters.
      * @param callback    device status callback.
      * @return Returns 0 if success.
      */
-    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName,
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName,
         const std::map<std::string, std::string> &extraParam,
-        std::shared_ptr<DeviceStatusCallback> callback) = 0;
+        std::shared_ptr<DeviceStateCallback> callback) = 0;
 
     /**
      * @brief Check the specific caller whether has permission to access the target.

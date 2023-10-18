@@ -203,10 +203,6 @@ DmDeviceBasicInfo {
      * NetworkId of the device.
      */
     char networkId[DM_MAX_DEVICE_ID_LEN];
-    /**
-     * Extra data of the device.
-     */
-    std::map<std::string, std::string> extraData;
 } DmDeviceBasicInfo;
 
 /**

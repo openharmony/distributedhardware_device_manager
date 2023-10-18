@@ -1598,18 +1598,18 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName,
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
+int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam,
-    std::shared_ptr<DeviceStatusCallback> callback)
+    std::shared_ptr<DeviceStateCallback> callback)
 {
     (void)extraParam;
     if (pkgName.empty() || callback == nullptr) {
-        LOGE("DeviceManagerImpl::RegisterDevStatusCallback failed: input pkgName or callback is empty.");
+        LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
-    LOGI("DeviceManagerImpl::RegisterDevStatusCallback completed, pkgName: %s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    LOGI("DeviceManagerImpl::RegisterDeviceStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 

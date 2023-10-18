@@ -313,9 +313,9 @@ public:
         const std::map<std::string, std::string> &filterOptions, bool isRefresh,
         std::vector<DmDeviceBasicInfo> &deviceList) override;
 
-    virtual int32_t RegisterDevStatusCallback(const std::string &pkgName,
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName,
         const std::map<std::string, std::string> &extraParam,
-        std::shared_ptr<DeviceStatusCallback> callback) override;
+        std::shared_ptr<DeviceStateCallback> callback) override;
 
     virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) override;
 

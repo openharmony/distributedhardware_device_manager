@@ -34,8 +34,33 @@
 #include "ipc_notify_verify_auth_result_req.h"
 #include "ipc_server_stub.h"
 
+#include "nlohmann/json.hpp"
+
 namespace OHOS {
 namespace DistributedHardware {
+void BuildIpcInnerDeviceInfo(const DmDeviceInfo &dmDevInfo, IpcInnerDeviceInfo &ipcDevInfo)
+{
+    std::string devIdStr(dmDevInfo.deviceId);
+    ipcDevInfo.deviceId = devIdStr;
+
+    std::string devNameStr(dmDevInfo.deviceName);
+    ipcDevInfo.deviceName = devNameStr;
+
+    std::string networkIdStr(dmDevInfo.networkId);
+    ipcDevInfo.networkId = networkIdStr;
+
+    ipcDevInfo.deviceTypeId = dmDevInfo.deviceTypeId;
+    ipcDevInfo.range = dmDevInfo.range;
+    ipcDevInfo.networkType = dmDevInfo.networkType;
+    ipcDevInfo.authForm = (int32_t)dmDevInfo.authForm;
+
+    nlohmann::json jsonObj;
+    for (const auto &it : dmDevInfo.extraData) {
+        jsonObj[it.first] = it.second;
+    }
+    ipcDevInfo.extraDataStr = jsonObj.dump();
+}
+
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
@@ -55,8 +80,10 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
         LOGE("write state failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    IpcInnerDeviceInfo ipcDevInfo;
+    BuildIpcInnerDeviceInfo(deviceInfo, ipcDevInfo);
+    if (!data.WriteRawData(&ipcDevInfo, sizeof(IpcInnerDeviceInfo))) {
+        LOGE("write ipc inner device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
@@ -94,8 +121,10 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
         LOGE("write subscribeId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    IpcInnerDeviceInfo ipcDevInfo;
+    BuildIpcInnerDeviceInfo(deviceInfo, ipcDevInfo);
+    if (!data.WriteRawData(&ipcDevInfo, sizeof(IpcInnerDeviceInfo))) {
+        LOGE("write ipc inner device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -350,8 +379,10 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
             deviceInfo = deviceList.back();
             deviceList.pop_back();
 
-            if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-                LOGE("write subscribeInfo failed");
+            IpcInnerDeviceInfo ipcDevInfo;
+            BuildIpcInnerDeviceInfo(deviceInfo, ipcDevInfo);
+            if (!reply.WriteRawData(&ipcDevInfo, sizeof(IpcInnerDeviceInfo))) {
+                LOGE("write ipc inner device info failed");
                 return ERR_DM_IPC_WRITE_FAILED;
             }
         }
@@ -554,8 +585,10 @@ ON_IPC_CMD(GET_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
     DmDeviceInfo deviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
 
-    if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    IpcInnerDeviceInfo ipcDevInfo;
+    BuildIpcInnerDeviceInfo(deviceInfo, ipcDevInfo);
+    if (!reply.WriteRawData(&ipcDevInfo, sizeof(IpcInnerDeviceInfo))) {
+        LOGE("write ipc inner device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
 
@@ -572,8 +605,10 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
     DmDeviceInfo localDeviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);
 
-    if (!reply.WriteRawData(&localDeviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write localDeviceInfo failed");
+    IpcInnerDeviceInfo ipcDevInfo;
+    BuildIpcInnerDeviceInfo(localDeviceInfo, ipcDevInfo);
+    if (!reply.WriteRawData(&ipcDevInfo, sizeof(IpcInnerDeviceInfo))) {
+        LOGE("write ipc inner device info failed");
     }
 
     if (!reply.WriteInt32(result)) {
