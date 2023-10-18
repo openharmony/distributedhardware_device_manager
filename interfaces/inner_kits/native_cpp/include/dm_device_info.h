@@ -179,7 +179,22 @@ typedef struct DmDeviceInfo {
      * Extra data of the device.
      * include keys: ""CONN_ADDR_TYPE"", "BR_MAC_", "BLE_MAC", "WIFI_IP", "WIFI_PORT", "CUSTOM_DATA"
      */
-    std::map<std::string, std::string> extraData;
+    std::map<std::string, std::string> extraData = {};
+
+    DmDeviceInfo& operator=(const DmDeviceInfo& other)
+    {
+        (void)memcpy_s(deviceId, sizeof(deviceId), other.deviceId, sizeof(other.deviceId));
+        (void)memcpy_s(networkId, sizeof(networkId), other.networkId, sizeof(other.networkId));
+        (void)memcpy_s(deviceName, sizeof(deviceName), other.deviceName, sizeof(other.deviceName));
+        range = other.range;
+        authForm = other.authForm;
+        networkType = other.networkType;
+        deviceTypeId = other.deviceTypeId;
+        if (!other.extraData.empty()) {
+            extraData.insert(other.extraData.begin(), other.extraData.end());
+        }
+        return *this;
+    }
 } DmDeviceInfo;
 
 /**

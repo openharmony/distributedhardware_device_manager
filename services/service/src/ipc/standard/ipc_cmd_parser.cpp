@@ -40,25 +40,26 @@ namespace OHOS {
 namespace DistributedHardware {
 void BuildIpcInnerDeviceInfo(const DmDeviceInfo &dmDevInfo, IpcInnerDeviceInfo &ipcDevInfo)
 {
-    std::string devIdStr(dmDevInfo.deviceId);
-    ipcDevInfo.deviceId = devIdStr;
-
-    std::string devNameStr(dmDevInfo.deviceName);
-    ipcDevInfo.deviceName = devNameStr;
-
-    std::string networkIdStr(dmDevInfo.networkId);
-    ipcDevInfo.networkId = networkIdStr;
+    (void)memcpy_s(ipcDevInfo.deviceId, sizeof(ipcDevInfo.deviceId), dmDevInfo.deviceId,
+        sizeof(dmDevInfo.deviceId));
+    (void)memcpy_s(ipcDevInfo.deviceName, sizeof(ipcDevInfo.deviceName), dmDevInfo.deviceName,
+        sizeof(dmDevInfo.deviceName));
+    (void)memcpy_s(ipcDevInfo.networkId, sizeof(ipcDevInfo.networkId), dmDevInfo.networkId,
+        sizeof(dmDevInfo.networkId));
 
     ipcDevInfo.deviceTypeId = dmDevInfo.deviceTypeId;
     ipcDevInfo.range = dmDevInfo.range;
     ipcDevInfo.networkType = dmDevInfo.networkType;
     ipcDevInfo.authForm = (int32_t)dmDevInfo.authForm;
 
-    nlohmann::json jsonObj;
-    for (const auto &it : dmDevInfo.extraData) {
-        jsonObj[it.first] = it.second;
+    ipcDevInfo.extraDataStr = "";
+    if (!dmDevInfo.extraData.empty()) {
+        nlohmann::json jsonObj;
+        for (const auto &it : dmDevInfo.extraData) {
+            jsonObj[it.first] = it.second;
+        }
+        ipcDevInfo.extraDataStr = jsonObj.dump();
     }
-    ipcDevInfo.extraDataStr = jsonObj.dump();
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)

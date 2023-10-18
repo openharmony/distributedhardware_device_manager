@@ -64,14 +64,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void BuildDmDeviceInfo(const IpcInnerDeviceInfo &ipcDevInfo, DmDeviceInfo &dmDevInfo)
 {
-    std::string devIdStr = ipcDevInfo.deviceId;
-    (void)memcpy_s(dmDevInfo.deviceId, DM_MAX_DEVICE_ID_LEN, devIdStr.c_str(), devIdStr.length());
-
-    std::string devNameStr = ipcDevInfo.deviceName;
-    (void)memcpy_s(dmDevInfo.deviceName, DM_MAX_DEVICE_ID_LEN, devNameStr.c_str(), devNameStr.length());
-
-    std::string networkIdStr = ipcDevInfo.networkId;
-    (void)memcpy_s(dmDevInfo.networkId, DM_MAX_DEVICE_ID_LEN, networkIdStr.c_str(), networkIdStr.length());
+    (void)memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), ipcDevInfo.deviceId,
+        sizeof(ipcDevInfo.deviceId));
+    (void)memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), ipcDevInfo.deviceName,
+        sizeof(ipcDevInfo.deviceName));
+    (void)memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), ipcDevInfo.networkId,
+        sizeof(ipcDevInfo.networkId));
 
     dmDevInfo.deviceTypeId = ipcDevInfo.deviceTypeId;
     dmDevInfo.range = ipcDevInfo.range;
@@ -81,7 +79,6 @@ void BuildDmDeviceInfo(const IpcInnerDeviceInfo &ipcDevInfo, DmDeviceInfo &dmDev
     if (ipcDevInfo.extraDataStr.empty()) {
         return;
     }
-
     nlohmann::json extraDataJson = nlohmann::json::parse(ipcDevInfo.extraDataStr, nullptr, false);
     if (extraDataJson.is_discarded()) {
         return;
