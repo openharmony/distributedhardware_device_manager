@@ -188,65 +188,123 @@ public:
     virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
     /**
-     * @tc.name: DeviceManagerService::RequestCredential
+     * @tc.name: IDeviceManagerServiceImpl::RequestCredential
      * @tc.desc: RequestCredential of the Device Manager Service
      * @tc.type: FUNC
      */
     virtual int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
     /**
-     * @tc.name: DeviceManagerService::ImportCredential
+     * @tc.name: IDeviceManagerServiceImpl::ImportCredential
      * @tc.desc: ImportCredential of the Device Manager Service
      * @tc.type: FUNC
      */
     virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
     /**
-     * @tc.name: DeviceManagerService::DeleteCredential
+     * @tc.name: IDeviceManagerServiceImpl::DeleteCredential
      * @tc.desc: DeleteCredential of the Device Manager Service
      * @tc.type: FUNC
      */
     virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
     /**
-     * @tc.name: DeviceManagerService::RegisterCredentialCallback
+     * @tc.name: IDeviceManagerServiceImpl::RegisterCredentialCallback
      * @tc.desc: RegisterCredentialCallback
      * @tc.type: FUNC
      */
     virtual int32_t RegisterCredentialCallback(const std::string &pkgName);
     /**
-     * @tc.name: DeviceManagerService::UnRegisterCredentialCallback
+     * @tc.name: IDeviceManagerServiceImpl::UnRegisterCredentialCallback
      * @tc.desc: UnRegisterCredentialCallback
      * @tc.type: FUNC
      */
     virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName);
 
     /**
-     * @tc.name: DeviceManagerService::NotifyEvent
+     * @tc.name: IDeviceManagerServiceImpl::NotifyEvent
      * @tc.desc: NotifyEvent
      * @tc.type: FUNC
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     /**
-     * @tc.name: DeviceManagerService::GetGroupType
+     * @tc.name: IDeviceManagerServiceImpl::GetGroupType
      * @tc.desc: GetGroupType
      * @tc.type: FUNC
      */
     virtual int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
 
     /**
-     * @tc.name: DeviceManagerService::GetUdidHashByNetWorkId
+     * @tc.name: IDeviceManagerServiceImpl::GetUdidHashByNetWorkId
      * @tc.desc: GetUdidHashByNetWorkId
      * @tc.type: FUNC
      */
     virtual int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
 
     /**
-     * @tc.name: DeviceManagerService::LoadHardwareFwkService
+     * @tc.name: IDeviceManagerServiceImpl::LoadHardwareFwkService
      * @tc.desc: LoadHardwareFwkService
      * @tc.type: FUNC
      */
     virtual void LoadHardwareFwkService();
     virtual int32_t RegisterUiStateCallback(const std::string &pkgName);
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName);
+
+    // The following interfaces are provided since OpenHarmony 4.1 Version.
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::StartDiscovering
+     * @tc.desc: StartDiscovering
+     * @tc.type: FUNC
+     */
+    virtual int32_t StartDiscovering(const std::string &pkgName,
+        const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::StopDiscovering
+     * @tc.desc: StopDiscovering
+     * @tc.type: FUNC
+     */
+    virtual int32_t StopDiscovering(const std::string &pkgName,
+        const std::map<std::string, std::string> &discoverParam);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::EnableDiscoveryListener
+     * @tc.desc: EnableDiscoveryListener
+     * @tc.type: FUNC
+     */
+    virtual int32_t EnableDiscoveryListener(const std::string &pkgName,
+        const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::DisableDiscoveryListener
+     * @tc.desc: DisableDiscoveryListener
+     * @tc.type: FUNC
+     */
+    virtual int32_t DisableDiscoveryListener(const std::string &pkgName,
+        const std::map<std::string, std::string> &extraParam);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::StartAdvertising
+     * @tc.desc: StartAdvertising
+     * @tc.type: FUNC
+     */
+    virtual int32_t StartAdvertising(const std::string &pkgName,
+        const std::map<std::string, std::string> &advertiseParam);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::StopAdvertising
+     * @tc.desc: StopAdvertising
+     * @tc.type: FUNC
+     */
+    virtual int32_t StopAdvertising(const std::string &pkgName,
+        const std::map<std::string, std::string> &advertiseParam);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::CheckAccessToTarget
+     * @tc.desc: CheckAccessToTarget
+     * @tc.type: FUNC
+     */
+    virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

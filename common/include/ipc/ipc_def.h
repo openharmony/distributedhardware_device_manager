@@ -18,6 +18,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+#define DM_MAX_DEVICE_ID_LEN (96)
+#define DM_MAX_DEVICE_NAME_LEN (128)
+
+typedef struct IpcInnerDeviceInfo {
+    char deviceId[DM_MAX_DEVICE_ID_LEN];
+    char deviceName[DM_MAX_DEVICE_NAME_LEN];
+    uint16_t deviceTypeId;
+    char networkId[DM_MAX_DEVICE_ID_LEN];
+    int32_t range;
+    int32_t networkType;
+    int32_t authForm;
+    std::string extraDataStr;
+} IpcInnerDeviceInfo;
+
 #define DEVICE_MANAGER_SERVICE_NAME "dev_mgr_svc"
 #define MAX_DM_IPC_LEN 2048
 

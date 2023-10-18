@@ -15,6 +15,7 @@
 
 #include "device_manager_service_impl.h"
 
+#include <dlfcn.h>
 #include <functional>
 
 #include "dm_anonymous.h"
@@ -32,6 +33,8 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
+
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
     LOGI("DeviceManagerServiceImpl constructor");
@@ -69,6 +72,9 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
     }
+    if (dmServiceImplExt_ == nullptr) {
+        dmServiceImplExt_ = std::make_shared<DefaultDMServiceImplExt>();
+    }
 
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId > 0) {
@@ -85,6 +91,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         LOGI("subscribe service user switch common event success");
     }
 #endif
+    LoadDMServiceAdapter(listener);
     LOGI("Init success, singleton initialized");
     return DM_OK;
 }
@@ -104,6 +111,7 @@ void DeviceManagerServiceImpl::Release()
     softbusConnector_ = nullptr;
     abilityMgr_ = nullptr;
     hiChainConnector_ = nullptr;
+    UnloadDMServiceAdapter();
 }
 
 int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
@@ -511,6 +519,185 @@ int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+}
+
+void DeviceManagerServiceImpl::LoadDMServiceAdapter(const std::shared_ptr<IDeviceManagerServiceListener> &listener)
+{
+    LOGI("DeviceManagerServiceImpl::LoadDMServiceAdapter start.");
+    std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
+    char path[PATH_MAX + 1] = {0x00};
+    std::string soName = std::string(LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
+    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soName.c_str());
+        return;
+    }
+    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    if (so_handle == nullptr) {
+        LOGE("load dm service adapter so %s failed.", soName.c_str());
+        return;
+    }
+    dlerror();
+    auto func = (CreateDMServiceImplExtFuncPtr)dlsym(so_handle, "CreateDMServiceImplExtObject");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(so_handle);
+        LOGE("Create object function is not exist.");
+        return;
+    }
+
+    dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
+    if (dmServiceImplExt_->Initialize(listener) != DM_OK) {
+        dlclose(so_handle);
+        dmServiceImplExt_ = nullptr;
+        LOGE("dm service adapter impl ext init failed.");
+        return;
+    }
+    LOGI("DeviceManagerServiceImpl::LoadDMServiceAdapter sucess.");
+}
+
+void DeviceManagerServiceImpl::UnloadDMServiceAdapter()
+{
+    LOGI("DeviceManagerServiceImpl::UnloadDMServiceAdapter start.");
+    std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
+    if (dmServiceImplExt_ != nullptr) {
+        dmServiceImplExt_->Release();
+    }
+    dmServiceImplExt_ = nullptr;
+
+    char path[PATH_MAX + 1] = {0x00};
+    std::string soPathName = std::string(LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
+    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
+        (realpath(soPathName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soPathName.c_str());
+        return;
+    }
+    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    if (so_handle != nullptr) {
+        LOGI("dm service adapter so_handle is not nullptr.");
+        dlclose(so_handle);
+    }
+}
+
+int32_t DeviceManagerServiceImpl::StartDiscovering(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam,
+    const std::map<std::string, std::string> &filterOptions)
+{
+    LOGI("DeviceManagerServiceImpl::StartDiscovering for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("StartDiscovering failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->StartDiscoveringExt(pkgName, discoverParam, filterOptions);
+}
+
+int32_t DeviceManagerServiceImpl::StopDiscovering(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam)
+{
+    LOGI("DeviceManagerServiceImpl::StopDiscovering for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("StopDiscovering failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->StopDiscoveringExt(pkgName, discoverParam);
+}
+
+int32_t DeviceManagerServiceImpl::EnableDiscoveryListener(const std::string &pkgName,
+    const std::map<std::string, std::string> &discoverParam,
+    const std::map<std::string, std::string> &filterOptions)
+{
+    LOGI("DeviceManagerServiceImpl::EnableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("EnableDiscoveryListener failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->EnableDiscoveryListenerExt(pkgName, discoverParam, filterOptions);
+}
+
+int32_t DeviceManagerServiceImpl::DisableDiscoveryListener(const std::string &pkgName,
+    const std::map<std::string, std::string> &extraParam)
+{
+    LOGI("DeviceManagerServiceImpl::DisableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (extraParam.find(PARAM_KEY_T_TYPE) == extraParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("DisableDiscoveryListener failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->DisableDiscoveryListenerExt(pkgName, extraParam);
+}
+
+int32_t DeviceManagerServiceImpl::StartAdvertising(const std::string &pkgName,
+    const std::map<std::string, std::string> &advertiseParam)
+{
+    LOGI("DeviceManagerServiceImpl::StartAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (advertiseParam.find(PARAM_KEY_T_TYPE) == advertiseParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("StartAdvertising failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->StartAdvertisingExt(pkgName, advertiseParam);
+}
+
+int32_t DeviceManagerServiceImpl::StopAdvertising(const std::string &pkgName,
+    const std::map<std::string, std::string> &advertiseParam)
+{
+    LOGI("DeviceManagerServiceImpl::StopAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (advertiseParam.find(PARAM_KEY_T_TYPE) == advertiseParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmServiceImplExt_ == nullptr) {
+        LOGE("StopAdvertising failed, dm service impl ext has not init or init failed.");
+        return ERR_DM_ADAPTER_NOT_INIT;
+    }
+    return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
+}
+
+int32_t DeviceManagerServiceImpl::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
+{
+    (void)tokenId;
+    (void)targetId;
+    return DM_OK;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

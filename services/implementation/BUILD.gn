@@ -130,6 +130,7 @@ if (defined(ohos_lite)) {
       "include/credential",
       "include/devicestate",
       "include/discovery",
+      "include/extension",
       "include/publish",
       "include/dependency/commonevent",
       "include/dependency/multipleuser",
@@ -179,6 +180,7 @@ if (defined(ohos_lite)) {
       "src/devicestate/dm_device_state_manager.cpp",
       "src/discovery/dm_discovery_filter.cpp",
       "src/discovery/dm_discovery_manager.cpp",
+      "src/extension/default_dm_service_impl_ext.cpp",
       "src/publish/dm_publish_manager.cpp",
     ]
 

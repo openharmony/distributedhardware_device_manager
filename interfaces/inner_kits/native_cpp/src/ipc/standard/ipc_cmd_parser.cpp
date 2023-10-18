@@ -55,10 +55,39 @@
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
 #include "securec.h"
+
+#include "nlohmann/json.hpp"
+
 namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {
+void BuildDmDeviceInfo(const IpcInnerDeviceInfo &ipcDevInfo, DmDeviceInfo &dmDevInfo)
+{
+    (void)memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), ipcDevInfo.deviceId,
+        sizeof(ipcDevInfo.deviceId));
+    (void)memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), ipcDevInfo.deviceName,
+        sizeof(ipcDevInfo.deviceName));
+    (void)memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), ipcDevInfo.networkId,
+        sizeof(ipcDevInfo.networkId));
+
+    dmDevInfo.deviceTypeId = ipcDevInfo.deviceTypeId;
+    dmDevInfo.range = ipcDevInfo.range;
+    dmDevInfo.networkType = ipcDevInfo.networkType;
+    dmDevInfo.authForm = (DmAuthForm)ipcDevInfo.authForm;
+
+    if (ipcDevInfo.extraDataStr.empty()) {
+        return;
+    }
+    nlohmann::json extraDataJson = nlohmann::json::parse(ipcDevInfo.extraDataStr, nullptr, false);
+    if (extraDataJson.is_discarded()) {
+        return;
+    }
+    for (auto &element : extraDataJson.items()) {
+        dmDevInfo.extraData.insert(std::pair<std::string, std::string>(element.key(), element.value()));
+    }
+}
+
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcRegisterListenerReq> pReq = std::static_pointer_cast<IpcRegisterListenerReq>(pBaseReq);
@@ -128,12 +157,12 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
     int32_t deviceNum = reply.ReadInt32();
     if (deviceNum > 0 && deviceNum <= INT32_MAX) {
         std::vector<DmDeviceInfo> deviceInfoVec;
-        DmDeviceInfo *pDmDeviceinfo = nullptr;
+        IpcInnerDeviceInfo *pIpcDevInfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
-            pDmDeviceinfo = nullptr;
-            pDmDeviceinfo = (DmDeviceInfo *)reply.ReadRawData(sizeof(DmDeviceInfo));
-            if (pDmDeviceinfo == nullptr) {
-                LOGE("GetTrustedDeviceList read node info failed!");
+            pIpcDevInfo = nullptr;
+            pIpcDevInfo = (IpcInnerDeviceInfo *)reply.ReadRawData(sizeof(IpcInnerDeviceInfo));
+            if (pIpcDevInfo == nullptr) {
+                LOGE("GetTrustedDeviceList read ipc inner device info failed!");
                 if (pRsp == nullptr) {
                     LOGE("pRsp is null");
                     return ERR_DM_FAILED;
@@ -141,7 +170,9 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
                 pRsp->SetErrCode(ERR_DM_IPC_WRITE_FAILED);
                 return ERR_DM_IPC_WRITE_FAILED;
             }
-            deviceInfoVec.emplace_back(*pDmDeviceinfo);
+            DmDeviceInfo dmDevInfo;
+            BuildDmDeviceInfo(*pIpcDevInfo, dmDevInfo);
+            deviceInfoVec.emplace_back(dmDevInfo);
         }
         pRsp->SetDeviceVec(deviceInfoVec);
     }
@@ -200,10 +231,11 @@ ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessagePar
 ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
-    DmDeviceInfo *deviceInfo =
-        static_cast<DmDeviceInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceInfo))));
-    if (deviceInfo != nullptr) {
-        pRsp->SetDeviceInfo(*deviceInfo);
+    IpcInnerDeviceInfo *ipcDevInfo = (IpcInnerDeviceInfo *)reply.ReadRawData(sizeof(IpcInnerDeviceInfo));
+    if (ipcDevInfo != nullptr) {
+        DmDeviceInfo dmDevInfo;
+        BuildDmDeviceInfo(*ipcDevInfo, dmDevInfo);
+        pRsp->SetDeviceInfo(dmDevInfo);
     }
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -222,10 +254,11 @@ ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Mess
 ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
-    DmDeviceInfo *localDeviceInfo =
-        static_cast<DmDeviceInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceInfo))));
-    if (localDeviceInfo != nullptr) {
-        pRsp->SetLocalDeviceInfo(*localDeviceInfo);
+    IpcInnerDeviceInfo *ipcDevInfo = (IpcInnerDeviceInfo *)reply.ReadRawData(sizeof(IpcInnerDeviceInfo));
+    if (ipcDevInfo != nullptr) {
+        DmDeviceInfo dmDevInfo;
+        BuildDmDeviceInfo(*ipcDevInfo, dmDevInfo);
+        pRsp->SetLocalDeviceInfo(dmDevInfo);
     }
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -694,12 +727,11 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     std::string pkgName = data.ReadString();
     DmDeviceState deviceState = static_cast<DmDeviceState>(data.ReadInt32());
     DmDeviceInfo dmDeviceInfo;
-    size_t deviceSize = sizeof(DmDeviceInfo);
-    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
-    if (deviceInfo != nullptr && memcpy_s(&dmDeviceInfo, deviceSize, deviceInfo, deviceSize) != 0) {
-        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
-        return DM_OK;
+    IpcInnerDeviceInfo *ipcDevInfo = (IpcInnerDeviceInfo *)data.ReadRawData(sizeof(IpcInnerDeviceInfo));
+    if (ipcDevInfo != nullptr) {
+        BuildDmDeviceInfo(*ipcDevInfo, dmDeviceInfo);
     }
+
     DmDeviceBasicInfo dmDeviceBasicInfo;
     size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
     void *deviceBasicInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceBasicSize)));
@@ -738,11 +770,9 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
-    size_t deviceSize = sizeof(DmDeviceInfo);
-    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
-    if (deviceInfo != nullptr && memcpy_s(&dmDeviceInfo, deviceSize, deviceInfo, deviceSize) != 0) {
-        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
-        return ERR_DM_IPC_COPY_FAILED;
+    IpcInnerDeviceInfo *ipcDevInfo = (IpcInnerDeviceInfo *)data.ReadRawData(sizeof(IpcInnerDeviceInfo));
+    if (ipcDevInfo != nullptr) {
+        BuildDmDeviceInfo(*ipcDevInfo, dmDeviceInfo);
     }
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
     reply.WriteInt32(DM_OK);

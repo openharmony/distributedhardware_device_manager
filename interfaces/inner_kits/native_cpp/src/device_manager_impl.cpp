@@ -86,7 +86,10 @@ constexpr const char* DM_HITRACE_START_DEVICE = "DM_HITRACE_START_DEVICE";
 constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_DEVICE_INFO";
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
+
+const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
+const uint16_t DM_INVALID_FLAG_ID = 0;
 
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
@@ -1468,6 +1471,213 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
     }
     netWorkType = rsp->GetNetworkType();
     return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
+    std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
+    std::shared_ptr<DiscoveryCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::StartDiscovering failed: input callback is null or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("StartDiscovering start, pkgName: %s", pkgName.c_str());
+    DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
+
+    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+
+    DmTraceEnd();
+    LOGI("StartDiscovering completed, pkgName: %s", pkgName.c_str());
+    SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
+        std::string(START_DEVICE_DISCOVERY_SUCCESS_MSG));
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
+    std::map<std::string, std::string> &discoverParam)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::StopDiscovering failed: input pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("StopDiscovering start, pkgName: %s", pkgName.c_str());
+
+    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+
+    LOGI("StopDiscovering completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
+    std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
+    std::shared_ptr<DiscoveryCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::RegisterDiscoveryCallback failed: input callback is null or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("RegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
+
+    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+
+    LOGI("EnableDiscoveryListener completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: input pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("UnRegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
+
+    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: cannot find pkgName in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> extraParam;
+    extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+
+    LOGI("UnRegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
+    std::map<std::string, std::string> &advertiseParam, std::shared_ptr<PublishCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::StartAdvertising error: pkgName %s invalid para", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::StartAdvertising start, pkgName %s", pkgName.c_str());
+
+    int32_t publishId = AddPublishCallback(pkgName, callback);
+    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
+
+    LOGI("DeviceManagerImpl::StartAdvertising completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
+    std::map<std::string, std::string> &advertiseParam)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::StopAdvertising failed: input pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::StopAdvertising start, pkgName: %s", pkgName.c_str());
+
+    int32_t publishId = RemovePublishCallback(pkgName);
+    if (publishId == DM_INVALID_FLAG_ID) {
+        LOGE("DeviceManagerImpl::StopAdvertising failed: cannot find pkgName in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
+    LOGI("DeviceManagerImpl::StopAdvertising completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName,
+    const std::map<std::string, std::string> &filterOptions, bool isRefresh,
+    std::vector<DmDeviceBasicInfo> &deviceList)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::GetTrustedDeviceList failed: input pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
+    const std::map<std::string, std::string> &extraParam,
+    std::shared_ptr<DeviceStateCallback> callback)
+{
+    (void)extraParam;
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    LOGI("DeviceManagerImpl::RegisterDeviceStateCallback completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
+{
+    LOGI("DeviceManagerImpl::CheckAccessToTarget start");
+    return DM_OK;
+}
+
+uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
+    std::shared_ptr<DiscoveryCallback> callback)
+{
+    uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subMapLock);
+        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
+            subscribeId = pkgName2SubIdMap_[pkgName];
+        } else {
+            subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            pkgName2SubIdMap_[pkgName] = subscribeId;
+        }
+    }
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
+    return subscribeId;
+}
+
+uint16_t DeviceManagerImpl::RemoveDiscoveryCallback(const std::string &pkgName)
+{
+    uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subMapLock);
+        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
+            subscribeId = pkgName2SubIdMap_[pkgName];
+            pkgName2SubIdMap_.erase(pkgName);
+        }
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    return subscribeId;
+}
+
+int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback)
+{
+    int32_t publishId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(pubMapLock);
+        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
+            publishId = pkgName2PubIdMap_[pkgName];
+        } else {
+            publishId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            pkgName2PubIdMap_[pkgName] = publishId;
+        }
+    }
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
+    return publishId;
+}
+
+int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
+{
+    uint16_t publishId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subMapLock);
+        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
+            publishId = pkgName2PubIdMap_[pkgName];
+            pkgName2PubIdMap_.erase(pkgName);
+        }
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    return publishId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

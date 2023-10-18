@@ -152,6 +152,27 @@ public:
     int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId, int32_t &networkType);
     int32_t RegisterUiStateCallback(const std::string &pkgName);
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
+
+    // The following interfaces are provided since OpenHarmony 4.1 Version.
+    int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    int32_t StopDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam);
+
+    int32_t EnableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
+        const std::map<std::string, std::string> &filterOptions);
+
+    int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
+
+    int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
+
+    int32_t StopAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
+
+    int32_t GetTrustedDeviceList(const std::string &pkgName, const std::map<std::string, std::string> &filterOptions,
+        bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList);
+
+    int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
+
 private:
     bool isImplsoLoaded_ = false;
     std::mutex isImplLoadLock_;
