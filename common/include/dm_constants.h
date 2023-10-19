@@ -71,6 +71,15 @@ enum {
     ERR_DM_BIND_HICHAIN_ERROR = -20040,
     ERR_DM_BIND_SOFTBUS_ERROR = -20041,
     ERR_DM_BIND_USER_CANCEL_ERROR = -20042,
+    ERR_DM_STOP_PUBLISH_LNN_FAILED = -20043,
+    ERR_DM_REFRESH_LNN_FAILED = -20044,
+    ERR_DM_STOP_REFRESH_LNN_FAILED = -20045,
+    ERR_DM_START_ADVERTISING_FAILED = -20046,
+    ERR_DM_STOP_ADVERTISING_FAILED = -20047,
+    ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED = -20048,
+    ERR_DM_DISABLE_DISCOVERY_LISTENER_FAILED = -20049,
+    ERR_DM_START_DISCOVERING_FAILED = -20050,
+    ERR_DM_STOP_DISCOVERING_FAILED = -20051,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -85,6 +94,7 @@ constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 const static char *DM_CAPABILITY_OSD = "osdCapability";
+const static char *DM_CAPABILITY_APPROACH = "approach";
 
 // Auth
 constexpr const char* AUTH_TYPE = "authType";
@@ -116,6 +126,11 @@ constexpr const char* EVENT_INIT = "EVENT_INIT";
 constexpr const char* EVENT_CONFIRM_CODE = "0";
 constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
+
+// Key of filter parameter
+const std::string FILTER_PARA_DEVICE_TYPE = "DEVICE_TYPE";
+const std::string FILTER_PARA_RANGE = "RANGE";
+const std::string FILTER_PARA_IS_TRUSTED = "IS_TRUSTED";
 
 // Connection address type
 const std::string CONN_ADDR_TYPE_BR = "BR_TYPE";

@@ -966,5 +966,34 @@ ON_IPC_CMD(UNREGISTER_UI_STATE_CALLBACK, MessageParcel &data, MessageParcel &rep
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(REGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    uint16_t subscribeId = data.ReadUint16();
+    std::map<std::string, std::string> discoverParam;
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::map<std::string, std::string> filterOptions;
+    int32_t result = DeviceManagerService::GetInstance().EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNREGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    uint16_t subscribeId = data.ReadUint16();
+    std::map<std::string, std::string> extraParam;
+    extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    int32_t result = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

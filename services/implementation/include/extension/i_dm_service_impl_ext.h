@@ -92,6 +92,29 @@ public:
      */
     virtual int32_t StopAdvertisingExt(const std::string &pkgName,
         const std::map<std::string, std::string> &advertiseParam) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::BindTargetExt
+     * @tc.desc: BindTargetExt
+     * @tc.type: FUNC
+     */
+    virtual int32_t BindTargetExt(const std::string &pkgName, const std::string &targetId,
+        const std::map<std::string, std::string> &bindParam) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::UnbindTargetExt
+     * @tc.desc: UnbindTargetExt
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnbindTargetExt(const std::string &pkgName, const std::string &targetId,
+        const std::map<std::string, std::string> &unbindParam) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::HandleDeviceStatusEvent
+     * @tc.desc: HandleDeviceStatusEvent
+     * @tc.type: FUNC
+     */
+    virtual int32_t HandleDeviceStatusEvent(int32_t eventCode, const DmDeviceInfo &devInfo) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

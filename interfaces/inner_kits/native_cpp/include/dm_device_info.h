@@ -177,7 +177,7 @@ typedef struct DmDeviceInfo {
     DmAuthForm authForm;
     /**
      * Extra data of the device.
-     * include json keys: ""CONN_ADDR_TYPE"", "BR_MAC_", "BLE_MAC", "WIFI_IP", "WIFI_PORT", "CUSTOM_DATA"
+     * include json keys: "CONN_ADDR_TYPE", "BR_MAC_", "BLE_MAC", "WIFI_IP", "WIFI_PORT", "CUSTOM_DATA"
      */
     std::string extraData;
 } DmDeviceInfo;
