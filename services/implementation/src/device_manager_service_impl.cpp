@@ -627,7 +627,6 @@ int32_t DeviceManagerServiceImpl::EnableDiscoveryListener(const std::string &pkg
     }
     if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (dmServiceImplExt_ == nullptr) {
         LOGE("EnableDiscoveryListener failed, dm service impl ext has not init or init failed.");
@@ -646,7 +645,6 @@ int32_t DeviceManagerServiceImpl::DisableDiscoveryListener(const std::string &pk
     }
     if (extraParam.find(PARAM_KEY_T_TYPE) == extraParam.end()) {
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (dmServiceImplExt_ == nullptr) {
         LOGE("DisableDiscoveryListener failed, dm service impl ext has not init or init failed.");

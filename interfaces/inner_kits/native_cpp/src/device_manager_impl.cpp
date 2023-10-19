@@ -1518,6 +1518,8 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
     std::shared_ptr<DiscoveryCallback> callback)
 {
+    (void)discoverParam;
+    (void)filterOptions;
     if (pkgName.empty() || callback == nullptr) {
         LOGE("DeviceManagerImpl::RegisterDiscoveryCallback failed: input callback is null or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1525,9 +1527,23 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     LOGI("RegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
 
     uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
 
-    LOGI("EnableDiscoveryListener completed, pkgName: %s", pkgName.c_str());
+    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DISCOVERY_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("RegisterDiscoveryCallback error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("RegisterDiscoveryCallback error: Failed with ret %d", ret);
+        return ret;
+    }
+    LOGI("RegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -1544,9 +1560,21 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::map<std::string, std::string> extraParam;
-    extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
 
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnRegisterDiscoveryCallback error: Failed with ret %d", ret);
+        return ret;
+    }
     LOGI("UnRegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }

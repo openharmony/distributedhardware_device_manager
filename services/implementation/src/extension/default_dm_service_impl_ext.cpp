@@ -90,5 +90,30 @@ int32_t DefaultDMServiceImplExt::StopAdvertisingExt(const std::string &pkgName,
     (void)advertiseParam;
     return ERR_DM_UNSUPPORTED_METHOD;
 }
+
+int32_t DefaultDMServiceImplExt::BindTargetExt(const std::string &pkgName, const std::string &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    (void)pkgName;
+    (void)targetId;
+    (void)bindParam;
+    return ERR_DM_UNSUPPORTED_METHOD;
+}
+
+int32_t DefaultDMServiceImplExt::UnbindTargetExt(const std::string &pkgName, const std::string &targetId,
+    const std::map<std::string, std::string> &unbindParam)
+{
+    (void)pkgName;
+    (void)targetId;
+    (void)unbindParam;
+    return ERR_DM_UNSUPPORTED_METHOD;
+}
+
+int32_t DefaultDMServiceImplExt::HandleDeviceStatusEvent(int32_t eventCode, const DmDeviceInfo &devInfo)
+{
+    (void)eventCode;
+    (void)devInfo;
+    return ERR_DM_UNSUPPORTED_METHOD;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
