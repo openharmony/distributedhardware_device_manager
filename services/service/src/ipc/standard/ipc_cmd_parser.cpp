@@ -36,6 +36,23 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+bool EncodeDmDeviceInfo(const DmDeviceInfo &devInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    std::string deviceIdStr(devInfo.deviceId);
+    bRet = (bRet && parcel.WriteString(deviceIdStr));
+    std::string deviceNameStr(devInfo.deviceName);
+    bRet = (bRet && parcel.WriteString(deviceNameStr));
+    bRet = (bRet && parcel.WriteUint16(devInfo.deviceTypeId));
+    std::string networkIdStr(devInfo.networkId);
+    bRet = (bRet && parcel.WriteString(networkIdStr));
+    bRet = (bRet && parcel.WriteInt32(devInfo.range));
+    bRet = (bRet && parcel.WriteInt32(devInfo.networkType));
+    bRet = (bRet && parcel.WriteInt32(devInfo.authForm));
+    bRet = (bRet && parcel.WriteString(devInfo.extraData));
+    return bRet;
+}
+
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
@@ -55,8 +72,8 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
         LOGE("write state failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    if (!EncodeDmDeviceInfo(deviceInfo, data)) {
+        LOGE("write dm device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
@@ -94,8 +111,8 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
         LOGE("write subscribeId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    if (!EncodeDmDeviceInfo(deviceInfo, data)) {
+        LOGE("write dm device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -339,21 +356,14 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh);
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    int32_t infoNum = (int32_t)(deviceList.size());
-    DmDeviceInfo deviceInfo;
-    if (!reply.WriteInt32(infoNum)) {
-        LOGE("write infoNum failed");
+    if (!reply.WriteInt32((int32_t)deviceList.size())) {
+        LOGE("write device list size failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!deviceList.empty()) {
-        for (; !deviceList.empty();) {
-            deviceInfo = deviceList.back();
-            deviceList.pop_back();
-
-            if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-                LOGE("write subscribeInfo failed");
-                return ERR_DM_IPC_WRITE_FAILED;
-            }
+    for (const auto &devInfo : deviceList) {
+        if (!EncodeDmDeviceInfo(devInfo, reply)) {
+            LOGE("write dm device info failed");
+            return ERR_DM_IPC_WRITE_FAILED;
         }
     }
     if (!reply.WriteInt32(result)) {
@@ -553,12 +563,10 @@ ON_IPC_CMD(GET_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
     std::string networkId = data.ReadString();
     DmDeviceInfo deviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
-
-    if (!reply.WriteRawData(&deviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write deviceInfo failed");
+    if (!EncodeDmDeviceInfo(deviceInfo, reply)) {
+        LOGE("write dm device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -571,11 +579,10 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
     (void)data;
     DmDeviceInfo localDeviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);
-
-    if (!reply.WriteRawData(&localDeviceInfo, sizeof(DmDeviceInfo))) {
-        LOGE("write localDeviceInfo failed");
+    if (!EncodeDmDeviceInfo(localDeviceInfo, reply)) {
+        LOGE("write dm device info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
     }
-
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
