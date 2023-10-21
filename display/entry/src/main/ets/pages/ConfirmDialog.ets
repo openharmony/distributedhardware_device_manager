@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
+import Context from '@ohos.app.ability.common';
+import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
 
-let dmClass;
-var gThis;
+let dmClass: deviceManager.DeviceManager | null;
+let gThis: dialogPlusPage;
 
 const ACTION_ALLOW_AUTH_ONCE: number = 0
 const ACTION_CANCEL_AUTH: number = 1
@@ -38,14 +41,16 @@ struct dialogPlusPage {
   @State isAvailableType: boolean = false
 
   initStatue() {
-    console.log('initStatue' + "windowNum:" + globalThis.windowNum)
+    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
+    console.log('initStatue' + 'windowNum:' + globalWindowNum)
     if (dmClass) {
       console.log('deviceManager exist')
       return
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui', (err, dm) => {
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm',
+      (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log("createDeviceManager err:" + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
+        console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
         return
       }
       dmClass = dm
@@ -53,50 +58,56 @@ struct dialogPlusPage {
   }
 
   onAllowOnce() {
-    console.log("allow once")
+    console.log('allow once')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    console.log("onAllowOnce execute" + JSON.stringify(globalThis.abilityWant.parameters))
-    console.log("allow once" + ACTION_ALLOW_AUTH_ONCE)
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
+    console.log('onAllowOnce execute' + JSON.stringify(globalWant.parameters))
+    console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
     this.setUserOperation(ACTION_ALLOW_AUTH_ONCE)
     this.destruction()
   }
 
   onAllowAlways() {
-    console.log("allow always")
+    console.log('allow always')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    console.log("onAllowAlways execute" + JSON.stringify(globalThis.abilityWant.parameters))
-    console.log("allow always" + ACTION_ALLOW_AUTH_ALWAYS)
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
+    console.log('onAllowAlways execute' + JSON.stringify(globalWant.parameters))
+    console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
     this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
     this.destruction()
   }
 
   onCancel() {
-    console.log("cancel")
+    console.log('cancel')
     if (dmClass == null) {
       console.log('createDeviceManager is null')
       return
     }
 
-    console.log("cancel" + ACTION_CANCEL_AUTH)
+    console.log('cancel' + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH)
     this.destruction()
   }
 
-  setUserOperation(operation) {
+  setUserOperation(operation: number) {
     console.log('setUserOperation: ' + operation)
     if(dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
       return;
     }
-    dmClass.setUserOperation(operation, "extra")
+    try {
+      dmClass.setUserOperation(operation, 'extra')
+    } catch (error) {
+      console.log('dmClass setUserOperation failed')
+    }
   }
 
   run() {
@@ -112,26 +123,27 @@ struct dialogPlusPage {
   }
 
   onPageShow() {
-    console.log("onPageShow")
+    console.log('onPageShow')
 
-    if (globalThis.abilityWant.parameters.deviceName != null) {
-      this.peerDeviceName = globalThis.abilityWant.parameters.deviceName
-      console.log("peerDeviceName is " + this.peerDeviceName)
+    let globalWant: Want = AppStorage.get('abilityWant') as Want
+    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceName != null) {
+      this.peerDeviceName = globalWant.parameters.deviceName as string
+      console.log('peerDeviceName is ' + this.peerDeviceName)
     }
 
-    if (globalThis.abilityWant.parameters.deviceType != null) {
-        this.peerDeviceType = globalThis.abilityWant.parameters.deviceType
-        console.log("peerDeviceType is " + this.peerDeviceType)
+    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceType != null) {
+      this.peerDeviceType = globalWant.parameters.deviceType as number
+      console.log('peerDeviceType is ' + this.peerDeviceType)
     }
 
-    if (globalThis.abilityWant.parameters.appOperation != null) {
-      this.peerAppOperation = globalThis.abilityWant.parameters.appOperation
-      console.log("peerAppOperation is " + this.peerAppOperation)
+    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.appOperation != null) {
+      this.peerAppOperation = globalWant.parameters.appOperation as string
+      console.log('peerAppOperation is ' + this.peerAppOperation)
     }
 
-    if (globalThis.abilityWant.parameters.customDescription != null) {
-      this.peerCustomDescription = globalThis.abilityWant.parameters.customDescription
-      console.log("peerCustomDescription is " + this.peerCustomDescription)
+    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.customDescription != null) {
+      this.peerCustomDescription = globalWant.parameters.customDescription as string
+      console.log('peerCustomDescription is ' + this.peerCustomDescription)
     }
 
     this.initStatue()
@@ -144,19 +156,27 @@ struct dialogPlusPage {
 
   destruction() {
     if (dmClass != null) {
-      dmClass.release()
-      dmClass = null
+      try {
+        dmClass.release()
+        dmClass = null
+      } catch (error) {
+        console.log('dmClass release failed')
+      }
     }
-    globalThis.extensionWin.destroy()
-    globalThis.windowNum--
-    console.info("windowNum:" + globalThis.windowNum)
-    if(globalThis.windowNum == 0) {
-      globalThis.extensionContext.terminateSelf()
+    let temporaryWindow: window.Window = AppStorage.get('confirmWin') as window.Window
+    temporaryWindow.destroy()
+    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
+    globalWindowNum--
+    AppStorage.SetOrCreate('confirmWindowNum', globalWindowNum)
+    console.info('confirmWindowNum:' + globalWindowNum)
+    if(globalWindowNum == 0) {
+      let context: Context.UIAbilityContext = AppStorage.get('confirmContext') as Context.UIAbilityContext
+      context.terminateSelf()
     }
   }
 
-  getImages(peerdeviceType): Resource {
-    console.info("peerdeviceType is " + peerdeviceType)
+  getImages(peerdeviceType: number): Resource {
+    console.info('peerdeviceType is ' + peerdeviceType)
     if (peerdeviceType == deviceManager.DeviceType.SPEAKER) {
       this.isAvailableType = true
       return $r('app.media.ic_device_soundx')
@@ -209,8 +229,8 @@ struct dialogPlusPage {
         .onClick(() => {
           this.onAllowAlways()
         })
-        .onTouch((event: TouchEvent) => {
-          if (event.type === TouchType.Down) {
+        .onTouch((event?: TouchEvent | undefined) => {
+          if (event != undefined && event.type === TouchType.Down) {
             this.selectIndex = 0
           }
         })
@@ -223,8 +243,8 @@ struct dialogPlusPage {
         .onClick(() => {
           this.onAllowOnce()
         })
-        .onTouch((event: TouchEvent) => {
-          if (event.type === TouchType.Down) {
+        .onTouch((event?: TouchEvent | undefined) => {
+          if (event != undefined && event.type === TouchType.Down) {
             this.selectIndex = 1
           }
         })
@@ -232,15 +252,15 @@ struct dialogPlusPage {
         .fontColor(this.selectIndex == 1 ? 0xffffff : 0x0000ff)
         .height(30)
         .width('100%')
-      Button("不信任(" + this.seconds + "秒)")
+      Button('不信任(' + this.seconds + '秒)')
         .margin({left: 16, right: 16})
         .backgroundColor(this.selectIndex == 2 ? 0x0000ff : 0xffffff)
         .fontColor(this.selectIndex == 2 ? 0xffffff : 0x0000ff)
         .onClick(() => {
           this.onCancel()
         })
-        .onTouch((event: TouchEvent) => {
-          if (event.type === TouchType.Down) {
+        .onTouch((event?: TouchEvent | undefined) => {
+          if (event != undefined && event.type === TouchType.Down) {
             this.selectIndex = 2
           }
         })

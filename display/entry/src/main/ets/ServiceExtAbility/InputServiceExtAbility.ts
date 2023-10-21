@@ -23,16 +23,24 @@ import type Want from '@ohos.app.ability.Want';
 const TAG = '[DeviceManagerUI:Input]==>';
 
 export default class ServiceExtAbility extends extension {
+  isCreatingWindow: boolean = false;
   onCreate(want: Want): void {
-    globalThis.extensionContext = this.context;
-    globalThis.windowNum = 0;
+    AppStorage.SetOrCreate('inputContext', this.context);
+    AppStorage.SetOrCreate('inputWindowNum', 0);
     this.getShareStyle();
   }
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    globalThis.abilityWant = want;
-    console.log(TAG + 'onRequest execute' + JSON.stringify(globalThis.abilityWant.parameters));
+    let inputWindowNum: number = AppStorage.get('inputWindowNum');
+    if (inputWindowNum !== 0 || this.isCreatingWindow) {
+      console.log(TAG + 'onRequest window number is not zero or creating window.');
+      return;
+    }
+    this.isCreatingWindow = true;
+    AppStorage.SetOrCreate('abilityWant', want);
+    let globalWant: Want = AppStorage.get('abilityWant') as Want;
+    console.log(TAG + 'onRequest execute' + JSON.stringify(globalWant.parameters));
 
     display.getDefaultDisplay().then((dis: display.Display) => {
       let density: number = dis.densityPixels;
@@ -67,14 +75,18 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      globalThis.extensionWin = win;
+      AppStorage.SetOrCreate('inputWin', win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.loadContent('pages/InputPinDialog');
       await win.show();
-      globalThis.windowNum++;
+      let windowNum: number = AppStorage.get('inputWindowNum') as number;
+      windowNum++;
+      AppStorage.SetOrCreate('inputWindowNum', windowNum);
+      this.isCreatingWindow = false;
       console.log(TAG + 'window create successfully');
     } catch {
+      this.isCreatingWindow = false;
       console.info(TAG + 'window create failed');
     }
   }
