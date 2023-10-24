@@ -134,7 +134,7 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
         return ERR_DM_FAILED;
     }
     int32_t processType = jsonObject[FIELD_PROCESS_TYPE].get<int32_t>(); 
-    if (IsString(jsonObject, FIELD_TTYPE) && processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
+    if (IsString(jsonObject, FIELD_TYPE) && processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
         int32_t ret = ImportRemoteCredentialExt(credentialInfo);
         if (ret == DM_OK) {
             OnGroupResultExt(ret, "success");

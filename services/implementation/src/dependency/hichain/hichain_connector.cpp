@@ -927,7 +927,7 @@ int32_t HiChainConnector::GetJsonInt(const nlohmann::json &jsonObj, const std::s
 {
     if (!IsInt32(jsonObj, key)) {
         LOGE("User string key not exist!");
-        return "";
+        return ERR_DM_FAILED;
     }
     return jsonObj[key].get<int32_t>();
 }
@@ -980,7 +980,7 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
         LOGE("failed to get groupid");
         return ERR_DM_FAILED;
     }
-    LOGI("The groupId %s, userId %s, groupOwner %s.", groupId.c_str(), userId.c_str(), groupOwner_c_str());
+    LOGI("The groupId %s, userId %s, groupOwner %s.", groupId.c_str(), userId.c_str(), groupOwner.c_str());
     jsonObj[FIELD_GROUP_TYPE] = groupType;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_USER_ID] = userId;
