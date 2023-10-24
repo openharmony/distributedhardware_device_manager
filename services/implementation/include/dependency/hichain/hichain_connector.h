@@ -33,6 +33,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+constexpr const char* FIELD_TYPE = "TType";
+constexpr const char* FIELD_OPERATION_CODE = "operationCode";
+constexpr const char* FIELD_META_NODE_TYPE = "metaNodeType";
+
 struct GroupInfo {
     std::string groupName;
     std::string groupId;
@@ -219,6 +224,9 @@ public:
      * @tc.type: FUNC
      */
     std::vector<std::string> GetTrustedDevices(const std::string &localDeviceUdid);
+
+    int32_t addMultiMembersExt(const std::string &credentialInfo);
+    
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
@@ -235,6 +243,12 @@ private:
     int32_t ParseRemoteCredential(const int32_t groupType, const std::string &userId,
     const nlohmann::json &jsonDeviceList, std::string &params, int32_t &osAccountUserId);
     int32_t GetTrustedDevicesUdid(const char* jsonStr, std::vector<std::string> &udidList);
+    int32_t GetGroupIdExt(const std::string &userId, const int32_t groupType,
+        std::string &groupId, std::string &groupOwner);
+    int32_t ParseRemoteCredentialExt(const std::string &credentialInfo, std::string &params, std::string &groupOwner);
+    int32_t GetJsonInt(const nlohmann::json &jsonObj, const std::string &key);
+    std::string GetJsonStr(const nlohmann::json &jsonObj, const std::string &key);
+
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     DeviceAuthCallback deviceAuthCallback_;
