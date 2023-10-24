@@ -21,6 +21,7 @@
 
 #include "auth_request_state.h"
 #include "auth_response_state.h"
+#include "auth_ui_state_manager.h"
 #include "authentication.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_ability_manager.h"
@@ -325,20 +326,6 @@ public:
     void CancelDisplay();
 
     /**
-     * @tc.name: DmAuthManager::UpdateInputDialogDisplay
-     * @tc.desc: Update InputDialog Display of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    void UpdateInputDialogDisplay(bool isShow);
-
-    /**
-     * @tc.name: DmAuthManager::UpdateInputDialogDisplay
-     * @tc.desc: Update InputDialog Display of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    void UpdateInputDialogDisplay();
-
-    /**
      * @tc.name: DmAuthManager::GeneratePincode
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -407,6 +394,20 @@ public:
      * @tc.type: FUNC
      */
     bool IsIdenticalAccount();
+
+    /**
+     * @tc.name: DmAuthManager::RegisterUiStateCallback
+     * @tc.desc: Register ui state callback
+     * @tc.type: FUNC
+     */
+    int32_t RegisterUiStateCallback(const std::string pkgName);
+
+    /**
+     * @tc.name: DmAuthManager::UnRegisterUiStateCallback
+     * @tc.desc: Unregister ui state callback
+     * @tc.type: FUNC
+     */
+    int32_t UnRegisterUiStateCallback(const std::string pkgName);
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
@@ -415,6 +416,7 @@ private:
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<AuthUiStateManager> authUiStateMgr_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::shared_ptr<DmAdapterManager> adapterMgr_;
     std::map<int32_t, std::shared_ptr<IAuthentication>> authenticationMap_;

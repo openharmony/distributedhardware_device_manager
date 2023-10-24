@@ -245,6 +245,8 @@ public:
      * @tc.type: FUNC
      */
     virtual void LoadHardwareFwkService();
+    virtual int32_t RegisterUiStateCallback(const std::string &pkgName);
+    virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName);
 
     /**
      * @tc.name: DeviceManagerService::GetEncryptedUuidByNetworkId

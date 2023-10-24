@@ -399,6 +399,32 @@ int32_t DeviceManagerServiceImpl::UnRegisterCredentialCallback(const std::string
     return credentialMgr_->UnRegisterCredentialCallback(pkgName);
 }
 
+int32_t DeviceManagerServiceImpl::RegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("RegisterUiStateCallback failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (authMgr_ == nullptr) {
+        LOGE("authMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    return authMgr_->RegisterUiStateCallback(pkgName);
+}
+
+int32_t DeviceManagerServiceImpl::UnRegisterUiStateCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("RegisterUiStateCallback failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (authMgr_ == nullptr) {
+        LOGE("authMgr_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    return authMgr_->UnRegisterUiStateCallback(pkgName);
+}
+
 int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject)
 {
     jsonObject = nlohmann::json::parse(event, nullptr, false);

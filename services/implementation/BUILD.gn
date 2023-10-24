@@ -164,6 +164,7 @@ if (defined(ohos_lite)) {
       "src/authentication/auth_message_processor.cpp",
       "src/authentication/auth_request_state.cpp",
       "src/authentication/auth_response_state.cpp",
+      "src/authentication/auth_ui_state_manager.cpp",
       "src/authentication/dm_auth_manager.cpp",
       "src/authentication/showconfirm/standard/show_confirm.cpp",
       "src/config/dm_config_manager.cpp",

@@ -104,6 +104,10 @@ public:
 
     void LoadHardwareFwkService();
 
+    int32_t RegisterUiStateCallback(const std::string &pkgName);
+
+    int32_t UnRegisterUiStateCallback(const std::string &pkgName);
+
     int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid);
 

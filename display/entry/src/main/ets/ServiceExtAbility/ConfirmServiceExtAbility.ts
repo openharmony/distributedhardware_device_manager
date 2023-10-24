@@ -23,15 +23,26 @@ import type Want from '@ohos.app.ability.Want';
 const TAG = '[DeviceManagerUI:Confirm]==>';
 
 export default class ServiceExtAbility extends extension {
+  isCreatingWindow: boolean = false;
   onCreate(want: Want): void {
-    globalThis.extensionContext = this.context;
-    globalThis.windowNum = 0;
+    globalThis.confirmContext = this.context;
+    globalThis.confirmWindowNum = 0;
+    AppStorage.SetOrCreate('confirmContext', this.context);
+    AppStorage.SetOrCreate('confirmWindowNum', 0);
+    let confirmWindowNum: number = AppStorage.get('confirmWindowNum') as number;
+    console.log('confirmWindowNum' + confirmWindowNum);
     this.getShareStyle();
   }
 
   onRequest(want: Want, startId: number): void {
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
-    globalThis.abilityWant = want;
+    let confirmWindowNum: number = AppStorage.get('confirmWindowNum');
+    if (confirmWindowNum !== 0 || this.isCreatingWindow) {
+      console.log(TAG + 'onRequest window number is not zero or creating window.');
+      return;
+    }
+    this.isCreatingWindow = true;
+    AppStorage.SetOrCreate('abilityWant', want);
     display.getDefaultDisplay().then((dis: display.Display) => {
       let density: number = dis.densityPixels;
       let dialogRect: { left: number; top: number; width: number; height: number; } = {
@@ -65,15 +76,19 @@ export default class ServiceExtAbility extends extension {
     console.log(TAG + 'createWindow execute');
     try {
       const win: window.Window = await window.create(this.context, name, windowType);
-      globalThis.extensionWin = win;
+      AppStorage.SetOrCreate('confirmWin', win);
       await win.moveTo(rect.left, rect.top);
       await win.resetSize(rect.width, rect.height);
       await win.setCornerRadius(Constant.SHARE_RADIUS);
       await win.loadContent('pages/ConfirmDialog');
       await win.show();
-      globalThis.windowNum++;
+      let windowNum: number = AppStorage.get('confirmWindowNum') as number;
+      windowNum++;
+      AppStorage.SetOrCreate('confirmWindowNum', windowNum);
+      this.isCreatingWindow = false;
       console.log(TAG + 'window create successfully');
     } catch {
+      this.isCreatingWindow = false;
       console.info(TAG + 'window create failed');
     }
   }
