@@ -961,7 +961,7 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
     LOGI("ParseRemoteCredentialExt start.");
     nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("credentialInfo string not a json type.");
+        LOGE("CredentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
     nlohmann::json jsonObj;
@@ -977,10 +977,9 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
     }
     std::string groupId = "";
     if (GetGroupIdExt(userId, groupType, groupId, groupOwner) != DM_OK) {
-        LOGE("failed to get groupid");
+        LOGE("Failed to get groupid");
         return ERR_DM_FAILED;
     }
-    LOGI("The groupId %s, userId %s, groupOwner %s.", groupId.c_str(), userId.c_str(), groupOwner.c_str());
     jsonObj[FIELD_GROUP_TYPE] = groupType;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_USER_ID] = userId;
@@ -988,7 +987,7 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
     jsonObj[FIELD_OPERATION_CODE] = GetJsonInt(jsonObject, FIELD_OPERATION_CODE);
     jsonObj[FIELD_META_NODE_TYPE] = GetJsonStr(jsonObject, FIELD_TYPE);
     if (!jsonObject.contains(FIELD_DEVICE_LIST)) {
-        LOGE("credentaildata or authType string key not exist!");
+        LOGE("Credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
     }
     jsonObj[FIELD_DEVICE_LIST] = jsonObject[FIELD_DEVICE_LIST];
@@ -1005,15 +1004,14 @@ int32_t HiChainConnector::addMultiMembersExt(const std::string &credentialInfo)
     std::string addParams = "";
     std::string groupOwner = "";
     if (ParseRemoteCredentialExt(credentialInfo, addParams, groupOwner) != DM_OK) {
-        LOGE("addMultiMembers ParseRemoteCredential failed!");
+        LOGE("AddMultiMembers ParseRemoteCredentialExt failed!");
         return ERR_DM_FAILED;
     }
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
-        LOGE("get current process account user id failed");
+        LOGE("Get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    LOGI("osAccountUserId %d.", osAccountUserId);
     int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId, groupOwner.c_str(), addParams.c_str());
     if (ret != DM_OK) {
         LOGE("[HICHAIN]fail to add member to hichain group with ret:%d.", ret);
