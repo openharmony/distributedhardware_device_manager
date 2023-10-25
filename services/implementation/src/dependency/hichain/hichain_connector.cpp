@@ -27,9 +27,11 @@
 #include "dm_log.h"
 #include "dm_random.h"
 #include "hichain_connector_callback.h"
+#include "iservice_registry.h"
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
+#include "system_ability_definition.h"
 #include "unistd.h"
 
 namespace OHOS {
@@ -99,17 +101,14 @@ HiChainConnector::HiChainConnector()
         LOGE("[HICHAIN]failed to init group manager.");
         return;
     }
-    int32_t ret = deviceGroupManager_->regCallback(DM_PKG_NAME, &deviceAuthCallback_);
-    if (ret != HC_SUCCESS) {
-        LOGE("[HICHAIN]fail to register callback to hachain with ret:%d.", ret);
-        return;
-    }
+    AddHiChainSAMonitor();
     LOGI("HiChainConnector::constructor success.");
 }
 
 HiChainConnector::~HiChainConnector()
 {
     LOGI("HiChainConnector::destructor.");
+    RemoveHiChainSAMonitor();
 }
 
 int32_t HiChainConnector::RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback> callback)
@@ -982,6 +981,90 @@ int32_t HiChainConnector::GetTrustedDevicesUdid(const char* jsonStr, std::vector
         udidList.push_back(udid);
     }
     return DM_OK;
+}
+
+void HiChainConnector::RegisterDevGroupMgrCallback()
+{
+    deviceGroupManager_ = GetGmInstance();
+    if (deviceGroupManager_ == nullptr) {
+        LOGE("[HICHAIN]failed to init group manager.");
+        return;
+    }
+    int32_t ret = deviceGroupManager_->regCallback(DM_PKG_NAME, &deviceAuthCallback_);
+    if (ret != HC_SUCCESS) {
+        LOGE("[HICHAIN]fail to register callback to hachain with ret:%d.", ret);
+        return;
+    }
+    LOGI("[HICHAIN] register device group manager callback success.");
+}
+
+void HiChainConnector::UnregisterDevGroupMgrCallback()
+{
+    deviceGroupManager_ = GetGmInstance();
+    if (deviceGroupManager_ == nullptr) {
+        LOGE("[HICHAIN]failed to init group manager.");
+        return;
+    }
+    deviceGroupManager_->unRegCallback(DM_PKG_NAME);
+    LOGI("[HICHAIN] unregister device group manager callback success.");
+}
+
+void HiChainConnector::AddHiChainSAMonitor()
+{
+    auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saMgr == nullptr) {
+        LOGE("Get system ability manager failed, add hichain sa monitor failed.");
+        return;
+    }
+    auto remoteObj = saMgr->CheckSystemAbility(DEVICE_AUTH_SERVICE_ID);
+    if (remoteObj != nullptr) {
+        RegisterDevGroupMgrCallback();
+        return;
+    }
+
+    hichainSAListener_ = new (std::nothrow) HiChainSystemAbilityListener(shared_from_this());
+    int32_t ret = saMgr->SubscribeSystemAbility(DEVICE_AUTH_SERVICE_ID, hichainSAListener_);
+    if (ret != DM_OK) {
+        LOGE("subscribe hichain system ability failed, ret:%d", ret);
+        return;
+    }
+    LOGI("[HICHAIN] Add hichain system ability monitor success.");
+}
+
+void HiChainConnector::RemoveHiChainSAMonitor()
+{
+    UnregisterDevGroupMgrCallback();
+    if (hichainSAListener_ == nullptr) {
+        LOGE("hichainSAListener is nullptr, unsubscribe hichain system ability failed.");
+        return;
+    }
+    auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saMgr == nullptr) {
+        LOGE("Get system ability manager failed, remove hichain sa monitor failed.");
+        return;
+    }
+    int32_t ret = saMgr->UnSubscribeSystemAbility(DEVICE_AUTH_SERVICE_ID, hichainSAListener_);
+    if (ret != DM_OK) {
+        LOGE("unsubscribe hichain system ability failed, ret:%d", ret);
+        return;
+    }
+    LOGI("[HICHAIN] Remove hichain system ability monitor success.");
+}
+
+void HiChainConnector::HiChainSystemAbilityListener::OnAddSystemAbility(int32_t saId, const std::string& deviceId)
+{
+    LOGI("[HICHAIN] systemAbility is added with said: %d.", saId);
+    if ((saId == DEVICE_AUTH_SERVICE_ID) && (hichainSAListener_ != nullptr)) {
+        hichainSAListener_->RegisterDevGroupMgrCallback();
+    }
+}
+
+void HiChainConnector::HiChainSystemAbilityListener::OnRemoveSystemAbility(int32_t saId, const std::string& deviceId)
+{
+    LOGI("[HICHAIN] systemAbility is removed with said: %d.", saId);
+    if ((saId == DEVICE_AUTH_SERVICE_ID) && (hichainSAListener_ != nullptr)) {
+        hichainSAListener_->UnregisterDevGroupMgrCallback();
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
