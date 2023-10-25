@@ -177,7 +177,6 @@ private:
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
 
-
 private:
     bool isImplsoLoaded_ = false;
     bool isAdapterSoLoaded_ = false;
