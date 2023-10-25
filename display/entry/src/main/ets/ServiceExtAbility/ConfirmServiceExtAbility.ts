@@ -75,13 +75,18 @@ export default class ServiceExtAbility extends extension {
     rect: { left: number; top: number; width: number; height: number; }): Promise<void> {
     console.log(TAG + 'createWindow execute');
     try {
-      const win: window.Window = await window.create(this.context, name, windowType);
+      class BaseContext {
+        stageMode: boolean = true;
+      }
+      let ctx: BaseContext = this.context;
+      let config: window.Configuration = { name: name, windowType: windowType, ctx: ctx };
+      const win: window.Window = await window.createWindow(config);
       AppStorage.SetOrCreate('confirmWin', win);
       await win.moveTo(rect.left, rect.top);
-      await win.resetSize(rect.width, rect.height);
+      await win.resize(rect.width, rect.height);
       await win.setCornerRadius(Constant.SHARE_RADIUS);
-      await win.loadContent('pages/ConfirmDialog');
-      await win.show();
+      await win.setUIContent('pages/ConfirmDialog');
+      await win.showWindow();
       let windowNum: number = AppStorage.get('confirmWindowNum') as number;
       windowNum++;
       AppStorage.SetOrCreate('confirmWindowNum', windowNum);
