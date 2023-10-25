@@ -100,6 +100,10 @@ public:
      * @tc.type: FUNC
      */
     void OnGroupResult(int64_t requestId, int32_t action, const std::string &resultInfo);
+
+    int32_t ImportRemoteCredentialExt(const std::string &credentialInfo);
+    void OnGroupResultExt(int32_t action, const std::string &resultInfo);
+    
 private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;

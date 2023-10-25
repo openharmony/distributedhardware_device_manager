@@ -2634,8 +2634,7 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
 
 napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info info)
 {
-    LOGE("ImportCredential function has been discarded");
-    return nullptr;
+    LOGI("ImportCredential start.");
     if (!IsSystemApp()) {
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
         return nullptr;

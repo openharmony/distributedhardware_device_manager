@@ -96,6 +96,9 @@ constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.
 const static char *DM_CAPABILITY_OSD = "osdCapability";
 const static char *DM_CAPABILITY_APPROACH = "approach";
 
+//The following constant are provided only for HiLink.
+const static char *EXT_PART = "ext_part";
+
 // Auth
 constexpr const char* AUTH_TYPE = "authType";
 constexpr const char* APP_OPERATION = "appOperation";

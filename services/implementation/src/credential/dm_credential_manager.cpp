@@ -134,14 +134,33 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
         return ERR_DM_FAILED;
     }
     int32_t processType = jsonObject[FIELD_PROCESS_TYPE].get<int32_t>();
-    if (processType == LOCAL_CREDENTIAL_DEAL_TYPE) {
-        return ImportLocalCredential(credentialInfo);
-    } else if (processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
+    if (IsString(jsonObject, FIELD_TYPE) && processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
+        int32_t ret = ImportRemoteCredentialExt(credentialInfo);
+        if (ret == DM_OK) {
+            OnGroupResultExt(ret, "success");
+        } else {
+            OnGroupResultExt(ret, "failed");
+        }
+        return ret;
+    }
+    if (processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
         return ImportRemoteCredential(credentialInfo);
+    } else if (processType == LOCAL_CREDENTIAL_DEAL_TYPE) {
+        return ImportLocalCredential(credentialInfo);
     } else {
         LOGE("credential type error!");
     }
     return ERR_DM_FAILED;
+}
+
+int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &credentialInfo)
+{
+    LOGI("ImportRemoteCredentialExt start.");
+    if (hiChainConnector_->addMultiMembersExt(credentialInfo) != DM_OK) {
+        LOGE("Failed to add member to group.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
 }
 
 int32_t DmCredentialManager::ImportLocalCredential(const std::string &credentialInfo)
@@ -223,6 +242,12 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         LOGE("credential type error!");
     }
     return ERR_DM_FAILED;
+}
+
+void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &resultInfo)
+{
+    LOGI("DmCredentialManager::OnGroupResultExt action %d, resultInfo %s.", action, resultInfo.c_str());
+    listener_->OnCredentialResult(pkgName_, action, resultInfo);
 }
 
 void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
