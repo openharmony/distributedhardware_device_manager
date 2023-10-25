@@ -978,7 +978,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return dmServiceImplExt_->StartDiscovering(pkgName, discoverParam, filterOptions);
+    return dmServiceImplExt_->StartDiscoveringExt(pkgName, discoverParam, filterOptions);
 }
 
 int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
@@ -1001,7 +1001,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return dmServiceImplExt_->StopDiscovering(pkgName, discoverParam);
+    return dmServiceImplExt_->StopDiscoveringExt(pkgName, discoverParam);
 }
 
 int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName,
@@ -1023,7 +1023,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
     if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
     }
-    return dmServiceImplExt_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    return dmServiceImplExt_->EnableDiscoveryListenerExt(pkgName, discoverParam, filterOptions);
 }
 
 int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgName,
@@ -1042,10 +1042,10 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("DisableDiscoveryListener failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
+    if (extraParam.find(PARAM_KEY_T_TYPE) == extraParam.end()) {
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
     }
-    return dmServiceImplExt_->DisableDiscoveryListener(pkgName, extraParam);
+    return dmServiceImplExt_->DisableDiscoveryListenerExt(pkgName, extraParam);
 }
 
 int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
@@ -1068,7 +1068,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return dmServiceImplExt_->StartAdvertising(pkgName, advertiseParam);
+    return dmServiceImplExt_->StartAdvertisingExt(pkgName, advertiseParam);
 }
 
 int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
@@ -1091,7 +1091,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return dmServiceImplExt_->StopAdvertising(pkgName, advertiseParam);
+    return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName,
