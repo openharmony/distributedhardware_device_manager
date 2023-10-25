@@ -247,64 +247,6 @@ public:
     virtual void LoadHardwareFwkService();
     virtual int32_t RegisterUiStateCallback(const std::string &pkgName);
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName);
-
-    // The following interfaces are provided since OpenHarmony 4.1 Version.
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::StartDiscovering
-     * @tc.desc: StartDiscovering
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartDiscovering(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam,
-        const std::map<std::string, std::string> &filterOptions);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::StopDiscovering
-     * @tc.desc: StopDiscovering
-     * @tc.type: FUNC
-     */
-    virtual int32_t StopDiscovering(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::EnableDiscoveryListener
-     * @tc.desc: EnableDiscoveryListener
-     * @tc.type: FUNC
-     */
-    virtual int32_t EnableDiscoveryListener(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam,
-        const std::map<std::string, std::string> &filterOptions);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::DisableDiscoveryListener
-     * @tc.desc: DisableDiscoveryListener
-     * @tc.type: FUNC
-     */
-    virtual int32_t DisableDiscoveryListener(const std::string &pkgName,
-        const std::map<std::string, std::string> &extraParam);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::StartAdvertising
-     * @tc.desc: StartAdvertising
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartAdvertising(const std::string &pkgName,
-        const std::map<std::string, std::string> &advertiseParam);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::StopAdvertising
-     * @tc.desc: StopAdvertising
-     * @tc.type: FUNC
-     */
-    virtual int32_t StopAdvertising(const std::string &pkgName,
-        const std::map<std::string, std::string> &advertiseParam);
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::CheckAccessToTarget
-     * @tc.desc: CheckAccessToTarget
-     * @tc.type: FUNC
-     */
-    virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

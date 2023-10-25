@@ -26,6 +26,7 @@
 
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
+#include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
 #include "softbus_listener.h"
 
@@ -120,10 +121,6 @@ public:
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
-    bool IsDMServiceImplReady();
-
-    bool IsDMServiceImplSoLoaded();
-
     int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
 
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
@@ -174,13 +171,23 @@ public:
     int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
 
 private:
+    bool IsDMServiceImplReady();
+    bool IsDMServiceImplSoLoaded();
+    bool IsDMServiceAdapterLoad();
+    void UnloadDMServiceImplSo();
+    void UnloadDMServiceAdapter();
+
+private:
     bool isImplsoLoaded_ = false;
+    bool isAdapterSoLoaded_ = false;
     std::mutex isImplLoadLock_;
+    std::mutex isAdapterLoadLock_;
     std::mutex registerDevStateLock_;
     std::map<std::string, std::string> registerDevStateMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
+    std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
     std::string localDeviceId_;
 };
 } // namespace DistributedHardware
