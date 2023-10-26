@@ -98,7 +98,7 @@ public:
      * @tc.desc: BindTargetExt
      * @tc.type: FUNC
      */
-    virtual int32_t BindTargetExt(const std::string &pkgName, const std::string &targetId,
+    virtual int32_t BindTargetExt(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam) = 0;
 
     /**
@@ -106,7 +106,7 @@ public:
      * @tc.desc: UnbindTargetExt
      * @tc.type: FUNC
      */
-    virtual int32_t UnbindTargetExt(const std::string &pkgName, const std::string &targetId,
+    virtual int32_t UnbindTargetExt(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam) = 0;
 
     /**

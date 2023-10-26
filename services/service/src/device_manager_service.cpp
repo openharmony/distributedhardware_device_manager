@@ -1094,6 +1094,53 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
     return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
 }
 
+
+int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::BindTarget for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("BindTarget failed, instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    if (bindParam.find(PARAM_KEY_T_TYPE) == bindParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return dmServiceImplExt_->BindTargetExt(pkgName, targetId, bindParam);
+}
+
+int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &unbindParam)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::UnbindTarget for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("UnbindTarget failed, instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    if (unbindParam.find(PARAM_KEY_T_TYPE) == unbindParam.end()) {
+        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return dmServiceImplExt_->UnbindTargetExt(pkgName, targetId, unbindParam);
+}
+
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName,
     const std::map<std::string, std::string> &filterOptions, bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList)
 {

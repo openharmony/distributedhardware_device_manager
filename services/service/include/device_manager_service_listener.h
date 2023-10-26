@@ -34,27 +34,33 @@ public:
     DeviceManagerServiceListener() {};
     virtual ~DeviceManagerServiceListener() {};
 
-    void OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &info);
+    void OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &info) override;
 
-    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info);
+    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info) override;
 
-    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info);
+    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info) override;
 
-    void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason);
+    void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason) override;
 
-    void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId);
+    void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) override;
 
-    void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
+    void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult) override;
 
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
-                      int32_t reason);
+                      int32_t reason) override;
 
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
-                            const std::string &flag);
+                            const std::string &flag) override;
 
-    void OnUiCall(std::string &pkgName, std::string &paramJson);
+    void OnUiCall(std::string &pkgName, std::string &paramJson) override;
 
-    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo);
+    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override;
+
+    void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+        std::string content) override;
+
+    void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+        std::string content) override;
 
     void DeleteDeviceIdFromMap(const std::string &deviceId);
     void RegisterDmListener(const std::string &pkgName, const std::string &appId);

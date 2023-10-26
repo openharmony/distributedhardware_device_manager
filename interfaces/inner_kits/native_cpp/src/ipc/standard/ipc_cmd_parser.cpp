@@ -20,8 +20,9 @@
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
-#include "ipc_unbind_device_req.h"
+#include "ipc_bind_target_req.h"
 #include "ipc_cmd_register.h"
+#include "ipc_common_param_req.h"
 #include "ipc_def.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
@@ -51,6 +52,7 @@
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
+#include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_verify_authenticate_req.h"
@@ -72,6 +74,26 @@ void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
     devInfo.networkType = parcel.ReadInt32();
     devInfo.authForm = (DmAuthForm)parcel.ReadInt32();
     devInfo.extraData = parcel.ReadString();
+}
+
+bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(targetId.deviceId));
+    bRet = (bRet && parcel.WriteString(targetId.brMac));
+    bRet = (bRet && parcel.WriteString(targetId.bleMac));
+    bRet = (bRet && parcel.WriteString(targetId.wifiIp));
+    bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
+    return bRet;
+}
+
+void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
+{
+    targetId.deviceId = parcel.ReadString();
+    targetId.brMac = parcel.ReadString();
+    targetId.bleMac = parcel.ReadString();
+    targetId.wifiIp = parcel.ReadString();
+    targetId.wifiPort = parcel.ReadUint16();
 }
 
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
@@ -1139,15 +1161,20 @@ ON_IPC_READ_RESPONSE(UNREGISTER_UI_STATE_CALLBACK, MessageParcel &reply, std::sh
 
 ON_IPC_SET_REQUEST(REGISTER_DISCOVERY_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcStopDiscoveryReq> pReq = std::static_pointer_cast<IpcStopDiscoveryReq>(pBaseReq);
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    uint16_t subscribeId = pReq->GetSubscribeId();
+    std::string discParaStr = pReq->GetFirstParam();
+    std::string filterOpStr = pReq->GetSecondParam();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteInt16((int16_t)subscribeId)) {
-        LOGE("write subscribeId failed");
+    if (!data.WriteString(discParaStr)) {
+        LOGE("write discovery parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(filterOpStr)) {
+        LOGE("write filter option parameter failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -1165,15 +1192,15 @@ ON_IPC_READ_RESPONSE(REGISTER_DISCOVERY_CALLBACK, MessageParcel &reply, std::sha
 
 ON_IPC_SET_REQUEST(UNREGISTER_DISCOVERY_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    std::shared_ptr<IpcStopDiscoveryReq> pReq = std::static_pointer_cast<IpcStopDiscoveryReq>(pBaseReq);
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    uint16_t subscribeId = pReq->GetSubscribeId();
+    std::string extraParaStr = pReq->GetFirstParam();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteInt16((int16_t)subscribeId)) {
-        LOGE("write subscribeId failed");
+    if (!data.WriteString(extraParaStr)) {
+        LOGE("write extra parameter failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -1186,6 +1213,206 @@ ON_IPC_READ_RESPONSE(UNREGISTER_DISCOVERY_CALLBACK, MessageParcel &reply, std::s
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(START_DISCOVERING, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string discParaStr = pReq->GetFirstParam();
+    std::string filterOpStr = pReq->GetSecondParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(discParaStr)) {
+        LOGE("write discovery parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(filterOpStr)) {
+        LOGE("write filter option parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(START_DISCOVERING, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(STOP_DISCOVERING, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string discParaStr = pReq->GetFirstParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(discParaStr)) {
+        LOGE("write discovery parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(STOP_DISCOVERING, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(START_ADVERTISING, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string adverParaStr = pReq->GetFirstParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(adverParaStr)) {
+        LOGE("write advertising parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(START_ADVERTISING, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(STOP_ADVERTISING, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string adverParaStr = pReq->GetFirstParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(adverParaStr)) {
+        LOGE("write advertising parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(STOP_ADVERTISING, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(BIND_TARGET, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcBindTargetReq> pReq = std::static_pointer_cast<IpcBindTargetReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    PeerTargetId targetId = pReq->GetPeerTargetId();
+    std::string bindParam = pReq->GetBindParam();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodePeerTargetId(targetId, data)) {
+        LOGE("write peer target id failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(bindParam)) {
+        LOGE("write bind parameter string failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(BIND_TARGET, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UNBIND_TARGET, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcBindTargetReq> pReq = std::static_pointer_cast<IpcBindTargetReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    PeerTargetId targetId = pReq->GetPeerTargetId();
+    std::string unbindParam = pReq->GetBindParam();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodePeerTargetId(targetId, data)) {
+        LOGE("write peer target id failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(unbindParam)) {
+        LOGE("write unbind parameter string failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNBIND_TARGET, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string targetIdStr = data.ReadString();
+    PeerTargetId targetId;
+    DecodePeerTargetId(data, targetId);
+    int32_t result = data.ReadInt32();
+    std::string content = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnBindResult(pkgName, targetId, result, content);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNBIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    PeerTargetId targetId;
+    DecodePeerTargetId(data, targetId);
+    int32_t result = data.ReadInt32();
+    std::string content = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnUnbindResult(pkgName, targetId, result, content);
+    reply.WriteInt32(DM_OK);
     return DM_OK;
 }
 } // namespace DistributedHardware

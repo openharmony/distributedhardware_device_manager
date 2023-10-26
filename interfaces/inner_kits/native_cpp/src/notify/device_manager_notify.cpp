@@ -716,5 +716,107 @@ void DeviceManagerNotify::OnCredentialResult(const std::string &pkgName, int32_t
     }
     tempCbk->OnCredentialResult(action, credentialResult);
 }
+
+void DeviceManagerNotify::RegisterBindCallback(const std::string &pkgName, const PeerTargetId &targetId,
+    std::shared_ptr<BindTargetCallback> callback)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId) || (callback == nullptr)) {
+        LOGE("DeviceManagerNotify::RegisterBindCallback error: Invalid parameter, pkgName: %s.", pkgName.c_str());
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (bindCallback_.count(pkgName) == 0) {
+        bindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>();
+    }
+    bindCallback_[pkgName][targetId] = callback;
+}
+
+void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, const PeerTargetId &targetId,
+    std::shared_ptr<UnbindTargetCallback> callback)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId) || (callback == nullptr)) {
+        LOGE("DeviceManagerNotify::RegisterUnbindCallback error: Invalid parameter, pkgName: %s.", pkgName.c_str());
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (unbindCallback_.count(pkgName) == 0) {
+        unbindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>();
+    }
+    unbindCallback_[pkgName][targetId] = callback;
+}
+
+void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, std::string content)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid para, pkgName: %s.", pkgName.c_str());
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnBindResult in, pkgName:%s, result:%d", pkgName.c_str(), result);
+    std::shared_ptr<BindTargetCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (bindCallback_.count(pkgName) == 0) {
+            LOGE("DeviceManagerNotify::OnBindResult error, callback not register for pkgName %s.", pkgName.c_str());
+            return;
+        }
+        std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>> &bindCbkMap = bindCallback_[pkgName];
+        auto iter = bindCbkMap.find(targetId);
+        if (iter == bindCbkMap.end()) {
+            LOGE("OnBindResult error, bind callback not register for targetId.");
+            return;
+        }
+        tempCbk = iter->second;
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnBindResult error, registered bind callback is nullptr.");
+        return;
+    }
+    tempCbk->OnBindResult(targetId, result, content);
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        bindCallback_[pkgName].erase(targetId);
+        if (bindCallback_[pkgName].empty()) {
+            bindCallback_.erase(pkgName);
+        }
+    }
+}
+
+void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, std::string content)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid para, pkgName: %s.", pkgName.c_str());
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnUnbindResult in, pkgName:%s, result:%d", pkgName.c_str(), result);
+    std::shared_ptr<UnbindTargetCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (unbindCallback_.count(pkgName) == 0) {
+            LOGE("DeviceManagerNotify::OnUnbindResult error, callback not register for pkgName %s.", pkgName.c_str());
+            return;
+        }
+        std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>> &unbindCbkMap = unbindCallback_[pkgName];
+        auto iter = unbindCbkMap.find(targetId);
+        if (iter == unbindCbkMap.end()) {
+            LOGE("OnUnbindResult error, unbind callback not register for targetId.");
+            return;
+        }
+        tempCbk = iter->second;
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnUnbindResult error, registered unbind callback is nullptr.");
+        return;
+    }
+    tempCbk->OnUnbindResult(targetId, result, content);
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        unbindCallback_[pkgName].erase(targetId);
+        if (unbindCallback_[pkgName].empty()) {
+            unbindCallback_.erase(pkgName);
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

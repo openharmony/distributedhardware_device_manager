@@ -463,6 +463,28 @@ public:
     virtual int32_t StopAdvertising(const std::string &pkgName, std::map<std::string, std::string> &advertiseParam) = 0;
 
     /**
+     * @brief Bind the specified target.
+     * @param pkgName    package name.
+     * @param targetId   id of target to bind.
+     * @param bindParam  bind parameters.
+     * @param callback   bind result callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) = 0;
+    
+    /**
+     * @brief Unbind the specified target.
+     * @param pkgName     package name.
+     * @param targetId    id of target to unbind.
+     * @param unbindParam unbind parameters.
+     * @param callback    bind result callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &unbindParam, std::shared_ptr<UnbindTargetCallback> callback) = 0;
+
+    /**
      * @brief Get device info list of trusted devices.
      * @param pkgName        package name.
      * @param filterOptions  filter option parameters.
@@ -472,7 +494,7 @@ public:
      */
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName,
         const std::map<std::string, std::string> &filterOptions, bool isRefresh,
-        std::vector<DmDeviceBasicInfo> &deviceList) = 0;
+        std::vector<DmDeviceInfo> &deviceList) = 0;
 
     /**
      * @brief Register device state callback.
