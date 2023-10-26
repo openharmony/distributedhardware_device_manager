@@ -15,12 +15,14 @@
 
 #include "permission_manager.h"
 
-#include "ipc_skeleton.h"
-#include "access_token.h"
-#include "hap_token_info.h"
-#include "native_token_info.h"
 #include "accesstoken_kit.h"
+#include "access_token.h"
+#include "dm_constants.h"
 #include "dm_log.h"
+#include "hap_token_info.h"
+#include "ipc_skeleton.h"
+#include "native_token_info.h"
+#include "securec.h"
 
 using namespace OHOS::Security::AccessToken;
 
@@ -71,6 +73,25 @@ bool PermissionManager::CheckNewPermission(void)
     }
     LOGE("DM service access is denied, please apply for corresponding new permissions");
     return false;
+}
+
+int32_t PermissionManager::GetCallerProcessName(std::string &processName)
+{
+    LOGI("Enter PermissionManager::GetCallerProcessName");
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        return ERR_DM_FAILED;
+    }
+    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
+
+    NativeTokenInfo tokenInfo;
+    if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
+        LOGE("GetCallerProcessName failed");
+        return ERR_DM_FAILED;
+    }
+    processName = std::move(tokenInfo.processName);
+    LOGI("Get process name: %s success.", processName.c_str());
+    return DM_OK;
 }
 
 } // namespace DistributedHardware

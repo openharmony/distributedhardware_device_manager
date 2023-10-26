@@ -569,7 +569,6 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     int32_t authType = 4;
     std::string deviceId = "deviceIdTest";
     std::string extra = "extraTest";
-    authManager->authenticationMap_.emplace(authType, nullptr);
     int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }

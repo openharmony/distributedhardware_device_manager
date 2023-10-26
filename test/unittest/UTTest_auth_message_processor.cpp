@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
+constexpr const char* TAG_HOST = "HOST";
 
 void AuthMessageProcessorTest::SetUp()
 {
@@ -107,6 +108,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     jsonObject[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
     jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
+    jsonObject[TAG_HOST] = "";
     std::string str2 = jsonObject.dump();
     ASSERT_EQ(str1, str2);
 }

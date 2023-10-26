@@ -108,6 +108,10 @@ public:
 
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
 
+    int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
+
+    int32_t ExportAuthCode(std::string &authCode);
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

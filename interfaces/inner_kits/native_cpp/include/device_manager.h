@@ -405,6 +405,21 @@ public:
     virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName,
         const std::string &netWorkId, int32_t &netWorkType) = 0;
 
+    /**
+     * @brief Import Auth Code.
+     * @param pkgName  BindDevice caller package name.
+     * @param authCode  Authentication code.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode) = 0;
+
+    /**
+     * @brief Export Auth Code.
+     * @param authCode  Authentication code.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t ExportAuthCode(std::string &authCode) = 0;
+
     // The following interfaces are provided since OpenHarmony 4.1 Version.
     /**
      * @brief Start to discover nearby devices or services.

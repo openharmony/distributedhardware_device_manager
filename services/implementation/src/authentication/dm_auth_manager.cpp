@@ -46,7 +46,7 @@ const int32_t MIN_PIN_TOKEN = 10000000;
 const int32_t MAX_PIN_TOKEN = 90000000;
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
-const int32_t DM_AUTH_TYPE_MAX = 4;
+const int32_t DM_AUTH_TYPE_MAX = 5;
 const int32_t DM_AUTH_TYPE_MIN = 1;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 const int32_t USLEEP_TIME_MS = 500000; // 500ms
@@ -65,6 +65,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
     dmConfigManager.GetAuthAdapter(authenticationMap_);
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
+    authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
 }
 
 DmAuthManager::~DmAuthManager()
@@ -85,12 +86,12 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::shared_ptr<IAuthentication> authentication = authenticationMap_[authType];
     if (listener_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild listener or authUiStateMgr is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (authentication == nullptr) {
+
+    if (!IsAuthTypeSupported(authType)) {
         LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
@@ -104,6 +105,12 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
+        LOGE("Auth code not exist.");
         listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -401,7 +408,12 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         return;
     }
 
-    int32_t pinCode = GeneratePincode();
+    int32_t pinCode = -1;
+    if (authResponseContext_->isShowDialog) {
+        pinCode = GeneratePincode();
+    } else {
+        GetAuthCode(authResponseContext_->hostPkgName, pinCode);
+    }
     nlohmann::json jsonObj;
     jsonObj[PIN_TOKEN] = authResponseContext_->token;
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
@@ -425,6 +437,10 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     LOGI("DmAuthManager OnMemberJoin start authTimes %d", authTimes_);
     isAddingMember_ = false;
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
+        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+            HandleMemberJoinImportAuthCode(requestId, status);
+            return;
+        }
         authTimes_++;
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
@@ -449,6 +465,17 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         }
     } else {
         LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
+    }
+}
+
+void DmAuthManager::HandleMemberJoinImportAuthCode(const int64_t requestId, const int32_t status)
+{
+    if (status != DM_OK || authResponseContext_->requestId != requestId) {
+        authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
+        authRequestContext_->reason = ERR_DM_AUTH_CODE_INCORRECT;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+    } else {
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
     }
 }
 
@@ -501,6 +528,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     authResponseContext_->authType = authRequestContext_->authType;
     authResponseContext_->deviceId = authRequestContext_->deviceId;
+    authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
@@ -510,13 +538,8 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
         });
 }
 
-void DmAuthManager::RespNegotiate(const int32_t &sessionId)
+void DmAuthManager::AbilityNegotiate()
 {
-    if (authResponseContext_ == nullptr || authRequestState_ != nullptr) {
-        LOGE("failed to RespNegotiate because authResponseContext_ is nullptr");
-        return;
-    }
-    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
@@ -528,13 +551,28 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     }
     authResponseContext_->localDeviceId = localDeviceId;
 
-    std::shared_ptr<IAuthentication> authentication = authenticationMap_[authResponseContext_->authType];
-    if (authentication == nullptr) {
+    if (!IsAuthTypeSupported(authResponseContext_->authType)) {
         LOGE("DmAuthManager::AuthenticateDevice authType %d not support.", authResponseContext_->authType);
         authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
     } else {
         authPtr_ = authenticationMap_[authResponseContext_->authType];
     }
+
+    if (IsAuthCodeReady(authResponseContext_->hostPkgName)) {
+        authResponseContext_->isAuthCodeReady = true;
+    } else {
+        authResponseContext_->isAuthCodeReady = false;
+    }
+}
+
+void DmAuthManager::RespNegotiate(const int32_t &sessionId)
+{
+    if (authResponseContext_ == nullptr || authRequestState_ != nullptr) {
+        LOGE("failed to RespNegotiate because authResponseContext_ is nullptr");
+        return;
+    }
+    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    AbilityNegotiate();
 
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
@@ -591,6 +629,12 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
         }
+    }
+    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
+        (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        authResponseContext_->isAuthCodeReady == false)) {
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return;
     }
 
     std::vector<std::string> messageList = authMessageProcessor_->CreateAuthRequestMessage();
@@ -743,6 +787,7 @@ void DmAuthManager::AuthenticateFinish()
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
         timer_->DeleteAll();
+        DeleteAuthCode();
         isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
         authResponseState_ = nullptr;
@@ -762,6 +807,7 @@ void DmAuthManager::AuthenticateFinish()
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
+        DeleteAuthCode();
         usleep(USLEEP_TIME_MS); // 500ms
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
         timer_->DeleteAll();
@@ -889,6 +935,11 @@ void DmAuthManager::ShowConfigDialog()
         LOGE("failed to ShowConfigDialog because authResponseContext_ is nullptr");
         return;
     }
+    if (!authResponseContext_->isShowDialog) {
+        LOGI("start auth process");
+        StartAuthProcess(USER_OPERATION_TYPE_ALLOW_AUTH);
+        return;
+    }
     LOGI("ShowConfigDialog start");
     dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
@@ -912,6 +963,10 @@ void DmAuthManager::ShowAuthInfoDialog()
         return;
     }
     LOGI("DmAuthManager::ShowAuthInfoDialog start %d", authResponseContext_->code);
+    if (!authResponseContext_->isShowDialog) {
+        LOGI("not show dialog.");
+        return;
+    }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = jsonObj.dump();
@@ -922,6 +977,16 @@ void DmAuthManager::ShowStartAuthDialog()
 {
     if (authResponseContext_ == nullptr) {
         LOGE("failed to ShowStartAuthDialog because authResponseContext_ is nullptr");
+        return;
+    }
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        LOGI("Add member start");
+        int32_t pinCode = -1;
+        if (GetAuthCode(authResponseContext_->hostPkgName, pinCode) != DM_OK) {
+            LOGE("failed to get auth code");
+            return;
+        }
+        AddMember(pinCode);
         return;
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
@@ -1037,6 +1102,62 @@ bool DmAuthManager::IsIdenticalAccount()
     }
     std::vector<GroupInfo> groupList;
     if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+        return false;
+    }
+    return true;
+}
+
+int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
+{
+    if (authCode.empty() || pkgName.empty()) {
+        LOGE("ImportAuthCode failed, authCode or pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    importAuthCode_ = authCode;
+    importPkgName_ = pkgName;
+    return DM_OK;
+}
+
+bool DmAuthManager::IsAuthCodeReady(const std::string &pkgName)
+{
+    if (importAuthCode_.empty() || importPkgName_.empty()) {
+        LOGE("DmAuthManager::IsAuthCodeReady, auth code not ready.");
+        return false;
+    }
+    if (pkgName != importPkgName_) {
+        LOGE("IsAuthCodeReady failed, pkgName not supported.");
+        return false;
+    }
+    return true;
+}
+
+int32_t DmAuthManager::DeleteAuthCode()
+{
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        importAuthCode_ = "";
+        importPkgName_ = "";
+    }
+    return DM_OK;
+}
+
+int32_t DmAuthManager::GetAuthCode(const std::string &pkgName, int32_t &pinCode)
+{
+    if (importAuthCode_.empty() || importPkgName_.empty()) {
+        LOGE("GetAuthCode failed, auth code not exist.");
+        return ERR_DM_FAILED;
+    }
+    if (pkgName != importPkgName_) {
+        LOGE("GetAuthCode failed, pkgName not supported.");
+        return ERR_DM_FAILED;
+    }
+    pinCode = std::stoi(importAuthCode_);
+    return DM_OK;
+}
+
+bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
+{
+    if (authenticationMap_.find(authType) == authenticationMap_.end()) {
+        LOGE("IsAuthTypeSupported failed, authType is not supported.");
         return false;
     }
     return true;
