@@ -56,6 +56,12 @@ public:
     void UnRegisterDeviceManagerFaCallback(const std::string &pkgName);
     void RegisterCredentialCallback(const std::string &pkgName, std::shared_ptr<CredentialCallback> callback);
     void UnRegisterCredentialCallback(const std::string &pkgName);
+    void RegisterBindCallback(const std::string &pkgName, const PeerTargetId &targetId,
+        std::shared_ptr<BindTargetCallback> callback);
+    void RegisterUnbindCallback(const std::string &pkgName, const PeerTargetId &targetId,
+        std::shared_ptr<UnbindTargetCallback> callback);
+    void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
+    void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
 
 public:
     void OnRemoteDied();
@@ -91,6 +97,8 @@ private:
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback_;
     std::map<std::string, std::shared_ptr<DeviceManagerUiCallback>> dmUiCallback_;
     std::map<std::string, std::shared_ptr<CredentialCallback>> credentialCallback_;
+    std::map<std::string, std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>> bindCallback_;
+    std::map<std::string, std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>> unbindCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

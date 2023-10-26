@@ -26,6 +26,8 @@
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
+#include "ipc_bind_target_req.h"
+#include "ipc_common_param_req.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
@@ -1486,6 +1488,24 @@ int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
 
     uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string discParaStr = ConvertMapToJsonString(discoverParam);
+    std::string filterOpStr = ConvertMapToJsonString(filterOptions);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(discParaStr);
+    req->SetSecondParam(filterOpStr);
+    int32_t ret = ipcClientProxy_->SendRequest(START_DISCOVERING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartDiscovering error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartDiscovering error: Failed with ret %d", ret);
+        return ret;
+    }
 
     DmTraceEnd();
     LOGI("StartDiscovering completed, pkgName: %s", pkgName.c_str());
@@ -1509,6 +1529,22 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string discParaStr = ConvertMapToJsonString(discoverParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(discParaStr);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopDiscovering error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopDiscovering error: Failed with ret %d", ret);
+        return ret;
+    }
 
     LOGI("StopDiscovering completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
@@ -1518,8 +1554,6 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
     std::shared_ptr<DiscoveryCallback> callback)
 {
-    (void)discoverParam;
-    (void)filterOptions;
     if (pkgName.empty() || callback == nullptr) {
         LOGE("DeviceManagerImpl::RegisterDiscoveryCallback failed: input callback is null or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1527,12 +1561,15 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     LOGI("RegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
 
     uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string discParaStr = ConvertMapToJsonString(discoverParam);
+    std::string filterOpStr = ConvertMapToJsonString(filterOptions);
 
-    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-
+    req->SetFirstParam(discParaStr);
+    req->SetSecondParam(filterOpStr);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGE("RegisterDiscoveryCallback error: Send Request failed ret: %d", ret);
@@ -1560,11 +1597,14 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::map<std::string, std::string> extraParam;
+    extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string extraParaStr = ConvertMapToJsonString(extraParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-
+    req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %d", ret);
@@ -1590,6 +1630,22 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
 
     int32_t publishId = AddPublishCallback(pkgName, callback);
     advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
+    std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(adverParaStr);
+    int32_t ret = ipcClientProxy_->SendRequest(START_ADVERTISING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartAdvertising error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartAdvertising error: Failed with ret %d", ret);
+        return ret;
+    }
 
     LOGI("DeviceManagerImpl::StartAdvertising completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
@@ -1610,20 +1666,99 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
+    std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(adverParaStr);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_ADVERTISING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopAdvertising error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopAdvertising error: Failed with ret %d", ret);
+        return ret;
+    }
+
     LOGI("DeviceManagerImpl::StopAdvertising completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId)) {
+        LOGE("DeviceManagerImpl::BindTarget failed: input pkgName or targetId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::BindTarget start, pkgName: %s", pkgName.c_str());
+    std::string bindParamStr = ConvertMapToJsonString(bindParam);
+
+    std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetPeerTargetId(targetId);
+    req->SetBindParam(bindParamStr);
+    int32_t ret = ipcClientProxy_->SendRequest(BIND_TARGET, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("BindTarget error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("BindTarget error: Failed with ret %d", ret);
+        return ret;
+    }
+    DeviceManagerNotify::GetInstance().RegisterBindCallback(pkgName, targetId, callback);
+
+    LOGI("DeviceManagerImpl::BindTarget completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    std::map<std::string, std::string> &unbindParam, std::shared_ptr<UnbindTargetCallback> callback)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId)) {
+        LOGE("DeviceManagerImpl::UnbindTarget failed: input pkgName or targetId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::UnbindTarget start, pkgName: %s", pkgName.c_str());
+    std::string unbindParamStr = ConvertMapToJsonString(unbindParam);
+
+    std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetPeerTargetId(targetId);
+    req->SetBindParam(unbindParamStr);
+    int32_t ret = ipcClientProxy_->SendRequest(UNBIND_TARGET, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnbindTarget error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnbindTarget error: Failed with ret %d", ret);
+        return ret;
+    }
+    DeviceManagerNotify::GetInstance().RegisterUnbindCallback(pkgName, targetId, callback);
+
+    LOGI("DeviceManagerImpl::UnbindTarget completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 
 int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName,
     const std::map<std::string, std::string> &filterOptions, bool isRefresh,
-    std::vector<DmDeviceBasicInfo> &deviceList)
+    std::vector<DmDeviceInfo> &deviceList)
 {
     if (pkgName.empty()) {
         LOGE("DeviceManagerImpl::GetTrustedDeviceList failed: input pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %s", pkgName.c_str());
-    return DM_OK;
+    std::string filterOpStr = ConvertMapToJsonString(filterOptions);
+    return GetTrustedDeviceList(pkgName, filterOpStr, isRefresh, deviceList);
 }
 
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,

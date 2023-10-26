@@ -21,6 +21,7 @@
 #include "dm_log.h"
 #include "dm_crypto.h"
 #include "ipc_notify_auth_result_req.h"
+#include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_discovery_req.h"
@@ -190,6 +191,32 @@ void DeviceManagerServiceListener::OnCredentialResult(const std::string &pkgName
     pReq->SetCredentialAction(action);
     pReq->SetCredentialResult(resultInfo);
     ipcServerListener_.SendRequest(SERVER_CREDENTIAL_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, std::string content)
+{
+    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
+    pReq->SetPkgName(pkgName);
+    pReq->SetPeerTargetId(targetId);
+    pReq->SetResult(result);
+    pReq->SetContent(content);
+    ipcServerListener_.SendRequest(BIND_TARGET_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, std::string content)
+{
+    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
+    pReq->SetPkgName(pkgName);
+    pReq->SetPeerTargetId(targetId);
+    pReq->SetResult(result);
+    pReq->SetContent(content);
+    ipcServerListener_.SendRequest(UNBIND_TARGET_RESULT, pReq, pRsp);
 }
 
 void DeviceManagerServiceListener::RegisterDmListener(const std::string &pkgName, const std::string &appId)

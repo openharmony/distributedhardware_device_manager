@@ -309,9 +309,15 @@ public:
     virtual int32_t StopAdvertising(const std::string &pkgName,
         std::map<std::string, std::string> &advertiseParam) override;
 
+    virtual int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
+    
+    virtual int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &unbindParam, std::shared_ptr<UnbindTargetCallback> callback) override;
+
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName,
         const std::map<std::string, std::string> &filterOptions, bool isRefresh,
-        std::vector<DmDeviceBasicInfo> &deviceList) override;
+        std::vector<DmDeviceInfo> &deviceList) override;
 
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName,
         const std::map<std::string, std::string> &extraParam,
