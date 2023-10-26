@@ -29,6 +29,7 @@
 #include "permission_manager.h"
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
+constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 const std::string PKGNAME_WHILTE_LIST = "com.ohos.dmtest";
 
 namespace OHOS {
