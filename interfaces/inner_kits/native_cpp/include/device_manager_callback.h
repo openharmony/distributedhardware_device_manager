@@ -52,6 +52,7 @@ public:
     virtual void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
     virtual void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) = 0;
 };
+
 class DiscoveryCallback {
 public:
     virtual ~DiscoveryCallback()
@@ -78,6 +79,22 @@ public:
     }
     virtual void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
                               int32_t reason) = 0;
+};
+
+class BindTargetCallback {
+public:
+    virtual ~BindTargetCallback()
+    {
+    }
+    virtual void OnBindResult(const PeerTargetId &targetId, int32_t result, std::string content) = 0;
+};
+
+class UnbindTargetCallback {
+public:
+    virtual ~UnbindTargetCallback()
+    {
+    }
+    virtual void OnUnbindResult(const PeerTargetId &targetId, int32_t result, std::string content) = 0;
 };
 
 class VerifyAuthCallback {

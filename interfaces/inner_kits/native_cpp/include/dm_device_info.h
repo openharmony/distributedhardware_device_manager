@@ -251,6 +251,44 @@ typedef struct DmAuthParam {
     DmAppImageInfo imageinfo;
 } DmAuthParam;
 
+/**
+ * @brief Peer target id Information.
+ */
+typedef struct PeerTargetId {
+    /**
+     * device id.
+     */
+    std::string deviceId;
+    /**
+     * br mac address.
+     */
+    std::string brMac;
+    /**
+     * ble mac address.
+     */
+    std::string bleMac;
+    /**
+     * wlan ip address.
+     */
+    std::string wifiIp;
+    /**
+     * wlan ip port.
+     */
+    uint16_t wifiPort;
+
+    bool operator==(const PeerTargetId &other) const
+    {
+        return (deviceId == other.deviceId) && (brMac == other.brMac) &&
+            (bleMac == other.bleMac) && (wifiIp == other.wifiIp) && (wifiPort == other.wifiPort);
+    }
+
+    bool operator<(const PeerTargetId &other) const
+    {
+        return (deviceId < other.deviceId) && (brMac < other.brMac) &&
+            (bleMac < other.bleMac) && (wifiIp < other.wifiIp) && (wifiPort < other.wifiPort);
+    }
+} PeerTargetId;
+
 typedef enum {
     BIT_NETWORK_TYPE_UNKNOWN = 0,  /**< Unknown network type */
     BIT_NETWORK_TYPE_WIFI,         /**< WIFI network type */

@@ -81,6 +81,7 @@ enum {
     ERR_DM_DISABLE_DISCOVERY_LISTENER_FAILED = -20049,
     ERR_DM_START_DISCOVERING_FAILED = -20050,
     ERR_DM_STOP_DISCOVERING_FAILED = -20051,
+    ERR_DM_SOFTBUS_SERVICE_NOT_INIT = -20052,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -136,6 +137,7 @@ const std::string FILTER_PARA_RANGE = "RANGE";
 const std::string FILTER_PARA_IS_TRUSTED = "IS_TRUSTED";
 
 // Connection address type
+const std::string CONN_ADDR_TYPE_ID = "ID_TYPE";
 const std::string CONN_ADDR_TYPE_BR = "BR_TYPE";
 const std::string CONN_ADDR_TYPE_BLE = "BLE_TYPE";
 const std::string CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";

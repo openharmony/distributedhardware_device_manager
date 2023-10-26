@@ -167,6 +167,12 @@ public:
 
     int32_t StopAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
 
+    int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    
+    int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &unbindParam);
+
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::map<std::string, std::string> &filterOptions,
         bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList);
 

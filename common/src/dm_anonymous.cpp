@@ -128,5 +128,37 @@ bool IsBool(const nlohmann::json &jsonObj, const std::string &key)
     }
     return res;
 }
+
+std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap)
+{
+    std::string jsonStr = "";
+    if (!paramMap.empty()) {
+        nlohmann::json jsonObj;
+        for (const auto &it : paramMap) {
+            jsonObj[it.first] = it.second;
+        }
+        jsonStr = jsonObj.dump();
+    }
+    return jsonStr;
+}
+
+void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap)
+{
+    if (jsonStr.empty()) {
+        return;
+    }
+    nlohmann::json paramJson = nlohmann::json::parse(jsonStr, nullptr, false);
+    if (paramJson.is_discarded()) {
+        return;
+    }
+    for (auto &element : paramJson.items()) {
+        paramMap.insert(std::pair<std::string, std::string>(element.key(), element.value()));
+    }
+}
+
+bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
+{
+    return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

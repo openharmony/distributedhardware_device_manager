@@ -16,7 +16,10 @@
 #ifndef OHOS_DM_ANONYMOUS_H
 #define OHOS_DM_ANONYMOUS_H
 
+#include <map>
 #include <string>
+
+#include "dm_device_info.h"
 
 #include "nlohmann/json.hpp"
 
@@ -30,6 +33,9 @@ bool IsInt32(const nlohmann::json &jsonObj, const std::string &key);
 bool IsInt64(const nlohmann::json &jsonObj, const std::string &key);
 bool IsArray(const nlohmann::json &jsonObj, const std::string &key);
 bool IsBool(const nlohmann::json &jsonObj, const std::string &key);
+std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap);
+void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
+bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H
