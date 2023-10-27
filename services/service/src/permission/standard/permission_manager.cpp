@@ -33,6 +33,12 @@ IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
+
+#define AUTH_CODE_WHITE_LIST_NUM (8)
+constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "com.huawei.msdp.hmringgenerator",
+    "com.huawei.msdp.hmringdiscriminator",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -94,5 +100,25 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
+bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
+{
+    LOGI("Enter PermissionManager::CheckProcessNameValidOnAuthCode");
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+
+    uint16_t index = 0;
+    size_t len = 0;
+    for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
+        len = strnlen(g_authCodeWhiteList[index], PKG_NAME_SIZE_MAX);
+        if (strncmp(processName.c_str(), g_authCodeWhiteList[index], len) == 0) {
+            return true;
+        }
+    }
+
+    LOGE("CheckProcessNameValidOnAuthCode process name: %s invalid.", processName.c_str());
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

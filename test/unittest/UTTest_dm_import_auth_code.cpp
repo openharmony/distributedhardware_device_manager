@@ -44,7 +44,7 @@ void DMImportAuthCodeTest::SetUp()
         .dcaps = NULL,
         .perms = perms,
         .acls = NULL,
-        .processName = "com.ohos.dmtest",
+        .processName = "com.huawei.msdp.hmringgenerator",
         .aplStr = "system_core",
     };
     tokenId = GetAccessTokenId(&infoInstance);

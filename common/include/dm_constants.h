@@ -97,6 +97,7 @@ constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 const static char *DM_CAPABILITY_OSD = "osdCapability";
 const static char *DM_CAPABILITY_APPROACH = "approach";
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 
 //The following constant are provided only for HiLink.
 const static char *EXT_PART = "ext_part";

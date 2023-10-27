@@ -30,7 +30,6 @@
 
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
-const std::string PKGNAME_WHILTE_LIST = "com.ohos.dmtest";
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -886,7 +885,7 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
         LOGE("Get caller process name failed, pkgname: %s.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
-    if (processName != PKGNAME_WHILTE_LIST) {
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
         LOGE("The caller: %s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -913,7 +912,7 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         LOGE("Get caller process name failed, processName: %s.", processName.c_str());
         return ERR_DM_FAILED;
     }
-    if (processName != PKGNAME_WHILTE_LIST) {
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
         LOGE("The caller: %s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
