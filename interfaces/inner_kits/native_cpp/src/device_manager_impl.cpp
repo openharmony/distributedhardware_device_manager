@@ -1490,15 +1490,12 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    bool isAuthCodeValid = true;
+
     for (int32_t i = 0; i < length; i++) {
         if (!isdigit(authCode[i])) {
-            isAuthCodeValid = false;
+            LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            return ERR_DM_INPUT_PARA_INVALID;
         }
-    }
-    if (!isAuthCodeValid) {
-        LOGE("ImportAuthCode error: Invalid para, authCode format error.");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::shared_ptr<IpcImportAuthCodeReq> req = std::make_shared<IpcImportAuthCodeReq>();
