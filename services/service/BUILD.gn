@@ -178,7 +178,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagerservice") {
-    stack_protector_ret = true
+    branch_protector_ret = "pac_ret"
 
     sanitize = {
       boundary_sanitize = true
