@@ -917,7 +917,7 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ImportAuthCode failed, instance not init or init failed.");
+        LOGE("ExportAuthCode failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     LOGI("DeviceManagerService::ExportAuthCode begin.");
