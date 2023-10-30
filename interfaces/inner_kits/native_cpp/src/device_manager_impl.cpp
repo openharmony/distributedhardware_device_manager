@@ -28,6 +28,7 @@
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
 #include "ipc_common_param_req.h"
+#include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
@@ -43,6 +44,7 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_get_availabledevice_req.h"
 #include "ipc_get_availabledevice_rsp.h"
+#include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_req.h"
@@ -92,6 +94,7 @@ constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
 const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
 const uint16_t DM_INVALID_FLAG_ID = 0;
+const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
 
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
@@ -1472,6 +1475,69 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
         return ret;
     }
     netWorkType = rsp->GetNetworkType();
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
+{
+    if (authCode.empty() || pkgName.empty()) {
+        LOGE("ImportAuthCode error: Invalid para, authCode: %s, pkgName: %s", authCode.c_str(), pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("ImportAuthCode start, authCode: %s", authCode.c_str());
+    int32_t length = authCode.length();
+    if (length != DM_IMPORT_AUTH_CODE_LENGTH) {
+        LOGE("ImportAuthCode error: Invalid para, authCode size error.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    for (int32_t i = 0; i < length; i++) {
+        if (!isdigit(authCode[i])) {
+            LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+
+    std::shared_ptr<IpcImportAuthCodeReq> req = std::make_shared<IpcImportAuthCodeReq>();
+    req->SetAuthCode(authCode);
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(IMPORT_AUTH_CODE, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("ImportAuthCode Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("ImportAuthCode Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
+{
+    LOGI("ExportAuthCode start");
+
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcExportAuthCodeRsp> rsp = std::make_shared<IpcExportAuthCodeRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(EXPORT_AUTH_CODE, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("ExportAuthCode Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("ExportAuthCode Failed with ret %d", ret);
+        return ret;
+    }
+
+    authCode = rsp->GetAuthCode();
+    LOGI("ExportAuthCode success, authCode: %s.", authCode.c_str());
     return DM_OK;
 }
 

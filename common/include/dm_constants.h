@@ -81,6 +81,7 @@ enum {
     ERR_DM_START_DISCOVERING_FAILED = -20050,
     ERR_DM_STOP_DISCOVERING_FAILED = -20051,
     ERR_DM_SOFTBUS_SERVICE_NOT_INIT = -20052,
+    ERR_DM_AUTH_CODE_INCORRECT = -20053,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -96,6 +97,7 @@ constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 const static char *DM_CAPABILITY_OSD = "osdCapability";
 const static char *DM_CAPABILITY_APPROACH = "approach";
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 
 //The following constant are provided only for HiLink.
 const static char *EXT_PART = "ext_part";
@@ -112,7 +114,6 @@ constexpr const char AUTH_ALWAYS = '1';
 constexpr const char AUTH_ONCE = '0';
 
 // HiChain
-constexpr int32_t AUTH_TYPE_PIN = 1;
 constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
 constexpr int32_t GROUP_TYPE_INVALID_GROUP = -1;

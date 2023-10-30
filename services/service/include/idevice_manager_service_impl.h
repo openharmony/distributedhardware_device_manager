@@ -240,6 +240,20 @@ public:
     virtual int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::ImportAuthCode
+     * @tc.desc: ImportAuthCode
+     * @tc.type: FUNC
+     */
+    virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::ExportAuthCode
+     * @tc.desc: ExportAuthCode
+     * @tc.type: FUNC
+     */
+    virtual int32_t ExportAuthCode(std::string &authCode);
+
+    /**
      * @tc.name: IDeviceManagerServiceImpl::LoadHardwareFwkService
      * @tc.desc: LoadHardwareFwkService
      * @tc.type: FUNC

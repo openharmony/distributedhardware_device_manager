@@ -16,6 +16,9 @@
 #ifndef OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 #define OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 
+#include <cstdint>
+#include <string>
+
 #include "single_instance.h"
 
 namespace OHOS {
@@ -26,6 +29,8 @@ class PermissionManager {
 public:
     bool CheckPermission(void);
     bool CheckNewPermission(void);
+    int32_t GetCallerProcessName(std::string &processName);
+    bool CheckProcessNameValidOnAuthCode(const std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -874,6 +874,56 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
     return DM_OK;
 }
 
+int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call ImportAuthCode.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::ImportAuthCode begin.");
+    if (authCode.empty() || pkgName.empty()) {
+        LOGE("Invalid parameter, authCode: %s.", authCode.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportAuthCode failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->ImportAuthCode(pkgName, authCode);
+}
+
+int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call ExportAuthCode.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, processName: %s.", processName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ExportAuthCode failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    LOGI("DeviceManagerService::ExportAuthCode begin.");
+    return dmServiceImpl_->ExportAuthCode(authCode);
+}
+
 void DeviceManagerService::UnloadDMServiceImplSo()
 {
     LOGI("DeviceManagerService::UnloadDMServiceImplSo start.");

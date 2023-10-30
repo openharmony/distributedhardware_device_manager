@@ -63,6 +63,11 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         jsonObj[TAG_TARGET] = authRequestContext_->targetPkgName;
         jsonObj[TAG_HOST] = authRequestContext_->hostPkgName;
     }
+    if (authRequestContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        jsonObj[TAG_IS_SHOW_DIALOG] = false;
+    } else {
+        jsonObj[TAG_IS_SHOW_DIALOG] = true;
+    }
     jsonObj[TAG_APP_OPERATION] = authRequestContext_->appOperation;
     jsonObj[TAG_CUSTOM_DESCRIPTION] = authRequestContext_->customDesc;
     jsonObj[TAG_APP_NAME] = authRequestContext_->appName;
@@ -96,8 +101,10 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
     jsonObj[TAG_MSG_TYPE] = msgType;
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
-        case MSG_TYPE_RESP_NEGOTIATE:
             CreateNegotiateMessage(jsonObj);
+            break;
+        case MSG_TYPE_RESP_NEGOTIATE:
+            CreateRespNegotiateMessage(jsonObj);
             break;
         case MSG_TYPE_SYNC_GROUP:
             CreateSyncGroupMessage(jsonObj);
@@ -124,9 +131,26 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
         json[TAG_CRYPTO_VERSION] = cryptoAdapter_->GetVersion();
         json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     }
+    json[TAG_HOST] = authResponseContext_->hostPkgName;
     json[TAG_AUTH_TYPE] = authResponseContext_->authType;
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
+}
+
+void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
+{
+    if (cryptoAdapter_ == nullptr) {
+        json[TAG_CRYPTO_SUPPORT] = false;
+    } else {
+        json[TAG_CRYPTO_SUPPORT] = true;
+        json[TAG_CRYPTO_NAME] = cryptoAdapter_->GetName();
+        json[TAG_CRYPTO_VERSION] = cryptoAdapter_->GetVersion();
+        json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
+    }
+    json[TAG_AUTH_TYPE] = authResponseContext_->authType;
+    json[TAG_REPLY] = authResponseContext_->reply;
+    json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
+    json[TAG_IS_AUTH_CODE_READY] = authResponseContext_->isAuthCodeReady;
 }
 
 void AuthMessageProcessor::CreateSyncGroupMessage(nlohmann::json &json)
@@ -261,6 +285,11 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
         authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
         return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
     }
+    if (IsBool(json, TAG_IS_SHOW_DIALOG)) {
+        authResponseContext_->isShowDialog = json[TAG_IS_SHOW_DIALOG].get<bool>();
+    } else {
+        authResponseContext_->isShowDialog = true;
+    }
     return DM_OK;
 }
 
@@ -319,6 +348,9 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
     }
+    if (IsString(json, TAG_HOST)) {
+        authResponseContext_->hostPkgName = json[TAG_HOST].get<std::string>();
+    }
 }
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
@@ -331,6 +363,9 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     }
     if (IsString(json, TAG_LOCAL_DEVICE_ID)) {
         authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
+    }
+    if (IsBool(json, TAG_IS_AUTH_CODE_READY)) {
+        authResponseContext_->isAuthCodeReady = json[TAG_IS_AUTH_CODE_READY].get<bool>();
     }
 }
 

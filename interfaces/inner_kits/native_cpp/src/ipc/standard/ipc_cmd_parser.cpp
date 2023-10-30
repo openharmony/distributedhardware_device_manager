@@ -24,6 +24,7 @@
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
 #include "ipc_def.h"
+#include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_dmfaparam_rsp.h"
@@ -40,6 +41,7 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_get_availabledevice_req.h"
 #include "ipc_get_availabledevice_rsp.h"
+#include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_register_dev_state_callback_req.h"
 #include "ipc_register_listener_req.h"
@@ -1156,6 +1158,46 @@ ON_IPC_SET_REQUEST(UNREGISTER_UI_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseRe
 ON_IPC_READ_RESPONSE(UNREGISTER_UI_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(IMPORT_AUTH_CODE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcImportAuthCodeReq> pReq = std::static_pointer_cast<IpcImportAuthCodeReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string authCode = pReq->GetAuthCode();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(authCode)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(IMPORT_AUTH_CODE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(EXPORT_AUTH_CODE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    LOGI("send export auth code request!");
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(EXPORT_AUTH_CODE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcExportAuthCodeRsp> pRsp = std::static_pointer_cast<IpcExportAuthCodeRsp>(pBaseRsp);
+    if (pRsp == nullptr) {
+        LOGE("GetAvailableDeviceList pRsp is null");
+        return ERR_DM_FAILED;
+    }
+    std::string authCode = reply.ReadString();
+    pRsp->SetAuthCode(authCode);
+    pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 

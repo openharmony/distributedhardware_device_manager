@@ -149,6 +149,8 @@ public:
     int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId, int32_t &networkType);
     int32_t RegisterUiStateCallback(const std::string &pkgName);
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
+    int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
+    int32_t ExportAuthCode(std::string &authCode);
 
     // The following interfaces are provided since OpenHarmony 4.1 Version.
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,

@@ -39,6 +39,8 @@ constexpr const char* TAG_LOCAL_DEVICE_ID = "LOCALDEVICEID";
 constexpr const char* TAG_LOCAL_DEVICE_TYPE = "LOCALDEVICETYPE";
 constexpr const char* TAG_INDEX = "INDEX";
 constexpr const char* TAG_SLICE_NUM = "SLICE";
+constexpr const char* TAG_IS_AUTH_CODE_READY = "IS_AUTH_CODE_READY";
+constexpr const char* TAG_IS_SHOW_DIALOG = "IS_SHOW_DIALOG";
 constexpr const char* TAG_TOKEN = "TOKEN";
 constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
@@ -67,6 +69,7 @@ public:
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);
     void CreateNegotiateMessage(nlohmann::json &json);
+    void CreateRespNegotiateMessage(nlohmann::json &json);
     void CreateSyncGroupMessage(nlohmann::json &json);
     void CreateResponseAuthMessage(nlohmann::json &json);
     void ParseAuthResponseMessage(nlohmann::json &json);

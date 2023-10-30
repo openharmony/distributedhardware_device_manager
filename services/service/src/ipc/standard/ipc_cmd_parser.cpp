@@ -997,6 +997,33 @@ ON_IPC_CMD(UNREGISTER_UI_STATE_CALLBACK, MessageParcel &data, MessageParcel &rep
     return DM_OK;
 }
 
+ON_IPC_CMD(IMPORT_AUTH_CODE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string authCode = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(EXPORT_AUTH_CODE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string authCode = "";
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
+    if (!reply.WriteString(authCode)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(REGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();

@@ -289,6 +289,8 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) override;
     virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                        int32_t &netWorkType) override;
+    virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode) override;
+    virtual int32_t ExportAuthCode(std::string &authCode) override;
 
     // The following interfaces are provided since OpenHarmony 4.1 Version.
     virtual int32_t StartDiscovering(const std::string &pkgName, std::map<std::string, std::string> &discoverParam,

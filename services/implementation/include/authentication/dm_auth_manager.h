@@ -66,6 +66,15 @@ enum DmMsgType : int32_t {
     MSG_TYPE_AUTH_BY_PIN = 500,
 };
 
+enum DmAuthType : int32_t {
+    AUTH_TYPE_CRE = 0,
+    AUTH_TYPE_PIN,
+    AUTH_TYPE_QR_CODE,
+    AUTH_TYPE_NFC,
+    AUTH_TYPE_NO_INTER_ACTION,
+    AUTH_TYPE_IMPORT_AUTH_CODE,
+};
+
 typedef struct DmAuthRequestContext {
     int32_t authType;
     std::string localDeviceId;
@@ -101,6 +110,8 @@ typedef struct DmAuthResponseContext {
     int32_t sessionId;
     bool cryptoSupport;
     bool isIdenticalAccount;
+    bool isAuthCodeReady;
+    bool isShowDialog;
     std::string cryptoName;
     std::string cryptoVer;
     int32_t reply;
@@ -408,11 +419,24 @@ public:
      * @tc.type: FUNC
      */
     int32_t UnRegisterUiStateCallback(const std::string pkgName);
+
+    /**
+     * @tc.name: DmAuthManager::ImportAuthCode
+     * @tc.desc: Import auth code
+     * @tc.type: FUNC
+     */
+    int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
+    void AbilityNegotiate();
+    void HandleMemberJoinImportAuthCode(const int64_t requestId, const int32_t status);
+    int32_t DeleteAuthCode();
+    int32_t GetAuthCode(const std::string &pkgName, int32_t &pinCode);
+    bool IsAuthTypeSupported(const int32_t &authType);
+    bool IsAuthCodeReady(const std::string &pkgName);
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
@@ -433,6 +457,8 @@ private:
     int32_t action_ = USER_OPERATION_TYPE_CANCEL_AUTH;
     std::shared_ptr<IAuthentication> authPtr_;
     bool isAddingMember_ = false;
+    std::string importPkgName_ = "";
+    std::string importAuthCode_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

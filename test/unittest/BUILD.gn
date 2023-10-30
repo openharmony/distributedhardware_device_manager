@@ -36,6 +36,7 @@ group("unittest") {
     ":UTTest_dm_dfx",
     ":UTTest_dm_discovery_filter",
     ":UTTest_dm_discovery_manager",
+    ":UTTest_dm_import_auth_code",
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_timer",
     ":UTTest_hichain_connector",
@@ -411,6 +412,19 @@ ohos_unittest("UTTest_device_manager_impl") {
 }
 
 ## UnitTest UTTest_device_manager_impl }}}
+
+## UnitTest UTTest_dm_import_auth_code {{{
+ohos_unittest("UTTest_dm_import_auth_code") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_import_auth_code.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
+}
+
+## UnitTest UTTest_dm_import_auth_code }}}
 
 ## UnitTest UTTest_multiple_user_connector {{{
 ohos_unittest("UTTest_multiple_user_connector") {

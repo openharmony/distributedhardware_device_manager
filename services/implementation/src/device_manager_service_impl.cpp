@@ -509,6 +509,24 @@ int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, 
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
+{
+    if (pkgName.empty() || authCode.empty()) {
+        LOGE("ImportAuthCode failed, pkgName or authCode is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return authMgr_->ImportAuthCode(pkgName, authCode);
+}
+
+int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
+{
+    int32_t ret = authMgr_->GeneratePincode();
+    authCode = std::to_string(ret);
+    LOGE("ExportAuthCode success, authCode: %s.", authCode.c_str());
+    return DM_OK;
+}
+
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
