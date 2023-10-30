@@ -916,6 +916,10 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         LOGE("The caller: %s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportAuthCode failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
     LOGI("DeviceManagerService::ExportAuthCode begin.");
     return dmServiceImpl_->ExportAuthCode(authCode);
 }

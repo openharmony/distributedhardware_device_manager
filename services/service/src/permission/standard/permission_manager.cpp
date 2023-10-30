@@ -89,13 +89,26 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
     LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
-
-    NativeTokenInfo tokenInfo;
-    if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
-        LOGE("GetCallerProcessName failed");
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo tokenInfo;
+        if (AccessTokenKit::GetHapTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.bundleName);
+    } else if {
+        NativeTokenInfo tokenInfo;
+        if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetCallerProcessName failed");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.processName);
+    } else {
+        LOGE("GetCallerProcessName failed, unsupported process.");
         return ERR_DM_FAILED;
     }
-    processName = std::move(tokenInfo.processName);
+
     LOGI("Get process name: %s success.", processName.c_str());
     return DM_OK;
 }
