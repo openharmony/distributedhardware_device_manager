@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ohos_shared_library("distributeddevicemanager") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
 
   sanitize = {
     boundary_sanitize = true
