@@ -97,7 +97,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
             return ERR_DM_FAILED;
         }
         processName = std::move(tokenInfo.bundleName);
-    } else if {
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         NativeTokenInfo tokenInfo;
         if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
             LOGE("GetCallerProcessName failed");
