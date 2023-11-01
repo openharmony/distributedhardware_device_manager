@@ -777,6 +777,7 @@ void DmAuthManager::AuthenticateFinish()
     }
     LOGI("DmAuthManager::AuthenticateFinish start");
     isAddingMember_ = false;
+    DeleteAuthCode();
     if (authResponseState_ != nullptr) {
         if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
             authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
@@ -787,7 +788,6 @@ void DmAuthManager::AuthenticateFinish()
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
         timer_->DeleteAll();
-        DeleteAuthCode();
         isFinishOfLocal_ = true;
         authResponseContext_ = nullptr;
         authResponseState_ = nullptr;
@@ -807,7 +807,6 @@ void DmAuthManager::AuthenticateFinish()
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
-        DeleteAuthCode();
         usleep(USLEEP_TIME_MS); // 500ms
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
         timer_->DeleteAll();
