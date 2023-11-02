@@ -509,6 +509,9 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
             params.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    if (IsDMServiceAdapterLoad()) {
+        dmServiceImplExt_->ReplyUiAction(pkgName, action, params);
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -551,6 +554,9 @@ int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgN
 
 void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
 {
+    if (IsDMServiceAdapterLoad()) {
+        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_ONLINE, info);
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOnline failed, instance not init or init failed.");
         return;
@@ -566,6 +572,9 @@ void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
 
 void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
 {
+    if (IsDMServiceAdapterLoad()) {
+        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_OFFLINE, info);
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceOffline failed, instance not init or init failed.");
         return;
@@ -575,6 +584,9 @@ void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
 
 void DeviceManagerService::HandleDeviceNameChange(DmDeviceInfo &info)
 {
+    if (IsDMServiceAdapterLoad()) {
+        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_INFO_CHANGE, info);
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("HandleDeviceNameChange failed, instance not init or init failed.");
         return;
@@ -1024,8 +1036,8 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         LOGE("StartDiscovering failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->StartDiscoveringExt(pkgName, discoverParam, filterOptions);
@@ -1047,8 +1059,8 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         LOGE("StopDiscovering failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->StopDiscoveringExt(pkgName, discoverParam);
@@ -1070,8 +1082,8 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         LOGE("EnableDiscoveryListener failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (discoverParam.find(PARAM_KEY_T_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->EnableDiscoveryListenerExt(pkgName, discoverParam, filterOptions);
 }
@@ -1092,8 +1104,8 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("DisableDiscoveryListener failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (extraParam.find(PARAM_KEY_T_TYPE) == extraParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (extraParam.find(PARAM_KEY_META_TYPE) == extraParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->DisableDiscoveryListenerExt(pkgName, extraParam);
 }
@@ -1114,8 +1126,8 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("StartAdvertising failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (advertiseParam.find(PARAM_KEY_T_TYPE) == advertiseParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->StartAdvertisingExt(pkgName, advertiseParam);
@@ -1137,8 +1149,8 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         LOGE("StopAdvertising failed, dm service adapter load failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (advertiseParam.find(PARAM_KEY_T_TYPE) == advertiseParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
@@ -1161,8 +1173,8 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         LOGE("BindTarget failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (bindParam.find(PARAM_KEY_T_TYPE) == bindParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->BindTargetExt(pkgName, targetId, bindParam);
@@ -1184,8 +1196,8 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         LOGE("UnbindTarget failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    if (unbindParam.find(PARAM_KEY_T_TYPE) == unbindParam.end()) {
-        LOGE("input discover parameter not contains T_TYPE, dm service adapter not supported.");
+    if (unbindParam.find(PARAM_KEY_META_TYPE) == unbindParam.end()) {
+        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->UnbindTargetExt(pkgName, targetId, unbindParam);

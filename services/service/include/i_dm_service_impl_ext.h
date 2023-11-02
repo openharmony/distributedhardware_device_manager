@@ -25,6 +25,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+enum struct StatusEventCode : int32_t {
+    DEVICE_ONLINE = 0,
+    DEVICE_OFFLINE = 1,
+    DEVICE_INFO_CHANGE = 2,
+};
+
 class IDMServiceImplExt {
 public:
     virtual ~IDMServiceImplExt() {}
@@ -114,7 +120,14 @@ public:
      * @tc.desc: HandleDeviceStatusEvent
      * @tc.type: FUNC
      */
-    virtual int32_t HandleDeviceStatusEvent(int32_t eventCode, const DmDeviceInfo &devInfo) = 0;
+    virtual int32_t HandleDeviceStatusEvent(StatusEventCode eventCode, const DmDeviceInfo &devInfo) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::ReplyUiAction
+     * @tc.desc: ReplyUiAction
+     * @tc.type: FUNC
+     */
+    virtual int32_t ReplyUiAction(const std::string &pkgName, int32_t action, const std::string &result) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
