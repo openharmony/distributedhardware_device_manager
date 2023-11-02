@@ -104,6 +104,7 @@ public:
     }
     virtual void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) = 0;
 };
+
 class DeviceManagerUiCallback {
 public:
     virtual ~DeviceManagerUiCallback()

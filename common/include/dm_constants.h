@@ -65,7 +65,7 @@ enum {
     ERR_DM_BIND_COMMON_FAILED = -20034,
     ERR_DM_BIND_INPUT_PARA_INVALID = -20035,
     ERR_DM_BIND_PIN_CODE_ERROR = -20036,
-    ERR_DM_BIND_PEER_REJECT = -20037,
+    ERR_DM_BIND_USER_CANCEL = -20037,
     ERR_DM_BIND_TIMEOUT_FAILED = -20038,
     ERR_DM_BIND_DP_ERROR = -20039,
     ERR_DM_BIND_HICHAIN_ERROR = -20040,
@@ -82,6 +82,16 @@ enum {
     ERR_DM_STOP_DISCOVERING_FAILED = -20051,
     ERR_DM_SOFTBUS_SERVICE_NOT_INIT = -20052,
     ERR_DM_AUTH_CODE_INCORRECT = -20053,
+    ERR_DM_META_TYPE_INVALID = -20054,
+    ERR_DM_LOAD_CUSTOM_META_NODE = -20055,
+
+    // The following status codes are provided since OpenHarmony 4.1 Version.
+    STATUS_DM_SHOW_AUTHORIZE_UI = -20100,
+    STATUS_DM_CLOSE_AUTHORIZE_UI = -20101,
+    STATUS_DM_SHOW_PIN_DISPLAY_UI = -20102,
+    STATUS_DM_CLOSE_PIN_DISPLAY_UI = -20103,
+    STATUS_DM_SHOW_PIN_INPUT_UI = -20104,
+    STATUS_DM_CLOSE_PIN_INPUT_UI = -20105,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -95,8 +105,11 @@ constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
-const static char *DM_CAPABILITY_OSD = "osdCapability";
-const static char *DM_CAPABILITY_APPROACH = "approach";
+constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
+constexpr const char* DM_CAPABILITY_APPROACH = "approach";
+constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
+constexpr const char* DM_CAPABILITY_SHARE = "share";
+constexpr const char* DM_CAPABILITY_WEAR = "wear";
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 
 //The following constant are provided only for HiLink.
@@ -144,7 +157,7 @@ const std::string CONN_ADDR_TYPE_BLE = "BLE_TYPE";
 const std::string CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
 
 // Parameter Key
-const std::string PARAM_KEY_T_TYPE = "T_TYPE";
+const std::string PARAM_KEY_META_TYPE = "META_TYPE";
 const std::string PARAM_KEY_TARGET_ID = "TARGET_ID";
 const std::string PARAM_KEY_BR_MAC = "BR_MAC";
 const std::string PARAM_KEY_BLE_MAC = "BLE_MAC";
@@ -157,7 +170,6 @@ const std::string PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
 const std::string PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
 const std::string PARAM_KEY_SUBSCRIBE_ID = "SUBSCRIBE_ID";
 const std::string PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
-const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
 const std::string PARAM_KEY_DISC_INCLUDE_TRUST = "DISC_INCLUDE_TRUST";
 } // namespace DistributedHardware
