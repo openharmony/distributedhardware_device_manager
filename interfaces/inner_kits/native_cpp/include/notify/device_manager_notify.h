@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,7 +79,7 @@ public:
     void OnDiscoverySuccess(const std::string &pkgName, uint16_t subscribeId);
     void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
-                      uint32_t status, uint32_t reason);
+                      int32_t status, int32_t reason);
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode, int32_t flag);
     void OnUiCall(std::string &pkgName, std::string &paramJson);
     void OnCredentialResult(const std::string &pkgName, int32_t &action, const std::string &credentialResult);

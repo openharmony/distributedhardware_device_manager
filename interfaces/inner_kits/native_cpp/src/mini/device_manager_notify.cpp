@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -212,7 +212,7 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
 }
 
 void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
-                                       const std::string &token, uint32_t status, uint32_t reason)
+                                       const std::string &token, int32_t status, int32_t reason)
 {
     LOGI("DeviceManagerNotify::OnAuthResult pkgName:%s, status:%d, reason:%d", pkgName.c_str(), status, reason);
 
