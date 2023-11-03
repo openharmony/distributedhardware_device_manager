@@ -135,6 +135,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_AUTH_TYPE] = authResponseContext_->authType;
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
+    json[TAG_ACCOUNT_GROUPID] = authResponseContext_->accountGroupIdHash;
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -347,6 +348,11 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     }
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    }
+    if (IsString(json, TAG_ACCOUNT_GROUPID)) {
+        authResponseContext_->accountGroupIdHash = json[TAG_ACCOUNT_GROUPID].get<std::string>();
+    } else {
+        authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     }
     if (IsString(json, TAG_HOST)) {
         authResponseContext_->hostPkgName = json[TAG_HOST].get<std::string>();

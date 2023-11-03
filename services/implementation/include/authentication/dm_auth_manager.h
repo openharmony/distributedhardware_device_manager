@@ -132,6 +132,7 @@ typedef struct DmAuthResponseContext {
     int32_t code;
     int32_t state;
     std::vector<std::string> syncGroupList;
+    std::string accountGroupIdHash;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -431,6 +432,7 @@ private:
         const std::string &extra);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
+    std::string GetAccountGroupIdHash();
     void AbilityNegotiate();
     void HandleMemberJoinImportAuthCode(const int64_t requestId, const int32_t status);
     int32_t DeleteAuthCode();

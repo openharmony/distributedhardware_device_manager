@@ -19,6 +19,8 @@
 #include "dm_log.h"
 #include "md.h"
 #include "securec.h"
+#include <sstream>
+#include <string>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -105,6 +107,23 @@ int32_t DmSoftbusAdapterCrypto::GetUdidHash(const std::string &udid, unsigned ch
         return ret;
     }
     return DM_OK;
+}
+
+std::string DmSoftbusAdapterCrypto::GetGroupIdHash(const std::string &groupId)
+{
+    char hashResult[SHA_HASH_LEN] = {0};
+    int32_t ret = DmGenerateStrHash((const uint8_t *)groupId.c_str(), strlen(groupId.c_str()),
+        (uint8_t *)hashResult);
+    if (ret != DM_OK) {
+        LOGE("GenerateStrHash failed");
+        return "";
+    }
+
+    std::stringstream ss;
+    for (int i = 0; i < SHA_HASH_LEN; i++) {
+        ss << std::hex << (int)hashResult[i];
+    }
+    return ss.str().substr(0, SHORT_DEVICE_ID_HASH_LENGTH);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

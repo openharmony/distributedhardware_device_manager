@@ -45,10 +45,10 @@ int32_t AuthResponseState::SetAuthManager(std::shared_ptr<DmAuthManager> authMan
 
 int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state)
 {
-    LOGI("AuthRequestState::TransitionTo");
+    LOGI("AuthResponseState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("AuthResponseState::authManager_ null");
         return ERR_DM_FAILED;
     }
     state->SetAuthManager(stateAuthManager);
