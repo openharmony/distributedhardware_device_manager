@@ -1434,7 +1434,6 @@ ON_IPC_READ_RESPONSE(UNBIND_TARGET, MessageParcel &reply, std::shared_ptr<IpcRsp
 ON_IPC_CMD(BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    std::string targetIdStr = data.ReadString();
     PeerTargetId targetId;
     DecodePeerTargetId(data, targetId);
     int32_t result = data.ReadInt32();
