@@ -1037,8 +1037,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->StartDiscoveringExt(pkgName, discoverParam, filterOptions);
 }
@@ -1060,8 +1059,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->StopDiscoveringExt(pkgName, discoverParam);
 }
@@ -1083,7 +1081,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
+        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->EnableDiscoveryListenerExt(pkgName, discoverParam, filterOptions);
 }
@@ -1105,7 +1103,7 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (extraParam.find(PARAM_KEY_META_TYPE) == extraParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
+        LOGD("input extra parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->DisableDiscoveryListenerExt(pkgName, extraParam);
 }
@@ -1127,8 +1125,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        LOGD("input advertise parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->StartAdvertisingExt(pkgName, advertiseParam);
 }
@@ -1150,8 +1147,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        LOGD("input advertise parameter not contains META_TYPE, dm service adapter not supported.");
     }
     return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
 }
@@ -1174,7 +1170,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
+        LOGE("input bind parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->BindTargetExt(pkgName, targetId, bindParam);
@@ -1197,7 +1193,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (unbindParam.find(PARAM_KEY_META_TYPE) == unbindParam.end()) {
-        LOGE("input discover parameter not contains META_TYPE, dm service adapter not supported.");
+        LOGE("input unbind parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->UnbindTargetExt(pkgName, targetId, unbindParam);
@@ -1222,17 +1218,15 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName,
 
 int32_t DeviceManagerService::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
 {
-    (void)tokenId;
-    (void)targetId;
+    LOGI("DeviceManagerService::CheckAccessToTarget for tokenId = %d, targetId = %s", tokenId, targetId.c_str());
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterLoad()) {
         LOGE("CheckAccessToTarget failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
     }
-    return DM_OK;
+    return ERR_DM_UNSUPPORTED_METHOD;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
