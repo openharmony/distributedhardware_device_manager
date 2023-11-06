@@ -35,6 +35,7 @@ ohos_shared_library("distributeddevicemanager") {
   ]
 
   sources = [
+    "${common_path}/src/dm_anonymous.cpp",
     "${common_path}/src/dm_error_message.cpp",
     "src/dm_native_event.cpp",
     "src/native_devicemanager_js.cpp",

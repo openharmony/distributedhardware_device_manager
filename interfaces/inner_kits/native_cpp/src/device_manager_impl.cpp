@@ -1844,8 +1844,10 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
 
 int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
 {
+    (void)tokenId;
+    (void)targetId;
     LOGI("DeviceManagerImpl::CheckAccessToTarget start");
-    return DM_OK;
+    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
