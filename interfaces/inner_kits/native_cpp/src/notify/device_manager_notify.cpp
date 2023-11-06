@@ -602,13 +602,13 @@ void DeviceManagerNotify::OnPublishResult(const std::string &pkgName, int32_t pu
 }
 
 void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::string &deviceId,
-                                       const std::string &token, uint32_t status, uint32_t reason)
+                                       const std::string &token, int32_t status, int32_t reason)
 {
     if (pkgName.empty() || token.empty() || deviceId.empty()) {
         LOGE("Invalid para, pkgName: %s, token: %s", pkgName.c_str(), token.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnAuthResult in, pkgName:%s, status:%d, reason:%u", pkgName.c_str(), status, reason);
+    LOGI("DeviceManagerNotify::OnAuthResult in, pkgName:%s, status:%d, reason:%d", pkgName.c_str(), status, reason);
     std::shared_ptr<AuthenticateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -629,7 +629,11 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
         LOGE("OnAuthResult error, registered authenticate callback is nullptr.");
         return;
     }
-    tempCbk->OnAuthResult(deviceId, token, status, (int32_t)reason);
+    tempCbk->OnAuthResult(deviceId, token, status, reason);
+    if (reason == DM_OK && (status >= STATUS_DM_CLOSE_PIN_INPUT_UI && status <= STATUS_DM_SHOW_AUTHORIZE_UI)) {
+        LOGI("update ui change, status: %d, reason: %d", status, reason);
+        return;
+    }
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         authenticateCallback_[pkgName].erase(deviceId);

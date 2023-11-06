@@ -685,6 +685,8 @@ void DmAuthManager::StartRespAuthProcess()
             [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
+        listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+                                authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
         authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
     } else {
         LOGE("do not accept");
@@ -1012,8 +1014,10 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
+            SetReasonAndFinish(ERR_DM_AUTH_PEER_REJECT, AuthState::AUTH_RESPONSE_CONFIRM);
+            break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
-            AuthenticateFinish();
+            SetReasonAndFinish(ERR_DM_AUTH_PEER_REJECT, AuthState::AUTH_REQUEST_JOIN);
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
             SetReasonAndFinish(ERR_DM_INPUT_PARA_INVALID, AuthState::AUTH_REQUEST_JOIN);
