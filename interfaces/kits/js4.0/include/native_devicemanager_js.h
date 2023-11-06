@@ -244,6 +244,20 @@ private:
     std::string bundleName_;
 };
 
+class DmNapiBindTargetCallback : public OHOS::DistributedHardware::BindTargetCallback {
+public:
+    explicit DmNapiBindTargetCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
+    {
+    }
+    ~DmNapiBindTargetCallback() override {};
+    void OnBindResult(const OHOS::DistributedHardware::PeerTargetId &targetId, int32_t result,
+        std::string content) override;
+
+private:
+    napi_env env_;
+    std::string bundleName_;
+};
+
 class DmNapiVerifyAuthCallback : public OHOS::DistributedHardware::VerifyAuthCallback {
 public:
     explicit DmNapiVerifyAuthCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
@@ -313,7 +327,8 @@ public:
     static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
                                   OHOS::DistributedHardware::DmPublishInfo &info);
     static void JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra, int32_t &authType);
-    static void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType);
+    static void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
+        bool &isMetaType);
     static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
     static void JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                              uint8_t **bufferPtr, int32_t &bufferLen);
@@ -356,6 +371,9 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static bool IsSystemApp();
     static std::string GetDeviceTypeById(OHOS::DistributedHardware::DmDeviceType type);
+    static int32_t BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
+        const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
+
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;
