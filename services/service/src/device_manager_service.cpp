@@ -439,7 +439,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         LOGE("BindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udidHash = listener_->GetUdidHash(deviceId);
+    std::string udidHash = listener_->GetUdidHash(deviceId, pkgName);
     return dmServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
 }
 
@@ -459,8 +459,8 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udidHash = listener_->GetUdidHash(deviceId);
-    listener_->DeleteDeviceIdFromMap(deviceId);
+    std::string udidHash = listener_->GetUdidHash(deviceId, pkgName);
+    listener_->DeleteDeviceIdFromMap(deviceId, pkgName);
     return dmServiceImpl_->UnBindDevice(pkgName, udidHash);
 }
 

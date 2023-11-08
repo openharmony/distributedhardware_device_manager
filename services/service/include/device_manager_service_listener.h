@@ -62,7 +62,7 @@ public:
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
         std::string content) override;
 
-    void DeleteDeviceIdFromMap(const std::string &deviceId);
+    void DeleteDeviceIdFromMap(const std::string &deviceId, const std::string &pkgName);
     void RegisterDmListener(const std::string &pkgName, const std::string &appId);
     void UnRegisterDmListener(const std::string &pkgName);
     std::string GetAppId(const std::string &pkgName);
