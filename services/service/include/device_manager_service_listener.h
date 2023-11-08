@@ -67,9 +67,9 @@ public:
     void UnRegisterDmListener(const std::string &pkgName);
     std::string GetAppId(const std::string &pkgName);
     std::string CalcDeviceId(const std::string &udidHash, const std::string &appId);
-    void SetUdidHashMap(const std::string &udidHash, const std::string &deviceId);
-    std::string GetDeviceId(const std::string &udidHash);
-    std::string GetUdidHash(const std::string &deviceId);
+    void SetUdidHashMap(const std::string &udidHash, const std::string &deviceId, const std::string &pkgName);
+    std::string GetDeviceId(const std::string &udidHash, const std::string &pkgName);
+    std::string GetUdidHash(const std::string &deviceId, const std::string &pkgName);
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
@@ -80,7 +80,7 @@ private:
     static std::mutex dmListenerMapLock_;
     static std::map<std::string, std::string> dmListenerMap_;
     static std::mutex udidHashMapLock_;
-    static std::map<std::string, std::string> udidHashMap_;
+    static std::map<std::string, std::map<std::string, std::string>> udidHashMap_;
 #endif
 };
 } // namespace DistributedHardware

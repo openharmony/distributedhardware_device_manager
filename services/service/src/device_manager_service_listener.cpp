@@ -35,7 +35,7 @@ namespace DistributedHardware {
 std::mutex DeviceManagerServiceListener::dmListenerMapLock_;
 std::mutex DeviceManagerServiceListener::udidHashMapLock_;
 std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ = {};
-std::map<std::string, std::string> DeviceManagerServiceListener::udidHashMap_ = {};
+std::map<std::string, std::map<std::string, std::string>> DeviceManagerServiceListener::udidHashMap_ = {};
 
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
@@ -234,25 +234,28 @@ void DeviceManagerServiceListener::UnRegisterDmListener(const std::string &pkgNa
     dmListenerMap_.erase(pkgName);
 }
 
-void DeviceManagerServiceListener::DeleteDeviceIdFromMap(const std::string &deviceId)
+void DeviceManagerServiceListener::DeleteDeviceIdFromMap(const std::string &deviceId, const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    auto iter = udidHashMap_.find(deviceId);
-    if (iter == udidHashMap_.end()) {
+    std::map<std::string, std::string> &udidMap = udidHashMap_[pkgName];
+    auto iter = udidMap.find(deviceId);
+    if (iter == udidMap.end()) {
         return;
     }
-    udidHashMap_.erase(deviceId);
+    udidMap.erase(deviceId);
 }
-void DeviceManagerServiceListener::SetUdidHashMap(const std::string &udidHash, const std::string &deviceId)
+void DeviceManagerServiceListener::SetUdidHashMap(const std::string &udidHash, const std::string &deviceId,
+    const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    udidHashMap_[deviceId] = udidHash;
+    udidHashMap_[pkgName][deviceId] = udidHash;
 }
 
-std::string DeviceManagerServiceListener::GetDeviceId(const std::string &udidHash)
+std::string DeviceManagerServiceListener::GetDeviceId(const std::string &udidHash, const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    for (auto iter = udidHashMap_.begin(); iter != udidHashMap_.end(); iter++) {
+    std::map<std::string, std::string> &udidMap = udidHashMap_[pkgName];
+    for (auto iter = udidMap.begin(); iter != udidMap.end(); iter++) {
         if (udidHash == iter->second) {
             return iter->first;
         }
@@ -260,10 +263,10 @@ std::string DeviceManagerServiceListener::GetDeviceId(const std::string &udidHas
     return "";
 }
 
-std::string DeviceManagerServiceListener::GetUdidHash(const std::string &deviceId)
+std::string DeviceManagerServiceListener::GetUdidHash(const std::string &deviceId, const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    return udidHashMap_.count(deviceId) > 0 ?  udidHashMap_[deviceId] : "";
+    return udidHashMap_[pkgName].count(deviceId) > 0 ?  udidHashMap_[pkgName][deviceId] : "";
 }
 
 std::string DeviceManagerServiceListener::GetAppId(const std::string &pkgName)
@@ -279,10 +282,10 @@ std::string DeviceManagerServiceListener::CalcDeviceId(const std::string &pkgNam
     if (appId.empty()) {
         return udidHash;
     }
-    std::string deviceId = GetDeviceId(udidHash);
+    std::string deviceId = GetDeviceId(udidHash, pkgName);
     if (deviceId.empty()) {
         deviceId = Crypto::Sha256(appId + udidHash);
-        SetUdidHashMap(udidHash, deviceId);
+        SetUdidHashMap(udidHash, deviceId, pkgName);
         return deviceId;
     }
     return deviceId;
