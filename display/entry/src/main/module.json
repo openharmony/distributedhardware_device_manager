@@ -59,6 +59,15 @@
         "label": "$string:ServiceExtAbility_label",
         "visible": false,
         "type": "service"
+      },
+      {
+        "name": "com.ohos.devicemanagerui.BluetoothDialogAbility",
+        "srcEntrance": "./ets/ServiceExtAbility/BluetoothDialogAbility.ts",
+        "description": "$string:ServiceExtAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:ServiceExtAbility_label",
+        "visible": false,
+        "type": "service"
       }
     ],
     "requestPermissions": [
