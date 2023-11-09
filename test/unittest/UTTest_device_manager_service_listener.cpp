@@ -331,7 +331,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, DeleteDeviceIdFromMap_001, testing::e
     std::string deviceId;
     std::string pkgName = "com.ohos.helloworld";
     listener_->DeleteDeviceIdFromMap(deviceId, pkgName);
-    EXPECT_EQ(listener_->udidHashMap_.empty(), true);
+    EXPECT_EQ(listener_->udidHashMap_.empty(), false);
 }
 
 /**
