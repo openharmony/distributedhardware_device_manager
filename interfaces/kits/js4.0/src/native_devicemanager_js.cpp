@@ -882,7 +882,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
     napi_value handler = nullptr;
     napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler);
     if (handler != nullptr) {
-        if (reason == DM_OK && (status >= STATUS_DM_CLOSE_PIN_INPUT_UI && status <= STATUS_DM_SHOW_AUTHORIZE_UI)) {
+        if (reason == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
             LOGI("update ui change, status: %d, reason: %d", status, reason);
         } else {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);

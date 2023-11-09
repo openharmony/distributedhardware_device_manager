@@ -630,7 +630,7 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
         return;
     }
     tempCbk->OnAuthResult(deviceId, token, status, reason);
-    if (reason == DM_OK && (status >= STATUS_DM_CLOSE_PIN_INPUT_UI && status <= STATUS_DM_SHOW_AUTHORIZE_UI)) {
+    if (reason == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
         LOGI("update ui change, status: %d, reason: %d", status, reason);
         return;
     }
