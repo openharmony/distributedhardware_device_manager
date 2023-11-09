@@ -26,7 +26,6 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
-                "bluetooth",
                 "bundle_framework",
                 "c_utils",
                 "common_event_service",
@@ -46,7 +45,6 @@
             "third_party": [
                 "json",
                 "node",
-                "googletest",
                 "mbedtls",
                 "openssl",
                 "bounds_checking_function"
