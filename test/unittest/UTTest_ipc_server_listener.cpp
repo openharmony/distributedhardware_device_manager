@@ -369,6 +369,9 @@ HWTEST_F(IpcServerListenerTest, SendAll_003, testing::ext::TestSize.Level0)
     std::string pkgName = "";
     // 2. set remoteObject not nullptr
     sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    if (remoteObject == nullptr) {
+        return;
+    }
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
     // set req not null
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();

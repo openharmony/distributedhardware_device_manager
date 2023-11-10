@@ -570,6 +570,8 @@ HWTEST_F(DeviceManagerServiceImplTest, BindDevice_003, testing::ext::TestSize.Le
     std::string udidHash = "udidHash";
     std::string bindParam;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
+    deviceManagerServiceImpl->authMgr_ =
+        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     int32_t ret = deviceManagerServiceImpl->BindDevice(pkgName, authType, udidHash, bindParam);
     EXPECT_NE(ret, DM_OK);
 }
