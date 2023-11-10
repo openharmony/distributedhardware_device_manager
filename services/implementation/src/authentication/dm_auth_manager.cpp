@@ -284,8 +284,8 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
         if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
             authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_INIT) {
             authRequestContext_->sessionId = sessionId;
-            authRequestState_->SetAuthContext(authRequestContext_);
             authMessageProcessor_->SetRequestContext(authRequestContext_);
+            authRequestState_->SetAuthContext(authRequestContext_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
         } else {
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
@@ -520,7 +520,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
         LOGE("DmAuthManager::StartNegotiate error, authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::StartNegotiate session id is %d", sessionId);
+    LOGI("DmAuthManager::StartNegotiate session id");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authRequestContext_->localDeviceId = localDeviceId;
@@ -571,7 +571,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         LOGE("failed to RespNegotiate because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::EstablishAuthChannel session id is %d", sessionId);
+    LOGI("DmAuthManager::RespNegotiate session id");
     AbilityNegotiate();
 
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
@@ -607,7 +607,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         LOGE("failed to SendAuthRequest because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::EstablishAuthChannel session id");
+    LOGI("DmAuthManager::SendAuthRequest session id");
     timer_->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
