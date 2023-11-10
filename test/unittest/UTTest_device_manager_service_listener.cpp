@@ -315,7 +315,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetUdidHashMap_001, testing::ext::Tes
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string udidHash;
     std::string deviceId;
-    listener_->SetUdidHashMap(udidHash, deviceId);
+    std::string pkgName = "com.ohos.helloworld";
+    listener_->SetUdidHashMap(udidHash, deviceId, pkgName);
     EXPECT_EQ(listener_->udidHashMap_.empty(), false);
 }
 
@@ -328,8 +329,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, DeleteDeviceIdFromMap_001, testing::e
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId;
-    listener_->DeleteDeviceIdFromMap(deviceId);
-    EXPECT_EQ(listener_->udidHashMap_.empty(), true);
+    std::string pkgName = "com.ohos.helloworld";
+    listener_->DeleteDeviceIdFromMap(deviceId, pkgName);
+    EXPECT_EQ(listener_->udidHashMap_.empty(), false);
 }
 
 /**
@@ -341,7 +343,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_001, testing::ext::TestSi
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string udidHash;
-    std::string str = listener_->GetDeviceId(udidHash);
+    std::string pkgName = "com.ohos.helloworld";
+    std::string str = listener_->GetDeviceId(udidHash, pkgName);
     EXPECT_EQ(str.empty(), true);
 }
 
@@ -354,7 +357,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetUdidHash_001, testing::ext::TestSi
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId;
-    std::string str = listener_->GetUdidHash(deviceId);
+    std::string pkgName = "com.ohos.helloworld";
+    std::string str = listener_->GetUdidHash(deviceId, pkgName);
     EXPECT_EQ(str.empty(), true);
 }
 
