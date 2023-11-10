@@ -1014,7 +1014,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
-            SetReasonAndFinish(ERR_DM_BIND_USER_CONFIRM_TIMEOUT, STATUS_DM_AUTH_CONFIRM);
+            SetReasonAndFinish(ERR_DM_TIME_OUT, STATUS_DM_AUTH_CONFIRM);
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
             SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, STATUS_DM_AUTH_ADD_MEMBER);
