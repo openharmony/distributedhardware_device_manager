@@ -1020,7 +1020,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, STATUS_DM_AUTH_ADD_MEMBER);
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
-            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_INPUT, STATUS_DM_AUTH_ADD_MEMBER);
+            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_ERROR, STATUS_DM_AUTH_ADD_MEMBER);
             break;
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
             AddMember(std::stoi(params));
