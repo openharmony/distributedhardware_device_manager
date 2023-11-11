@@ -139,9 +139,9 @@ constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
 
 // Key of filter parameter
-const std::string FILTER_PARA_DEVICE_TYPE = "DEVICE_TYPE";
-const std::string FILTER_PARA_RANGE = "RANGE";
-const std::string FILTER_PARA_IS_TRUSTED = "IS_TRUSTED";
+const std::string FILTER_PARA_RANGE = "FILTER_RANGE";
+const std::string FILTER_PARA_DEVICE_TYPE = "FILTER_DEVICE_TYPE";
+const std::string FILTER_PARA_INCLUDE_TRUST = "FILTER_INCLUDE_TRUST";
 
 // Connection address type
 const std::string CONN_ADDR_TYPE_ID = "ID_TYPE";
@@ -166,9 +166,9 @@ const std::string PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
 const std::string PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
 const std::string PARAM_KEY_SUBSCRIBE_ID = "SUBSCRIBE_ID";
 const std::string PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
+const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 const std::string PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
 const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
-const std::string PARAM_KEY_DISC_INCLUDE_TRUST = "DISC_INCLUDE_TRUST";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

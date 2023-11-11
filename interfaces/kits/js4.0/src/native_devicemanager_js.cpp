@@ -3228,10 +3228,6 @@ int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const s
         std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
     }
-    if (IsString(bindParamObj, PARAM_KEY_AUTH_TOKEN)) {
-        std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
-        bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
-    }
     return DeviceManager::GetInstance().BindTarget(pkgName, targetId, bindParamMap, callback);
 }
 
