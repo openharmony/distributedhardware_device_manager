@@ -232,6 +232,27 @@ public:
      */
     virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo) override;
     /**
+     * @tc.name: DeviceManagerImpl::RegisterPinHolderCallback
+     * @tc.desc: RegisterPinHolderCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName,
+        std::shared_ptr<PinHolderCallback> callback) override;
+    /**
+     * @tc.name: DeviceManagerImpl::CreatePinHolder
+     * @tc.desc: CreatePinHolder
+     * @tc.type: FUNC
+     */
+    virtual int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload) override;
+    /**
+     * @tc.name: DeviceManagerImpl::DestroyPinHolder
+     * @tc.desc: DestroyPinHolder
+     * @tc.type: FUNC
+     */
+    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType) override;
+    /**
      * @tc.name: DeviceManagerImpl::DeleteCredential
      * @tc.desc: DeleteCredential
      * @tc.type: FUNC

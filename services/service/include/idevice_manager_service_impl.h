@@ -188,6 +188,27 @@ public:
     virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionOpened
+     * @tc.desc: Send Session Opened event to the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual int OnPinHolderSessionOpened(int sessionId, int result);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionClosed
+     * @tc.desc: Send Session Closed event to the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual void OnPinHolderSessionClosed(int sessionId);
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderBytesReceived
+     * @tc.desc: Send Bytes Received event to the device manager service impl
+     * @tc.type: FUNC
+     */
+    virtual void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
+    /**
      * @tc.name: IDeviceManagerServiceImpl::RequestCredential
      * @tc.desc: RequestCredential of the Device Manager Service
      * @tc.type: FUNC
@@ -254,6 +275,14 @@ public:
     virtual int32_t ExportAuthCode(std::string &authCode);
 
     /**
+     * @tc.name: IDeviceManagerServiceImpl::BindTarget
+     * @tc.desc: BindTarget
+     * @tc.type: FUNC
+     */
+    virtual int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam) = 0;
+
+    /**
      * @tc.name: IDeviceManagerServiceImpl::LoadHardwareFwkService
      * @tc.desc: LoadHardwareFwkService
      * @tc.type: FUNC
@@ -261,6 +290,10 @@ public:
     virtual void LoadHardwareFwkService();
     virtual int32_t RegisterUiStateCallback(const std::string &pkgName);
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName);
+    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName);
+    virtual int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
+    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

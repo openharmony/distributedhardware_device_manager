@@ -120,6 +120,17 @@ public:
     }
     virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) = 0;
 };
+
+class PinHolderCallback {
+public:
+    virtual ~PinHolderCallback()
+    {
+    }
+    virtual void OnPinHolderCreate(const std::string &deviceId, DmPinType pinType, const std::string &payload) = 0;
+    virtual void OnPinHolderDestroy(DmPinType pinType) = 0;
+    virtual void OnCreateResult(int32_t result) = 0;
+    virtual void OnDestroyResult(int32_t result) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

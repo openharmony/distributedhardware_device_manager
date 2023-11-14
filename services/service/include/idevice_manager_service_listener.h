@@ -115,6 +115,11 @@ public:
      */
     virtual void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
         std::string content) = 0;
+    virtual void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
+        const std::string &payload);
+    virtual void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType);
+    virtual void OnCreateResult(const std::string &pkgName, int32_t result);
+    virtual void OnDestroyResult(const std::string &pkgName, int32_t result);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -98,11 +98,13 @@ constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
+constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager.pinholder";
 constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
 constexpr const char* DM_CAPABILITY_APPROACH = "approach";
 constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
 constexpr const char* DM_CAPABILITY_SHARE = "share";
 constexpr const char* DM_CAPABILITY_WEAR = "wear";
+constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 
 //The following constant are provided only for HiLink.

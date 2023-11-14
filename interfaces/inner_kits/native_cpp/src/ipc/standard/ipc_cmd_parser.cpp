@@ -23,6 +23,8 @@
 #include "ipc_bind_target_req.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
+#include "ipc_create_pin_holder_req.h"
+#include "ipc_destroy_pin_holder_req.h"
 #include "ipc_def.h"
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
@@ -1453,6 +1455,121 @@ ON_IPC_CMD(UNBIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
     std::string content = data.ReadString();
 
     DeviceManagerNotify::GetInstance().OnUnbindResult(pkgName, targetId, result, content);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REGISTER_PIN_HOLDER_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REGISTER_PIN_HOLDER_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(CREATE_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcCreatePinHolderReq> pReq = std::static_pointer_cast<IpcCreatePinHolderReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    PeerTargetId targetId = pReq->GetPeerTargetId();
+    std::string payload = pReq->GetPayload();
+    int32_t pinType = pReq->GetPinType();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodePeerTargetId(targetId, data)) {
+        LOGE("write peer target id failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(payload)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(pinType)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(CREATE_PIN_HOLDER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::static_pointer_cast<IpcDestroyPinHolderReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    PeerTargetId targetId = pReq->GetPeerTargetId();
+    int32_t pinType = pReq->GetPinType();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodePeerTargetId(targetId, data)) {
+        LOGE("write peer target id failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(pinType)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(DESTROY_PIN_HOLDER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_CREATE_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string deviceId = data.ReadString();
+    DmPinType pinType = static_cast<DmPinType>(data.ReadInt32());
+    std::string payload = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnPinHolderCreate(pkgName, deviceId, pinType, payload);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmPinType pinType = static_cast<DmPinType>(data.ReadInt32());
+
+    DeviceManagerNotify::GetInstance().OnPinHolderDestroy(pkgName, pinType);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_CREATE_PIN_HOLDER_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = data.ReadInt32();
+
+    DeviceManagerNotify::GetInstance().OnCreateResult(pkgName, result);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_DESTROY_PIN_HOLDER_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = data.ReadInt32();
+
+    DeviceManagerNotify::GetInstance().OnDestroyResult(pkgName, result);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

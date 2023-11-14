@@ -621,6 +621,33 @@ void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsi
     dmServiceImpl_->OnBytesReceived(sessionId, data, dataLen);
 }
 
+int DeviceManagerService::OnPinHolderSessionOpened(int sessionId, int result)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnPinHolderSessionOpened failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->OnPinHolderSessionOpened(sessionId, result);
+}
+
+void DeviceManagerService::OnPinHolderSessionClosed(int sessionId)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnPinHolderSessionClosed failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->OnPinHolderSessionClosed(sessionId);
+}
+
+void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnPinHolderBytesReceived failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->OnPinHolderBytesReceived(sessionId, data, dataLen);
+}
+
 int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -1165,14 +1192,19 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("BindTarget failed, instance not init or init failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
+    if (!IsDMServiceImplReady()) {
+        LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
     }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
-        LOGE("input bind parameter not contains META_TYPE, dm service adapter not supported.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        LOGI("BindTarget stardard begin.");
+        return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
     }
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("BindTarget failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    LOGI("BindTarget unstardard begin.");
     return dmServiceImplExt_->BindTargetExt(pkgName, targetId, bindParam);
 }
 
@@ -1227,6 +1259,89 @@ int32_t DeviceManagerService::CheckAccessToTarget(uint64_t tokenId, const std::s
         LOGE("CheckAccessToTarget failed, dm service adapter load failed.");
     }
     return ERR_DM_UNSUPPORTED_METHOD;
+}
+
+int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call ImportAuthCode.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::RegisterPinHolderCallback begin.");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("RegisterPinHolderCallback failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->RegisterPinHolderCallback(pkgName);
+}
+
+int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType, const std::string &payload)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call CreatePinHolder.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::CreatePinHolder begin.");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("CreatePinHolder failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->CreatePinHolder(pkgName, targetId, pinType, payload);
+}
+
+int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %s does not have permission to call DestroyPinHolder.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::DestroyPinHolder begin.");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("DestroyPinHolder failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->DestroyPinHolder(pkgName, targetId, pinType);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

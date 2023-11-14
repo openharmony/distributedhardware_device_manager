@@ -252,6 +252,17 @@ void DeviceManagerNotify::UnRegisterCredentialCallback(const std::string &pkgNam
     credentialCallback_.erase(pkgName);
 }
 
+void DeviceManagerNotify::RegisterPinHolderCallback(const std::string &pkgName,
+    std::shared_ptr<PinHolderCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    pinHolderCallback_[pkgName] = callback;
+}
+
 void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManagerNotify::OnRemoteDied");
@@ -821,6 +832,99 @@ void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerT
             unbindCallback_.erase(pkgName);
         }
     }
+}
+
+void DeviceManagerNotify::OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId,
+    DmPinType pinType, const std::string &payload)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnPinHolderCreate in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnPinHolderCreate error, device state callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnPinHolderCreate error, registered device state callback is nullptr.");
+        return;
+    }
+    tempCbk->OnPinHolderCreate(deviceId, pinType, payload);
+}
+
+void DeviceManagerNotify::OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnPinHolderDestroy in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnPinHolderDestroy error, device state callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnPinHolderDestroy error, registered device state callback is nullptr.");
+        return;
+    }
+    tempCbk->OnPinHolderDestroy(pinType);
+}
+
+void DeviceManagerNotify::OnCreateResult(const std::string &pkgName, int32_t result)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnCreateResult in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnCreateResult error, device state callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnCreateResult error, registered device state callback is nullptr.");
+        return;
+    }
+    tempCbk->OnCreateResult(result);
+}
+
+void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t result)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnDestroyResult in, pkgName:%s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnDestroyResult error, device state callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnDestroyResult error, registered device state callback is nullptr.");
+        return;
+    }
+    tempCbk->OnDestroyResult(result);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
