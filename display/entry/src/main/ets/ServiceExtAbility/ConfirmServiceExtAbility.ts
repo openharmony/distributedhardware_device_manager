@@ -21,6 +21,7 @@ import Constant from '../common/constant';
 import type Want from '@ohos.app.ability.Want';
 
 const TAG = '[DeviceManagerUI:Confirm]==>';
+const dmCallerUid: number = 3062;
 
 export default class ServiceExtAbility extends extension {
   isCreatingWindow: boolean = false;
@@ -35,6 +36,10 @@ export default class ServiceExtAbility extends extension {
   }
 
   onRequest(want: Want, startId: number): void {
+    if (want.parameters['ohos.aafwk.param.callerUid'] as number !== dmCallerUid) {
+      console.log(TAG + 'device manager callerUid ' + want.parameters['ohos.aafwk.param.callerUid']);
+      return;
+    }
     console.log(TAG + 'onRequest execute' + JSON.stringify(want.parameters));
     let confirmWindowNum: number = AppStorage.get('confirmWindowNum');
     if (confirmWindowNum !== 0 || this.isCreatingWindow) {
