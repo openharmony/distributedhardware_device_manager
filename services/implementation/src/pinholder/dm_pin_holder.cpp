@@ -57,12 +57,22 @@ DmPinHolder::DmPinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener
 
 DmPinHolder::~DmPinHolder()
 {
-    session_->UnRegisterSessionCallback();
-    timer_->DeleteAll();
+    if (session_ != nullptr) {
+        session_->UnRegisterSessionCallback();
+        session_ = nullptr;
+    }
+    if (timer_ != nullptr) {
+        timer_->DeleteAll();
+        timer_ = nullptr;
+    }
 }
 
 int32_t DmPinHolder::RegisterPinHolderCallback(const std::string &pkgName)
 {
+    if (session_ == nullptr) {
+        LOGE("RegisterPinHolderCallback session is nullptr.");
+        return ERR_DM_FAILED;
+    }
     registerPkgName_ = pkgName;
     session_->RegisterSessionCallback(shared_from_this());
     return DM_OK;
@@ -82,8 +92,8 @@ int32_t DmPinHolder::CreatePinHolder(const std::string &pkgName,
         return ret;
     }
 
-    if (listener_ == nullptr) {
-        LOGE("CreatePinHolder listener is nullptr.");
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("CreatePinHolder listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
 
@@ -113,8 +123,8 @@ int32_t DmPinHolder::CreatePinHolder(const std::string &pkgName,
 int32_t DmPinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType)
 {
     LOGI("DestroyPinHolder.");
-    if (listener_ == nullptr) {
-        LOGE("DestroyPinHolder listener is nullptr.");
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("DestroyPinHolder listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
 
@@ -157,8 +167,8 @@ int32_t DmPinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarg
 
 int32_t DmPinHolder::CreateGeneratePinHolderMsg()
 {
-    if (listener_ == nullptr) {
-        LOGE("CreateGeneratePinHolderMsg listener is nullptr.");
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("CreateGeneratePinHolderMsg listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
 
@@ -199,6 +209,10 @@ int32_t DmPinHolder::ParseMsgType(const std::string &message)
 
 void DmPinHolder::ProcessCreateMsg(const std::string &message)
 {
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("ProcessCreateMsg listener or session is nullptr.");
+        return;
+    }
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("ProcessCreateMsg DecodeRequest jsonStr error");
@@ -219,9 +233,7 @@ void DmPinHolder::ProcessCreateMsg(const std::string &message)
         jsonObj[TAG_REPLY] = REPLY_SUCCESS;
         sinkState_ = SINK_CREATE;
         sourceState_ = SOURCE_CREATE;
-        if (listener_ != nullptr) {
-            listener_->OnPinHolderCreate(registerPkgName_, remoteDeviceId_, pinType, payload);
-        }
+        listener_->OnPinHolderCreate(registerPkgName_, remoteDeviceId_, pinType, payload);
     }
 
     std::string msg = jsonObj.dump();
@@ -245,8 +257,8 @@ void DmPinHolder::ProcessCreateRespMsg(const std::string &message)
         return;
     }
     int32_t reply = jsonObject[TAG_REPLY].get<int32_t>();
-    if (listener_ == nullptr) {
-        LOGE("ProcessCreateRespMsg listener is nullptr.");
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("ProcessCreateRespMsg listener or session is nullptr.");
         return;
     }
     if (reply == REPLY_SUCCESS) {
@@ -262,6 +274,10 @@ void DmPinHolder::ProcessCreateRespMsg(const std::string &message)
 
 void DmPinHolder::ProcessDestroyMsg(const std::string &message)
 {
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("ProcessDestroyMsg listener or session is nullptr.");
+        return;
+    }
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("ProcessDestroyMsg DecodeRequest jsonStr error.");
@@ -281,9 +297,7 @@ void DmPinHolder::ProcessDestroyMsg(const std::string &message)
         jsonObj[TAG_REPLY] = REPLY_SUCCESS;
         sinkState_ = SINK_INIT;
         sourceState_ = SOURCE_INIT;
-        if (listener_ != nullptr) {
-            listener_->OnPinHolderDestroy(registerPkgName_, pinType);
-        }
+        listener_->OnPinHolderDestroy(registerPkgName_, pinType);
     }
 
     std::string msg = jsonObj.dump();
@@ -298,6 +312,10 @@ void DmPinHolder::ProcessDestroyMsg(const std::string &message)
 void DmPinHolder::CloseSession(const std::string &name)
 {
     LOGI("DmPinHolder::CloseSession start timer name %s.", name.c_str());
+    if (session_ == nullptr) {
+        LOGE("CloseSession session is nullptr.");
+        return;
+    }
     session_->CloseSessionServer(sessionId_);
 }
 
@@ -313,8 +331,8 @@ void DmPinHolder::ProcessDestroyResMsg(const std::string &message)
         return;
     }
     int32_t reply = jsonObject[TAG_REPLY].get<int32_t>();
-    if (listener_ == nullptr) {
-        LOGE("ProcessDestroyResMsg listener is nullptr.");
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("ProcessDestroyResMsg listener or session is nullptr.");
         return;
     }
     if (reply == REPLY_SUCCESS) {
@@ -403,6 +421,7 @@ void DmPinHolder::OnSessionClosed(int32_t sessionId)
     remoteDeviceId_ = "";
     return;
 }
+
 int32_t DmPinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
 {
     if (targetId.deviceId.empty() && targetId.brMac.empty() && targetId.brMac.empty() && targetId.brMac.empty()) {

@@ -1221,6 +1221,7 @@ int32_t DmAuthManager::ParseExtra(const std::map<std::string, std::string> &bind
     if (iter == bindParam.end()) {
         LOGE("DmAuthManager::ParseExtra bind param key: %s not exist.", PARAM_KEY_APP_DESC.c_str());
         extra = "";
+        return DM_OK;
     }
     extra = iter->second;
     return DM_OK;

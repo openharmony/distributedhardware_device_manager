@@ -531,7 +531,7 @@ public:
     virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) = 0;
 
     /**
-     * @brief Register Auth Code Holder Callback
+     * @brief Register Pin Code Holder Callback
      * @param pkgName  package name.
      * @param callback  the callback to be invoked upon CreateAuthCodeHolder or DestroyAuthCodeHolder.
      * @return Returns 0 if success.
@@ -540,10 +540,10 @@ public:
         std::shared_ptr<PinHolderCallback> callback) = 0;
 
     /**
-     * @brief Create Auth Code Holder
+     * @brief Create Pin Code Holder
      * @param pkgName  package name.
      * @param targetId  id of target to create pin holder.
-     * @param pinType  auth code holder type.
+     * @param pinType  pin code holder type.
      * @param payload  business custom data.
      * @return Returns 0 if success.
      */
@@ -551,9 +551,10 @@ public:
         DmPinType pinType, const std::string &payload) = 0;
 
     /**
-     * @brief Destroy Auth Code Holder
+     * @brief Destroy Pin Code Holder
      * @param pkgName  package name.
      * @param targetId  id of target to destroy pin holder.
+     * @param pinType  pin code holder type.
      * @return Returns 0 if success.
      */
     virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,

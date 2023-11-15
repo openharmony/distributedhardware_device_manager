@@ -71,6 +71,10 @@ int32_t PinHolderSession::CloseSessionServer(int32_t sessionId)
 
 int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
+    if (sessionCallback_ == nullptr) {
+        LOGE("OnSessionOpened error, sessionCallback_ is nullptr.");
+        return ERR_DM_FAILED;
+    }
     int32_t sessionSide = GetSessionSide(sessionId);
     sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
     LOGI("OnSessionOpened, success, sessionId: %d.", sessionId);
@@ -80,6 +84,10 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %d", sessionId);
+    if (sessionCallback_ == nullptr) {
+        LOGE("OnSessionClosed error, sessionCallback_ is nullptr.");
+        return;
+    }
     sessionCallback_->OnSessionClosed(sessionId);
     return;
 }
@@ -87,7 +95,11 @@ void PinHolderSession::OnSessionClosed(int sessionId)
 void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
-        LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
+        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
+        return;
+    }
+    if (sessionCallback_ == nullptr) {
+        LOGE("OnBytesReceived error, sessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
