@@ -103,6 +103,18 @@ SoftbusListener::SoftbusListener()
     } else {
         LOGI("[SOFTBUS]CreateSessionServer ok.");
     }
+
+    ISessionListener pinHolderSessionListener = {.OnSessionOpened = SoftbusListener::OnPinHolderSessionOpened,
+                                                 .OnSessionClosed = SoftbusListener::OnPinHolderSessionClosed,
+                                                 .OnBytesReceived = SoftbusListener::OnPinHolderBytesReceived,
+                                                 .OnMessageReceived = nullptr,
+                                                 .OnStreamReceived = nullptr};
+    ret = CreateSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME, &pinHolderSessionListener);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %d.", ret);
+    } else {
+        LOGI("[SOFTBUS]CreateSessionServer pin holder ok.");
+    }
     Init();
 }
 
@@ -461,6 +473,21 @@ void SoftbusListener::OnSessionClosed(int sessionId)
 void SoftbusListener::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     DeviceManagerService::GetInstance().OnBytesReceived(sessionId, data, dataLen);
+}
+
+int SoftbusListener::OnPinHolderSessionOpened(int sessionId, int result)
+{
+    return DeviceManagerService::GetInstance().OnPinHolderSessionOpened(sessionId, result);
+}
+
+void SoftbusListener::OnPinHolderSessionClosed(int sessionId)
+{
+    DeviceManagerService::GetInstance().OnPinHolderSessionClosed(sessionId);
+}
+
+void SoftbusListener::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, data, dataLen);
 }
 
 void SoftbusListener::OnPublishResult(int publishId, PublishResult result)

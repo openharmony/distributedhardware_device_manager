@@ -652,5 +652,22 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
     }
     return nodeBasicInfo.deviceTypeId;
 }
+
+int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo)
+{
+    if (deviceId.empty()) {
+        LOGE("AddMemberToDiscoverMap failed, deviceId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+#endif
+    discoveryDeviceInfoMap_[deviceId] = std::move(deviceInfo);
+    if (deviceInfo != nullptr) {
+        deviceInfo = nullptr;
+    }
+
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

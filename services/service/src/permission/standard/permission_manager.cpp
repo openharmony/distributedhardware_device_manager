@@ -39,6 +39,11 @@ constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NA
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
 };
+
+#define PIN_HOLDER_WHITE_LIST_NUM (1)
+constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "CollaborationFwk",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -131,6 +136,27 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
     }
 
     LOGE("CheckProcessNameValidOnAuthCode process name: %s invalid.", processName.c_str());
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
+{
+    LOGI("Enter PermissionManager::CheckProcessNameValidOnPinHolder");
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+
+    uint16_t index = 0;
+    size_t len = 0;
+    for (; index < PIN_HOLDER_WHITE_LIST_NUM; ++index) {
+        len = strnlen(g_pinHolderWhiteList[index], PKG_NAME_SIZE_MAX);
+        if (strncmp(processName.c_str(), g_pinHolderWhiteList[index], len) == 0) {
+            return true;
+        }
+    }
+
+    LOGE("CheckProcessNameValidOnPinHolder process name: %s invalid.", processName.c_str());
     return false;
 }
 } // namespace DistributedHardware

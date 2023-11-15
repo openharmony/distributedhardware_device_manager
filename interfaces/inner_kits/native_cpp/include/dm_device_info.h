@@ -299,6 +299,13 @@ typedef enum {
 } DmNetworkType;
 
 typedef enum {
+    NUMBER_PIN_CODE = 0,
+    QR_CODE,
+    VISIBLE_LLIGHT,
+    SUPER_SONIC,
+} DmPinType;
+
+typedef enum {
     STATUS_DM_AUTH_PARAM_CHECK = 1,
     STATUS_DM_AUTH_NEGOTIATE,
     STATUS_DM_AUTH_NEGOTIATE_DONE,

@@ -426,6 +426,14 @@ public:
      * @tc.type: FUNC
      */
     int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
+
+    /**
+     * @tc.name: DmAuthManager::BindTarget
+     * @tc.desc: Bind Target
+     * @tc.type: FUNC
+     */
+    int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
@@ -437,6 +445,9 @@ private:
     int32_t GetAuthCode(const std::string &pkgName, int32_t &pinCode);
     bool IsAuthTypeSupported(const int32_t &authType);
     bool IsAuthCodeReady(const std::string &pkgName);
+    int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
+    int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
+    int32_t ParseExtra(const std::map<std::string, std::string> &bindParam, std::string &extra);
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
@@ -459,6 +470,7 @@ private:
     bool isAddingMember_ = false;
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
+    PeerTargetId peerTargetId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

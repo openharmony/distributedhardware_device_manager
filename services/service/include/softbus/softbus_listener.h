@@ -38,6 +38,10 @@ public:
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    static int OnPinHolderSessionOpened(int sessionId, int result);
+    static void OnPinHolderSessionClosed(int sessionId);
+    static void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
 public:
     /**
      * @tc.name: SoftbusListener::OnPublishResult

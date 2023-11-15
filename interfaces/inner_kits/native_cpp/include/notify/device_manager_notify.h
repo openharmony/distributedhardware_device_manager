@@ -62,6 +62,7 @@ public:
         std::shared_ptr<UnbindTargetCallback> callback);
     void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
+    void RegisterPinHolderCallback(const std::string &pkgName, std::shared_ptr<PinHolderCallback> callback);
 
 public:
     void OnRemoteDied();
@@ -83,6 +84,11 @@ public:
     void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode, int32_t flag);
     void OnUiCall(std::string &pkgName, std::string &paramJson);
     void OnCredentialResult(const std::string &pkgName, int32_t &action, const std::string &credentialResult);
+    void OnPinHolderCreate(const std::string &deviceId, const std::string &pkgName, DmPinType pinType,
+        const std::string &payload);
+    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType);
+    void OnCreateResult(const std::string &pkgName, int32_t result);
+    void OnDestroyResult(const std::string &pkgName, int32_t result);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -99,6 +105,7 @@ private:
     std::map<std::string, std::shared_ptr<CredentialCallback>> credentialCallback_;
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>> bindCallback_;
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>> unbindCallback_;
+    std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

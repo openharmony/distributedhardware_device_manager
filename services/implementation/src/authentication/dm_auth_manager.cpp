@@ -94,24 +94,28 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
     if (!IsAuthTypeSupported(authType)) {
         LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_PARAM_CHECK, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_UNSUPPORTED_AUTH_TYPE, "");
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %s is request authentication.", pkgName.c_str());
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_PARAM_CHECK, ERR_DM_AUTH_BUSINESS_BUSY);
+        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_PARAM_CHECK, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_PARAM_CHECK, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
@@ -789,12 +793,7 @@ void DmAuthManager::AuthenticateFinish()
             std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         }
-        timer_->DeleteAll();
-        isFinishOfLocal_ = true;
-        authResponseContext_ = nullptr;
         authResponseState_ = nullptr;
-        authMessageProcessor_ = nullptr;
-        authPtr_ = nullptr;
     } else if (authRequestState_ != nullptr) {
         if (isFinishOfLocal_) {
             authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -809,17 +808,18 @@ void DmAuthManager::AuthenticateFinish()
         }
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
+        listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason, "");
         usleep(USLEEP_TIME_MS); // 500ms
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
-        timer_->DeleteAll();
-        isFinishOfLocal_ = true;
         authRequestContext_ = nullptr;
-        authResponseContext_ = nullptr;
         authRequestState_ = nullptr;
-        authMessageProcessor_ = nullptr;
-        authPtr_ = nullptr;
         authTimes_ = 0;
     }
+    timer_->DeleteAll();
+    isFinishOfLocal_ = true;
+    authResponseContext_ = nullptr;
+    authMessageProcessor_ = nullptr;
+    authPtr_ = nullptr;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1118,6 +1118,112 @@ int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::str
     }
     importAuthCode_ = authCode;
     importPkgName_ = pkgName;
+    return DM_OK;
+}
+
+int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (pkgName.empty()) {
+        LOGE("DmAuthManager::BindTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t authType = -1;
+    if (ParseAuthType(bindParam, authType) != DM_OK) {
+        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string extra = "";
+    ParseExtra(bindParam, extra);
+    std::string deviceId = "";
+    peerTargetId_ = targetId;
+    if (ParseConnectAddr(targetId, deviceId) == DM_OK) {
+        return AuthenticateDevice(pkgName, authType, deviceId, extra);
+    } else if (!targetId.deviceId.empty()) {
+        return AuthenticateDevice(pkgName, authType, targetId.deviceId, extra);
+    } else {
+        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+}
+
+int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId)
+{
+    int32_t index = 0;
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    ConnectionAddr addr;
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+        LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %s.", GetAnonyString(targetId.wifiIp).c_str());
+        addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
+        memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
+        addr.info.ip.port = targetId.wifiPort;
+        deviceInfo->addr[index] = addr;
+        deviceId = targetId.wifiIp;
+        index++;
+    } else if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+        LOGI("DmAuthManager::ParseConnectAddr parse brMac: %s.", GetAnonyString(targetId.brMac).c_str());
+        addr.type = ConnectionAddrType::CONNECTION_ADDR_BR;
+        memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length());
+        deviceInfo->addr[index] = addr;
+        deviceId = targetId.brMac;
+        index++;
+    } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+        LOGI("DmAuthManager::ParseConnectAddr parse bleMac: %s.", GetAnonyString(targetId.bleMac).c_str());
+        addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
+        memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
+        deviceInfo->addr[index] = addr;
+        deviceId = targetId.bleMac;
+        index++;
+    } else {
+        LOGE("DmAuthManager::ParseConnectAddr failed, not addr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    deviceInfo->addrNum = index;
+    if (softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo) != DM_OK) {
+        LOGE("DmAuthManager::ParseConnectAddr failed, AddMemberToDiscoverMap failed.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (deviceInfo != nullptr) {
+        deviceInfo = nullptr;
+    }
+
+    return DM_OK;
+}
+
+int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType)
+{
+    auto iter = bindParam.find(PARAM_KEY_AUTH_TYPE);
+    if (iter == bindParam.end()) {
+        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string authTypeStr = iter->second;
+    if (authTypeStr.empty()) {
+        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (authTypeStr.length() > 1) {
+        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!isdigit(authTypeStr[0])) {
+        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    authType = std::stoi(authTypeStr);
+    return DM_OK;
+}
+
+int32_t DmAuthManager::ParseExtra(const std::map<std::string, std::string> &bindParam, std::string &extra)
+{
+    auto iter = bindParam.find(PARAM_KEY_APP_DESC);
+    if (iter == bindParam.end()) {
+        LOGE("DmAuthManager::ParseExtra bind param key: %s not exist.", PARAM_KEY_APP_DESC.c_str());
+        extra = "";
+        return DM_OK;
+    }
+    extra = iter->second;
     return DM_OK;
 }
 

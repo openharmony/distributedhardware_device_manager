@@ -121,6 +121,12 @@ public:
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    int OnPinHolderSessionOpened(int sessionId, int result);
+
+    void OnPinHolderSessionClosed(int sessionId);
+
+    void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
     int32_t DmHiDumper(const std::vector<std::string>& args, std::string &result);
 
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
@@ -151,6 +157,11 @@ public:
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
     int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
     int32_t ExportAuthCode(std::string &authCode);
+
+    int32_t RegisterPinHolderCallback(const std::string &pkgName);
+    int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
+    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
 
     // The following interfaces are provided since OpenHarmony 4.1 Version.
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,

@@ -28,6 +28,8 @@
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
 #include "ipc_common_param_req.h"
+#include "ipc_create_pin_holder_req.h"
+#include "ipc_destroy_pin_holder_req.h"
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
@@ -1909,6 +1911,86 @@ int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
     }
     DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
     return publishId;
+}
+
+int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
+    std::shared_ptr<PinHolderCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("RegisterPinHolderCallback error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_PIN_HOLDER_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("RegisterPinHolderCallback Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("RegisterPinHolderCallback Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType, const std::string &payload)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
+        pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE ||
+        payload.length() > DM_STRING_LENGTH_MAX) {
+        LOGE("CreatePinHolder error: Invalid para, pkgName: %s, pinType: %d", pkgName.c_str(), pinType);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcCreatePinHolderReq> req = std::make_shared<IpcCreatePinHolderReq>();
+    req->SetPkgName(pkgName);
+    req->SetPeerTargetId(targetId);
+    req->SetPinType(pinType);
+    req->SetPayload(payload);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(CREATE_PIN_HOLDER, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("CreatePinHolder Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CreatePinHolder Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType)
+{
+    if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
+        pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE) {
+        LOGE("DestroyPinHolder error: Invalid para, pkgName: %s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcDestroyPinHolderReq> req = std::make_shared<IpcDestroyPinHolderReq>();
+    req->SetPkgName(pkgName);
+    req->SetPeerTargetId(targetId);
+    req->SetPinType(pinType);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(DESTROY_PIN_HOLDER, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("DestroyPinHolder Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DestroyPinHolder Failed with ret %d", ret);
+        return ret;
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

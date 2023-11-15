@@ -529,6 +529,36 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) = 0;
+
+    /**
+     * @brief Register Pin Code Holder Callback
+     * @param pkgName  package name.
+     * @param callback  the callback to be invoked upon CreateAuthCodeHolder or DestroyAuthCodeHolder.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName,
+        std::shared_ptr<PinHolderCallback> callback) = 0;
+
+    /**
+     * @brief Create Pin Code Holder
+     * @param pkgName  package name.
+     * @param targetId  id of target to create pin holder.
+     * @param pinType  pin code holder type.
+     * @param payload  business custom data.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload) = 0;
+
+    /**
+     * @brief Destroy Pin Code Holder
+     * @param pkgName  package name.
+     * @param targetId  id of target to destroy pin holder.
+     * @param pinType  pin code holder type.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

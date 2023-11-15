@@ -26,6 +26,7 @@
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
+#include "dm_pin_holder.h"
 #include "dm_publish_manager.h"
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
@@ -86,6 +87,12 @@ public:
 
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    int OnPinHolderSessionOpened(int sessionId, int result);
+
+    void OnPinHolderSessionClosed(int sessionId);
+
+    void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
     int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
 
     int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
@@ -112,6 +119,13 @@ public:
 
     int32_t ExportAuthCode(std::string &authCode);
 
+    int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+
+    int32_t RegisterPinHolderCallback(const std::string &pkgName);
+    int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
+    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -126,6 +140,7 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
+    std::shared_ptr<DmPinHolder> pinHolder_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

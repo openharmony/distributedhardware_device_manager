@@ -136,6 +136,7 @@ if (defined(ohos_lite)) {
       "include/dependency/hichain",
       "include/dependency/softbus",
       "include/dependency/timer",
+      "include/pinholder",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
@@ -190,6 +191,8 @@ if (defined(ohos_lite)) {
       "src/devicestate/dm_device_state_manager.cpp",
       "src/discovery/dm_discovery_filter.cpp",
       "src/discovery/dm_discovery_manager.cpp",
+      "src/pinholder/dm_pin_holder.cpp",
+      "src/pinholder/pin_holder_session.cpp",
       "src/publish/dm_publish_manager.cpp",
     ]
 

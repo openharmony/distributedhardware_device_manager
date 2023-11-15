@@ -69,6 +69,9 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
     }
+    if (pinHolder_ == nullptr) {
+        pinHolder_ = std::make_shared<DmPinHolder>(listener);
+    }
 
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId > 0) {
@@ -330,6 +333,21 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
     SoftbusSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
+int DeviceManagerServiceImpl::OnPinHolderSessionOpened(int sessionId, int result)
+{
+    return PinHolderSession::OnSessionOpened(sessionId, result);
+}
+
+void DeviceManagerServiceImpl::OnPinHolderSessionClosed(int sessionId)
+{
+    PinHolderSession::OnSessionClosed(sessionId);
+}
+
+void DeviceManagerServiceImpl::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    PinHolderSession::OnBytesReceived(sessionId, data, dataLen);
+}
+
 int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
     if (reqJsonStr.empty()) {
@@ -525,6 +543,48 @@ int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
     authCode = std::to_string(ret);
     LOGE("ExportAuthCode success, authCode: %s.", authCode.c_str());
     return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::RegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("RegisterPinHolderCallback failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return pinHolder_->RegisterPinHolderCallback(pkgName);
+}
+
+int32_t DeviceManagerServiceImpl::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType, const std::string &payload)
+{
+    if (pkgName.empty()) {
+        LOGE("CreatePinHolder failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return pinHolder_->CreatePinHolder(pkgName, targetId, pinType, payload);
+}
+
+int32_t DeviceManagerServiceImpl::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType)
+{
+    if (pkgName.empty()) {
+        LOGE("DestroyPinHolder failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType);
+}
+
+int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (pkgName.empty()) {
+        LOGE("BindTarget failed, pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return authMgr_->BindTarget(pkgName, targetId, bindParam);
 }
 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
