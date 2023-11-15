@@ -57,7 +57,7 @@ public:
     void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override;
 
     void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
-        std::string content) override;
+        int32_t status, std::string content) override;
 
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
         std::string content) override;

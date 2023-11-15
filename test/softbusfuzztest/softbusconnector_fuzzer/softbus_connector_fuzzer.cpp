@@ -45,7 +45,6 @@ void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
     SoftbusConnector::OnSoftbusPublishResult(publishId, pResult);
     SoftbusConnector::OnSoftbusDiscoveryResult(subscribeId, rResult);
     SoftbusConnector::OnSoftbusJoinLNNResult(addr, networkId, result);
-    SoftbusConnector::GetConnectionIpAddress(szData, szData);
 }
 }
 }

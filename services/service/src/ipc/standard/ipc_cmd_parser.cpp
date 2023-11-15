@@ -1156,6 +1156,7 @@ ON_IPC_SET_REQUEST(BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
     std::string pkgName = pReq->GetPkgName();
     PeerTargetId targetId = pReq->GetPeerTargetId();
     int32_t result = pReq->GetResult();
+    int32_t status = pReq->GetStatus();
     std::string content = pReq->GetContent();
 
     if (!data.WriteString(pkgName)) {
@@ -1168,6 +1169,10 @@ ON_IPC_SET_REQUEST(BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
     }
     if (!data.WriteInt32(result)) {
         LOGE("write bind result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(status)) {
+        LOGE("write bind result status failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(content)) {

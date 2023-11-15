@@ -198,7 +198,7 @@ void DeviceManagerServiceListener::OnCredentialResult(const std::string &pkgName
 }
 
 void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, const PeerTargetId &targetId,
-    int32_t result, std::string content)
+    int32_t result, int32_t status, std::string content)
 {
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
@@ -206,6 +206,7 @@ void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, cons
     pReq->SetPkgName(pkgName);
     pReq->SetPeerTargetId(targetId);
     pReq->SetResult(result);
+    pReq->SetStatus(status);
     pReq->SetContent(content);
     ipcServerListener_.SendRequest(BIND_TARGET_RESULT, pReq, pRsp);
 }

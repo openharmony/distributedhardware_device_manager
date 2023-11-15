@@ -60,7 +60,8 @@ public:
         std::shared_ptr<BindTargetCallback> callback);
     void RegisterUnbindCallback(const std::string &pkgName, const PeerTargetId &targetId,
         std::shared_ptr<UnbindTargetCallback> callback);
-    void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
+    void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
+        std::string content);
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
     void RegisterPinHolderCallback(const std::string &pkgName, std::shared_ptr<PinHolderCallback> callback);
 
