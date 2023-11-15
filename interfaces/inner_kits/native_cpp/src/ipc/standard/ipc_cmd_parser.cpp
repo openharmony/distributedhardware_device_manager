@@ -1439,9 +1439,10 @@ ON_IPC_CMD(BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
     PeerTargetId targetId;
     DecodePeerTargetId(data, targetId);
     int32_t result = data.ReadInt32();
+    int32_t status = data.ReadInt32();
     std::string content = data.ReadString();
 
-    DeviceManagerNotify::GetInstance().OnBindResult(pkgName, targetId, result, content);
+    DeviceManagerNotify::GetInstance().OnBindResult(pkgName, targetId, result, status, content);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

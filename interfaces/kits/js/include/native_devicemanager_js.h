@@ -353,8 +353,6 @@ public:
                                  OHOS::DistributedHardware::DmDeviceInfo &info);
     static void JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra, int32_t &authType);
     static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
-    static void JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                             uint8_t **bufferPtr, int32_t &bufferLen);
     static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                nlohmann::json &jsonObj);
     static void JsToDmTokenInfo(const napi_env &env, const napi_value &object, const std::string &fieldStr,

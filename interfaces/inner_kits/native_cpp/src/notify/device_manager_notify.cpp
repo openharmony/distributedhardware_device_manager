@@ -761,7 +761,7 @@ void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, con
 }
 
 void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTargetId &targetId,
-    int32_t result, std::string content)
+    int32_t result, int32_t status, std::string content)
 {
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId)) {
         LOGE("Invalid para, pkgName: %s.", pkgName.c_str());
@@ -787,7 +787,7 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
         LOGE("OnBindResult error, registered bind callback is nullptr.");
         return;
     }
-    tempCbk->OnBindResult(targetId, result, content);
+    tempCbk->OnBindResult(targetId, result, status, content);
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         bindCallback_[pkgName].erase(targetId);

@@ -1152,31 +1152,6 @@ void DeviceManagerNapi::JsToDmPublishInfo(const napi_env &env, const napi_value 
     return;
 }
 
-void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra,
-                                    int32_t &authType)
-{
-    LOGI("JsToDmExtra in.");
-    int32_t authTypeTemp = -1;
-    JsObjectToInt(env, object, "authType", authTypeTemp);
-    authType = authTypeTemp;
-
-    char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
-    std::string appOperationStr = appOperation;
-
-    char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
-    std::string customDescriptionStr = customDescription;
-
-    nlohmann::json jsonObj;
-    jsonObj[AUTH_TYPE] = authType;
-    jsonObj[APP_OPERATION] = appOperationStr;
-    jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
-    JsToJsonObject(env, object, "extraInfo", jsonObj);
-    extra = jsonObj.dump();
-    LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
-}
-
 void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
     int32_t &bindType, bool &isMetaType)
 {
@@ -1239,43 +1214,6 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
     bindParam = jsonObj.dump();
     LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
-}
-
-void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                     uint8_t **bufferPtr, int32_t &bufferLen)
-{
-    LOGI("JsToDmBuffer in.");
-    bool hasProperty = false;
-    NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
-    if (!hasProperty) {
-        LOGE("devicemanager napi js to str no property: %s", fieldStr.c_str());
-        return;
-    }
-
-    napi_value field = nullptr;
-    napi_get_named_property(env, object, fieldStr.c_str(), &field);
-    napi_typedarray_type type = napi_uint8_array;
-    size_t length = 0;
-    napi_value buffer = nullptr;
-    size_t offset = 0;
-    uint8_t *data = nullptr;
-    napi_get_typedarray_info(env, field, &type, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
-    if (type != napi_uint8_array || length == 0 || data == nullptr) {
-        LOGE("Invalid AppIconInfo");
-        return;
-    }
-    *bufferPtr = static_cast<uint8_t *>(calloc(sizeof(uint8_t), length));
-    if (*bufferPtr == nullptr) {
-        LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
-        return;
-    }
-    if (memcpy_s(*bufferPtr, length, data, length) != 0) {
-        LOGE("memcpy_s failed, filed %s", fieldStr.c_str());
-        free(*bufferPtr);
-        *bufferPtr = nullptr;
-        return;
-    }
-    bufferLen = static_cast<int32_t>(length);
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
@@ -1669,7 +1607,8 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
     napi_close_handle_scope(env_, scope);
 }
 
-void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_t result, std::string content)
+void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status,
+    std::string content)
 {
     (void)targetId;
     uv_loop_s *loop = nullptr;
@@ -1683,8 +1622,7 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
         return;
     }
 
-    DmNapiAuthJsCallback *jsCallback = new DmNapiAuthJsCallback(bundleName_, content, "",
-        DM_AUTH_REQUEST_SUCCESS_STATUS, result);
+    DmNapiAuthJsCallback *jsCallback = new DmNapiAuthJsCallback(bundleName_, content, "", status, result);
     if (jsCallback == nullptr) {
         DeleteUvWork(work);
         return;

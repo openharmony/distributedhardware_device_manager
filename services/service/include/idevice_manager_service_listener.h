@@ -106,7 +106,7 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
-        std::string content) = 0;
+        int32_t status, std::string content) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnUnbindResult

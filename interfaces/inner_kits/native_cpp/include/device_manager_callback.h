@@ -78,7 +78,7 @@ public:
     {
     }
     virtual void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
-                              int32_t reason) = 0;
+        int32_t reason) = 0;
 };
 
 class BindTargetCallback {
@@ -86,7 +86,7 @@ public:
     virtual ~BindTargetCallback()
     {
     }
-    virtual void OnBindResult(const PeerTargetId &targetId, int32_t result, std::string content) = 0;
+    virtual void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) = 0;
 };
 
 class UnbindTargetCallback {

@@ -284,40 +284,6 @@ bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
     return true;
 }
 
-int32_t SoftbusConnector::GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress)
-{
-    DeviceInfo *deviceInfo = nullptr;
-    {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
-#endif
-
-        auto iter = discoveryDeviceInfoMap_.find(deviceId);
-        if (iter == discoveryDeviceInfoMap_.end()) {
-            LOGE("deviceInfo not found by deviceId: %s.", GetAnonyString(deviceId).c_str());
-            return ERR_DM_FAILED;
-        }
-        deviceInfo = iter->second.get();
-    }
-
-    if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
-        LOGE("deviceInfo address num not valid, addrNum: %d.", deviceInfo->addrNum);
-        return ERR_DM_FAILED;
-    }
-    for (uint32_t i = 0; i < deviceInfo->addrNum; ++i) {
-        // currently, only support CONNECT_ADDR_WLAN
-        if (deviceInfo->addr[i].type != ConnectionAddrType::CONNECTION_ADDR_WLAN &&
-            deviceInfo->addr[i].type != ConnectionAddrType::CONNECTION_ADDR_ETH) {
-            continue;
-        }
-        ipAddress = deviceInfo->addr[i].info.ip.ip;
-        LOGI("DM_GetConnectionIpAddr get ip ok.");
-        return DM_OK;
-    }
-    LOGE("failed to get ipAddress for deviceId: %s.", GetAnonyString(deviceId).c_str());
-    return ERR_DM_FAILED;
-}
-
 ConnectionAddr *SoftbusConnector::GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type)
 {
     if (deviceInfo == nullptr) {

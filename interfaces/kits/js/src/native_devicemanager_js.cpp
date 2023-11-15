@@ -1234,43 +1234,6 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
 }
 
-void DeviceManagerNapi::JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                     uint8_t **bufferPtr, int32_t &bufferLen)
-{
-    LOGI("JsToDmBuffer in.");
-    bool hasProperty = false;
-    NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
-    if (!hasProperty) {
-        LOGE("devicemanager napi js to str no property: %s", fieldStr.c_str());
-        return;
-    }
-
-    napi_value field = nullptr;
-    napi_get_named_property(env, object, fieldStr.c_str(), &field);
-    napi_typedarray_type type = napi_uint8_array;
-    size_t length = 0;
-    napi_value buffer = nullptr;
-    size_t offset = 0;
-    uint8_t *data = nullptr;
-    napi_get_typedarray_info(env, field, &type, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
-    if (type != napi_uint8_array || length == 0 || data == nullptr) {
-        LOGE("Invalid AppIconInfo");
-        return;
-    }
-    *bufferPtr = static_cast<uint8_t *>(calloc(sizeof(uint8_t), length));
-    if (*bufferPtr == nullptr) {
-        LOGE("low memory, calloc return nullptr, length is %d, filed %s", length, fieldStr.c_str());
-        return;
-    }
-    if (memcpy_s(*bufferPtr, length, data, length) != 0) {
-        LOGE("memcpy_s failed, filed %s", fieldStr.c_str());
-        free(*bufferPtr);
-        *bufferPtr = nullptr;
-        return;
-    }
-    bufferLen = static_cast<int32_t>(length);
-}
-
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                        nlohmann::json &jsonObj)
 {

@@ -251,7 +251,7 @@ public:
     }
     ~DmNapiBindTargetCallback() override {};
     void OnBindResult(const OHOS::DistributedHardware::PeerTargetId &targetId, int32_t result,
-        std::string content) override;
+        int32_t status, std::string content) override;
 
 private:
     napi_env env_;
@@ -326,12 +326,9 @@ public:
     static std::string JsObjectToString(const napi_env &env, const napi_value &param);
     static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
                                   OHOS::DistributedHardware::DmPublishInfo &info);
-    static void JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra, int32_t &authType);
     static void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
         bool &isMetaType);
     static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
-    static void JsToDmBuffer(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                             uint8_t **bufferPtr, int32_t &bufferLen);
     static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                nlohmann::json &jsonObj);
     static void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);

@@ -66,6 +66,26 @@ public:
     }
 
     /**
+     * @tc.name: IpcNotifyBindResultReq::GetStatus
+     * @tc.desc: Ipc get status
+     * @tc.type: FUNC
+     */
+    int32_t GetStatus() const
+    {
+        return status_;
+    }
+
+    /**
+     * @tc.name: IpcNotifyBindResultReq::SetStatus
+     * @tc.desc: Ipc set status
+     * @tc.type: FUNC
+     */
+    void SetStatus(int32_t status)
+    {
+        status_ = status;
+    }
+
+    /**
      * @tc.name: IpcNotifyBindResultReq::GetSecondParam
      * @tc.desc: Ipc get content
      * @tc.type: FUNC
@@ -88,6 +108,7 @@ public:
 private:
     PeerTargetId targetId_;
     int32_t result_;
+    int32_t status_;
     std::string content_;
 };
 } // namespace DistributedHardware

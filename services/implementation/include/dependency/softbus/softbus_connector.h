@@ -79,13 +79,6 @@ public:
     static void OnParameterChgCallback(const char *key, const char *value, void *context);
 
     /**
-     * @tc.name: SoftbusConnector::GetConnectionIpAddress
-     * @tc.desc: Get Connection Ip Address of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static int32_t GetConnectionIpAddress(const std::string &deviceId, std::string &ipAddress);
-
-    /**
      * @tc.name: SoftbusConnector::GetConnectAddr
      * @tc.desc: Get Connect Addr of the SoftbusConnector
      * @tc.type: FUNC
