@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
+const int32_t SESSION_KEY_LENGTH = 16;
 
 SoftbusSession::SoftbusSession()
 {
@@ -142,6 +143,48 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     sessionCallback_->OnDataReceived(sessionId, message);
     LOGI("completed.");
+}
+
+AesGcmCipherKey SoftbusSession::getSessionKeyAndIv()
+{
+    AesGcmCipherKey cipherKey = {0};
+    const unsigned char sessionKey[SESSION_KEY_LENGTH] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    const unsigned char iv[GCM_IV_LEN] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+    cipherKey.keyLen = SESSION_KEY_LENGTH;
+    memcpy_s(cipherKey.key, SESSION_KEY_LENGTH, sessionKey, SESSION_KEY_LENGTH);
+    memcpy_s(cipherKey.iv, GCM_IV_LEN, iv, GCM_IV_LEN);
+    return cipherKey;
+}
+
+void SoftbusSession::encrypt(char* plainText, char* cipherText)
+{
+    AesGcmCipherKey cipherKey = getSessionKeyAndIv();
+    int32_t encryptDataGCMLen = strlen(plainText) + OVERHEAD_LEN;
+    int32_t realEncryptDataGCMLen = strlen(plainText) + TAG_LEN;
+    unsigned char encryptDataGCM[realEncryptDataGCMLen];
+    DmAdapterCrypto::MbedAesGcmEncrypt(&cipherKey, (unsigned char *)plainText, strlen(plainText), encryptDataGCM,
+        encryptDataGCMLen);
+    int32_t ret = memcpy_s(cipherText, realEncryptDataGCMLen, (char *)encryptDataGCM, realEncryptDataGCMLen);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]encrypt failed, ret: %d.", ret);
+        return;
+    }
+    cipherText[realEncryptDataGCMLen] = '\0';
+}
+void SoftbusSession::decrypt(char *cipherText, unsigned int cipherTextLen, char *plainText)
+{
+    int32_t realCipherTextLen = static_cast<int32_t>(cipherTextLen);
+    char realCipherText[realCipherTextLen];
+    int32_t ret = memcpy_s(realCipherText, realCipherTextLen, cipherText, realCipherTextLen);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS] decrypt failed, ret: %d.", ret);
+        return;
+    }
+    AesGcmCipherKey cipherKey = getSessionKeyAndIv();
+    unsigned char *cipherText_uc = (unsigned char*)realCipherText;
+    DmAdapterCrypto::MbedAesGcmDecrypt(&cipherKey, cipherText_uc, realCipherTextLen, (unsigned char *)plainText,
+        realCipherTextLen);
+    plainText[realCipherTextLen - TAG_LEN] = '\0';
 }
 } // namespace DistributedHardware
 } // namespace OHOS

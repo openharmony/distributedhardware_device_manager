@@ -169,6 +169,7 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
+      "${common_path}/src/dm_adapter_crypto.cpp",
       "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "src/ability/standard/dm_ability_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",

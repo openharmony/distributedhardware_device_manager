@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "dm_adapter_crypto.h"
 #include "inner_session.h"
 #include "session.h"
 #include "softbus_session_callback.h"
@@ -33,6 +34,9 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    static void encrypt(char *plainText, char *cipherText);
+    static void decrypt(char *cipherText, unsigned int cipherTextLen, char *plainText);
+    static AesGcmCipherKey getSessionKeyAndIv();
 
 public:
     SoftbusSession();
