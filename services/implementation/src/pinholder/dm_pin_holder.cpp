@@ -424,7 +424,7 @@ void DmPinHolder::OnSessionClosed(int32_t sessionId)
 
 int32_t DmPinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
 {
-    if (targetId.deviceId.empty() && targetId.brMac.empty() && targetId.brMac.empty() && targetId.brMac.empty()) {
+    if (targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty()) {
         LOGE("CheckTargetIdVaild failed. targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
