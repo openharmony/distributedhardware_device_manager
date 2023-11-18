@@ -373,6 +373,11 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     if (IsBool(json, TAG_IS_AUTH_CODE_READY)) {
         authResponseContext_->isAuthCodeReady = json[TAG_IS_AUTH_CODE_READY].get<bool>();
     }
+    if (IsString(json, TAG_ACCOUNT_GROUPID)) {
+        authResponseContext_->accountGroupIdHash = json[TAG_ACCOUNT_GROUPID].get<std::string>();
+    } else {
+        authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
+    }
 }
 
 void AuthMessageProcessor::SetRequestContext(std::shared_ptr<DmAuthRequestContext> authRequestContext)

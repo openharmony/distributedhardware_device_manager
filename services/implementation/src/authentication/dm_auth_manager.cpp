@@ -585,6 +585,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
+    jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
