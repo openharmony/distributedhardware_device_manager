@@ -24,6 +24,7 @@
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
@@ -167,6 +168,15 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestState_ = std::make_shared<AuthRequestInitState>();
     authRequestState_->SetAuthManager(shared_from_this());
     authRequestState_->SetAuthContext(authRequestContext_);
+    struct RadarInfo info = {
+        .funcName = "AuthenticateDevice",
+        .stageRes = StageRes::STAGE_IDLE,
+        .bizState = BizState::BIZ_STATE_START,
+        .isTrust = TrustStatus::NOT_TRUST,
+    };
+    if (!DmRadarHelper.GetInstance().ReportAuthStart(info)) {
+        LOGE("ReportAuthStart failed");
+    }
     authRequestState_->Enter();
     LOGI("DmAuthManager::AuthenticateDevice complete");
     return DM_OK;

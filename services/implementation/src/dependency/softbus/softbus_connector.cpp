@@ -184,6 +184,17 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     LOGI("StartDiscovery begin, subscribeId: %d, mode: 0x%x, medium: %d.", subscribeInfo.subscribeId,
         subscribeInfo.mode, subscribeInfo.medium);
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
+    struct RadarInfo info = {
+        .funcName = "StartDiscovery",
+        .toCallPkg = SOFTBUSNAME;
+        .stageRes = (ret == DM_OK) ? StageRes::STAGE_IDLE : StageRes::STAGE_FAIL,
+        .bizState = (ret == DM_OK) ? BizState::BIZ_STATE_START : BizState::BIZ_STATE_END,
+        .errCode = ret,
+        .commServ = CommServ::USE_SOFTBUS,
+    };
+    if (!DmRadarHelper.GetInstance().ReportDiscoverRegCallback(info)) {
+        LOGE("ReportDiscoverRegCallback failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
         return ERR_DM_DISCOVERY_FAILED;
@@ -205,6 +216,17 @@ int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
     LOGI("StartDiscovery by subscribeId begin, subscribeId: %d, mode: 0x%x, medium: %d.",
         subscribeId, subscribeInfo.mode, subscribeInfo.medium);
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryByIdCallback_);
+    struct RadarInfo info = {
+        .funcName = "StartDiscovery",
+        .toCallPkg = SOFTBUSNAME;
+        .stageRes = (ret == DM_OK) ? StageRes::STAGE_IDLE : StageRes::STAGE_FAIL,
+        .bizState = (ret == DM_OK) ? BizState::BIZ_STATE_START : BizState::BIZ_STATE_END,
+        .errCode = ret,
+        .commServ = CommServ::USE_SOFTBUS,
+    };
+    if (!DmRadarHelper.GetInstance().ReportDiscoverRegCallback(info)) {
+        LOGE("ReportDiscoverRegCallback failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
         return ERR_DM_DISCOVERY_FAILED;
@@ -216,6 +238,15 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
 {
     LOGI("StopDiscovery begin, subscribeId: %d.", (int32_t)subscribeId);
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
+    struct RadarInfo info = {
+        .funcName = "StopDiscovery",
+        .hostName = SOFTBUSNAME;
+        .stageRes = StageRes::STAGE_CANCEL,
+        .commServ = CommServ::USE_SOFTBUS,
+    };
+    if (!DmRadarHelper.GetInstance().ReportDiscoverUserRes(info)) {
+        LOGE("ReportDiscoverUserRes failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %d.", ret);
         return ERR_DM_DISCOVERY_FAILED;
@@ -480,7 +511,16 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
-
+    struct RadarInfo info = {
+        .funcName = "OnSoftbusDeviceFound",
+        .hostName = SOFTBUSNAME;
+        .peerUdid = device.devId;
+        .stageRes = StageRes::STAGE_SUCC,
+        .commServ = CommServ::USE_SOFTBUS,
+    };
+    if (!DmRadarHelper.GetInstance().ReportDiscoverResCallback(info)) {
+        LOGE("ReportDiscoverResCallback failed");
+    }
     for (auto &iter : discoveryCallbackMap_) {
         iter.second->OnDeviceFound(iter.first, dmDeviceInfo, device->isOnline);
     }
@@ -525,7 +565,16 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
-
+    struct RadarInfo info = {
+        .funcName = "OnSoftbusDeviceDiscovery",
+        .hostName = SOFTBUSNAME;
+        .peerUdid = device.devId;
+        .stageRes = StageRes::STAGE_SUCC,
+        .commServ = CommServ::USE_SOFTBUS,
+    };
+    if (!DmRadarHelper.GetInstance().ReportDiscoverResCallback(info)) {
+        LOGE("ReportDiscoverResCallback failed");
+    }
     for (auto &iter : discoveryCallbackMap_) {
         iter.second->OnDeviceFound(iter.first, dmDeviceBasicInfo, device->range, device->isOnline);
     }

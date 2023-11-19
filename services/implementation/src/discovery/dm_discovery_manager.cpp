@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "parameter.h"
 
 namespace OHOS {
