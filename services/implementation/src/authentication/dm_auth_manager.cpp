@@ -24,6 +24,7 @@
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
@@ -532,6 +533,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     authResponseContext_->authType = authRequestContext_->authType;
     authResponseContext_->deviceId = authRequestContext_->deviceId;
+    authResponseContext_->accountGroupIdHash = GetAccountGroupIdHash();
     authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
@@ -546,7 +548,7 @@ void DmAuthManager::AbilityNegotiate()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
+    bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
@@ -587,6 +589,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
+    jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
@@ -627,8 +630,8 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         }
     }
     if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId,
-                                                authRequestContext_->localDeviceId)) {
+        if (hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
+                                                   authRequestContext_->localDeviceId)) {
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
@@ -1110,7 +1113,51 @@ bool DmAuthManager::IsIdenticalAccount()
     if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
         return false;
     }
-    return true;
+    if (authResponseContext_ == nullptr) {
+        LOGE("authResponseContext_ is nullptr.");
+        return false;
+    }
+    if (authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT) {
+        LOGI("The old version.");
+        return true;
+    }
+    nlohmann::json jsonPeerGroupIdObj = nlohmann::json::parse(authResponseContext_->accountGroupIdHash,
+        nullptr, false);
+    if (jsonPeerGroupIdObj.is_discarded()) {
+        LOGE("accountGroupIdHash string not a json type.");
+        return false;
+    }
+    for (auto &groupInfo : groupList) {
+        for (nlohmann::json::iterator it = jsonPeerGroupIdObj.begin(); it != jsonPeerGroupIdObj.end(); ++it) {
+            if ((*it) == DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId)) {
+                LOGI("Is identical Account.");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+std::string DmAuthManager::GetAccountGroupIdHash()
+{
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
+    std::string queryParams = jsonObj.dump();
+
+    int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (osAccountUserId < 0) {
+        LOGE("get current process account user id failed");
+        return "";
+    }
+    std::vector<GroupInfo> groupList;
+    if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+        return "";
+    }
+    nlohmann::json jsonAccountObj;
+    for (auto &groupInfo : groupList) {
+        jsonAccountObj.push_back(DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId));
+    }
+    return jsonAccountObj.dump();
 }
 
 int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)

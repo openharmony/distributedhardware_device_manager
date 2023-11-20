@@ -23,6 +23,7 @@ namespace DistributedHardware {
 class DmSoftbusAdapterCrypto {
 public:
     static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
+    static std::string GetGroupIdHash(const std::string &groupId);
 };
 }; // namespace DistributedHardware
 }; // namespace OHOS

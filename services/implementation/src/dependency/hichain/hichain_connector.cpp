@@ -565,15 +565,21 @@ int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, st
     return DM_OK;
 }
 
-bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice)
+bool HiChainConnector::IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice)
 {
-    LOGI("HiChainConnector::IsDevicesInGroup");
+    LOGI("HiChainConnector::IsDevicesInP2PGroup");
     std::vector<GroupInfo> hostGroupInfoList;
     GetRelatedGroups(hostDevice, hostGroupInfoList);
     std::vector<GroupInfo> peerGroupInfoList;
     GetRelatedGroups(peerDevice, peerGroupInfoList);
     for (const auto &hostGroupInfo : hostGroupInfoList) {
+        if (hostGroupInfo.groupType != GROUP_TYPE_PEER_TO_PEER_GROUP) {
+            continue;
+        }
         for (const auto &peerGroupInfo : peerGroupInfoList) {
+            if (peerGroupInfo.groupType != GROUP_TYPE_PEER_TO_PEER_GROUP) {
+                continue;
+            }
             if (hostGroupInfo.groupId == peerGroupInfo.groupId && hostGroupInfo.groupName == peerGroupInfo.groupName) {
                 LOGE("these are authenticated");
                 return true;
