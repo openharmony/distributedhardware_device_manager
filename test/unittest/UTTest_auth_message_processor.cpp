@@ -102,6 +102,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     std::string str1 = jsonObj.dump();
 
     nlohmann::json jsonObject;
+    jsonObject[TAG_ACCOUNT_GROUPID] = "";
     jsonObject[TAG_VER] = DM_ITF_VER;
     jsonObject[TAG_MSG_TYPE] = msgType;
     jsonObject[TAG_CRYPTO_SUPPORT] = false;

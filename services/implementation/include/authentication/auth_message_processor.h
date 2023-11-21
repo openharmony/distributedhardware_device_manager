@@ -45,10 +45,12 @@ constexpr const char* TAG_TOKEN = "TOKEN";
 constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
 constexpr const char* TAG_IDENTICAL_ACCOUNT = "IDENTICALACCOUNT";
+constexpr const char* TAG_ACCOUNT_GROUPID = "ACCOUNTGROUPID";
 constexpr const char* APP_THUMBNAIL = "appThumbnail";
 constexpr const char* QR_CODE_KEY = "qrCode";
 constexpr const char* TAG_AUTH_TOKEN = "authToken";
 constexpr const char* NFC_CODE_KEY = "nfcCode";
+constexpr const char* OLD_VERSION_ACCOUNT = "oldVersionAccount";
 
 class DmAuthManager;
 struct DmAuthRequestContext;

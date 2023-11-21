@@ -24,6 +24,7 @@
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
 #include "dm_radar_helper.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
@@ -168,13 +169,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     authRequestState_ = std::make_shared<AuthRequestInitState>();
     authRequestState_->SetAuthManager(shared_from_this());
     authRequestState_->SetAuthContext(authRequestContext_);
-    struct RadarInfo info = {
-        .funcName = "AuthenticateDevice",
-        .stageRes = StageRes::STAGE_IDLE,
-        .bizState = BizState::BIZ_STATE_START,
-        .isTrust = TrustStatus::NOT_TRUST,
-    };
-    if (!DmRadarHelper.GetInstance().ReportAuthStart(info)) {
+    if (!DmRadarHelper::GetInstance().ReportAuthStart(deviceId)) {
         LOGE("ReportAuthStart failed");
     }
     authRequestState_->Enter();
@@ -209,6 +204,21 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     }
     if (softbusConnector_ != nullptr) {
         softbusConnector_->EraseUdidFromMap(deviceUdid);
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    struct RadarInfo info = {
+        .funcName = "UnAuthenticateDevice",
+        .toCallPkg = HICHAINNAME,
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+        .peerNetId = networkId,
+        .localUdid = localDeviceId,
+        .peerUdid = deviceUdid,
+    };
+    if (!DmRadarHelper::GetInstance().ReportDeleteTrustRelation(info)) {
+        LOGE("ReportDeleteTrustRelation failed");
     }
     return DM_OK;
 }
@@ -293,6 +303,13 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authMessageProcessor->SetResponseContext(authResponseContext);
             std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+            struct RadarInfo info = {
+                .funcName = "OnSessionOpened",
+                .channelId = sessionId,
+            };
+            if (!DmRadarHelper::GetInstance().ReportAuthSendRequest(info)) {
+                LOGE("ReportAuthSendRequest failed");
+            }
         }
     } else {
         if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
@@ -516,6 +533,26 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
 int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 {
     int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    struct RadarInfo info = {
+        .funcName = "EstablishAuthChannel",
+        .stageRes = (sessionId > 0) ?
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (sessionId > 0) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .localSessName = DM_SESSION_NAME,
+        .peerSessName = DM_SESSION_NAME,
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
+        .localUdid = localDeviceId,
+        .peerUdid = deviceId,
+        .channelId = sessionId,
+        .errCode = ERR_DM_AUTH_OPEN_SESSION_FAILED,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthOpenSession(info)) {
+        LOGE("ReportAuthOpenSession failed");
+    }
     if (sessionId < 0) {
         LOGE("OpenAuthSession failed, stop the authentication");
         authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -542,6 +579,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     authResponseContext_->authType = authRequestContext_->authType;
     authResponseContext_->deviceId = authRequestContext_->deviceId;
+    authResponseContext_->accountGroupIdHash = GetAccountGroupIdHash();
     authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
@@ -556,7 +594,7 @@ void DmAuthManager::AbilityNegotiate()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    bool ret = hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId, localDeviceId);
+    bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
@@ -597,6 +635,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
+    jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
         if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
@@ -637,8 +676,8 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         }
     }
     if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        if (hiChainConnector_->IsDevicesInGroup(authResponseContext_->localDeviceId,
-                                                authRequestContext_->localDeviceId)) {
+        if (hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
+                                                   authRequestContext_->localDeviceId)) {
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
@@ -669,6 +708,17 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     }
     LOGI("DmAuthManager::StartAuthProcess");
     action_ = action;
+    struct RadarInfo info = {
+        .funcName = "StartAuthProcess",
+        .stageRes = (action_ == USER_OPERATION_TYPE_CANCEL_AUTH) ?
+            static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = (action_ == USER_OPERATION_TYPE_CANCEL_AUTH) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_END) : static_cast<int32_t>(BizState::BIZ_STATE_START),
+        .errCode = USER_OPERATION_TYPE_CANCEL_AUTH,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
+        LOGE("ReportAuthConfirmBox failed");
+    }
     if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH || action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         authResponseContext_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
     } else {
@@ -755,6 +805,16 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     }
     isAddingMember_ = true;
     int32_t ret = hiChainConnector_->AddMember(authRequestContext_->deviceId, connectInfo);
+    struct RadarInfo info = {
+        .funcName = "AddMember",
+        .stageRes = (ret == 0) ?
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .peerUdid = authResponseContext_->deviceId,
+        .errCode = ret,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthAddGroup(info)) {
+        LOGE("ReportAuthAddGroup failed");
+    }
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %d", ret);
         isAddingMember_ = false;
@@ -967,6 +1027,13 @@ void DmAuthManager::ShowConfigDialog()
     const std::string params = jsonObj.dump();
     std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
     showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
+    struct RadarInfo info = {
+        .funcName = "ShowConfigDialog",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthPullAuthBox(info)) {
+        LOGE("ReportAuthPullAuthBox failed");
+    }
     LOGI("ShowConfigDialog end");
 }
 
@@ -980,6 +1047,13 @@ void DmAuthManager::ShowAuthInfoDialog()
     if (!authResponseContext_->isShowDialog) {
         LOGI("not show dialog.");
         return;
+    }
+    struct RadarInfo info = {
+        .funcName = "ShowAuthInfoDialog",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthPullPinBox(info)) {
+        LOGE("ReportAuthPullPinBox failed");
     }
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
@@ -1003,6 +1077,15 @@ void DmAuthManager::ShowStartAuthDialog()
         AddMember(pinCode);
         return;
     }
+    struct RadarInfo info = {
+        .funcName = "ShowStartAuthDialog",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
+        LOGE("ReportAuthInputPinBox failed");
+    }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
 }
@@ -1019,7 +1102,12 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
         LOGE("Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
-
+    struct RadarInfo info = {
+        .funcName = "OnUserOperation",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_CANCEL),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .errCode = action,
+    };
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
         case USER_OPERATION_TYPE_CANCEL_AUTH:
@@ -1027,16 +1115,29 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             StartAuthProcess(action);
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
-            SetReasonAndFinish(ERR_DM_TIME_OUT, STATUS_DM_AUTH_CONFIRM);
+            SetReasonAndFinish(ERR_DM_TIME_OUT, STATUS_DM_AUTH_DEFAULT);
+            if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
+                LOGE("ReportAuthConfirmBox failed");
+            }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
-            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, STATUS_DM_AUTH_ADD_MEMBER);
+            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, STATUS_DM_AUTH_DEFAULT);
+            if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
+                LOGE("ReportAuthInputPinBox failed");
+            }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
-            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_ERROR, STATUS_DM_AUTH_ADD_MEMBER);
+            SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_ERROR, STATUS_DM_AUTH_DEFAULT);
+            if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
+                LOGE("ReportAuthInputPinBox failed");
+            }
             break;
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
             AddMember(std::stoi(params));
+            info.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
+            if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
+                LOGE("ReportAuthInputPinBox failed");
+            }
             break;
         default:
             LOGE("this action id not support");
@@ -1120,7 +1221,51 @@ bool DmAuthManager::IsIdenticalAccount()
     if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
         return false;
     }
-    return true;
+    if (authResponseContext_ == nullptr) {
+        LOGE("authResponseContext_ is nullptr.");
+        return false;
+    }
+    if (authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT) {
+        LOGI("The old version.");
+        return true;
+    }
+    nlohmann::json jsonPeerGroupIdObj = nlohmann::json::parse(authResponseContext_->accountGroupIdHash,
+        nullptr, false);
+    if (jsonPeerGroupIdObj.is_discarded()) {
+        LOGE("accountGroupIdHash string not a json type.");
+        return false;
+    }
+    for (auto &groupInfo : groupList) {
+        for (nlohmann::json::iterator it = jsonPeerGroupIdObj.begin(); it != jsonPeerGroupIdObj.end(); ++it) {
+            if ((*it) == DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId)) {
+                LOGI("Is identical Account.");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+std::string DmAuthManager::GetAccountGroupIdHash()
+{
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
+    std::string queryParams = jsonObj.dump();
+
+    int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (osAccountUserId < 0) {
+        LOGE("get current process account user id failed");
+        return "";
+    }
+    std::vector<GroupInfo> groupList;
+    if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+        return "";
+    }
+    nlohmann::json jsonAccountObj;
+    for (auto &groupInfo : groupList) {
+        jsonAccountObj.push_back(DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId));
+    }
+    return jsonAccountObj.dump();
 }
 
 int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)

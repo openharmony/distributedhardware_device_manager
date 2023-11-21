@@ -141,11 +141,11 @@ public:
     int32_t DeleteGroup(int64_t requestId_, const std::string &userId, const int32_t authType);
 
     /**
-     * @tc.name: HiChainConnector::IsDevicesInGroup
-     * @tc.desc: IsDevicesInGroup of the HiChain Connector
+     * @tc.name: HiChainConnector::IsDevicesInP2PGroup
+     * @tc.desc: IsDevicesInP2PGroup of the HiChain Connector
      * @tc.type: FUNC
      */
-    bool IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice);
+    bool IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice);
 
     /**
      * @tc.name: HiChainConnector::GetRelatedGroups

@@ -17,10 +17,14 @@ ohos_shared_library("devicemanagerradar") {
   include_dirs = [
     "include",
     "${common_path}/include",
-    "//commonlibrary/c_utils/base/include",
+    "${innerkits_path}/native_cpp/include",
+    "${c_utils_path}/include",
   ]
 
-  sources = [ "src/dm_radar_helper.cpp" ]
+  sources = [
+    "${common_path}/src/dm_softbus_adapter_crypto.cpp",
+    "src/dm_radar_helper.cpp",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -29,6 +33,7 @@ ohos_shared_library("devicemanagerradar") {
   ]
 
   deps = [
+    "${mbedtls_path}:mbedtls_shared",
     "${utils_path}:devicemanagerutils",
   ]
 
@@ -36,6 +41,7 @@ ohos_shared_library("devicemanagerradar") {
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "init:libbegetutil",
   ]
 
   subsystem_name = "distributedhardware"

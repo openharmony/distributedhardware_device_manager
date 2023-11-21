@@ -13,18 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H
-#define OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H
+#ifndef OHOS_DM_RADAR_HELPER_TEST_H
+#define OHOS_DM_RADAR_HELPER_TEST_H
 
-#include <string>
+#include <memory>
+#include <gtest/gtest.h>
+
+#include "dm_radar_helper.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmSoftbusAdapterCrypto {
+class DmRadarHelperTest : public testing::Test {
 public:
-    static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
-    static std::string GetGroupIdHash(const std::string &groupId);
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
-}; // namespace DistributedHardware
-}; // namespace OHOS
-#endif // OHOS_DM_SOFUBUS_ADAPTER_CRYPTO_H
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DM_RADAR_HELPER_TEST_H

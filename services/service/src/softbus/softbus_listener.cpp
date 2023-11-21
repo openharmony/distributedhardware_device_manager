@@ -30,6 +30,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 
@@ -192,6 +193,21 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    struct RadarInfo radarInfo = {
+        .funcName = "GetTrustedDeviceList",
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .localUdid = std::string(localDeviceId),
+        .peerUdid = DmRadarHelper::GetInstance().GetStringUdidList(deviceInfoList),
+        .peerNetId = DmRadarHelper::GetInstance().GetStringNetIdList(deviceInfoList),
+        .errCode = ERR_DM_FAILED,
+    };
+    if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
+        LOGE("ReportGetTrustDeviceList failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
         return ERR_DM_FAILED;
@@ -365,6 +381,22 @@ void SoftbusListener::OnSoftBusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
+    struct RadarInfo radarInfo = {
+        .funcName = "OnSoftBusDeviceOnline",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
+        .isTrust = static_cast<int32_t>(TrustStatus::IS_TRUST),
+        .peerNetId = info->networkId,
+        .localUdid = std::string(localDeviceId),
+        .peerUdid = peerUdid,
+    };
+    if (!DmRadarHelper::GetInstance().ReportNetworkOnline(radarInfo)) {
+        LOGE("ReportNetworkOnline failed");
+    }
 #if defined(__LITEOS_M__)
     DmThread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     deviceOnLine.DmCreatThread();
@@ -387,6 +419,21 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
+    struct RadarInfo radarInfo = {
+        .funcName = "OnSoftbusDeviceOffline",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .peerNetId = info->networkId,
+        .localUdid = std::string(localDeviceId),
+        .peerUdid = peerUdid,
+    };
+    if (!DmRadarHelper::GetInstance().ReportNetworkOffline(radarInfo)) {
+        LOGE("ReportNetworkOffline failed");
+    }
 #if defined(__LITEOS_M__)
     DmThread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     deviceOffLine.DmCreatThread();
@@ -462,6 +509,15 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
 
 int SoftbusListener::OnSessionOpened(int sessionId, int result)
 {
+    struct RadarInfo info = {
+        .funcName = "OnSessionOpened",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+        .channelId = sessionId,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
+        LOGE("ReportAuthSessionOpenCb failed");
+    }
     return DeviceManagerService::GetInstance().OnSessionOpened(sessionId, result);
 }
 

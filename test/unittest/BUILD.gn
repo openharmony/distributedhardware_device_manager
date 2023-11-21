@@ -39,6 +39,7 @@ group("unittest") {
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
     ":UTTest_dm_publish_manager",
+    ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_timer",
     ":UTTest_hichain_connector",
     ":UTTest_ipc_client_manager",
@@ -656,6 +657,28 @@ ohos_unittest("UTTest_dm_auth_manager") {
 }
 
 ## UTTest_dm_auth_manager }}}
+
+###############################
+## UnitTest UTTest_dm_radar_helper_test {{{
+ohos_unittest("UTTest_dm_radar_helper_test") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/test/unittest",
+    "${devicemanager_path}/radar/include",
+  ]
+
+  sources = [ "${devicemanager_path}/test/unittest/dm_radar_helper_test.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "device_auth:deviceauth_sdk" ]
+}
+
+## UTTest_dm_radar_helper_test }}}
+
+#############################
+
 ## UnitTest UTTest_dm_discovery_manager {{{
 ohos_unittest("UTTest_dm_discovery_manager") {
   module_out_path = module_out_path
@@ -795,6 +818,7 @@ ohos_static_library("device_manager_test_common") {
     "${access_token_path}/nativetoken:libnativetoken",
     "${access_token_path}/token_setproc:libtoken_setproc",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
+    "${devicemanager_path}/radar:devicemanagerradar",
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",

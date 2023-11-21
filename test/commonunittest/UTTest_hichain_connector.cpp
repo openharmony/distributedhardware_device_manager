@@ -795,17 +795,17 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: IsDevicesInGroup_001
+ * @tc.name: IsDevicesInP2PGroup_001
  * @tc.desc: return ERR_DM_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, IsDevicesInGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsDevicesInP2PGroup_001, testing::ext::TestSize.Level0)
 {
     std::string hostDevice = "hostDeviceTest";
     std::string peerDevice = "peerDeviceTest";
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    bool ret = hichainConnector->IsDevicesInGroup(hostDevice, peerDevice);
+    bool ret = hichainConnector->IsDevicesInP2PGroup(hostDevice, peerDevice);
     EXPECT_EQ(ret, false);
 }
 

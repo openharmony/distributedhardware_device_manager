@@ -23,6 +23,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
+#include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -186,13 +187,15 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
     struct RadarInfo info = {
         .funcName = "StartDiscovery",
-        .toCallPkg = SOFTBUSNAME;
-        .stageRes = (ret == DM_OK) ? StageRes::STAGE_IDLE : StageRes::STAGE_FAIL,
-        .bizState = (ret == DM_OK) ? BizState::BIZ_STATE_START : BizState::BIZ_STATE_END,
+        .toCallPkg = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
         .errCode = ret,
-        .commServ = CommServ::USE_SOFTBUS,
     };
-    if (!DmRadarHelper.GetInstance().ReportDiscoverRegCallback(info)) {
+    if (!DmRadarHelper::GetInstance().ReportDiscoverRegCallback(info)) {
         LOGE("ReportDiscoverRegCallback failed");
     }
     if (ret != DM_OK) {
@@ -218,13 +221,15 @@ int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryByIdCallback_);
     struct RadarInfo info = {
         .funcName = "StartDiscovery",
-        .toCallPkg = SOFTBUSNAME;
-        .stageRes = (ret == DM_OK) ? StageRes::STAGE_IDLE : StageRes::STAGE_FAIL,
-        .bizState = (ret == DM_OK) ? BizState::BIZ_STATE_START : BizState::BIZ_STATE_END,
+        .toCallPkg = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
         .errCode = ret,
-        .commServ = CommServ::USE_SOFTBUS,
     };
-    if (!DmRadarHelper.GetInstance().ReportDiscoverRegCallback(info)) {
+    if (!DmRadarHelper::GetInstance().ReportDiscoverRegCallback(info)) {
         LOGE("ReportDiscoverRegCallback failed");
     }
     if (ret != DM_OK) {
@@ -240,11 +245,15 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopDiscovery",
-        .hostName = SOFTBUSNAME;
-        .stageRes = StageRes::STAGE_CANCEL,
-        .commServ = CommServ::USE_SOFTBUS,
+        .hostName = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
+        .errCode = ret,
     };
-    if (!DmRadarHelper.GetInstance().ReportDiscoverUserRes(info)) {
+    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
         LOGE("ReportDiscoverUserRes failed");
     }
     if (ret != DM_OK) {
@@ -511,14 +520,15 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceFound",
-        .hostName = SOFTBUSNAME;
-        .peerUdid = device.devId;
-        .stageRes = StageRes::STAGE_SUCC,
-        .commServ = CommServ::USE_SOFTBUS,
+        .peerNetId = std::string(nodeInfo->networkId),
+        .peerUdid = device->devId,
     };
-    if (!DmRadarHelper.GetInstance().ReportDiscoverResCallback(info)) {
+    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
         LOGE("ReportDiscoverResCallback failed");
     }
     for (auto &iter : discoveryCallbackMap_) {
@@ -565,14 +575,16 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
 #endif
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceDiscovery",
-        .hostName = SOFTBUSNAME;
-        .peerUdid = device.devId;
-        .stageRes = StageRes::STAGE_SUCC,
-        .commServ = CommServ::USE_SOFTBUS,
+        .peerNetId = std::string(nodeInfo->networkId),
+        .peerUdid = device->devId,
+
     };
-    if (!DmRadarHelper.GetInstance().ReportDiscoverResCallback(info)) {
+    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
         LOGE("ReportDiscoverResCallback failed");
     }
     for (auto &iter : discoveryCallbackMap_) {

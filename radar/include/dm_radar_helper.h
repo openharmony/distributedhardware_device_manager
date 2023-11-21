@@ -19,21 +19,27 @@
 #include <cstdint>
 #include <chrono>
 #include <string>
+#include <vector>
 
 #include "single_instance.h"
 
+#include "dm_device_info.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-constexpr const char* ORGPKGNAME = "ohos.distributedhardware.devicemanager";
-constexpr const char* SOFTBUSNAME = "ohos.softbus";
-constexpr const char* HICHAINNAME = "ohos.hichain";
+const std::string ORGPKGNAME = "ohos.distributedhardware.devicemanager";
+const std::string SOFTBUSNAME = "ohos.softbus";
+const std::string HICHAINNAME = "ohos.hichain";
+const std::string DM_DISCOVER_BEHAVIOR = "DM_DISCOVER_BEHAVIOR";
+const std::string DM_AUTHCATION_BEHAVIOR = "DM_AUTHCATION_BEHAVIOR";
 constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
+constexpr int32_t INVALID_UDID_LENGTH = 10;
+constexpr int32_t SUBSTR_UDID_LENGTH = 5;
 enum class BizScene : int32_t {
     DM_DISCOVER = 0x1,
     DM_AUTHCATION = 0x2,
     DM_NETWORK = 0x3,
     DM_DELET_TRUST_RELATION = 0x4,
-    DM_GET_TRUST_DEVICE_LIST = 0x5,
 };
 
 enum class StageRes : int32_t {
@@ -51,16 +57,16 @@ enum class BizState : int32_t {
 };
 
 enum class DisCoverStage : int32_t {
-    DISCOVER_REGISTER_CB_START = 0x1,
-    DISCOVER_CB_END = 0x2,
-    DISCOVER_USER_ACTION_RES = 0x3,
+    DISCOVER_REGISTER_CALLBACK = 0x1,
+    DISCOVER_USER_DEAL_RES = 0x2,
+    DISCOVER_GET_TRUST_DEVICE_LIST = 0x3,
 };
 
 enum class AuthStage : int32_t {
     AUTH_START = 0x1,
     AUTH_OPEN_SESSION = 0x2,
-    AUTH_PULL_AUTH_BOX = 0x3,
-    AUTH_USER_CONFIRM_BOX_RESULT = 0x4,
+    AUTH_SEND_REQUEST = 0x3,
+    AUTH_PULL_AUTH_BOX = 0x4,
     AUTH_CREATE_HICHAIN_GROUP = 0x5,
     AUTH_PULL_PIN_BOX_START = 0x6,
     AUTH_PULL_PIN_INPUT_BOX_END = 0x7,
@@ -99,18 +105,19 @@ enum class Module : int32_t {
 
 struct RadarInfo {
     std::string funcName;
-    int32_t stageRes;
-    int32_t bizState;
     std::string toCallPkg;
     std::string hostName;
-    int32_t errCode;
-    std::string peerNetId;
+    int32_t stageRes;
+    int32_t bizState;
     std::string localSessName;
+    std::string peerSessName;
     int32_t isTrust;
     int32_t commServ;
+    std::string peerNetId;
     std::string localUdid;
     std::string peerUdid;
     int32_t channelId;
+    int32_t errCode;
 };
 
 class DmRadarHelper {
@@ -119,23 +126,29 @@ public:
     bool ReportDiscoverRegCallback(struct RadarInfo info);
     bool ReportDiscoverResCallback(struct RadarInfo info);
     bool ReportDiscoverUserRes(struct RadarInfo info);
-    bool ReportAuthStart(struct RadarInfo info);
+    bool ReportAuthStart(std::string peerUdid);
     bool ReportAuthOpenSession(struct RadarInfo info);
     bool ReportAuthSessionOpenCb(struct RadarInfo info);
+    bool ReportAuthSendRequest(struct RadarInfo info);
     bool ReportAuthPullAuthBox(struct RadarInfo info);
     bool ReportAuthConfirmBox(struct RadarInfo info);
     bool ReportAuthCreateGroup(struct RadarInfo info);
-    bool ReportAuthCreateGroupCb(struct RadarInfo info);
+    bool ReportAuthCreateGroupCb(std::string funcName, int32_t stageRes);
     bool ReportAuthPullPinBox(struct RadarInfo info);
     bool ReportAuthInputPinBox(struct RadarInfo info);
     bool ReportAuthAddGroup(struct RadarInfo info);
-    bool ReportAuthAddGroupCb(struct RadarInfo info);
+    bool ReportAuthAddGroupCb(std::string funcName, int32_t stageRes);
     bool ReportNetworkOnline(struct RadarInfo info);
     bool ReportNetworkOffline(struct RadarInfo info);
     bool ReportDeleteTrustRelation(struct RadarInfo info);
     bool ReportGetTrustDeviceList(struct RadarInfo info);
+    std::string GetStringUdidList(std::vector<DmDeviceInfo> &deviceInfoList);
+    std::string GetStringNetIdList(std::vector<DmDeviceInfo> &deviceInfoList);
+    std::string GetUdidHashByUdid(std::string udid);
 private:
     int32_t GetErrorCode(int32_t errCode, int32_t module);
+    std::string GetAnonyUdid(std::string udid);
+    std::string GetLocalUdid();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

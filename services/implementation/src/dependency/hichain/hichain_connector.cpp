@@ -26,6 +26,7 @@
 #include "dm_hisysevent.h"
 #include "dm_log.h"
 #include "dm_random.h"
+#include "dm_radar_helper.h"
 #include "hichain_connector_callback.h"
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
@@ -154,6 +155,19 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     }
 
     int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
+    struct RadarInfo info = {
+        .funcName = "CreateGroup",
+        .toCallPkg = HICHAINNAME,
+        .stageRes = (ret != 0) ?
+            static_cast<int32_t>(StageRes::STAGE_FAIL) : static_cast<int32_t>(StageRes::STAGE_IDLE),
+        .bizState = (ret != 0) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_END) : static_cast<int32_t>(BizState::BIZ_STATE_START),
+        .localUdid = std::string(localDeviceId),
+        .errCode = ERR_DM_CREATE_GROUP_FAILED,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthCreateGroup(info)) {
+        LOGE("ReportAuthCreateGroup failed");
+    }
     if (ret != 0) {
         LOGE("[HICHAIN]fail to create group with ret:%d, requestId:%lld.", ret, requestId);
         return ERR_DM_CREATE_GROUP_FAILED;
@@ -364,13 +378,14 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
 
 void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
 {
-    std::string data = "";
-    if (returnData != nullptr) {
-        data = std::string(returnData);
-    }
+    std::string data = (returnData != nullptr) ? std::string(returnData) : "";
     LOGI("HiChainConnector::onFinish reqId:%lld, operation:%d", requestId, operationCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGI("Add Member To Group success");
+        if (!DmRadarHelper::GetInstance().ReportAuthAddGroupCb(
+            "onFinish", static_cast<int32_t>(StageRes::STAGE_SUCC))) {
+            LOGE("ReportAuthAddGroupCb failed");
+        }
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_SUCCESS_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
@@ -379,6 +394,10 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
+        if (!DmRadarHelper::GetInstance().ReportAuthCreateGroupCb(
+            "onFinish", static_cast<int32_t>(StageRes::STAGE_SUCC))) {
+            LOGE("ReportAuthCreateGroupCb failed");
+        }
         SysEventWrite(std::string(DM_CREATE_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
             std::string(DM_CREATE_GROUP_SUCCESS_MSG));
         if (networkStyle_ == CREDENTIAL_NETWORK) {
@@ -411,13 +430,14 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
 
 void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
 {
-    std::string data = "";
-    if (errorReturn != nullptr) {
-        data = std::string(errorReturn);
-    }
+    std::string data = (errorReturn != nullptr) ? std::string(errorReturn) : "";
     LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::MEMBER_JOIN) {
         LOGE("Add Member To Group failed");
+        if (!DmRadarHelper::GetInstance().ReportAuthAddGroupCb(
+            "onError", static_cast<int32_t>(StageRes::STAGE_FAIL))) {
+            LOGE("ReportAuthAddGroupCb failed");
+        }
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_FAILED_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
@@ -426,6 +446,10 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
+        if (!DmRadarHelper::GetInstance().ReportAuthCreateGroupCb(
+            "onError", static_cast<int32_t>(StageRes::STAGE_FAIL))) {
+            LOGE("ReportAuthCreateGroupCb failed");
+        }
         SysEventWrite(std::string(DM_CREATE_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(DM_CREATE_GROUP_FAILED_MSG));
         if (networkStyle_ == CREDENTIAL_NETWORK) {
@@ -565,15 +589,21 @@ int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, st
     return DM_OK;
 }
 
-bool HiChainConnector::IsDevicesInGroup(const std::string &hostDevice, const std::string &peerDevice)
+bool HiChainConnector::IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice)
 {
-    LOGI("HiChainConnector::IsDevicesInGroup");
+    LOGI("HiChainConnector::IsDevicesInP2PGroup");
     std::vector<GroupInfo> hostGroupInfoList;
     GetRelatedGroups(hostDevice, hostGroupInfoList);
     std::vector<GroupInfo> peerGroupInfoList;
     GetRelatedGroups(peerDevice, peerGroupInfoList);
     for (const auto &hostGroupInfo : hostGroupInfoList) {
+        if (hostGroupInfo.groupType != GROUP_TYPE_PEER_TO_PEER_GROUP) {
+            continue;
+        }
         for (const auto &peerGroupInfo : peerGroupInfoList) {
+            if (peerGroupInfo.groupType != GROUP_TYPE_PEER_TO_PEER_GROUP) {
+                continue;
+            }
             if (hostGroupInfo.groupId == peerGroupInfo.groupId && hostGroupInfo.groupName == peerGroupInfo.groupName) {
                 LOGE("these are authenticated");
                 return true;
