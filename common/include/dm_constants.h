@@ -163,6 +163,7 @@ const std::string PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
 const std::string PARAM_KEY_PIN_CODE = "PIN_CODE";
 const std::string PARAM_KEY_APP_OPER = "APP_OPER";
 const std::string PARAM_KEY_APP_DESC = "APP_DESC";
+const std::string PARAM_KEY_BLE_UDID_HASH = "BLE_UDID_HASH";
 const std::string PARAM_KEY_CUSTOM_DATA = "CUSTOM_DATA";
 const std::string PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
 const std::string PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
@@ -171,6 +172,7 @@ const std::string PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
 const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 const std::string PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
 const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
+const std::string PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
