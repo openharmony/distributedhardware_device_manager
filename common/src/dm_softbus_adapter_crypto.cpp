@@ -27,7 +27,7 @@ namespace DistributedHardware {
 
 namespace {
 constexpr int SHA_HASH_LEN = 32;
-constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 8;
+constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int HEXIFY_UNIT_LEN = 2;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int DEC_MAX_NUM = 10;
