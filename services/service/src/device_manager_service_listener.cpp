@@ -153,9 +153,6 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
 {
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::make_shared<IpcNotifyAuthResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {
-        status = STATUS_DM_AUTH_DEFAULT;
-    }
 
     pReq->SetPkgName(pkgName);
     pReq->SetDeviceId(deviceId);
@@ -205,9 +202,6 @@ void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, cons
 {
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {
-        status = STATUS_DM_AUTH_DEFAULT;
-    }
 
     pReq->SetPkgName(pkgName);
     pReq->SetPeerTargetId(targetId);
