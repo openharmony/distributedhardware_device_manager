@@ -17,7 +17,7 @@
 #define OHOS_DM_MULTIPLE_USER_CONNECTOR_H
 
 #include <cstdint>
-
+#include <string>
 namespace OHOS {
 namespace DistributedHardware {
 class MultipleUserConnector {

@@ -41,11 +41,11 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     std::string accountId = MultipleUserConnector::GetOhosAccountId();
-    std::string userId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     queryParams["userId"] = std::to_string(userId);
     queryParams["accountId"] = accountId;
     if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
-        LOGE("DP GetAccessControlProfile failed."); 
+        LOGE("DP GetAccessControlProfile failed.");
     }
     return profiles;
 }
@@ -136,7 +136,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
         } else if (item.GetBindLevel() == DEVICE) {
             priority = DEVICE_LEVEL_BIND_TYPE;
         } else if (item.GetBindLevel() == APP && (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId()) == trustDeviceId) {
+            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
             priority = APP_LEVEL_BIND_TYPE;
         } else if (item.GetBindLevel() == APP && (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
             item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
@@ -268,9 +268,9 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             offlineParam.leftAclNumber--;
         } else if ((item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId &&) ||
+            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
             (item.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&)) {
+            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
             priority = APP_LEVEL_BIND_TYPE;
             offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
             if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
@@ -305,12 +305,12 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
     profile.SetBindLevel(aclInfo.bindLevel);
     profile.SetStatus(ACTIVE);
     profile.SetTrustDeviceId(aclInfo.trustDeviceId);
-    profile.SetDeviceIdType(DeviceIdType::UDID);
+    profile.SetDeviceIdType((int32_t)DeviceIdType::UDID);
     profile.SetDeviceIdHash(aclInfo.deviceIdHash);
     profile.SetAuthenticationType(aclInfo.authenticationType);
     profile.SetAccessee(accessee);
     profile.SetAccesser(accesser);
-    if(DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile) != DM_OK) {
+    if (DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile) != DM_OK) {
         LOGE("PutAccessControlProfile failed.");
         return ERR_DM_FAILED;
     }

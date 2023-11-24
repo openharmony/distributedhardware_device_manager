@@ -14,6 +14,7 @@
  */
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
+#include <string>
 #include "access_control_profile.h"
 #include "accessee.h"
 #include "accesser.h"
@@ -86,7 +87,7 @@ public:
     DeviceProfileConnector();
     ~DeviceProfileConnector();
 
-    std::vector<AccessControlProfile> GetAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile();
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
     int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
