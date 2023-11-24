@@ -788,6 +788,10 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
         return;
     }
     tempCbk->OnBindResult(targetId, result, status, content);
+    if (result == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
+        LOGI("notify bind status, result: %d, status: %d", result, status);
+        return;
+    }
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         bindCallback_[pkgName].erase(targetId);
