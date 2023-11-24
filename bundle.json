@@ -30,6 +30,7 @@
                 "c_utils",
                 "common_event_service",
                 "device_auth",
+                "device_info_manager",
                 "dsoftbus",
                 "hisysevent",
                 "hitrace",

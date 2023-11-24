@@ -16,6 +16,9 @@
 #include "multiple_user_connector.h"
 
 #include "dm_log.h"
+
+#include "account_info.h"
+#include "ohos_account_kits.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
@@ -26,6 +29,8 @@ using namespace OHOS::AccountSA;
 namespace OHOS {
 namespace DistributedHardware {
 int32_t MultipleUserConnector::oldUserId_ = -1;
+std::string MultipleUserConnector::accountId_ = "";
+
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
@@ -48,6 +53,25 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 #endif
 }
 
+std::string MultipleUserConnector::GetOhosAccountId(void)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return "";
+#else
+#ifdef OS_ACCOUNT_PART_EXISTS
+    OhosAccountInfo accountInfo;
+    ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfo(accountInfo);
+    if (ret != 0 || accountInfo.uid_ == "") {
+        return "";
+    }
+    accountId_ = accountInfo.uid_;
+    return accountInfo.uid_;
+#else // OS_ACCOUNT_PART_EXISTS
+    return "";
+#endif // OS_ACCOUNT_PART_EXISTS
+#endif
+}
+
 void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
 {
     oldUserId_ = userId;
@@ -56,6 +80,16 @@ void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
 int32_t MultipleUserConnector::GetSwitchOldUserId(void)
 {
     return oldUserId_;
+}
+
+void MultipleUserConnector::SetSwitchOldAccountId(std::string accountId)
+{
+    accountId_ = accountId;
+}
+
+std::string MultipleUserConnector::GetSwitchOldAccountId(void)
+{
+    return accountId_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

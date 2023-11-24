@@ -42,8 +42,30 @@ public:
      * @tc.type: FUNC
      */
     static int32_t GetSwitchOldUserId(void);
+
+    /**
+     * @tc.name: MultipleUserConnector::GetOhosAccountId
+     * @tc.desc: Get Current AccountId of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static std::string GetOhosAccountId(void);
+ 
+    /**
+     * @tc.name: MultipleUserConnector::SetSwitchOldAccountId
+     * @tc.desc: Set Switch Old UserId of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static void SetSwitchOldAccountId(std::string accountId);
+
+    /**
+     * @tc.name: MultipleUserConnector::GetSwitchOldAccountId
+     * @tc.desc: Get Switc hOld UserId of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static std::string GetSwitchOldAccountId(void);
 private:
     static int32_t oldUserId_;
+    static std::string accountId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

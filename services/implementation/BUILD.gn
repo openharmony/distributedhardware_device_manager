@@ -132,6 +132,7 @@ if (defined(ohos_lite)) {
       "include/discovery",
       "include/publish",
       "include/dependency/commonevent",
+      "include/dependency/deviceprofile",
       "include/dependency/multipleuser",
       "include/dependency/hichain",
       "include/dependency/softbus",
@@ -153,6 +154,7 @@ if (defined(ohos_lite)) {
     if (os_account_part_exists) {
       include_dirs += [
         "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+        "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
       ]
     }
   }
@@ -182,6 +184,7 @@ if (defined(ohos_lite)) {
       "src/authentication/showconfirm/standard/show_confirm.cpp",
       "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
+      "src/dependency/deviceprofile/deviceprofile_connector.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
       "src/dependency/multipleuser/multiple_user_connector.cpp",
@@ -222,16 +225,23 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "device_auth:deviceauth_sdk",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
+      "hilog:libhilog",
       "init:libbegetutil",
       "ipc:ipc_core",
+      "os_account:libaccountkits",
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
     ]
 
     if (os_account_part_exists) {
       defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-      external_deps += [ "os_account:os_account_innerkits" ]
+      external_deps += [
+        "os_account:libaccountkits",
+        "os_account:os_account_innerkits"
+      ]
     }
 
     subsystem_name = "distributedhardware"
