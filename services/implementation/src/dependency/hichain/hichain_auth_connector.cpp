@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t P2P_BIND = 0
+const int32_t P2P_BIND = 0;
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 
 int32_t HiChainAuthConnector::StartAuthDevice(int64_t requestId,

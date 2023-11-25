@@ -1508,21 +1508,23 @@ void DmAuthManager::AuthDeviceFinish(int64_t requestId)
 void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
     LOGI("AuthDeviceError start.");
-    if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
-        authTimes_++;
-        timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
-        if (errorCode != DM_OK || requestId != authResponseContext_->requestId) {
-            if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
-                authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
-                authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            } else {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
-                    [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-                authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
-            }
+    if (authRequestState_ == nullptr || authResponseState_ != nullptr) {
+        LOGD("AuthDeviceError sink return.");
+        return;
+    }
+    authTimes_++;
+    timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
+    if (errorCode != DM_OK || requestId != authResponseContext_->requestId) {
+        if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
+            authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
+            authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        } else {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
+                [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
         }
     }
 }
