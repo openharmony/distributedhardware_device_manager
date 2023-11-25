@@ -43,7 +43,7 @@ int32_t HiChainAuthConnector::ProcessAuthDevice(int64_t requestId,
     (void)callbak;
     return DM_OK;
 }
-int32_t ProcessCredential(int32_t operationCode, const char* requestParams, char** returnData)
+int32_t HiChainAuthConnector::ProcessCredential(int32_t operationCode, const char* requestParams, char** returnData)
 {
     LOGI("ProcessCredential mock.");
     (void)operationCode;
