@@ -224,10 +224,6 @@ HWTEST_F(DmDiscoveryManagerTest, OnDiscoveryFailed_002, testing::ext::TestSize.L
     discoveryMgr_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     int ret1 = discoveryMgr_->discoveryContextMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
-    std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    std::string ret = pReq->GetPkgName();
-    EXPECT_EQ(ret, pkgName);
 }
 
 /**

@@ -38,6 +38,8 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
     DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
+    DeviceManagerService::GetInstance().ImportAuthCode(pkgName, extra);
+    DeviceManagerService::GetInstance().ExportAuthCode(extra);
 }
 }
 }

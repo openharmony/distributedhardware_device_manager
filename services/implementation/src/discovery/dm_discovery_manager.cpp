@@ -231,7 +231,21 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)
 {
     LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId = %d reason = %d", subscribeId, failedReason);
-    StopDeviceDiscovery(pkgName, (uint32_t)subscribeId);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (!discoveryQueue_.empty()) {
+            discoveryQueue_.pop();
+        }
+        if (!discoveryContextMap_.empty()) {
+            discoveryContextMap_.erase(pkgName);
+            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+        }
+    }
+    softbusConnector_->StopDiscovery(subscribeId);
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, failedReason);
 }
 
