@@ -545,8 +545,9 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
         }
     } else {
         LOGE("[SOFTBUS]fail to discovery device with subscribeId: %d, result: %d.", subscribeId, result);
-        for (auto &iter : discoveryCallbackMap_) {
+        for (auto iter = discoveryCallbackMap_.begin(); iter != discoveryCallbackMap_.end();) {
             iter.second->OnDiscoveryFailed(iter.first, originId, result);
+            iter = discoveryCallbackMap_.erase(iter);
         }
     }
 }
