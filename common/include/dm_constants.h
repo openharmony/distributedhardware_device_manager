@@ -19,9 +19,9 @@
 #include <string>
 
 #ifdef __LP64__
-constexpr const char* LIB_LOAD_PATH = "/system/lib64/";
+constexpr const char* DM_LIB_LOAD_PATH = "/system/lib64/";
 #else
-constexpr const char* LIB_LOAD_PATH = "/system/lib/";
+constexpr const char* DM_LIB_LOAD_PATH = "/system/lib/";
 #endif
 
 namespace OHOS {
