@@ -399,5 +399,16 @@ std::shared_ptr<DmAuthRequestContext> AuthMessageProcessor::GetRequestContext()
 {
     return authRequestContext_;
 }
+
+std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen)
+{
+    LOGI("CreateDeviceAuthMessage start, msgType %d.", msgType);
+    nlohmann::json jsonObj;
+    jsonObj[TAG_MSG_TYPE] = msgType;
+    std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);
+    jsonObj[TAG_DATA] = authDataStr;
+    jsonObj[TAG_DATA_LEN] = dataLen;
+    return jsonObj.dump();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

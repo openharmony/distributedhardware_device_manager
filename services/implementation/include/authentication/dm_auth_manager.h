@@ -29,6 +29,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_timer.h"
+#include "hichain_auth_connector.h"
 #include "hichain_connector.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
@@ -42,13 +43,21 @@ typedef enum AuthState {
     AUTH_REQUEST_REPLY,
     AUTH_REQUEST_JOIN,
     AUTH_REQUEST_NETWORK,
+    AUTH_REQUEST_CREDENTIAL,
+    AUTH_REQUEST_CREDENTIAL_DONE,
     AUTH_REQUEST_FINISH,
+    AUTH_REQUEST_DELETE_INIT,
+    AUTH_REQUEST_SYNCDELETE,
+    AUTH_REQUEST_SYNCDELETE_DONE,
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
     AUTH_RESPONSE_CONFIRM,
     AUTH_RESPONSE_GROUP,
     AUTH_RESPONSE_SHOW,
+    AUTH_RESPONSE_CREDENTIAL,
     AUTH_RESPONSE_FINISH,
+    AUTH_RESPONSE_SYNCDELETE,
+    AUTH_RESPONSE_SYNCDELETE_DONE,
 } AuthState;
 
 enum DmMsgType : int32_t {
@@ -64,6 +73,13 @@ enum DmMsgType : int32_t {
     MSG_TYPE_CHANNEL_CLOSED = 300,
     MSG_TYPE_SYNC_GROUP = 400,
     MSG_TYPE_AUTH_BY_PIN = 500,
+
+    MSG_TYPE_REQ_PUBLICKEY,
+    MSG_TYPE_RESP_PUBLICKEY,
+    MSG_TYPE_REQ_SYNC_DELETE,
+    MSG_TYPE_REQ_SYNC_DELETE_DONE,
+    MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE,
+    MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE,
 };
 
 enum DmAuthType : int32_t {
@@ -133,12 +149,17 @@ typedef struct DmAuthResponseContext {
     int32_t state;
     std::vector<std::string> syncGroupList;
     std::string accountGroupIdHash;
+    std::string publicKey;
+    bool isOnline;
+    int32_t bindLevel;
+    bool haveCredential;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
 
 class DmAuthManager final : public ISoftbusSessionCallback,
                             public IHiChainConnectorCallback,
+                            public IDmDeviceAuthCallback,
                             public std::enable_shared_from_this<DmAuthManager> {
 public:
     DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -450,6 +471,25 @@ private:
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     int32_t ParseExtra(const std::map<std::string, std::string> &bindParam, std::string &extra);
+
+public:
+    void RequestCredential();
+    void GenerateCredential(std::string &publicKey);
+    void RequestCredentialDone();
+    void RequestSyncDeleteAcl();
+    void ResponseCredential();
+    void ResponseSyncDeleteAcl();
+    bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen);
+    void AuthDeviceFinish(int64_t requestId);
+    void AuthDeviceError(int64_t requestId, int32_t errorCode);
+    void GetRemoteDeviceId(std::string &deviceId);
+    int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
+    void SyncDeleteAclDone();
+    void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
+
+private:
+    int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
+
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
@@ -473,6 +513,12 @@ private:
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
     PeerTargetId peerTargetId_;
+    bool unBindFlag_ = false;
+private:
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
+    const uint8_t *sessionKey_ = nullptr;
+    uint32_t sessionKeyLen_ = 0;
+    std::string remoteDeviceId_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

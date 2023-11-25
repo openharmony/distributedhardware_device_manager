@@ -186,5 +186,11 @@ void SoftbusSession::decrypt(char *cipherText, unsigned int cipherTextLen, char 
         realCipherTextLen);
     plainText[realCipherTextLen - TAG_LEN] = '\0';
 }
+
+int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
+{
+    LOGI("SoftbusSession::OpenUnbindSession");
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
