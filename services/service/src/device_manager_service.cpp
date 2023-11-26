@@ -749,7 +749,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         return true;
     }
     char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
+    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
     if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
         LOGE("File %s canonicalization failed.", soName.c_str());
         return false;
@@ -971,7 +971,7 @@ void DeviceManagerService::UnloadDMServiceImplSo()
         dmServiceImpl_->Release();
     }
     char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = std::string(LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
+    std::string soPathName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
     if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
         (realpath(soPathName.c_str(), path) == nullptr)) {
         LOGE("File %s canonicalization failed.", soPathName.c_str());
@@ -993,7 +993,7 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
     }
 
     char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
+    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
     if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
         LOGE("File %s canonicalization failed.", soName.c_str());
         return false;
@@ -1034,7 +1034,7 @@ void DeviceManagerService::UnloadDMServiceAdapter()
     dmServiceImplExt_ = nullptr;
 
     char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = std::string(LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
+    std::string soPathName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
     if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
         (realpath(soPathName.c_str(), path) == nullptr)) {
         LOGE("File %s canonicalization failed.", soPathName.c_str());

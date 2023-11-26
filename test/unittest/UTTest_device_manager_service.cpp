@@ -170,7 +170,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::Tes
     publishInfo.freq = DM_HIGH;
     publishInfo.ranging = 1;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 

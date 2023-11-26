@@ -81,7 +81,7 @@ void DmConfigManager::ParseAdapterConfig()
             LOGE("adapter json config string exist invalid members");
             continue;
         }
-        soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
+        soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
         LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
         LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
@@ -111,7 +111,7 @@ void DmConfigManager::ParseAuthConfig()
             LOGE("adapter json config string exist invalid members");
             continue;
         }
-        soLoadInfo[i].soPath = std::string(LIB_LOAD_PATH);
+        soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
         LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
         LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
