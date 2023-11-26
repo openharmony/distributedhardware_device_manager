@@ -58,6 +58,7 @@ enum {
     ERR_DM_PUBLISH_FAILED = -20029,
     ERR_DM_PUBLISH_REPEATED = -20030,
     ERR_DM_STOP_DISCOVERY = -20031,
+    ERR_DM_ADD_GROUP_FAILED = -20032,
 
     // The following error codes are provided since OpenHarmony 4.1 Version.
     ERR_DM_ADAPTER_NOT_INIT = -20032,
@@ -124,6 +125,7 @@ constexpr const char AUTH_ONCE = '0';
 // HiChain
 constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
+constexpr int32_t DEVICE_NETWORKID_LENGTH = 100;
 constexpr int32_t GROUP_TYPE_INVALID_GROUP = -1;
 constexpr int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;
 constexpr int32_t GROUP_TYPE_PEER_TO_PEER_GROUP = 256;

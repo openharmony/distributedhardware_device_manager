@@ -170,6 +170,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${common_path}/include/ipc/standard",
+      "${devicemanager_path}/radar/include",
       "${innerkits_path}/native_cpp/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
@@ -214,6 +215,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "${devicemanager_path}/radar:devicemanagerradar",
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
     ]

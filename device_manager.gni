@@ -29,6 +29,8 @@ os_account_path = "//base/account/os_account"
 samgr_lite_path = "//foundation/systemabilitymgr/samgr_lite/interfaces"
 interfaces_path = "//foundation/communication/ipc/interfaces/innerkits"
 utils_lite_path = "//commonlibrary/utils_lite"
+c_utils_path = "//commonlibrary/c_utils/base/"
+mbedtls_path = "//third_party/mbedtls"
 fuzz_test_output_path = "device_manager/device_manager"
 
 #--------------------------softbus----------------------------------#
