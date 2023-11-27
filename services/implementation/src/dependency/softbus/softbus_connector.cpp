@@ -525,7 +525,7 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceFound",
-        .peerNetId = std::string(nodeInfo->networkId),
+        .peerNetId = (nodeInfo != nullptr) ? std::string(nodeInfo->networkId) : "",
         .peerUdid = device->devId,
     };
     if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
@@ -580,7 +580,7 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
     GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceDiscovery",
-        .peerNetId = std::string(nodeInfo->networkId),
+        .peerNetId = (nodeInfo != nullptr) ? std::string(nodeInfo->networkId) : "",
         .peerUdid = device->devId,
 
     };
