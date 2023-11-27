@@ -21,6 +21,7 @@
 #include "dm_log.h"
 #include "dm_crypto.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
@@ -313,14 +314,16 @@ void DeviceManagerServiceListener::OnPinHolderCreate(const std::string &pkgName,
     ipcServerListener_.SendRequest(SERVER_CREATE_PIN_HOLDER, pReq, pRsp);
 }
 
-void DeviceManagerServiceListener::OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType)
+void DeviceManagerServiceListener::OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType,
+    const std::string &payload)
 {
     LOGI("DeviceManagerServiceListener::OnPinHolderDestroy : %s", pkgName.c_str());
-    std::shared_ptr<IpcCreatePinHolderReq> pReq = std::make_shared<IpcCreatePinHolderReq>();
+    std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::make_shared<IpcDestroyPinHolderReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
     pReq->SetPkgName(pkgName);
     pReq->SetPinType(pinType);
+    pReq->SetPayload(payload);
     ipcServerListener_.SendRequest(SERVER_DESTROY_PIN_HOLDER, pReq, pRsp);
 }
 

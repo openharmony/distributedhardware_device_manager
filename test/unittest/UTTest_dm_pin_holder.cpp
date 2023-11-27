@@ -90,7 +90,7 @@ void DmPinHolderCallbackTest::OnDestroyResult(int32_t result)
     std::cout << "OnDestroyResult " << result << std::endl;
 }
 
-void DmPinHolderCallbackTest::OnPinHolderDestroy(DmPinType pinType)
+void DmPinHolderCallbackTest::OnPinHolderDestroy(DmPinType pinType, const std::string &payload)
 {
     std::cout << "OnPinHolderDestroy" << std::endl;
     std::cout << "pinType: " << pinType << std::endl;
@@ -120,30 +120,16 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmPinHolderTest, InitDeviceManager_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.Level0)
 {
     // 1. set packName not null
     std::string packName = "com.ohos.dmtest";
-    // set dmInitCallback not null
+    // 2. set dmInitCallback not null
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
 
     std::shared_ptr<DmPinHolderCallbackTest> pinHolderCallback = std::make_shared<DmPinHolderCallbackTest>();
     ret = DeviceManager::GetInstance().RegisterPinHolderCallback(packName, pinHolderCallback);
-
-    std::shared_ptr<DeviceDiscoveryCallbackTest> discCallback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    DmSubscribeInfo subscribeInfo;
-    subscribeInfo.subscribeId = static_cast<uint16_t>(123456);
-    subscribeInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
-    subscribeInfo.medium = DmExchangeMedium::DM_AUTO;
-    subscribeInfo.freq = DmExchangeFreq::DM_HIGH;
-    subscribeInfo.isSameAccount = false;
-    subscribeInfo.isWakeRemote = false;
-    (void)strncpy_s(subscribeInfo.capability, sizeof(subscribeInfo.capability),
-        DM_CAPABILITY_OSD, strlen(DM_CAPABILITY_OSD));
-    std::string extra = "";
-    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, discCallback);
-    sleep(60);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);

@@ -1513,6 +1513,7 @@ ON_IPC_SET_REQUEST(DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, Message
     std::string pkgName = pReq->GetPkgName();
     PeerTargetId targetId = pReq->GetPeerTargetId();
     int32_t pinType = pReq->GetPinType();
+    std::string payload = pReq->GetPayload();
     if (!data.WriteString(pkgName)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1521,6 +1522,9 @@ ON_IPC_SET_REQUEST(DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, Message
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(pinType)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(payload)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -1549,8 +1553,9 @@ ON_IPC_CMD(SERVER_DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     DmPinType pinType = static_cast<DmPinType>(data.ReadInt32());
+    std::string payload = data.ReadString();
 
-    DeviceManagerNotify::GetInstance().OnPinHolderDestroy(pkgName, pinType);
+    DeviceManagerNotify::GetInstance().OnPinHolderDestroy(pkgName, pinType, payload);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

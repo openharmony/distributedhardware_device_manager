@@ -127,7 +127,7 @@ public:
     {
     }
     virtual void OnPinHolderCreate(const std::string &deviceId, DmPinType pinType, const std::string &payload) = 0;
-    virtual void OnPinHolderDestroy(DmPinType pinType) = 0;
+    virtual void OnPinHolderDestroy(DmPinType pinType, const std::string &payload) = 0;
     virtual void OnCreateResult(int32_t result) = 0;
     virtual void OnDestroyResult(int32_t result) = 0;
 };

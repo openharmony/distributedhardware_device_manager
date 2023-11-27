@@ -555,10 +555,11 @@ public:
      * @param pkgName  package name.
      * @param targetId  id of target to destroy pin holder.
      * @param pinType  pin code holder type.
+     * @param payload  business custom data.
      * @return Returns 0 if success.
      */
     virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType) = 0;
+        DmPinType pinType, const std::string &payload) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

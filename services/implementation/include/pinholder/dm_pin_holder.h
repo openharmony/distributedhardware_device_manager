@@ -49,7 +49,8 @@ public:
     int32_t RegisterPinHolderCallback(const std::string &pkgName);
     int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
-    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
+    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
 public:
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);

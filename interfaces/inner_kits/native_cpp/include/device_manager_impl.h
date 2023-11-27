@@ -251,7 +251,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType) override;
+        DmPinType pinType, const std::string &payload) override;
     /**
      * @tc.name: DeviceManagerImpl::DeleteCredential
      * @tc.desc: DeleteCredential

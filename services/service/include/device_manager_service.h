@@ -161,7 +161,8 @@ public:
     int32_t RegisterPinHolderCallback(const std::string &pkgName);
     int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
-    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
+    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
 
     // The following interfaces are provided since OpenHarmony 4.1 Version.
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,

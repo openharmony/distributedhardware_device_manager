@@ -125,7 +125,8 @@ public:
     int32_t RegisterPinHolderCallback(const std::string &pkgName);
     int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
-    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
+    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
