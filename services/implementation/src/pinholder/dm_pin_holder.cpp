@@ -43,7 +43,6 @@ constexpr int32_t PIN_HOLDER_SESSION_TTL_TIMEOUT = 60;
 constexpr const char* TAG_PIN_TYPE = "PIN_TYPE";
 constexpr const char* TAG_PAYLOAD = "PAYLOAD";
 constexpr const char* TAG_REPLY = "REPLY";
-constexpr const char* TAG_DM_TIME_OUT = "DM_TIME_OUT";
 DmPinHolder::DmPinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener): listener_(listener)
 {
     if (session_ == nullptr) {
@@ -430,7 +429,7 @@ void DmPinHolder::OnSessionClosed(int32_t sessionId)
     sourceState_ = SOURCE_INIT;
     remoteDeviceId_ = "";
     nlohmann::json jsonObj;
-    jsonObj[TAG_DM_TIME_OUT] = true;
+    jsonObj[DM_CONNECTION_DISCONNECTED] = true;
     std::string payload = jsonObj.dump();
     if (listener_ != nullptr) {
         listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);

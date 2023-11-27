@@ -1944,7 +1944,8 @@ int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const Pee
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
         pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE ||
         payload.length() > DM_STRING_LENGTH_MAX) {
-        LOGE("CreatePinHolder error: Invalid para, pkgName: %s, pinType: %d", pkgName.c_str(), pinType);
+        LOGE("CreatePinHolder error: Invalid para, pkgName: %s, pinType: %d, payload.length: %d.",
+            pkgName.c_str(), pinType, payload.length());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcCreatePinHolderReq> req = std::make_shared<IpcCreatePinHolderReq>();
@@ -1973,7 +1974,8 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
         pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE ||
         payload.length() > DM_STRING_LENGTH_MAX) {
-        LOGE("DestroyPinHolder error: Invalid para, pkgName: %s", pkgName.c_str());
+        LOGE("DestroyPinHolder error: Invalid para, pkgName: %s, pinType: %d, payload.length: %d.",
+            pkgName.c_str(), pinType, payload.length());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcDestroyPinHolderReq> req = std::make_shared<IpcDestroyPinHolderReq>();

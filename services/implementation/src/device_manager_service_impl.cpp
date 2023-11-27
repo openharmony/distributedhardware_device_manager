@@ -541,7 +541,7 @@ int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
 {
     int32_t ret = authMgr_->GeneratePincode();
     authCode = std::to_string(ret);
-    LOGI("ExportAuthCode success, authCode: %s.", authCode.c_str());
+    LOGI("ExportAuthCode success, authCode: %s.", GetAnonyString(authCode).c_str());
     return DM_OK;
 }
 
