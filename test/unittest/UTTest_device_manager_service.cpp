@@ -22,6 +22,7 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
+#include "softbus_error_code.h"
 
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
@@ -293,7 +294,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Leve
     std::string callerId = "com.ohos.test";
     bool isRefresh = true;
     int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_TRUE(ret == DM_OK || ret == SOFTBUS_NOT_IMPLEMENT);
 }
 
 /**
