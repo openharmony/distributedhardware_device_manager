@@ -30,7 +30,6 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
-#include "ipc_notify_verify_auth_result_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -164,17 +163,6 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
     pReq->SetStatus(status);
     pReq->SetReason(reason);
     ipcServerListener_.SendRequest(SERVER_AUTH_RESULT, pReq, pRsp);
-}
-
-void DeviceManagerServiceListener::OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId,
-                                                      int32_t resultCode, const std::string &flag)
-{
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq = std::make_shared<IpcNotifyVerifyAuthResultReq>();
-    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-
-    pReq->SetDeviceId(deviceId);
-    pReq->SetResult(resultCode);
-    ipcServerListener_.SendAll(SERVER_VERIFY_AUTH_RESULT, pReq, pRsp);
 }
 
 void DeviceManagerServiceListener::OnUiCall(std::string &pkgName, std::string &paramJson)

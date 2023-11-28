@@ -79,14 +79,6 @@ public:
                               int32_t status, int32_t reason) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceListener::OnVerifyAuthResult
-     * @tc.desc: Verify Auth Result of the DeviceManager Service Listener
-     * @tc.type: FUNC
-     */
-    virtual void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
-                            const std::string &flag) = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceListener::OnUiCall
      * @tc.desc: Fa Call of the DeviceManager Service Listener
      * @tc.type: FUNC

@@ -27,12 +27,6 @@ DmAdapterManager &DmAdapterManager::GetInstance()
     return instance;
 }
 
-std::shared_ptr<IDecisionAdapter> DmAdapterManager::GetDecisionAdapter(const std::string &soName)
-{
-    DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
-    return dmConfigManager.GetDecisionAdapter(soName);
-}
-
 std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter(const std::string &soName)
 {
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();

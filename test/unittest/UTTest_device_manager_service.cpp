@@ -404,20 +404,6 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
 }
 
 /**
- * @tc.name: VerifyAuthentication_001
- * @tc.desc: Set intFlag for VerifyAuthentication to false and set authParam = "jdjjjj"，The return value is
- * ERR_DM_AUTH_NOT_START
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, VerifyAuthentication_001, testing::ext::TestSize.Level0)
-{
-    std::string authParam = "jdjjjj";
-    int ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
-    EXPECT_EQ(ret, ERR_DM_AUTH_NOT_START);
-}
-
-/**
  * @tc.name: GetUdidByNetworkId_001
  * @tc.desc: Make success for GetUdidByNetworkId，The return value is
  * DM_OK
@@ -514,36 +500,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSiz
 }
 
 /**
- * @tc.name: GetFaParam_001
- * @tc.desc: Make success for GetFaParam，The return value is
- * DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetFaParam_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DmAuthParam authParam;
-    int ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetFaParam_002
- * @tc.desc: Make pkgName empty for GetFaParam, The return value is
- * ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetFaParam_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    DmAuthParam authParam;
-    int ret = DeviceManagerService::GetInstance().GetFaParam(pkgName, authParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
  * @tc.name: SetUserOperation_001
  * @tc.desc: Make success for SetUserOperation，The return value is
  * DM_OK
@@ -572,64 +528,6 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
     int32_t action = 0;
     const std::string param = "extra";
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: RegisterDevStateCallback_001
- * @tc.desc: Make success for RegisterDevStateCallback，The return value is
- * DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, RegisterDevStateCallback_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "extra";
-    int32_t ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: RegisterDevStateCallback_002
- * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, RegisterDevStateCallback_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    std::string extra = "extraTest";
-    int32_t ret = DeviceManagerService::GetInstance().RegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: UnRegisterDevStateCallback_001
- * @tc.desc: Make success for UnRegisterDevStateCallback，The return value is
- * DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterDevStateCallback_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "extra";
-    int32_t ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: UnRegisterDevStateCallback_002
- * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterDevStateCallback_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    std::string extra = "extraTest";
-    int32_t ret = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

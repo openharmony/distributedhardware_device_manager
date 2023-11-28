@@ -53,7 +53,6 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     }
     if (deviceStateMgr_ == nullptr) {
         deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
-        deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
@@ -200,23 +199,6 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
     return authMgr_->UnBindDevice(pkgName, udidHash);
 }
 
-int32_t DeviceManagerServiceImpl::VerifyAuthentication(const std::string &authParam)
-{
-    return authMgr_->VerifyAuthentication(authParam);
-}
-
-int32_t DeviceManagerServiceImpl::GetFaParam(std::string &pkgName, DmAuthParam &authParam)
-{
-    if (pkgName.empty()) {
-        LOGE("GetFaParam failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (authMgr_ != nullptr) {
-        authMgr_->GetAuthenticationParam(authParam);
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
     const std::string &params)
 {
@@ -231,76 +213,17 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerServiceImpl::RegisterDevStateCallback error: Invalid parameter, pkgName: %s, extra: %s",
-            pkgName.c_str(), extra.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (deviceStateMgr_ != nullptr) {
-        deviceStateMgr_->RegisterDevStateCallback(pkgName, extra);
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
-{
-    if (pkgName.empty()) {
-        LOGE("UnRegisterDevStateCallback failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (deviceStateMgr_!= nullptr) {
-        deviceStateMgr_->UnRegisterDevStateCallback(pkgName, extra);
-    }
-    return DM_OK;
-}
-
-void DeviceManagerServiceImpl::HandleDeviceOnline(DmDeviceInfo &info)
-{
-    if (softbusConnector_ == nullptr) {
-        LOGE("softbusConnector_ is nullpter!");
+    if (deviceStateMgr_ == nullptr) {
+        LOGE("deviceStateMgr_ is nullpter!");
         return;
     }
-
-    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
+    std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
-    softbusConnector_->HandleDeviceOnline(info);
-}
-
-void DeviceManagerServiceImpl::HandleDeviceOffline(DmDeviceInfo &info)
-{
-    if (softbusConnector_ == nullptr) {
-        LOGE("softbusConnector_ is nullpter!");
-        return;
-    }
-
-    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
-    }
-    softbusConnector_->HandleDeviceOffline(info);
-
-    std::string udid;
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(info.networkId, udid);
-    if (ret == DM_OK) {
-        softbusConnector_->EraseUdidFromMap(udid);
-    }
-}
-
-void DeviceManagerServiceImpl::HandleDeviceNameChange(DmDeviceInfo &info)
-{
-    if (softbusConnector_ == nullptr) {
-        LOGE("softbusConnector_ is nullpter!");
-        return;
-    }
-    std::string deviceId = GetUdidHashByNetworkId(info.networkId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
-    }
-    softbusConnector_->HandleDeviceNameChange(info);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
@@ -479,7 +402,7 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
             LOGE("deviceStateMgr_ is nullptr");
             return ERR_DM_POINT_NULL;
         }
-        if (deviceStateMgr_->ProcNotifyEvent(pkgName, eventId, deviceId) != DM_OK) {
+        if (deviceStateMgr_->ProcNotifyEvent(eventId, deviceId) != DM_OK) {
             LOGE("NotifyEvent failed");
             return ERR_DM_INPUT_PARA_INVALID;
         };

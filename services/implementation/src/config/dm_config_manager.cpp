@@ -169,46 +169,6 @@ DmConfigManager::~DmConfigManager()
     LOGI("DmAdapterManager destructor");
 }
 
-std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std::string &soName)
-{
-    if (soName.empty()) {
-        LOGE("soName size is zero");
-        return nullptr;
-    }
-    auto soInfoIter = soAdapterLoadInfo_.find(soName);
-    if (soInfoIter == soAdapterLoadInfo_.end() || (soInfoIter->second).type != std::string(DECISION_JSON_TYPE_KEY)) {
-        LOGE("not find so info or type key not match");
-        return nullptr;
-    }
-    std::unique_lock<std::mutex> locker(decisionAdapterMutex_);
-    auto ptrIter = decisionAdapterPtr_.find(soName);
-    if (ptrIter != decisionAdapterPtr_.end()) {
-        return decisionAdapterPtr_[soName];
-    }
-    void *so_handle = nullptr;
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-         (realpath(soPathName.c_str(), path) == nullptr)) {
-        LOGE("File %s canonicalization failed.", soPathName.c_str());
-        return nullptr;
-    }
-    so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
-    if (so_handle == nullptr) {
-        LOGE("load decision so %s failed", soName.c_str());
-        return nullptr;
-    }
-    dlerror();
-    auto func = (CreateIDecisionAdapterFuncPtr)dlsym(so_handle, (soInfoIter->second).funcName.c_str());
-    if (dlerror() != nullptr || func == nullptr) {
-        LOGE("Create object function is not exist");
-        return nullptr;
-    }
-    std::shared_ptr<IDecisionAdapter> iDecisionAdapter(func());
-    decisionAdapterPtr_[soName] = iDecisionAdapter;
-    return decisionAdapterPtr_[soName];
-}
-
 std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::string &soName)
 {
     if (soName.empty()) {

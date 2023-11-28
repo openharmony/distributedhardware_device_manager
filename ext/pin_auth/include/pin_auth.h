@@ -45,15 +45,7 @@ public:
      */
     int32_t StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager) override;
 
-    /**
-     * @tc.name: PinAuth::VerifyAuthentication
-     * @tc.desc: Verify Authentication of the PinAuth
-     * @tc.type: FUNC
-     */
-    int32_t VerifyAuthentication(std::string &authToken, const std::string &authParam) override;
-
 private:
-    int32_t times_ = 0;
     std::shared_ptr<PinAuthUi> pinAuthUi_;
 };
 } // namespace DistributedHardware

@@ -37,21 +37,6 @@ std::shared_ptr<DmAdapterManager> dmAdapterManager =
     std::make_shared<DmAdapterManager>();
 
 /**
- * @tc.name: DmAdapterManager::GetDecisionAdapter_001
- * @tc.desc: 1 set soName to null
- *           2 call DmAdapterManager::GetDecisionAdapter_001 with soName = nullptr
- * @tc.type: FUNC
- * @tc.require:AR000GHSJK
- */
-HWTEST_F(DmAdapterManagerTest, GetDecisionAdapter_001, testing::ext::TestSize.Level0)
-{
-    std::string soName = "123";
-    soName.clear();
-    std::shared_ptr<IDecisionAdapter> iDecisionAdapter = dmAdapterManager->GetDecisionAdapter(soName);
-    EXPECT_EQ(nullptr, iDecisionAdapter);
-}
-
-/**
  * @tc.name: DmAdapterManager::GetCryptoAdapter_001
  * @tc.desc: 1 set soName to null
  *           2 callDmAdapterManager::GetCryptoAdapter_001 with soName = nullptr

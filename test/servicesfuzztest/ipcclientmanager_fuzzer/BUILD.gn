@@ -31,6 +31,7 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
+    "${common_path}/include/ipc/standard",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include/dependency/timer",
@@ -68,11 +69,7 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "ipc_client_manager_fuzzer.cpp",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -90,10 +87,7 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "samgr:samgr_proxy",
   ]
 
-  public_deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//third_party/googletest:gmock",
-  ]
+  public_deps = [ "//third_party/googletest:gmock" ]
 }
 
 ###############################################################################

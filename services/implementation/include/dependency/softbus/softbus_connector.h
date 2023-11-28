@@ -30,7 +30,6 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
-#include "softbus_state_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -115,9 +114,6 @@ public:
 public:
     SoftbusConnector();
     ~SoftbusConnector();
-    int32_t RegisterSoftbusStateCallback(const std::string &pkgName,
-                                         const std::shared_ptr<ISoftbusStateCallback> callback);
-    int32_t UnRegisterSoftbusStateCallback(const std::string &pkgName);
     int32_t RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
                                              const std::shared_ptr<ISoftbusDiscoveryCallback> callback);
     int32_t UnRegisterSoftbusDiscoveryCallback(const std::string &pkgName);
@@ -131,9 +127,6 @@ public:
     int32_t StopDiscovery(uint16_t subscribeId);
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     bool HaveDeviceInMap(std::string deviceId);
-    void HandleDeviceOnline(DmDeviceInfo &info);
-    void HandleDeviceOffline(const DmDeviceInfo &info);
-    void HandleDeviceNameChange(const DmDeviceInfo &info);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
     void EraseUdidFromMap(const std::string &udid);
     std::string GetLocalDeviceName();
@@ -160,7 +153,6 @@ private:
     static IPublishCb softbusPublishCallback_;
     std::shared_ptr<SoftbusSession> softbusSession_;
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
-    static std::map<std::string, std::shared_ptr<ISoftbusStateCallback>> stateCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
@@ -168,7 +160,6 @@ private:
     static std::vector<std::string> pkgNameVec_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
-    static std::mutex stateCallbackMutex_;
     static std::mutex deviceUdidLocks_;
     static std::mutex pkgNameVecMutex_;
 };

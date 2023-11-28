@@ -28,10 +28,7 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
-#include "ipc_get_dmfaparam_rsp.h"
-#include "ipc_register_dev_state_callback_req.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_verify_authenticate_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_get_local_device_info_rsp.h"
@@ -400,40 +397,6 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_016, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: SetRequest_017
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_017, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = VERIFY_AUTHENTICATION;
-    MessageParcel data;
-    std::shared_ptr<IpcVerifyAuthenticateReq> req = std::make_shared<IpcVerifyAuthenticateReq>();
-    std::string pkgName = "ohos.test";
-    std::string authPara;
-    req->SetPkgName(pkgName);
-    req->SetAuthPara(authPara);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SetRequest_018
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_018, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_GET_DMFA_INFO;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::string pkgName = "ohos.test";
-    req->SetPkgName(pkgName);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: SetRequest_019
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -449,42 +412,6 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_019, testing::ext::TestSize.Level0)
     std::string params;
     req->SetOperation(action);
     req->SetParams(params);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SetRequest_020
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_020, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = REGISTER_DEV_STATE_CALLBACK;
-    MessageParcel data;
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
-    std::string pkgName = "ohos.test";
-    std::string extra;
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SetRequest_021
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_021, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = UNREGISTER_DEV_STATE_CALLBACK;
-    MessageParcel data;
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
-    std::string pkgName = "ohos.test";
-    std::string extra;
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -814,20 +741,6 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_014, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: ReadResponse_015
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_015, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = VERIFY_AUTHENTICATION;
-    MessageParcel reply;
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: ReadResponse_016
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -849,34 +762,6 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_016, testing::ext::TestSize.Level0)
 HWTEST_F(IpcCmdRegisterTest, ReadResponse_017, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_USER_AUTH_OPERATION;
-    MessageParcel reply;
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ReadResponse_018
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_018, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = REGISTER_DEV_STATE_CALLBACK;
-    MessageParcel reply;
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ReadResponse_019
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_019, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = UNREGISTER_DEV_STATE_CALLBACK;
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
@@ -1214,28 +1099,6 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_011, testing::ext::TestSize.Level0)
     data.WriteString(token);
     data.WriteInt32(status);
     data.WriteInt32(reason);
-    int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: OnIpcCmd_012
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_012, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_VERIFY_AUTH_RESULT;
-    MessageParcel reply;
-    MessageParcel data;
-    std::string pkgName = "ohos.test";
-    std::string deviceId = "123";
-    int32_t flag = 1;
-    int32_t resultCode = 0;
-    data.WriteString(pkgName);
-    data.WriteString(deviceId);
-    data.WriteInt32(resultCode);
-    data.WriteInt32(flag);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     ASSERT_EQ(ret, DM_OK);
 }

@@ -519,8 +519,7 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t RegisterDevStateCallback(const std::string &pkgName,
-        const std::map<std::string, std::string> &extraParam,
-        std::shared_ptr<DeviceStateCallback> callback) = 0;
+        const std::map<std::string, std::string> &extraParam, std::shared_ptr<DeviceStateCallback> callback) = 0;
 
     /**
      * @brief Check the specific caller whether has permission to access the target.

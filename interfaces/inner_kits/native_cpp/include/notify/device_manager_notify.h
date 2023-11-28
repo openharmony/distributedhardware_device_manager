@@ -49,9 +49,6 @@ public:
                                       std::shared_ptr<AuthenticateCallback> callback);
     void UnRegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId);
     void UnRegisterPackageCallback(const std::string &pkgName);
-    void RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
-                                              std::shared_ptr<VerifyAuthCallback> callback);
-    void UnRegisterVerifyAuthenticationCallback(const std::string &pkgName);
     void RegisterDeviceManagerFaCallback(const std::string &pkgName, std::shared_ptr<DeviceManagerUiCallback> callback);
     void UnRegisterDeviceManagerFaCallback(const std::string &pkgName);
     void RegisterCredentialCallback(const std::string &pkgName, std::shared_ptr<CredentialCallback> callback);
@@ -82,7 +79,6 @@ public:
     void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
                       int32_t status, int32_t reason);
-    void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode, int32_t flag);
     void OnUiCall(std::string &pkgName, std::string &paramJson);
     void OnCredentialResult(const std::string &pkgName, int32_t &action, const std::string &credentialResult);
     void OnPinHolderCreate(const std::string &deviceId, const std::string &pkgName, DmPinType pinType,
@@ -100,7 +96,6 @@ private:
     std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
     std::map<std::string, std::map<int32_t, std::shared_ptr<PublishCallback>>> devicePublishCallbacks_;
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;
-    std::map<std::string, std::shared_ptr<VerifyAuthCallback>> verifyAuthCallback_;
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback_;
     std::map<std::string, std::shared_ptr<DeviceManagerUiCallback>> dmUiCallback_;
     std::map<std::string, std::shared_ptr<CredentialCallback>> credentialCallback_;

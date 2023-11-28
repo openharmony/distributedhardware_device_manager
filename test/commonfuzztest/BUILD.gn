@@ -23,7 +23,6 @@ group("fuzztest") {
     "dmdiscoverymanager_fuzzer:fuzztest",
     "generateencrypteduuid_fuzzer:fuzztest",
     "getdeviceinfo_fuzzer:fuzztest",
-    "getfaparam_fuzzer:fuzztest",
     "ondatareceived_fuzzer:fuzztest",
     "onerror_fuzzer:fuzztest",
     "onfinish_fuzzer:fuzztest",

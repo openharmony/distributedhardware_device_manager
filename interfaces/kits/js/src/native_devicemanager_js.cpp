@@ -70,7 +70,6 @@ std::map<std::string, std::shared_ptr<DmNapiDeviceStateCallback>> g_deviceStateC
 std::map<std::string, std::shared_ptr<DmNapiDiscoveryCallback>> g_DiscoveryCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiPublishCallback>> g_publishCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiAuthenticateCallback>> g_authCallbackMap;
-std::map<std::string, std::shared_ptr<DmNapiVerifyAuthCallback>> g_verifyAuthCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiCredentialCallback>> g_creCallbackMap;
 
@@ -253,7 +252,6 @@ bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi
 
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
 AuthAsyncCallbackInfo DeviceManagerNapi::authAsyncCallbackInfo_;
-AuthAsyncCallbackInfo DeviceManagerNapi::verifyAsyncCallbackInfo_;
 CredentialAsyncCallbackInfo DeviceManagerNapi::creAsyncCallbackInfo_;
 std::mutex DeviceManagerNapi::creMapLocks_;
 
@@ -697,46 +695,6 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
     }
 }
 
-void DmNapiVerifyAuthCallback::OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
-{
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(env_, &loop);
-    if (loop == nullptr) {
-        return;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        LOGE("DmNapiVerifyAuthCallback: OnVerifyAuthResult, No memory");
-        return;
-    }
-
-    DmNapiVerifyJsCallback *jsCallback = new DmNapiVerifyJsCallback(bundleName_, deviceId, resultCode, flag);
-    if (jsCallback == nullptr) {
-        DeleteUvWork(work);
-        return;
-    }
-    work->data = reinterpret_cast<void *>(jsCallback);
-
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
-        DmNapiVerifyJsCallback *callback = reinterpret_cast<DmNapiVerifyJsCallback *>(work->data);
-        DeviceManagerNapi *deviceManagerNapi =  DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
-        if (deviceManagerNapi == nullptr) {
-            LOGE("OnVerifyAuthResult, deviceManagerNapi not find for bundleName %s", callback->bundleName_.c_str());
-        } else {
-            deviceManagerNapi->OnVerifyResult(callback->deviceId_, callback->resultCode_, callback->flag_);
-        }
-        delete callback;
-        callback = nullptr;
-        DeleteUvWork(work);
-    }, uv_qos_user_initiated);
-    if (ret != 0) {
-        LOGE("Failed to execute OnVerifyAuthResult work queue");
-        delete jsCallback;
-        jsCallback = nullptr;
-        DeleteUvWork(work);
-    }
-}
-
 DeviceManagerNapi::DeviceManagerNapi(napi_env env, napi_value thisVar) : DmNativeEvent(env, thisVar)
 {
     env_ = env;
@@ -905,38 +863,6 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
     }
     napi_close_handle_scope(env_, scope);
     g_authCallbackMap.erase(bundleName_);
-}
-
-void DeviceManagerNapi::OnVerifyResult(const std::string &deviceId, int32_t resultCode, int32_t flag)
-{
-    LOGI("OnVerifyResult for resultCode: %d, flag: %d", resultCode, flag);
-    napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
-    napi_value thisVar = nullptr;
-    napi_get_reference_value(env_, thisVarRef_, &thisVar);
-    napi_value result[DM_NAPI_ARGS_TWO] = {0};
-    if (resultCode == 0) {
-        napi_get_undefined(env_, &result[0]);
-        napi_create_object(env_, &result[1]);
-        SetValueUtf8String(env_, "deviceId", deviceId, result[1]);
-        SetValueInt32(env_, "level", flag, result[1]);
-    } else {
-        napi_create_object(env_, &result[0]);
-        SetValueInt32(env_, "code", resultCode, result[0]);
-        napi_get_undefined(env_, &result[1]);
-    }
-
-    napi_value callResult = nullptr;
-    napi_value handler = nullptr;
-    napi_get_reference_value(env_, verifyAsyncCallbackInfo_.callback, &handler);
-    if (handler != nullptr) {
-        napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
-        napi_delete_reference(env_, verifyAsyncCallbackInfo_.callback);
-    } else {
-        LOGE("handler is nullptr");
-    }
-    napi_close_handle_scope(env_, scope);
-    g_verifyAuthCallbackMap.erase(bundleName_);
 }
 
 void DeviceManagerNapi::SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
@@ -1432,7 +1358,7 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
         }
         int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
         if (ret != 0) {
-            LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
+            LOGE("UnRegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
         g_deviceStateCallbackMap.erase(bundleName);
@@ -1467,42 +1393,12 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
         }
         int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(bundleName);
         if (ret != 0) {
-            LOGE("RegisterDevStateCallback failed for bundleName %s", bundleName.c_str());
+            LOGE("UnRegisterDeviceManagerFaCallback failed for bundleName %s", bundleName.c_str());
             return;
         }
         g_dmUiCallbackMap.erase(bundleName);
         return;
     }
-}
-
-napi_value DeviceManagerNapi::GetAuthenticationParamSync(napi_env env, napi_callback_info info)
-{
-    LOGI("GetAuthenticationParamSync in");
-    if (!IsSystemApp()) {
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    size_t argc = 0;
-    napi_value thisVar = nullptr;
-    napi_value resultParam = nullptr;
-    napi_value result = nullptr;
-
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-    DmAuthParam authParam;
-    int32_t ret = DeviceManager::GetInstance().GetFaParam(deviceManagerWrapper->bundleName_, authParam);
-    if (ret != 0) {
-        LOGE("GetAuthenticationParam for %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        napi_get_undefined(env, &resultParam);
-        return resultParam;
-    }
-    napi_create_object(env, &resultParam);
-    DmAuthParamToJsAuthParam(env, authParam, resultParam);
-    return resultParam;
 }
 
 napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_info info)
@@ -2475,57 +2371,6 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
     return result;
 }
 
-napi_value DeviceManagerNapi::VerifyAuthInfo(napi_env env, napi_callback_info info)
-{
-    if (!IsSystemApp()) {
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO,  "Wrong number of arguments, required 2")) {
-        return nullptr;
-    }
-
-    napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_object, "authInfo", "object")) {
-        return nullptr;
-    }
-    if (!IsFunctionType(env, argv[1])) {
-        return nullptr;
-    }
-
-    verifyAsyncCallbackInfo_.env = env;
-    napi_create_reference(env, argv[1], 1, &verifyAsyncCallbackInfo_.callback);
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-
-    std::shared_ptr<DmNapiVerifyAuthCallback> verifyCallback = nullptr;
-    auto iter = g_verifyAuthCallbackMap.find(deviceManagerWrapper->bundleName_);
-    if (iter == g_verifyAuthCallbackMap.end()) {
-        verifyCallback = std::make_shared<DmNapiVerifyAuthCallback>(env, deviceManagerWrapper->bundleName_);
-        g_verifyAuthCallbackMap[deviceManagerWrapper->bundleName_] = verifyCallback;
-    } else {
-        verifyCallback = iter->second;
-    }
-    std::string authParam;
-    JsToDmAuthInfo(env, argv[0], authParam);
-
-    int32_t ret =
-        DeviceManager::GetInstance().VerifyAuthentication(deviceManagerWrapper->bundleName_, authParam, verifyCallback);
-    if (ret != 0) {
-        LOGE("VerifyAuthInfo for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-    }
-    napi_get_undefined(env, &result);
-    return result;
-}
-
 napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info info)
 {
     LOGI("RequestCredential function has been discarded");
@@ -2926,7 +2771,6 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     g_DiscoveryCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_publishCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_authCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_verifyAuthCallbackMap.erase(deviceManagerWrapper->bundleName_);
     {
         std::lock_guard<std::mutex> autoLock(creMapLocks_);
         g_creCallbackMap.erase(deviceManagerWrapper->bundleName_);
@@ -3250,13 +3094,10 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDeviceInfo", GetDeviceInfo),
         DECLARE_NAPI_FUNCTION("unAuthenticateDevice", UnAuthenticateDevice),
         DECLARE_NAPI_FUNCTION("authenticateDevice", AuthenticateDevice),
-        DECLARE_NAPI_FUNCTION("verifyAuthInfo", VerifyAuthInfo),
         DECLARE_NAPI_FUNCTION("setUserOperation", SetUserOperationSync),
         DECLARE_NAPI_FUNCTION("requestCredentialRegisterInfo", RequestCredential),
         DECLARE_NAPI_FUNCTION("importCredential", ImportCredential),
         DECLARE_NAPI_FUNCTION("deleteCredential", DeleteCredential),
-        DECLARE_NAPI_FUNCTION("getFaParam", GetAuthenticationParamSync),
-        DECLARE_NAPI_FUNCTION("getAuthenticationParam", GetAuthenticationParamSync),
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff)};
 

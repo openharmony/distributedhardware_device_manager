@@ -464,40 +464,6 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     return dmServiceImpl_->UnBindDevice(pkgName, udidHash);
 }
 
-int32_t DeviceManagerService::VerifyAuthentication(const std::string &authParam)
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller does not have permission to call VerifyAuthentication.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (authParam.empty()) {
-        LOGE("DeviceManagerService::VerifyAuthentication error: Invalid parameter, authParam: %s", authParam.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("DeviceManagerService::VerifyAuthentication failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->VerifyAuthentication(authParam);
-}
-
-int32_t DeviceManagerService::GetFaParam(std::string &pkgName, DmAuthParam &authParam)
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %s does not have permission to call GetFaParam.", pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("GetFaParam failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->GetFaParam(pkgName, authParam);
-}
-
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -519,79 +485,14 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     return dmServiceImpl_->SetUserOperation(pkgName, action, params);
 }
 
-int32_t DeviceManagerService::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
+void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerService::RegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }
-    {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_);
-        if (registerDevStateMap_.count(pkgName) == 0) {
-            registerDevStateMap_.insert(std::map<std::string, std::string>::value_type (pkgName, extra));
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
-{
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_);
-        if (registerDevStateMap_.count(pkgName) > 0) {
-            registerDevStateMap_.erase(pkgName);
-        }
-    }
-    if (IsDMServiceImplSoLoaded()) {
-        return dmServiceImpl_->UnRegisterDevStateCallback(pkgName, extra);
-    }
-    return DM_OK;
-}
-
-void DeviceManagerService::HandleDeviceOnline(DmDeviceInfo &info)
-{
     if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_ONLINE, info);
+        dmServiceImplExt_->HandleDeviceStatusChange(devState, devInfo);
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("HandleDeviceOnline failed, instance not init or init failed.");
-        return;
-    }
-    {
-        std::lock_guard<std::mutex> lock(registerDevStateLock_);
-        for (auto iter : registerDevStateMap_) {
-            dmServiceImpl_->RegisterDevStateCallback(iter.first, iter.second);
-        }
-    }
-    dmServiceImpl_->HandleDeviceOnline(info);
-}
-
-void DeviceManagerService::HandleDeviceOffline(DmDeviceInfo &info)
-{
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_OFFLINE, info);
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("HandleDeviceOffline failed, instance not init or init failed.");
-        return;
-    }
-    dmServiceImpl_->HandleDeviceOffline(info);
-}
-
-void DeviceManagerService::HandleDeviceNameChange(DmDeviceInfo &info)
-{
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->HandleDeviceStatusEvent(StatusEventCode::DEVICE_INFO_CHANGE, info);
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("HandleDeviceNameChange failed, instance not init or init failed.");
-        return;
-    }
-    dmServiceImpl_->HandleDeviceNameChange(info);
 }
 
 int DeviceManagerService::OnSessionOpened(int sessionId, int result)
@@ -732,7 +633,7 @@ int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName
 int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerService::UnRegisterDevStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
+        LOGE("DeviceManagerService::UnRegisterUiStateCallback error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {

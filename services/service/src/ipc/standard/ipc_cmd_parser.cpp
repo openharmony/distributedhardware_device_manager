@@ -35,7 +35,6 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
-#include "ipc_notify_verify_auth_result_req.h"
 #include "ipc_server_stub.h"
 
 #include "nlohmann/json.hpp"
@@ -302,47 +301,6 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<I
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(pBaseReq);
-
-    std::string pkgName = pReq->GetPkgName();
-    std::string deviceId = pReq->GetDeviceId();
-    int32_t result = pReq->GetResult();
-    int32_t flag = pReq->GetFlag();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(deviceId)) {
-        LOGE("write deviceId failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteInt32(flag)) {
-        LOGE("write flag failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
@@ -573,17 +531,6 @@ ON_IPC_CMD(UNAUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(VERIFY_AUTHENTICATION, MessageParcel &data, MessageParcel &reply)
-{
-    std::string authPara = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().VerifyAuthentication(authPara);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(GET_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
     std::string networkId = data.ReadString();
@@ -709,43 +656,6 @@ ON_IPC_CMD(GET_UUID_BY_NETWORK, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
-{
-    std::string packName = data.ReadString();
-    DmAuthParam authParam;
-    if (DeviceManagerService::GetInstance().GetFaParam(packName, authParam) != DM_OK) {
-        LOGE("ipc read fa parm failed");
-        return ERR_DM_IPC_READ_FAILED;
-    }
-    int32_t appIconLen = authParam.imageinfo.GetAppIconLen();
-    int32_t appThumbnailLen = authParam.imageinfo.GetAppThumbnailLen();
-
-    reply.WriteInt32(authParam.direction);
-    reply.WriteInt32(authParam.authType);
-    reply.WriteString(authParam.authToken);
-    reply.WriteString(authParam.packageName);
-    reply.WriteString(authParam.appName);
-    reply.WriteString(authParam.appDescription);
-    reply.WriteInt32(authParam.business);
-    reply.WriteInt32(authParam.pincode);
-    reply.WriteInt32(appIconLen);
-    reply.WriteInt32(appThumbnailLen);
-
-    if (appIconLen > 0 && authParam.imageinfo.GetAppIcon() != nullptr) {
-        if (!reply.WriteRawData(authParam.imageinfo.GetAppIcon(), appIconLen)) {
-            LOGE("write appIcon failed");
-            return ERR_DM_IPC_WRITE_FAILED;
-        }
-    }
-    if (appThumbnailLen > 0 && authParam.imageinfo.GetAppThumbnail() != nullptr) {
-        if (!reply.WriteRawData(authParam.imageinfo.GetAppThumbnail(), appThumbnailLen)) {
-            LOGE("write appThumbnail failed");
-            return ERR_DM_IPC_WRITE_FAILED;
-        }
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply)
 {
     std::string packageName = data.ReadString();
@@ -753,30 +663,6 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
     std::string params = data.ReadString();
     int result = DeviceManagerService::GetInstance().SetUserOperation(packageName, action, params);
     if (!reply.WriteInt32(result)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return result;
-}
-
-ON_IPC_CMD(REGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
-{
-    std::string packageName = data.ReadString();
-    std::string extra = data.ReadString();
-    int result = DeviceManagerService::GetInstance().RegisterDevStateCallback(packageName, extra);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return result;
-}
-
-ON_IPC_CMD(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
-{
-    std::string packageName = data.ReadString();
-    std::string extra = data.ReadString();
-    int result = DeviceManagerService::GetInstance().UnRegisterDevStateCallback(packageName, extra);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return result;

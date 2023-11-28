@@ -21,23 +21,9 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 if (defined(ohos_lite)) {
   if (ohos_kernel_type == "liteos_m") {
     static_library("devicemanagersdk_mini") {
-      include_dirs = [
-        "${innerkits_path}/native_cpp/include",
-        "${innerkits_path}/native_cpp/include/notify",
-        "${common_path}/include",
-        "${common_path}/include/ipc",
-        "${common_path}/include/ipc/model",
-        "${samgr_lite_path}/kits/samgr",
-        "${servicesimpl_path}/include/dispatch",
-        "//third_party/bounds_checking_function/include",
-        "//third_party/json/include",
-      ]
+      include_dirs = []
 
-      sources = [
-        "${innerkits_path}/native_cpp/src/mini/device_manager.cpp",
-        "${innerkits_path}/native_cpp/src/mini/device_manager_impl.cpp",
-        "${innerkits_path}/native_cpp/src/mini/device_manager_notify.cpp",
-      ]
+      sources = []
 
       defines = [
         "__LITEOS_M__",
@@ -63,11 +49,11 @@ if (defined(ohos_lite)) {
         "include/ipc/lite",
         "include/notify",
         "${common_path}/include",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
         "${common_path}/include/ipc/model",
-        "${common_path}/include/dfx",
-        "${common_path}/include/dfx/lite",
         "${interfaces_path}/c/ipc/include",
         "${interfaces_path}/ipc_core/include",
         "${samgr_lite_path}/kits/samgr",

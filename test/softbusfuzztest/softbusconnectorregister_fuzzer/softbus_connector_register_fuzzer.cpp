@@ -22,21 +22,10 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
-#include "softbus_state_callback.h"
 #include "softbus_connector_register_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusStateCallbackFuzzTest : public ISoftbusStateCallback {
-public:
-    virtual ~SoftbusStateCallbackFuzzTest() {}
-
-    void OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info) override {}
-    void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info) override {}
-    void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info) override {}
-    void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info) override {}
-};
-
 class SoftbusDiscoveryCallbackFuzzTest : public ISoftbusDiscoveryCallback {
 public:
     virtual ~SoftbusDiscoveryCallbackFuzzTest() {}
@@ -62,11 +51,8 @@ void SoftBusConnectorRegisterFuzzTest(const uint8_t* data, size_t size)
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<ISoftbusPublishCallback> pubishCallback = std::make_shared<SoftbusPublishCallbackFuzzTest>();
     std::shared_ptr<ISoftbusDiscoveryCallback> discoveryCallback = std::make_shared<SoftbusDiscoveryCallbackFuzzTest>();
-    std::shared_ptr<ISoftbusStateCallback> stateCallback = std::make_shared<SoftbusStateCallbackFuzzTest>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 
-    softbusConnector->RegisterSoftbusStateCallback(pkgName, stateCallback);
-    softbusConnector->UnRegisterSoftbusStateCallback(pkgName);
     softbusConnector->RegisterSoftbusDiscoveryCallback(pkgName, discoveryCallback);
     softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
     softbusConnector->RegisterSoftbusPublishCallback(pkgName, pubishCallback);

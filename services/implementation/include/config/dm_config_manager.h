@@ -70,7 +70,6 @@ public:
      * @tc.type: FUNC
      */
     void GetAllAuthType(std::vector<std::string> &allAuthType);
-    std::shared_ptr<IDecisionAdapter> GetDecisionAdapter(const std::string &soName);
     std::shared_ptr<ICryptoAdapter> GetCryptoAdapter(const std::string &soName);
 
     /**
@@ -89,11 +88,9 @@ private:
 #if !defined(__LITEOS_M__)
     std::mutex authAdapterMutex_;
     std::mutex cryptoAdapterMutex_;
-    std::mutex decisionAdapterMutex_;
 #endif
     std::map<int32_t, AuthSoLoadInfo> soAuthLoadInfo_;
     std::map<std::string, AdapterSoLoadInfo> soAdapterLoadInfo_;
-    std::map<std::string, std::shared_ptr<IDecisionAdapter>> decisionAdapterPtr_;
     std::map<std::string, std::shared_ptr<ICryptoAdapter>> cryptoAdapterPtr_;
 };
 } // namespace DistributedHardware

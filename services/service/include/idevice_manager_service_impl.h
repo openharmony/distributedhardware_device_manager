@@ -112,20 +112,6 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::VerifyAuthentication
-     * @tc.desc: Verify Authentication of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t VerifyAuthentication(const std::string &authParam) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::GetFaParam
-     * @tc.desc: Get FaParam of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam) = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::SetUserOperation
      * @tc.desc: Se tUser Operation of device manager service impl
      * @tc.type: FUNC
@@ -133,39 +119,11 @@ public:
     virtual int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::RegisterDevStateCallback
-     * @tc.desc: Register Device State Callback to device manager service impl
+     * @tc.name: IDeviceManagerServiceImpl::HandleDeviceStatusChange
+     * @tc.desc: Handle Device Status Event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::UnRegisterDevStateCallback
-     * @tc.desc: UnRegister Device State Callback to device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::HandleDeviceOnline
-     * @tc.desc: Handle Device Online to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual void HandleDeviceOnline(DmDeviceInfo &info) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::HandleDeviceOffline
-     * @tc.desc: Handle Device Offline to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual void HandleDeviceOffline(DmDeviceInfo &info) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::HandleDeviceNameChange
-     * @tc.desc: Handle Device Name Change to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual void HandleDeviceNameChange(DmDeviceInfo &info) = 0;
+    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl

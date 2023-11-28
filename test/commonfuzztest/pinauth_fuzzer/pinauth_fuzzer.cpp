@@ -45,7 +45,6 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<PinAuth> pinauth = std::make_shared<PinAuth>();
     pinauth->ShowAuthInfo(authToken, authManager);
     pinauth->StartAuth(authToken, authManager);
-    pinauth->VerifyAuthentication(authToken, authParam);
 }
 }
 }

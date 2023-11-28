@@ -69,50 +69,6 @@ HWTEST_F(DeviceManagerServiceImplTest, Initialize_002, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: RegisterDevStateCallback_001
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, RegisterDevStateCallback_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->RegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: RegisterDevStateCallback_002
- * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, RegisterDevStateCallback_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string extra;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->RegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: RegisterDevStateCallback_003
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, RegisterDevStateCallback_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "extraTest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->deviceStateMgr_ =
-        std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector_);
-    int32_t ret = deviceManagerServiceImpl->RegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: PraseNotifyEventJson_001
  * @tc.desc: return ERR_DM_FAILED
  * @tc.type: FUNC
@@ -397,42 +353,6 @@ HWTEST_F(DeviceManagerServiceImplTest, UnRegisterCredentialCallback_002, testing
 }
 
 /**
- * @tc.name: GetFaParam_001
- * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, GetFaParam_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    DmAuthParam authParam;
-    DmDeviceInfo info;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->softbusConnector_ = std::make_shared<SoftbusConnector>();
-    deviceManagerServiceImpl->HandleDeviceOnline(info);
-    int32_t ret = deviceManagerServiceImpl->GetFaParam(pkgName, authParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: GetFaParam_002
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, GetFaParam_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DmAuthParam authParam;
-    DmDeviceInfo info;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->softbusConnector_ = softbusConnector;
-    deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
-    deviceManagerServiceImpl->HandleDeviceOffline(info);
-    int32_t ret = deviceManagerServiceImpl->GetFaParam(pkgName, authParam);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: SetUserOperation_001
  * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
@@ -461,36 +381,6 @@ HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_002, testing::ext::TestS
     deviceManagerServiceImpl->authMgr_ =
         std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
     int32_t ret = deviceManagerServiceImpl->SetUserOperation(pkgName, action, params);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: UnRegisterDevStateCallback_001
- * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, UnRegisterDevStateCallback_001, testing::ext::TestSize.Level0)
-{
-    const std::string pkgName;
-    const std::string extra;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->UnRegisterDevStateCallback(pkgName, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: UnRegisterDevStateCallback_002
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, UnRegisterDevStateCallback_002, testing::ext::TestSize.Level0)
-{
-    const std::string pkgName = "com.ohos.test";
-    const std::string extra = "extraTest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->deviceStateMgr_ =
-        std::make_shared<DmDeviceStateManager>(softbusConnector, listener, hiChainConnector_);
-    int32_t ret = deviceManagerServiceImpl->UnRegisterDevStateCallback(pkgName, extra);
     EXPECT_EQ(ret, DM_OK);
 }
 
