@@ -1317,7 +1317,7 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
 }
 
 int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-    DmPinType pinType)
+    DmPinType pinType, const std::string &payload)
 {
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller: %s does not have permission to call DestroyPinHolder.", pkgName.c_str());
@@ -1341,7 +1341,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("DestroyPinHolder failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->DestroyPinHolder(pkgName, targetId, pinType);
+    return dmServiceImpl_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

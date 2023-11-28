@@ -541,7 +541,7 @@ int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
 {
     int32_t ret = authMgr_->GeneratePincode();
     authCode = std::to_string(ret);
-    LOGE("ExportAuthCode success, authCode: %s.", authCode.c_str());
+    LOGI("ExportAuthCode success, authCode: %s.", GetAnonyString(authCode).c_str());
     return DM_OK;
 }
 
@@ -567,14 +567,14 @@ int32_t DeviceManagerServiceImpl::CreatePinHolder(const std::string &pkgName, co
 }
 
 int32_t DeviceManagerServiceImpl::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-    DmPinType pinType)
+    DmPinType pinType, const std::string &payload)
 {
     if (pkgName.empty()) {
         LOGE("DestroyPinHolder failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType);
+    return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
 int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,

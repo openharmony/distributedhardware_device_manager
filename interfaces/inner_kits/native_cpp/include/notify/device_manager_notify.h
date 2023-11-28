@@ -87,7 +87,7 @@ public:
     void OnCredentialResult(const std::string &pkgName, int32_t &action, const std::string &credentialResult);
     void OnPinHolderCreate(const std::string &deviceId, const std::string &pkgName, DmPinType pinType,
         const std::string &payload);
-    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType);
+    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload);
     void OnCreateResult(const std::string &pkgName, int32_t result);
     void OnDestroyResult(const std::string &pkgName, int32_t result);
 

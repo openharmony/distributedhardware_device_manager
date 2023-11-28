@@ -1944,7 +1944,8 @@ int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const Pee
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
         pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE ||
         payload.length() > DM_STRING_LENGTH_MAX) {
-        LOGE("CreatePinHolder error: Invalid para, pkgName: %s, pinType: %d", pkgName.c_str(), pinType);
+        LOGE("CreatePinHolder error: Invalid para, pkgName: %s, pinType: %d, payload.length: %d.",
+            pkgName.c_str(), pinType, payload.length());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcCreatePinHolderReq> req = std::make_shared<IpcCreatePinHolderReq>();
@@ -1967,17 +1968,21 @@ int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const Pee
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType)
+int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+    DmPinType pinType, const std::string &payload)
 {
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) ||
-        pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE) {
-        LOGE("DestroyPinHolder error: Invalid para, pkgName: %s", pkgName.c_str());
+        pinType > DmPinType::SUPER_SONIC || pinType < DmPinType::NUMBER_PIN_CODE ||
+        payload.length() > DM_STRING_LENGTH_MAX) {
+        LOGE("DestroyPinHolder error: Invalid para, pkgName: %s, pinType: %d, payload.length: %d.",
+            pkgName.c_str(), pinType, payload.length());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcDestroyPinHolderReq> req = std::make_shared<IpcDestroyPinHolderReq>();
     req->SetPkgName(pkgName);
     req->SetPeerTargetId(targetId);
     req->SetPinType(pinType);
+    req->SetPayload(payload);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
     int32_t ret = ipcClientProxy_->SendRequest(DESTROY_PIN_HOLDER, req, rsp);

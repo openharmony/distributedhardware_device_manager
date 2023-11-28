@@ -72,7 +72,7 @@ public:
     std::string GetUdidHash(const std::string &deviceId, const std::string &pkgName);
     void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
         const std::string &payload) override;
-    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType) override;
+    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload) override;
     void OnCreateResult(const std::string &pkgName, int32_t result) override;
     void OnDestroyResult(const std::string &pkgName, int32_t result) override;
 

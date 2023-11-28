@@ -58,7 +58,7 @@ public:
     DmPinHolderCallbackTest() : PinHolderCallback() {}
     ~DmPinHolderCallbackTest() override {}
     void OnPinHolderCreate(const std::string &deviceId, DmPinType pinType, const std::string &payload) override;
-    void OnPinHolderDestroy(DmPinType pinType) override;
+    void OnPinHolderDestroy(DmPinType pinType, const std::string &payload) override;
     void OnCreateResult(int32_t result) override;
     void OnDestroyResult(int32_t result) override;
 };

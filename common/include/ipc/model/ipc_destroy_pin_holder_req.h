@@ -65,9 +65,30 @@ public:
         pinType_ = pinType;
     }
 
+    /**
+     * @tc.name: IpcDestroyPinHolderReq::GetPayload
+     * @tc.desc: Ipc Destroy Pin Holder request Get Payload
+     * @tc.type: FUNC
+     */
+    std::string GetPayload() const
+    {
+        return payload_;
+    }
+
+    /**
+     * @tc.name: IpcDestroyPinHolderReq::SetPayload
+     * @tc.desc: Ipc Destroy Pin Holder request Set Payload
+     * @tc.type: FUNC
+     */
+    void SetPayload(const std::string payload)
+    {
+        payload_ = payload;
+    }
+
 private:
     PeerTargetId targetId_;
     int32_t pinType_;
+    std::string payload_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

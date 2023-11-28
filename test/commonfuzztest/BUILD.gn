@@ -30,5 +30,6 @@ group("fuzztest") {
     "onrequest_fuzzer:fuzztest",
     "pinauth_fuzzer:fuzztest",
     "pinauthui_fuzzer:fuzztest",
+    "pinholder_fuzzer:fuzztest",
   ]
 }

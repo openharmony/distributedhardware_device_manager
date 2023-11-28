@@ -26,6 +26,7 @@
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
@@ -1264,7 +1265,8 @@ ON_IPC_CMD(DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
     PeerTargetId targetId;
     DecodePeerTargetId(data, targetId);
     DmPinType pinType = static_cast<DmPinType>(data.ReadInt32());
-    int32_t result = DeviceManagerService::GetInstance().DestroyPinHolder(pkgName, targetId, pinType);
+    std::string payload = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1317,9 +1319,10 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, 
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcCreatePinHolderReq> pReq = std::static_pointer_cast<IpcCreatePinHolderReq>(pBaseReq);
+    std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::static_pointer_cast<IpcDestroyPinHolderReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t pinType = pReq->GetPinType();
+    std::string payload = pReq->GetPayload();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -1327,6 +1330,10 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, 
     }
     if (!data.WriteInt32(pinType)) {
         LOGE("write pinType failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(payload)) {
+        LOGE("write payload failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

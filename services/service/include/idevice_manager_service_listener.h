@@ -115,11 +115,35 @@ public:
      */
     virtual void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
         std::string content) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnPinHolderCreate
+     * @tc.desc: Unbind target Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
     virtual void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
-        const std::string &payload);
-    virtual void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType);
-    virtual void OnCreateResult(const std::string &pkgName, int32_t result);
-    virtual void OnDestroyResult(const std::string &pkgName, int32_t result);
+        const std::string &payload) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnPinHolderDestroy
+     * @tc.desc: Unbind target Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnCreateResult
+     * @tc.desc: Create Pin Holder Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnCreateResult(const std::string &pkgName, int32_t result) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnDestroyResult
+     * @tc.desc: Destroy Pin Holder Result of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnDestroyResult(const std::string &pkgName, int32_t result) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

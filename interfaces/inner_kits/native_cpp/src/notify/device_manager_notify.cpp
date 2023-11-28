@@ -862,7 +862,8 @@ void DeviceManagerNotify::OnPinHolderCreate(const std::string &pkgName, const st
     tempCbk->OnPinHolderCreate(deviceId, pinType, payload);
 }
 
-void DeviceManagerNotify::OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType)
+void DeviceManagerNotify::OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType,
+    const std::string &payload)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -882,7 +883,7 @@ void DeviceManagerNotify::OnPinHolderDestroy(const std::string &pkgName, DmPinTy
         LOGE("OnPinHolderDestroy error, registered device state callback is nullptr.");
         return;
     }
-    tempCbk->OnPinHolderDestroy(pinType);
+    tempCbk->OnPinHolderDestroy(pinType, payload);
 }
 
 void DeviceManagerNotify::OnCreateResult(const std::string &pkgName, int32_t result)

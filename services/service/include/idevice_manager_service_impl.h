@@ -35,14 +35,14 @@ public:
      * @tc.desc: Initialize the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener);
+    virtual int32_t Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::Release
      * @tc.desc: Release the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void Release();
+    virtual void Release() = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::StartDeviceDiscovery
@@ -50,7 +50,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                         const std::string &extra);
+                                         const std::string &extra) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::StartDeviceDiscovery
@@ -58,28 +58,28 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
-                                 const std::string &filterOptions);
+                                 const std::string &filterOptions) = 0;
                                  
    /**
      * @tc.name: IDeviceManagerServiceImpl::StopDeviceDiscovery
      * @tc.desc: Stop Device Discovery of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
+    virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
 
    /**
      * @tc.name: IDeviceManagerServiceImpl::PublishDeviceDiscovery
      * @tc.desc: Publish Device Discovery of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
+    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnPublishDeviceDiscovery
      * @tc.desc: UnPublish Device Discovery of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
+    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::AuthenticateDevice
@@ -87,14 +87,14 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-                                       const std::string &extra);
+                                       const std::string &extra) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnAuthenticateDevice
      * @tc.desc: UnAuthenticate Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::BindDevice
@@ -102,177 +102,177 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-        const std::string &bindParam);
+        const std::string &bindParam) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnBindDevice
      * @tc.desc: UnBindDevice Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::VerifyAuthentication
      * @tc.desc: Verify Authentication of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t VerifyAuthentication(const std::string &authParam);
+    virtual int32_t VerifyAuthentication(const std::string &authParam) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::GetFaParam
      * @tc.desc: Get FaParam of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
+    virtual int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::SetUserOperation
      * @tc.desc: Se tUser Operation of device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
+    virtual int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterDevStateCallback
      * @tc.desc: Register Device State Callback to device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+    virtual int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnRegisterDevStateCallback
      * @tc.desc: UnRegister Device State Callback to device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
+    virtual int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::HandleDeviceOnline
      * @tc.desc: Handle Device Online to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceOnline(DmDeviceInfo &info);
+    virtual void HandleDeviceOnline(DmDeviceInfo &info) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::HandleDeviceOffline
      * @tc.desc: Handle Device Offline to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceOffline(DmDeviceInfo &info);
+    virtual void HandleDeviceOffline(DmDeviceInfo &info) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::HandleDeviceNameChange
      * @tc.desc: Handle Device Name Change to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceNameChange(DmDeviceInfo &info);
+    virtual void HandleDeviceNameChange(DmDeviceInfo &info) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int OnSessionOpened(int sessionId, int result);
+    virtual int OnSessionOpened(int sessionId, int result) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionClosed
      * @tc.desc: Send Session Closed event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void OnSessionClosed(int sessionId);
+    virtual void OnSessionClosed(int sessionId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnBytesReceived
      * @tc.desc: Send Bytes Received event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int OnPinHolderSessionOpened(int sessionId, int result);
+    virtual int OnPinHolderSessionOpened(int sessionId, int result) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionClosed
      * @tc.desc: Send Session Closed event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void OnPinHolderSessionClosed(int sessionId);
+    virtual void OnPinHolderSessionClosed(int sessionId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnPinHolderBytesReceived
      * @tc.desc: Send Bytes Received event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    virtual void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::RequestCredential
      * @tc.desc: RequestCredential of the Device Manager Service
      * @tc.type: FUNC
      */
-    virtual int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr);
+    virtual int32_t RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::ImportCredential
      * @tc.desc: ImportCredential of the Device Manager Service
      * @tc.type: FUNC
      */
-    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo);
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &credentialInfo) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::DeleteCredential
      * @tc.desc: DeleteCredential of the Device Manager Service
      * @tc.type: FUNC
      */
-    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterCredentialCallback
      * @tc.desc: RegisterCredentialCallback
      * @tc.type: FUNC
      */
-    virtual int32_t RegisterCredentialCallback(const std::string &pkgName);
+    virtual int32_t RegisterCredentialCallback(const std::string &pkgName) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnRegisterCredentialCallback
      * @tc.desc: UnRegisterCredentialCallback
      * @tc.type: FUNC
      */
-    virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName);
+    virtual int32_t UnRegisterCredentialCallback(const std::string &pkgName) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::NotifyEvent
      * @tc.desc: NotifyEvent
      * @tc.type: FUNC
      */
-    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
+    virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::GetGroupType
      * @tc.desc: GetGroupType
      * @tc.type: FUNC
      */
-    virtual int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList);
+    virtual int32_t GetGroupType(std::vector<DmDeviceInfo> &deviceList) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::GetUdidHashByNetWorkId
      * @tc.desc: GetUdidHashByNetWorkId
      * @tc.type: FUNC
      */
-    virtual int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
+    virtual int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::ImportAuthCode
      * @tc.desc: ImportAuthCode
      * @tc.type: FUNC
      */
-    virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode);
+    virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::ExportAuthCode
      * @tc.desc: ExportAuthCode
      * @tc.type: FUNC
      */
-    virtual int32_t ExportAuthCode(std::string &authCode);
+    virtual int32_t ExportAuthCode(std::string &authCode) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::BindTarget
@@ -287,13 +287,44 @@ public:
      * @tc.desc: LoadHardwareFwkService
      * @tc.type: FUNC
      */
-    virtual void LoadHardwareFwkService();
-    virtual int32_t RegisterUiStateCallback(const std::string &pkgName);
-    virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName);
-    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName);
+    virtual void LoadHardwareFwkService() = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::RegisterUiStateCallback
+     * @tc.desc: RegisterUiStateCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterUiStateCallback(const std::string &pkgName) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::UnRegisterUiStateCallback
+     * @tc.desc: UnRegisterUiStateCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::RegisterPinHolderCallback
+     * @tc.desc: RegisterPinHolderCallback
+     * @tc.type: FUNC
+     */
+    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::CreatePinHolder
+     * @tc.desc: CreatePinHolder
+     * @tc.type: FUNC
+     */
     virtual int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType, const std::string &payload);
-    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId, DmPinType pinType);
+        DmPinType pinType, const std::string &payload) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::DestroyPinHolder
+     * @tc.desc: DestroyPinHolder
+     * @tc.type: FUNC
+     */
+    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
+        DmPinType pinType, const std::string &payload) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
