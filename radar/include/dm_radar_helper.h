@@ -116,6 +116,7 @@ struct RadarInfo {
     std::string peerNetId;
     std::string localUdid;
     std::string peerUdid;
+    std::string discoverDevList;
     int32_t channelId;
     int32_t errCode;
 };
@@ -142,9 +143,10 @@ public:
     bool ReportNetworkOffline(struct RadarInfo info);
     bool ReportDeleteTrustRelation(struct RadarInfo info);
     bool ReportGetTrustDeviceList(struct RadarInfo info);
-    std::string GetStringUdidList(std::vector<DmDeviceInfo> &deviceInfoList);
+    std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList);
     std::string GetStringNetIdList(std::vector<DmDeviceInfo> &deviceInfoList);
     std::string GetUdidHashByUdid(std::string udid);
+    std::string ConvertHexToString(uint16_t hex);
 private:
     int32_t GetErrorCode(int32_t errCode, int32_t module);
     std::string GetAnonyUdid(std::string udid);

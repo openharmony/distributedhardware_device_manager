@@ -58,7 +58,6 @@ enum {
     ERR_DM_PUBLISH_FAILED = -20029,
     ERR_DM_PUBLISH_REPEATED = -20030,
     ERR_DM_STOP_DISCOVERY = -20031,
-    ERR_DM_ADD_GROUP_FAILED = -20032,
 
     // The following error codes are provided since OpenHarmony 4.1 Version.
     ERR_DM_ADAPTER_NOT_INIT = -20032,
@@ -86,6 +85,7 @@ enum {
     ERR_DM_META_TYPE_INVALID = -20054,
     ERR_DM_LOAD_CUSTOM_META_NODE = -20055,
     ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY = -20056,
+    ERR_DM_ADD_GROUP_FAILED = -20057,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";

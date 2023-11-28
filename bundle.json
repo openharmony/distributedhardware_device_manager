@@ -44,6 +44,7 @@
                 "resource_management"
             ],
             "third_party": [
+                "cJSON",
                 "json",
                 "node",
                 "mbedtls",

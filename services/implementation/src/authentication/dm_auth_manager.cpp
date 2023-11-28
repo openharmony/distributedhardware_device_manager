@@ -303,13 +303,6 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authMessageProcessor->SetResponseContext(authResponseContext);
             std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
             softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-            struct RadarInfo info = {
-                .funcName = "OnSessionOpened",
-                .channelId = sessionId,
-            };
-            if (!DmRadarHelper::GetInstance().ReportAuthSendRequest(info)) {
-                LOGE("ReportAuthSendRequest failed");
-            }
         }
     } else {
         if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
@@ -318,6 +311,13 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authMessageProcessor_->SetRequestContext(authRequestContext_);
             authRequestState_->SetAuthContext(authRequestContext_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
+            struct RadarInfo info = {
+                .funcName = "OnSessionOpened",
+                .channelId = sessionId,
+            };
+            if (!DmRadarHelper::GetInstance().ReportAuthSendRequest(info)) {
+                LOGE("ReportAuthSendRequest failed");
+            }
         } else {
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
             LOGE("DmAuthManager::OnSessionOpened but request state is wrong");
@@ -1076,15 +1076,6 @@ void DmAuthManager::ShowStartAuthDialog()
         }
         AddMember(pinCode);
         return;
-    }
-    struct RadarInfo info = {
-        .funcName = "ShowStartAuthDialog",
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
-        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
-    };
-    if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
-        LOGE("ReportAuthInputPinBox failed");
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
