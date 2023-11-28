@@ -30,6 +30,16 @@ class IDmGroupResCallback {
 public:
     virtual void OnGroupResult(int64_t requestId, int32_t action, const std::string &resultInfo) = 0;
 };
+
+class IDmDeviceAuthCallback {
+public:
+    virtual bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen) = 0;
+    virtual void AuthDeviceFinish(int64_t requestId) = 0;
+    virtual void AuthDeviceError(int64_t requestId, int32_t errorCode) = 0;
+    virtual void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen) = 0;
+    virtual int32_t GetPinCode() = 0;
+    virtual void GetRemoteDeviceId(std::string &deviceId) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_HICHAIN_CONNECTOR_CALLBACK_H

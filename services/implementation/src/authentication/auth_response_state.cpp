@@ -151,5 +151,53 @@ int32_t AuthResponseFinishState::Enter()
     stateAuthManager->AuthenticateFinish();
     return DM_OK;
 }
+
+int32_t AuthResponseCredential::GetStateType()
+{
+    return AuthState::AUTH_RESPONSE_CREDENTIAL;
+}
+
+int32_t AuthResponseCredential::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthResponseFinishState authManager_ is null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->ResponseCredential();
+    return DM_OK;
+}
+
+int32_t AuthResponseSyncDeleteAcl::GetStateType()
+{
+    return AuthState::AUTH_RESPONSE_SYNCDELETE;
+}
+
+int32_t AuthResponseSyncDeleteAcl::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthResponseFinishState authManager_ is null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->ResponseSyncDeleteAcl();
+    return DM_OK;
+}
+
+int32_t AuthResponseSyncDeleteAclNone::GetStateType()
+{
+    return AuthState::AUTH_RESPONSE_SYNCDELETE_DONE;
+}
+
+int32_t AuthResponseSyncDeleteAclNone::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthResponseFinishState authManager_ is null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->SyncDeleteAclDone();
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

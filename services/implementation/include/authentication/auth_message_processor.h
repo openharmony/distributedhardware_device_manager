@@ -51,6 +51,9 @@ constexpr const char* QR_CODE_KEY = "qrCode";
 constexpr const char* TAG_AUTH_TOKEN = "authToken";
 constexpr const char* NFC_CODE_KEY = "nfcCode";
 constexpr const char* OLD_VERSION_ACCOUNT = "oldVersionAccount";
+constexpr const char* TAG_DATA = "data";
+constexpr const char* TAG_DATA_LEN = "dataLen";
+
 
 class DmAuthManager;
 struct DmAuthRequestContext;
@@ -67,6 +70,7 @@ public:
     void SetResponseContext(std::shared_ptr<DmAuthResponseContext> authResponseContext);
     std::shared_ptr<DmAuthResponseContext> GetResponseContext();
     std::shared_ptr<DmAuthRequestContext> GetRequestContext();
+    std::string CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen);
 
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);

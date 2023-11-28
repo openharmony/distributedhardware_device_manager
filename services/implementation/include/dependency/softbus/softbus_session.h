@@ -83,6 +83,7 @@ public:
      * @tc.type: FUNC
      */
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
+    int32_t OpenUnbindSession(const std::string &netWorkId);
 
 private:
     static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;

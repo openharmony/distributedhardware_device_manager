@@ -139,6 +139,9 @@ public:
     std::string GetLocalDeviceName();
     int32_t GetLocalDeviceTypeId();
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
+    std::string GetNetworkIdByUdidHash(const std::string &deviceIdHash);
+    void HandleDeviceOnline(std::string &deviceId);
+    void SetPkgName(std::string pkgName);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
@@ -162,10 +165,12 @@ private:
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
+    static std::vector<std::string> pkgNameVec_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex stateCallbackMutex_;
     static std::mutex deviceUdidLocks_;
+    static std::mutex pkgNameVecMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

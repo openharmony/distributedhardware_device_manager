@@ -48,10 +48,12 @@ std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnect
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
 std::unordered_map<std::string, std::string> SoftbusConnector::deviceUdidMap_ = {};
+std::vector<std::string> SoftbusConnector::pkgNameVec_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::stateCallbackMutex_;
 std::mutex SoftbusConnector::deviceUdidLocks_;
+std::mutex SoftbusConnector::pkgNameVecMutex_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -696,6 +698,48 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
     }
 
     return DM_OK;
+}
+
+std::string SoftbusConnector::GetNetworkIdByUdidHash(const std::string &deviceIdHash)
+{
+    LOGI("Check the device is online.");
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed.");
+        return "";
+    }
+    for (int32_t i = 0; i < deviceCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        uint8_t mUdid[UDID_BUF_LEN] = {0};
+        if (GetNodeKeyInfo(DM_PKG_NAME, reinterpret_cast<char *>(nodeBasicInfo->networkId),
+            NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid)) != DM_OK) {
+            LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+        }
+        std::string udid = reinterpret_cast<char *>(mUdid);
+        char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)mUdidHash) != DM_OK) {
+            LOGE("get mUdidHash by udid: %s failed.", GetAnonyString(udid).c_str());
+        }
+        std::string udidHash = static_cast<std::string>(mUdidHash);
+        if (udidHash == deviceIdHash) {
+            return static_cast<std::string>(nodeBasicInfo->networkId);
+        }
+    }
+    return "";
+}
+
+void SoftbusConnector::SetPkgName(std::string pkgName)
+{
+    LOGI("Set online device report pkgName");
+    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
+    pkgNameVec_ .push_back(pkgName);
+}
+
+void SoftbusConnector::HandleDeviceOnline(std::string &deviceId)
+{
+    LOGI("SoftbusConnector::HandleDeviceOnline");
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
