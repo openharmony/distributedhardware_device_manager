@@ -191,13 +191,6 @@ public:
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
     /**
-     * @tc.name: DmAuthManager::VerifyAuthentication
-     * @tc.desc: Verify Authentication of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    int32_t VerifyAuthentication(const std::string &authParam);
-
-    /**
      * @tc.name: DmAuthManager::OnSessionOpened
      * @tc.desc: Opened Session of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -385,13 +378,6 @@ public:
      * @tc.type: FUNC
      */
     void ShowStartAuthDialog();
-
-    /**
-     * @tc.name: DmAuthManager::GetAuthenticationParam
-     * @tc.desc: Get Authentication Param of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    int32_t GetAuthenticationParam(DmAuthParam &authParam);
 
     /**
      * @tc.name: DmAuthManager::OnUserOperation

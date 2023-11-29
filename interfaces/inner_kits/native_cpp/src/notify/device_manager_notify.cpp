@@ -192,28 +192,6 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
     dmInitCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
-                                                               std::shared_ptr<VerifyAuthCallback> callback)
-{
-    if (pkgName.empty() || callback == nullptr) {
-        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
-        return;
-    }
-    (void)authPara;
-    std::lock_guard<std::mutex> autoLock(lock_);
-    verifyAuthCallback_[pkgName] = callback;
-}
-
-void DeviceManagerNotify::UnRegisterVerifyAuthenticationCallback(const std::string &pkgName)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
-    }
-    std::lock_guard<std::mutex> autoLock(lock_);
-    verifyAuthCallback_.erase(pkgName);
-}
-
 void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
                                                           std::shared_ptr<DeviceManagerUiCallback> callback)
 {
@@ -651,36 +629,6 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
         if (authenticateCallback_[pkgName].empty()) {
             authenticateCallback_.erase(pkgName);
         }
-    }
-}
-
-void DeviceManagerNotify::OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId,
-                                             int32_t resultCode, int32_t flag)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
-    }
-    LOGI("DeviceManagerNotify::OnVerifyAuthResult in, pkgName:%s, resultCode:%d, flag:%d", pkgName.c_str(),
-        resultCode, flag);
-    std::shared_ptr<VerifyAuthCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (verifyAuthCallback_.count(pkgName) == 0) {
-            LOGE("DeviceManagerNotify::OnVerifyAuthResult error, verify auth callback not register for pkgName %s.",
-                pkgName.c_str());
-            return;
-        }
-        tempCbk = verifyAuthCallback_[pkgName];
-    }
-    if (tempCbk == nullptr) {
-        LOGE("OnVerifyAuthResult error, registered verify auth callback is nullptr.");
-        return;
-    }
-    tempCbk->OnVerifyAuthResult(deviceId, resultCode, flag);
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        verifyAuthCallback_.erase(pkgName);
     }
 }
 

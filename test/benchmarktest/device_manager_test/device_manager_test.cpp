@@ -96,18 +96,6 @@ BENCHMARK_F(DeviceManagerTest, InitDeviceManagerTestCase)(benchmark::State &stat
     }
 }
 
-// GetFaParam
-BENCHMARK_F(DeviceManagerTest, GetFaParamTestCase)(benchmark::State &state)
-{
-    while (state.KeepRunning()) {
-        DmAuthParam authParam;
-        int32_t ret = DeviceManager::GetInstance().GetFaParam(pkgName, authParam);
-        if (ret != DM_OK) {
-            state.SkipWithError("GetFaParamTestCase. failed");
-        }
-    }
-}
-
 // SetUserOperation
 BENCHMARK_F(DeviceManagerTest, SetUserOperationTestCase)(benchmark::State &state)
 {

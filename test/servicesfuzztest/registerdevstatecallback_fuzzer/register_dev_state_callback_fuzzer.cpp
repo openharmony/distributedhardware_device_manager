@@ -43,7 +43,6 @@ void RegisterDevStateCallbackFuzzTest(const uint8_t* data, size_t size)
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DeviceStatusCallback> deviceStatusCallback = std::make_shared<DeviceStatusCallbackFuzzTest>();
 
-    DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra);
     DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, deviceStatusCallback);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(bundleName);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(bundleName);

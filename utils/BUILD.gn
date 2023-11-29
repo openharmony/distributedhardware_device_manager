@@ -22,25 +22,9 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 if (defined(ohos_lite)) {
   if (ohos_kernel_type == "liteos_m") {
     static_library("devicemanagerutils_mini") {
-      include_dirs = [
-        "${utils_path}/include",
-        "${utils_path}/include/crypto",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
-        "${utils_path}/include/permission/lite",
-        "${common_path}/include",
-        "${innerkits_path}/native_cpp/include",
-        "//third_party/json/include",
-        "//third_party/bounds_checking_function/include",
-      ]
+      include_dirs = []
 
-      sources = [
-        "${utils_path}/src/crypto/dm_crypto.cpp",
-        "${utils_path}/src/dm_anonymous.cpp",
-        "${utils_path}/src/dm_error_message.cpp",
-        "${utils_path}/src/dm_log.cpp",
-        "${utils_path}/src/dm_random.cpp",
-      ]
+      sources = []
 
       defines = [
         "__LITEOS_M__",
@@ -71,11 +55,11 @@ if (defined(ohos_lite)) {
         "include/fwkload/lite",
         "include/appInfo/lite",
         "${common_path}/include",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
         "${common_path}/include/ipc/model",
-        "${common_path}/include/dfx",
-        "${common_path}/include/dfx/lite",
         "${innerkits_path}/native_cpp/include",
         "${interfaces_path}/c/ipc/include",
         "//third_party/json/include",

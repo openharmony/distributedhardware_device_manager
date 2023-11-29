@@ -247,33 +247,6 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
     return DM_OK;
 }
 
-int32_t DmAuthManager::VerifyAuthentication(const std::string &authParam)
-{
-    LOGI("DmAuthManager::VerifyAuthentication");
-    if (authResponseContext_ == nullptr) {
-        LOGE("authResponseContext_ is not init");
-        return ERR_DM_AUTH_NOT_START;
-    }
-    timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
-    int32_t ret = authPtr_->VerifyAuthentication(authResponseContext_->authToken, authParam);
-    switch (ret) {
-        case DM_OK:
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestJoinState>());
-            break;
-        case ERR_DM_INPUT_PARA_INVALID:
-            listener_->OnVerifyAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-                                          ERR_DM_INPUT_PARA_INVALID, "");
-            break;
-        default:
-            authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
-            authResponseContext_->state = authRequestState_->GetStateType();
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            break;
-    }
-    LOGI("DmAuthManager::VerifyAuthentication complete");
-    return DM_OK;
-}
-
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     LOGI("DmAuthManager::OnSessionOpened sessionId = %d result = %d", sessionId, result);
@@ -1088,12 +1061,6 @@ void DmAuthManager::ShowStartAuthDialog()
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
-}
-
-int32_t DmAuthManager::GetAuthenticationParam(DmAuthParam &authParam)
-{
-    (void)authParam;
-    return DM_OK;
 }
 
 int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params)

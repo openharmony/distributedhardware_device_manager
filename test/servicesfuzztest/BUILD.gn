@@ -39,6 +39,5 @@ group("fuzztest") {
     "shiftlnngeardeviceservice_fuzzer:fuzztest",
     "unauthenticatedevice_fuzzer:fuzztest",
     "unregisterdevicemanagerfacallback_fuzzer:fuzztest",
-    "verifyauthentication_fuzzer:fuzztest",
   ]
 }

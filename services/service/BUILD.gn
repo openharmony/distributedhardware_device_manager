@@ -20,137 +20,52 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
-    static_library("devicemanagerservice_mini") {
-      include_dirs = [
-        "${innerkits_path}/native_cpp/include",
-        "${innerkits_path}/native_cpp/include/notify",
-        "${servicesimpl_path}/include",
-        "${servicesimpl_path}/include/config",
-        "${servicesimpl_path}/include/adapter",
-        "${servicesimpl_path}/include/authentication",
-        "${servicesimpl_path}/include/authentication/showconfirm/lite",
-        "${servicesimpl_path}/include/ability",
-        "${servicesimpl_path}/include/credential",
-        "${servicesimpl_path}/include/devicestate",
-        "${servicesimpl_path}/include/discovery",
-        "${servicesimpl_path}/include/dependency/commonevent",
-        "${servicesimpl_path}/include/dependency/multipleuser",
-        "${servicesimpl_path}/include/dependency/hichain",
-        "${servicesimpl_path}/include/dependency/softbus",
-        "${servicesimpl_path}/include/dependency/mini",
-        "${servicesimpl_path}/include/dependency/timer",
-        "${servicesimpl_path}/include/dispatch",
-        "${servicesimpl_path}/include/eventbus",
-        "${common_path}/include",
-        "${common_path}/include/ipc",
-        "${common_path}/include/ipc/model",
-        "${utils_path}/include",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
-        "${utils_path}/include/permission/lite",
-        "foundation/multimedia/image_framework/mock/native/include",
-        "${ext_path}/pin_auth/include",
-        "${ext_path}/pin_auth/include/lite",
-        "//third_party/json/include",
-        "//third_party/bounds_checking_function/include",
-      ]
+  executable("devicemanagerservice") {
+    include_dirs = [
+      "include",
+      "include/softbus",
+      "include/ipc/lite",
+      "include/permission/lite",
+      "${common_path}/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/lite",
+      "${common_path}/include/ipc/model",
+      "${utils_path}/include",
+      "${utils_path}/include/fwkload/lite",
+      "${innerkits_path}/native_cpp/include",
+      "${innerkits_path}/native_cpp/include/ipc",
+      "${innerkits_path}/native_cpp/include/ipc/lite",
+      "//third_party/json/include",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-      sources = [
-        "src/device_manager_service.cpp",
-        "src/device_manager_service_listener.cpp",
-        "src/ipc/lite/ipc_cmd_parser.cpp",
-        "src/ipc/lite/ipc_server_listener.cpp",
-        "src/ipc/lite/ipc_server_main.cpp",
-        "src/ipc/lite/ipc_server_stub.cpp",
-        "src/softbus/softbus_listener.cpp",
-      ]
+    sources = [ "src/ipc/lite/ipc_server_main.cpp" ]
+    ldflags = dm_ldflags
 
-      defines = [
-        "__LITEOS_M__",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerservice\"",
-        "LOG_DOMAIN=0xD004100",
-      ]
+    defines = [
+      "LITE_DEVICE",
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerservice\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
 
-      if (os_account_part_exists) {
-        defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-        include_dirs += [
-          "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-        ]
-      }
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${utils_path}:devicemanagerutils",
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/mbedtls:mbedtls_shared",
+    ]
 
-      ldflags = dm_ldflags
-
-      deps = [
-        "${innerkits_path}/native_cpp:devicemanagersdk_mini",
-        "${utils_path}:devicemanagerutils_mini",
-        "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/mbedtls",
-      ]
-
-      external_deps = [
-        "device_auth:deviceauth_sdk",
-        "dsoftbus:softbus_client",
-        "hilog_lite:hilog_static",
-        "hisysevent:libhisysevent",
-        "hitrace:hitrace_meter",
-        "init:libbegetutil",
-        "ipc:ipc_single",
-        "safwk:system_ability_fwk",
-        "utils_lite:utils",
-      ]
-    }
-  } else {
-    executable("devicemanagerservice") {
-      include_dirs = [
-        "include",
-        "include/softbus",
-        "include/ipc/lite",
-        "include/permission/lite",
-        "${common_path}/include",
-        "${common_path}/include/ipc",
-        "${common_path}/include/ipc/lite",
-        "${common_path}/include/ipc/model",
-        "${common_path}/include/dfx",
-        "${common_path}/include/dfx/lite",
-        "${utils_path}/include",
-        "${utils_path}/include/fwkload/lite",
-        "${innerkits_path}/native_cpp/include",
-        "${innerkits_path}/native_cpp/include/ipc",
-        "${innerkits_path}/native_cpp/include/ipc/lite",
-        "//third_party/json/include",
-        "//third_party/bounds_checking_function/include",
-      ]
-
-      sources = [ "src/ipc/lite/ipc_server_main.cpp" ]
-      ldflags = dm_ldflags
-
-      defines = [
-        "LITE_DEVICE",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerservice\"",
-        "LOG_DOMAIN=0xD004100",
-      ]
-
-      deps = [
-        "${innerkits_path}/native_cpp:devicemanagersdk",
-        "${utils_path}:devicemanagerutils",
-        "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/mbedtls:mbedtls_shared",
-      ]
-
-      external_deps = [
-        "device_auth:deviceauth_sdk",
-        "dsoftbus:softbus_client",
-        "hilog_lite:hilog_shared",
-        "init:libbegetutil",
-        "ipc:ipc_single",
-        "safwk:system_ability_fwk",
-        "samgr:samgr_proxy",
-        "utils_lite:utils",
-      ]
-    }
+    external_deps = [
+      "device_auth:deviceauth_sdk",
+      "dsoftbus:softbus_client",
+      "hilog_lite:hilog_shared",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
+      "utils_lite:utils",
+    ]
   }
 } else if (!support_jsapi) {
   group("devicemanagerservice") {

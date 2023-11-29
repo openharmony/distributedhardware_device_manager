@@ -11,110 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
-
+import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
-    static_library("devicemanagerservice_mini") {
-      include_dirs = [
-        "${innerkits_path}/native_cpp/include",
-        "${innerkits_path}/native_cpp/include/notify",
-        "${servicesimpl_path}/include",
-        "${servicesimpl_path}/include/config",
-        "${servicesimpl_path}/include/adapter",
-        "${servicesimpl_path}/include/authentication",
-        "${servicesimpl_path}/include/authentication/showconfirm/lite",
-        "${servicesimpl_path}/include/ability",
-        "${servicesimpl_path}/include/credential",
-        "${servicesimpl_path}/include/devicestate",
-        "${servicesimpl_path}/include/discovery",
-        "${servicesimpl_path}/include/dependency/commonevent",
-        "${servicesimpl_path}/include/dependency/multipleuser",
-        "${servicesimpl_path}/include/dependency/hichain",
-        "${servicesimpl_path}/include/dependency/softbus",
-        "${servicesimpl_path}/include/dependency/mini",
-        "${servicesimpl_path}/include/dependency/timer",
-        "${servicesimpl_path}/include/dispatch",
-        "${servicesimpl_path}/include/eventbus",
-        "${common_path}/include",
-        "${common_path}/include/ipc",
-        "${common_path}/include/ipc/model",
-        "${utils_path}/include",
-        "${utils_path}/include/dfx",
-        "${utils_path}/include/dfx/lite",
-        "${utils_path}/include/permission/lite",
-        "foundation/multimedia/image_framework/mock/native/include",
-        "${ext_path}/pin_auth/include",
-        "${ext_path}/pin_auth/include/lite",
-        "//third_party/json/include",
-        "//third_party/bounds_checking_function/include",
-      ]
-
-      sources = [
-        "${servicesimpl_path}/src/ability/lite/dm_ability_manager.cpp",
-        "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
-        "${servicesimpl_path}/src/authentication/auth_message_processor.cpp",
-        "${servicesimpl_path}/src/authentication/auth_request_state.cpp",
-        "${servicesimpl_path}/src/authentication/auth_response_state.cpp",
-        "${servicesimpl_path}/src/authentication/dm_auth_manager.cpp",
-        "${servicesimpl_path}/src/authentication/showconfirm/lite/show_confirm.cpp",
-        "${servicesimpl_path}/src/config/mini/dm_config_manager.cpp",
-        "${servicesimpl_path}/src/config/mini/pin_auth.cpp",
-        "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
-        "${servicesimpl_path}/src/dependency/mini/dm_mutex.cpp",
-        "${servicesimpl_path}/src/dependency/mini/dm_thread.cpp",
-        "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
-        "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
-        "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-        "${servicesimpl_path}/src/dependency/timer/mini/dm_timer.cpp",
-        "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
-        "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
-        "${servicesimpl_path}/src/dispatch/command_dispatch.cpp",
-        "${servicesimpl_path}/src/dispatch/device_manager_service_listener_mini.cpp",
-        "${servicesimpl_path}/src/dispatch/server_stub.cpp",
-      ]
-
-      defines = [
-        "__LITEOS_M__",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerserviceimpl\"",
-        "LOG_DOMAIN=0xD004100",
-      ]
-
-      if (os_account_part_exists) {
-        defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-        include_dirs += [
-          "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-        ]
-      }
-
-      ldflags = dm_ldflags
-
-      deps = [
-        "${innerkits_path}/native_cpp:devicemanagersdk_mini",
-        "${utils_path}:devicemanagerutils_mini",
-        "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/mbedtls",
-      ]
-
-      external_deps = [
-        "device_auth:deviceauth_sdk",
-        "dsoftbus:softbus_client",
-        "hilog_lite:hilog_static",
-        "init:libbegetutil",
-        "ipc:ipc_single",
-        "safwk:system_ability_fwk",
-        "utils_lite:utils",
-      ]
-    }
-  }
-} else if (!support_jsapi) {
+if (!support_jsapi) {
   group("devicemanagerserviceimpl") {
     deps = []
   }
@@ -216,9 +116,6 @@ if (defined(ohos_lite)) {
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
     ]
-
-    if (!device_manager_no_interaction_auth) {
-    }
 
     external_deps = [
       "ability_base:want",

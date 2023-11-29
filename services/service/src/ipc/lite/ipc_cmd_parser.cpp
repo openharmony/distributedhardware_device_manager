@@ -23,7 +23,6 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
-#include "ipc_notify_verify_auth_result_req.h"
 #include "ipc_server_stub.h"
 
 namespace OHOS {
@@ -130,29 +129,6 @@ ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> p
     return SetRspErrCode(reply, pBaseRsp);
 }
 
-ON_IPC_SET_REQUEST(SERVER_VERIFY_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string deviceId = pReq->GetDeviceId();
-    int32_t result = pReq->GetResult();
-    int32_t flag = pReq->GetFlag();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    WriteString(&request, deviceId.c_str());
-    WriteInt32(&request, result);
-    WriteInt32(&request, flag);
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(SERVER_VERIFY_AUTH_RESULT, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    return SetRspErrCode(reply, pBaseRsp);
-}
-
 ON_IPC_SERVER_CMD(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
 {
     int32_t errCode = RegisterDeviceManagerListener(&req, &reply);
@@ -234,14 +210,6 @@ ON_IPC_SERVER_CMD(UNAUTHENTICATE_DEVICE, IpcIo &req, IpcIo &reply)
     std::string deviceId = (const char *)ReadString(&req, nullptr);
 
     int32_t ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, deviceId);
-    WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(VERIFY_AUTHENTICATION, IpcIo &req, IpcIo &reply)
-{
-    LOGI("VerifyAuthentication service listener.");
-    std::string authParam = (const char *)ReadString(&req, nullptr);
-    int32_t ret = DeviceManagerService::GetInstance().VerifyAuthentication(authParam);
     WriteInt32(&reply, ret);
 }
 

@@ -21,7 +21,6 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
-#include "softbus_state_callback.h"
 #include "softbus_connector_fuzzer.h"
 
 namespace OHOS {

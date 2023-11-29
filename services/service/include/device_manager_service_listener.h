@@ -49,9 +49,6 @@ public:
     void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
                       int32_t reason) override;
 
-    void OnVerifyAuthResult(const std::string &pkgName, const std::string &deviceId, int32_t resultCode,
-                            const std::string &flag) override;
-
     void OnUiCall(std::string &pkgName, std::string &paramJson) override;
 
     void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override;

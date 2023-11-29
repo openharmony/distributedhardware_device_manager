@@ -33,7 +33,6 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
-#include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
@@ -60,8 +59,6 @@
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
-#include "ipc_verify_authenticate_req.h"
-#include "ipc_register_dev_state_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -320,7 +317,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
 }
 
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra,
-                                                    std::shared_ptr<DeviceStateCallback> callback)
+    std::shared_ptr<DeviceStateCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("RegisterDevStateCallback error: Invalid para");
@@ -328,7 +325,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     }
     LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
-    RegisterDevStateCallback(pkgName, extra);
     LOGI("RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -342,7 +338,6 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
     }
     LOGI("DeviceManagerImpl::RegisterDevStatusCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
-    RegisterDevStateCallback(pkgName, extra);
     LOGI("RegisterDevStatusCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -355,8 +350,6 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
     }
     LOGI("UnRegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
-    std::string extra = "";
-    UnRegisterDevStateCallback(pkgName, extra);
     LOGI("UnRegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -369,8 +362,6 @@ int32_t DeviceManagerImpl::UnRegisterDevStatusCallback(const std::string &pkgNam
     }
     LOGI("UnRegisterDevStatusCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
-    std::string extra = "";
-    UnRegisterDevStateCallback(pkgName, extra);
     LOGI("UnRegisterDevStatusCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -674,7 +665,7 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
     LOGI("dRegisterDeviceManagerFaCallback start, pkgName: %s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     RegisterUiStateCallback(pkgName);
-    LOGI("DeviceManagerImpl::RegisterDevStateCallback completed, pkgName: %s", pkgName.c_str());
+    LOGI("DeviceManagerImpl::RegisterDeviceManagerFaCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -702,52 +693,18 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
 int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, const std::string &authPara,
                                                 std::shared_ptr<VerifyAuthCallback> callback)
 {
-    if (pkgName.empty() || callback == nullptr) {
-        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("VerifyAuthentication start, pkgName: %s", pkgName.c_str());
-    DeviceManagerNotify::GetInstance().RegisterVerifyAuthenticationCallback(pkgName, authPara, callback);
-
-    std::shared_ptr<IpcVerifyAuthenticateReq> req = std::make_shared<IpcVerifyAuthenticateReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetAuthPara(authPara);
-
-    int32_t ret = ipcClientProxy_->SendRequest(VERIFY_AUTHENTICATION, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("VerifyAuthentication error: Send Request failed ret: %d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("VerifyAuthentication error: Failed with ret %d", ret);
-        return ret;
-    }
-
-    LOGI("VerifyAuthentication completed, pkgName: %s", pkgName.c_str());
+    (void)pkgName;
+    (void)authPara;
+    (void)callback;
+    LOGI("VerifyAuthentication not support method.");
     return DM_OK;
 }
 
 int32_t DeviceManagerImpl::GetFaParam(const std::string &pkgName, DmAuthParam &dmFaParam)
 {
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerImpl::GetFaParam Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("GetFaParam start, pkgName: %s", pkgName.c_str());
-
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetDmFaParamRsp> rsp = std::make_shared<IpcGetDmFaParamRsp>();
-    req->SetPkgName(pkgName);
-
-    int32_t ret = ipcClientProxy_->SendRequest(SERVER_GET_DMFA_INFO, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("GetFaParam Send Request failed ret: %d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    dmFaParam = rsp->GetDmAuthParam();
-    LOGI("GetFaParam completed, pkgName: %s", pkgName.c_str());
+    (void)pkgName;
+    (void)dmFaParam;
+    LOGI("GetFaParam not support method.");
     return DM_OK;
 }
 
@@ -842,54 +799,17 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
 
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("RegisterDevStateCallback start, pkgName: %s", pkgName.c_str());
-
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
-
-    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DEV_STATE_CALLBACK, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("RegisterDevStateCallback Send Request failed ret: %d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("RegisterDevStateCallback Failed with ret %d", ret);
-        return ret;
-    }
+    (void)pkgName;
+    (void)extra;
+    LOGI("RegisterDevStateCallback not support method.");
     return DM_OK;
 }
 
 int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> req = std::make_shared<IpcRegisterDevStateCallbackReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
-
-    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DEV_STATE_CALLBACK, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("UnRegisterDevStateCallback Send Request failed ret: %d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("UnRegisterDevStateCallback Failed with ret %d", ret);
-        return ret;
-    }
+    (void)pkgName;
+    (void)extra;
+    LOGI("UnRegisterDevStateCallback not support method.");
     return DM_OK;
 }
 
@@ -1830,15 +1750,13 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName,
 }
 
 int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
-    const std::map<std::string, std::string> &extraParam,
-    std::shared_ptr<DeviceStateCallback> callback)
+    const std::map<std::string, std::string> &extraParam, std::shared_ptr<DeviceStateCallback> callback)
 {
     (void)extraParam;
     if (pkgName.empty() || callback == nullptr) {
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     LOGI("DeviceManagerImpl::RegisterDeviceStateCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;

@@ -65,21 +65,9 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
-    int32_t VerifyAuthentication(const std::string &authParam);
-
-    int32_t GetFaParam(std::string &pkgName, DmAuthParam &authParam);
-
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
-    int32_t RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
-
-    int32_t UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
-
-    void HandleDeviceOnline(DmDeviceInfo &info);
-
-    void HandleDeviceOffline(DmDeviceInfo &info);
-
-    void HandleDeviceNameChange(DmDeviceInfo &info);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
 
     int OnSessionOpened(int sessionId, int result);
 

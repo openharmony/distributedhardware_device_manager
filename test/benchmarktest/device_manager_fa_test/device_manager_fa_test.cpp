@@ -342,30 +342,6 @@ BENCHMARK_F(UnRegisterDeviceManagerFaTest, UnRegisterDeviceManagerFaCallbackTest
         }
     }
 }
-
-// RegisterDevStateCallback
-BENCHMARK_F(RegisterDevStateTest, RegisterDevStateCallbackTestCase)(
-    benchmark::State &state)
-{
-    while (state.KeepRunning()) {
-        int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
-        if (ret != DM_OK) {
-            state.SkipWithError("RegisterDevStateCallbackTestCase failed.");
-        }
-    }
-}
-
-// UnRegisterDevStateCallback
-BENCHMARK_F(UnRegisterDevStateTest, UnRegisterDevStateCallbackTestCase)(
-    benchmark::State &state)
-{
-    while (state.KeepRunning()) {
-        int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName);
-        if (ret != DM_OK) {
-            state.SkipWithError("UnRegisterDevStateCallbackTestCase failed.");
-        }
-    }
-}
 }
 
 // Run the benchmark

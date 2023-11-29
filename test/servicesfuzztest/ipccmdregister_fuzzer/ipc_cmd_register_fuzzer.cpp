@@ -32,10 +32,7 @@
 #include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
-#include "ipc_get_dmfaparam_rsp.h"
-#include "ipc_register_dev_state_callback_req.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_verify_authenticate_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_rsp.h"
 

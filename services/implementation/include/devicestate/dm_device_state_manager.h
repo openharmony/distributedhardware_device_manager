@@ -69,133 +69,23 @@ typedef struct NotifyTask {
     bool threadRunning_ = false;
 } NotifyTask;
 
-class DmDeviceStateManager final : public ISoftbusStateCallback,
-                                   public std::enable_shared_from_this<DmDeviceStateManager> {
+class DmDeviceStateManager final : public std::enable_shared_from_this<DmDeviceStateManager> {
 public:
     DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                          std::shared_ptr<IDeviceManagerServiceListener> listener,
                          std::shared_ptr<HiChainConnector> hiChainConnector);
     ~DmDeviceStateManager();
 
-    /**
-     * @tc.name: DmDeviceStateManager::SaveOnlineDeviceInfo
-     * @tc.desc: Save Online DeviceInfo of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void SaveOnlineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::DeleteOfflineDeviceInfo
-     * @tc.desc: Delete Offline DeviceInfo of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void DeleteOfflineDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
-    
-    /**
-     * @tc.name: DmDeviceStateManager::PostDeviceOnline
-     * @tc.desc: Post Device Online of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void PostDeviceOnline(const std::string &pkgName, DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::PostDeviceOffline
-     * @tc.desc: Post Device Offline of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void PostDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::PostDeviceChanged
-     * @tc.desc: Post Device Offline of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void PostDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info);
-    /**
-     * @tc.name: DmDeviceStateManager::OnDeviceOnline
-     * @tc.desc: OnDevice Online of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void OnDeviceOnline(const std::string &pkgName, DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::OnDeviceOffline
-     * @tc.desc: OnDevice Offline of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::OnDeviceChanged
-     * @tc.desc: OnDevice Changed of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::OnDeviceReady
-     * @tc.desc: OnDevice Ready of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &info);
-
-    /**
-     * @tc.name: DmDeviceStateManager::OnDbReady
-     * @tc.desc: OnDb Ready of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
+    int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId);
+    void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
+    void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
     void OnDbReady(const std::string &pkgName, const std::string &deviceId);
-
-    /**
-     * @tc.name: DmDeviceStateManager::RegisterSoftbusStateCallback
-     * @tc.desc: Register Softbus State Callback of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    int32_t RegisterSoftbusStateCallback();
-
-    /**
-     * @tc.name: DmDeviceStateManager::RegisterOffLineTimer
-     * @tc.desc: Register OffLine Timerof the Dm Device State Manager
-     * @tc.type: FUNC
-     */
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
-
-    /**
-     * @tc.name: DmDeviceStateManager::StartOffLineTimer
-     * @tc.desc: Start OffLine Timer of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
-
-    /**
-     * @tc.name: DmDeviceStateManager::DeleteTimeOutGroup
-     * @tc.desc: Delete TimeOut Group of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
     void DeleteTimeOutGroup(std::string name);
+    void ChangeDeviceInfo(const DmDeviceInfo &info);
 
-    /**
-     * @tc.name: DmDeviceStateManager::RegisterDevStateCallback
-     * @tc.desc: Register DevState Callback of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void RegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
-
-    /**
-     * @tc.name: DmDeviceStateManager::UnRegisterDevStateCallback
-     * @tc.desc: UnRegister DevState Callback of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    void UnRegisterDevStateCallback(const std::string &pkgName, const std::string &extra);
-
-    /**
-     * @tc.name: DmDeviceStateManager::ProcNotifyEvent
-     * @tc.desc: Proc Notify Event of the Dm Device State Manager
-     * @tc.type: FUNC
-     */
-    int32_t ProcNotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &deviceId);
-
-    void ChangeDeviceInfo(const std::string &pkgName, const DmDeviceInfo &info);
 private:
     void StartEventThread();
     void StopEventThread();
@@ -203,16 +93,13 @@ private:
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
     DmAuthForm GetAuthForm(const std::string &networkId);
+
 private:
-#if !defined(__LITEOS_M__)
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;
-    std::mutex decisionInfosMutex_;
-#endif
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
-    std::map<std::string, std::string> decisionInfos_;
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;

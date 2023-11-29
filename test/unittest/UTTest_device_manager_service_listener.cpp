@@ -25,7 +25,6 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
-#include "ipc_notify_verify_auth_result_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -91,26 +90,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
     EXPECT_EQ(ret, pkgName);
 }
 
-/**
- * @tc.name: OnVerifyAuthResult_001
- * @tc.desc: OnVerifyAuthResult,construct a dummy listener, pass in pkgName, use the constructed listener to get
- * deviceId
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceListenerTest, OnVerifyAuthResult_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
-    std::string deviceId = "dkdkd";
-    int32_t resultCode = 1;
-    std::string flag = "true";
-    listener_->OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyVerifyAuthResultReq>(listener_->ipcServerListener_.req_);
-    std::string ret = pReq->GetDeviceId();
-    EXPECT_EQ(ret, deviceId);
-}
 /**
  * @tc.name: OnDeviceFound_001
  * @tc.desc: OnDeviceFound,construct a dummy listener, pass in pkgName, subscribeId, info

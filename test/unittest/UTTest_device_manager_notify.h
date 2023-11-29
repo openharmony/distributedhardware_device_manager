@@ -103,11 +103,6 @@ public:
     void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
 };
 
-class VerifyAuthCallbackTest : public VerifyAuthCallback {
-public:
-    void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override {}
-};
-
 class DeviceStatusCallbackTest : public DeviceStatusCallback {
 public:
     void OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo) override {}

@@ -29,7 +29,6 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
-#include "ipc_get_dmfaparam_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
@@ -45,7 +44,6 @@
 #include "ipc_get_availabledevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
-#include "ipc_register_dev_state_callback_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -59,7 +57,6 @@
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
-#include "ipc_verify_authenticate_req.h"
 #include "securec.h"
 namespace OHOS { class IRemoteObject; }
 
@@ -568,49 +565,6 @@ ON_IPC_READ_RESPONSE(UNAUTHENTICATE_DEVICE, MessageParcel &reply, std::shared_pt
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(VERIFY_AUTHENTICATION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcVerifyAuthenticateReq> pReq = std::static_pointer_cast<IpcVerifyAuthenticateReq>(pBaseReq);
-    std::string authPara = pReq->GetAuthPara();
-    if (!data.WriteString(authPara)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(VERIFY_AUTHENTICATION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(SERVER_GET_DMFA_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string packagename = pReq->GetPkgName();
-    if (!data.WriteString(packagename)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(SERVER_GET_DMFA_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetDmFaParamRsp> pRsp = std::static_pointer_cast<IpcGetDmFaParamRsp>(pBaseRsp);
-    DmAuthParam authParam;
-    authParam.direction = reply.ReadInt32();
-    authParam.authType = reply.ReadInt32();
-    authParam.authToken = reply.ReadString();
-    authParam.packageName = reply.ReadString();
-    authParam.appName = reply.ReadString();
-    authParam.appDescription = reply.ReadString();
-    authParam.business = reply.ReadInt32();
-    authParam.pincode = reply.ReadInt32();
-    pRsp->SetDmAuthParam(authParam);
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcGetOperationReq> pReq = std::static_pointer_cast<IpcGetOperationReq>(pBaseReq);
@@ -640,31 +594,6 @@ ON_IPC_READ_RESPONSE(SERVER_USER_AUTH_OPERATION, MessageParcel &reply, std::shar
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(REGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> pReq =
-    std::static_pointer_cast<IpcRegisterDevStateCallbackReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string extra = pReq->GetExtra();
-
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(extra)) {
-        LOGE("write extra failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(REGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(CHECK_API_ACCESS_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     LOGI("send permission request!");
@@ -688,31 +617,6 @@ ON_IPC_READ_RESPONSE(CHECK_API_ACCESS_NEWPERMISSION, MessageParcel &reply, std::
 {
     int32_t ret = reply.ReadInt32();
     pBaseRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(UNREGISTER_DEV_STATE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcRegisterDevStateCallbackReq> pReq =
-    std::static_pointer_cast<IpcRegisterDevStateCallbackReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string extra = pReq->GetExtra();
-
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(extra)) {
-        LOGE("write extra failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(UNREGISTER_DEV_STATE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
@@ -820,17 +724,6 @@ ON_IPC_CMD(SERVER_AUTH_RESULT, MessageParcel &data, MessageParcel &reply)
     int32_t status = data.ReadInt32();
     int32_t reason = data.ReadInt32();
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, (uint32_t)status, reason);
-    reply.WriteInt32(DM_OK);
-    return DM_OK;
-}
-
-ON_IPC_CMD(SERVER_VERIFY_AUTH_RESULT, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string deviceId = data.ReadString();
-    int32_t resultCode = data.ReadInt32();
-    int32_t flag = data.ReadInt32();
-    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

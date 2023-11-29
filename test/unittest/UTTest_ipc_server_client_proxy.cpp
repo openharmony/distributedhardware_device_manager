@@ -31,7 +31,6 @@
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_auth_result_req.h"
-#include "ipc_notify_verify_auth_result_req.h"
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_notify_credential_req.h"
 #include "dm_constants.h"
@@ -259,32 +258,6 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_006, testing::ext::TestSize.Level0)
     req->SetToken(token);
     req->SetStatus(status);
     req->SetReason(reason);
-    int ret = 0;
-    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
-    ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SendCmd_007
- * @tc.type: FUNC
- * @tc.require: I5N1K3
- */
-HWTEST_F(IpcServerClientProxyTest, SendCmd_007, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_VERIFY_AUTH_RESULT;
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "123";
-    int32_t result = 0;
-    int32_t flag = 1;
-    sptr<IpcClientStub> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
-    IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, remoteObject);
-    std::shared_ptr<IpcNotifyVerifyAuthResultReq> req = std::make_shared<IpcNotifyVerifyAuthResultReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetDeviceId(deviceId);
-    req->SetFlag(flag);
-    req->SetResult(result);
     int ret = 0;
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ret = ipcServerListener->SendRequest(cmdCode, req, rsp);

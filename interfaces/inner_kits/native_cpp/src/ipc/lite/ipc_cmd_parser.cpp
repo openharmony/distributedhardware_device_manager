@@ -28,7 +28,6 @@
 #include "ipc_register_listener_req.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_stop_discovery_req.h"
-#include "ipc_verify_authenticate_req.h"
 #include "ipc_set_useroperation_req.h"
 #include "securec.h"
 
@@ -216,22 +215,6 @@ ON_IPC_READ_RESPONSE(AUTHENTICATE_DEVICE, IpcIo &reply, std::shared_ptr<IpcRsp> 
     return SetRspErrCode(reply, pBaseRsp);
 }
 
-ON_IPC_SET_REQUEST(VERIFY_AUTHENTICATION, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::shared_ptr<IpcVerifyAuthenticateReq> pReq = std::static_pointer_cast<IpcVerifyAuthenticateReq>(pBaseReq);
-    std::string authPara = pReq->GetAuthPara();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, authPara.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(VERIFY_AUTHENTICATION, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    return SetRspErrCode(reply, pBaseRsp);
-}
-
 ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
@@ -329,24 +312,6 @@ ON_IPC_CMD(SERVER_AUTH_RESULT, IpcIo &reply)
     }
     std::string token = "";
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
-}
-
-ON_IPC_CMD(SERVER_VERIFY_AUTH_RESULT, IpcIo &reply)
-{
-    size_t len = 0;
-    std::string pkgName = (const char *)ReadString(&reply, &len);
-    size_t devIdLen = 0;
-    std::string deviceId = (const char *)ReadString(&reply, &devIdLen);
-    int32_t resultCode = 0;
-    ReadInt32(&reply, &resultCode);
-    int32_t flag = 0;
-    ReadInt32(&reply, &flag);
-
-    if (pkgName == "" || len == 0 || deviceId == "" || devIdLen == 0) {
-        LOGE("OnAuthResult, get para failed");
-        return;
-    }
-    DeviceManagerNotify::GetInstance().OnVerifyAuthResult(pkgName, deviceId, resultCode, flag);
 }
 
 ON_IPC_CMD(SERVER_DEVICE_FA_NOTIFY, IpcIo &reply)

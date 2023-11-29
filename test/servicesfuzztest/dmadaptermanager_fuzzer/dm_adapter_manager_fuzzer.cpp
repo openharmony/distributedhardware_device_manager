@@ -26,8 +26,6 @@ void DmAdapterManagerFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string soName(reinterpret_cast<const char*>(data), size);
-
-    DmAdapterManager::GetInstance().GetDecisionAdapter(soName);
     DmAdapterManager::GetInstance().GetCryptoAdapter(soName);
 }
 }

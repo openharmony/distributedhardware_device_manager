@@ -65,7 +65,7 @@ void DeviceOnLine(DmDeviceInfo deviceInfo)
     std::mutex lockDeviceOnLine;
     std::lock_guard<std::mutex> lock(lockDeviceOnLine);
 #endif
-    DeviceManagerService::GetInstance().HandleDeviceOnline(deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
 }
 
 void DeviceOffLine(DmDeviceInfo deviceInfo)
@@ -76,7 +76,7 @@ void DeviceOffLine(DmDeviceInfo deviceInfo)
     std::mutex lockDeviceOffLine;
     std::lock_guard<std::mutex> lock(lockDeviceOffLine);
 #endif
-    DeviceManagerService::GetInstance().HandleDeviceOffline(deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_OFFLINE, deviceInfo);
 }
 
 void DeviceNameChange(DmDeviceInfo deviceInfo)
@@ -87,7 +87,7 @@ void DeviceNameChange(DmDeviceInfo deviceInfo)
     std::mutex lockDeviceOffLine;
     std::lock_guard<std::mutex> lock(lockDeviceOffLine);
 #endif
-    DeviceManagerService::GetInstance().HandleDeviceNameChange(deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_INFO_CHANGED, deviceInfo);
 }
 
 SoftbusListener::SoftbusListener()
