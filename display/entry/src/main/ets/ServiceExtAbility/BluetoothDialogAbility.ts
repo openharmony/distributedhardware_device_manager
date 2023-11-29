@@ -26,8 +26,8 @@ const dmCallerUid: number = 3062;
 export default class ServiceExtAbility extends extension {
   isCreatingWindow: boolean = false;
   onCreate(want: Want): void {
-      AppStorage.SetOrCreate('bluetoothDialogContext', this.context);
-      AppStorage.SetOrCreate('bluetoothDialogWindowNum', 0);
+    AppStorage.SetOrCreate('bluetoothDialogContext', this.context);
+    AppStorage.SetOrCreate('bluetoothDialogWindowNum', 0);
     this.getShareStyle();
   }
 
