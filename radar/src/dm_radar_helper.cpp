@@ -57,7 +57,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo info)
             "BIZ_STATE", info.bizState,
             "TO_CALL_PKG", info.toCallPkg,
             "COMM_SERV", info.commServ,
-            "ERROR_CODE", GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS)));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportDiscoverRegCallback error, res:%d", res);
@@ -78,6 +78,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo info)
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
             "BIZ_SCENCE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
             "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
@@ -92,6 +93,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo info)
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
             "BIZ_SCENCE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
             "ERROR_CODE", GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS)));
@@ -144,7 +146,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
-            "ERROR_CODE", GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS)));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportDiscoverUserRes error, res:%d", res);
