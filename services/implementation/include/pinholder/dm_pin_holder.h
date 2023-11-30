@@ -17,7 +17,7 @@
 #define OHOS_DM_PIN_HOLDER_H
 
 #include "device_manager.h"
-
+#include "dm_adapter_crypto.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
@@ -58,6 +58,11 @@ public:
     bool GetIsCryptoSupport()
     {
         return false;
+    }
+    AesGcmCipherKey GetSessionKeyAndLen()
+    {
+        AesGcmCipherKey cipherKey = { 0 };
+        return cipherKey;
     }
 private:
     int32_t CreateGeneratePinHolderMsg();

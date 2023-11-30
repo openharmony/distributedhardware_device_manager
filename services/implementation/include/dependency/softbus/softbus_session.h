@@ -34,9 +34,11 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void encrypt(char *plainText, char *cipherText);
-    static void decrypt(char *cipherText, unsigned int cipherTextLen, char *plainText);
-    static AesGcmCipherKey getSessionKeyAndIv();
+    static void Encrypt(char* plainText, char* cipherText);
+    static void Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText);
+    static void GetRealMessage(const void* data, unsigned int dataLen, std::string& message);
+    static AesGcmCipherKey GetSessionKeyAndIv();
+
 
 public:
     SoftbusSession();
