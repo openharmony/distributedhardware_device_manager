@@ -19,6 +19,7 @@ ohos_shared_library("devicemanagerradar") {
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include",
     "${c_utils_path}/include",
+    "//third_party/cJSON",
   ]
 
   sources = [
@@ -35,6 +36,7 @@ ohos_shared_library("devicemanagerradar") {
   deps = [
     "${mbedtls_path}:mbedtls_shared",
     "${utils_path}:devicemanagerutils",
+    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [

@@ -197,18 +197,12 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo radarInfo = {
         .funcName = "GetTrustedDeviceList",
-        .stageRes = (ret == DM_OK) ?
-            static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
         .localUdid = std::string(localDeviceId),
-        .peerUdid = DmRadarHelper::GetInstance().GetStringUdidList(deviceInfoList),
-        .peerNetId = DmRadarHelper::GetInstance().GetStringNetIdList(deviceInfoList),
-        .errCode = ERR_DM_FAILED,
     };
-    if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
-        LOGE("ReportGetTrustDeviceList failed");
-    }
     if (ret != DM_OK) {
+        radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL);
+        radarInfo.errCode = ERR_DM_FAILED;
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
@@ -223,6 +217,11 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         DmDeviceInfo *deviceInfo = *pInfoList + i;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceInfo);
         deviceInfoList.push_back(*deviceInfo);
+    }
+    radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
+    radarInfo.discoverDevList = DmRadarHelper::GetInstance().GetDeviceInfoList(deviceInfoList);
+    if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
+        LOGE("ReportGetTrustDeviceList failed!");
     }
     FreeNodeInfo(nodeInfo);
     free(info);

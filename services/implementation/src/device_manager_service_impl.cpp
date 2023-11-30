@@ -22,6 +22,7 @@
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -163,6 +164,14 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
              pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    struct RadarInfo info = {
+        .funcName = "AuthenticateDevice",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
+        LOGE("ReportDiscoverUserRes failed");
     }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }

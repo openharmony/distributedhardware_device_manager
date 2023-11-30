@@ -219,7 +219,6 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
             static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
             static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
-        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
         .errCode = ret,
     };
     if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
@@ -517,6 +516,13 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
         for (auto iter = discoveryCallbackMap_.begin(); iter != discoveryCallbackMap_.end();) {
             iter->second->OnDiscoveryFailed(iter->first, originId, result);
             iter = discoveryCallbackMap_.erase(iter);
+        }
+        struct RadarInfo info = {
+            .funcName = "OnSoftbusDiscoveryResult",
+            .errCode = result,
+        };
+        if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
+            LOGE("ReportDiscoverResCallback failed");
         }
     }
 }
