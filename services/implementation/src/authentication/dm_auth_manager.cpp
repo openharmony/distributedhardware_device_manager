@@ -57,6 +57,7 @@ constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
+const int32_t SESSION_KEY_LENGTH = 16;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -72,6 +73,8 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 
 DmAuthManager::~DmAuthManager()
 {
+    delete[] sessionKey_;
+    sessionKey_ = nullptr;
     LOGI("DmAuthManager destructor");
 }
 
@@ -1602,7 +1605,8 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
         LOGE("DmAuthManager::onTransmit requestId %lld is error.", requestId);
         return;
     }
-    sessionKey_ = sessionKey;
+    sessionKey_ = new unsigned char[sessionKeyLen];
+    memcpy_s(sessionKey_, sessionKeyLen, sessionKey, sessionKeyLen);
     sessionKeyLen_ = sessionKeyLen;
 }
 
@@ -1610,6 +1614,18 @@ void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
 {
     LOGI("GetRemoteDeviceId start.");
     deviceId = authResponseContext_->localDeviceId;
+}
+
+AesGcmCipherKey DmAuthManager::GetSessionKeyAndLen()
+{
+    AesGcmCipherKey cipherKey = { 0 };
+    if (sessionKey_ == nullptr || sessionKeyLen_ == 0) {
+        LOGE("GetSessionKeyAndIv");
+        return cipherKey;
+    }
+    cipherKey.keyLen = SESSION_KEY_LENGTH;
+    memcpy_s(cipherKey.key, cipherKey.keyLen, sessionKey_, cipherKey.keyLen);
+    return cipherKey;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

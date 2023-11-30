@@ -25,6 +25,7 @@
 #include "authentication.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_ability_manager.h"
+#include "dm_adapter_crypto.h"
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -472,7 +473,7 @@ public:
     int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-
+    AesGcmCipherKey GetSessionKeyAndLen();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
 
@@ -502,7 +503,7 @@ private:
     bool unBindFlag_ = false;
 private:
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
-    const uint8_t *sessionKey_ = nullptr;
+    unsigned char *sessionKey_ = nullptr;
     uint32_t sessionKeyLen_ = 0;
     std::string remoteDeviceId_ = "";
 };
