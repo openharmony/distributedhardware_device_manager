@@ -157,7 +157,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
-            LOGI("StartDiscovering4MetaType for huawei_share meta node process.");
+            LOGI("StartDiscovering4MetaType for share meta node process.");
             strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_SHARE);
             break;
         case MetaNodeType::PROXY_WEAR:

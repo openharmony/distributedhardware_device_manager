@@ -274,7 +274,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    softbusListener_->GetUdidByNetworkId(netWorkId.c_str(), udid);
+    SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
     return DM_OK;
 }
 
