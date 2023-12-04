@@ -75,10 +75,11 @@ if (defined(ohos_lite)) {
   config("devicemanagerservice_config") {
     include_dirs = [
       "include",
-      "include/softbus",
+      "include/discovery",
       "include/ipc",
       "include/ipc/standard",
       "include/permission/standard",
+      "include/softbus",
       "${common_path}/include",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
@@ -89,6 +90,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
+      "${utils_path}/include/timer",
       "//third_party/json/include",
     ]
   }
@@ -113,6 +115,8 @@ if (defined(ohos_lite)) {
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
+      "src/discovery/discovery_filter.cpp",
+      "src/discovery/discovery_manager.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",
       "src/ipc/standard/ipc_server_client_proxy.cpp",
       "src/ipc/standard/ipc_server_listener.cpp",

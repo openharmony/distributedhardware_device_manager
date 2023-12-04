@@ -227,7 +227,6 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
@@ -694,7 +693,6 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "${services_path}/src/softbus/softbus_listener.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
     "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
   ]
@@ -724,7 +722,6 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "${services_path}/src/softbus/softbus_listener.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/dependency/timer/dm_timer.cpp",
     "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
   ]
 
@@ -754,9 +751,9 @@ config("device_manager_test_common_public_config") {
     "${innerkits_path}/native_cpp/include/notify",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
+    "${utils_path}/include/timer",
     "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/credential",
-    "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
     "${servicesimpl_path}/include/authentication",

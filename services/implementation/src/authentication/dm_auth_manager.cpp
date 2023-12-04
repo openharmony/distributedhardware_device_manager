@@ -1252,14 +1252,12 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
         LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string extra = "";
-    ParseExtra(bindParam, extra);
-    std::string deviceId = "";
     peerTargetId_ = targetId;
+    std::string deviceId = "";
     if (ParseConnectAddr(targetId, deviceId) == DM_OK) {
-        return AuthenticateDevice(pkgName, authType, deviceId, extra);
+        return AuthenticateDevice(pkgName, authType, deviceId, ParseExtraFromMap(bindParam));
     } else if (!targetId.deviceId.empty()) {
-        return AuthenticateDevice(pkgName, authType, targetId.deviceId, extra);
+        return AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
     } else {
         LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1334,16 +1332,13 @@ int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &b
     return DM_OK;
 }
 
-int32_t DmAuthManager::ParseExtra(const std::map<std::string, std::string> &bindParam, std::string &extra)
+std::string DmAuthManager::ParseExtraFromMap(const std::map<std::string, std::string> &bindParam)
 {
-    auto iter = bindParam.find(PARAM_KEY_APP_DESC);
-    if (iter == bindParam.end()) {
-        LOGE("DmAuthManager::ParseExtra bind param key: %s not exist.", PARAM_KEY_APP_DESC.c_str());
-        extra = "";
-        return DM_OK;
+    auto iter = bindParam.find(PARAM_KEY_BIND_EXTRA_DATA);
+    if (iter != bindParam.end()) {
+        return iter->second;
     }
-    extra = iter->second;
-    return DM_OK;
+    return ConvertMapToJsonString(bindParam);
 }
 
 bool DmAuthManager::IsAuthCodeReady(const std::string &pkgName)
