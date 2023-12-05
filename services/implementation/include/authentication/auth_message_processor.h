@@ -51,6 +51,21 @@ constexpr const char* QR_CODE_KEY = "qrCode";
 constexpr const char* TAG_AUTH_TOKEN = "authToken";
 constexpr const char* NFC_CODE_KEY = "nfcCode";
 constexpr const char* OLD_VERSION_ACCOUNT = "oldVersionAccount";
+
+constexpr const char* TAG_HAVE_CREDENTIAL = "haveCredential";
+constexpr const char* TAG_PUBLICKEY = "publicKey";
+constexpr const char* TAG_SESSIONKEY = "sessionKey";
+constexpr const char* TAG_BIND_LEVEL = "bindLevel";
+constexpr const char* TAG_LOCAL_USERID = "localUserId";
+constexpr const char* TAG_BIND_TYPE_SIZE = "bindTypeSize";
+constexpr const char* TAG_ISONLINE = "isOnline";
+constexpr const char* TAG_AUTHED = "authed";
+constexpr const char* TAG_LOCAL_ACCOUNTID = "localAccountId";
+constexpr const char* TAG_DMVERSION = "dmVersion";
+constexpr const char* TAG_HOST_PKGNAME = "hostPkgname";
+constexpr const char* TAG_TOKENID = "tokenId";
+constexpr const char* TAG_HAVECREDENTIAL = "haveCredential";
+constexpr const char* TAG_CONFIRM_OPERATION = "confirmOperation";
 constexpr const char* TAG_DATA = "data";
 constexpr const char* TAG_DATA_LEN = "dataLen";
 
@@ -71,6 +86,9 @@ public:
     std::shared_ptr<DmAuthResponseContext> GetResponseContext();
     std::shared_ptr<DmAuthRequestContext> GetRequestContext();
     std::string CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen);
+    void CreateResponseAuthMessageExt(nlohmann::json &json);
+    void ParseAuthResponseMessageExt(nlohmann::json &json);
+    
 
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);
@@ -85,6 +103,12 @@ private:
     void CreateResponseFinishMessage(nlohmann::json &json);
     void ParseResponseFinishMessage(nlohmann::json &json);
     void GetAuthReqMessage(nlohmann::json &json);
+    void ParsePkgNegotiateMessage(const nlohmann::json &json);
+    void CreatePublicKeyMessageExt(nlohmann::json &json);
+    void ParsePublicKeyMessageExt(nlohmann::json &json);
+    void CreateSyncDeleteMessageExt(nlohmann::json &json);
+    void ParseSyncDeleteMessageExt(nlohmann::json &json);
+
 private:
     std::weak_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<ICryptoAdapter> cryptoAdapter_;

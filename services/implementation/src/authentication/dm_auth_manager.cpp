@@ -58,6 +58,7 @@ constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 const int32_t SESSION_KEY_LENGTH = 16;
+constexpr const char* DM_VERSION = "4.1.5.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -124,6 +125,53 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
+    const std::string &deviceId, const std::string &extra)
+{
+    LOGI("Get auth param.");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    authRequestContext_->hostPkgName = pkgName;
+    authRequestContext_->authType = authType;
+    authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
+    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId(); 
+    authRequestContext_->localDeviceId = localUdid;
+    authRequestContext_->deviceId = deviceId;
+    authRequestContext_->dmVersion = DM_VERSION;
+    authRequestContext_->localAccountId = MultipleUserConnector::GetOhosAccountId();
+    MultipleUserConnector::SetSwitchOldAccountId(authRequestContext_->localAccountId);
+    authRequestContext_->localUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    MultipleUserConnector::SetSwitchOldUserId(authRequestContext_->localUserId);
+    authRequestContext_->bindType =
+        DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, localUdid, deviceId);
+    authRequestContext_->isOnline = softbusConnector_->CheckIsOnline(deviceId);
+    authRequestContext_->authed = !authRequestContext_->bindType.empty();
+    authRequestContext_->bindLevel = DEVICE;
+    nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if (!jsonObject.is_discarded()) {
+        if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
+            authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].get<std::string>();
+        }
+        if (IsString(jsonObject, APP_OPERATION_KEY)) {
+            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].get<std::string>();
+        }
+        if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
+            authRequestContext_->customDesc = jsonObject[CUSTOM_DESCRIPTION_KEY].get<std::string>();
+        }
+        if (IsString(jsonObject, APP_THUMBNAIL)) {
+            authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
+        }
+        if (IsInt64(jsonObject, TAG_TOKENID)) {
+            authRequestContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
+        }
+        if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
+            authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+        }
+    }
+    authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
@@ -331,6 +379,18 @@ void DmAuthManager::ProcessSourceMsg()
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             }
             break;
+        case MSG_TYPE_RESP_PUBLICKEY:
+            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_CREDENTIAL) {
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestCredentialDone>());
+            }
+            break;
+        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
+            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
+                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                isFinishOfLocal_ = false;
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
+            }
+            break;
         default:
             break;
     }
@@ -363,6 +423,23 @@ void DmAuthManager::ProcessSinkMsg()
             if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
                 isFinishOfLocal_ = false;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
+            }
+            break;
+        case MSG_TYPE_REQ_PUBLICKEY:
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
+            }
+            break;
+        case MSG_TYPE_REQ_SYNC_DELETE:
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseSyncDeleteAcl>());
+            }
+            break;
+        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
+            if (authResponseState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
+                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                isFinishOfLocal_ = false;
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseSyncDeleteAclNone>());
             }
             break;
         default:
@@ -1621,6 +1698,231 @@ AesGcmCipherKey DmAuthManager::GetSessionKeyAndLen()
     cipherKey.keyLen = SESSION_KEY_LENGTH;
     memcpy_s(cipherKey.key, cipherKey.keyLen, sessionKey_, cipherKey.keyLen);
     return cipherKey;
+}
+
+void DmAuthManager::CompatiblePutAcl()
+{
+    LOGI("DmAuthManager::CompatiblePutAcl");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, (uint8_t *)mUdidHash);
+    std::string localUdidHash = static_cast<std::string>(mUdidHash);
+    DmAclInfo aclInfo;
+    aclInfo.bindLevel = DEVICE;
+    aclInfo.bindType = DM_POINT_TO_POINT;
+    aclInfo.trustDeviceId = remoteDeviceId_;
+    if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        aclInfo.authenticationType = ALLOW_AUTH_ALWAYS;
+    } else {
+        aclInfo.authenticationType = ALLOW_AUTH_ONCE;
+    }
+    aclInfo.deviceIdHash = localUdidHash;
+
+    DmAccesser accesser;
+    accesser.requestTokenId = authResponseContext_->tokenId;
+    accesser.requestBundleName = authResponseContext_->hostPkgName;
+    if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
+        accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
+        accesser.requestAccountId = MultipleUserConnector::GetOhosAccountId();
+        accesser.requestDeviceId = localUdid;
+    } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
+        accesser.requestDeviceId = authResponseContext_->localDeviceId;
+    }
+
+    DmAccessee accessee;
+    accessee.trustTokenId = authResponseContext_->tokenId;
+    accessee.trustBundleName = authResponseContext_->hostPkgName;
+    if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
+        accessee.trustDeviceId = remoteDeviceId_;
+    } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
+        accessee.trustUserId = MultipleUserConnector::GetCurrentAccountUserID();
+        accessee.trustAccountId = MultipleUserConnector::GetOhosAccountId();
+        accessee.trustDeviceId = localUdid;
+    }
+    DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+void DmAuthManager::CommonEventCallback(int32_t userId)
+{
+    LOGI("DmAuthManager::CommonEventCallback");
+    if (MultipleUserConnector::GetSwitchOldUserId() == userId) {
+        AccountIdLogoutEventCallback(userId);
+    } else {
+        UserSwitchEventCallback(userId);
+    }
+}
+
+void DmAuthManager::AccountIdLogoutEventCallback(int32_t userId)
+{
+    LOGI("DmAuthManager::AccountIdLogoutEventCallback");
+    std::string oldAccountId = MultipleUserConnector::GetSwitchOldAccountId();
+    std::string currentAccountId = MultipleUserConnector::GetOhosAccountId();
+    MultipleUserConnector::SetSwitchOldAccountId(currentAccountId);
+    if (oldAccountId == currentAccountId) {
+        LOGE("The account logout is error.");
+        return;
+    }
+    if (currentAccountId == "ohosAnonymousUid" &&
+        DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, oldAccountId)) {
+        DeviceProfileConnector::GetInstance().DeleteAccessControlList(userId, oldAccountId);
+        DeleteAllGroup(userId);
+    }
+}
+
+void DmAuthManager::DeleteAllGroup(int32_t userId)
+{
+    LOGI("DmAuthManager::DeleteAllGroup");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    std::vector<GroupInfo> groupList;
+    hiChainConnector_->GetRelatedGroups(localUdid, groupList);
+    for (auto &iter : groupList) {
+        if (hiChainConnector_->DeleteGroup(iter.groupId) != DM_OK) {
+            LOGE("Delete groupId %s failed.", iter.groupId.c_str());
+        }
+    }
+}
+
+void DmAuthManager::UserChangeEventCallback(int32_t userId)
+{
+    LOGI("DmAuthManager::UserChangeEventCallback");
+    std::string oldAccountId = MultipleUserConnector::GetSwitchOldAccountId();
+    int32_t oldUseId = MultipleUserConnector::GetSwitchOldUserId();
+    DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(oldUseId, oldAccountId);
+    DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, oldAccountId);
+    DeleteP2PGroup(userId);
+}
+
+void DmAuthManager::DeleteP2PGroup(int32_t userId)
+{
+    LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    std::string queryParams = jsonObj.dump();
+    std::vector<GroupInfo> groupList;
+
+    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
+    MultipleUserConnector::SetSwitchOldUserId(userId);
+    if (!hiChainConnector_->GetGroupInfo(oldUserId, queryParams, groupList)) {
+        LOGE("failed to get the old user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        int32_t ret = hiChainConnector_->DeleteGroup(oldUserId, iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("failed to delete the old user id group");
+        }
+    }
+
+    if (!hiChainConnector_->GetGroupInfo(userId, queryParams, groupList)) {
+        LOGE("failed to get the user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        int32_t ret = hiChainConnector_->DeleteGroup(userId, iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("failed to delete the user id group");
+        }
+    }
+}
+
+void DmAuthManager::HandleSyncDeleteTimeout(std::string name)
+{
+    LOGI("DmAuthManager::HandleSyncDeleteTimeout start timer name %s", name.c_str());
+    if (authRequestState_ != nullptr && authRequestState_->GetStateType() != AuthState::AUTH_REQUEST_CREDENTIAL_DONE) {
+        if (authResponseContext_ == nullptr) {
+            authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+        }
+        authResponseContext_->state = authRequestState_->GetStateType();
+        authRequestContext_->reason = ERR_DM_TIME_OUT;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
+    }
+
+    if (authResponseState_ != nullptr &&
+        authResponseState_->GetStateType() != AuthState::AUTH_REQUEST_SYNCDELETE_DONE) {
+        authResponseContext_->state = authResponseState_->GetStateType();
+        authResponseContext_->reply = ERR_DM_TIME_OUT;
+        authResponseState_->TransitionTo(std::make_shared<AuthResponseSyncDeleteAclNone>());
+    }
+    LOGI("DmAuthManager::HandleSyncDeleteTimeout start complete");
+}
+
+int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &deviceId)
+{
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string localDeviceId = static_cast<std::string>(localUdid);
+    DmOfflineParam offlineParam =
+        DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, deviceId);
+    if (offlineParam.bindType == INVALIED_TYPE) {
+        LOGE("Acl not contain the pkgName bind data.");
+        return ERR_DM_FAILED;
+    } else if (offlineParam.bindType == APP_LEVEL_BIND_TYPE && offlineParam.leftAclNumber != 0) {
+        LOGI("The pkgName unbind app-level type leftAclNumber not zero.");
+        softbusConnector_->SetPkgName(pkgName);
+        softbusConnector_->HandleDeviceOffline(deviceId);
+    } else if (offlineParam.bindType == APP_LEVEL_BIND_TYPE && offlineParam.leftAclNumber == 0) {
+        LOGI("The pkgName unbind app-level type leftAclNumber is zero.");
+        softbusConnector_->SetPkgName(pkgName);
+        hiChainAuthConnector_->DeleteCredential(deviceId, MultipleUserConnector::GetCurrentAccountUserID());
+    } else if (offlineParam.bindType == DEVICE_PPEER_TO_PEER_TYPE && offlineParam.leftAclNumber != 0) {
+        LOGI("Unbind deivce-level, retain identical account bind type.");
+    } else if (offlineParam.bindType == DEVICE_PPEER_TO_PEER_TYPE && offlineParam.leftAclNumber == 0) {
+        LOGI("Unbind deivce-level, retain null.");
+        hiChainAuthConnector_->DeleteCredential(deviceId, MultipleUserConnector::GetCurrentAccountUserID());
+    }
+    return DM_OK;
+}
+
+void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
+{
+    LOGI("DmAuthManager::ProRespNegotiateExt start.");
+    remoteDeviceId_ = authResponseContext_->localDeviceId;
+    std::string accountId = MultipleUserConnector::GetOhosAccountId();
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    MultipleUserConnector::SetSwitchOldAccountId(accountId);
+    MultipleUserConnector::SetSwitchOldUserId(userId);
+    authResponseContext_->isIdenticalAccount = false;
+    if (authResponseContext_->localAccountId == accountId && accountId != "ohosAnonymousUid") {
+        authResponseContext_->isIdenticalAccount = true;
+    }
+
+    authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
+    authResponseContext_->localAccountId = accountId;
+    authResponseContext_->remoteUserId = authResponseContext_->localUserId;
+    authResponseContext_->localUserId = userId;
+
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    authResponseContext_->deviceId = authResponseContext_->localDeviceId;
+    authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
+
+    std::vector<int32_t> bindType =
+        DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
+        authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
+    authResponseContext_->bindType = bindType;
+    authResponseContext_->authed = !bindType.empty();
+
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (DmSoftbusAdapterCrypto::GetUdidHash(remoteDeviceId_, (uint8_t *)udidHash) != DM_OK) {
+        LOGE("get udidhash by udid: %s failed.", GetAnonyString(udidHash).c_str());
+    }
+    std::string deviceIdHash = static_cast<std::string>(udidHash);
+    if (authResponseContext_->isOnline && softbusConnector_->CheckIsOnline(deviceIdHash)) {
+        authResponseContext_->isOnline = true;
+    } else {
+        authResponseContext_->isOnline = false;
+    }
+
+    authResponseContext_->haveCredential =
+        hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId, authResponseContext_->localUserId);
+
+    AbilityNegotiate();
+    std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
+    softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

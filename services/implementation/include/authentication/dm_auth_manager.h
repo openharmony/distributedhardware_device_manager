@@ -24,6 +24,7 @@
 #include "auth_ui_state_manager.h"
 #include "authentication.h"
 #include "idevice_manager_service_listener.h"
+#include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
 #include "dm_adapter_crypto.h"
 #include "dm_adapter_manager.h"
@@ -75,12 +76,13 @@ enum DmMsgType : int32_t {
     MSG_TYPE_SYNC_GROUP = 400,
     MSG_TYPE_AUTH_BY_PIN = 500,
 
+    MSG_TYPE_RESP_AUTH_EXT,
     MSG_TYPE_REQ_PUBLICKEY,
     MSG_TYPE_RESP_PUBLICKEY,
     MSG_TYPE_REQ_SYNC_DELETE,
     MSG_TYPE_REQ_SYNC_DELETE_DONE,
-    MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE,
-    MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE,
+    MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE = 600,
+    MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE = 700,
 };
 
 enum DmAuthType : int32_t {
@@ -115,6 +117,14 @@ typedef struct DmAuthRequestContext {
     std::string token;
     int32_t reason;
     std::vector<std::string> syncGroupList;
+    std::string dmVersion;
+    int32_t localUserId;
+    std::string localAccountId;
+    std::vector<int32_t> bindType;
+    bool isOnline;
+    bool authed;
+    int32_t bindLevel;
+    int64_t tokenId;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -154,6 +164,15 @@ typedef struct DmAuthResponseContext {
     bool isOnline;
     int32_t bindLevel;
     bool haveCredential;
+    int32_t confirmOperation;
+    std::string localAccountId;
+    int32_t localUserId;
+    int64_t tokenId;
+    bool authed;
+    std::string dmVersion;
+    std::vector<int32_t> bindType;
+    std::string remoteAccountId;
+    int32_t remoteUserId;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -458,6 +477,10 @@ private:
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
+	void CompatiblePutAcl();
+    void ProRespNegotiateExt(const int32_t &sessionId);
+    void AccountIdLogoutEventCallback(int32_t userId);
+    void UserChangeEventCallback(int32_t userId);
 
 public:
     void RequestCredential();
@@ -474,8 +497,15 @@ public:
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     AesGcmCipherKey GetSessionKeyAndLen();
+    void CommonEventCallback(int32_t userId);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
+    void DeleteAllGroup(int32_t userId);
+    void DeleteP2PGroup(int32_t userId);
+    void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &extra);
+    void HandleSyncDeleteTimeout(std::string name);
+    int32_t DeleteAcl(const std::string &pkgName, const std::string &deviceId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

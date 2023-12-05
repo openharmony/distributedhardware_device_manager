@@ -277,12 +277,13 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string 
     return DM_OK;
 }
 
-int32_t HiChainAuthConnector::DeleteCredential(std::string &deviceId)
+int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId)
 {
     LOGI("DeleteCredential start.");
     nlohmann::json jsonObj;
     jsonObj["deviceId"] = deviceId;
     jsonObj["acquireType"] = P2P_BIND;
+    jsonObj["osAccountId"] = userId;
     char *requestParam = strdup(jsonObj.dump().c_str());
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_DELETE, requestParam, &returnData) != HC_SUCCESS) {
