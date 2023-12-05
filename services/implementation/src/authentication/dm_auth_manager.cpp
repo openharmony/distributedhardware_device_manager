@@ -1868,9 +1868,9 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
         LOGI("The pkgName unbind app-level type leftAclNumber is zero.");
         softbusConnector_->SetPkgName(pkgName);
         hiChainAuthConnector_->DeleteCredential(deviceId, MultipleUserConnector::GetCurrentAccountUserID());
-    } else if (offlineParam.bindType == DEVICE_PPEER_TO_PEER_TYPE && offlineParam.leftAclNumber != 0) {
+    } else if (offlineParam.bindType == DEVICE_PEER_TO_PEER_TYPE && offlineParam.leftAclNumber != 0) {
         LOGI("Unbind deivce-level, retain identical account bind type.");
-    } else if (offlineParam.bindType == DEVICE_PPEER_TO_PEER_TYPE && offlineParam.leftAclNumber == 0) {
+    } else if (offlineParam.bindType == DEVICE_PEER_TO_PEER_TYPE && offlineParam.leftAclNumber == 0) {
         LOGI("Unbind deivce-level, retain null.");
         hiChainAuthConnector_->DeleteCredential(deviceId, MultipleUserConnector::GetCurrentAccountUserID());
     }

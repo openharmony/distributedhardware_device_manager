@@ -20,6 +20,7 @@
 #include "accesser.h"
 #include "distributed_device_profile_client.h"
 #include "distributed_device_profile_enums.h"
+#include "single_instance.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
 constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
@@ -28,6 +29,7 @@ constexpr uint32_t INVALIED_TYPE = 0;
 constexpr uint32_t APP_LEVEL_BIND_TYPE = 1;
 constexpr uint32_t DEVICE_LEVEL_BIND_TYPE = 2;
 constexpr uint32_t IDENTICAL_ACCOUNT_TYPE = 3;
+constexpr uint32_t DEVICE_PEER_TO_PEER_TYPE = 4;
 
 constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
 constexpr uint32_t DM_POINT_TO_POINT = 256;
@@ -83,6 +85,7 @@ typedef struct DmOfflineParam {
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceProfileConnector {
+DECLARE_SINGLE_INSTANCE_BASE(DeviceProfileConnector);
 public:
     DeviceProfileConnector();
     ~DeviceProfileConnector();
@@ -102,6 +105,8 @@ public:
     DmOfflineParam DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
         std::string remoteDeviceId);
     std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId);
+    bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
+    int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

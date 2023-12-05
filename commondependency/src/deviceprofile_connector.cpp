@@ -25,6 +25,7 @@ using namespace OHOS::DistributedDeviceProfile;
 
 namespace OHOS {
 namespace DistributedHardware {
+IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 DeviceProfileConnector::DeviceProfileConnector()
 {
     LOGD("DeviceProfileConnector constructor.");
@@ -131,7 +132,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
             continue;
         }
         uint32_t priority = INVALIED_TYPE;
-        if (item.GetBindType() == IDENTICAL_ACCOUNT) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             priority = IDENTICAL_ACCOUNT_TYPE;
         } else if (item.GetBindLevel() == DEVICE) {
             priority = DEVICE_LEVEL_BIND_TYPE;
@@ -165,7 +166,7 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
         if (trustDeviceIdHash != trustUdidHash || item.GetStatus() == INACTIVE) {
             continue;
         }
-        if (item.GetBindType() == IDENTICAL_ACCOUNT) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
         } else if (item.GetBindLevel() == DEVICE) {
             bindTypeVec.push_back(DEVICE_LEVEL_BIND_TYPE);
@@ -193,7 +194,7 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
         if (profiles[index].GetTrustDeviceId() != targetDeviceId || profiles[index].GetStatus() != ACTIVE) {
             continue;
         }
-        if (profiles[index].GetBindType() == IDENTICAL_ACCOUNT) {
+        if (profiles[index].GetBindType() == DM_IDENTICAL_ACCOUNT) {
             sinkBindType.push_back(IDENTICAL_ACCOUNT_TYPE);
             bindTypeIndex.push_back(index);
         } else if (profiles[index].GetBindLevel() == DEVICE) {
@@ -400,6 +401,47 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
             item.GetAccessee().GetAccesseeAccountId() == newAccountId)) {
             item.SetStatus(ACTIVE);
             DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
+    return DM_OK;
+}
+
+bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::string &accountId)
+{
+    LOGI("DeviceProfileConnector::CheckIdenticalAccount");
+    std::vector<AccessControlProfile> profiles;
+    std::map<std::string, std::string> queryParams;
+    queryParams["userId"] = std::to_string(userId);
+    queryParams["accountId"] = accountId;
+    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
+        LOGE("DP GetAccessControlProfile failed.");
+    }
+    for (auto &item : profiles) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && item.GetStatus() == ACTIVE) {
+            return true;
+        }
+    }
+    return false;
+}
+int32_t DeviceProfileConnector::DeleteP2PAccessControlList(int32_t userId, std::string &accountId)
+{
+    LOGI("DeviceProfileConnector::DeleteP2PAccessControlList");
+    std::vector<AccessControlProfile> profiles;
+    std::map<std::string, std::string> queryParams;
+    queryParams["userId"] = std::to_string(userId);
+    queryParams["accountId"] = accountId;
+    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
+        LOGE("DP GetAccessControlProfile failed.");
+    }
+    for (auto &item : profiles) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserUserId() == userId &&
+            item.GetAccesser().GetAccesserAccountId() == accountId) ||
+            (item.GetAccessee().GetAccesseeUserId() == userId &&
+            item.GetAccessee().GetAccesseeAccountId() == accountId)) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
     return DM_OK;

@@ -74,7 +74,11 @@ ohos_unittest("UTTest_pin_auth") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_pin_auth }}}
@@ -194,11 +198,7 @@ ohos_unittest("UTTest_device_manager_service") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-  ]
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_device_manager_service }}}
@@ -231,6 +231,7 @@ ohos_unittest("UTTest_softbus_connector") {
   include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
 
   sources = [
+    "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_connector.cpp",
     "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
@@ -240,7 +241,6 @@ ohos_unittest("UTTest_softbus_connector") {
     "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
     "${servicesimpl_path}/src/config/dm_config_manager.cpp",
     "${servicesimpl_path}/src/dependency/hichain/hichain_connector.cpp",
-    "${servicesimpl_path}/src/dependency/multipleuser/multiple_user_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
     "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
     "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
@@ -257,6 +257,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "device_info_manager:distributed_device_profile_sdk",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "os_account:libaccountkits",
   ]
 }
 
@@ -468,11 +469,18 @@ ohos_unittest("UTTest_multiple_user_connector") {
 
   include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_multiple_user_connector.cpp" ]
+  sources = [
+    "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
+    "${devicemanager_path}/test/commonunittest/UTTest_multiple_user_connector.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+  ]
 }
 
 ## UnitTest UTTest_multiple_user_connector }}}
@@ -586,7 +594,13 @@ ohos_unittest("UTTest_dm_discovery_filter") {
 ohos_unittest("UTTest_device_manager_service_impl") {
   module_out_path = module_out_path
 
+  include_dirs = [
+    "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
+    "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+  ]
+
   sources = [
+    "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
     "${servicesimpl_path}/src/device_manager_service_impl.cpp",
     "UTTest_device_manager_service_impl.cpp",
   ]
@@ -597,6 +611,8 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
   ]
 }
 
