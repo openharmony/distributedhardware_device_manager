@@ -135,7 +135,7 @@ public:
     std::string GetNetworkIdByUdidHash(const std::string &deviceIdHash);
     void HandleDeviceOnline(std::string &deviceId);
     void HandleDeviceOffline(const std::string &deviceId);
-    void SetPkgName(std::string pkgName); 
+    void SetPkgName(std::string pkgName);
     bool CheckIsOnline(const std::string &targetDeviceId);
 
 private:

@@ -133,7 +133,7 @@ void SoftbusAdapter::OnQosEvent(int sessionId, int eventId, int tvCount, const Q
     (void)eventId;
     (void)tvCount;
     (void)tvList;
-    LOGI("SoftbusAdapter::OnQosEvent, sessionId:%d" , sessionId);
+    LOGI("SoftbusAdapter::OnQosEvent, sessionId:%d", sessionId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -137,7 +137,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->hostPkgName = pkgName;
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
-    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId(); 
+    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
     authRequestContext_->localDeviceId = localUdid;
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->dmVersion = DM_VERSION;

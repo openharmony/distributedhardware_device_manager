@@ -44,7 +44,6 @@ public:
     void OnMessageReceived(int sessionId, const void *data, unsigned int dataLen) const;
     void OnQosEvent(int sessionId, int eventId, int tvCount, const QosTv *tvList) const;
 
-
 private:
     ISessionListener sessListener_;
 };

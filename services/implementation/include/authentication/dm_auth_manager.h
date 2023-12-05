@@ -477,7 +477,7 @@ private:
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
-	void CompatiblePutAcl();
+    void CompatiblePutAcl();
     void ProRespNegotiateExt(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
