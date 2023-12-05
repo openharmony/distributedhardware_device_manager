@@ -181,11 +181,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-  ]
+  external_deps = [ "device_auth:deviceauth_sdk" ]
 }
 
 ## UnitTest UTTest_dm_credential_manager }}}
@@ -198,7 +194,11 @@ ohos_unittest("UTTest_device_manager_service") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_service }}}
