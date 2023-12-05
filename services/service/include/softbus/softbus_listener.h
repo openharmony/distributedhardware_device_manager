@@ -20,83 +20,45 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <sstream>
+#include <type_traits>
 #include <vector>
 
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
+#include "i_softbus_lnn_ops_callback.h"
 #include "inner_session.h"
 #include "session.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceOnLine(DmDeviceInfo deviceInfo);
-void DeviceOffLine(DmDeviceInfo deviceInfo);
 class SoftbusListener {
-public:
-    static int OnSessionOpened(int sessionId, int result);
-    static void OnSessionClosed(int sessionId);
-    static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-
-    static int OnPinHolderSessionOpened(int sessionId, int result);
-    static void OnPinHolderSessionClosed(int sessionId);
-    static void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-
-public:
-    /**
-     * @tc.name: SoftbusListener::OnPublishResult
-     * @tc.desc: OnPublishResult of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnPublishResult(int publishId, PublishResult result);
-
-    /**
-     * @tc.name: SoftbusListener::OnSoftBusDeviceOnline
-     * @tc.desc: OnSoftBus DeviceOnline of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnSoftBusDeviceOnline(NodeBasicInfo *info);
-
-    /**
-     * @tc.name: SoftbusListener::OnSoftbusDeviceOffline
-     * @tc.desc: OnSoftbus DeviceOffline of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDeviceOffline(NodeBasicInfo *info);
-
-    /**
-     * @tc.name: SoftbusListener::OnSoftbusDeviceInfoChanged
-     * @tc.desc: OnSoftbus DeviceInfoChanged of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
-
-    /**
-     * @tc.name: SoftbusListener::OnParameterChgCallback
-     * @tc.desc: OnParameter Chg Callback of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static void OnParameterChgCallback(const char *key, const char *value, void *context);
-
-    /**
-     * @tc.name: SoftbusListener::GetUdidByNetworkId
-     * @tc.desc: Get Udid By NetworkId of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
-
-    /**
-     * @tc.name: SoftbusListener::GetUuidByNetworkId
-     * @tc.desc: Get Uuid By NetworkId of the SoftbusListener
-     * @tc.type: FUNC
-     */
-    static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
-
-    static int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
-
 public:
     SoftbusListener();
     ~SoftbusListener();
+
+    static void OnSoftbusDeviceFound(const DeviceInfo *device);
+    static void OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result);
+    static void OnSoftbusDeviceOnline(NodeBasicInfo *info);
+    static void OnSoftbusDeviceOffline(NodeBasicInfo *info);
+    static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
+    static void OnParameterChgCallback(const char *key, const char *value, void *context);
+    static void OnSoftbusPublishResult(int publishId, PublishResult result);
+    static void DeviceOnLine(DmDeviceInfo deviceInfo);
+    static void DeviceOffLine(DmDeviceInfo deviceInfo);
+    static void DeviceNameChange(DmDeviceInfo deviceInfo);
+
+    static void CacheDiscoveredDevice(const DeviceInfo *device);
+    static void ClearDiscoveredDevice();
+    static void ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice);
+    static int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
+    static int32_t GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId);
+    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
+    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceBasicInfo &devInfo);
+    static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);
+
+    int32_t InitSoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &deviceBasicInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);
@@ -105,23 +67,13 @@ public:
     int32_t GetLocalDeviceType(int32_t &deviceType);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
     int32_t ShiftLNNGear();
-
-private:
-    int32_t Init();
-    void SetPublishInfo(PublishInfo &dmPublishInfo);
-    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
-    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo,
-        DmDeviceBasicInfo &dmDeviceBasicInfo);
-
-private:
-    enum PulishStatus {
-        STATUS_UNKNOWN = 0,
-        ALLOW_BE_DISCOVERY = 1,
-        NOT_ALLOW_BE_DISCOVERY = 2,
-    };
-    static PulishStatus publishStatus;
-    static INodeStateCb softbusNodeStateCb_;
-    static IPublishCb softbusPublishCallback_;
+    int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
+    int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
+    int32_t RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo, const std::string &customData);
+    int32_t StopRefreshSoftbusLNN(uint16_t subscribeId);
+    int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
+        const std::shared_ptr<ISoftbusLnnOpsCallback> callback);
+    int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

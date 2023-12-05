@@ -24,6 +24,7 @@
 #include <mutex>
 #endif
 
+#include "discovery_manager.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
 #include "i_dm_service_impl_ext.h"
@@ -173,14 +174,8 @@ public:
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
 
-    int32_t GetTrustedDeviceList(const std::string &pkgName, const std::map<std::string, std::string> &filterOptions,
-        bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList);
-
-    int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId);
-
 private:
     bool IsDMServiceImplReady();
-    bool IsDMServiceImplSoLoaded();
     bool IsDMServiceAdapterLoad();
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
@@ -190,6 +185,7 @@ private:
     bool isAdapterSoLoaded_ = false;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
+    std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;

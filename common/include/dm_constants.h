@@ -175,6 +175,8 @@ const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 const std::string PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
 const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
 const std::string PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
+const std::string PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
+const std::string PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 const std::string DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
 } // namespace DistributedHardware
 } // namespace OHOS

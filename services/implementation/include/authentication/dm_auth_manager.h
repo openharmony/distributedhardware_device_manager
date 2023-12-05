@@ -457,7 +457,7 @@ private:
     bool IsAuthCodeReady(const std::string &pkgName);
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
-    int32_t ParseExtra(const std::map<std::string, std::string> &bindParam, std::string &extra);
+    std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
 
 public:
     void RequestCredential();

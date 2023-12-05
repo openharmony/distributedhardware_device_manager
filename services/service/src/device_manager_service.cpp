@@ -46,7 +46,6 @@ int32_t DeviceManagerService::Init()
 {
     InitSoftbusListener();
     InitDMServiceListener();
-
     LOGI("Init success, dm service single instance initialized.");
     return DM_OK;
 }
@@ -57,7 +56,6 @@ int32_t DeviceManagerService::InitSoftbusListener()
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
     LOGI("SoftbusListener init success.");
-
     return DM_OK;
 }
 
@@ -72,7 +70,9 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
-
+    if (discoveryMgr_ == nullptr) {
+        discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener_, listener_);
+    }
     LOGI("DeviceManagerServiceListener init success.");
     return DM_OK;
 }
@@ -80,6 +80,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
 void DeviceManagerService::UninitDMServiceListener()
 {
     listener_ = nullptr;
+    discoveryMgr_ = nullptr;
     LOGI("DeviceManagerServiceListener uninit.");
 }
 
@@ -289,12 +290,12 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
+    softbusListener_->GetUuidByNetworkId(netWorkId.c_str(), uuid);
     return DM_OK;
 }
 
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                                   const std::string &extra)
+    const std::string &extra)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call StartDeviceDiscovery.", pkgName.c_str());
@@ -306,11 +307,16 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("StartDeviceDiscovery failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID,
+        std::to_string(subscribeInfo.subscribeId)));
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_MEDIUM, std::to_string(subscribeInfo.medium)));
+
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, extra));
+
+    return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
@@ -326,11 +332,14 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("StartDeviceDiscovery failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId)));
+
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, filterOptions));
+
+    return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
@@ -345,11 +354,7 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("StopDeviceDiscovery failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
+    return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
 int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
@@ -402,7 +407,18 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("AuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+
+    PeerTargetId targetId;
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId);
+    if (ret != DM_OK) {
+        LOGE("AuthenticateDevice failed, cannot get target info from cached discovered device map.");
+        return ERR_DM_BIND_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> bindParam;
+    bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
+    bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, extra));
+
+    return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
 }
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
@@ -439,8 +455,18 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         LOGE("BindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udidHash = listener_->GetUdidHash(deviceId, pkgName);
-    return dmServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
+
+    PeerTargetId targetId;
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(listener_->GetUdidHash(deviceId, pkgName), targetId);
+    if (ret != DM_OK) {
+        LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
+        return ERR_DM_BIND_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> bindParamMap;
+    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
+    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, bindParam));
+
+    return dmServiceImpl_->BindTarget(pkgName, targetId, bindParamMap);
 }
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
@@ -679,12 +705,6 @@ bool DeviceManagerService::IsDMServiceImplReady()
     return true;
 }
 
-bool DeviceManagerService::IsDMServiceImplSoLoaded()
-{
-    std::lock_guard<std::mutex> lock(isImplLoadLock_);
-    return isImplsoLoaded_;
-}
-
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
@@ -742,16 +762,12 @@ void DeviceManagerService::LoadHardwareFwkService()
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid)
 {
-    if (!IsDMServiceImplReady()) {
-        LOGE("GetEncryptedUuidByNetworkId failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerService::GetEncryptedUuidByNetworkId for pkgName = %s", pkgName.c_str());
-    int32_t ret = SoftbusListener::GetUuidByNetworkId(networkId.c_str(), uuid);
+    int32_t ret = softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId failed, ret : %d", ret);
         return ret;
@@ -767,10 +783,6 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
 int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid,
     const std::string &appId, std::string &encryptedUuid)
 {
-    if (!IsDMServiceImplReady()) {
-        LOGE("GenerateEncryptedUuid failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -810,7 +822,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
         LOGE("Invalid parameter, pkgName: %s, netWorkId: %s", pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SoftbusListener::GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+    softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
     return DM_OK;
 }
 
@@ -960,14 +972,10 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("StartDiscovering failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
+    if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
+        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
     }
-    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-    }
-    return dmServiceImplExt_->StartDiscoveringExt(pkgName, discoverParam, filterOptions);
+    return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
 }
 
 int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
@@ -982,14 +990,14 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("StopDiscovering failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
+    uint16_t subscribeId = -1;
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
-    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
+    if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
+        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
     }
-    return dmServiceImplExt_->StopDiscoveringExt(pkgName, discoverParam);
+    return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
 int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName,
@@ -1004,14 +1012,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("EnableDiscoveryListener failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    if (discoverParam.find(PARAM_KEY_META_TYPE) == discoverParam.end()) {
-        LOGD("input discover parameter not contains META_TYPE, dm service adapter not supported.");
-    }
-    return dmServiceImplExt_->EnableDiscoveryListenerExt(pkgName, discoverParam, filterOptions);
+    return discoveryMgr_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
 }
 
 int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgName,
@@ -1026,14 +1027,7 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("DisableDiscoveryListener failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    if (extraParam.find(PARAM_KEY_META_TYPE) == extraParam.end()) {
-        LOGD("input extra parameter not contains META_TYPE, dm service adapter not supported.");
-    }
-    return dmServiceImplExt_->DisableDiscoveryListenerExt(pkgName, extraParam);
+    return discoveryMgr_->DisableDiscoveryListener(pkgName, extraParam);
 }
 
 int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
@@ -1130,36 +1124,6 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return dmServiceImplExt_->UnbindTargetExt(pkgName, targetId, unbindParam);
-}
-
-int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName,
-    const std::map<std::string, std::string> &filterOptions, bool isRefresh, std::vector<DmDeviceBasicInfo> &deviceList)
-{
-    (void)filterOptions;
-    LOGI("DeviceManagerService::GetTrustedDeviceList for pkgName = %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (softbusListener_ == nullptr) {
-        LOGE("GetTrustedDeviceList failed, softbus listener has not ready.");
-        return ERR_DM_NOT_INIT;
-    }
-    ShiftLNNGear(pkgName, pkgName, isRefresh);
-    return GetAvailableDeviceList(pkgName, deviceList);
-}
-
-int32_t DeviceManagerService::CheckAccessToTarget(uint64_t tokenId, const std::string &targetId)
-{
-    LOGI("DeviceManagerService::CheckAccessToTarget for tokenId = %d, targetId = %s", tokenId, targetId.c_str());
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("CheckAccessToTarget failed, dm service adapter load failed.");
-    }
-    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)

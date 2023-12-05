@@ -708,20 +708,6 @@ HWTEST_F(DeviceManagerServiceTest, UninitDMServiceListener_001, testing::ext::Te
 }
 
 /**
- * @tc.name: IsDMServiceImplSoLoaded_001
- * @tc.desc: DeviceManagerService::GetInstance().isImplsoLoaded_ is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplSoLoaded_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplSoLoaded();
-    EXPECT_EQ(ret, false);
-}
-
-/**
  * @tc.name: IsDMServiceImplReady_001
  * @tc.desc: The return value is true
  * @tc.type: FUNC

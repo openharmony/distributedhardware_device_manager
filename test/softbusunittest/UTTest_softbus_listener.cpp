@@ -71,9 +71,8 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize
     void *context = nullptr;
     softbusListener->OnParameterChgCallback(key, value, context);
     NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftBusDeviceOnline(info);
+    softbusListener->OnSoftbusDeviceOnline(info);
     softbusListener->OnSoftbusDeviceOffline(info);
-    EXPECT_EQ(softbusListener->publishStatus, SoftbusListener::STATUS_UNKNOWN);
 }
 
 /**
@@ -103,10 +102,8 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_002, testing::ext::TestSize
             .deviceName = "123456",
             .deviceTypeId = 1
         };
-    softbusListener->OnSoftBusDeviceOnline(&info);
+    softbusListener->OnSoftbusDeviceOnline(&info);
     softbusListener->OnSoftbusDeviceOffline(&info);
-    sleep(1);
-    EXPECT_EQ(softbusListener->publishStatus, SoftbusListener::STATUS_UNKNOWN);
 }
 
 /**

@@ -101,6 +101,7 @@ if (defined(ohos_lite)) {
       "include/crypto",
       "include/fwkload/standard",
       "include/appInfo/standard",
+      "include/timer",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
@@ -136,6 +137,7 @@ if (defined(ohos_lite)) {
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
+      "src/timer/dm_timer.cpp",
     ]
 
     if (support_jsapi) {
