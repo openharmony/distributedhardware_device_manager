@@ -40,6 +40,7 @@ if (!support_jsapi) {
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
+      "${devicemanager_path}/commondependency/include",
       "${devicemanager_path}/radar/include",
       "${utils_path}/include",
       "${utils_path}/include/fwkload/standard",
@@ -51,13 +52,6 @@ if (!support_jsapi) {
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
     ]
-
-    if (os_account_part_exists) {
-      include_dirs += [
-        "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
-        "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-      ]
-    }
   }
 
   ohos_shared_library("devicemanagerserviceimpl") {
@@ -86,10 +80,8 @@ if (!support_jsapi) {
       "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",
-      "src/dependency/deviceprofile/deviceprofile_connector.cpp",
       "src/dependency/hichain/hichain_auth_connector.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
-      "src/dependency/multipleuser/multiple_user_connector.cpp",
       "src/dependency/softbus/softbus_connector.cpp",
       "src/dependency/softbus/softbus_session.cpp",
       "src/device_manager_service_impl.cpp",
@@ -110,6 +102,7 @@ if (!support_jsapi) {
     ]
 
     deps = [
+      "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
@@ -134,14 +127,6 @@ if (!support_jsapi) {
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
     ]
-
-    if (os_account_part_exists) {
-      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
-      external_deps += [
-        "os_account:libaccountkits",
-        "os_account:os_account_innerkits",
-      ]
-    }
 
     subsystem_name = "distributedhardware"
 

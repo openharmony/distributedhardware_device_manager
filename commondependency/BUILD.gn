@@ -13,38 +13,52 @@
 
 import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-ohos_shared_library("devicemanagerradar") {
+ohos_shared_library("devicemanagerdependency") {
   include_dirs = [
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include",
-    "${c_utils_path}/include",
-    "//third_party/cJSON",
   ]
+
+  if (os_account_part_exists) {
+    include_dirs += [
+      "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
+      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+    ]
+  }
 
   sources = [
     "${common_path}/src/dm_softbus_adapter_crypto.cpp",
-    "src/dm_radar_helper.cpp",
+    "src/deviceprofile_connector.cpp",
+    "src/multiple_user_connector.cpp",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanagerradar\"",
+    "DH_LOG_TAG=\"devicemanagerdependency\"",
     "LOG_DOMAIN=0xD004100",
   ]
 
   deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
     "${mbedtls_path}:mbedtls_shared",
-    "${utils_path}:devicemanagerutils",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
-    "c_utils:utils",
+    "ability_base:want",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "init:libbegetutil",
+    "os_account:libaccountkits",
   ]
+
+  if (os_account_part_exists) {
+    defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+    external_deps += [
+      "os_account:libaccountkits",
+      "os_account:os_account_innerkits",
+    ]
+  }
 
   subsystem_name = "distributedhardware"
 

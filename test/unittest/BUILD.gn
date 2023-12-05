@@ -93,7 +93,11 @@ ohos_unittest("UTTest_pin_auth_ui") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_pin_auth_ui }}}
@@ -173,7 +177,11 @@ ohos_unittest("UTTest_dm_credential_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_dm_credential_manager }}}
@@ -186,7 +194,11 @@ ohos_unittest("UTTest_device_manager_service") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_service }}}
@@ -203,7 +215,11 @@ ohos_unittest("UTTest_hichain_connector") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_hichain_connector }}}
@@ -237,6 +253,8 @@ ohos_unittest("UTTest_softbus_connector") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -258,6 +276,8 @@ ohos_unittest("UTTest_softbus_listener") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -279,6 +299,8 @@ ohos_unittest("UTTest_softbus_session") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -551,7 +573,11 @@ ohos_unittest("UTTest_dm_discovery_filter") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_dm_discovery_filter }}}
@@ -567,7 +593,11 @@ ohos_unittest("UTTest_device_manager_service_impl") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_service_impl }}}
@@ -584,7 +614,11 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_service_listener }}}
@@ -597,7 +631,11 @@ ohos_unittest("UTTest_auth_message_processor") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UTTest_auth_message_processor }}}
@@ -610,7 +648,11 @@ ohos_unittest("UTTest_auth_response_state") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UTTest_auth_response_state }}}
@@ -623,7 +665,11 @@ ohos_unittest("UTTest_auth_request_state") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UTTest_auth_request_state }}}
@@ -652,7 +698,11 @@ ohos_unittest("UTTest_dm_auth_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
 }
 
 ## UTTest_dm_auth_manager }}}
@@ -701,6 +751,8 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hitrace:hitrace_meter",
   ]
 }
@@ -729,6 +781,8 @@ ohos_unittest("UTTest_dm_publish_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "hitrace:hitrace_meter",
   ]
 }
