@@ -24,34 +24,34 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(SoftbusAdapter);
-static int32_t ScreenOnSoftbusSessionOpened(int32_t sessionId, int32_t result)
+static int32_t DmOnSoftbusSessionOpened(int32_t sessionId, int32_t result)
 {
     SoftbusAdapter::GetInstance().OnSoftbusSessionOpened(sessionId, result);
     return DM_OK;
 }
 
-static void ScreenOnSoftbusSessionClosed(int32_t sessionId)
+static void DmOnSoftbusSessionClosed(int32_t sessionId)
 {
     SoftbusAdapter::GetInstance().OnSoftbusSessionClosed(sessionId);
 }
 
-static void ScreenOnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+static void DmOnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
     SoftbusAdapter::GetInstance().OnBytesReceived(sessionId, data, dataLen);
 }
 
-static void ScreenOnStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
+static void DmOnStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
     const StreamFrameInfo *frameInfo)
 {
     SoftbusAdapter::GetInstance().OnStreamReceived(sessionId, data, ext, frameInfo);
 }
 
-static void ScreenOnMessageReceived(int sessionId, const void *data, unsigned int dataLen)
+static void DmOnMessageReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     SoftbusAdapter::GetInstance().OnMessageReceived(sessionId, data, dataLen);
 }
 
-static void ScreenOnQosEvent(int sessionId, int eventId, int tvCount, const QosTv *tvList)
+static void DmOnQosEvent(int sessionId, int eventId, int tvCount, const QosTv *tvList)
 {
     SoftbusAdapter::GetInstance().OnQosEvent(sessionId, eventId, tvCount, tvList);
 }
@@ -59,12 +59,12 @@ static void ScreenOnQosEvent(int sessionId, int eventId, int tvCount, const QosT
 SoftbusAdapter::SoftbusAdapter()
 {
     LOGI("SoftbusAdapter");
-    sessListener_.OnSessionOpened = ScreenOnSoftbusSessionOpened;
-    sessListener_.OnSessionClosed = ScreenOnSoftbusSessionClosed;
-    sessListener_.OnBytesReceived = ScreenOnBytesReceived;
-    sessListener_.OnStreamReceived = ScreenOnStreamReceived;
-    sessListener_.OnMessageReceived = ScreenOnMessageReceived;
-    sessListener_.OnQosEvent = ScreenOnQosEvent;
+    sessListener_.OnSessionOpened = DmOnSoftbusSessionOpened;
+    sessListener_.OnSessionClosed = DmOnSoftbusSessionClosed;
+    sessListener_.OnBytesReceived = DmOnBytesReceived;
+    sessListener_.OnStreamReceived = DmOnStreamReceived;
+    sessListener_.OnMessageReceived = DmOnMessageReceived;
+    sessListener_.OnQosEvent = DmOnQosEvent;
 }
 
 SoftbusAdapter::~SoftbusAdapter()
