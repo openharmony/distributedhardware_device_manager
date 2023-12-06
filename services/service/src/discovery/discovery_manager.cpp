@@ -292,7 +292,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
         filterData = filterOps.find(PARAM_KEY_FILTER_OPTIONS)->second;
     }
     DeviceFilterOption dmFilter;
-    if (dmFilter.TransformToFilter(filterData) != DM_OK) {
+    if ((dmFilter.TransformToFilter(filterData) != DM_OK) && (dmFilter.TransformFilterOption(filterData) != DM_OK)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
