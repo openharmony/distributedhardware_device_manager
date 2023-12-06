@@ -24,6 +24,7 @@
 #include <mutex>
 #endif
 
+#include "advertise_manager.h"
 #include "discovery_manager.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
@@ -185,6 +186,7 @@ private:
     bool isAdapterSoLoaded_ = false;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
+    std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;

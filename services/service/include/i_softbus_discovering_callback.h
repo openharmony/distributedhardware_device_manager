@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_SOFTBUS_LNN_OPS_CALLBACK_H
-#define OHOS_SOFTBUS_LNN_OPS_CALLBACK_H
+#ifndef OHOS_SOFTBUS_DISCOVERING_CALLBACK_H
+#define OHOS_SOFTBUS_DISCOVERING_CALLBACK_H
 
 namespace OHOS {
 namespace DistributedHardware {
-class ISoftbusLnnOpsCallback {
+class ISoftbusDiscoveringCallback {
 public:
-    virtual ~ISoftbusLnnOpsCallback() {}
+    virtual ~ISoftbusDiscoveringCallback() {}
 
     virtual void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) = 0;
     virtual void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_SOFTBUS_LNN_OPS_CALLBACK_H
+#endif // OHOS_SOFTBUS_DISCOVERING_CALLBACK_H

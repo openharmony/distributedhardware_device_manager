@@ -70,6 +70,9 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
+    if (advertiseMgr_ == nullptr) {
+        advertiseMgr_ = std::make_shared<AdvertiseManager>(softbusListener_);
+    }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener_, listener_);
     }
@@ -80,6 +83,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
 void DeviceManagerService::UninitDMServiceListener()
 {
     listener_ = nullptr;
+    advertiseMgr_ = nullptr;
     discoveryMgr_ = nullptr;
     LOGI("DeviceManagerServiceListener uninit.");
 }
@@ -368,11 +372,12 @@ int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("PublishDeviceDiscovery failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
+
+    std::map<std::string, std::string> advertiseParam;
+    advertiseParam.insert(std::pair<std::string, std::string>(PARAM_KEY_PUBLISH_ID,
+        std::to_string(publishInfo.publishId)));
+
+    return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
 
 int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
@@ -385,11 +390,7 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnPublishDeviceDiscovery failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
+    return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
 
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
@@ -973,7 +974,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
+        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
 }
@@ -995,7 +996,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
+        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
@@ -1042,14 +1043,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("StartAdvertising failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
-        LOGD("input advertise parameter not contains META_TYPE, dm service adapter not supported.");
-    }
-    return dmServiceImplExt_->StartAdvertisingExt(pkgName, advertiseParam);
+    return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
 
 int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
@@ -1064,16 +1058,15 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
-        LOGE("StopAdvertising failed, dm service adapter load failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
+    if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
+        LOGI("StopAdvertising input MetaType=%s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
-    if (advertiseParam.find(PARAM_KEY_META_TYPE) == advertiseParam.end()) {
-        LOGD("input advertise parameter not contains META_TYPE, dm service adapter not supported.");
+    int32_t publishId = -1;
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
+        publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
     }
-    return dmServiceImplExt_->StopAdvertisingExt(pkgName, advertiseParam);
+    return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
-
 
 int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)

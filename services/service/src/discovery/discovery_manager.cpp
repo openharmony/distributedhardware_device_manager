@@ -41,9 +41,14 @@ DiscoveryManager::~DiscoveryManager()
     LOGI("DiscoveryManager destructor.");
 }
 
-int32_t DiscoveryManager::EnableDiscoveryListener(const std::string& pkgName,
+int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
+    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
@@ -67,13 +72,14 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string& pkgName,
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %d.", ret);
         return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
     }
-    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, std::shared_ptr<ISoftbusLnnOpsCallback>(shared_from_this()));
+    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     return DM_OK;
 }
 
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
+    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -95,6 +101,10 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
     LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
@@ -125,7 +135,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         ret = StartDiscoveringNoMetaType(dmSubInfo, discoverParam);
     } else {
         LOGI("StartDiscovering for meta node process, input metaType = %s",
-             (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+            (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
         ret = StartDiscovering4MetaType(dmSubInfo, discoverParam);
     }
     if (ret != DM_OK) {
@@ -134,8 +144,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     }
 
     StartDiscoveryTimer();
-    return softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName,
-        std::shared_ptr<ISoftbusLnnOpsCallback>(shared_from_this()));
+    return softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
 }
 
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
@@ -274,7 +283,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
         filterData = filterOps.find(PARAM_KEY_FILTER_OPTIONS)->second;
     }
     DeviceFilterOption dmFilter;
-    if (dmFilter.TransformToFilter(filterData) != DM_OK) {
+    if ((dmFilter.TransformToFilter(filterData) != DM_OK) && (dmFilter.TransformFilterOption(filterData) != DM_OK)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
 

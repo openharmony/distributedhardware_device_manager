@@ -32,9 +32,9 @@ struct DeviceFilterOption {
     std::string filterOp_;
     std::vector<DeviceFilters> filters_;
     int32_t ParseFilterJson(const std::string &str);
-    void ParseFilterOptionJson(const std::string &str);
+    int32_t ParseFilterOptionJson(const std::string &str);
     int32_t TransformToFilter(const std::string &filterOptions);
-    void TransformFilterOption(const std::string &filterOptions);
+    int32_t TransformFilterOption(const std::string &filterOptions);
 };
 
 struct DeviceFilterPara {
