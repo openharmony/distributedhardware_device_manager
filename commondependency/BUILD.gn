@@ -1,0 +1,66 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+ohos_shared_library("devicemanagerdependency") {
+  include_dirs = [
+    "include",
+    "${common_path}/include",
+    "${innerkits_path}/native_cpp/include",
+  ]
+
+  if (os_account_part_exists) {
+    include_dirs += [
+      "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
+      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+    ]
+  }
+
+  sources = [
+    "${common_path}/src/dm_softbus_adapter_crypto.cpp",
+    "src/deviceprofile_connector.cpp",
+    "src/multiple_user_connector.cpp",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"devicemanagerdependency\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${mbedtls_path}:mbedtls_shared",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hilog:libhilog",
+    "os_account:libaccountkits",
+  ]
+
+  if (os_account_part_exists) {
+    defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+    external_deps += [
+      "os_account:libaccountkits",
+      "os_account:os_account_innerkits",
+    ]
+  }
+
+  subsystem_name = "distributedhardware"
+
+  part_name = "device_manager"
+}

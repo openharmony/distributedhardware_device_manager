@@ -134,7 +134,9 @@ public:
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
     std::string GetNetworkIdByUdidHash(const std::string &deviceIdHash);
     void HandleDeviceOnline(std::string &deviceId);
+    void HandleDeviceOffline(const std::string &deviceId);
     void SetPkgName(std::string pkgName);
+    bool CheckIsOnline(const std::string &targetDeviceId);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);

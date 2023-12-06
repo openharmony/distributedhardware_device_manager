@@ -112,13 +112,43 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         case MSG_TYPE_RESP_AUTH:
             CreateResponseAuthMessage(jsonObj);
             break;
+        case MSG_TYPE_RESP_AUTH_EXT:
+            CreateResponseAuthMessageExt(jsonObj);
+            break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
+        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             CreateResponseFinishMessage(jsonObj);
+            break;
+        case MSG_TYPE_REQ_PUBLICKEY:
+        case MSG_TYPE_RESP_PUBLICKEY:
+            CreatePublicKeyMessageExt(jsonObj);
+            break;
+        case MSG_TYPE_REQ_SYNC_DELETE:
+            CreateSyncDeleteMessageExt(jsonObj);
             break;
         default:
             break;
     }
     return jsonObj.dump();
+}
+
+void AuthMessageProcessor::CreateSyncDeleteMessageExt(nlohmann::json &json)
+{
+    json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
+    json[TAG_HOST_PKGNAME] = authResponseContext_->hostPkgName;
+}
+
+void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
+{
+    json[TAG_PUBLICKEY] = authResponseContext_->publicKey;
+}
+
+void AuthMessageProcessor::CreateResponseAuthMessageExt(nlohmann::json &json)
+{
+    json[TAG_REPLY] = authResponseContext_->reply;
+    json[TAG_TOKEN] = authResponseContext_->token;
+    json[TAG_CONFIRM_OPERATION] = authResponseContext_->confirmOperation;
+    json[TAG_REQUEST_ID] = authResponseContext_->requestId;
 }
 
 void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
@@ -216,13 +246,58 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         case MSG_TYPE_RESP_AUTH:
             ParseAuthResponseMessage(jsonObject);
             break;
+        case MSG_TYPE_RESP_AUTH_EXT:
+            ParseAuthResponseMessageExt(jsonObject);
+            break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
+        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             ParseResponseFinishMessage(jsonObject);
+            break;
+        case MSG_TYPE_REQ_PUBLICKEY:
+        case MSG_TYPE_RESP_PUBLICKEY:
+            ParsePublicKeyMessageExt(jsonObject);
+            break;
+        case MSG_TYPE_REQ_SYNC_DELETE:
+            ParseSyncDeleteMessageExt(jsonObject);
             break;
         default:
             break;
     }
     return DM_OK;
+}
+
+void AuthMessageProcessor::ParseSyncDeleteMessageExt(nlohmann::json &json)
+{
+    if (IsString(json, TAG_LOCAL_DEVICE_ID)) {
+        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
+    }
+    if (IsString(json, TAG_HOST_PKGNAME)) {
+        authResponseContext_->hostPkgName = json[TAG_HOST_PKGNAME].get<std::string>();
+    }
+}
+
+void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
+{
+    if (IsString(json, TAG_PUBLICKEY)) {
+        authResponseContext_->publicKey = json[TAG_PUBLICKEY].get<std::string>();
+    }
+}
+
+void AuthMessageProcessor::ParseAuthResponseMessageExt(nlohmann::json &json)
+{
+    LOGI("start ParseAuthResponseMessageExt");
+    if (IsInt32(json, TAG_REPLY)) {
+        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    }
+    if (IsString(json, TAG_TOKEN)) {
+        authResponseContext_->token = json[TAG_TOKEN].get<std::string>();
+    }
+    if (IsInt32(json, TAG_CONFIRM_OPERATION)) {
+        authResponseContext_->confirmOperation = json[TAG_CONFIRM_OPERATION].get<int32_t>();
+    }
+    if (IsInt64(json, TAG_REQUEST_ID)) {
+        authResponseContext_->requestId = json[TAG_REQUEST_ID].get<int64_t>();
+    }
 }
 
 void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
@@ -323,6 +398,46 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         }
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s",
             GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
+    }
+}
+
+void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
+{
+    if (IsString(json, TAG_LOCAL_ACCOUNTID)) {
+        authResponseContext_->localAccountId = json[TAG_LOCAL_ACCOUNTID].get<std::string>();
+    }
+    if (IsInt32(json, TAG_LOCAL_USERID)) {
+        authResponseContext_->localUserId = json[TAG_LOCAL_USERID].get<int32_t>();
+    }
+    if (IsBool(json, TAG_ISONLINE)) {
+        authResponseContext_->isOnline = json[TAG_ISONLINE].get<bool>();
+    }
+    if (IsBool(json, TAG_IDENTICAL_ACCOUNT)) {
+        authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT].get<bool>();
+    }
+    if (IsBool(json, TAG_AUTHED)) {
+        authResponseContext_->authed = json[TAG_AUTHED].get<bool>();
+    }
+    if (IsInt64(json, TAG_TOKENID)) {
+        authResponseContext_->tokenId = json[TAG_TOKENID].get<int64_t>();
+    }
+    if (IsString(json, TAG_DMVERSION)) {
+        authResponseContext_->dmVersion = json[TAG_DMVERSION].get<std::string>();
+    } else {
+        authResponseContext_->dmVersion = "";
+    }
+    if (IsBool(json, TAG_HAVECREDENTIAL)) {
+        authResponseContext_->haveCredential = json[TAG_HAVECREDENTIAL].get<bool>();
+    }
+    if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
+        int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
+        authResponseContext_->bindType.clear();
+        for (int32_t item = 0; item < bindTypeSize; item++) {
+            std::string itemStr = std::to_string(item);
+            if (IsInt32(json, itemStr)) {
+                authResponseContext_->bindType.push_back(json[itemStr].get<int32_t>());
+            }
+        }
     }
 }
 

@@ -85,6 +85,8 @@ ohos_fuzztest("PinAuthUiFuzzTest") {
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "init:libbegetutil",
     "resource_management:resmgr_napi_core",
     "safwk:system_ability_fwk",

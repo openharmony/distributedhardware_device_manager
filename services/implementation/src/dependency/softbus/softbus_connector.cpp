@@ -651,5 +651,43 @@ void SoftbusConnector::HandleDeviceOnline(std::string &deviceId)
     LOGI("SoftbusConnector::HandleDeviceOnline");
     return;
 }
+
+void SoftbusConnector::HandleDeviceOffline(const std::string &deviceId)
+{
+    LOGI("SoftbusConnector::HandleDeviceOnline");
+    return;
+}
+
+bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
+{
+    LOGI("Check the device is online.");
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed.");
+        return ERR_DM_FAILED;
+    }
+    for (int32_t i = 0; i < deviceCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        uint8_t mUdid[UDID_BUF_LEN] = {0};
+        if (GetNodeKeyInfo(DM_PKG_NAME, reinterpret_cast<char *>(nodeBasicInfo->networkId),
+            NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid)) != DM_OK) {
+            LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+        }
+        std::string udid = reinterpret_cast<char *>(mUdid);
+        char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)mUdidHash) != DM_OK) {
+            LOGE("get mUdidHash by udid: %s failed.", GetAnonyString(udid).c_str());
+        }
+        std::string udidHash = static_cast<std::string>(mUdidHash);
+        if (udidHash == targetDeviceId) {
+            LOGI("The device is online.");
+            return true;
+        }
+    }
+    LOGI("The device is not online.");
+    return false;
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS
