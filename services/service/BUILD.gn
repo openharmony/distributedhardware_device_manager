@@ -75,6 +75,7 @@ if (defined(ohos_lite)) {
   config("devicemanagerservice_config") {
     include_dirs = [
       "include",
+      "include/advertise",
       "include/discovery",
       "include/ipc",
       "include/ipc/standard",
@@ -115,6 +116,7 @@ if (defined(ohos_lite)) {
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
+      "src/advertise/advertise_manager.cpp",
       "src/discovery/discovery_filter.cpp",
       "src/discovery/discovery_manager.cpp",
       "src/ipc/standard/ipc_cmd_parser.cpp",

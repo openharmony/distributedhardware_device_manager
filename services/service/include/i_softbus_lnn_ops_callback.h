@@ -24,6 +24,7 @@ public:
 
     virtual void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) = 0;
     virtual void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) = 0;
+    virtual void OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

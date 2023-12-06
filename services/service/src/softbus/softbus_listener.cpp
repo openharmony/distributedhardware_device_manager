@@ -386,6 +386,7 @@ int32_t SoftbusListener::InitSoftbusListener()
 int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo,
     const std::string &customData)
 {
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
     subscribeInfo.subscribeId = dmSubInfo.subscribeId;
@@ -416,6 +417,42 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %d.", ret);
         return ERR_DM_STOP_REFRESH_LNN_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
+    const std::string &customData)
+{
+    LOGI("PublishSoftbusLNN begin, publishId: %d.", dmPubInfo.publishId);
+    PublishInfo publishInfo;
+    publishInfo.publishId = dmPubInfo.publishId;
+    publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
+    publishInfo.medium = (capability == DM_CAPABILITY_APPROACH) ? ExchangeMedium::BLE : ExchangeMedium::AUTO;
+    publishInfo.freq = static_cast<ExchangeFreq>(dmPubInfo.freq);
+    publishInfo.capability = capability.c_str();
+    publishInfo.capabilityData = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(customData.c_str()));
+    publishInfo.dataLen = customData.length();
+    publishInfo.ranging = dmPubInfo.ranging;
+
+    LOGI("PublishSoftbusLNN begin, publishId: %d, mode: 0x%x, medium: %d, capability: %s, ranging: %d.",
+        publishInfo.publishId, publishInfo.mode, publishInfo.medium, publishInfo.capability, publishInfo.ranging);
+
+    int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]PublishLNN failed, ret: %d.", ret);
+        return ERR_DM_PUBLISH_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
+{
+    LOGI("StopPublishSoftbusLNN begin, publishId: %d.", publishId);
+    int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]StopPublishLNN failed, ret: %d.", ret);
+        return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
     return DM_OK;
 }

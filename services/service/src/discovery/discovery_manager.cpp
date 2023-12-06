@@ -44,6 +44,11 @@ DiscoveryManager::~DiscoveryManager()
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string& pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
+    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
@@ -74,6 +79,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string& pkgName,
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
+    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -95,6 +101,10 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
     LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
@@ -253,6 +263,14 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+}
+
+void DiscoveryManager::OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result)
+{
+    (void)pkgName;
+    (void)publishId;
+    (void)result;
+    LOGI("DiscoveryManager::OnAdvertisingResult, ignore.");
 }
 
 void DiscoveryManager::StartDiscoveryTimer()

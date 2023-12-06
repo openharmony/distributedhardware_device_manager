@@ -42,6 +42,7 @@ public:
     // interfaces from ISoftbusLnnOpsCallback
     void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override;
     void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override;
+    void OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result) override;
 
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);

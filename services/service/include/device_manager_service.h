@@ -185,6 +185,7 @@ private:
     bool isAdapterSoLoaded_ = false;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
+    std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;

@@ -71,6 +71,8 @@ public:
     int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
     int32_t RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo, const std::string &customData);
     int32_t StopRefreshSoftbusLNN(uint16_t subscribeId);
+    int32_t PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability, const std::string &customData);
+    int32_t StopPublishSoftbusLNN(int32_t publishId);
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusLnnOpsCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
