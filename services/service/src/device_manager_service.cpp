@@ -974,7 +974,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
+        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
 }
@@ -996,7 +996,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE))->second.c_str());
+        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }

@@ -81,9 +81,10 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         if (timer_ == nullptr) {
             timer_ = std::make_shared<DmTimer>();
         }
+        int32_t publishId = dmPubInfo.publishId;
         timer_->StartTimer(std::string(AUTO_STOP_ADVERTISE_TASK), stopTime,
-            [this, pkgName, dmPubInfo.publishId] (std::string name) {
-                AdvertiseManager::HandleAutoStopAdvertise(name, pkgName, dmPubInfo.publishId);
+            [this, pkgName, publishId] (std::string name) {
+                AdvertiseManager::HandleAutoStopAdvertise(name, pkgName, publishId);
             });
     }
     return DM_OK;

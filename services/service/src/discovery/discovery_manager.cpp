@@ -41,7 +41,7 @@ DiscoveryManager::~DiscoveryManager()
     LOGI("DiscoveryManager destructor.");
 }
 
-int32_t DiscoveryManager::EnableDiscoveryListener(const std::string& pkgName,
+int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
     LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
@@ -135,7 +135,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         ret = StartDiscoveringNoMetaType(dmSubInfo, discoverParam);
     } else {
         LOGI("StartDiscovering for meta node process, input metaType = %s",
-             (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+            (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
         ret = StartDiscovering4MetaType(dmSubInfo, discoverParam);
     }
     if (ret != DM_OK) {

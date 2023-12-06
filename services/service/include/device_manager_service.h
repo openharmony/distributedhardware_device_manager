@@ -24,6 +24,7 @@
 #include <mutex>
 #endif
 
+#include "advertise_manager.h"
 #include "discovery_manager.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"

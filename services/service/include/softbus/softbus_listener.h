@@ -26,6 +26,7 @@
 
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
+#include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 #include "i_softbus_lnn_ops_callback.h"
 #include "inner_session.h"
@@ -71,7 +72,8 @@ public:
     int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
     int32_t RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo, const std::string &customData);
     int32_t StopRefreshSoftbusLNN(uint16_t subscribeId);
-    int32_t PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability, const std::string &customData);
+    int32_t PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
+        const std::string &customData);
     int32_t StopPublishSoftbusLNN(int32_t publishId);
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusLnnOpsCallback> callback);
