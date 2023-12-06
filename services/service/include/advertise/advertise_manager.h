@@ -24,7 +24,7 @@ namespace DistributedHardware {
 class AdvertiseManager : public std::enable_shared_from_this<AdvertiseManager> {
 public:
     AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener);
-    ~AdvertiseManager() override;
+    ~AdvertiseManager();
 
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
