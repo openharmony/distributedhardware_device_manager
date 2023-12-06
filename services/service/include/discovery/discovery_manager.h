@@ -33,16 +33,15 @@ typedef struct DiscoveryContext {
     std::vector<DeviceFilters> filters;
 } DiscoveryContext;
 
-class DiscoveryManager : public ISoftbusLnnOpsCallback, public std::enable_shared_from_this<DiscoveryManager> {
+class DiscoveryManager : public ISoftbusDiscoveringCallback, public std::enable_shared_from_this<DiscoveryManager> {
 public:
     DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
         std::shared_ptr<IDeviceManagerServiceListener> listener);
     ~DiscoveryManager() override;
 
-    // interfaces from ISoftbusLnnOpsCallback
+    // interfaces from ISoftbusDiscoveringCallback
     void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override;
     void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override;
-    void OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result) override;
 
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);

@@ -72,7 +72,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %d.", ret);
         return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
     }
-    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, std::shared_ptr<ISoftbusLnnOpsCallback>(shared_from_this()));
+    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     return DM_OK;
 }
 
@@ -144,8 +144,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     }
 
     StartDiscoveryTimer();
-    return softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName,
-        std::shared_ptr<ISoftbusLnnOpsCallback>(shared_from_this()));
+    return softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
 }
 
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
@@ -263,14 +262,6 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
-}
-
-void DiscoveryManager::OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result)
-{
-    (void)pkgName;
-    (void)publishId;
-    (void)result;
-    LOGI("DiscoveryManager::OnAdvertisingResult, ignore.");
 }
 
 void DiscoveryManager::StartDiscoveryTimer()

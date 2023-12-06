@@ -71,7 +71,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
     if (advertiseMgr_ == nullptr) {
-        advertiseMgr_ = std::make_shared<AdvertiseManager>(softbusListener_, listener_);
+        advertiseMgr_ = std::make_shared<AdvertiseManager>(softbusListener_);
     }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener_, listener_);

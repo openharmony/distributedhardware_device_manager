@@ -25,8 +25,7 @@ namespace DistributedHardware {
 const int32_t AUTO_STOP_ADVERTISE_DEFAULT_TIME = 120;
 const std::string AUTO_STOP_ADVERTISE_TASK = "AutoStopAdvertisingTask";
 
-AdvertiseManager::AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener,
-    std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
+AdvertiseManager::AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener) : softbusListener_(softbusListener)
 {
     LOGI("AdvertiseManager constructor.");
 }
@@ -70,7 +69,6 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         LOGE("StartAdvertising failed, softbus publish lnn ret: %d", ret);
         return ERR_DM_START_ADVERTISING_FAILED;
     }
-    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
 
     if (advertiseParam.find(PARAM_KEY_AUTO_STOP_ADVERTISE) != advertiseParam.end()) {
         int32_t stopTime = std::atoi((advertiseParam.find(PARAM_KEY_AUTO_STOP_ADVERTISE)->second).c_str());
@@ -97,34 +95,7 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
     return softbusListener_->StopPublishSoftbusLNN(publishId);
-}
-
-void AdvertiseManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
-{
-    (void)pkgName;
-    (void)info;
-    (void)isOnline;
-    LOGI("AdvertiseManager::OnDeviceFound, ignore.");
-}
-
-void AdvertiseManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
-{
-    (void)pkgName;
-    (void)subscribeId;
-    (void)result;
-    LOGI("AdvertiseManager::OnDiscoveringResult, ignore.");
-}
-
-void AdvertiseManager::OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result)
-{
-    LOGI("OnAdvertisingResult, pkgName=%s, publishId=%d, result=%d.", pkgName.c_str(), publishId, result);
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
-    }
-    listener_->OnPublishResult(pkgName, publishId, result);
 }
 
 void AdvertiseManager::HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName,

@@ -28,7 +28,7 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#include "i_softbus_lnn_ops_callback.h"
+#include "i_softbus_discovering_callback.h"
 #include "inner_session.h"
 #include "session.h"
 
@@ -76,7 +76,7 @@ public:
         const std::string &customData);
     int32_t StopPublishSoftbusLNN(int32_t publishId);
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
-        const std::shared_ptr<ISoftbusLnnOpsCallback> callback);
+        const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
 };
 } // namespace DistributedHardware

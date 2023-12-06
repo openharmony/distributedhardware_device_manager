@@ -17,22 +17,14 @@
 #define OHOS_ADVERTISE_MANAGER_H
 
 #include "dm_timer.h"
-#include "idevice_manager_service_listener.h"
-#include "i_softbus_lnn_ops_callback.h"
 #include "softbus_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AdvertiseManager : public ISoftbusLnnOpsCallback, public std::enable_shared_from_this<AdvertiseManager> {
+class AdvertiseManager : public std::enable_shared_from_this<AdvertiseManager> {
 public:
-    AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener,
-        std::shared_ptr<IDeviceManagerServiceListener> listener);
+    AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener);
     ~AdvertiseManager() override;
-
-    // interfaces from ISoftbusLnnOpsCallback
-    void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override;
-    void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override;
-    void OnAdvertisingResult(const std::string &pkgName, int32_t publishId, int32_t result) override;
 
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
@@ -43,7 +35,6 @@ private:
 private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<SoftbusListener> softbusListener_;
-    std::shared_ptr<IDeviceManagerServiceListener> listener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -56,7 +56,7 @@ static PulishStatus g_publishStatus = PulishStatus::STATUS_UNKNOWN;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveredDeviceMap;
-static std::map<std::string, std::shared_ptr<ISoftbusLnnOpsCallback>> lnnOpsCbkMap;
+static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -458,13 +458,14 @@ int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
 }
 
 int32_t SoftbusListener::RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
-    const std::shared_ptr<ISoftbusLnnOpsCallback> callback)
+    const std::shared_ptr<ISoftbusDiscoveringCallback> callback)
 {
     if (callback == nullptr) {
         LOGE("RegisterSoftbusDiscoveringCbk failed, input callback is null.");
         return ERR_DM_POINT_NULL;
     }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    lnnOpsCbkMap.erase(pkgName);
     lnnOpsCbkMap.emplace(pkgName, callback);
     return DM_OK;
 }
