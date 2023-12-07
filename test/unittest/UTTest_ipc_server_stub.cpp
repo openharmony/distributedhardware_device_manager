@@ -154,6 +154,24 @@ HWTEST_F(IpcServerStubTest, OnRemoteRequest_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(IpcServerStubTest, SendCmd_001, testing::ext::TestSize.Level0)
 {
+    int32_t cmdCode = 1;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    // 1. Call IpcServerStub SendCmd
+    int32_t ret = IpcServerStub::GetInstance().SendCmd(cmdCode, req, rsp);
+    // 2. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: SendCmd_002
+ * @tc.desc: 1. Call IpcServerStub SendCmd
+ *           2. check ret is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, SendCmd_002, testing::ext::TestSize.Level0)
+{
     int result = 305;
     int32_t cmdCode = -1;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
@@ -165,13 +183,13 @@ HWTEST_F(IpcServerStubTest, SendCmd_001, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: SendCmd_002
+ * @tc.name: SendCmd_003
  * @tc.desc: 1. Call IpcServerStub SendCmd
  *           2. check ret is ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(IpcServerStubTest, SendCmd_002, testing::ext::TestSize.Level0)
+HWTEST_F(IpcServerStubTest, SendCmd_003, testing::ext::TestSize.Level0)
 {
     int result = 305;
     int32_t cmdCode = IPC_MSG_BUTT;

@@ -31,7 +31,6 @@ void GenerateEncryptedUuidFuzzTest(const uint8_t* data, size_t size)
     std::string appId(reinterpret_cast<const char*>(data), size);
     std::string encryptedUuid(reinterpret_cast<const char*>(data), size);
     DeviceManagerImpl::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
-    DeviceManagerImpl::GetInstance().GetEncryptedUuidByNetworkId(pkgName, uuid, appId);
 }
 }
 }
