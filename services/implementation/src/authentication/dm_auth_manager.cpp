@@ -1378,10 +1378,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         LOGE("DmAuthManager::ParseConnectAddr failed, AddMemberToDiscoverMap failed.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (deviceInfo != nullptr) {
-        deviceInfo = nullptr;
-    }
-
+    deviceInfo = nullptr;
     return DM_OK;
 }
 

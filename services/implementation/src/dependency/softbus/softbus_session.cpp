@@ -206,8 +206,8 @@ void SoftbusSession::Encrypt(char* plainText, char* cipherText)
     int32_t encryptDataGCMLen = strlen(plainText) + OVERHEAD_LEN;
     int32_t realEncryptDataGCMLen = strlen(plainText) + TAG_LEN;
     unsigned char encryptDataGCM[realEncryptDataGCMLen];
-    DmAdapterCrypto::MbedAesGcmEncrypt(&cipherKey, (unsigned char*)plainText, strlen(plainText), encryptDataGCM,
-        encryptDataGCMLen);
+    DmAdapterCrypto::MbedAesGcmEncrypt(&cipherKey, reinterpret_cast<unsigned char*>(plainText), strlen(plainText),
+        encryptDataGCM, encryptDataGCMLen);
     int32_t ret = memcpy_s(cipherText, ENCRY_FLAG_LEN, (char*)ENCRY_FLAG, ENCRY_FLAG_LEN);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]Encrypt failed, ret: %d.", ret);
@@ -231,9 +231,9 @@ void SoftbusSession::Decrypt(char* cipherText, unsigned int cipherTextLen, char*
         return;
     }
     AesGcmCipherKey cipherKey = GetSessionKeyAndIv();
-    unsigned char* cipherText_uc = (unsigned char*)realCipherText;
-    DmAdapterCrypto::MbedAesGcmDecrypt(&cipherKey, cipherText_uc, realCipherTextLen, (unsigned char*)plainText,
-        realCipherTextLen);
+    unsigned char* cipherText_uc = reinterpret_cast<unsigned char*>(realCipherText);
+    DmAdapterCrypto::MbedAesGcmDecrypt(&cipherKey, cipherText_uc, realCipherTextLen,
+        reinterpret_cast<unsigned char*>(plainText), realCipherTextLen);
     plainText[realCipherTextLen - TAG_LEN] = '\0';
 }
 

@@ -729,11 +729,12 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
   module_out_path = module_out_path
 
   include_dirs = [
-    "${devicemanager_path}/test/unittest",
+    "${devicemanager_path}/test/commonunittest",
     "${devicemanager_path}/radar/include",
   ]
 
-  sources = [ "${devicemanager_path}/test/unittest/dm_radar_helper_test.cpp" ]
+  sources =
+      [ "${devicemanager_path}/test/commonunittest/dm_radar_helper_test.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 

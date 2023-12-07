@@ -603,10 +603,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
     }
     std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
     discoveryDeviceInfoMap_[deviceId] = std::move(deviceInfo);
-    if (deviceInfo != nullptr) {
-        deviceInfo = nullptr;
-    }
-
+    deviceInfo = nullptr;
     return DM_OK;
 }
 
