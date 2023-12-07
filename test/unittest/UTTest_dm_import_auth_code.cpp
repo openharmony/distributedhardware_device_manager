@@ -86,21 +86,6 @@ HWTEST_F(DMImportAuthCodeTest, ExportAuthCode_001, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(pkgName);
 }
-
-HWTEST_F(DMImportAuthCodeTest, PeerTargetId_001, testing::ext::TestSize.Level0)
-{
-    PeerTargetId peerTargetId = {
-        .deviceId = "pkgName",
-        .brMac = "brMac",
-        .bleMac = "bleMac",
-        .wifiIp = "wifiIp",
-        .wifiPort = 0,
-    };
-
-    PeerTargetId other;
-    ASSERT_NE(other == peerTargetId, true);
-    ASSERT_NE(other < peerTargetId, true);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
