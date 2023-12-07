@@ -21,6 +21,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -259,6 +260,14 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
             discoveryContextMap_.erase(pkgName);
             timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
         }
+    }
+    struct RadarInfo info = {
+        .funcName = "OnSoftbusDiscoveryResult",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .errCode = result,
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
+        LOGE("ReportDiscoverResCallback failed");
     }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);

@@ -267,7 +267,15 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
     DmDeviceInfo dmDevInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDevInfo);
-
+    struct RadarInfo info = {
+        .funcName = "OnSoftbusDeviceFound",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .peerNetId = "",
+        .peerUdid = device->devId,
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
+        LOGE("ReportDiscoverResCallback failed");
+    }
     LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d, extraData=%s",
         GetAnonyString(dmDevInfo.deviceId).c_str(), dmDevInfo.deviceName, dmDevInfo.deviceTypeId,
         dmDevInfo.range, device->isOnline, dmDevInfo.extraData.c_str());
@@ -403,6 +411,19 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
         subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium, subscribeInfo.capability);
 
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
+    struct RadarInfo info = {
+        .funcName = "RefreshSoftbusLNN",
+        .toCallPkg = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
+        .errCode = ret,
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverRegCallback(info)) {
+        LOGE("ReportDiscoverRegCallback failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
         return ERR_DM_REFRESH_LNN_FAILED;
@@ -414,6 +435,18 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
     LOGI("StopRefreshSoftbusLNN begin, subscribeId: %d.", (int32_t)subscribeId);
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
+    struct RadarInfo info = {
+        .funcName = "StopRefreshSoftbusLNN",
+        .hostName = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+            static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+            static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .errCode = ret,
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
+        LOGE("ReportDiscoverUserRes failed");
+    }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %d.", ret);
         return ERR_DM_STOP_REFRESH_LNN_FAILED;
@@ -492,6 +525,9 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     if (ret != DM_OK) {
         radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL);
         radarInfo.errCode = ERR_DM_FAILED;
+        if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
+            LOGE("ReportGetTrustDeviceList failed!");
+        }
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
         return ERR_DM_FAILED;
     }
@@ -509,8 +545,8 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
     radarInfo.discoverDevList = DmRadarHelper::GetInstance().GetDeviceInfoList(deviceInfoList);
-    if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
-        LOGE("ReportGetTrustDeviceList failed!");
+    if (deviceCount > 0 && !DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
+        LOGE("no device trust or ReportGetTrustDeviceList failed!");
     }
     FreeNodeInfo(nodeInfo);
     free(info);
