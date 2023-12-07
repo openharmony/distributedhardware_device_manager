@@ -49,7 +49,7 @@ const int32_t MAX_PIN_TOKEN = 90000000;
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 5;
-const int32_t DM_AUTH_TYPE_MIN = 1;
+const int32_t DM_AUTH_TYPE_MIN = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 const int32_t USLEEP_TIME_MS = 500000; // 500ms
 const int32_t DM_APP = 3;
@@ -70,6 +70,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     dmConfigManager.GetAuthAdapter(authenticationMap_);
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
+    authenticationMap_[AUTH_TYPE_CRE] = nullptr;
 }
 
 DmAuthManager::~DmAuthManager()
@@ -109,13 +110,6 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
-    }
-
-    if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
-        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
-        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
@@ -182,6 +176,13 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
         return ret;
+    }
+    if (authType == AUTH_TYPE_CRE) {
+        LOGI("DmAuthManager::AuthenticateDevice joinLNN.");
+        softbusConnector_->JoinLnn(deviceId);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_OK);
+        listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
+        return DM_OK;
     }
 
     authPtr_ = authenticationMap_[authType];
@@ -1331,6 +1332,9 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     peerTargetId_ = targetId;
     std::string deviceId = "";
+    if (authType == AUTH_TYPE_CRE && !targetId.deviceId.empty()) {
+        return AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
+    }
     if (ParseConnectAddr(targetId, deviceId) == DM_OK) {
         return AuthenticateDevice(pkgName, authType, deviceId, ParseExtraFromMap(bindParam));
     } else if (!targetId.deviceId.empty()) {
