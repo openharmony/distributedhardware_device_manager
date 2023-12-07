@@ -182,6 +182,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
     json[TAG_IS_AUTH_CODE_READY] = authResponseContext_->isAuthCodeReady;
+    json[TAG_NET_ID] = authResponseContext_->networkId;
 }
 
 void AuthMessageProcessor::CreateSyncGroupMessage(nlohmann::json &json)
@@ -492,6 +493,9 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
         authResponseContext_->accountGroupIdHash = json[TAG_ACCOUNT_GROUPID].get<std::string>();
     } else {
         authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
+    }
+    if (IsString(json, TAG_NET_ID)) {
+        authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
     }
 }
 

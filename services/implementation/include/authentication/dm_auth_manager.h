@@ -481,6 +481,7 @@ private:
     void ProRespNegotiateExt(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
+    std::string GenerateBindResultContent();
 
 public:
     void RequestCredential();

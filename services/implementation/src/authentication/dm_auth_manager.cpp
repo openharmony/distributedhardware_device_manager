@@ -668,6 +668,7 @@ void DmAuthManager::AbilityNegotiate()
     } else {
         authResponseContext_->isAuthCodeReady = false;
     }
+    authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
 }
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
@@ -747,6 +748,9 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
+    listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
     timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
@@ -934,7 +938,7 @@ void DmAuthManager::AuthenticateFinish()
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
                                 authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
         listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
-            authResponseContext_->state, "");
+            authResponseContext_->state, GenerateBindResultContent());
         usleep(USLEEP_TIME_MS); // 500ms
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
         authRequestContext_ = nullptr;
@@ -1923,6 +1927,14 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
     AbilityNegotiate();
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+}
+
+std::string DmAuthManager::GenerateBindResultContent()
+{
+    nlohmann::json jsonObj;
+    jsonObj[DM_BIND_RESULT_NETWORK_ID] = authResponseContext_->networkId;
+    std::string content = jsonObj.dump();
+    return content;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -595,6 +595,17 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
     return nodeBasicInfo.deviceTypeId;
 }
 
+std::string SoftbusConnector::GetLocalDeviceNetworkId()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalDeviceNetworkId failed, ret: %d.", ret);
+        return "";
+    }
+    return nodeBasicInfo.networkId;
+}
+
 int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo)
 {
     if (deviceId.empty()) {
