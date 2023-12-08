@@ -27,6 +27,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     }
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
+    std::string authCode;
     uint16_t subscribeId = 12;
     int32_t publishId = 14;
     DmSubscribeInfo subscribeInfo;
@@ -39,7 +40,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
     DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
     DeviceManagerService::GetInstance().ImportAuthCode(pkgName, extra);
-    DeviceManagerService::GetInstance().ExportAuthCode(extra);
+    DeviceManagerService::GetInstance().ExportAuthCode(authCode);
 }
 }
 }
