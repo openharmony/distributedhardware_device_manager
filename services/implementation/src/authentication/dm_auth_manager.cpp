@@ -749,7 +749,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
     listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+        authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
     listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
     timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
         [this] (std::string name) {
