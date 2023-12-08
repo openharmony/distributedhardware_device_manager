@@ -130,6 +130,7 @@ public:
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
     void EraseUdidFromMap(const std::string &udid);
     std::string GetLocalDeviceName();
+    std::string GetLocalDeviceNetworkId();
     int32_t GetLocalDeviceTypeId();
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
     std::string GetNetworkIdByUdidHash(const std::string &deviceIdHash);

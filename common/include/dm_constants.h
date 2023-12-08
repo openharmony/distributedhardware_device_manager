@@ -178,6 +178,7 @@ const std::string PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
 const std::string PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
 const std::string PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 const std::string DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
+const std::string DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
