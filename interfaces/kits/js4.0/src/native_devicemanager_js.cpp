@@ -438,7 +438,8 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
 }
 
-void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo)
+void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
+                                            const DmDeviceBasicInfo &deviceBasicInfo)
 {
     LOGI("OnDeviceFound for %s, subscribeId %d", bundleName_.c_str(), (int32_t)subscribeId);
     uv_loop_s *loop = nullptr;
@@ -2154,21 +2155,21 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
         }
         JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
     }
-    std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = nullptr;
+    std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
     auto iter = g_DiscoveryCallbackMap.find(deviceManagerWrapper->bundleName_);
     if (iter == g_DiscoveryCallbackMap.end()) {
-        discoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, deviceManagerWrapper->bundleName_);
-        g_DiscoveryCallbackMap[deviceManagerWrapper->bundleName_] = discoveryCallback;
+        DiscoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, deviceManagerWrapper->bundleName_);
+        g_DiscoveryCallbackMap[deviceManagerWrapper->bundleName_] = DiscoveryCallback;
     } else {
-        discoveryCallback = iter->second;
+        DiscoveryCallback = iter->second;
     }
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_, tokenId,
-        extra, discoveryCallback);
+        extra, DiscoveryCallback);
     if (ret != 0) {
         LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
-        discoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
+        DiscoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
     }
     napi_get_undefined(env, &result);
     return result;
