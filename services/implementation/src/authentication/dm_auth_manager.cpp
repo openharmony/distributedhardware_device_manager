@@ -175,7 +175,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
-void DmAuthManager::AuthStateInit(const std::string &pkgName, int32_t authType,
+void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
     authPtr_ = authenticationMap_[authType];
@@ -231,13 +231,13 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         return ret;
     }
     if (authType == AUTH_TYPE_CRE) {
-        LOGI("DmAuthManager::AuthenticateDevice joinLNN.");
+        LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId);
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_OK);
+        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         return DM_OK;
     }
-    AuthStateInit(pkgName, authType, deviceId, extra);
+    InitAuthState(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 

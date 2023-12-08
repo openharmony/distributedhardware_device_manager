@@ -506,7 +506,7 @@ private:
         const std::string &extra);
     void HandleSyncDeleteTimeout(std::string name);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &deviceId);
-    void AuthStateInit(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+    void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
 
 private:
