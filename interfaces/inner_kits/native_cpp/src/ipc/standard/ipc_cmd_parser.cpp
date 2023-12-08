@@ -77,6 +77,17 @@ void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
     devInfo.extraData = parcel.ReadString();
 }
 
+void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
+{
+    std::string deviceIdStr = parcel.ReadString();
+    strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str());
+    std::string deviceNameStr = parcel.ReadString();
+    strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str());
+    devInfo.deviceTypeId = parcel.ReadUint16();
+    std::string networkIdStr = parcel.ReadString();
+    strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str());
+}
+
 bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -666,7 +677,10 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
     DecodeDmDeviceInfo(data, dmDeviceInfo);
+    DmDeviceBasicInfo devBasicInfo;
+    DecodeDmDeviceBasicInfo(data, devBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, devBasicInfo);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

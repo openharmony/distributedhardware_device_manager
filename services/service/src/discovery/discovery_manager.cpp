@@ -295,20 +295,30 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
     if ((dmFilter.TransformToFilter(filterData) != DM_OK) && (dmFilter.TransformFilterOption(filterData) != DM_OK)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
-    std::lock_guard<std::mutex> autoLock(locks_);
-    if (!discoveryQueue_.empty()) {
-        std::string frontPkgName = discoveryQueue_.front();
+    uint16_t frontSubscribeId = 0;
+    std::string frontPkgName = "";
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (discoveryQueue_.empty()) {
+            discoveryQueue_.push(pkgName);
+            DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
+            discoveryContextMap_.emplace(pkgName, context);
+            return DM_OK;
+        }
+        frontPkgName = discoveryQueue_.front();
+        frontSubscribeId = discoveryContextMap_[frontPkgName].subscribeId;
         if (pkgName == frontPkgName) {
             LOGE("DiscoveryManager::HandleDiscoveryQueue repeated, pkgName : %s.", pkgName.c_str());
             return ERR_DM_DISCOVERY_REPEATED;
         }
-        StopDiscovering(frontPkgName, discoveryContextMap_[frontPkgName].subscribeId);
     }
-
-    discoveryQueue_.push(pkgName);
-    DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
-    discoveryContextMap_.emplace(pkgName, context);
+    StopDiscovering(frontPkgName, frontSubscribeId);
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        discoveryQueue_.push(pkgName);
+        DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
+        discoveryContextMap_.emplace(pkgName, context);
+    }
     return DM_OK;
 }
 
