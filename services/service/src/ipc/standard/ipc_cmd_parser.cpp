@@ -58,6 +58,19 @@ bool EncodeDmDeviceInfo(const DmDeviceInfo &devInfo, MessageParcel &parcel)
     return bRet;
 }
 
+bool EncodeDmDeviceBasicInfo(const DmDeviceBasicInfo &devInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    std::string deviceIdStr(devInfo.deviceId);
+    bRet = (bRet && parcel.WriteString(deviceIdStr));
+    std::string deviceNameStr(devInfo.deviceName);
+    bRet = (bRet && parcel.WriteString(deviceNameStr));
+    bRet = (bRet && parcel.WriteUint16(devInfo.deviceTypeId));
+    std::string networkIdStr(devInfo.networkId);
+    bRet = (bRet && parcel.WriteString(networkIdStr));
+    return bRet;
+}
+
 bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -128,6 +141,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
+    DmDeviceBasicInfo devBasicInfo = pReq->GetDeviceBasicInfo();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -138,6 +152,10 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
     }
     if (!EncodeDmDeviceInfo(deviceInfo, data)) {
         LOGE("write dm device info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodeDmDeviceBasicInfo(devBasicInfo, data)) {
+        LOGE("write dm device basic info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

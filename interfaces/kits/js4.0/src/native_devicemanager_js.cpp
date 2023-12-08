@@ -438,7 +438,7 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
 }
 
-void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &devInfo)
+void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo)
 {
     LOGI("OnDeviceFound for %s, subscribeId %d", bundleName_.c_str(), (int32_t)subscribeId);
     uv_loop_s *loop = nullptr;
@@ -451,22 +451,8 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
-    DmDeviceBasicInfo basicInfo;
-    if (memcpy_s(basicInfo.deviceId, sizeof(devInfo.deviceId), devInfo.deviceId,
-        sizeof(devInfo.deviceId)) != DM_OK) {
-        LOGE("memcpy_s deviceId error.");
-    }
-    if (memcpy_s(basicInfo.deviceName, sizeof(devInfo.deviceName), devInfo.deviceName,
-        sizeof(devInfo.deviceName)) != DM_OK) {
-        LOGE("memcpy_s deviceName error.");
-    }
-    if (memcpy_s(basicInfo.networkId, sizeof(devInfo.networkId), devInfo.networkId,
-        sizeof(devInfo.networkId)) != DM_OK) {
-        LOGE("memcpy_s networkId error.");
-    }
-    basicInfo.deviceTypeId = devInfo.deviceTypeId;
 
-    DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, subscribeId, 0, basicInfo);
+    DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, subscribeId, 0, deviceBasicInfo);
     if (jsCallback == nullptr) {
         DeleteUvWork(work);
         return;

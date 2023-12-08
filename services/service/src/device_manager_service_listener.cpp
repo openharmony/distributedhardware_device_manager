@@ -90,6 +90,13 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::make_shared<IpcNotifyDeviceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
+    DmDeviceBasicInfo devBasicInfo;
+    ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, devBasicInfo);
+    std::string udIdHash = CalcDeviceId(pkgName, info.deviceId);
+    if (memcpy_s(devBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+    }
+    pReq->SetDeviceBasicInfo(devBasicInfo);
     pReq->SetPkgName(pkgName);
     pReq->SetSubscribeId(subscribeId);
     pReq->SetDeviceInfo(info);

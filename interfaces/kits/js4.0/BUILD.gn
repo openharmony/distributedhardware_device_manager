@@ -44,10 +44,7 @@ ohos_shared_library("distributeddevicemanager") {
     "src/native_devicemanager_js.cpp",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
