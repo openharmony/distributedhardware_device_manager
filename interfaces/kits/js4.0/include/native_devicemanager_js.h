@@ -164,7 +164,7 @@ public:
     }
     ~DmNapiDiscoveryCallback() override {};
     void OnDeviceFound(uint16_t subscribeId,
-        const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override;
+        const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo) override;
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     void OnDiscoverySuccess(uint16_t subscribeId) override;
     void IncreaseRefCount();

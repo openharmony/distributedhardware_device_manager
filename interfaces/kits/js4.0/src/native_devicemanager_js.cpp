@@ -438,8 +438,7 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
 }
 
-void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
-                                            const DmDeviceBasicInfo &deviceBasicInfo)
+void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
 {
     LOGI("OnDeviceFound for %s, subscribeId %d", bundleName_.c_str(), (int32_t)subscribeId);
     uv_loop_s *loop = nullptr;
@@ -452,8 +451,13 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
         LOGE("DmNapiDiscoveryCallback: OnDeviceFound, No memory");
         return;
     }
+    DmDeviceBasicInfo basicInfo;
+    strcpy_s(basicInfo.deviceId, sizeof(deviceInfo.deviceId) + 1, deviceInfo.deviceId);
+    strcpy_s(basicInfo.deviceName, sizeof(deviceInfo.deviceName) + 1, deviceInfo.deviceName);
+    strcpy_s(basicInfo.networkId, sizeof(deviceInfo.networkId) + 1, deviceInfo.networkId);
+    basicInfo.deviceTypeId = deviceInfo.deviceTypeId;
 
-    DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, subscribeId, 0, deviceBasicInfo);
+    DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, subscribeId, 0, basicInfo);
     if (jsCallback == nullptr) {
         DeleteUvWork(work);
         return;
@@ -2155,21 +2159,21 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
         }
         JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
     }
-    std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
+    std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = nullptr;
     auto iter = g_DiscoveryCallbackMap.find(deviceManagerWrapper->bundleName_);
     if (iter == g_DiscoveryCallbackMap.end()) {
-        DiscoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, deviceManagerWrapper->bundleName_);
-        g_DiscoveryCallbackMap[deviceManagerWrapper->bundleName_] = DiscoveryCallback;
+        discoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, deviceManagerWrapper->bundleName_);
+        g_DiscoveryCallbackMap[deviceManagerWrapper->bundleName_] = discoveryCallback;
     } else {
-        DiscoveryCallback = iter->second;
+        discoveryCallback = iter->second;
     }
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_, tokenId,
-        extra, DiscoveryCallback);
+        extra, discoveryCallback);
     if (ret != 0) {
         LOGE("StartDeviceDiscovery for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);
-        DiscoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
+        discoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
     }
     napi_get_undefined(env, &result);
     return result;
