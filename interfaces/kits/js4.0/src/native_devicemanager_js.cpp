@@ -438,7 +438,7 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
 }
 
-void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
+void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &devInfo)
 {
     LOGI("OnDeviceFound for %s, subscribeId %d", bundleName_.c_str(), (int32_t)subscribeId);
     uv_loop_s *loop = nullptr;
@@ -452,10 +452,19 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDevice
         return;
     }
     DmDeviceBasicInfo basicInfo;
-    strcpy_s(basicInfo.deviceId, sizeof(deviceInfo.deviceId) + 1, deviceInfo.deviceId);
-    strcpy_s(basicInfo.deviceName, sizeof(deviceInfo.deviceName) + 1, deviceInfo.deviceName);
-    strcpy_s(basicInfo.networkId, sizeof(deviceInfo.networkId) + 1, deviceInfo.networkId);
-    basicInfo.deviceTypeId = deviceInfo.deviceTypeId;
+    if (memcpy_s(basicInfo.deviceId, sizeof(devInfo.deviceId), devInfo.deviceId,
+        sizeof(devInfo.deviceId)) != DM_OK) {
+        LOGE("memcpy_s deviceId error.");
+    }
+    if (memcpy_s(basicInfo.deviceName, sizeof(devInfo.deviceName), devInfo.deviceName,
+        sizeof(devInfo.deviceName)) != DM_OK) {
+        LOGE("memcpy_s deviceName error.");
+    }
+    if (memcpy_s(basicInfo.networkId, sizeof(devInfo.networkId), devInfo.networkId,
+        sizeof(devInfo.networkId)) != DM_OK) {
+        LOGE("memcpy_s networkId error.");
+    }
+    basicInfo.deviceTypeId = devInfo.deviceTypeId;
 
     DmNapiStatusJsCallback *jsCallback = new DmNapiStatusJsCallback(bundleName_, subscribeId, 0, basicInfo);
     if (jsCallback == nullptr) {
