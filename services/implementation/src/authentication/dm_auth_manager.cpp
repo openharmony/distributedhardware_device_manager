@@ -112,6 +112,13 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
+    if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
+        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
+        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
         listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
@@ -1337,9 +1344,6 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     peerTargetId_ = targetId;
     std::string deviceId = "";
-    if (authType == AUTH_TYPE_CRE && !targetId.deviceId.empty()) {
-        return AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
-    }
     if (ParseConnectAddr(targetId, deviceId) == DM_OK) {
         return AuthenticateDevice(pkgName, authType, deviceId, ParseExtraFromMap(bindParam));
     } else if (!targetId.deviceId.empty()) {
