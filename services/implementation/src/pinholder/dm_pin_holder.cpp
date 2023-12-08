@@ -392,7 +392,7 @@ void DmPinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
     }
     std::string deviceId = peerDeviceId;
     char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, (uint8_t *)udidHashTmp) != DM_OK) {
+    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(deviceId).c_str());
         udidHash = "";
         return;
