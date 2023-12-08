@@ -168,23 +168,9 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
-int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+void DmAuthManager::AuthStateInit(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
-    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    if (ret != DM_OK) {
-        LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
-        return ret;
-    }
-    if (authType == AUTH_TYPE_CRE) {
-        LOGI("DmAuthManager::AuthenticateDevice joinLNN.");
-        softbusConnector_->JoinLnn(deviceId);
-        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_OK);
-        listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
-        return DM_OK;
-    }
-
     authPtr_ = authenticationMap_[authType];
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
@@ -226,6 +212,25 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     authRequestState_->Enter();
     LOGI("DmAuthManager::AuthenticateDevice complete");
+}
+
+int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+    const std::string &deviceId, const std::string &extra)
+{
+    LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
+    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
+    if (ret != DM_OK) {
+        LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        return ret;
+    }
+    if (authType == AUTH_TYPE_CRE) {
+        LOGI("DmAuthManager::AuthenticateDevice joinLNN.");
+        softbusConnector_->JoinLnn(deviceId);
+        listener_->OnAuthResult(pkgName, deviceId, "", AuthState::AUTH_REQUEST_INIT, DM_OK);
+        listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
+        return DM_OK;
+    }
+    AuthStateInit(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 
