@@ -11,42 +11,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-ohos_shared_library("devicemanagerradar") {
-  include_dirs = [
-    "include",
-    "${common_path}/include",
-    "${innerkits_path}/native_cpp/include",
-    "${c_utils_path}/include",
-    "//third_party/cJSON",
-  ]
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "linux") {
+    shared_library("devicemanagerradar") {
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+        "${innerkits_path}/native_cpp/include",
+        "${c_utils_path}/include",
+        "//third_party/cJSON",
+      ]
 
-  sources = [
-    "${common_path}/src/dm_softbus_adapter_crypto.cpp",
-    "src/dm_radar_helper.cpp",
-  ]
+      sources = [
+        "${common_path}/src/dm_softbus_adapter_crypto.cpp",
+        "src/lite/dm_radar_helper.cpp",
+      ]
 
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanagerradar\"",
-    "LOG_DOMAIN=0xD004100",
-  ]
+      defines = [
+        "LITE_DEVICE",
+        "DH_LOG_TAG=\"devicemanagerradar\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
 
-  deps = [
-    "${mbedtls_path}:mbedtls_shared",
-    "${utils_path}:devicemanagerutils",
-    "//third_party/cJSON:cjson",
-  ]
+      deps = [
+        "${utils_path}:devicemanagerutils",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
+        "//commonlibrary/utils_lite:utils",
+        "//third_party/mbedtls:mbedtls_shared",
+      ]
+    }
+  }
+} else {
+  ohos_shared_library("devicemanagerradar") {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${innerkits_path}/native_cpp/include",
+      "${c_utils_path}/include",
+      "//third_party/cJSON",
+    ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "init:libbegetutil",
-  ]
+    sources = [
+      "${common_path}/src/dm_softbus_adapter_crypto.cpp",
+      "src/dm_radar_helper.cpp",
+    ]
 
-  subsystem_name = "distributedhardware"
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerradar\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
 
-  part_name = "device_manager"
+    deps = [
+      "${mbedtls_path}:mbedtls_shared",
+      "${utils_path}:devicemanagerutils",
+      "//third_party/cJSON:cjson",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
+      "init:libbegetutil",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
 }

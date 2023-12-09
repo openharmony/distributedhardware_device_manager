@@ -20,40 +20,14 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
-    static_library("devicemanagerutils_mini") {
-      include_dirs = []
-
-      sources = []
-
-      defines = [
-        "__LITEOS_M__",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerutils\"",
-        "LOG_DOMAIN=0xD004100",
-      ]
-
-      deps = [
-        "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/mbedtls:mbedtls_shared",
-        "//third_party/openssl:libcrypto_shared",
-      ]
-
-      external_deps = [
-        "device_auth:deviceauth_sdk",
-        "hilog_lite:hilog_static",
-        "init:libbegetutil",
-        "safwk:system_ability_fwk",
-        "utils_lite:utils",
-      ]
-    }
-  } else {
+  if (ohos_kernel_type == "linux") {
     shared_library("devicemanagerutils") {
       include_dirs = [
         "include",
         "include/crypto",
         "include/fwkload/lite",
         "include/appInfo/lite",
+        "include/timer",
         "${common_path}/include",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
@@ -78,6 +52,7 @@ if (defined(ohos_lite)) {
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
+        "src/timer/dm_timer.cpp",
       ]
 
       defines = [

@@ -29,7 +29,9 @@
 #include "dm_subscribe_info.h"
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "softbus_session.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -125,7 +127,9 @@ public:
     int32_t StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo);
     int32_t StartDiscovery(const uint16_t subscribeId);
     int32_t StopDiscovery(uint16_t subscribeId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
+#endif
     bool HaveDeviceInMap(std::string deviceId);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
     void EraseUdidFromMap(const std::string &udid);
@@ -154,7 +158,9 @@ private:
     static IRefreshCallback softbusDiscoveryCallback_;
     static IRefreshCallback softbusDiscoveryByIdCallback_;
     static IPublishCb softbusPublishCallback_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> softbusSession_;
+#endif
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;

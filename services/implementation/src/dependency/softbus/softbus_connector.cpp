@@ -68,7 +68,9 @@ IRefreshCallback SoftbusConnector::softbusDiscoveryByIdCallback_ = {
 
 SoftbusConnector::SoftbusConnector()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     softbusSession_ = std::make_shared<SoftbusSession>();
+#endif
     LOGD("SoftbusConnector constructor.");
 }
 
@@ -273,10 +275,12 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
     return ret;
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 {
     return softbusSession_;
 }
+#endif
 
 bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 {

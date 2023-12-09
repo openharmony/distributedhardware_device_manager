@@ -78,6 +78,9 @@ public:
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
+
+private:
+    int32_t InitSoftPublishLNN();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

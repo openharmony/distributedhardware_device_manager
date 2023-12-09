@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,6 +90,16 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         }
     }
     return DM_OK;
+}
+
+std::vector<std::string> IpcServerListener::GetAllPkgName()
+{
+    std::vector<std::string> pkgNameList;
+    const std::map<std::string, CommonSvcId> &listenerMap = IpcServerListenermgr::GetInstance().GetAllListeners();
+    for (const auto &kv : listenerMap) {
+        pkgNameList.push_back(kv.first);
+    }
+    return pkgNameList;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

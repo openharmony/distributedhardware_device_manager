@@ -19,29 +19,7 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
-    static_library("devicemanagersdk_mini") {
-      include_dirs = []
-
-      sources = []
-
-      defines = [
-        "__LITEOS_M__",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerkit\"",
-        "LOG_DOMAIN=0xD004100",
-      ]
-
-      deps = [ "//third_party/bounds_checking_function:libsec_static" ]
-
-      external_deps = [
-        "hilog_lite:hilog_static",
-        "ipc:ipc_single",
-        "napi:ace_napi",
-        "utils_lite:utils",
-      ]
-    }
-  } else {
+  if (ohos_kernel_type == "linux") {
     shared_library("devicemanagersdk") {
       include_dirs = [
         "include",
@@ -61,9 +39,18 @@ if (defined(ohos_lite)) {
         "${utils_lite_path}/include",
         "//third_party/bounds_checking_function/include",
         "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
+        "${interfaces_path}/c/ipc/include",
+        "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       ]
 
       sources = [
+        "${common_path}/src/dfx/lite/dm_hidumper.cpp",
+        "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
+        "${common_path}/src/dfx/lite/dm_hitrace.cpp",
+        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_log.cpp",
         "src/device_manager.cpp",
         "src/device_manager_impl.cpp",
         "src/ipc/ipc_client_proxy.cpp",
@@ -74,13 +61,23 @@ if (defined(ohos_lite)) {
         "src/notify/device_manager_notify.cpp",
       ]
 
-      deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
       defines = [
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerkit\"",
         "LOG_DOMAIN=0xD004100",
+      ]
+
+      deps = [
+        "${utils_path}:devicemanagerutils",
+        "//base/security/device_auth/services:deviceauth_sdk",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
+        "//commonlibrary/utils_lite:utils",
+        "//foundation/communication/dsoftbus:dsoftbus",
+        "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/mbedtls:mbedtls_shared",
       ]
     }
   }

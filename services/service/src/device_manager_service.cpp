@@ -28,7 +28,11 @@
 #include "parameter.h"
 #include "permission_manager.h"
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
+#else
+constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
+#endif
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 
 namespace OHOS {
@@ -684,10 +688,9 @@ bool DeviceManagerService::IsDMServiceImplReady()
     }
     void *so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load libdevicemanagerserviceimpl so %s failed.", soName.c_str());
+        LOGE("load libdevicemanagerserviceimpl so %s failed, errMsg: %s.", soName.c_str(), dlerror());
         return false;
     }
-    dlerror();
     auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
     if (dlerror() != nullptr || func == nullptr) {
         dlclose(so_handle);

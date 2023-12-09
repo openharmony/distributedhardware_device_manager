@@ -130,6 +130,8 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         isStandardMetaNode = (metaType == MetaNodeType::PROXY_TRANSMISION);
     }
 
+    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
+    StartDiscoveryTimer();
     int32_t ret = DM_OK;
     if (isStandardMetaNode) {
         LOGI("StartDiscovering for standard meta node process.");
@@ -144,8 +146,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         return ERR_DM_START_DISCOVERING_FAILED;
     }
 
-    StartDiscoveryTimer();
-    return softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
+    return ret;
 }
 
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,

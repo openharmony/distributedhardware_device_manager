@@ -17,9 +17,9 @@
 
 #include "dm_log.h"
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "account_info.h"
 #include "ohos_account_kits.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
 using namespace OHOS::AccountSA;

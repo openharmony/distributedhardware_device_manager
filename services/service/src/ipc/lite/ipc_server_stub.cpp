@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,12 +144,12 @@ static BOOL Initialize(Service *service, Identity identity)
         return FALSE;
     }
 
-    DeviceManagerSamgrService *mgrService = static_cast<DeviceManagerSamgrService *>(service);
+    DeviceManagerSamgrService *mgrService = reinterpret_cast<DeviceManagerSamgrService *>(service);
     mgrService->identity = identity;
     return TRUE;
 }
 
-static BOOL MessageHandle(const Service *service, const Request *request)
+static BOOL MessageHandle(Service *service, Request *request)
 {
     if ((service == nullptr) || (request == nullptr)) {
         LOGW("invalid param");
