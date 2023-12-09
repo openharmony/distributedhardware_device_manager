@@ -126,8 +126,7 @@ private:
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void SubscribeCommonEvent();
-    void PutIdenticalAccountToAcl(std::string accountId, int32_t userId,
-        std::string requestDeviceId, std::string trustDeviceId);
+    void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;

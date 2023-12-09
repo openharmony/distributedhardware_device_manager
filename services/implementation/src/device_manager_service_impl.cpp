@@ -612,8 +612,7 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     return authMgr_->BindTarget(pkgName, targetId, bindParam);
 }
 
-void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string accountId, int32_t userId,
-    std::string requestDeviceId, std::string trustDeviceId)
+void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId)
 {
     LOGI("DeviceManagerServiceImpl::PutIdenticalAccountAcl start.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};

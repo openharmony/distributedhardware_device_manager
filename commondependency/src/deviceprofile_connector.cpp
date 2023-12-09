@@ -562,7 +562,7 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
     for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != deviceId && item.GetStatus() != ACTIVE) {
+        if (item.GetTrustDeviceId() != remoteDeviceId && item.GetStatus() != ACTIVE) {
             continue;
         }
         if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
