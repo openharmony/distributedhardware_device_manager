@@ -1694,16 +1694,41 @@ void DmAuthManager::RequestSyncDeleteAcl()
         });
 }
 
-void DmAuthManager::SyncDeleteAclDone()
+void DmAuthManager::SrcSyncDeleteAclDone()
 {
-    LOGI("SyncDeleteAclDone start.");
-    if (authRequestState_ != nullptr) {
-        if (isFinishOfLocal_) {
-            authMessageProcessor_->SetResponseContext(authResponseContext_);
-            std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
-            softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
-            usleep(USLEEP_TIME_MS);
+    LOGI("DmAuthManager::SrcSyncDeleteAclDone");
+    if (isFinishOfLocal_) {
+        authMessageProcessor_->SetResponseContext(authResponseContext_);
+        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
+        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
+        usleep(USLEEP_TIME_MS);
+    }
+    if (authResponseContext_->reply == DM_OK) {
+        char localUdid[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+        if (hiChainConnector_->IsDevicesInP2PGroup(remoteDeviceId_, localUdid) &&
+            DeviceProfileConnector::GetInstance().CheckDeviceIdInAcl(authResponseContext_->hostPkgName,
+            remoteDeviceId_)) {
+            DeleteGroup(authResponseContext_->hostPkgName, remoteDeviceId_);
         }
+        DeleteAcl(authResponseContext_->hostPkgName, remoteDeviceId_);
+    }
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+    timer_->DeleteAll();
+    isFinishOfLocal_ = true;
+    authRequestContext_ = nullptr;
+    authResponseContext_ = nullptr;
+    authRequestState_ = nullptr;
+    authMessageProcessor_ = nullptr;
+}
+
+void DmAuthManager::SinkSyncDeleteAclDone()
+{
+    LOGI("DmAuthManager::SinkSyncDeleteAclDone");
+    if (isFinishOfLocal_) {
+        authMessageProcessor_->SetResponseContext(authResponseContext_);
+        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
+        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         if (authResponseContext_->reply == DM_OK) {
             char localUdid[DEVICE_UUID_LENGTH] = {0};
             GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
@@ -1714,34 +1739,21 @@ void DmAuthManager::SyncDeleteAclDone()
             }
             DeleteAcl(authResponseContext_->hostPkgName, remoteDeviceId_);
         }
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
-        timer_->DeleteAll();
-        isFinishOfLocal_ = true;
-        authRequestContext_ = nullptr;
-        authResponseContext_ = nullptr;
-        authRequestState_ = nullptr;
-        authMessageProcessor_ = nullptr;
+    }
+    timer_->DeleteAll();
+    isFinishOfLocal_ = true;
+    authResponseContext_ = nullptr;
+    authResponseState_ = nullptr;
+    authMessageProcessor_ = nullptr;
+}
+
+void DmAuthManager::SyncDeleteAclDone()
+{
+    LOGI("SyncDeleteAclDone start.");
+    if (authRequestState_ != nullptr) {
+        SrcSyncDeleteAclDone();
     } else if (authResponseState_ != nullptr) {
-        if (isFinishOfLocal_) {
-            authMessageProcessor_->SetResponseContext(authResponseContext_);
-            std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
-            softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
-            if (authResponseContext_->reply == DM_OK) {
-                char localUdid[DEVICE_UUID_LENGTH] = {0};
-                GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
-                if (hiChainConnector_->IsDevicesInP2PGroup(remoteDeviceId_, localUdid) &&
-                    DeviceProfileConnector::GetInstance().CheckDeviceIdInAcl(authResponseContext_->hostPkgName,
-                    remoteDeviceId_)) {
-                    DeleteGroup(authResponseContext_->hostPkgName, remoteDeviceId_);
-                }
-                DeleteAcl(authResponseContext_->hostPkgName, remoteDeviceId_);
-            }
-        }
-        timer_->DeleteAll();
-        isFinishOfLocal_ = true;
-        authResponseContext_ = nullptr;
-        authResponseState_ = nullptr;
-        authMessageProcessor_ = nullptr;
+        SinkSyncDeleteAclDone();
     }
 }
 
@@ -1788,6 +1800,62 @@ bool DmAuthManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, u
     return true;
 }
 
+void DmAuthManager::SrcAuthDeviceFinish()
+{
+    if (authResponseContext_->isOnline) {
+        if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
+            (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
+            authResponseContext_->haveCredential)) {
+            if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
+                softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
+            }
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
+            authRequestContext_->reason = DM_OK;
+            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            return;
+        }
+        if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
+            !authResponseContext_->haveCredential) {
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
+            if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
+                softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
+            }
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
+            return;
+        }
+    }
+    if (!authResponseContext_->isOnline && authResponseContext_->haveCredential) {
+        softbusConnector_->JoinLnn(authRequestContext_->ip);
+        timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
+        authRequestContext_->reason = DM_OK;
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return;
+    }
+    if (!authResponseContext_->isOnline && !authResponseContext_->haveCredential) {
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
+        return;
+    }
+}
+
+void DmAuthManager::SinkAuthDeviceFinish()
+{
+    if (!authResponseContext_->haveCredential) {
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
+    }
+    if (authResponseContext_->isOnline) {
+        LOGI("The device is online.");
+        if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
+            softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
+        }
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+    }
+}
+
 void DmAuthManager::AuthDeviceFinish(int64_t requestId)
 {
     LOGI("DmAuthManager::AuthDeviceFinish start.");
@@ -1799,56 +1867,10 @@ void DmAuthManager::AuthDeviceFinish(int64_t requestId)
     timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         PutAccessControlList();
-        if (authResponseContext_->isOnline) {
-            if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
-                (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
-                authResponseContext_->haveCredential)) {
-                if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
-                    softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
-                }
-                softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
-                timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
-                authRequestContext_->reason = DM_OK;
-                authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-                return;
-            }
-            if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
-                !authResponseContext_->haveCredential) {
-                authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
-                if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
-                    softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
-                }
-                softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
-                return;
-            }
-        }
-        if (!authResponseContext_->isOnline && authResponseContext_->haveCredential) {
-            softbusConnector_->JoinLnn(authRequestContext_->ip);
-            timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
-            authRequestContext_->reason = DM_OK;
-            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            return;
-        }
-        if (!authResponseContext_->isOnline && !authResponseContext_->haveCredential) {
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
-            return;
-        }
+        SrcAuthDeviceFinish();
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
         PutAccessControlList();
-        if (!authResponseContext_->haveCredential) {
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
-        }
-        if (authResponseContext_->isOnline) {
-            LOGI("The device is online.");
-            if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
-                softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
-            }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
-        }
+        SinkAuthDeviceFinish();
     }
 }
 
@@ -2123,7 +2145,7 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
     authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
 
-    authResponseContext_->bindType = 
+    authResponseContext_->bindType =
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();

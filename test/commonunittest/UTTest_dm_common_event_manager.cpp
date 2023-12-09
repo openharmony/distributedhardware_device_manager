@@ -137,7 +137,7 @@ HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_003, testing::ext::TestSiz
         std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
     systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
     std::vector<std::string> event = systemAbilityStatusChangeListener->changeSubscriber_->GetSubscriberEventNameVec();
-    EXPECT_EQ(event, "strEventVec");
+    EXPECT_EQ(event, strEventVec);
 }
 
 /**
@@ -181,7 +181,7 @@ HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Le
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
     commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEventVec);
     commonEventManager->subscriber_->OnReceiveEvent(data);
-    EXPECT_NE(commonEventManager->subscriber_->GetSubscriberEventNameVec(), "changeEventVec");
+    EXPECT_NE(commonEventManager->subscriber_->GetSubscriberEventNameVec(), changeEventVec);
 }
 
 /**

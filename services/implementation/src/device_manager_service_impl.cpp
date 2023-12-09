@@ -250,7 +250,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
-    std::string requestDeviceId =static_cast<std::string>(localUdid);
+    std::string requestDeviceId = static_cast<std::string>(localUdid);
     DmOfflineParam offlineParam =
         DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
     LOGI("The offline device bind type is %d.", offlineParam.bindType);

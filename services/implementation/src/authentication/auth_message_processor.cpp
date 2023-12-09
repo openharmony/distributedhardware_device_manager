@@ -40,13 +40,8 @@ AuthMessageProcessor::~AuthMessageProcessor()
     authMgr_.reset();
 }
 
-std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
+void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
 {
-    LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
-    std::vector<std::string> jsonStrVec;
-    int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
-    int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
-    nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
@@ -73,6 +68,21 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_APP_NAME] = authRequestContext_->appName;
     jsonObj[TAG_APP_DESCRIPTION] = authRequestContext_->appDesc;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
+    jsonObj[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
+    for (uint32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
+        auto itemStr = std::to_string(item);
+        json[itemStr] = authResponseContext_->bindType[item];
+    }
+}
+
+std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
+{
+    LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
+    std::vector<std::string> jsonStrVec;
+    int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
+    int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
+    nlohmann::json jsonObj;
+    GetJsonObj(jsonObj);
     jsonStrVec.push_back(jsonObj.dump());
 
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
@@ -177,11 +187,6 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
-    json[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
-    for (int32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
-        auto itemStr = std::to_string(item);
-        json[itemStr] = authResponseContext_->bindType[item];
-    }
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -207,7 +212,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
     json[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
-    for (int32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
+    for (uint32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
         auto itemStr = std::to_string(item);
         json[itemStr] = authResponseContext_->bindType[item];
     }
@@ -397,6 +402,16 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
         authResponseContext_->isShowDialog = json[TAG_IS_SHOW_DIALOG].get<bool>();
     } else {
         authResponseContext_->isShowDialog = true;
+    }
+    if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
+        int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
+        authResponseContext_->bindType.clear();
+        for (int32_t item = 0; item < bindTypeSize; item++) {
+            std::string itemStr = std::to_string(item);
+            if (IsInt32(json, itemStr)) {
+                authResponseContext_->bindType.push_back(json[itemStr].get<int32_t>());
+            }
+        }
     }
     return DM_OK;
 }

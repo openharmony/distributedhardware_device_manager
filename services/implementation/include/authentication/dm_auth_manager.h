@@ -488,6 +488,10 @@ private:
     void UserChangeEventCallback(int32_t userId);
     std::string GenerateBindResultContent();
     void GetAuthRequestContext();
+    void SinkAuthDeviceFinish();
+    void SrcAuthDeviceFinish();
+    void SrcSyncDeleteAclDone();
+    void SinkSyncDeleteAclDone();
 
 public:
     void RequestCredential();

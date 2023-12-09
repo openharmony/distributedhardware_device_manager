@@ -89,7 +89,6 @@ std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm)
 {
-    LOGI("GetDeviceAclParam start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
@@ -97,12 +96,10 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
             LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;
         }
-        std::string trustDeviceIdHash = static_cast<std::string>(deviceIdHash);
-        if (trustDeviceIdHash != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
+        if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-            LOGI("The found device is identical account.");
             isonline = true;
             authForm = DmAuthForm::IDENTICAL_ACCOUNT;
         } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == DEVICE) {
@@ -209,8 +206,8 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
     return bindTypeVec;
 }
 
-void DeviceProfileConnector::CompareBindType(std::vector<AccessControlProfile> profiles,
-    std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex)
+void DeviceProfileConnector::CompareBindType(std::vector<AccessControlProfile> profiles, std::string pkgName
+    std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, std::string localDeviceId)
 {
     for (uint32_t index = 0; index < profiles.size(); index++) {
         if (profiles[index].GetTrustDeviceId() != targetDeviceId || profiles[index].GetStatus() != ACTIVE) {

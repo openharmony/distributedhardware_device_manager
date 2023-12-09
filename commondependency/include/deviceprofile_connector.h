@@ -99,7 +99,7 @@ public:
     std::map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName, const std::string &deviceId);
     DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId);
     std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
-        std::string trustUdidHash);
+        std::string trustUdid);
     std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm);
@@ -115,8 +115,8 @@ public:
     int32_t GetTrustNumber(const std::string &deviceId);
     bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
     bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId);
-    void CompareBindType(std::vector<AccessControlProfile> profiles, std::vector<int32_t> &sinkBindType,
-        std::vector<int32_t> &bindTypeIndex);
+    void CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles, std::string pkgName
+        std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, std::string localDeviceId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
