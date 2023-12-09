@@ -1955,7 +1955,7 @@ void DmAuthManager::CompatiblePutAcl()
     aclInfo.trustDeviceId = remoteDeviceId_;
     if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         aclInfo.authenticationType = ALLOW_AUTH_ALWAYS;
-    } else if (action_ = USER_OPERATION_TYPE_ALLOW_AUTH) {
+    } else if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH) {
         aclInfo.authenticationType = ALLOW_AUTH_ONCE;
     }
     aclInfo.deviceIdHash = localUdidHash;
