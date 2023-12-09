@@ -885,6 +885,7 @@ ohos_static_library("device_manager_test_common") {
     "${access_token_path}/accesstoken:libaccesstoken_sdk",
     "${access_token_path}/nativetoken:libnativetoken",
     "${access_token_path}/token_setproc:libtoken_setproc",
+    "${devicemanager_path}/commondependency:devicemanagerdependency",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
     "${devicemanager_path}/radar:devicemanagerradar",
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",

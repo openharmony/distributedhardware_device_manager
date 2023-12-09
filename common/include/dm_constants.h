@@ -185,6 +185,7 @@ const std::string PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 const std::string DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
 const std::string BIND_LEVEL = "bindLevel";
 const std::string TOKENID = "tokenId";
+const std::string DM_BIND_RESULT_NETWORK_ID = "tokenId";
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_CONSTANTS_H
+#endif // OHOS_DM_CONSTANTS_H 

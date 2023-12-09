@@ -91,7 +91,6 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
 {
     LOGI("GetDeviceAclParam start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), (uint8_t *)deviceIdHash) != DM_OK) {
@@ -99,8 +98,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
             return ERR_DM_FAILED;
         }
         std::string trustDeviceIdHash = static_cast<std::string>(deviceIdHash);
-        if (trustDeviceIdHash.substr(0, DEVICEID_LEN) != discoveryInfo.remoteDeviceIdHash.substr(0, DEVICEID_LEN) ||
-            item.GetStatus() != ACTIVE) {
+        if (trustDeviceIdHash != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
@@ -121,6 +119,18 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
             LOGI("The found device is peer-to-peer app bind-level.");
             isonline = true;
             authForm = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+            (discoveryInfo.pkgname == item.GetAccessee().GetAccesseeBundleName() &&
+            discoveryInfo.localDeviceId == item.GetAccessee().GetAccesseeDeviceId())) {
+            LOGI("The found device is acrooc-account app bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (discoveryInfo.pkgname == item.GetAccesser().GetAccesserBundleName() &&
+            discoveryInfo.localDeviceId == item.GetAccesser().GetAccesserDeviceId())) {
+            LOGI("The found device is peer-to-peer app bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::ACROSS_ACCOUNT;
         } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
             (discoveryInfo.pkgname == item.GetAccessee().GetAccesseeBundleName() &&
             discoveryInfo.localDeviceId == item.GetAccessee().GetAccesseeDeviceId())) {
@@ -162,19 +172,14 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 }
 
 std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
-    std::string trustUdidHash)
+    std::string trustUdid)
 {
     LOGI("GetBindTypeByPkgName start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
     std::vector<int32_t> bindTypeVec;
     for (auto &item : profiles) {
-        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), (uint8_t *)udidHash) != DM_OK) {
-            LOGE("get udidhash by udid: %s failed.", GetAnonyString(udidHash).c_str());
-        }
-        std::string trustDeviceIdHash = static_cast<std::string>(udidHash);
-        if (trustUdidHash != static_cast<std::string>(udidHash) || item.GetStatus() != ACTIVE) {
+        if (trustUdid != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {

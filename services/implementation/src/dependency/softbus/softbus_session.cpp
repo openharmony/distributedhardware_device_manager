@@ -113,7 +113,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         LOGI("SendData Start encryption.");
     }
     if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed.");
         return ERR_DM_FAILED;
     }
     return DM_OK;

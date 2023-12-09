@@ -42,6 +42,7 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 /**
@@ -53,7 +54,7 @@ const int32_t MAX_PIN_CODE = 999999;
 HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<SoftbusSession> sessionSession = std::shared_ptr<SoftbusSession>();
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     std::string pkgName = "";
@@ -72,7 +73,7 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSiz
 {
     std::string name = "test";
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
@@ -92,7 +93,7 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_002, testing::ext::TestSiz
 {
     std::string name = "test";
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -111,7 +112,7 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_002, testing::ext::TestSiz
 HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<SoftbusSession> sessionSession = std::shared_ptr<SoftbusSession>();
     std::shared_ptr<DmAuthResponseContext> authRequestContext = std::make_shared<DmAuthResponseContext>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -131,7 +132,7 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_001, testing::ext::TestSize.Lev
 HWTEST_F(DmAuthManagerTest, StartAuthProcess_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -152,7 +153,7 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, StartAuthProcess_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -175,7 +176,7 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, StartAuthProcess_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = nullptr;
     int32_t action = 1;
     int32_t ret = authManager->StartAuthProcess(action);
@@ -191,7 +192,7 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_003, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, CreateGroup_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -214,7 +215,7 @@ HWTEST_F(DmAuthManagerTest, CreateGroup_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, CreateGroup_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = nullptr;
     int32_t ret = authManager->CreateGroup();
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -229,7 +230,7 @@ HWTEST_F(DmAuthManagerTest, CreateGroup_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -258,7 +259,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, AddMember_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t pinCode = 33333;
     authManager->authResponseContext_ = nullptr;
     int32_t ret = authManager->AddMember(pinCode);
@@ -274,7 +275,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     authManager->timer_ = std::make_shared<DmTimer>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
@@ -303,7 +304,7 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = nullptr;
     int32_t userId = 1;
     authManager->UserSwitchEventCallback(userId);
@@ -322,7 +323,7 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, SetAuthResponseState_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
     authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
     authManager->SetAuthResponseState(authResponseState);
@@ -339,7 +340,7 @@ HWTEST_F(DmAuthManagerTest, SetAuthResponseState_001, testing::ext::TestSize.Lev
 HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authResponseContext_->code = 123456;
     int32_t ret = authManager->GetPinCode();
@@ -355,7 +356,7 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = nullptr;
     authManager->ShowConfigDialog();
     authManager->ShowAuthInfoDialog();
@@ -373,7 +374,7 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t pageId = 123;
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t ret = authManager->SetPageId(pageId);
@@ -389,7 +390,7 @@ HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t pageId = 123;
     authManager->authResponseContext_ = nullptr;
     authManager->authMessageProcessor_ = nullptr;
@@ -412,7 +413,7 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     const int32_t sessionId = 78;
     int32_t reason = 123;
     int32_t state = 456;
@@ -434,7 +435,7 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     int32_t reason = 1234;
@@ -455,7 +456,7 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_002, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestState_ = nullptr;
     authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
@@ -474,7 +475,7 @@ HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_003, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     bool ret = authManager->IsIdenticalAccount();
     ASSERT_EQ(ret, false);
 }
@@ -488,7 +489,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_001, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t openedSessionId = 66;
     int32_t sessionSide = 0;
     int32_t result = 3;
@@ -509,7 +510,7 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 0;
     std::string deviceId = "113456";
@@ -527,7 +528,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "";
     int32_t authType = 1;
     std::string deviceId = "113456";
@@ -545,7 +546,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
     std::string deviceId = "234568";
@@ -564,7 +565,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_003, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 4;
     std::string deviceId = "deviceIdTest";
@@ -582,7 +583,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_005, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
     std::string deviceId = "deviceIdTest";
@@ -602,7 +603,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_005, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_006, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
     std::string deviceId = "deviceIdTest";
@@ -628,7 +629,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_006, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_007, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
     std::string deviceId = "deviceIdTest";
@@ -651,7 +652,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_007, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, GenerateGroupName_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = nullptr;
     std::string ret = authManager->GenerateGroupName();
     ASSERT_TRUE(ret.empty());
@@ -666,7 +667,7 @@ HWTEST_F(DmAuthManagerTest, GenerateGroupName_001, testing::ext::TestSize.Level0
 HWTEST_F(DmAuthManagerTest, GenerateGroupName_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authResponseContext_->targetPkgName = "targetPkgNameTest";
     authManager->authResponseContext_->localDeviceId = "localDeviceIdTest";
@@ -683,7 +684,7 @@ HWTEST_F(DmAuthManagerTest, GenerateGroupName_002, testing::ext::TestSize.Level0
 HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseState_ = nullptr;
     bool ret = authManager->GetIsCryptoSupport();
     ASSERT_EQ(ret, false);
@@ -698,7 +699,7 @@ HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_001, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
     authManager->authRequestState_ = nullptr;
     bool ret = authManager->GetIsCryptoSupport();
@@ -714,7 +715,7 @@ HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_002, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
     authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     bool ret = authManager->GetIsCryptoSupport();
@@ -730,7 +731,7 @@ HWTEST_F(DmAuthManagerTest, GetIsCryptoSupport_003, testing::ext::TestSize.Level
 HWTEST_F(DmAuthManagerTest, OnUserOperation_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t action = 0;
     std::string params = "paramsTest";
     authManager->authResponseContext_ = nullptr;
@@ -747,7 +748,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
@@ -766,7 +767,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_002, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t action = 2;
     std::string params = "paramsTest2";
@@ -783,7 +784,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_003, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_004, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t action = 3;
     std::string params = "paramsTest3";
@@ -800,7 +801,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_004, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t action = 4;
     std::string params = "paramsTest4";
@@ -817,7 +818,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_006, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->timer_ = std::make_shared<DmTimer>();
@@ -836,7 +837,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_006, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     int32_t action = 1111;
     std::string params = "paramsTest1111";
@@ -853,7 +854,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, UnBindDevice001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
     std::string udidHash = "udidHash";
     int32_t ret = authManager->UnBindDevice(pkgName, udidHash);
@@ -869,7 +870,7 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, UnBindDevice002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName;
     std::string udidHash = "udidHash";
     int32_t ret = authManager->UnBindDevice(pkgName, udidHash);

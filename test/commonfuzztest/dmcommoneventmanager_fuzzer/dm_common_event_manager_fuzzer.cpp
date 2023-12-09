@@ -26,9 +26,11 @@ void DmCommonEventManagerFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string eventName(reinterpret_cast<const char*>(data), size);
+    std::vector<std::string> eventNameVec;
+    eventNameVec.push_back(eventName);
     DmCommonEventManager dmCommonEventManager;
     CommomEventCallback callback;
-    dmCommonEventManager.SubscribeServiceEvent(eventName, callback);
+    dmCommonEventManager.SubscribeServiceEvent(eventNameVec, callback);
 }
 }
 }
