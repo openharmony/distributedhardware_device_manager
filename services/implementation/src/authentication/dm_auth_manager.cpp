@@ -49,7 +49,7 @@ const int32_t MAX_PIN_TOKEN = 90000000;
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 5;
-const int32_t DM_AUTH_TYPE_MIN = 1;
+const int32_t DM_AUTH_TYPE_MIN = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 const int32_t USLEEP_TIME_MS = 500000; // 500ms
 const int32_t DM_APP = 3;
@@ -70,6 +70,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     dmConfigManager.GetAuthAdapter(authenticationMap_);
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
+    authenticationMap_[AUTH_TYPE_CRE] = nullptr;
 }
 
 DmAuthManager::~DmAuthManager()
@@ -174,16 +175,9 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
-int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
-    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    if (ret != DM_OK) {
-        LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
-        return ret;
-    }
-
     authPtr_ = authenticationMap_[authType];
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
@@ -225,6 +219,25 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     authRequestState_->Enter();
     LOGI("DmAuthManager::AuthenticateDevice complete");
+}
+
+int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
+    const std::string &deviceId, const std::string &extra)
+{
+    LOGI("DmAuthManager::AuthenticateDevice start auth type %d.", authType);
+    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
+    if (ret != DM_OK) {
+        LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        return ret;
+    }
+    if (authType == AUTH_TYPE_CRE) {
+        LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
+        softbusConnector_->JoinLnn(deviceId);
+        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
+        listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
+        return DM_OK;
+    }
+    InitAuthState(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 
