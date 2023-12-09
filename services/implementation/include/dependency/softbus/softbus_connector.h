@@ -30,6 +30,7 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
+#include "softbus_state_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -120,6 +121,8 @@ public:
     int32_t RegisterSoftbusPublishCallback(const std::string &pkgName,
                                            const std::shared_ptr<ISoftbusPublishCallback> callback);
     int32_t UnRegisterSoftbusPublishCallback(const std::string &pkgName);
+    int32_t RegisterSoftbusStateCallback(const std::shared_ptr<ISoftbusStateCallback> callback);
+    int32_t UnRegisterSoftbusStateCallback();
     int32_t PublishDiscovery(const DmPublishInfo &dmPublishInfo);
     int32_t UnPublishDiscovery(int32_t publishId);
     int32_t StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo);
@@ -133,16 +136,21 @@ public:
     std::string GetLocalDeviceNetworkId();
     int32_t GetLocalDeviceTypeId();
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
-    std::string GetNetworkIdByUdidHash(const std::string &deviceIdHash);
-    void HandleDeviceOnline(std::string &deviceId);
-    void HandleDeviceOffline(const std::string &deviceId);
-    void SetPkgName(std::string pkgName);
+    std::string GetNetworkIdByDeviceId(const std::string &deviceId);
+    void HandleDeviceOnline(std::string deviceId);
+    void HandleDeviceOffline(std::string deviceId);
+    void SetPkgName(std::string pkgName); 
     bool CheckIsOnline(const std::string &targetDeviceId);
+    void SetPkgNameVec(std::vector<std::string> pkgNameVec);
+    std::vector<std::string> GetPkgName();
+    void ClearPkgName();
+    DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo);
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
+    static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
 
 private:
     enum PulishStatus {
@@ -158,6 +166,7 @@ private:
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
     static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
+    std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
     static std::vector<std::string> pkgNameVec_;

@@ -1126,6 +1126,9 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     int32_t wifiPort = -1;
     JsObjectToInt(env, object, "wifiPort", wifiPort);
 
+    int32_t bindLevel = 0;
+    JsObjectToInt(env, object, "bindLevel", bindLevel);
+
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = bindType;
     jsonObj[APP_OPERATION] = appOperationStr;
@@ -1138,6 +1141,8 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     jsonObj[PARAM_KEY_BLE_MAC] = bleMacStr;
     jsonObj[PARAM_KEY_WIFI_IP] = wifiIPStr;
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
+    jsonObj[BIND_LEVEL] = bindLevel;
+    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     bindParam = jsonObj.dump();
     LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
 }

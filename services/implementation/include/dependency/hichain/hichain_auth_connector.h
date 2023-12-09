@@ -56,9 +56,7 @@ public:
     int32_t ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey);
     int32_t DeleteCredential(const std::string &deviceId, int32_t userId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);
-    int32_t StartAuthDevice(int64_t requestId, const char* authParams, const DeviceAuthCallback* callbak);
-    int32_t ProcessAuthDevice(int64_t requestId, const char* authParams, const DeviceAuthCallback* callbak);
-    int32_t ProcessCredential(int32_t operationCode, const char* requestParams, char** returnData);
+    int32_t GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
 
 private:
     DeviceAuthCallback deviceAuthCallback_;

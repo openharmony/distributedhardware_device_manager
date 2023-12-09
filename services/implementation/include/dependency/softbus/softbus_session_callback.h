@@ -27,6 +27,8 @@ public:
     virtual void OnDataReceived(int32_t sessionId, std::string message) = 0;
     virtual bool GetIsCryptoSupport() = 0;
     virtual AesGcmCipherKey GetSessionKeyAndLen() = 0;
+    virtual void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result) = 0;
+    virtual void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

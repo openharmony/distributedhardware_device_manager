@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t LOG_MAX_LEN = 512;
+const int32_t LOG_MAX_LEN = 1000;
 const std::string DHDM_LOG_TITLE_TAG = "DHDM";
 
 static void DmLogOut(DmLogLevel logLevel, const char *logBuf)

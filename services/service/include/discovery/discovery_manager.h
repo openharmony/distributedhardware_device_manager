@@ -57,6 +57,7 @@ private:
     int32_t StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo, const std::map<std::string, std::string> &param);
     int32_t HandleDiscoveryQueue(const std::string &pkgName, uint16_t subscribeId,
         const std::map<std::string, std::string> &filterOps);
+    int32_t GetDeviceAclParam(const std::string &pkgName, std::string deviceId, bool &isonline, int32_t &authForm);
 
 private:
     std::mutex locks_;

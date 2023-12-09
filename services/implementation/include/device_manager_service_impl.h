@@ -115,10 +115,19 @@ public:
         DmPinType pinType, const std::string &payload);
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
+    std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
+    void OnUnbindSessionOpened(int32_t sessionId, int32_t result);
+    void OnUnbindSessionCloseed(int32_t sessionId);
+    void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
-
+    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void SubscribeCommonEvent();
+    void PutIdenticalAccountToAcl(std::string accountId, int32_t userId,
+        std::string requestDeviceId, std::string trustDeviceId);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -130,6 +139,7 @@ private:
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<DmPinHolder> pinHolder_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

@@ -1151,10 +1151,15 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
     std::string customDescriptionStr = customDescription;
 
+    int32_t bindLevel = 0;
+    JsObjectToInt(env, object, "bindLevel", bindLevel);
+
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = authType;
     jsonObj[APP_OPERATION] = appOperationStr;
     jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
+    jsonObj[BIND_LEVEL] = bindLevel;
+    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     JsToJsonObject(env, object, "extraInfo", jsonObj);
     extra = jsonObj.dump();
     LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());

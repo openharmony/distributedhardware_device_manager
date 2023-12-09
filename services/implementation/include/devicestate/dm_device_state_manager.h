@@ -69,7 +69,8 @@ typedef struct NotifyTask {
     bool threadRunning_ = false;
 } NotifyTask;
 
-class DmDeviceStateManager final : public std::enable_shared_from_this<DmDeviceStateManager> {
+class DmDeviceStateManager final : public ISoftbusStateCallback,
+                                   public std::enable_shared_from_this<DmDeviceStateManager> {
 public:
     DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                          std::shared_ptr<IDeviceManagerServiceListener> listener,
@@ -85,6 +86,10 @@ public:
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
     void DeleteTimeOutGroup(std::string name);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
+    int32_t RegisterSoftbusStateCallback();
+    void OnDeviceOnline(std::string deviceId);
+    void OnDeviceOffline(std::string deviceId);
+    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
 
 private:
     void StartEventThread();
@@ -100,6 +105,7 @@ private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
+    std::map<std::string, DmDeviceInfo> stateDeviceInfos_;
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;

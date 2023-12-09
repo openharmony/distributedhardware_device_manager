@@ -51,6 +51,10 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
         std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
     }
+    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
+        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+    }
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 
@@ -65,11 +69,6 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
     if (pkgName == std::string(DM_PKG_NAME)) {
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
-            std::string udIdHash = CalcDeviceId(it, info.deviceId);
-            if (memcpy_s(deviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN,
-                udIdHash.c_str(), udIdHash.length()) != DM_OK) {
-                LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
-            }
             pReq->SetPkgName(it);
             pReq->SetDeviceState(state);
             pReq->SetDeviceInfo(info);
@@ -80,6 +79,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
         pReq->SetPkgName(pkgName);
         pReq->SetDeviceState(state);
         pReq->SetDeviceInfo(info);
+        pReq->SetDeviceBasicInfo(deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }
 }
@@ -92,10 +92,6 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
 
     DmDeviceBasicInfo devBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, devBasicInfo);
-    std::string udIdHash = CalcDeviceId(pkgName, info.deviceId);
-    if (memcpy_s(devBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
-    }
     pReq->SetDeviceBasicInfo(devBasicInfo);
     pReq->SetPkgName(pkgName);
     pReq->SetSubscribeId(subscribeId);
