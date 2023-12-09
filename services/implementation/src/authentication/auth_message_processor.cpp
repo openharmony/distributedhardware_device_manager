@@ -44,7 +44,6 @@ void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
 {
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
-    jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_INDEX] = 0;
     jsonObj[TAG_REQUESTER] = authRequestContext_->localDeviceName;
     jsonObj[TAG_DEVICE_ID] = authRequestContext_->deviceId;
@@ -67,11 +66,10 @@ void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
     jsonObj[TAG_CUSTOM_DESCRIPTION] = authRequestContext_->customDesc;
     jsonObj[TAG_APP_NAME] = authRequestContext_->appName;
     jsonObj[TAG_APP_DESCRIPTION] = authRequestContext_->appDesc;
-    jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     jsonObj[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
     for (uint32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
-        auto itemStr = std::to_string(item);
-        json[itemStr] = authResponseContext_->bindType[item];
+        std::string itemStr = std::to_string(item);
+        jsonObj[itemStr] = authResponseContext_->bindType[item];
     }
 }
 
@@ -82,6 +80,8 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
     int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
     nlohmann::json jsonObj;
+    jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
+    jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     GetJsonObj(jsonObj);
     jsonStrVec.push_back(jsonObj.dump());
 

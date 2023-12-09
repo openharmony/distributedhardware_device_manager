@@ -819,7 +819,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     std::vector<int32_t> bindType =
         DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
-    authResponseContext_->authed = !authResponseContext_->bindType.empty()
+    authResponseContext_->authed = !authResponseContext_->bindType.empty();
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
         listener_->OnAuthResult(authResponseContext_->hostPkgName, authRequestContext_->deviceId,
             authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
@@ -1223,7 +1223,7 @@ void DmAuthManager::ShowConfigDialog()
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    DeviceProfileConnector::GetInstance().SyncAclByBindType.SyncAclByBindType(authResponseContext_->hostPkgName,
+    DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, localUdid, remoteDeviceId_);
     std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
     showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
@@ -2147,7 +2147,7 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
 
     authResponseContext_->bindType =
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
-        authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
+        authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     authResponseContext_->haveCredential =
