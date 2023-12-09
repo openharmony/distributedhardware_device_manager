@@ -934,6 +934,11 @@ void DmAuthManager::StartRespAuthProcess()
     }
     LOGI("DmAuthManager::StartRespAuthProcess sessionId = %d", authResponseContext_->sessionId);
     timer_->DeleteTimer(std::string(CONFIRM_TIMEOUT_TASK));
+    if (authResponseContext_->groupName[CHECK_AUTH_ALWAYS_POS] == AUTH_ALWAYS) {
+        action_ = USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    } else if (authResponseContext_->groupName[CHECK_AUTH_ALWAYS_POS] == AUTH_ONCE) {
+        action_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    }
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
         timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
             [this] (std::string name) {
@@ -1950,7 +1955,7 @@ void DmAuthManager::CompatiblePutAcl()
     aclInfo.trustDeviceId = remoteDeviceId_;
     if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         aclInfo.authenticationType = ALLOW_AUTH_ALWAYS;
-    } else {
+    } else if (action_ = USER_OPERATION_TYPE_ALLOW_AUTH) {
         aclInfo.authenticationType = ALLOW_AUTH_ONCE;
     }
     aclInfo.deviceIdHash = localUdidHash;
