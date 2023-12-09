@@ -209,15 +209,9 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
     return bindTypeVec;
 }
 
-std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
-    std::string localDeviceId, std::string targetDeviceId)
+void DeviceProfileConnector::CompareBindType(std::vector<AccessControlProfile> profiles,
+    std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex)
 {
-    LOGI("SyncAclByBindType start.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
-    std::vector<int32_t> bindType;
     for (uint32_t index = 0; index < profiles.size(); index++) {
         if (profiles[index].GetTrustDeviceId() != targetDeviceId || profiles[index].GetStatus() != ACTIVE) {
             continue;
@@ -253,6 +247,18 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
             bindTypeIndex.push_back(index);
         }
     }
+}
+
+std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
+    std::string localDeviceId, std::string targetDeviceId)
+{
+    LOGI("SyncAclByBindType start.");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    std::vector<int32_t> sinkBindType;
+    std::vector<int32_t> bindTypeIndex;
+    std::vector<int32_t> bindType;
+    CompareBindType(profiles, sinkBindType, bindTypeIndex);
     for (uint32_t sinkIndex = 0; sinkIndex < sinkBindType.size(); sinkIndex++) {
         bool deleteAclFlag = true;
         for (uint32_t srcIndex = 0; srcIndex < bindTypeVec.size(); srcIndex++) {

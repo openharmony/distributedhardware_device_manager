@@ -283,7 +283,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
-    std::string requestDeviceId =static_cast<std::string>(localUdid);
+    std::string requestDeviceId = static_cast<std::string>(localUdid);
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     LOGI("The online device bind type is %d.", bindType);
     if (bindType == INVALIED_TYPE) {

@@ -481,12 +481,13 @@ private:
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
-	void CompatiblePutAcl();
+    void CompatiblePutAcl();
     void ProRespNegotiateExt(const int32_t &sessionId);
     void ProRespNegotiate(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
     std::string GenerateBindResultContent();
+    void GetAuthRequestContext();
 
 public:
     void RequestCredential();
@@ -522,7 +523,7 @@ private:
     int32_t AuthDevice(int32_t pinCode);
     void SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId);
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
-    void PutAccessControlList();	
+    void PutAccessControlList();
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
 

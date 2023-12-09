@@ -139,7 +139,7 @@ public:
     std::string GetNetworkIdByDeviceId(const std::string &deviceId);
     void HandleDeviceOnline(std::string deviceId);
     void HandleDeviceOffline(std::string deviceId);
-    void SetPkgName(std::string pkgName); 
+    void SetPkgName(std::string pkgName);
     bool CheckIsOnline(const std::string &targetDeviceId);
     void SetPkgNameVec(std::vector<std::string> pkgNameVec);
     std::vector<std::string> GetPkgName();

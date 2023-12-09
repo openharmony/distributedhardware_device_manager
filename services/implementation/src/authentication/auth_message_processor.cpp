@@ -198,7 +198,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
     json[TAG_IS_AUTH_CODE_READY] = authResponseContext_->isAuthCodeReady;
-	json[TAG_NET_ID] = authResponseContext_->networkId;
+    json[TAG_NET_ID] = authResponseContext_->networkId;
     json[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
     json[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
     json[TAG_ISONLINE] = authResponseContext_->isOnline;
@@ -532,7 +532,8 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     if (IsString(json, TAG_NET_ID)) {
         authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
     }
-	ParsePkgNegotiateMessage(json);
+
+    ParsePkgNegotiateMessage(json);
 }
 
 void AuthMessageProcessor::SetRequestContext(std::shared_ptr<DmAuthRequestContext> authRequestContext)

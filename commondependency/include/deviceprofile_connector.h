@@ -115,6 +115,8 @@ public:
     int32_t GetTrustNumber(const std::string &deviceId);
     bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
     bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId);
+    void CompareBindType(std::vector<AccessControlProfile> profiles, std::vector<int32_t> &sinkBindType,
+        std::vector<int32_t> &bindTypeIndex);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

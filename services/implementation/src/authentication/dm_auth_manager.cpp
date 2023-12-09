@@ -67,7 +67,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<IDeviceManagerServiceListener> listener,
                              std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector)
     : softbusConnector_(softbusConnector), hiChainConnector_(hiChainConnector), listener_(listener),
-        hiChainAuthConnector_(hiChainAuthConnector)
+      hiChainAuthConnector_(hiChainAuthConnector)
 {
     LOGI("DmAuthManager constructor");
     DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
@@ -142,7 +142,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->hostPkgName = pkgName;
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
-    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId(); 
+    authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
     authRequestContext_->localDeviceId = localUdid;
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->ip = deviceId;
@@ -788,9 +788,8 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     }
 }
 
-void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
+void DmAuthManager::GetAuthRequestContext()
 {
-    LOGI("ProcessAuthRequestExt start.");
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
     DmSoftbusAdapterCrypto::GetUdidHash(authResponseContext_->localDeviceId, (uint8_t *)deviceIdHash);
     authRequestContext_->deviceId = static_cast<std::string>(deviceIdHash);
@@ -811,7 +810,12 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     } else {
         authResponseContext_->haveCredential = false;
     }
+}
 
+void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
+{
+    LOGI("ProcessAuthRequestExt start.");
+    GetAuthRequestContext();
     std::vector<int32_t> bindType =
         DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
@@ -2120,13 +2124,10 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
     authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
 
     authResponseContext_->bindType = 
-        DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
+        DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
-    authResponseContext_->bindType =
-        DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
-        authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->haveCredential =
         hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId, authResponseContext_->localUserId);
 

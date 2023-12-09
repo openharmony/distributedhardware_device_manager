@@ -1081,7 +1081,6 @@ void DeviceManagerNapi::JsToDmPublishInfo(const napi_env &env, const napi_value 
 void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
     int32_t &bindType, bool &isMetaType)
 {
-    LOGI("JsToBindParam in.");
     int32_t bindTypeTemp = -1;
     JsObjectToInt(env, object, "bindType", bindTypeTemp);
     bindType = bindTypeTemp;
@@ -1144,7 +1143,6 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     jsonObj[BIND_LEVEL] = bindLevel;
     jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     bindParam = jsonObj.dump();
-    LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,

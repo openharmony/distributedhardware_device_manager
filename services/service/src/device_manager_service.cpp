@@ -124,9 +124,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
         for (auto item : onlineDeviceList) {
             std::string udid = "";
-            if (SoftbusListener::GetUdidByNetworkId(item.networkId, udid) != DM_OK) {
-                LOGE("SoftbusListener GetUdidByNetworkId failed.");
-            }
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
                 std::string deviceIdHash = "";
                 dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
@@ -161,9 +159,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
         for (auto item : onlineDeviceList) {
             std::string udid = "";
-            if (SoftbusListener::GetUdidByNetworkId(item.networkId, udid) != DM_OK) {
-                LOGE("SoftbusListener GetUdidByNetworkId failed.");
-            }
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
                 std::string deviceIdHash = "";
                 dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
