@@ -1081,7 +1081,6 @@ void DeviceManagerNapi::JsToDmPublishInfo(const napi_env &env, const napi_value 
 void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
     int32_t &bindType, bool &isMetaType)
 {
-    LOGI("JsToBindParam in.");
     int32_t bindTypeTemp = -1;
     JsObjectToInt(env, object, "bindType", bindTypeTemp);
     bindType = bindTypeTemp;
@@ -1126,6 +1125,9 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     int32_t wifiPort = -1;
     JsObjectToInt(env, object, "wifiPort", wifiPort);
 
+    int32_t bindLevel = 0;
+    JsObjectToInt(env, object, "bindLevel", bindLevel);
+
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = bindType;
     jsonObj[APP_OPERATION] = appOperationStr;
@@ -1138,8 +1140,9 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
     jsonObj[PARAM_KEY_BLE_MAC] = bleMacStr;
     jsonObj[PARAM_KEY_WIFI_IP] = wifiIPStr;
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
+    jsonObj[BIND_LEVEL] = bindLevel;
+    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     bindParam = jsonObj.dump();
-    LOGI("appOperationLen %d, customDescriptionLen %d.", appOperationStr.size(), customDescriptionStr.size());
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,

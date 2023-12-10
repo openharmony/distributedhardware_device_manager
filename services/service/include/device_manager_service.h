@@ -175,6 +175,10 @@ public:
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
 
+    void OnUnbindSessionOpened(int32_t sessionId, int32_t result);
+    void OnUnbindSessionCloseed(int32_t sessionId);
+    void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

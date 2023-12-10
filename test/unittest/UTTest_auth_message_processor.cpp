@@ -45,6 +45,7 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
 /**
  * @tc.name: AuthMessageProcessor::AuthMessageProcessor_001
  * @tc.desc: 1 set cryptoAdapter_ to null
@@ -56,7 +57,7 @@ std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainCo
 HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> Test =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     ASSERT_NE(Test, nullptr);
 }
 
@@ -71,7 +72,7 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestS
 HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> Test =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     Test.reset();
     EXPECT_EQ(Test, nullptr);
 }
@@ -87,7 +88,7 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestS
 HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -124,7 +125,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::Tes
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     nlohmann::json jsona;
@@ -151,7 +152,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsona;
@@ -190,7 +191,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsona;
@@ -213,7 +214,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext:
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -235,7 +236,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext:
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
@@ -254,7 +255,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_003, testing::ext:
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::string str = R"(
@@ -277,7 +278,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsona;
@@ -312,7 +313,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -345,7 +346,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -375,7 +376,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::Te
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -402,7 +403,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::Te
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -433,7 +434,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::Test
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -461,7 +462,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::Test
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -489,7 +490,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::Test
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -517,7 +518,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::Test
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -545,7 +546,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -573,7 +574,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_001, testing::ext::
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -593,7 +594,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -613,7 +614,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_001, testing::ext::TestSize
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->SetRequestContext(authRequestContext);
@@ -630,7 +631,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_002, testing::ext::TestSize
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->SetRequestContext(nullptr);
@@ -647,7 +648,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_001, testing::ext::TestSiz
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -664,7 +665,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_002, testing::ext::TestSiz
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(nullptr);
@@ -681,7 +682,7 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_001, testing::ext::TestSiz
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<DmAuthResponseContext> authResponseContext = authMessageProcessor->GetResponseContext();
@@ -698,7 +699,7 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSiz
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<DmAuthResponseContext> authResponseContext = authMessageProcessor->GetResponseContext();
@@ -715,7 +716,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSi
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -740,7 +741,7 @@ HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->SetRequestContext(authRequestContext);
@@ -758,7 +759,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -786,7 +787,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -814,7 +815,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -855,7 +856,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -887,7 +888,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
@@ -912,7 +913,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Leve
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);

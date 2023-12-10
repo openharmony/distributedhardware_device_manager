@@ -21,6 +21,7 @@
 #include "dm_constants.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,10 +29,11 @@ using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
 
 constexpr const char* DEAL_THREAD = "common_event";
+constexpr int32_t MAX_TRY_TIMES = 3;
 
-std::string DmEventSubscriber::GetSubscriberEventName() const
+std::vector<std::string> DmEventSubscriber::GetSubscriberEventNameVec() const
 {
-    return eventName_;
+    return eventNameVec_;
 }
 
 DmCommonEventManager::~DmCommonEventManager()
@@ -39,22 +41,25 @@ DmCommonEventManager::~DmCommonEventManager()
     DmCommonEventManager::UnsubscribeServiceEvent();
 }
 
-bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback &callback)
+bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> &eventNameVec,
+    const CommomEventCallback &callback)
 {
-    if (eventName.empty() || callback == nullptr) {
+    if (eventNameVec.empty() || callback == nullptr) {
         LOGE("enentNsmr is empty or callback is nullptr.");
         return false;
     }
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
-        LOGE("failed to subscribe commom eventName: %s.", eventName.c_str());
+        LOGE("failed to subscribe commom eventName size: %d.", eventNameVec.size());
         return false;
     }
 
     MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(eventName);
+    for (auto &item : eventNameVec) {
+        matchingSkills.AddEvent(item);
+    }
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, eventName);
+    subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, eventNameVec);
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         LOGE("samgrProxy is nullptr");
@@ -67,16 +72,20 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::string &eventName, c
         subscriber_ = nullptr;
         return false;
     }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    if (ret != ERR_OK) {
-        LOGE("failed to subscribe system ability COMMON_EVENT_SERVICE_ID ret:%d", ret);
-        subscriber_ = nullptr;
-        statusChangeListener_ = nullptr;
-        return false;
+    while (counter_ != MAX_TRY_TIMES) {
+        if (samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_) == ERR_OK) {
+            LOGI("SubscribeServiceEvent success.");
+            counter_ = 0;
+            break;
+        }
+        if (++counter_ == MAX_TRY_TIMES) {
+            LOGI("SubscribeServiceEvent failed.");
+        }
+        sleep(1);
     }
-    eventName_ = eventName;
+    eventNameVec_ = eventNameVec;
     eventValidFlag_ = true;
-    LOGI("success to subscribe commom eventName: %s", eventName.c_str());
+    LOGI("success to subscribe commom event name size: %d", eventNameVec.size());
     return true;
 }
 
@@ -84,16 +93,16 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
 {
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
-        LOGE("failed to unsubscribe commom eventName: %s because event is invalid.", eventName_.c_str());
+        LOGE("failed to unsubscribe commom event name size: %d because event is invalid.", eventNameVec_.size());
         return false;
     }
     if (subscriber_ != nullptr) {
-        LOGI("start to unsubscribe commom eventName: %s", eventName_.c_str());
+        LOGI("start to unsubscribe commom event name size: %d", eventNameVec_.size());
         if (!CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
-            LOGE("failed to unsubscribe commom eventName: %s.", eventName_.c_str());
+            LOGE("failed to unsubscribe commom event name size: %d", eventNameVec_.size());
             return false;
         }
-        LOGI("success to unsubscribe commom eventName: %s.", eventName_.c_str());
+        LOGI("success to unsubscribe commom event name size: %d", eventNameVec_.size());
         subscriber_ = nullptr;
     }
     if (statusChangeListener_ != nullptr) {
@@ -110,7 +119,7 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
         statusChangeListener_ = nullptr;
     }
 
-    LOGI("success to unsubscribe commom eventName: %s", eventName_.c_str());
+    LOGI("success to unsubscribe commom event name size: %d", eventNameVec_.size());
     eventValidFlag_ = false;
     return true;
 }
@@ -119,11 +128,12 @@ void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     LOGI("Received event: %s", receiveEvent.c_str());
-    if (receiveEvent != eventName_) {
-        LOGE("Received event and local event is not match");
-        return;
-    }
     int32_t userId = data.GetCode();
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        userId = data.GetCode();
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        userId = data.GetWant().GetIntParam("userId", 0);
+    }
     if (userId <= 0) {
         LOGE("userId is less zero");
         return;
@@ -147,10 +157,10 @@ void DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility
         LOGE("failed to subscribe commom event because changeSubscriber_ is nullptr.");
         return;
     }
-    std::string eventName = changeSubscriber_->GetSubscriberEventName();
-    LOGI("start to subscribe commom eventName: %s", eventName.c_str());
+    std::vector<std::string> eventNameVec = changeSubscriber_->GetSubscriberEventNameVec();
+    LOGI("start to subscribe commom eventName: %d", eventNameVec.size());
     if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
-        LOGE("failed to subscribe commom event: %s", eventName.c_str());
+        LOGE("failed to subscribe commom event: %d", eventNameVec.size());
         return;
     }
 }

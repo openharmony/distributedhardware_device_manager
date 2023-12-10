@@ -77,6 +77,18 @@ SoftbusConnector::~SoftbusConnector()
     LOGD("SoftbusConnector destructor.");
 }
 
+int32_t SoftbusConnector::RegisterSoftbusStateCallback(const std::shared_ptr<ISoftbusStateCallback> callback)
+{
+    deviceStateManagerCallback_ = callback;
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::UnRegisterSoftbusStateCallback()
+{
+    deviceStateManagerCallback_ = nullptr;
+    return DM_OK;
+}
+
 int32_t SoftbusConnector::RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
     const std::shared_ptr<ISoftbusDiscoveryCallback> callback)
 {
@@ -618,7 +630,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
     return DM_OK;
 }
 
-std::string SoftbusConnector::GetNetworkIdByUdidHash(const std::string &deviceIdHash)
+std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId)
 {
     LOGI("Check the device is online.");
     int32_t deviceCount = 0;
@@ -634,13 +646,7 @@ std::string SoftbusConnector::GetNetworkIdByUdidHash(const std::string &deviceId
             NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid)) != DM_OK) {
             LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
         }
-        std::string udid = reinterpret_cast<char *>(mUdid);
-        char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)mUdidHash) != DM_OK) {
-            LOGE("get mUdidHash by udid: %s failed.", GetAnonyString(udid).c_str());
-        }
-        std::string udidHash = static_cast<std::string>(mUdidHash);
-        if (udidHash == deviceIdHash) {
+        if (reinterpret_cast<char *>(mUdid) == deviceId) {
             return static_cast<std::string>(nodeBasicInfo->networkId);
         }
     }
@@ -649,20 +655,43 @@ std::string SoftbusConnector::GetNetworkIdByUdidHash(const std::string &deviceId
 
 void SoftbusConnector::SetPkgName(std::string pkgName)
 {
-    LOGI("Set online device report pkgName");
+    LOGI("SoftbusConnector::SetPkgName");
     std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
-    pkgNameVec_ .push_back(pkgName);
+    pkgNameVec_.push_back(pkgName);
 }
 
-void SoftbusConnector::HandleDeviceOnline(std::string &deviceId)
+void SoftbusConnector::SetPkgNameVec(std::vector<std::string> pkgNameVec)
+{
+    LOGI("SoftbusConnector::SetPkgNameVec");
+    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
+    pkgNameVec_ = pkgNameVec;
+}
+
+std::vector<std::string> SoftbusConnector::GetPkgName()
+{
+    LOGI("SoftbusConnector::GetPkgName");
+    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
+    return pkgNameVec_;
+}
+
+void SoftbusConnector::ClearPkgName()
+{
+    LOGI("SoftbusConnector::SetPkgName vec");
+    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
+    pkgNameVec_.clear();
+}
+
+void SoftbusConnector::HandleDeviceOnline(std::string deviceId)
 {
     LOGI("SoftbusConnector::HandleDeviceOnline");
+    deviceStateManagerCallback_->OnDeviceOnline(deviceId);
     return;
 }
 
-void SoftbusConnector::HandleDeviceOffline(const std::string &deviceId)
+void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
 {
-    LOGI("SoftbusConnector::HandleDeviceOnline");
+    LOGI("SoftbusConnector::HandleDeviceOffline");
+    deviceStateManagerCallback_->OnDeviceOffline(deviceId);
     return;
 }
 
@@ -683,12 +712,7 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
             LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
         }
         std::string udid = reinterpret_cast<char *>(mUdid);
-        char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)mUdidHash) != DM_OK) {
-            LOGE("get mUdidHash by udid: %s failed.", GetAnonyString(udid).c_str());
-        }
-        std::string udidHash = static_cast<std::string>(mUdidHash);
-        if (udidHash == targetDeviceId) {
+        if (udid == targetDeviceId) {
             LOGI("The device is online.");
             return true;
         }
@@ -697,5 +721,57 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     return false;
 }
 
+DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
+{
+    LOGI("SoftbusConnector::GetDeviceInfoBydeviceId");
+    DmDeviceInfo info;
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed.");
+        return info;
+    }
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, (uint8_t *)deviceIdHash) != DM_OK) {
+        LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceId).c_str());
+        return info;
+    }
+    for (int32_t i = 0; i < deviceCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        uint8_t mUdid[UDID_BUF_LEN] = {0};
+        if (GetNodeKeyInfo(DM_PKG_NAME, nodeBasicInfo->networkId, NodeDeviceInfoKey::NODE_KEY_UDID,
+            mUdid, sizeof(mUdid)) != DM_OK) {
+            LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+            return info;
+        }
+        std::string udid = reinterpret_cast<char *>(mUdid);
+        if (udid != deviceId) {
+            continue;
+        } else {
+            ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, info);
+            if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash, DM_MAX_DEVICE_ID_LEN) != 0) {
+                LOGE("Get deviceId: %s failed.", GetAnonyString(deviceId).c_str());
+            }
+            break;
+        }
+    }
+    FreeNodeInfo(nodeInfo);
+    return info;
+}
+
+void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
+{
+    (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
+                 std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+    }
+
+    if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
+                 std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+    }
+    dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

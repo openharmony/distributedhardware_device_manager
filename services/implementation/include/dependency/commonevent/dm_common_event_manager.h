@@ -19,6 +19,8 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include "common_event_data.h"
 #include "common_event_manager.h"
@@ -39,14 +41,14 @@ using CommomEventCallback = std::function<void(int32_t)>;
 class DmEventSubscriber : public CommonEventSubscriber {
 public:
     DmEventSubscriber(const CommonEventSubscribeInfo &subscribeInfo, const CommomEventCallback &callback,
-        const std::string &eventName) : CommonEventSubscriber(subscribeInfo),
-        eventName_(eventName), callback_(callback) {}
+        const std::vector<std::string> &eventNameVec) : CommonEventSubscriber(subscribeInfo),
+        eventNameVec_(eventNameVec), callback_(callback) {}
     ~DmEventSubscriber() override = default;
-    std::string GetSubscriberEventName() const;
+    std::vector<std::string> GetSubscriberEventNameVec() const;
     void OnReceiveEvent(const CommonEventData &data) override;
 
 private:
-    std::string eventName_;
+    std::vector<std::string> eventNameVec_;
     CommomEventCallback callback_;
 };
 
@@ -54,15 +56,16 @@ class DmCommonEventManager {
 public:
     DmCommonEventManager() = default;
     ~DmCommonEventManager();
-    bool SubscribeServiceEvent(const std::string &eventName, const CommomEventCallback &callback);
+    bool SubscribeServiceEvent(const std::vector<std::string> &eventNameVec, const CommomEventCallback &callback);
     bool UnsubscribeServiceEvent();
 
 private:
-    std::string eventName_;
+    std::vector<std::string> eventNameVec_;
     bool eventValidFlag_ = false;
     std::mutex evenSubscriberMutex_;
     std::shared_ptr<DmEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    int32_t counter_ = 0;
 
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {

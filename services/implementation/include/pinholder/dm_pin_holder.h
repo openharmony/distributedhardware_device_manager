@@ -64,6 +64,15 @@ public:
         AesGcmCipherKey cipherKey = { 0 };
         return cipherKey;
     }
+    void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result)
+    {
+        return;
+    }
+    void OnAuthDeviceDataReceived(int32_t sessionId, std::string message)
+    {
+        return;
+    }
+
 private:
     int32_t CreateGeneratePinHolderMsg();
     int32_t ParseMsgType(const std::string &message);

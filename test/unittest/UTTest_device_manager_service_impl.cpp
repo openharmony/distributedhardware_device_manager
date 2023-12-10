@@ -37,6 +37,7 @@ namespace {
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
 
 /**
  * @tc.name: Initialize_001
@@ -379,7 +380,7 @@ HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_002, testing::ext::TestS
     const std::string params = "paramsTest";
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t ret = deviceManagerServiceImpl->SetUserOperation(pkgName, action, params);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -461,7 +462,7 @@ HWTEST_F(DeviceManagerServiceImplTest, BindDevice_003, testing::ext::TestSize.Le
     std::string bindParam;
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t ret = deviceManagerServiceImpl->BindDevice(pkgName, authType, udidHash, bindParam);
     EXPECT_NE(ret, DM_OK);
 }
@@ -505,7 +506,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_003, testing::ext::TestSize.
     std::string udidHash = "udidHash";
     auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, listener, hiChainConnector_);
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     int32_t ret = deviceManagerServiceImpl->UnBindDevice(pkgName, udidHash);
     EXPECT_NE(ret, DM_OK);
 }
