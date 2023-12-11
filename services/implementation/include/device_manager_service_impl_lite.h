@@ -109,6 +109,10 @@ public:
         DmPinType pinType, const std::string &payload);
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
+    std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
+    void OnUnbindSessionOpened(int32_t sessionId, int32_t result);
+    void OnUnbindSessionCloseed(int32_t sessionId);
+    void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
 
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);

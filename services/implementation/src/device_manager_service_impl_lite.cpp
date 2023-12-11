@@ -345,6 +345,31 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     return DM_OK;
 }
 
+std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname)
+{
+    (void)pkgname;
+    std::map<std::string, DmAuthForm> tmp;
+    return tmp;
+}
+
+void OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+{
+    (void)sessionId;
+    (void)result;
+}
+
+void OnUnbindSessionCloseed(int32_t sessionId)
+{
+    (void)sessionId;
+}
+
+void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+{
+    (void)sessionId;
+    (void)data;
+    (void)dataLen;
+}
+
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
 }

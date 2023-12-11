@@ -17,7 +17,9 @@
 
 #include <securec.h>
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
+#endif
 #include "discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -146,7 +148,6 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
     }
-
     return ret;
 }
 
@@ -355,6 +356,7 @@ void DiscoveryManager::HandleDiscoveryTimeout(std::string name)
 int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::string deviceId,
     bool &isonline, int32_t &authForm)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     LOGI("Get deviceId = %s isonline and authForm.", GetAnonyString(deviceId).c_str());
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -367,6 +369,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
         LOGE("GetDeviceAclParam failed.");
         return ERR_DM_FAILED;
     }
+#endif
     return DM_OK;
 }
 } // namespace DistributedHardware

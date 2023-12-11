@@ -22,7 +22,9 @@
 #include "dm_constants.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -250,7 +252,9 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
         if (((iter->second).timerName == name) && (hiChainConnector_ != nullptr)) {
             LOGI("remove hichain group with deviceId: %s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             DeviceProfileConnector::GetInstance().DeleteTimeOutAcl((iter->first).c_str());
+#endif
             stateTimerInfoMap_.erase(iter);
             break;
         }
