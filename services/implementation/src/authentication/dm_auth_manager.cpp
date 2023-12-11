@@ -74,6 +74,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     dmConfigManager.GetAuthAdapter(authenticationMap_);
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
+    authenticationMap_[AUTH_TYPE_CRE] = nullptr;
     dmVersion_ = DM_VERSION;
 }
 
