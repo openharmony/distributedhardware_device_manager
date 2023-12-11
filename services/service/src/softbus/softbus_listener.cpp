@@ -358,8 +358,7 @@ int32_t SoftbusListener::InitSoftbusListener()
         }
     } while (ret != DM_OK);
 #endif
-    ret = InitSoftPublishLNN();
-    return ret;
+    return InitSoftPublishLNN();
 }
 
 int32_t SoftbusListener::InitSoftPublishLNN()

@@ -35,12 +35,12 @@ static void InitAll()
         LOGE("service init failed.");
         return;
     }
-    LOGE("DM service init success.");
+    LOGI("DM service init success.");
 }
 
 int32_t main(int32_t argc, char *argv[])
 {
-    LOGE("DM service init start.");
+    LOGI("DM service init start.");
     (void)argc;
     (void)argv;
     InitAll();
