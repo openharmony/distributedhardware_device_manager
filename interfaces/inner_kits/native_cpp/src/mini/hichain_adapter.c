@@ -25,7 +25,7 @@
 #include "parameter.h"
 #include "securec.h"
 
-#define HICHAIN_DELAY_TICK_COUNT 10 * LOSCFG_BASE_CORE_TICK_PER_SECOND  // delay 10s
+#define HICHAIN_DELAY_TICK_COUNT (10 * LOSCFG_BASE_CORE_TICK_PER_SECOND)  // delay 10s
 
 static const UINT32 HICHAIN_SEM_INIT_COUNT = 0;
 
@@ -177,7 +177,8 @@ int GetAuthFormByDeviceId(const char *deviceId, int authForm)
     }
 
     do {
-        int ret = g_deviceGroupManager->getRelatedGroups(userId, HICHAIN_PKG_NAME, deviceId, &returnJsonStr, &groupNumber);
+        int ret = g_deviceGroupManager->getRelatedGroups(userId, HICHAIN_PKG_NAME, deviceId, &returnJsonStr,
+            &groupNumber);
         if (ret != HC_SUCCESS) {
             DMLOGE("failed to get related group ret: %d.", ret);
             resultFlag = ERR_DM_HICHAIN_FAILED;

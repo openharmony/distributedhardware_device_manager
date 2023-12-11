@@ -91,7 +91,7 @@ enum {
     ERR_DM_CJSON_GET_USERID,
 };
 
-static const int g_supportBindType = CREDENTIAL;
+static const int SUPPORT_BIND_TYPE = 0;
 
 typedef struct {
     char deviceId[DM_MAX_DEVICE_ID_LEN + 1];

@@ -38,10 +38,10 @@
 #include "softbus_common.h"
 #include "softbus_errcode.h"
 
-#define NOT_FILTER -1
-#define SESSION_SIDE_CLIENT 1
-#define SOFTBUS_DELAY_TICK_COUNT 10 * LOSCFG_BASE_CORE_TICK_PER_SECOND  // 10s
-#define DM_MAX_DEVICE_SIZE 100
+#define NOT_FILTER (-1)
+#define SESSION_SIDE_CLIENT (1)
+#define SOFTBUS_DELAY_TICK_COUNT (10 * LOSCFG_BASE_CORE_TICK_PER_SECOND)  // 10s
+#define DM_MAX_DEVICE_SIZE (100)
 
 static const char * const DM_CAPABILITY_OSD = "osdCapability";
 static const char * const DM_PKG_NAME = "com.ohos.devicemanager";
@@ -97,13 +97,14 @@ static void OnSessionClosed(int sessionId);
 static void OnJoinLNNCallback(ConnectionAddr *addr, const char *networkId, int32_t retCode);
 static void OnLeaveLNNCallback(const char *networkId, int32_t retCode);
 
-static void ProcessSinkMsg(const void *data, unsigned int dataLen);
-static void ProcessSourceMsg(const void *data, unsigned int dataLen);
+static void ProcessSinkMsg(const char *data, unsigned int dataLen);
+static void ProcessSourceMsg(const char *data, unsigned int dataLen);
 static int GetConnAddrByDeviceId(const char *deviceId, ConnectionAddr *addr);
 static bool ImportDeviceToAddrMap(const DmDeviceInfo *deviceInfo);
 static bool IsPkgNameValid(const char *pkgName);
 static bool IsDeviceIdValid(const char *deviceId);
 static char* CreateRespNegotiateMsg(const int bindType);
+static int AbilityNegotiate(const int bindType);
 
 static UINT32 g_bindSem = 0;
 static bool g_publishLNNFlag = false;
@@ -396,7 +397,8 @@ int UnRegisterSoftbusDevStateCallback(const char *pkgName)
     return DM_OK;
 }
 
-int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen, int *trustListLen)
+int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen,
+    int *trustListLen)
 {
     DMLOGI("GetSoftbusTrustedDeviceList.");
     if (!IsPkgNameValid(pkgName)) {
@@ -1056,7 +1058,7 @@ static void DmDeviceInfoToDmBasicInfo(const DmDeviceInfo *dmDeviceInfo, DmDevice
 
 static bool IsSupportBindType(const int bindType)
 {
-    if (g_supportBindType != bindType) {
+    if (bindType != SUPPORT_BIND_TYPE) {
         DMLOGE("bindType %d is not supported.", bindType);
         return false;
     }
@@ -1151,24 +1153,13 @@ static char* CreateNegotiateMsg()
     return retStr;
 }
 
-static char* CreateRespNegotiateMsg(const int bindType)
+static int AbilityNegotiate(const int bindType)
 {
-    cJSON *msg = cJSON_CreateObject();
-    if (msg == NULL) {
-        DMLOGE("failed to create cjson object.");
-        return NULL;
-    }
-    if (cJSON_AddNumberToObject(msg, FILED_MSG_TYPE, MSG_NEGOTIATE_RESP) == NULL) {
-        DMLOGE("failed to add msg type to cjson object.");
-        cJSON_Delete(msg);
-        return NULL;
-    }
     char deviceUdid[DM_MAX_DEVICE_UDID_LEN + 1] = {0};
     int retValue = GetDevUdid(deviceUdid, DM_MAX_DEVICE_UDID_LEN);
-    if (retValue != 0) {
+    if (retValue != DM_OK) {
         DMLOGE("failed to get local device udid with ret: %d.", retValue);
-        cJSON_Delete(msg);
-        return NULL;
+        return retValue;
     }
     int authType = -1;
     bool isCredentialExist = false;
@@ -1181,20 +1172,30 @@ static char* CreateRespNegotiateMsg(const int bindType)
     if (isCredentialExist && isSupportBindType) {
         reply = DM_OK;
     }
+    return reply;
+}
+
+static char* CreateRespNegotiateMsg(const int bindType)
+{
+    cJSON *msg = cJSON_CreateObject();
+    if (msg == NULL) {
+        DMLOGE("failed to create cjson object.");
+        return NULL;
+    }
+    if (cJSON_AddNumberToObject(msg, FILED_MSG_TYPE, MSG_NEGOTIATE_RESP) == NULL) {
+        DMLOGE("failed to add msg type to cjson object.");
+        cJSON_Delete(msg);
+        return NULL;
+    }
+    int reply = AbilityNegotiate(bindType)
+    if (reply != DM_OK) {
+        DMLOGE("failed to AbilityNegotiate with ret: %d.", retValue);
+        cJSON_Delete(msg);
+        return NULL;
+    }
 
     if (cJSON_AddNumberToObject(msg, FILED_REPLY, reply) == NULL) {
         DMLOGE("failed to add reply to cjson object.");
-        cJSON_Delete(msg);
-        return NULL;
-    }
-    if (cJSON_AddBoolToObject(msg, FILED_IS_CRE_EXISTED, isCredentialExist) == NULL) {
-        DMLOGE("failed to add isCredentialExist to cjson object.");
-        cJSON_Delete(msg);
-        return NULL;
-    }
-
-    if (cJSON_AddBoolToObject(msg, FILED_IS_BIND_TYPE_SUPPORTED, isSupportBindType) == NULL) {
-        DMLOGE("failed to add isSupportBindType to cjson object.");
         cJSON_Delete(msg);
         return NULL;
     }
@@ -1267,7 +1268,7 @@ static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLe
     DMLOGE("unrecognized message.");
 }
 
-static void ProcessSinkMsg(const void *data, unsigned int dataLen)
+static void ProcessSinkMsg(const char *data, unsigned int dataLen)
 {
     (void)dataLen;
     cJSON *msgData = cJSON_Parse(data);
@@ -1311,7 +1312,7 @@ static void OnJoinLNNCallback(ConnectionAddr *addr, const char *networkId, int32
     }
 }
 
-static void ProcessSourceMsg(const void *data, unsigned int dataLen)
+static void ProcessSourceMsg(const char *data, unsigned int dataLen)
 {
     (void)dataLen;
     cJSON *msg = cJSON_Parse(data);
