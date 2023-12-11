@@ -22,6 +22,7 @@
 #include "cJSON.h"
 #include "cmsis_os2.h"
 #include "discovery_service.h"
+#include "hichain_adapter.h"
 #include "inner_session.h"
 #include "los_config.h"
 #include "los_mux.h"
@@ -36,7 +37,6 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 #include "softbus_errcode.h"
-#include "hichain_adapter.h"
 
 #define NOT_FILTER -1
 #define SESSION_SIDE_CLIENT 1
@@ -496,20 +496,20 @@ static bool IsValidStartDiscoveryInput(const char *pkgName, const char *filterOp
 
 static int StartSoftbusDiscovering(const char *pkgName, const int subscribeId, OnTargetFound callback)
 {
-    DMLOGI("StopSoftbusDiscovery start.");
+    DMLOGI("StartSoftbusDiscovering start.");
     if (g_discoveryCallbackMap.valid) {
-        DMLOGE("failed to start quick discovery because discovery behavior already exists.");
+        DMLOGE("failed to start discovery because discovery behavior already exists.");
         return ERR_DM_SOFTBUS_REPEAT_DISCOVERY_DEVICE;
     }
     if (SoftbusRefreshLNN(pkgName, subscribeId) != DM_OK) {
-        DMLOGE("failed to start quick discovery because sending broadcast info.");
+        DMLOGE("failed to start discovery because sending broadcast info.");
         return ERR_DM_SOFTBUS_SEND_BROADCAST;
     }
     if (!ImportPkgNameToDiscoveryMap(pkgName, subscribeId, callback)) {
         DMLOGE("failed to import pkgName to discovery map.");
         return ERR_DM_IMPORT_PKGNAME;
     }
-    DMLOGI("StopSoftbusDiscovery end.");
+    DMLOGI("StartSoftbusDiscovering end.");
     return DM_OK;
 }
 
@@ -623,7 +623,7 @@ static int SoftbusRefreshLNN(const char *pkgName, const int subscribeId)
     subscribeInfo.subscribeId = subscribeId;
     int retValue = RefreshLNN(pkgName, &subscribeInfo, &g_refreshDiscoveryCallback);
     if (retValue != SOFTBUS_OK) {
-        DMLOGE("failed to start to refresh quick discovery with ret: %d.", retValue);
+        DMLOGE("failed to start to refresh discovery with ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
     DMLOGI("softbus RefreshLNN successfully.");
@@ -934,7 +934,7 @@ int StopSoftbusPublish(const char *pkgName)
     }
     int retValue = StopPublishLNN(pkgName, DEVICEMANAGER_SA_ID);
     if (retValue != SOFTBUS_OK) {
-        DMLOGE("failed to call softbus publishLNN function with ret: %d.", retValue);
+        DMLOGE("failed to call stop softbus publishLNN function with ret: %d.", retValue);
         return ERR_DM_SOFTBUS_STOP_PUBLISH_LNN;
     }
     g_publishLNNFlag = false;
@@ -1167,6 +1167,7 @@ static char* CreateRespNegotiateMsg(const int bindType)
     int retValue = GetDevUdid(deviceUdid, DM_MAX_DEVICE_UDID_LEN);
     if (retValue != 0) {
         DMLOGE("failed to get local device udid with ret: %d.", retValue);
+        cJSON_Delete(msg);
         return NULL;
     }
     int authType = -1;
@@ -1321,16 +1322,19 @@ static void ProcessSourceMsg(const void *data, unsigned int dataLen)
     }
     cJSON *object = cJSON_GetObjectItem(msg, FILED_IS_CRE_EXISTED);
     if (object == NULL || !cJSON_IsBool(object)) {
+        cJSON_Delete(msg);
         DMLOGE("on byte received get isCreExisted failed.");
         return;
     }
     bool isCreExist = object->valueint;
     object = cJSON_GetObjectItem(msg, FILED_IS_BIND_TYPE_SUPPORTED);
     if (object == NULL || !cJSON_IsBool(object)) {
+        cJSON_Delete(msg);
         DMLOGE("on byte received get isBindTypeSupported failed.");
         return;
     }
     bool isBindTypeSupported = object->valueint;
+    cJSON_Delete(msg);
 
     if (isBindTypeSupported == false || isCreExist == false) {
         DMLOGE("remote client no credential or not support bind type.");

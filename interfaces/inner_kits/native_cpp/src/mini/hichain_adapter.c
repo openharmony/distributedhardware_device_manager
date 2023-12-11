@@ -30,7 +30,6 @@
 static const UINT32 HICHAIN_SEM_INIT_COUNT = 0;
 
 static const char * const HICHAIN_PKG_NAME = "com.ohos.devicemanager";
-
 static const char * const FILED_GROUP_TYPE = "groupType";
 
 static const int GROUP_TYPE_INVALID_GROUP = -1;
@@ -57,16 +56,6 @@ static DeviceAuthCallback g_deviceAuthCallback = {
     .onFinish = OnFinish,
     .onError = OnError,
     .onRequest = NULL,
-};
-
-typedef struct {
-    int groupType;
-    int authForm;
-} GroupTypeToAuthForm;
-static const GroupTypeToAuthForm g_authFormMap[3] = {
-    {GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP, AUTH_FORM_IDENTICAL_ACCOUNT_GROUP},
-    {GROUP_TYPE_PEER_TO_PEER_GROUP, AUTH_FORM_PEER_TO_PEER_GROUP},
-    {GROUP_TYPE_ACROSS_ACCOUNT_GROUP, AUTH_FORM_ACROSS_ACCOUNT_GROUP}
 };
 
 int InitHichainModle(void)
@@ -97,7 +86,7 @@ int InitHichainModle(void)
     }
     if (retValue != DM_OK) {
         DMLOGE("failed to init hichain modle with retValue: %d.", retValue);
-        UnInitHichainModle();   // rollback release resources.
+        UnInitHichainModle();
         return retValue;
     }
     DMLOGI("init hichain modle successfully.");
@@ -212,8 +201,6 @@ int GetAuthFormByDeviceId(const char *deviceId, int authForm)
     g_deviceGroupManager->destroyInfo(&returnJsonStr);
     return resultFlag;
 }
-
-
 
 static void OnFinish(int64_t requestId, int operationCode, const char *returnData)
 {

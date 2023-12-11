@@ -91,11 +91,6 @@ enum {
     ERR_DM_CJSON_GET_USERID,
 };
 
-enum BindAbility {
-    CREDENTIAL = 0,
-    PINCODE = 1,
-};
-
 static const int g_supportBindType = CREDENTIAL;
 
 typedef struct {
