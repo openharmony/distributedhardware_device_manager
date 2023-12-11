@@ -207,6 +207,23 @@ const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
     return dmListener_;
 }
 
+int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
+{
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    for (const auto &iter : dmListener_) {
+        auto pkgName = iter.first;
+        auto remote = iter.second;
+        req->SetPkgName(pkgName);
+        sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
+        if (listener == nullptr) {
+            LOGE("IpcServerStub::SendALL, listener is nullptr, pkgName : %s.", pkgName.c_str());
+            continue;
+        }
+        listener->SendCmd(cmdCode, req, rsp);
+    }
+    return DM_OK;
+}
+
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
 {
     if (pkgName.empty()) {
@@ -221,6 +238,19 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) co
     auto remote = iter->second;
     sptr<IpcRemoteBroker> dmListener = iface_cast<IpcRemoteBroker>(remote);
     return dmListener;
+}
+
+const std::string IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
+{
+    std::string pkgName = "";
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    for (const auto &iter : dmListener_) {
+        if (iter.second == remote.promote()) {
+            pkgName = iter.first;
+            break;
+        }
+    }
+    return pkgName;
 }
 
 int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
@@ -247,14 +277,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    std::map<std::string, sptr<IRemoteObject>> listeners = IpcServerStub::GetInstance().GetDmListener();
-    std::string pkgName;
-    for (auto iter : listeners) {
-        if (iter.second == remote.promote()) {
-            pkgName = iter.first;
-            break;
-        }
-    }
+    std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
     LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
 }
