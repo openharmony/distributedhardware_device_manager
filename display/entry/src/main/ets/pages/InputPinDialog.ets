@@ -155,6 +155,7 @@ struct dialogPlusPage {
           Row() {}.height('2%')
           TextInput({text: this.inputPinCode})
             .fontSize(25)
+            .defaultFocus(true)
             .fontWeight(FontWeight.Bold)
             .maxLength(6)
             .height('20%')
