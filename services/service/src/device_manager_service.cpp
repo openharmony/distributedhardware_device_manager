@@ -117,13 +117,29 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
     if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
         return ret;
     }
-    if (deviceList.size() > 0 && IsDMServiceImplReady()) {
-        return dmServiceImpl_->GetGroupType(deviceList);
+
+    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        for (auto item : onlineDeviceList) {
+            std::string udid = "";
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
+            if (udidMap.find(udid) != udidMap.end()) {
+                std::string deviceIdHash = "";
+                dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
+                if (memcpy_s(item.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash.c_str(), deviceIdHash.length()) != 0) {
+                    LOGE("get deviceId: %s failed", GetAnonyString(deviceIdHash).c_str());
+                }
+                item.authForm = udidMap[udid];
+                deviceList.push_back(item);
+            }
+        }
+        LOGI("Current app available device size: %d.", deviceList.size());
     }
     return DM_OK;
 }
@@ -136,26 +152,29 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t ret = softbusListener_->GetAvailableDeviceList(deviceBasicInfoList);
+    std::vector<DmDeviceBasicInfo> onlineDeviceList;
+    int32_t ret = softbusListener_->GetAvailableDeviceList(onlineDeviceList);
     if (ret != DM_OK) {
         LOGE("GetAvailableDeviceList failed");
         return ret;
     }
 
-    if (deviceBasicInfoList.size() > 0 && IsDMServiceImplReady()) {
-        for (auto it = deviceBasicInfoList.begin(); it != deviceBasicInfoList.end(); ++it) {
-            std::string udidHash = "";
-            ret = dmServiceImpl_->GetUdidHashByNetWorkId(it->networkId, udidHash);
-            if (ret != DM_OK) {
-                LOGE("DeviceManagerService::GetAvailableDeviceList get UdidHash by network failed.");
-                return ret;
-            }
-            std::string deviceId = listener_->CalcDeviceId(pkgName, udidHash);
-            if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(),
-                deviceId.length()) != 0) {
-                LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        for (auto item : onlineDeviceList) {
+            std::string udid = "";
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
+            if (udidMap.find(udid) != udidMap.end()) {
+                std::string deviceIdHash = "";
+                dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
+                if (memcpy_s(item.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash.c_str(),
+                    deviceIdHash.length()) != 0) {
+                    LOGE("get deviceId: %s failed", GetAnonyString(deviceIdHash).c_str());
+                }
+                deviceBasicInfoList.push_back(item);
             }
         }
+        LOGI("Current app available device size: %d.", deviceBasicInfoList.size());
     }
     return DM_OK;
 }
@@ -462,7 +481,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     }
 
     PeerTargetId targetId;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(listener_->GetUdidHash(deviceId, pkgName), targetId);
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId);
     if (ret != DM_OK) {
         LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
@@ -490,9 +509,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udidHash = listener_->GetUdidHash(deviceId, pkgName);
-    listener_->DeleteDeviceIdFromMap(deviceId, pkgName);
-    return dmServiceImpl_->UnBindDevice(pkgName, udidHash);
+    return dmServiceImpl_->UnBindDevice(pkgName, deviceId);
 }
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
@@ -1203,6 +1220,33 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->DestroyPinHolder(pkgName, targetId, pinType, payload);
+}
+
+void DeviceManagerService::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->OnUnbindSessionOpened(sessionId, result);
+}
+
+void DeviceManagerService::OnUnbindSessionCloseed(int32_t sessionId)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->OnUnbindSessionCloseed(sessionId);
+}
+
+void DeviceManagerService::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->OnUnbindBytesReceived(sessionId, data, dataLen);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

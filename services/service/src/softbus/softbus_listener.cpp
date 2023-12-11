@@ -29,6 +29,7 @@
 #include "dm_radar_helper.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
+#include "softbus_adapte.cpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -281,10 +282,10 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         dmDevInfo.range, device->isOnline, dmDevInfo.extraData.c_str());
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    CacheDiscoveredDevice(device);
     for (auto &iter : lnnOpsCbkMap) {
         iter.second->OnDeviceFound(iter.first, dmDevInfo, device->isOnline);
     }
-    CacheDiscoveredDevice(device);
 }
 
 void SoftbusListener::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result)
@@ -327,6 +328,7 @@ SoftbusListener::SoftbusListener()
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %d.", ret);
     }
+    SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
 #endif
     InitSoftbusListener();
     ClearDiscoveredDevice();
@@ -337,6 +339,7 @@ SoftbusListener::~SoftbusListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
+    SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
 #endif
     LOGD("SoftbusListener destructor.");
 }
@@ -817,9 +820,6 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
 
 void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
 {
-    if (device->isOnline) {
-        return;
-    }
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     if (memcpy_s(infoPtr.get(), sizeof(DeviceInfo), device, sizeof(DeviceInfo)) != DM_OK) {
         LOGE("CacheDiscoveredDevice error, copy device info failed.");

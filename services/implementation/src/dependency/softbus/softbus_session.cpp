@@ -112,28 +112,11 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SendData Start encryption.");
     }
-    int32_t ret = DM_OK;
-    if (msgType == MSG_TYPE_REQ_PUBLICKEY || msgType == MSG_TYPE_RESP_PUBLICKEY) {
-        int32_t cipherTextLen = strlen(message.c_str()) + TAG_LEN + ENCRY_FLAG_LEN;
-        char cipherText[cipherTextLen + 1];
-        int32_t plainTextLen = strlen(message.c_str());
-        char plainText[plainTextLen + 1];
-        int32_t ret = memcpy_s(plainText, plainTextLen, message.c_str(), plainTextLen);
-        if (ret != DM_OK) {
-            LOGE("[SOFTBUS]SendBytes memcpy_s failed, ret: %d.", ret);
-            return ERR_DM_FAILED;
-        }
-        plainText[plainTextLen] = '\0';
-        Encrypt(plainText, cipherText);
-        ret = SendBytes(sessionId, cipherText, cipherTextLen);
-    } else {
-        ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
-    }
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+    if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
+        LOGE("[SOFTBUS]SendBytes failed.");
         return ERR_DM_FAILED;
     }
-    return ret;
+    return DM_OK;
 }
 
 int SoftbusSession::OnSessionOpened(int sessionId, int result)
@@ -159,9 +142,23 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("Start decryption.");
     }
-    std::string message;
+    std::string message = "";
     GetRealMessage(data, dataLen, message);
-    sessionCallback_->OnDataReceived(sessionId, message);
+    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return;
+    }
+    if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("err json string, first time");
+        return;
+    }
+    if (jsonObject[TAG_MSG_TYPE].get<int32_t>() == AUTH_DEVICE_REQ_NEGOTIATE ||
+        jsonObject[TAG_MSG_TYPE].get<int32_t>() == AUTH_DEVICE_RESP_NEGOTIATE) {
+        sessionCallback_->OnAuthDeviceDataReceived(sessionId, message);
+    } else {
+        sessionCallback_->OnDataReceived(sessionId, message);
+    }
     LOGI("completed.");
 }
 
@@ -237,10 +234,38 @@ void SoftbusSession::Decrypt(char* cipherText, unsigned int cipherTextLen, char*
     plainText[realCipherTextLen - TAG_LEN] = '\0';
 }
 
+void SoftbusSession::OnUnbindSessionOpened(int sessionId, int result)
+{
+    int32_t sessionSide = GetSessionSide(sessionId);
+    sessionCallback_->OnUnbindSessionOpened(sessionId, sessionSide, result);
+    LOGD("OnUnbindSessionOpened, success, sessionId: %d.", sessionId);
+}
+
 int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
 {
-    LOGI("SoftbusSession::OpenUnbindSession");
-    return DM_OK;
+    int dataType = TYPE_BYTES;
+    int streamType = INVALID;
+    SessionAttribute attr = { 0 };
+    attr.dataType = dataType;
+    attr.linkTypeNum = LINK_TYPE_MAX;
+    LinkType linkTypeList[LINK_TYPE_MAX] = {
+        LINK_TYPE_WIFI_P2P,
+        LINK_TYPE_WIFI_WLAN_5G,
+        LINK_TYPE_WIFI_WLAN_2G,
+        LINK_TYPE_BR,
+    };
+    if (memcpy_s(attr.linkType, sizeof(attr.linkType), linkTypeList, sizeof(linkTypeList)) != DM_OK) {
+        LOGE("OpenUnbindSession: Data copy failed.");
+        return ERR_DM_FAILED;
+    }
+    attr.attr.streamAttr.streamType = streamType;
+    int32_t sessionId = OpenSession(DM_UNBIND_SESSION_NAME, DM_UNBIND_SESSION_NAME, netWorkId.c_str(), "0", &attr);
+    if (sessionId < 0) {
+        LOGE("[SOFTBUS]open OpenUnbindSession error, sessionId: %d.", sessionId);
+        return sessionId;
+    }
+    LOGI("OpenUnbindSession success. sessionId: %d.", sessionId);
+    return sessionId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -283,6 +283,10 @@ public:
      */
     virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload) = 0;
+    virtual std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
+    virtual void OnUnbindSessionOpened(int32_t sessionId, int32_t result) = 0;
+    virtual void OnUnbindSessionCloseed(int32_t sessionId) = 0;
+    virtual void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

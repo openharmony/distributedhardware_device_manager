@@ -120,6 +120,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
       "${common_path}/include/ipc/standard",
+      "${devicemanager_path}/commondependency/include",
       "${devicemanager_path}/radar/include",
       "${innerkits_path}/native_cpp/include",
       "${utils_path}/include/appInfo/standard",
@@ -169,6 +170,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
@@ -177,6 +179,8 @@ if (defined(ohos_lite)) {
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
       "hilog:libhilog",
       "init:libbeget_proxy",

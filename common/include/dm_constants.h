@@ -90,6 +90,7 @@ enum {
     ERR_DM_LOAD_CUSTOM_META_NODE = -20055,
     ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY = -20056,
     ERR_DM_ADD_GROUP_FAILED = -20057,
+    ERR_DM_SYNC_DELETE_DEVICE_REPEATED = -20058,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -104,6 +105,7 @@ constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager.pinholder";
+constexpr const char* DM_UNBIND_SESSION_NAME = "ohos.distributedhardware.devicemanager.unbind";
 constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
 constexpr const char* DM_CAPABILITY_APPROACH = "approach";
 constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
@@ -137,6 +139,9 @@ constexpr int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP = 1282;
 constexpr int32_t GROUP_VISIBILITY_PUBLIC = -1;
 constexpr int64_t MIN_REQUEST_ID = 1000000000;
 constexpr int64_t MAX_REQUEST_ID = 9999999999;
+constexpr int32_t AUTH_DEVICE_REQ_NEGOTIATE = 600;
+constexpr int32_t AUTH_DEVICE_RESP_NEGOTIATE = 700;
+constexpr int32_t DEVICEID_LEN = 8;
 
 // ACE
 constexpr const char* EVENT_CONFIRM = "EVENT_CONFIRM";
@@ -182,6 +187,8 @@ const std::string PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
 const std::string PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
 const std::string PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 const std::string DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
+const std::string BIND_LEVEL = "bindLevel";
+const std::string TOKENID = "tokenId";
 const std::string DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 } // namespace DistributedHardware
 } // namespace OHOS

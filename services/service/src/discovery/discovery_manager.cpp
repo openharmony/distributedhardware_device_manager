@@ -17,12 +17,13 @@
 
 #include <securec.h>
 
+#include "deviceprofile_connector.h"
 #include "discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "parameter.h"
 #include "dm_radar_helper.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t DISCOVERY_TIMEOUT = 120;
@@ -220,6 +221,15 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
 {
     DiscoveryContext discoveryContext;
+    DiscoveryFilter filter;
+    DeviceFilterPara filterPara;
+    filterPara.isOnline = false;
+    filterPara.range = info.range;
+    filterPara.deviceType = info.deviceTypeId;
+    std::string deviceIdHash = static_cast<std::string>(info.deviceId);
+    if (isOnline && GetDeviceAclParam(pkgName, deviceIdHash, filterPara.isOnline, filterPara.authForm) != DM_OK) {
+        LOGE("The found device get online param failed.");
+    }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
@@ -229,11 +239,6 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         }
         discoveryContext = iter->second;
     }
-    DiscoveryFilter filter;
-    DeviceFilterPara filterPara;
-    filterPara.isOnline = isOnline;
-    filterPara.range = info.range;
-    filterPara.deviceType = info.deviceTypeId;
     if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
         listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
     }
@@ -345,6 +350,24 @@ void DiscoveryManager::HandleDiscoveryTimeout(std::string name)
         subscribeId = discoveryContextMap_[pkgName].subscribeId;
     }
     StopDiscovering(pkgName, subscribeId);
+}
+
+int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::string deviceId,
+    bool &isonline, int32_t &authForm)
+{
+    LOGI("Get deviceId = %s isonline and authForm.", GetAnonyString(deviceId).c_str());
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = static_cast<std::string>(localDeviceId);
+    DmDiscoveryInfo discoveryInfo;
+    discoveryInfo.pkgname = pkgName;
+    discoveryInfo.localDeviceId = requestDeviceId;
+    discoveryInfo.remoteDeviceIdHash = deviceId;
+    if (DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm) != DM_OK) {
+        LOGE("GetDeviceAclParam failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

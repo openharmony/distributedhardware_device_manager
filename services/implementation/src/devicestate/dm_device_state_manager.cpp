@@ -22,6 +22,7 @@
 #include "dm_constants.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#include "deviceprofile_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,7 +41,16 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
 DmDeviceStateManager::~DmDeviceStateManager()
 {
     LOGI("DmDeviceStateManager destructor");
+    softbusConnector_->UnRegisterSoftbusStateCallback();
     StopEventThread();
+}
+
+int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
+{
+    if (softbusConnector_ != nullptr) {
+        return softbusConnector_->RegisterSoftbusStateCallback(shared_from_this());
+    }
+    return DM_OK;
 }
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
@@ -54,6 +64,9 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
         {
             std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
             remoteDeviceInfos_[uuid] = saveInfo;
+            if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
+                stateDeviceInfos_[udid] = saveInfo;
+            }
         }
         LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
             std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
@@ -71,6 +84,52 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
             break;
         }
     }
+    if (stateDeviceInfos_.find(info.deviceId) != stateDeviceInfos_.end()) {
+        stateDeviceInfos_.erase(info.deviceId);
+    }
+}
+
+void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
+{
+    LOGI("DmDeviceStateManager::OnDeviceOnline");
+    DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
+            stateDeviceInfos_[deviceId] = devInfo;
+        }
+    }
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    if (pkgName.size() == 0) {
+        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), DEVICE_STATE_ONLINE, devInfo);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnDeviceStateChange(item, DEVICE_STATE_ONLINE, devInfo);
+        }
+    }
+    softbusConnector_->ClearPkgName();
+}
+
+void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
+{
+    LOGI("DmDeviceStateManager::OnDeviceOffline");
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
+            LOGE("DmDeviceStateManager::OnDeviceOnline not find deviceId");
+            return;
+        }
+    }
+    DmDeviceInfo devInfo = stateDeviceInfos_[deviceId];
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    if (pkgName.size() == 0) {
+        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), DEVICE_STATE_OFFLINE, devInfo);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnDeviceStateChange(item, DEVICE_STATE_OFFLINE, devInfo);
+        }
+    }
+    softbusConnector_->ClearPkgName();
 }
 
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -102,7 +161,15 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         LOGE("HandleDeviceStatusChange failed, device manager client listener is null.");
         return;
     }
-    listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    if (pkgName.size() == 0) {
+        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnDeviceStateChange(item, devState, devInfo);
+        }
+    }
+    softbusConnector_->ClearPkgName();
 }
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceId)
@@ -183,6 +250,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
         if (((iter->second).timerName == name) && (hiChainConnector_ != nullptr)) {
             LOGI("remove hichain group with deviceId: %s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
+            DeviceProfileConnector::GetInstance().DeleteTimeOutAcl((iter->first).c_str());
             stateTimerInfoMap_.erase(iter);
             break;
         }

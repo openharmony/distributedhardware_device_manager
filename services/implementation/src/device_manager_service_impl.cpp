@@ -23,8 +23,10 @@
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
+#include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
+#include "parameter.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "common_event_support.h"
@@ -54,6 +56,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     }
     if (deviceStateMgr_ == nullptr) {
         deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
+        deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
@@ -61,10 +64,15 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (publishMgr_ == nullptr) {
         publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener);
     }
+    if (hiChainAuthConnector_ == nullptr) {
+        hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
+    }
     if (authMgr_ == nullptr) {
-        authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, listener, hiChainConnector_);
+        authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener,
+            hiChainAuthConnector_);
         softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
         hiChainConnector_->RegisterHiChainCallback(authMgr_);
+        hiChainAuthConnector_->RegisterHiChainAuthCallback(authMgr_);
     }
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
@@ -79,18 +87,28 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
         MultipleUserConnector::SetSwitchOldUserId(userId);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (commonEventManager_ == nullptr) {
-        commonEventManager_ = std::make_shared<DmCommonEventManager>();
-    }
-    CommomEventCallback callback = std::bind(&DmAuthManager::UserSwitchEventCallback, *authMgr_.get(),
-        std::placeholders::_1);
-    if (commonEventManager_->SubscribeServiceEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED, callback)) {
-        LOGI("subscribe service user switch common event success");
-    }
+    SubscribeCommonEvent();
 #endif
 
     LOGI("Init success, singleton initialized");
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::SubscribeCommonEvent()
+{
+    LOGI("DeviceManagerServiceImpl::SubscribeCommonEvent");
+    if (commonEventManager_ == nullptr) {
+        commonEventManager_ = std::make_shared<DmCommonEventManager>();
+    }
+    CommomEventCallback callback = std::bind(&DmAuthManager::CommonEventCallback, *authMgr_.get(),
+        std::placeholders::_1);
+    std::vector<std::string> commonEvevtVec;
+    commonEvevtVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    commonEvevtVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
+    if (commonEventManager_->SubscribeServiceEvent(commonEvevtVec, callback)) {
+        LOGI("subscribe service user switch common event success");
+    }
+    return;
 }
 
 void DeviceManagerServiceImpl::Release()
@@ -222,6 +240,75 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
+{
+    LOGI("DeviceManagerServiceImpl::HandleOffline");
+    std::string trustDeviceId = "";
+    if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
+        LOGE("HandleDeviceOffline get udid failed.");
+        return;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = static_cast<std::string>(localUdid);
+    DmOfflineParam offlineParam =
+        DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
+    LOGI("The offline device bind type is %d.", offlineParam.bindType);
+    if (offlineParam.leftAclNumber == 0 && offlineParam.bindType == INVALIED_TYPE) {
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (offlineParam.bindType == IDENTICAL_ACCOUNT_TYPE) {
+        LOGI("The offline device is identical account bind type.");
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (offlineParam.bindType == DEVICE_PEER_TO_PEER_TYPE) {
+        LOGI("The offline device is device-level bind type.");
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (offlineParam.bindType == APP_PEER_TO_PEER_TYPE) {
+        LOGI("The offline device is app-level bind type.");
+        softbusConnector_->SetPkgNameVec(offlineParam.pkgNameVec);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    }
+    if (offlineParam.leftAclNumber == 0) {
+        LOGI("Delete credential in HandleDeviceOffline.");
+        hiChainAuthConnector_->DeleteCredential(trustDeviceId, MultipleUserConnector::GetCurrentAccountUserID());
+    }
+}
+
+void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
+{
+    LOGI("DeviceManagerServiceImpl::HandleOnline");
+    std::string trustDeviceId = "";
+    if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
+        LOGE("HandleDeviceOffline get udid failed.");
+        return;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = static_cast<std::string>(localUdid);
+    uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
+    LOGI("The online device bind type is %d.", bindType);
+    if (bindType == INVALIED_TYPE) {
+        LOGI("The online device is identical account.");
+        PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
+        LOGI("The online device is identical account self-networking.");
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
+        LOGI("The online device is device-level bind type.");
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    } else if (bindType == APP_PEER_TO_PEER_TYPE) {
+        LOGI("The online device is app-level bind type.");
+        std::vector<std::string> pkgNameVec =
+            DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(requestDeviceId, trustDeviceId);
+        if (pkgNameVec.size() == 0) {
+            LOGI("The online device not need report pkgname");
+            return;
+        }
+        softbusConnector_->SetPkgNameVec(pkgNameVec);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    }
+}
+
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
     if (deviceStateMgr_ == nullptr) {
@@ -232,7 +319,13 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
     }
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    if (devState == DEVICE_STATE_ONLINE) {
+        HandleOnline(devState, devInfo);
+    } else if (devState == DEVICE_STATE_OFFLINE) {
+        HandleOffline(devState, devInfo);
+    } else {
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    }
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
@@ -517,6 +610,51 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->BindTarget(pkgName, targetId, bindParam);
+}
+
+void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId)
+{
+    LOGI("DeviceManagerServiceImpl::PutIdenticalAccountAcl start.");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    DmSoftbusAdapterCrypto::GetUdidHash(requestDeviceId, (uint8_t *)localDeviceId);
+    std::string localUdidHash = static_cast<std::string>(localDeviceId);
+    DmAclInfo aclInfo;
+    aclInfo.bindType = IDENTICAL_ACCOUNT;
+    aclInfo.trustDeviceId = trustDeviceId;
+    aclInfo.authenticationType = ALLOW_AUTH_ALWAYS;
+    aclInfo.deviceIdHash = localUdidHash;
+    DmAccesser accesser;
+    accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    accesser.requestAccountId = MultipleUserConnector::GetOhosAccountId();
+    MultipleUserConnector::SetSwitchOldUserId(accesser.requestUserId);
+    MultipleUserConnector::SetSwitchOldAccountId(accesser.requestAccountId);
+    accesser.requestDeviceId = requestDeviceId;
+    DmAccessee accessee;
+    accessee.trustDeviceId = trustDeviceId;
+    DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string deviceId = reinterpret_cast<char *>(localDeviceId);
+    return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
+}
+
+void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+{
+    SoftbusSession::OnUnbindSessionOpened(sessionId, result);
+}
+
+void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t sessionId)
+{
+    SoftbusSession::OnSessionClosed(sessionId);
+}
+
+void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+{
+    SoftbusSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()

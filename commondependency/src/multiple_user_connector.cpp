@@ -64,7 +64,6 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
     if (ret != 0 || accountInfo.uid_ == "") {
         return "";
     }
-    accountId_ = accountInfo.uid_;
     return accountInfo.uid_;
 #else // OS_ACCOUNT_PART_EXISTS
     return "";

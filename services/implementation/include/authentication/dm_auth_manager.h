@@ -125,6 +125,9 @@ typedef struct DmAuthRequestContext {
     bool authed;
     int32_t bindLevel;
     int64_t tokenId;
+    std::string remoteAccountId;
+    int32_t remoteUserId;
+    std::string ip;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -183,8 +186,9 @@ class DmAuthManager final : public ISoftbusSessionCallback,
                             public std::enable_shared_from_this<DmAuthManager> {
 public:
     DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
+                  std::shared_ptr<HiChainConnector> hiChainConnector,
                   std::shared_ptr<IDeviceManagerServiceListener> listener,
-                  std::shared_ptr<HiChainConnector> hiChainConnector);
+                  std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector);
     ~DmAuthManager();
 
     /**
@@ -295,11 +299,11 @@ public:
     int32_t CreateGroup();
 
     /**
-     * @tc.name: DmAuthManager::AddMember
+     * @tc.name: DmAuthManager::ProcessPincode
      * @tc.desc: Add Member of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t AddMember(int32_t pinCode);
+    int32_t ProcessPincode(int32_t pinCode);
 
     /**
      * @tc.name: DmAuthManager::GetConnectAddr
@@ -479,9 +483,15 @@ private:
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
     void CompatiblePutAcl();
     void ProRespNegotiateExt(const int32_t &sessionId);
+    void ProRespNegotiate(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
     std::string GenerateBindResultContent();
+    void GetAuthRequestContext();
+    void SinkAuthDeviceFinish();
+    void SrcAuthDeviceFinish();
+    void SrcSyncDeleteAclDone();
+    void SinkSyncDeleteAclDone();
 
 public:
     void RequestCredential();
@@ -499,6 +509,8 @@ public:
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     AesGcmCipherKey GetSessionKeyAndLen();
     void CommonEventCallback(int32_t userId);
+    void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
+    void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void DeleteAllGroup(int32_t userId);
@@ -507,6 +519,15 @@ private:
         const std::string &extra);
     void HandleSyncDeleteTimeout(std::string name);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &deviceId);
+    void ProcessAuthRequestExt(const int32_t &sessionId);
+    void ProcessAuthRequest(const int32_t &sessionId);
+    int32_t ConfirmProcess(const int32_t &action);
+    int32_t ConfirmProcessExt(const int32_t &action);
+    int32_t AddMember(int32_t pinCode);
+    int32_t AuthDevice(int32_t pinCode);
+    void SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId);
+    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
+    void PutAccessControlList();
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
 
@@ -524,6 +545,7 @@ private:
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
     int32_t authTimes_ = 0;
@@ -533,12 +555,11 @@ private:
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
     PeerTargetId peerTargetId_;
-    bool unBindFlag_ = false;
-private:
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     unsigned char *sessionKey_ = nullptr;
     uint32_t sessionKeyLen_ = 0;
     std::string remoteDeviceId_ = "";
+    std::string dmVersion_ = "";
+    bool isAuthDevice_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

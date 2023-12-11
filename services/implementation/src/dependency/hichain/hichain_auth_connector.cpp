@@ -22,35 +22,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t P2P_BIND = 0;
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
-
-int32_t HiChainAuthConnector::StartAuthDevice(int64_t requestId,
-    const char* authParams, const DeviceAuthCallback* callbak)
-{
-    LOGI("StartAuthDevice mock.");
-    (void)requestId;
-    (void)authParams;
-    (void)callbak;
-    return DM_OK;
-}
-int32_t HiChainAuthConnector::ProcessAuthDevice(int64_t requestId,
-    const char* authParams, const DeviceAuthCallback* callbak)
-{
-    LOGI("ProcessAuthDevice mock.");
-    (void)requestId;
-    (void)authParams;
-    (void)callbak;
-    return DM_OK;
-}
-int32_t HiChainAuthConnector::ProcessCredential(int32_t operationCode, const char* requestParams, char** returnData)
-{
-    LOGI("ProcessCredential mock.");
-    (void)operationCode;
-    (void)requestParams;
-    (void)returnData;
-    return DM_OK;
-}
 
 HiChainAuthConnector::HiChainAuthConnector()
 {
@@ -83,7 +55,7 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
     nlohmann::json authParamJson;
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = std::to_string(pinCode);
-    authParamJson["acquireType"] = P2P_BIND;
+    authParamJson["acquireType"] = AcquireType::P2P_BIND;
     char *authParam = strdup(authParamJson.dump().c_str());
     LOGI("StartAuthDevice authParam %s ,requestId %d.", authParam, requestId);
     int32_t ret = StartAuthDevice(requestId, authParam, &deviceAuthCallback_);
@@ -97,15 +69,10 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
 int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string authData, int32_t osAccountId)
 {
     LOGI("HiChainAuthConnector::ProcessAuthData start.");
-    nlohmann::json jsonObject = nlohmann::json::parse(authData, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return ERR_DM_FAILED;
-    }
     nlohmann::json jsonAuthParam;
     jsonAuthParam["osAccountId"] = osAccountId;
-    jsonAuthParam["data"] = jsonObject;
-    int32_t ret = ProcessAuthDevice(requestId, authData.c_str(), &deviceAuthCallback_);
+    jsonAuthParam["data"] = authData;
+    int32_t ret = ProcessAuthDevice(requestId, jsonAuthParam.dump().c_str(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
         LOGE("Hichain processData failed ret %d.", ret);
         return ERR_DM_FAILED;
@@ -187,7 +154,7 @@ int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t
     nlohmann::json jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["deviceId"] = localUdid;
-    jsonObj["acquireType"] = P2P_BIND;
+    jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
     char *requestParam = strdup(jsonObj.dump().c_str());
     char *returnData = nullptr;
@@ -220,7 +187,7 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     nlohmann::json jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["deviceId"] = localUdid;
-    jsonObj["acquireType"] = P2P_BIND;
+    jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
     char *requestParam = strdup(jsonObj.dump().c_str());
     char *returnData = nullptr;
@@ -245,13 +212,45 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     return true;
 }
 
+int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey)
+{
+    LOGI("HiChainAuthConnector::GetCredential");
+    nlohmann::json jsonObj;
+    jsonObj["osAccountId"] = osAccountId;
+    jsonObj["deviceId"] = localUdid;
+    jsonObj["acquireType"] = AcquireType::P2P_BIND;
+    jsonObj["flag"] = 1;
+    char *requestParam = strdup(jsonObj.dump().c_str());
+    char *returnData = nullptr;
+    if (ProcessCredential(CRED_OP_QUERY, requestParam, &returnData) != HC_SUCCESS) {
+        LOGE("Hichain query credential failed.");
+        return ERR_DM_FAILED;
+    }
+    std::string returnDataStr = static_cast<std::string>(returnData);
+    nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("Decode query return data jsonStr error.");
+        return ERR_DM_FAILED;
+    }
+    if (!IsInt32(jsonObject, "result") || jsonObject["result"].get<int32_t>() == -1) {
+        LOGE("Hichain generate public key failed.");
+        return ERR_DM_FAILED;
+    }
+    if (!IsString(jsonObject, "publicKey") || jsonObject["result"].get<int32_t>() == 1) {
+        LOGI("Credential not exist.");
+        return ERR_DM_FAILED;
+    }
+    publicKey = jsonObject["publicKey"];
+    return DM_OK;
+}
+
 int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey)
 {
     LOGI("HiChainAuthConnector::ImportCredential");
     nlohmann::json jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["deviceId"] = deviceId;
-    jsonObj["acquireType"] = P2P_BIND;
+    jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["publicKey"] = publicKey;
     char *requestParam = strdup(jsonObj.dump().c_str());
     char *returnData = nullptr;
@@ -282,7 +281,7 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
     LOGI("DeleteCredential start.");
     nlohmann::json jsonObj;
     jsonObj["deviceId"] = deviceId;
-    jsonObj["acquireType"] = P2P_BIND;
+    jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["osAccountId"] = userId;
     char *requestParam = strdup(jsonObj.dump().c_str());
     char *returnData = nullptr;

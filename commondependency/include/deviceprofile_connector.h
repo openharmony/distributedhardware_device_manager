@@ -20,16 +20,18 @@
 #include "accesser.h"
 #include "distributed_device_profile_client.h"
 #include "distributed_device_profile_enums.h"
+#include "dm_device_info.h"
 #include "single_instance.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
 constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
 
 constexpr uint32_t INVALIED_TYPE = 0;
-constexpr uint32_t APP_LEVEL_BIND_TYPE = 1;
-constexpr uint32_t DEVICE_LEVEL_BIND_TYPE = 2;
-constexpr uint32_t IDENTICAL_ACCOUNT_TYPE = 3;
-constexpr uint32_t DEVICE_PEER_TO_PEER_TYPE = 4;
+constexpr uint32_t APP_PEER_TO_PEER_TYPE = 1;
+constexpr uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
+constexpr uint32_t DEVICE_PEER_TO_PEER_TYPE = 3;
+constexpr uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 4;
+constexpr uint32_t IDENTICAL_ACCOUNT_TYPE = 5;
 
 constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
 constexpr uint32_t DM_POINT_TO_POINT = 256;
@@ -94,10 +96,10 @@ public:
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
     int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
-    std::vector<std::string> GetAppTrustDeviceList(const std::string &pkgName, const std::string &deviceId);
+    std::map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName, const std::string &deviceId);
     DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId);
     std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
-        std::string trustUdidHash);
+        std::string trustUdid);
     std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm);
@@ -107,6 +109,14 @@ public:
     std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId);
     bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
     int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId);
+    bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
+    bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
+    int32_t DeleteTimeOutAcl(const std::string &deviceId);
+    int32_t GetTrustNumber(const std::string &deviceId);
+    bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
+    bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId);
+    std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
+        std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

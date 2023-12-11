@@ -48,7 +48,7 @@ namespace {
  */
 HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::TestSize.Level0)
 {
-    std::string strEvent;
+    std::vector<std::string> strEvent;
     CommomEventCallback callback = nullptr;
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
     bool result = commonEventManager->SubscribeServiceEvent(strEvent, callback);
@@ -64,9 +64,11 @@ HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::Test
 HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::TestSize.Level0)
 {
     std::string strEvent = "test";
+    std::vector<std::string> strEventVec;
+    strEventVec.push_back(strEvent);
     CommomEventCallback callback = nullptr;
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
-    bool result = commonEventManager->SubscribeServiceEvent(strEvent, callback);
+    bool result = commonEventManager->SubscribeServiceEvent(strEventVec, callback);
     EXPECT_EQ(false, result);
 }
 
@@ -126,14 +128,16 @@ HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_003, testing::ext::TestSiz
     std::string deviceId;
     CommonEventSubscribeInfo subscribeInfo;
     CommomEventCallback callback = nullptr;
-    std::string eventName = "test";
+    std::string strEvent = "test";
+    std::vector<std::string> strEventVec;
+    strEventVec.push_back(strEvent);
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
-    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscribeInfo, callback, eventName);
+    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscribeInfo, callback, strEventVec);
     auto systemAbilityStatusChangeListener =
         std::make_shared<DmCommonEventManager::SystemAbilityStatusChangeListener>(commonEventManager->subscriber_);
     systemAbilityStatusChangeListener->OnAddSystemAbility(systemAbilityId, deviceId);
-    std::string event = systemAbilityStatusChangeListener->changeSubscriber_->GetSubscriberEventName();
-    EXPECT_EQ(event, "test");
+    std::vector<std::string> event = systemAbilityStatusChangeListener->changeSubscriber_->GetSubscriberEventNameVec();
+    EXPECT_EQ(event, strEventVec);
 }
 
 /**
@@ -164,17 +168,20 @@ HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Le
     want.SetAction("changeEvent");
     data.SetWant(want);
     data.SetCode(0);
-
+    std::vector<std::string> changeEventVec;
+    changeEventVec.push_back("changeEvent");
     std::string strEvent = "test";
+    std::vector<std::string> strEventVec;
+    strEventVec.push_back(strEvent);
     CommomEventCallback callback = nullptr;
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(strEvent);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
 
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
-    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEvent);
+    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEventVec);
     commonEventManager->subscriber_->OnReceiveEvent(data);
-    EXPECT_NE(commonEventManager->subscriber_->GetSubscriberEventName(), "changeEvent");
+    EXPECT_NE(commonEventManager->subscriber_->GetSubscriberEventNameVec(), changeEventVec);
 }
 
 /**
@@ -192,13 +199,15 @@ HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_002, testing::ext::TestSize.Le
     CommomEventCallback callback = nullptr;
     EventFwk::MatchingSkills matchingSkills;
     std::string strEvent = "test";
+    std::vector<std::string> strEventVec;
+    strEventVec.push_back(strEvent);
     matchingSkills.AddEvent(strEvent);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
 
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
-    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEvent);
+    commonEventManager->subscriber_ = std::make_shared<DmEventSubscriber>(subscriberInfo, callback, strEventVec);
     commonEventManager->subscriber_->OnReceiveEvent(data);
-    EXPECT_EQ(commonEventManager->subscriber_->GetSubscriberEventName(), "test");
+    EXPECT_EQ(commonEventManager->subscriber_->GetSubscriberEventNameVec(), strEventVec);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -16,7 +16,7 @@
 #include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_device_info.h"
+
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
@@ -51,71 +51,89 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     return profiles;
 }
 
-std::vector<std::string> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
+std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
     LOGI("GetAppTrustDeviceList Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
-    std::vector<std::string> deviceIdVec;
+    std::map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == IDENTICAL_ACCOUNT) {
-            LOGI("The device %s is identical account.", GetAnonyString(std::string(trustDeviceId)).c_str());
-            deviceIdVec.push_back(trustDeviceId);
-        } else if (item.GetBindLevel() == DEVICE) {
-            LOGI("The device %s is device-level bind.", GetAnonyString(std::string(trustDeviceId)).c_str());
-            deviceIdVec.push_back(trustDeviceId);
-        } else if (item.GetAccesser().GetAccesserBundleName() == pkgName &&
-            item.GetAccesser().GetAccesserDeviceId() == deviceId) {
-            LOGI("The device %s is pkg-level bind accesser.", GetAnonyString(std::string(trustDeviceId)).c_str());
-            deviceIdVec.push_back(trustDeviceId);
-        } else if (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
-            item.GetAccessee().GetAccesseeDeviceId() == deviceId) {
-            LOGI("The device %s is pkg-level bind accessee.", GetAnonyString(std::string(trustDeviceId)).c_str());
-            deviceIdVec.push_back(trustDeviceId);
+            deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
+        } else if (item.GetBindLevel() == DEVICE && item.GetBindType() == DM_POINT_TO_POINT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindLevel() == DEVICE && item.GetBindType() == DM_ACROSS_ACCOUNT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+        } else if (item.GetBindLevel() == APP && (item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserDeviceId() == deviceId) && item.GetBindType() == DM_POINT_TO_POINT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindLevel() == APP && (item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserDeviceId() == deviceId) && item.GetBindType() == DM_ACROSS_ACCOUNT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+        } else if (item.GetBindLevel() == APP && (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeDeviceId() == deviceId) && item.GetBindType() == DM_POINT_TO_POINT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindLevel() == APP && (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeDeviceId() == deviceId) && item.GetBindType() == DM_ACROSS_ACCOUNT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
         }
     }
-    LOGI("GetAppTrustDeviceList size is %d.", deviceIdVec.size());
-    return deviceIdVec;
+    LOGI("GetAppTrustDeviceList size is %d.", deviceIdMap.size());
+    return deviceIdMap;
 }
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm)
 {
-    LOGI("GetDeviceAclParam start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
     for (auto &item : profiles) {
-        if (item.GetStatus() != ACTIVE) {
-            continue;
-        }
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), (uint8_t *)deviceIdHash) != DM_OK) {
             LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;
         }
-        std::string trustDeviceIdHash = static_cast<std::string>(deviceIdHash);
-        if (trustDeviceIdHash != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
+        if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
             continue;
         }
-        if (item.GetBindType() == IDENTICAL_ACCOUNT) {
-            LOGI("The found device is identical account.");
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             isonline = true;
             authForm = DmAuthForm::IDENTICAL_ACCOUNT;
-        } else if (item.GetBindLevel() == DEVICE) {
-            LOGI("The found device is device bind-level.");
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == DEVICE) {
+            LOGI("The found device is peer-to-peer device bind-level.");
             isonline = true;
             authForm = DmAuthForm::PEER_TO_PEER;
-        } else if ((discoveryInfo.pkgname == item.GetAccesser().GetAccesserBundleName() &&
-            discoveryInfo.localDeviceId == item.GetAccesser().GetAccesserDeviceId()) ||
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == DEVICE) {
+            LOGI("The found device is acrooc-account device bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::ACROSS_ACCOUNT;
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+            (discoveryInfo.pkgname == item.GetAccesser().GetAccesserBundleName() &&
+            discoveryInfo.localDeviceId == item.GetAccesser().GetAccesserDeviceId())) {
+            LOGI("The found device is peer-to-peer app bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
             (discoveryInfo.pkgname == item.GetAccessee().GetAccesseeBundleName() &&
             discoveryInfo.localDeviceId == item.GetAccessee().GetAccesseeDeviceId())) {
-            LOGI("The found device is pkg bind-level.");
+            LOGI("The found device is acrooc-account app bind-level.");
             isonline = true;
             authForm = DmAuthForm::PEER_TO_PEER;
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (discoveryInfo.pkgname == item.GetAccesser().GetAccesserBundleName() &&
+            discoveryInfo.localDeviceId == item.GetAccesser().GetAccesserDeviceId())) {
+            LOGI("The found device is peer-to-peer app bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::ACROSS_ACCOUNT;
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (discoveryInfo.pkgname == item.GetAccessee().GetAccesseeBundleName() &&
+            discoveryInfo.localDeviceId == item.GetAccessee().GetAccesseeDeviceId())) {
+            LOGI("The found device is acrooc-account app bind-level.");
+            isonline = true;
+            authForm = DmAuthForm::ACROSS_ACCOUNT;
         }
     }
     return DM_OK;
@@ -135,13 +153,13 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             priority = IDENTICAL_ACCOUNT_TYPE;
         } else if (item.GetBindLevel() == DEVICE) {
-            priority = DEVICE_LEVEL_BIND_TYPE;
+            priority = DEVICE_PEER_TO_PEER_TYPE;
         } else if (item.GetBindLevel() == APP && (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
             item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
-            priority = APP_LEVEL_BIND_TYPE;
+            priority = APP_PEER_TO_PEER_TYPE;
         } else if (item.GetBindLevel() == APP && (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
             item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
-            priority = APP_LEVEL_BIND_TYPE;
+            priority = APP_PEER_TO_PEER_TYPE;
         }
         if (priority > highestPriority) {
             highestPriority = priority;
@@ -151,34 +169,83 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 }
 
 std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
-    std::string trustUdidHash)
+    std::string trustUdid)
 {
     LOGI("GetBindTypeByPkgName start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
     std::vector<int32_t> bindTypeVec;
     for (auto &item : profiles) {
-        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), (uint8_t *)udidHash) != DM_OK) {
-            LOGE("get udidhash by udid: %s failed.", GetAnonyString(udidHash).c_str());
-        }
-        std::string trustDeviceIdHash = static_cast<std::string>(udidHash);
-        if (trustDeviceIdHash != trustUdidHash || item.GetStatus() == INACTIVE) {
+        if (trustUdid != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
-        } else if (item.GetBindLevel() == DEVICE) {
-            bindTypeVec.push_back(DEVICE_LEVEL_BIND_TYPE);
-        } else if (item.GetAccesser().GetAccesserBundleName() == pkgName &&
-            item.GetAccesser().GetAccesserDeviceId() == requestDeviceId) {
-            bindTypeVec.push_back(APP_LEVEL_BIND_TYPE);
-        } else if (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
-            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) {
-            bindTypeVec.push_back(APP_LEVEL_BIND_TYPE);
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == DEVICE) {
+            bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == DEVICE) {
+            bindTypeVec.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP && (
+            item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserDeviceId() == requestDeviceId)) {
+            bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+            (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
+            bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
+            bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP && (
+            item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserDeviceId() == requestDeviceId)) {
+            bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
         }
     }
     return bindTypeVec;
+}
+
+std::vector<int32_t> DeviceProfileConnector::CompareBindType(std::vector<AccessControlProfile> profiles,
+    std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId)
+{
+    std::vector<int32_t> bindTypeIndex;
+    for (uint32_t index = 0; index < profiles.size(); index++) {
+        if (profiles[index].GetTrustDeviceId() != targetDeviceId || profiles[index].GetStatus() != ACTIVE) {
+            continue;
+        }
+        if (profiles[index].GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            sinkBindType.push_back(IDENTICAL_ACCOUNT_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_POINT_TO_POINT && profiles[index].GetBindLevel() == DEVICE) {
+            sinkBindType.push_back(DEVICE_PEER_TO_PEER_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_ACROSS_ACCOUNT && profiles[index].GetBindLevel() == DEVICE) {
+            sinkBindType.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_POINT_TO_POINT && profiles[index].GetBindLevel() == APP &&
+            (profiles[index].GetAccesser().GetAccesserBundleName() == pkgName &&
+            profiles[index].GetAccesser().GetAccesserDeviceId() == localDeviceId)) {
+            sinkBindType.push_back(APP_PEER_TO_PEER_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_POINT_TO_POINT && profiles[index].GetBindLevel() == APP &&
+            (profiles[index].GetAccessee().GetAccesseeBundleName() == pkgName &&
+            profiles[index].GetAccessee().GetAccesseeDeviceId() == localDeviceId)) {
+            sinkBindType.push_back(APP_PEER_TO_PEER_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_ACROSS_ACCOUNT && profiles[index].GetBindLevel() == APP &&
+            (profiles[index].GetAccessee().GetAccesseeBundleName() == pkgName &&
+            profiles[index].GetAccessee().GetAccesseeDeviceId() == localDeviceId)) {
+            sinkBindType.push_back(APP_ACROSS_ACCOUNT_TYPE);
+            bindTypeIndex.push_back(index);
+        } else if (profiles[index].GetBindType() == DM_ACROSS_ACCOUNT && profiles[index].GetBindLevel() == APP &&
+            (profiles[index].GetAccesser().GetAccesserBundleName() == pkgName &&
+            profiles[index].GetAccesser().GetAccesserDeviceId() == localDeviceId)) {
+            sinkBindType.push_back(APP_ACROSS_ACCOUNT_TYPE);
+            bindTypeIndex.push_back(index);
+        }
+    }
+    return bindTypeIndex;
 }
 
 std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
@@ -188,26 +255,9 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
     std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
     std::vector<int32_t> bindType;
-    for (uint32_t index = 0; index < profiles.size(); index++) {
-        if (profiles[index].GetTrustDeviceId() != targetDeviceId || profiles[index].GetStatus() != ACTIVE) {
-            continue;
-        }
-        if (profiles[index].GetBindType() == DM_IDENTICAL_ACCOUNT) {
-            sinkBindType.push_back(IDENTICAL_ACCOUNT_TYPE);
-            bindTypeIndex.push_back(index);
-        } else if (profiles[index].GetBindLevel() == DEVICE) {
-            sinkBindType.push_back(DEVICE_LEVEL_BIND_TYPE);
-            bindTypeIndex.push_back(index);
-        } else if ((profiles[index].GetAccesser().GetAccesserBundleName() == pkgName &&
-            profiles[index].GetAccesser().GetAccesserDeviceId() == targetDeviceId) ||
-            (profiles[index].GetAccessee().GetAccesseeBundleName() == pkgName &&
-            profiles[index].GetAccessee().GetAccesseeDeviceId() == localDeviceId)) {
-            sinkBindType.push_back(APP_LEVEL_BIND_TYPE);
-            bindTypeIndex.push_back(index);
-        }
-    }
+    std::vector<int32_t> bindTypeIndex =
+        CompareBindType(profiles, pkgName, sinkBindType, localDeviceId, targetDeviceId);
     for (uint32_t sinkIndex = 0; sinkIndex < sinkBindType.size(); sinkIndex++) {
         bool deleteAclFlag = true;
         for (uint32_t srcIndex = 0; srcIndex < bindTypeVec.size(); srcIndex++) {
@@ -258,13 +308,14 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
             continue;
         }
         offlineParam.leftAclNumber++;
-        uint32_t priority = APP_LEVEL_BIND_TYPE;
+        uint32_t priority = INVALIED_TYPE;
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             priority = IDENTICAL_ACCOUNT_TYPE;
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         } else if (item.GetBindType() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ALWAYS) {
-            priority = DEVICE_LEVEL_BIND_TYPE;
+            priority = DEVICE_PEER_TO_PEER_TYPE;
         } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
-            priority = DEVICE_LEVEL_BIND_TYPE;
+            priority = DEVICE_PEER_TO_PEER_TYPE;
             offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             offlineParam.leftAclNumber--;
@@ -272,7 +323,7 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
             item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
             (item.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
             item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
-            priority = APP_LEVEL_BIND_TYPE;
+            priority = APP_PEER_TO_PEER_TYPE;
             offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
             if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
                 DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
@@ -321,13 +372,17 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
 int32_t DeviceProfileConnector::DeleteAccessControlList(int32_t userId, std::string &accountId)
 {
     LOGI("DeleteAccessControlList by userId and accountId.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    std::vector<AccessControlProfile> profiles;
+    std::map<std::string, std::string> queryParams;
+    queryParams["userId"] = std::to_string(userId);
+    queryParams["accountId"] = accountId;
+    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
+        LOGE("DP GetAccessControlProfile failed.");
+    }
     LOGI("AccessControlProfile size is %d.", profiles.size());
     for (auto &item : profiles) {
-        if ((item.GetAccesser().GetAccesserUserId() == userId &&
-            item.GetAccesser().GetAccesserAccountId() == accountId) ||
-            (item.GetAccessee().GetAccesseeUserId() == userId &&
-            item.GetAccessee().GetAccesseeAccountId() == accountId)) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && (item.GetAccesser().GetAccesserUserId() &&
+            item.GetAccesser().GetAccesserAccountId() == accountId)) {
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
@@ -354,7 +409,7 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
             if (item.GetBindLevel() == DEVICE && item.GetBindType() != DM_IDENTICAL_ACCOUNT &&
                 item.GetAccesser().GetAccesserBundleName() == pkgName) {
                 LOGI("DeleteAccessControlList device unbind.");
-                offlineParam.bindType = DEVICE_LEVEL_BIND_TYPE;
+                offlineParam.bindType = DEVICE_PEER_TO_PEER_TYPE;
             }
         }
     }
@@ -366,12 +421,12 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
             item.GetAccessee().GetAccesseeDeviceId() == remoteDeviceId) ||
             (item.GetAccessee().GetAccesseeDeviceId() == localDeviceId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteDeviceId)) {
-            if (offlineParam.bindType == DEVICE_LEVEL_BIND_TYPE) {
+            if (offlineParam.bindType == DEVICE_PEER_TO_PEER_TYPE) {
                 DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
                 offlineParam.leftAclNumber--;
             } else if (item.GetAccesser().GetAccesserBundleName() == pkgName &&
                 item.GetAccessee().GetAccesseeBundleName() == pkgName) {
-                offlineParam.bindType = APP_LEVEL_BIND_TYPE;
+                offlineParam.bindType = APP_PEER_TO_PEER_TYPE;
                 DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
                 offlineParam.leftAclNumber--;
                 break;
@@ -445,6 +500,99 @@ int32_t DeviceProfileConnector::DeleteP2PAccessControlList(int32_t userId, std::
         }
     }
     return DM_OK;
+}
+
+bool DeviceProfileConnector::CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId)
+{
+    LOGI("DeviceProfileConnector::CheckSrcDeviceIdInAcl");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
+            item.GetBindLevel() == DEVICE && item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeUserId() == 0 && item.GetAccessee().GetAccesseeAccountId() == "") {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId)
+{
+    LOGI("DeviceProfileConnector::CheckSinkDeviceIdInAcl");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
+            item.GetBindLevel() == DEVICE && item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserUserId() == 0 && item.GetAccesser().GetAccesserAccountId() == "") {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId)
+{
+    return (CheckSinkDeviceIdInAcl(pkgName, deviceId) || CheckSrcDeviceIdInAcl(pkgName, deviceId));
+}
+
+int32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
+{
+    LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
+            item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+        }
+    }
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
+{
+    LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    int32_t trustNumber = 0;
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE) {
+            trustNumber++;
+        }
+    }
+    return trustNumber;
+}
+
+bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId,
+    std::string remoteDeviceId)
+{
+    LOGI("DeviceProfileConnector::CheckPkgnameInAcl");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %d.", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() != remoteDeviceId && item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
+            item.GetBindLevel() == DEVICE && (item.GetAccesser().GetAccesserBundleName() == pkgName ||
+            item.GetAccessee().GetAccesseeBundleName() == pkgName)) {
+            LOGI("The pkgname %s is peer-to-peer device unbind.", pkgName.c_str());
+            return true;
+        } else if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
+            item.GetBindLevel() == APP && item.GetAccesser().GetAccesserBundleName() == pkgName &&
+            item.GetAccesser().GetAccesserDeviceId() == localDeviceId) {
+            LOGI("The pkgname %s is peer-to-peer app unbind.", pkgName.c_str());
+            return true;
+        } else if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
+            item.GetBindLevel() == APP && item.GetAccessee().GetAccesseeBundleName() == pkgName &&
+            item.GetAccessee().GetAccesseeDeviceId() == localDeviceId) {
+            LOGI("The pkgname %s is peer-to-peer app unbind.", pkgName.c_str());
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
