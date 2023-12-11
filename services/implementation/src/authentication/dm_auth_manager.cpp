@@ -778,6 +778,8 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
         (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
         authResponseContext_->isAuthCodeReady == false)) {
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestContext_->reason = ERR_DM_BIND_PEER_UNSUPPORTED;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
