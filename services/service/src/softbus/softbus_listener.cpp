@@ -15,6 +15,7 @@
 
 #include "softbus_listener.h"
 
+#include <dlfcn.h>
 #include <mutex>
 #include <pthread.h>
 #include <securec.h>
@@ -26,7 +27,6 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "dm_radar_helper.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "softbus_adapte.cpp"
@@ -42,12 +42,15 @@ const int32_t DISCOVER_STATUS_LEN = 20;
 const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
+const int32_t LOAD_RADAR_TIMEOUT = 180;
 constexpr const char* DISCOVER_STATUS_KEY = "persist.distributed_hardware.device_manager.discover_status";
 constexpr const char* DISCOVER_STATUS_ON = "1";
 constexpr const char* DISCOVER_STATUS_OFF = "0";
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
+constexpr const char* LOAD_RADAR_TIMEOUT_TASK = "deviceManagerTimer:loadRadarSo";
+constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -56,8 +59,13 @@ constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
 static PulishStatus g_publishStatus = PulishStatus::STATUS_UNKNOWN;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
+static std::mutex g_radarLoadLock;
 static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
+bool SoftbusListener::isRadarSoLoad_ = false;
+IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
+std::shared_ptr<DmTimer> SoftbusListener::timer_ = std::make_shared<DmTimer>();
+void* SoftbusListener::radarHandle_ = nullptr;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -67,8 +75,10 @@ static int OnSessionOpened(int sessionId, int result)
         .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
         .channelId = sessionId,
     };
-    if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
-        LOGE("ReportAuthSessionOpenCb failed");
+    if (SoftbusListener::IsDmRadarHelperReady() && SoftbusListener::GetDmRadarHelperObj() != nullptr) {
+        if (!SoftbusListener::GetDmRadarHelperObj()->ReportAuthSessionOpenCb(info)) {
+            LOGE("ReportAuthSessionOpenCb failed");
+        }
     }
     return DeviceManagerService::GetInstance().OnSessionOpened(sessionId, result);
 }
@@ -164,8 +174,10 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             .localUdid = std::string(localDeviceId),
             .peerUdid = peerUdid,
         };
-        if (!DmRadarHelper::GetInstance().ReportNetworkOnline(radarInfo)) {
-            LOGE("ReportNetworkOnline failed");
+        if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+            if (!GetDmRadarHelperObj()->ReportNetworkOnline(radarInfo)) {
+                LOGE("ReportNetworkOnline failed");
+            }
         }
     }
 }
@@ -198,8 +210,10 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             .localUdid = std::string(localDeviceId),
             .peerUdid = peerUdid,
         };
-        if (!DmRadarHelper::GetInstance().ReportNetworkOffline(radarInfo)) {
-            LOGE("ReportNetworkOffline failed");
+        if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+            if (!GetDmRadarHelperObj()->ReportNetworkOffline(radarInfo)) {
+                LOGE("ReportNetworkOffline failed");
+            }
         }
     }
 }
@@ -274,8 +288,10 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         .peerNetId = "",
         .peerUdid = device->devId,
     };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
-        LOGE("ReportDiscoverResCallback failed");
+    if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+        if (!GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
+            LOGE("ReportDiscoverResCallback failed");
+        }
     }
     LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d, extraData=%s",
         GetAnonyString(dmDevInfo.deviceId).c_str(), dmDevInfo.deviceName, dmDevInfo.deviceTypeId,
@@ -424,8 +440,10 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
         .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
         .errCode = ret,
     };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverRegCallback(info)) {
-        LOGE("ReportDiscoverRegCallback failed");
+    if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+        if (!GetDmRadarHelperObj()->ReportDiscoverRegCallback(info)) {
+            LOGE("ReportDiscoverRegCallback failed");
+        }
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
@@ -447,8 +465,10 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
             static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
         .errCode = ret,
     };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
-        LOGE("ReportDiscoverUserRes failed");
+    if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+        if (!GetDmRadarHelperObj()->ReportDiscoverUserRes(info)) {
+            LOGE("ReportDiscoverUserRes failed");
+        }
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %d.", ret);
@@ -528,8 +548,11 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     if (ret != DM_OK) {
         radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL);
         radarInfo.errCode = ERR_DM_FAILED;
-        if (!DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
-            LOGE("ReportGetTrustDeviceList failed!");
+        radarInfo.discoverDevList = "";
+        if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+            if (!GetDmRadarHelperObj()->ReportGetTrustDeviceList(radarInfo)) {
+                LOGE("ReportGetTrustDeviceList failed");
+            }
         }
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
         return ERR_DM_FAILED;
@@ -547,9 +570,11 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         deviceInfoList.push_back(*deviceInfo);
     }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
-    radarInfo.discoverDevList = DmRadarHelper::GetInstance().GetDeviceInfoList(deviceInfoList);
-    if (deviceCount > 0 && !DmRadarHelper::GetInstance().ReportGetTrustDeviceList(radarInfo)) {
-        LOGE("no device trust or ReportGetTrustDeviceList failed!");
+    if (deviceCount > 0 && IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+        radarInfo.discoverDevList = GetDmRadarHelperObj()->GetDeviceInfoList(deviceInfoList);
+        if (!GetDmRadarHelperObj()->ReportGetTrustDeviceList(radarInfo)) {
+            LOGE("ReportGetTrustDeviceList failed");
+        }
     }
     FreeNodeInfo(nodeInfo);
     free(info);
@@ -858,6 +883,78 @@ void SoftbusListener::ClearDiscoveredDevice()
 {
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
     discoveredDeviceMap.clear();
+}
+
+IDmRadarHelper* SoftbusListener::GetDmRadarHelperObj()
+{
+    return dmRadarHelper_;
+}
+
+bool SoftbusListener::IsDmRadarHelperReady()
+{
+    LOGI("SoftbusListener::IsDmRadarHelperReady start.");
+    std::lock_guard<std::mutex> lock(g_radarLoadLock);
+    if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
+        LOGI("IsDmRadarHelperReady alReady");
+        if (timer_ != nullptr) {
+            timer_->DeleteTimer(std::string(LOAD_RADAR_TIMEOUT_TASK));
+            timer_->StartTimer(std::string(LOAD_RADAR_TIMEOUT_TASK), LOAD_RADAR_TIMEOUT,
+                [=] (std::string name) {
+                    SoftbusListener::CloseDmRadarHelperObj(name);
+                });
+        }
+        return true;
+    }
+    char path[PATH_MAX + 1] = {0x00};
+    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_RADAR_NAME);
+    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soName.c_str());
+        return false;
+    }
+    radarHandle_ = dlopen(path, RTLD_NOW);
+    if (radarHandle_ == nullptr) {
+        LOGE("load libdevicemanagerradar so %s failed.", soName.c_str());
+        return false;
+    }
+    dlerror();
+    auto func = (CreateDmRadarFuncPtr)dlsym(radarHandle_, "CreateDmRadarInstance");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(radarHandle_);
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+    isRadarSoLoad_ = true;
+    dmRadarHelper_ = func();
+    LOGI("IsDmRadarHelperReady ready success");
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(LOAD_RADAR_TIMEOUT_TASK));
+        timer_->StartTimer(std::string(LOAD_RADAR_TIMEOUT_TASK), LOAD_RADAR_TIMEOUT,
+            [=] (std::string name) {
+                SoftbusListener::CloseDmRadarHelperObj(name);
+            });
+    }
+    return true;
+}
+
+bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
+{
+    (void) name;
+    LOGI("SoftbusListener::CloseDmRadarHelperObj start.");
+    std::lock_guard<std::mutex> lock(g_radarLoadLock);
+    if (!isRadarSoLoad_ && (dmRadarHelper_ == nullptr) && (radarHandle_ == nullptr)) {
+        return true;
+    }
+
+    int32_t ret = dlclose(radarHandle_);
+    if (ret != 0) {
+        LOGE("close libdevicemanagerradar failed ret = %d.", ret);
+        return false;
+    }
+    isRadarSoLoad_ = false;
+    dmRadarHelper_ = nullptr;
+    radarHandle_ = nullptr;
+    LOGI("close libdevicemanagerradar so success.");
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
