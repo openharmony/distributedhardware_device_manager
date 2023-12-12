@@ -729,6 +729,21 @@ HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSi
     msgType = MSG_TYPE_REQ_AUTH_TERMINATE;
     ret = authMessageProcessor->CreateSimpleMessage(msgType);
     ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_RESP_AUTH_EXT;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_REQ_PUBLICKEY;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_REQ_SYNC_DELETE;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_NEGOTIATE;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_RESP_NEGOTIATE;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
 }
 
 /**
@@ -926,6 +941,78 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Leve
     )";
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_007, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "REPLY": 1,
+        "LOCALDEVICEID": "devId_4655198_test",
+        "hostPkgname": "pkgname_dm_test"
+        "MSG_TYPE": "501",
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_008, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "publicKey": "publicKey_test",
+        "MSG_TYPE": "502",
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_009, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    std::string message = R"(
+    {
+        "REPLY": 1,
+        "tokenId": "tokenId_123_test",
+        "confirmOperation": "1",
+        "REQUESTID": "1",
+        "MSG_TYPE": "501",
+    }
+    )";
+    int32_t ret = authMessageProcessor->ParseMessage(message);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    nlohmann::json jsonObj;
+    jsonObj[TAG_LOCAL_ACCOUNTID] = "local_accountId_123";
+    jsonObj[TAG_LOCAL_USERID] = 1;
+    jsonObj[TAG_BIND_LEVEL] = 1;
+    jsonObj[TAG_ISONLINE] = true;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = true;
+    jsonObj[TAG_AUTHED] = true;
+    jsonObj[TAG_TOKENID] = 100;
+        jsonObj[TAG_DMVERSION] = "1.1.1";
+    jsonObj[TAG_HAVECREDENTIAL] = true;
+    jsonObj[TAG_BIND_TYPE_SIZE] = 5;
+    authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
 }
 } // namespace
 } // namespace DistributedHardware
