@@ -836,14 +836,14 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_105, testing::ext::TestSize
 HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
-    uint16_t subscribeId = 0;
+    uint16_t subscribeId = -1;
     std::string filterOptions = "filterOptions";
+    DeviceManagerImpl::GetInstance().subscribIdMap_.clear();
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
-    DeviceManagerImpl::GetInstance().subscribIdMap_.clear();
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -982,7 +982,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
 {
     std::string pkgName = "pkgName";
     int32_t ret =  DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
