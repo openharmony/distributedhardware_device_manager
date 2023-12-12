@@ -674,5 +674,10 @@ std::string DmRadarHelper::GetLocalUdid()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     return std::string(localDeviceId);
 }
+
+IDmRadarHelper *CreateDmRadarInstance()
+{
+    return &DmRadarHelper::GetInstance();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
