@@ -33,6 +33,7 @@ group("unittest") {
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_device_state_manager",
+    ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_dfx",
     ":UTTest_dm_discovery_filter",
     ":UTTest_dm_discovery_manager",
@@ -742,6 +743,29 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
 }
 
 ## UTTest_dm_radar_helper_test }}}
+
+###############################
+## UnitTest UTTest_dm_deviceprofile_connector {{{
+ohos_unittest("UTTest_dm_deviceprofile_connector") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+    "${devicemanager_path}/test/commonunittest",
+    "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
+    "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+  ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector.cpp" ]
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+}
+
+## UTTest_dm_deviceprofile_connector }}}
 
 #############################
 
