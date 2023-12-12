@@ -80,12 +80,11 @@ public:
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
-
-private:
-    int32_t InitSoftPublishLNN();
     static IDmRadarHelper* GetDmRadarHelperObj();
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);
+private:
+    int32_t InitSoftPublishLNN();
 private:
     static bool isRadarSoLoad_;
     static IDmRadarHelper *dmRadarHelper_;

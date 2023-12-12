@@ -76,7 +76,6 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "${devicemanager_path}/radar:devicemanagerradar",
         "${utils_path}:devicemanagerutils",
         "//base/security/device_auth/services:deviceauth_sdk",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
