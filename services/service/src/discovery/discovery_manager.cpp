@@ -273,8 +273,10 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
         .stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL),
         .errCode = result,
     };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
-        LOGE("ReportDiscoverResCallback failed");
+    if (SoftbusListener::IsDmRadarHelperReady() && SoftbusListener::GetDmRadarHelperObj() != nullptr) {
+        if (!SoftbusListener::GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
+            LOGE("ReportDiscoverResCallback failed");
+        }
     }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);

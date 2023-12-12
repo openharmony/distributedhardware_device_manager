@@ -19,7 +19,53 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "linux") {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagersdk") {
+      include_dirs = [
+        "${innerkits_path}/native_cpp/include/lite",
+        "//third_party/cJSON",
+        "//kernel/liteos_m/kal/cmsis",
+        "//utils/native/lite/include",
+        "//kernel/liteos_m/kal/posix/include",
+        "//third_party/mbedtls/include",
+        "//third_party/mbedtls/include/mbedtls",
+        "//third_party/musl/porting/liteos_m/kernel/include",
+        "//device/bestechnic/bes2600w/sdk_liteos/bsp/platform/hal",
+        "//foundation/communication/wifi_lite/interfaces/wifiservice",
+        "//foundation/communication/dsoftbus/core/common/include",
+        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+        "//foundation/communication/dsoftbus/interfaces/kits/transport",
+        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+        "//base/security/device_auth/interfaces/inner_api",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
+      ]
+
+      sources = [
+        "${innerkits_path}/native_cpp/src/lite/device_manager_impl_lite_m.c",
+        "${innerkits_path}/native_cpp/src/lite/hichain_adapter.c",
+        "${innerkits_path}/native_cpp/src/lite/softbus_adapter.c",
+      ]
+
+      external_deps = [
+        "hilog_lite:hilog_static",
+        "ipc:ipc_single",
+        "napi:ace_napi",
+        "utils_lite:utils",
+      ]
+
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-std=c99",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+      ]
+      cflags_cc = cflags
+    }
+  } else {
     shared_library("devicemanagersdk") {
       include_dirs = [
         "include",

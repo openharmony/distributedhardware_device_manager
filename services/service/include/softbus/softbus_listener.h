@@ -27,6 +27,8 @@
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
+#include "dm_radar_helper.h"
+#include "dm_timer.h"
 #include "dm_subscribe_info.h"
 #include "i_softbus_discovering_callback.h"
 #include "inner_session.h"
@@ -81,6 +83,14 @@ public:
 
 private:
     int32_t InitSoftPublishLNN();
+    static IDmRadarHelper* GetDmRadarHelperObj();
+    static bool IsDmRadarHelperReady();
+    static bool CloseDmRadarHelperObj(std::string name);
+private:
+    static bool isRadarSoLoad_;
+    static IDmRadarHelper *dmRadarHelper_;
+    static std::shared_ptr<DmTimer> timer_;
+    static void *radarHandle_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

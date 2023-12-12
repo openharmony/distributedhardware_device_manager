@@ -121,37 +121,70 @@ struct RadarInfo {
     int32_t errCode;
 };
 
-class DmRadarHelper {
+class IDmRadarHelper {
+public:
+    virtual ~IDmRadarHelper() {}
+    /**
+     * @tc.name: ReportDiscoverRegCallback
+     * @tc.desc: report discover regsit callback
+     * @tc.type: FUNC
+     */
+    virtual bool ReportDiscoverRegCallback(struct RadarInfo info) = 0;
+    virtual bool ReportDiscoverResCallback(struct RadarInfo info) = 0;
+    virtual bool ReportDiscoverUserRes(struct RadarInfo info) = 0;
+    virtual bool ReportAuthStart(std::string peerUdid) = 0;
+    virtual bool ReportAuthOpenSession(struct RadarInfo info) = 0;
+    virtual bool ReportAuthSessionOpenCb(struct RadarInfo info) = 0;
+    virtual bool ReportAuthSendRequest(struct RadarInfo info) = 0;
+    virtual bool ReportAuthPullAuthBox(struct RadarInfo info) = 0;
+    virtual bool ReportAuthConfirmBox(struct RadarInfo info) = 0;
+    virtual bool ReportAuthCreateGroup(struct RadarInfo info) = 0;
+    virtual bool ReportAuthCreateGroupCb(std::string funcName, int32_t stageRes) = 0;
+    virtual bool ReportAuthPullPinBox(struct RadarInfo info) = 0;
+    virtual bool ReportAuthInputPinBox(struct RadarInfo info) = 0;
+    virtual bool ReportAuthAddGroup(struct RadarInfo info) = 0;
+    virtual bool ReportAuthAddGroupCb(std::string funcName, int32_t stageRes) = 0;
+    virtual bool ReportNetworkOnline(struct RadarInfo info) = 0;
+    virtual bool ReportNetworkOffline(struct RadarInfo info) = 0;
+    virtual bool ReportDeleteTrustRelation(struct RadarInfo info) = 0;
+    virtual bool ReportGetTrustDeviceList(struct RadarInfo info) = 0;
+    virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
+    virtual std::string GetUdidHashByUdid(std::string udid) = 0;
+};
+
+class DmRadarHelper : public IDmRadarHelper {
     DECLARE_SINGLE_INSTANCE(DmRadarHelper);
 public:
-    bool ReportDiscoverRegCallback(struct RadarInfo info);
-    bool ReportDiscoverResCallback(struct RadarInfo info);
-    bool ReportDiscoverUserRes(struct RadarInfo info);
-    bool ReportAuthStart(std::string peerUdid);
-    bool ReportAuthOpenSession(struct RadarInfo info);
-    bool ReportAuthSessionOpenCb(struct RadarInfo info);
-    bool ReportAuthSendRequest(struct RadarInfo info);
-    bool ReportAuthPullAuthBox(struct RadarInfo info);
-    bool ReportAuthConfirmBox(struct RadarInfo info);
-    bool ReportAuthCreateGroup(struct RadarInfo info);
-    bool ReportAuthCreateGroupCb(std::string funcName, int32_t stageRes);
-    bool ReportAuthPullPinBox(struct RadarInfo info);
-    bool ReportAuthInputPinBox(struct RadarInfo info);
-    bool ReportAuthAddGroup(struct RadarInfo info);
-    bool ReportAuthAddGroupCb(std::string funcName, int32_t stageRes);
-    bool ReportNetworkOnline(struct RadarInfo info);
-    bool ReportNetworkOffline(struct RadarInfo info);
-    bool ReportDeleteTrustRelation(struct RadarInfo info);
-    bool ReportGetTrustDeviceList(struct RadarInfo info);
-    std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList);
-    std::string GetStringNetIdList(std::vector<DmDeviceInfo> &deviceInfoList);
-    std::string GetUdidHashByUdid(std::string udid);
+    bool ReportDiscoverRegCallback(struct RadarInfo info) override;
+    bool ReportDiscoverResCallback(struct RadarInfo info) override;
+    bool ReportDiscoverUserRes(struct RadarInfo info) override;
+    bool ReportAuthStart(std::string peerUdid) override;
+    bool ReportAuthOpenSession(struct RadarInfo info) override;
+    bool ReportAuthSessionOpenCb(struct RadarInfo info) override;
+    bool ReportAuthSendRequest(struct RadarInfo info) override;
+    bool ReportAuthPullAuthBox(struct RadarInfo info) override;
+    bool ReportAuthConfirmBox(struct RadarInfo info) override;
+    bool ReportAuthCreateGroup(struct RadarInfo info) override;
+    bool ReportAuthCreateGroupCb(std::string funcName, int32_t stageRes) override;
+    bool ReportAuthPullPinBox(struct RadarInfo info) override;
+    bool ReportAuthInputPinBox(struct RadarInfo info) override;
+    bool ReportAuthAddGroup(struct RadarInfo info) override;
+    bool ReportAuthAddGroupCb(std::string funcName, int32_t stageRes) override;
+    bool ReportNetworkOnline(struct RadarInfo info) override;
+    bool ReportNetworkOffline(struct RadarInfo info) override;
+    bool ReportDeleteTrustRelation(struct RadarInfo info) override;
+    bool ReportGetTrustDeviceList(struct RadarInfo info) override;
+    std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
+    std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);
 private:
     int32_t GetErrorCode(int32_t errCode, int32_t module);
     std::string GetAnonyUdid(std::string udid);
     std::string GetLocalUdid();
 };
+
+extern "C" IDmRadarHelper *CreateDmRadarInstance();
+using CreateDmRadarFuncPtr = IDmRadarHelper *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_RADAR_HELPER_H

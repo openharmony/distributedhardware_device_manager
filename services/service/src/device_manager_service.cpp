@@ -877,7 +877,7 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
 int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
 {
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %s does not have permission to call ExportAuthCode.");
+        LOGE("The caller does not have permission to call ExportAuthCode.");
         return ERR_DM_NO_PERMISSION;
     }
     std::string processName = "";
