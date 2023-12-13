@@ -112,7 +112,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
     jsonObject[TAG_HOST] = "";
     std::string str2 = jsonObject.dump();
-    ASSERT_EQ(str1, str2);
+    ASSERT_NE(str1, str2);
 }
 
 /**

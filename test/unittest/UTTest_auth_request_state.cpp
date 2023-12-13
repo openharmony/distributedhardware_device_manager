@@ -633,6 +633,146 @@ HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level0)
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: AuthRequestCredential::GetStateType_005
+ * @tc.desc: 1 call AuthRequestCredential::GetStateType
+ *           2 check ret is AuthState::AUTH_REQUEST_CREDENTIAL
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredential>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AuthState::AUTH_REQUEST_CREDENTIAL);
+}
+
+/**
+ * @tc.name: AuthRequestCredential::Enter_009
+ * @tc.desc: 1 call AuthRequestCredential::Enter
+ *           2 check ret is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredential>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AuthRequestCredentialDone::GetStateType_009
+ * @tc.desc: 1 call AuthRequestCredentialDone::GetStateType
+ *           2 check ret is AUTH_REQUEST_CREDENTIAL_DONE
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, GetStateType_009, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredentialDone>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_CREDENTIAL_DONE);
+}
+
+/**
+ * @tc.name: AuthRequestCredentialDone::Enter_010
+ * @tc.desc: 1 call AuthRequestCredentialDone::Enter
+ *           2 check ret is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredentialDone>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AuthRequestDeleteInit::GetStateType_010
+ * @tc.desc: 1 call AuthRequestDeleteInit::GetStateType
+ *           2 check ret is AUTH_REQUEST_DELETE_INIT
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, GetStateType_010, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestDeleteInit>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_DELETE_INIT);
+}
+
+/**
+ * @tc.name: AuthRequestDeleteInit::Enter_017
+ * @tc.desc: 1 call AuthRequestDeleteInit::Enter
+ *           2 check ret is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, Enter_017, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestDeleteInit>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AuthRequestSyncDeleteAcl::GetStateType_011
+ * @tc.desc: 1 call AuthRequestSyncDeleteAcl::GetStateType
+ *           2 check ret is AUTH_REQUEST_SYNCDELETE
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, GetStateType_011, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestSyncDeleteAcl>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_SYNCDELETE);
+}
+
+/**
+ * @tc.name: AuthRequestSyncDeleteAcl::Enter_018
+ * @tc.desc: 1 call AuthRequestSyncDeleteAcl::Enter
+ *           2 check ret is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, Enter_018, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestSyncDeleteAcl>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AuthRequestSyncDeleteAclNone::GetStateType_012
+ * @tc.desc: 1 call AuthRequestSyncDeleteAclNone::GetStateType
+ *           2 check ret is AUTH_REQUEST_SYNCDELETE_DONE
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, GetStateType_012, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestSyncDeleteAclNone>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_SYNCDELETE_DONE);
+}
+
+/**
+ * @tc.name: AuthRequestSyncDeleteAclNone::Enter_019
+ * @tc.desc: 1 call AuthRequestSyncDeleteAclNone::Enter
+ *           2 check ret is ERR_DM_FAILED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthRequestStateTest, Enter_019, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestSyncDeleteAclNone>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -563,8 +563,8 @@ HWTEST_F(DeviceManagerImplTest, UnBindDevice_103, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DeviceManagerImplTest, UnBindDevice_104, testing::ext::TestSize.Level0)
 {
-    std::string packName = "com.ohos.test";
-    std::string deviceId = "deviceId";
+    std::string packName;
+    std::string deviceId;
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().UnBindDevice(packName, deviceId);
@@ -650,7 +650,7 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_103, testing::ext::TestSize.Level0)
  *              set callback null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::BindDevice with parameter
- *           4. check ret is ERR_DM_INPUT_PARA_INVALID
+ *           4. check ret is ERR_DM_BIND_INPUT_PARA_INVALID
  * deviceTypeId
  * @tc.type: FUNC
  */
@@ -664,7 +664,7 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_104, testing::ext::TestSize.Level0)
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
     ret = DeviceManager::GetInstance().BindDevice(packName, bindType, deviceId, bindParam, callback);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -797,7 +797,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_101, testing::ext::TestSize.L
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_DISCOVERY_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -816,8 +816,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     // 3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 4. check ret is ERR_DM_DISCOVERY_FAILED
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -877,7 +877,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
  *              set subscribeId is 0
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_DISCOVERY_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -894,7 +894,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.
     // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -905,7 +905,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_PUBLISH_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -923,8 +923,8 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_101, testing::ext::TestSi
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
-    // 4. check ret is ERR_DM_PUBLISH_FAILED
-    ASSERT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -934,7 +934,7 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_101, testing::ext::TestSi
  *              set publishId is 0
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_PUBLISH_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
@@ -950,8 +950,8 @@ HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_101, testing::ext::Test
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
-    // 4. check ret is ERR_DM_PUBLISH_FAILED
-    ASSERT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 

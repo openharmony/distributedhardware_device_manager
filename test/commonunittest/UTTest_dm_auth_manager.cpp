@@ -512,7 +512,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::string pkgName = "com.ohos.test";
-    int32_t authType = 0;
+    int32_t authType = -1;
     std::string deviceId = "113456";
     std::string extra = "extraTest";
     int32_t ret = authManager->AuthenticateDevice(pkgName, authType, deviceId, extra);

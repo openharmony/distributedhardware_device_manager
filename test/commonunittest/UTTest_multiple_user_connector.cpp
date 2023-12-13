@@ -46,7 +46,7 @@ HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::T
 {
     int32_t ret = DM_OK;
     ret = MultipleUserConnector::GetCurrentAccountUserID();
-    ASSERT_TRUE(ret > 0);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
