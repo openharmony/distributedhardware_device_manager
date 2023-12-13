@@ -21,7 +21,11 @@
 #ifdef __LP64__
 constexpr const char* DM_LIB_LOAD_PATH = "/system/lib64/";
 #else
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DM_LIB_LOAD_PATH = "/system/lib/";
+#else
+constexpr const char* DM_LIB_LOAD_PATH = "/usr/lib/";
+#endif
 #endif
 
 namespace OHOS {

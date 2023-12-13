@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,40 +13,23 @@
  * limitations under the License.
  */
 
-#include "permission_manager.h"
+#include "dm_adapter_manager.h"
 
 #include "dm_constants.h"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
-
-bool PermissionManager::CheckPermission(void)
+DmAdapterManager &DmAdapterManager::GetInstance()
 {
-    return true;
+    static DmAdapterManager instance;
+    return instance;
 }
 
-bool PermissionManager::CheckNewPermission(void)
+std::shared_ptr<ICryptoAdapter> DmAdapterManager::GetCryptoAdapter(const std::string &soName)
 {
-    return true;
-}
-
-int32_t PermissionManager::GetCallerProcessName(std::string &processName)
-{
-    (void)processName;
-    return DM_OK;
-}
-
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    (void)processName;
-    return true;
+    (void)soName;
+    return nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

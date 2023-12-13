@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,40 +13,17 @@
  * limitations under the License.
  */
 
-#include "permission_manager.h"
+#include "dm_ability_manager.h"
 
 #include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
-
-bool PermissionManager::CheckPermission(void)
+AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
 {
-    return true;
-}
-
-bool PermissionManager::CheckNewPermission(void)
-{
-    return true;
-}
-
-int32_t PermissionManager::GetCallerProcessName(std::string &processName)
-{
-    (void)processName;
-    return DM_OK;
-}
-
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    (void)processName;
-    return true;
+    // not support for L1 yet, do nothing. just save status and role
+    (void)params;
+    return AbilityStatus::ABILITY_STATUS_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

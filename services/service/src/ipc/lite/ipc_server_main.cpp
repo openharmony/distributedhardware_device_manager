@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,30 @@
 #include <unistd.h>
 
 #include "dm_constants.h"
+#include "dm_log.h"
+#include "device_manager_service.h"
+#include "ipc_server_stub.h"
+
+using namespace OHOS::DistributedHardware;
 
 static void InitAll()
 {
-    const int32_t DM_SERVICE_INIT_DELAY = 2;
+    const int32_t DM_SERVICE_INIT_DELAY = 5;
     sleep(DM_SERVICE_INIT_DELAY);
+    if (IpcServerStubInit() != DM_OK) {
+        LOGE("IpcServerStubInit failed.");
+        return;
+    }
+    if (DeviceManagerService::GetInstance().Init() != DM_OK) {
+        LOGE("service init failed.");
+        return;
+    }
+    LOGI("DM service init success.");
 }
 
 int32_t main(int32_t argc, char *argv[])
 {
+    LOGI("DM service init start.");
     (void)argc;
     (void)argv;
     InitAll();

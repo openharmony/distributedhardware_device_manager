@@ -84,6 +84,8 @@ public:
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);
 private:
+    int32_t InitSoftPublishLNN();
+private:
     static bool isRadarSoLoad_;
     static IDmRadarHelper *dmRadarHelper_;
     static std::shared_ptr<DmTimer> timer_;

@@ -1,0 +1,60 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+} else {
+  import("//build/ohos.gni")
+}
+
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+group("lite_devicemanager_test") {
+  if (ohos_build_type == "debug") {
+    deps = [ ":lite_devicemanager_unittest" ]
+  }
+}
+
+if (defined(ohos_lite)) {
+  if (ohos_build_type == "debug") {
+    unittest("lite_devicemanager_unittest") {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/unittest/devicemanager"
+
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
+        "${common_path}/include/ipc/model",
+        "${innerkits_path}/native_cpp/include",
+        "${innerkits_path}/native_cpp/include/ipc",
+        "${innerkits_path}/native_cpp/include/ipc/lite",
+        "${innerkits_path}/native_cpp/include/notify",
+        "${interfaces_path}/c/ipc/include",
+        "${interfaces_path}/ipc_core/include",
+        "${samgr_lite_path}/kits/samgr",
+        "${samgr_lite_path}/kits/registry",
+        "${utils_lite_path}/include",
+        "//third_party/bounds_checking_function/include",
+        "//third_party/json/include",
+      ]
+
+      sources = [ "device_manager_linux_test.cpp" ]
+
+      deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+    }
+  }
+}

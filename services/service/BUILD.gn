@@ -20,52 +20,84 @@ if (defined(ohos_lite)) {
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  executable("devicemanagerservice") {
-    include_dirs = [
-      "include",
-      "include/softbus",
-      "include/ipc/lite",
-      "include/permission/lite",
-      "${common_path}/include",
-      "${common_path}/include/ipc",
-      "${common_path}/include/ipc/lite",
-      "${common_path}/include/ipc/model",
-      "${utils_path}/include",
-      "${utils_path}/include/fwkload/lite",
-      "${innerkits_path}/native_cpp/include",
-      "${innerkits_path}/native_cpp/include/ipc",
-      "${innerkits_path}/native_cpp/include/ipc/lite",
-      "//third_party/json/include",
-      "//third_party/bounds_checking_function/include",
-    ]
+  if (ohos_kernel_type == "linux") {
+    executable("devicemanagerservice") {
+      include_dirs = [
+        "include",
+        "include/advertise",
+        "include/discovery",
+        "include/softbus",
+        "include/ipc/lite",
+        "include/permission/lite",
+        "${common_path}/include",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
+        "${common_path}/include/ipc/model",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
+        "${utils_path}/include",
+        "${utils_path}/include/appInfo/lite",
+        "${utils_path}/include/crypto",
+        "${utils_path}/include/fwkload/lite",
+        "${utils_path}/include/timer",
+        "${innerkits_path}/native_cpp/include",
+        "${innerkits_path}/native_cpp/include/ipc",
+        "${innerkits_path}/native_cpp/include/ipc/lite",
+        "//third_party/json/include",
+        "//third_party/bounds_checking_function/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
+        "${interfaces_path}/c/ipc/include",
+        "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+        "${devicemanager_path}/radar/include",
+      ]
 
-    sources = [ "src/ipc/lite/ipc_server_main.cpp" ]
-    ldflags = dm_ldflags
+      sources = [
+        "${common_path}/src/dm_softbus_adapter_crypto.cpp",
+        "src/advertise/advertise_manager.cpp",
+        "src/device_manager_service.cpp",
+        "src/device_manager_service_listener.cpp",
+        "src/discovery/discovery_filter.cpp",
+        "src/discovery/discovery_manager.cpp",
+        "src/ipc/lite/ipc_cmd_parser.cpp",
+        "src/ipc/lite/ipc_server_listener.cpp",
+        "src/ipc/lite/ipc_server_listenermgr.cpp",
+        "src/ipc/lite/ipc_server_main.cpp",
+        "src/ipc/lite/ipc_server_stub.cpp",
+        "src/permission/lite/permission_manager.cpp",
+        "src/softbus/softbus_listener.cpp",
+      ]
 
-    defines = [
-      "LITE_DEVICE",
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagerservice\"",
-      "LOG_DOMAIN=0xD004100",
-    ]
+      defines = [
+        "LITE_DEVICE",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerservice\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
 
-    deps = [
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${utils_path}:devicemanagerutils",
-      "//third_party/bounds_checking_function:libsec_shared",
-      "//third_party/mbedtls:mbedtls_shared",
-    ]
+      deps = [
+        "${utils_path}:devicemanagerutils",
+        "//base/security/device_auth/services:deviceauth_sdk",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
+        "//commonlibrary/utils_lite:utils",
+        "//foundation/communication/dsoftbus:dsoftbus",
+        "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/mbedtls:mbedtls_shared",
+      ]
 
-    external_deps = [
-      "device_auth:deviceauth_sdk",
-      "dsoftbus:softbus_client",
-      "hilog_lite:hilog_shared",
-      "init:libbegetutil",
-      "ipc:ipc_single",
-      "safwk:system_ability_fwk",
-      "samgr:samgr_proxy",
-      "utils_lite:utils",
-    ]
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+        "-Wshadow",
+      ]
+
+      cflags_cc = cflags
+    }
   }
 } else if (!support_jsapi) {
   group("devicemanagerservice") {

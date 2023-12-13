@@ -328,6 +328,7 @@ SoftbusListener::SoftbusListener()
         .OnStreamReceived = nullptr
     };
     LOGD("SoftbusListener constructor.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer failed, ret: %d.", ret);
@@ -344,15 +345,18 @@ SoftbusListener::SoftbusListener()
         LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %d.", ret);
     }
     SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
+#endif
     InitSoftbusListener();
     ClearDiscoveredDevice();
 }
 
 SoftbusListener::~SoftbusListener()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
     SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
+#endif
     LOGD("SoftbusListener destructor.");
 }
 
@@ -360,6 +364,7 @@ int32_t SoftbusListener::InitSoftbusListener()
 {
     int32_t ret;
     int32_t retryTimes = 0;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     do {
         ret = RegNodeDeviceStateCb(DM_PKG_NAME, &softbusNodeStateCb_);
         if (ret != DM_OK) {
@@ -368,6 +373,13 @@ int32_t SoftbusListener::InitSoftbusListener()
             usleep(SOFTBUS_CHECK_INTERVAL);
         }
     } while (ret != DM_OK);
+#endif
+    return InitSoftPublishLNN();
+}
+
+int32_t SoftbusListener::InitSoftPublishLNN()
+{
+    int32_t ret;
 
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;

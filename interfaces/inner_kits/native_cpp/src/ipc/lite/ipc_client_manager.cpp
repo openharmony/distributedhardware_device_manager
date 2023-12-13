@@ -70,6 +70,11 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
         return ret;
     }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DeviceManager::UnInitDeviceManager completed, pkgName: %s, ret = %d", pkgName.c_str(), ret);
+        return ret;
+    }
     packageInitSet_.erase(pkgName);
     LOGI("UnInitDeviceManager SUCCESS");
     return DM_OK;
