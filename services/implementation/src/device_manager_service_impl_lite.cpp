@@ -251,6 +251,40 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
     return credentialMgr_->DeleteCredential(pkgName, deleteInfo);
 }
 
+int32_t DeviceManagerServiceImpl::MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr)
+{
+    (void)pkgName;
+    (void)returnJsonStr;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    (void)reqJsonStr;
+    (void)returnJsonStr;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    (void)reqJsonStr;
+    (void)returnJsonStr;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    (void)reqJsonStr;
+    (void)returnJsonStr;
+    return DM_OK;
+}
+
 int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &pkgName)
 {
     (void)pkgName;

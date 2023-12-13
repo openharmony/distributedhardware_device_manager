@@ -165,6 +165,7 @@ if (defined(ohos_lite)) {
       "src/dependency/commonevent/dm_common_event_manager.cpp",
       "src/dependency/hichain/hichain_auth_connector.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
+      "src/dependency/hichain/mine_hichain_connector.cpp",
       "src/dependency/softbus/softbus_connector.cpp",
       "src/dependency/softbus/softbus_session.cpp",
       "src/device_manager_service_impl.cpp",
