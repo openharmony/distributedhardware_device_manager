@@ -32,7 +32,6 @@ const int32_t DISCOVERY_TIMEOUT = 120;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
 constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
-constexpr const char* DM_PKG_NAME_APPROACH = "ohos.distributedhardware.devicemanager.approach";
 
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
     std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
@@ -71,7 +70,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
     }
 
-    int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME_APPROACH, dmSubInfo, LNN_DISC_CAPABILITY);
+    int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %d.", ret);
         return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
