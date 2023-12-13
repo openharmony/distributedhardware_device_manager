@@ -56,7 +56,7 @@ public:
     static void ClearDiscoveredDevice();
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
-    static int32_t GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId);
+    static int32_t GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId, ConnectionAddrType &addrType);
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceBasicInfo &devInfo);
     static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);

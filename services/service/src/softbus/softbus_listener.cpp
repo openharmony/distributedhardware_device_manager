@@ -795,7 +795,12 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
         dmDevice.extraData = jsonObj.dump();
         return;
     }
-    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
+    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
+        std::string wifiIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
+        jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_ETH_IP;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
         std::string wifiIp((addrInfo->info).ip.ip);
         jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
         jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
@@ -846,7 +851,8 @@ void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
     discoveredDeviceMap.insert(std::pair<std::string, std::shared_ptr<DeviceInfo>>(device->devId, infoPtr));
 }
 
-int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId)
+int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId,
+    ConnectionAddrType &addrType)
 {
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
     auto iter = discoveredDeviceMap.find(deviceId);
@@ -861,7 +867,12 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
         return ERR_DM_BIND_COMMON_FAILED;
     }
 
-    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
+    addrType = addrInfo->type;
+    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
+        std::string wifiIp((addrInfo->info).ip.ip);
+        targetId.wifiIp = wifiIp;
+        targetId.wifiPort = (addrInfo->info).ip.port;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
         std::string wifiIp((addrInfo->info).ip.ip);
         targetId.wifiIp = wifiIp;
         targetId.wifiPort = (addrInfo->info).ip.port;

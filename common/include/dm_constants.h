@@ -158,6 +158,7 @@ const std::string CONN_ADDR_TYPE_ID = "ID_TYPE";
 const std::string CONN_ADDR_TYPE_BR = "BR_TYPE";
 const std::string CONN_ADDR_TYPE_BLE = "BLE_TYPE";
 const std::string CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
+const std::string CONN_ADDR_TYPE_ETH_IP = "ETH_IP_TYPE";
 
 // Parameter Key
 const std::string PARAM_KEY_META_TYPE = "META_TYPE";

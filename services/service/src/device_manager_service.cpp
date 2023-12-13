@@ -429,7 +429,8 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     }
 
     PeerTargetId targetId;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId);
+    ConnectionAddrType addrType;
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId, addrType);
     if (ret != DM_OK) {
         LOGE("AuthenticateDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
@@ -437,7 +438,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     std::map<std::string, std::string> bindParam;
     bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, extra));
-
+    bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
 }
 
@@ -477,7 +478,8 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     }
 
     PeerTargetId targetId;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId);
+    ConnectionAddrType addrType;
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId, addrType);
     if (ret != DM_OK) {
         LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
@@ -485,7 +487,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     std::map<std::string, std::string> bindParamMap;
     bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, bindParam));
-
+    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParamMap);
 }
 
