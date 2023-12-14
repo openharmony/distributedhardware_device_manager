@@ -54,8 +54,8 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
     DeviceManagerNotify::GetInstance().OnUiCall(pkgName, deviceId);
 }
