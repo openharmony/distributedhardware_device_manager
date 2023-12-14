@@ -478,7 +478,7 @@ private:
     int32_t GetAuthCode(const std::string &pkgName, int32_t &pinCode);
     bool IsAuthTypeSupported(const int32_t &authType);
     bool IsAuthCodeReady(const std::string &pkgName);
-    int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId);
+    int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId, std::string &addrType);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
     void CompatiblePutAcl();

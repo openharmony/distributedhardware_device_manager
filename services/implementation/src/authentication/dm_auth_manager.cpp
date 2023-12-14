@@ -1498,7 +1498,11 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     peerTargetId_ = targetId;
     std::string deviceId = "";
-    if (ParseConnectAddr(targetId, deviceId) == DM_OK) {
+    std::string addrType;
+    if (bindParam.count(PARAM_KEY_CONN_ADDR_TYPE) != 0) {
+        addrType = bindParam.at(PARAM_KEY_CONN_ADDR_TYPE);
+    }
+    if (ParseConnectAddr(targetId, deviceId, addrType) == DM_OK) {
         return AuthenticateDevice(pkgName, authType, deviceId, ParseExtraFromMap(bindParam));
     } else if (!targetId.deviceId.empty()) {
         return AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
@@ -1508,14 +1512,14 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
 }
 
-int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId)
+int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId, std::string &addrType)
 {
     int32_t index = 0;
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
     ConnectionAddr addr;
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %s.", GetAnonyString(targetId.wifiIp).c_str());
-        addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
+        addr.type = static_cast<ConnectionAddrType>(std::stoi(addrType));
         memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
         addr.info.ip.port = targetId.wifiPort;
         deviceInfo->addr[index] = addr;
