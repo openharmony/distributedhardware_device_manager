@@ -274,13 +274,6 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
         LOGE("UnBindDevice is syncchronizing sink acl data.");
         return ERR_DM_FAILED;
     }
-    if (timer_ == nullptr) {
-        timer_ = std::make_shared<DmTimer>();
-    }
-    timer_->StartTimer(std::string(SYNC_DELETE_TIMEOUT_TASK), SYNC_DELETE_TIMEOUT,
-        [this] (std::string name) {
-            DmAuthManager::HandleSyncDeleteTimeout(name);
-        });
     remoteDeviceId_ = SoftbusConnector::GetDeviceUdidByUdidHash(udidHash);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -1700,6 +1693,9 @@ void DmAuthManager::RequestSyncDeleteAcl()
     LOGI("RequestSyncDeleteAcl start.");
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE);
     softbusConnector_->GetSoftbusSession()->SendData(authRequestContext_->sessionId, message);
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
     timer_->StartTimer(std::string(SYNC_DELETE_TIMEOUT_TASK), SYNC_DELETE_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleSyncDeleteTimeout(name);
