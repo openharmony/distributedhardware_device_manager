@@ -179,6 +179,9 @@ public:
     void OnUnbindSessionCloseed(int32_t sessionId);
     void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
 
+    void MappingPkgName2SubMapAndPubMap(const std::string &pkgName);
+    void UnMappingPkgName2SubMapAndPubMap(const std::string &pkgName);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
@@ -190,6 +193,8 @@ private:
     bool isAdapterSoLoaded_ = false;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
+    std::mutex initLock_;
+    std::mutex unInitLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;

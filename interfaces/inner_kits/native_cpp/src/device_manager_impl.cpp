@@ -90,9 +90,7 @@ constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_D
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
 
-const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
-const uint16_t DM_INVALID_FLAG_ID = 0;
 const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
 
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
@@ -375,9 +373,8 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    LOGI("StartDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    LOGI("StartDeviceDiscovery start with DmSubscribeInfo, pkgName: %s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
 
     std::shared_ptr<IpcStartDiscoveryReq> req = std::make_shared<IpcStartDiscoveryReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -397,7 +394,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
             std::string(START_DEVICE_DISCOVERY_FAILED_MSG));
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, callback);
     DmTraceEnd();
     LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
@@ -424,7 +421,6 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
         subscribIdMap_[tokenId] = subscribeId;
     }
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
     std::shared_ptr<IpcStartDevDiscoveryByIdReq> req = std::make_shared<IpcStartDevDiscoveryByIdReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -443,7 +439,7 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
             std::string(START_DEVICE_DISCOVERY_FAILED_MSG));
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, callback);
     DmTraceEnd();
     LOGI("StartDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
@@ -474,7 +470,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint1
         return ret;
     }
 
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
     LOGI("StopDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -485,7 +481,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(uint64_t tokenId, const std::stri
         LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("StopDeviceDiscovery start, pkgName: %s", pkgName.c_str());
+    LOGI("StopDeviceDiscovery start with tokenId, pkgName: %s", pkgName.c_str());
     uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(subscribIdLock);
@@ -511,7 +507,7 @@ int32_t DeviceManagerImpl::StopDeviceDiscovery(uint64_t tokenId, const std::stri
         return ret;
     }
 
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
     LOGI("StopDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -525,8 +521,6 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
     }
 
     LOGI("PublishDeviceDiscovery start, pkgName %s", pkgName.c_str());
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishInfo.publishId, callback);
-
     std::shared_ptr<IpcPublishReq> req = std::make_shared<IpcPublishReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -534,7 +528,6 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
     int32_t ret = ipcClientProxy_->SendRequest(PUBLISH_DEVICE_DISCOVER, req, rsp);
     if (ret != DM_OK) {
         LOGE("PublishDeviceDiscovery error: Send Request failed ret: %d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishInfo.publishId);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -543,7 +536,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
         LOGE("PublishDeviceDiscovery error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
     LOGI("PublishDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -572,7 +565,7 @@ int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, 
         return ret;
     }
 
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName);
     LOGI("UnPublishDeviceDiscovery completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1473,9 +1466,6 @@ int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
     }
     LOGI("StartDiscovering start, pkgName: %s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-
-    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
     std::string filterOpStr = ConvertMapToJsonString(filterOptions);
 
@@ -1494,7 +1484,7 @@ int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
         LOGE("StartDiscovering error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, callback);
     DmTraceEnd();
     LOGI("StartDiscovering completed, pkgName: %s", pkgName.c_str());
     SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
@@ -1510,13 +1500,6 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("StopDiscovering start, pkgName: %s", pkgName.c_str());
-
-    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
@@ -1533,7 +1516,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         LOGE("StopDiscovering error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
     LOGI("StopDiscovering completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1547,9 +1530,6 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("RegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
-
-    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
     std::string filterOpStr = ConvertMapToJsonString(filterOptions);
 
@@ -1568,6 +1548,7 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
         LOGE("RegisterDiscoveryCallback error: Failed with ret %d", ret);
         return ret;
     }
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, callback);
     LOGI("RegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1579,20 +1560,9 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("UnRegisterDiscoveryCallback start, pkgName: %s", pkgName.c_str());
-
-    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: cannot find pkgName in cache map.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::map<std::string, std::string> extraParam;
-    extraParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
-    std::string extraParaStr = ConvertMapToJsonString(extraParam);
-
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %d", ret);
@@ -1603,6 +1573,7 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         LOGE("UnRegisterDiscoveryCallback error: Failed with ret %d", ret);
         return ret;
     }
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
     LOGI("UnRegisterDiscoveryCallback completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1615,9 +1586,6 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::StartAdvertising start, pkgName %s", pkgName.c_str());
-
-    int32_t publishId = AddPublishCallback(pkgName, callback);
-    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
     std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
@@ -1634,7 +1602,7 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
         LOGE("StartAdvertising error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
     LOGI("DeviceManagerImpl::StartAdvertising completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1647,13 +1615,6 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::StopAdvertising start, pkgName: %s", pkgName.c_str());
-
-    int32_t publishId = RemovePublishCallback(pkgName);
-    if (publishId == DM_INVALID_FLAG_ID) {
-        LOGE("DeviceManagerImpl::StopAdvertising failed: cannot find pkgName in cache map.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
     std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
@@ -1670,7 +1631,7 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
         LOGE("StopAdvertising error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName);
     LOGI("DeviceManagerImpl::StopAdvertising completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1768,67 +1729,6 @@ int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::stri
     (void)targetId;
     LOGI("DeviceManagerImpl::CheckAccessToTarget start");
     return ERR_DM_UNSUPPORTED_METHOD;
-}
-
-uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
-    std::shared_ptr<DiscoveryCallback> callback)
-{
-    uint16_t subscribeId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subMapLock);
-        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
-            subscribeId = pkgName2SubIdMap_[pkgName];
-        } else {
-            subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
-            pkgName2SubIdMap_[pkgName] = subscribeId;
-        }
-    }
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
-    return subscribeId;
-}
-
-uint16_t DeviceManagerImpl::RemoveDiscoveryCallback(const std::string &pkgName)
-{
-    uint16_t subscribeId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subMapLock);
-        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
-            subscribeId = pkgName2SubIdMap_[pkgName];
-            pkgName2SubIdMap_.erase(pkgName);
-        }
-    }
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
-    return subscribeId;
-}
-
-int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback)
-{
-    int32_t publishId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(pubMapLock);
-        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
-            publishId = pkgName2PubIdMap_[pkgName];
-        } else {
-            publishId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
-            pkgName2PubIdMap_[pkgName] = publishId;
-        }
-    }
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
-    return publishId;
-}
-
-int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
-{
-    uint16_t publishId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subMapLock);
-        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
-            publishId = pkgName2PubIdMap_[pkgName];
-            pkgName2PubIdMap_.erase(pkgName);
-        }
-    }
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
-    return publishId;
 }
 
 int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
