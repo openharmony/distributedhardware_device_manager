@@ -909,6 +909,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_004, testing::ext::T
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call checkMap OnDiscoverySuccess
+    uint16_t subscribeId = 0;
     checkMap->OnDiscoverySuccess(subscribeId);
     // 7. check count is 1
     ASSERT_EQ(count, 1);
@@ -960,7 +961,8 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_006, testing::ext::T
     int count = 0;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DiscoveryCallbackTest>(count);
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, callback);
-    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_.count(pkgName), 0);
+    count = static_cast<int>(DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_.count(pkgName));
+    EXPECT_EQ(count, 0);
 }
 
 /**
