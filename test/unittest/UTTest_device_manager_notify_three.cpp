@@ -918,8 +918,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound6, testing::ext::TestSize.Level0)
     uint16_t subscribeId = 0;
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
-    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
-    EXPECT_EQ(map.empty(), true);
+    auto callback = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(callback == nullptr, true);
 }
 
 /**
@@ -932,8 +932,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound7, testing::ext::TestSize.Level0)
     uint16_t subscribeId = 0;
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
-    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
-    EXPECT_EQ(map.empty(), false);
+    auto callback = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(callback == nullptr, false);
 }
 } // namespace
 
