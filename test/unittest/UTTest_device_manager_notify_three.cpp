@@ -132,8 +132,6 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess3, testing::ext::TestSize.Leve
     // set callback not null
     int count = 0;
     std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
-    // set publishId not null
-    int32_t publishId = 0;
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
