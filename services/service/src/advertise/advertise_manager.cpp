@@ -117,7 +117,6 @@ void AdvertiseManager::UnMappingPkgName2PubMap(const std::string &pkgName)
         uint16_t publishId = pkgName2PubIdMap_.find(pkgName)->second;
         StopAdvertising(pkgName, publishId);
         pkgName2PubIdMap_.erase(pkgName);
-        timer_->DeleteTimer(AUTO_STOP_ADVERTISE_TASK);
     }
 }
 } // namespace DistributedHardware
