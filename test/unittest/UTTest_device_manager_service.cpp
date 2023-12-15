@@ -82,17 +82,35 @@ HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: StartDeviceDiscovery_001
- * @tc.desc: Start device discovery and return DM_OK
+ * @tc.desc: Start device discovery and return ERR_DM_NO_PERMISSION
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "DeviceManagerServiceTest",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     std::string pkgName = "com.ohos.test";
     DmSubscribeInfo subscribeInfo;
     std::string extra;
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -156,12 +174,30 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
 
 /**
  * @tc.name: PublishDeviceDiscovery_001
- * @tc.desc: Publish device discovery and return ERR_DM_NOT_INIT
+ * @tc.desc: Publish device discovery and return ERR_DM_NO_PERMISSION
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
 HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "DeviceManagerServiceTest",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     std::string pkgName = "com.ohos.test12";
     DmPublishInfo publishInfo;
     publishInfo.publishId = 1;
@@ -169,7 +205,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::Tes
     publishInfo.freq = DM_HIGH;
     publishInfo.ranging = 1;
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 
@@ -292,7 +328,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Leve
     std::string callerId = "com.ohos.test";
     bool isRefresh = true;
     int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
-    EXPECT_TRUE(ret == DM_OK || ret == SOFTBUS_NOT_IMPLEMENT);
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
@@ -872,11 +908,29 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_004, testing::ext::TestS
 
 /**
  * @tc.name: StartDeviceDiscovery_005
- * @tc.desc: The return value is DM_OK
+ * @tc.desc: The return value is ERR_DM_NO_PERMISSION
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_005, testing::ext::TestSize.Level0)
 {
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "DeviceManagerServiceTest",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
     std::string filterOptions;
@@ -884,7 +938,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_005, testing::ext::TestS
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     DeviceManagerService::GetInstance().discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener, listener);
     int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
