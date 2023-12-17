@@ -286,12 +286,8 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     std::string requestDeviceId = static_cast<std::string>(localUdid);
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     LOGI("The online device bind type is %d.", bindType);
-    if (bindType == INVALIED_TYPE) {
+    if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         LOGI("The online device is identical account.");
-        PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
-    } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
-        LOGI("The online device is identical account self-networking.");
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
         LOGI("The online device is device-level bind type.");
