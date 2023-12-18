@@ -40,7 +40,6 @@ public:
     static void OnUnbindSessionOpened(int sessionId, int result);
     static AesGcmCipherKey GetSessionKeyAndIv();
 
-
 public:
     SoftbusSession();
     ~SoftbusSession();

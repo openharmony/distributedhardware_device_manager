@@ -15,6 +15,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -782,6 +783,33 @@ ON_IPC_READ_RESPONSE(REQUEST_CREDENTIAL, MessageParcel &reply, std::shared_ptr<I
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(SERVER_GET_DMFA_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string reqJsonStr = pReq->GetCredentialParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkg failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(reqJsonStr)) {
+        LOGE("write returnJsonStr failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_GET_DMFA_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    if (pRsp->GetErrCode() == DM_OK) {
+        std::string returnJsonStr = reply.ReadString();
+        pRsp->SetCredentialResult(returnJsonStr);
+    }
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(IMPORT_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
@@ -800,7 +828,19 @@ ON_IPC_SET_REQUEST(IMPORT_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageP
 
 ON_IPC_READ_RESPONSE(IMPORT_CREDENTIAL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    pBaseRsp->SetErrCode(reply.ReadInt32());
+    std::string outParaStr = reply.ReadString();
+    std::map<std::string, std::string> outputResult;
+    ParseMapFromJsonString(outParaStr, outputResult);
+    if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
+        pBaseRsp->SetErrCode(reply.ReadInt32());
+    }
+    if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+        pRsp->SetErrCode(reply.ReadInt32());
+        if (pRsp->GetErrCode() == DM_OK) {
+            pRsp->SetCredentialResult(outputResult[DM_CREDENTIAL_RETURNJSONSTR]);
+        }
+    }
     return DM_OK;
 }
 
@@ -823,7 +863,19 @@ ON_IPC_SET_REQUEST(DELETE_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, MessageP
 
 ON_IPC_READ_RESPONSE(DELETE_CREDENTIAL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    pBaseRsp->SetErrCode(reply.ReadInt32());
+    std::string outParaStr = reply.ReadString();
+    std::map<std::string, std::string> outputResult;
+    ParseMapFromJsonString(outParaStr, outputResult);
+    if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
+        pBaseRsp->SetErrCode(reply.ReadInt32());
+    }
+    if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+        pRsp->SetErrCode(reply.ReadInt32());
+        if (pRsp->GetErrCode() == DM_OK) {
+            pRsp->SetCredentialResult(outputResult[DM_CREDENTIAL_RETURNJSONSTR]);
+        }
+    }
     return DM_OK;
 }
 

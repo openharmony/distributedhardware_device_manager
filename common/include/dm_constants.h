@@ -92,6 +92,15 @@ enum {
     ERR_DM_ADD_GROUP_FAILED = -20057,
     ERR_DM_SYNC_DELETE_DEVICE_REPEATED = -20058,
     ERR_DM_BIND_PEER_UNSUPPORTED = -20059,
+    ERR_DM_HICHAIN_CREDENTIAL_REQUEST_FAILED = -20060,
+    ERR_DM_HICHAIN_CREDENTIAL_CHECK_FAILED = -20061,
+    ERR_DM_HICHAIN_CREDENTIAL_IMPORT_FAILED = -20062,
+    ERR_DM_HICHAIN_CREDENTIAL_DELETE_FAILED = -20063,
+    ERR_DM_HICHAIN_UNREGISTER_CALLBACK = -20064,
+    ERR_DM_HICHAIN_GET_REGISTER_INFO = -20065,
+    ERR_DM_HICHAIN_CREDENTIAL_EXISTS = -20066,
+    ERR_DM_HICHAIN_REGISTER_CALLBACK = -20067,
+    ERR_DM_HICHAIN_GROUP_CREATE_FAILED = -20068,
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -112,8 +121,15 @@ constexpr const char* DM_CAPABILITY_APPROACH = "approach";
 constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
 constexpr const char* DM_CAPABILITY_SHARE = "share";
 constexpr const char* DM_CAPABILITY_WEAR = "wear";
+constexpr const char* DM_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
+constexpr const char* DM_CREDENTIAL_REQJSONSTR = "CREDENTIAL_REQJSONSTR";
+constexpr const char* DM_CREDENTIAL_RETURNJSONSTR = "CREDENTIAL_RETURNJSONSTR";
+constexpr const char* DEVICE_MANAGER_GROUPNAME = "DMSameAccountGroup";
+constexpr const char* FIELD_CREDENTIAL_EXISTS = "isCredentialExists";
 constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+const std::string DM_TYPE_MINE = "MINE";
+const std::string DM_TYPE_OH = "OH";
 
 //The following constant are provided only for HiLink.
 const static char *EXT_PART = "ext_part";

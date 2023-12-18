@@ -31,6 +31,7 @@
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
+#include "mine_hichain_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -87,6 +88,17 @@ public:
 
     int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
 
+    int32_t MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr);
+
+    int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
     int32_t RegisterCredentialCallback(const std::string &pkgName);
 
     int32_t UnRegisterCredentialCallback(const std::string &pkgName);
@@ -135,6 +147,7 @@ private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<MineHiChainConnector> mineHiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<DmPinHolder> pinHolder_;

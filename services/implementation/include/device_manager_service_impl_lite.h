@@ -71,6 +71,17 @@ public:
 
     int OnPinHolderSessionOpened(int sessionId, int result);
 
+    int32_t MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr);
+
+    int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
     void OnPinHolderSessionClosed(int sessionId);
 
     void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen);

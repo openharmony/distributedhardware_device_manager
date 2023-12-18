@@ -847,6 +847,114 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
+/**
+ * @tc.name: RequestCredential_101
+ * @tc.desc: 1. set packName not null
+ *              set reqJsonStr not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::RequestCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string returnJsonStr;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(packName, returnJsonStr);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: CheckCredential_101
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::ImportCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, CheckCredential_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = "{\n}";
+    std::string returnJsonStr;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().CheckCredential(packName, credentialInfo, returnJsonStr);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ImportCredential_101
+ * @tc.desc: 1. set packName not null
+ *              set credentialInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::ImportCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = R"(
+    {
+        "processType": 1,
+        "authType": 1,
+        "userId": "123",
+        "credentialData":
+        [
+            {
+                "credentialType": 1,
+                "credentialId": "104",
+                "authCode": "10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+                "serverPk": "",
+                "pkInfoSignature": "",
+                "pkInfo": "",
+                "peerDeviceId": ""
+            }
+        ]
+    }
+    )";
+    std::string returnJsonStr;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(packName, credentialInfo, returnJsonStr);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DeleteCredential_101
+ * @tc.desc: 1. set packName not null
+ *              set deleteInfo not null
+ *           2. MOCK IpcClientProxy SendRequest return DM_OK
+ *           3. call DeviceManagerImpl::DeleteCredential with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, DeleteCredential_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string credentialInfo = R"({"isDeleteAll":true})";
+    std::string returnJsonStr;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().DeleteCredential(packName, credentialInfo, returnJsonStr);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
 HWTEST_F(DeviceManagerImplTest, VerifyAuthentication001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
