@@ -15,6 +15,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
@@ -180,7 +181,7 @@ ON_IPC_SERVER_CMD(GET_DEVICE_INFO, IpcIo &req, IpcIo &reply)
 
 ON_IPC_SERVER_CMD(GET_AVAILABLE_DEVICE_LIST, IpcIo &req, IpcIo &reply)
 {
-    LOGI("enter GetTrustedDeviceList.");
+    LOGI("enter get available device list.");
     std::string pkgName = (const char *)ReadString(&req, nullptr);
     std::vector<DmDeviceBasicInfo> deviceList;
     int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceList);
@@ -188,6 +189,24 @@ ON_IPC_SERVER_CMD(GET_AVAILABLE_DEVICE_LIST, IpcIo &req, IpcIo &reply)
     WriteInt32(&reply, deviceList.size());
     if (ret == DM_OK && deviceList.size() > 0) {
         WriteRawData(&reply, deviceList.data(), sizeof(DmDeviceBasicInfo) * deviceList.size());
+    }
+}
+
+ON_IPC_SERVER_CMD(GET_TRUST_DEVICE_LIST, IpcIo &req, IpcIo &reply)
+{
+    LOGI("enter get trust device list.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    std::string extra = (const char *)ReadString(&req, nullptr);
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    WriteInt32(&reply, ret);
+    WriteInt32(&reply, deviceList.size());
+    if (ret == DM_OK && deviceList.size() > 0) {
+        for (const auto &devInfo : deviceList) {
+            if (!EncodeDmDeviceInfo(devInfo, reply)) {
+                LOGE("write dm device info failed");
+            }
+        }
     }
 }
 
@@ -210,6 +229,83 @@ ON_IPC_SERVER_CMD(STOP_DEVICE_DISCOVER, IpcIo &req, IpcIo &reply)
     ReadUint16(&req, &subscribeId);
     int32_t ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     WriteInt32(&reply, ret);
+}
+
+ON_IPC_SERVER_CMD(REQUEST_CREDENTIAL, IpcIo &req, IpcIo &reply)
+{
+    LOGI("request credential service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    std::string reqParaStr = (const char *)ReadString(&req, nullptr);
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
+    std::string returnJsonStr;
+    int32_t ret = DM_OK;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        DeviceManagerService::GetInstance().MineRequestCredential(pkgName, returnJsonStr);
+    }
+    WriteInt32(&reply, ret);
+    if (ret == DM_OK) {
+        WriteString(&reply, returnJsonStr.c_str());
+    }
+}
+
+ON_IPC_SERVER_CMD(SERVER_GET_DMFA_INFO, IpcIo &req, IpcIo &reply)
+{
+    LOGI("check credential service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    std::string reqJsonStr = (const char *)ReadString(&req, nullptr);
+    std::string returnJsonStr;
+    int32_t ret = DeviceManagerService::GetInstance().CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    WriteInt32(&reply, ret);
+    if (ret == DM_OK) {
+        WriteString(&reply, returnJsonStr.c_str());
+    }
+}
+
+ON_IPC_SERVER_CMD(IMPORT_CREDENTIAL, IpcIo &req, IpcIo &reply)
+{
+    LOGI("import credential service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    std::string reqParaStr = (const char *)ReadString(&req, nullptr);
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
+    std::string returnJsonStr;
+    std::map<std::string, std::string> outputResult;
+    int32_t ret = DM_OK;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        DeviceManagerService::GetInstance().ImportCredential(pkgName, requestParam[DM_CREDENTIAL_REQJSONSTR],
+                                                             returnJsonStr);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+        outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
+        returnJsonStr = ConvertMapToJsonString(outputResult);
+    }
+    WriteInt32(&reply, ret);
+    if (ret == DM_OK) {
+        WriteString(&reply, returnJsonStr.c_str());
+    }
+}
+
+ON_IPC_SERVER_CMD(DELETE_CREDENTIAL, IpcIo &req, IpcIo &reply)
+{
+    LOGI("import credential service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    std::string reqParaStr = (const char *)ReadString(&req, nullptr);
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
+    std::map<std::string, std::string> outputResult;
+    std::string returnJsonStr;
+    int32_t ret = DM_OK;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        DeviceManagerService::GetInstance().DeleteCredential(pkgName, requestParam[DM_CREDENTIAL_REQJSONSTR],
+                                                             returnJsonStr);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+        outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
+        returnJsonStr = ConvertMapToJsonString(outputResult);
+    }
+    WriteInt32(&reply, ret);
+    if (ret == DM_OK) {
+        WriteString(&reply, returnJsonStr.c_str());
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

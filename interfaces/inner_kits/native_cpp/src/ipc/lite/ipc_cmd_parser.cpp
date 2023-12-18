@@ -15,6 +15,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -30,7 +31,11 @@
 #include "ipc_get_local_device_networkId_rsp.h"
 #include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_local_deviceId_rsp.h"
+#include "ipc_get_trustdevice_req.h"
+#include "ipc_get_trustdevice_rsp.h"
 #include "ipc_register_listener_req.h"
+#include "ipc_set_credential_req.h"
+#include "ipc_set_credential_rsp.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
 #include "securec.h"
@@ -241,7 +246,7 @@ ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, IpcIo &reply, std::shared_ptr<Ip
     ReadInt32(&reply, &deviceNum);
 
     if (ret == DM_OK && deviceNum > 0) {
-        uint32_t deviceTotalSize = deviceNum * (int32_t)sizeof(DmDeviceInfo);
+        uint32_t deviceTotalSize = deviceNum * (int32_t)sizeof(DmDeviceBasicInfo);
         DmDeviceBasicInfo *pDmDeviceinfo = (DmDeviceBasicInfo *)ReadRawData(&reply, deviceTotalSize);
         if (pDmDeviceinfo == nullptr) {
             LOGE("failed to read trusted device node info.");
@@ -254,6 +259,40 @@ ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, IpcIo &reply, std::shared_ptr<Ip
             pDmDeviceinfo = ++pDmDeviceinfo;
         }
         pRsp->SetDeviceVec(dmDeviceInfoVec);
+    }
+    pRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_TRUST_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcGetTrustDeviceReq> req = std::static_pointer_cast<IpcGetTrustDeviceReq>(pBaseReq);
+    std::string pkgName = req->GetPkgName();
+    std::string extra = req->GetExtra();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteString(&request, extra.c_str());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetTrustDeviceRsp> pRsp = std::static_pointer_cast<IpcGetTrustDeviceRsp>(pBaseRsp);
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    int32_t deviceNum = 0;
+    ReadInt32(&reply, &deviceNum);
+
+    if (ret == DM_OK && deviceNum > 0) {
+        std::vector<DmDeviceInfo> deviceInfoVec;
+        for (int32_t i = 0; i < deviceNum; ++i) {
+            DmDeviceInfo deviceInfo;
+            DecodeDmDeviceInfo(reply, deviceInfo);
+            deviceInfoVec.emplace_back(deviceInfo);
+        }
+        pRsp->SetDeviceVec(deviceInfoVec);
     }
     pRsp->SetErrCode(ret);
     return DM_OK;
@@ -295,6 +334,120 @@ ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, IpcIo
 ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     return SetRspErrCode(reply, pBaseRsp);
+}
+
+ON_IPC_SET_REQUEST(REQUEST_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string requestJsonStr = pReq->GetCredentialParam();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteString(&request, requestJsonStr.c_str());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REQUEST_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    if (ret == DM_OK) {
+        std::string returnJsonStr = (const char *)ReadString(&reply, nullptr);
+        pRsp->SetCredentialResult(returnJsonStr);
+    }
+    pRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SERVER_GET_DMFA_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string reqJsonStr = pReq->GetCredentialParam();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteString(&request, reqJsonStr.c_str());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_GET_DMFA_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    if (ret == DM_OK) {
+        std::string returnJsonStr = (const char *)ReadString(&reply, nullptr);
+        pRsp->SetCredentialResult(returnJsonStr);
+    }
+    pRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(IMPORT_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string credentialInfo = pReq->GetCredentialParam();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteString(&request, credentialInfo.c_str());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(IMPORT_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    if (ret == DM_OK) {
+        std::string outParaStr = (const char *)ReadString(&reply, nullptr);
+        std::map<std::string, std::string> outputResult;
+        ParseMapFromJsonString(outParaStr, outputResult);
+        if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+            if (ret == DM_OK) {
+                pRsp->SetCredentialResult(outputResult[DM_CREDENTIAL_RETURNJSONSTR]);
+            }
+        }
+    }
+    pRsp->SetErrCode(ret);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(DELETE_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string deleteInfo = pReq->GetCredentialParam();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteString(&request, deleteInfo.c_str());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(DELETE_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
+    int32_t ret = 0;
+    ReadInt32(&reply, &ret);
+    if (ret == DM_OK) {
+        std::string outParaStr = (const char *)ReadString(&reply, nullptr);
+        std::map<std::string, std::string> outputResult;
+        ParseMapFromJsonString(outParaStr, outputResult);
+        if (outputResult[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+            pRsp->SetCredentialResult(outputResult[DM_CREDENTIAL_RETURNJSONSTR]);
+        }
+    }
+    pRsp->SetErrCode(ret);
+    return DM_OK;
 }
 
 ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply)
