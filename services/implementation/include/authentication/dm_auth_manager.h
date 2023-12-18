@@ -560,6 +560,7 @@ private:
     std::string remoteDeviceId_ = "";
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;
+    bool isAuthenticateDevice_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
