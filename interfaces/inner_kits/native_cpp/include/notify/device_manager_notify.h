@@ -39,12 +39,10 @@ public:
     void UnRegisterDeviceStateCallback(const std::string &pkgName);
     void UnRegisterDeviceStatusCallback(const std::string &pkgName);
     void RegisterDeviceStatusCallback(const std::string &pkgName, std::shared_ptr<DeviceStatusCallback> callback);
-    void RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
-                                   std::shared_ptr<DiscoveryCallback> callback);
-    void UnRegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
-    void RegisterPublishCallback(const std::string &pkgName, int32_t publishId,
-        std::shared_ptr<PublishCallback> callback);
-    void UnRegisterPublishCallback(const std::string &pkgName, int32_t publishId);
+    void RegisterDiscoveryCallback(const std::string &pkgName, std::shared_ptr<DiscoveryCallback> callback);
+    void UnRegisterDiscoveryCallback(const std::string &pkgName);
+    void RegisterPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback);
+    void UnRegisterPublishCallback(const std::string &pkgName);
     void RegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId,
                                       std::shared_ptr<AuthenticateCallback> callback);
     void UnRegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId);
@@ -93,8 +91,8 @@ private:
 #endif
     std::map<std::string, std::shared_ptr<DeviceStateCallback>> deviceStateCallback_;
     std::map<std::string, std::shared_ptr<DeviceStatusCallback>> deviceStatusCallback_;
-    std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
-    std::map<std::string, std::map<int32_t, std::shared_ptr<PublishCallback>>> devicePublishCallbacks_;
+    std::map<std::string, std::shared_ptr<DiscoveryCallback>> deviceDiscoveryCallbacks_;
+    std::map<std::string, std::shared_ptr<PublishCallback>> devicePublishCallbacks_;
     std::map<std::string, std::map<std::string, std::shared_ptr<AuthenticateCallback>>> authenticateCallback_;
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback_;
     std::map<std::string, std::shared_ptr<DeviceManagerUiCallback>> dmUiCallback_;

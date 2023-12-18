@@ -425,7 +425,6 @@ int32_t SoftbusListener::InitSoftPublishLNN()
 int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo,
     const std::string &customData)
 {
-    LOGI("RefreshSoftbusLNN begin, subscribeId: %d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
     subscribeInfo.subscribeId = dmSubInfo.subscribeId;
@@ -492,7 +491,6 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
     const std::string &customData)
 {
-    LOGI("PublishSoftbusLNN begin, publishId: %d.", dmPubInfo.publishId);
     PublishInfo publishInfo;
     publishInfo.publishId = dmPubInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
@@ -516,7 +514,6 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
 
 int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
 {
-    LOGI("StopPublishSoftbusLNN begin, publishId: %d.", publishId);
     int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %d.", ret);
