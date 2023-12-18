@@ -60,6 +60,7 @@ if (defined(ohos_lite)) {
         "src/adapter/lite/dm_adapter_manager.cpp",
         "src/credential/dm_credential_manager.cpp",
         "src/dependency/hichain/hichain_connector.cpp",
+        "src/dependency/hichain/mine_hichain_connector.cpp",
         "src/dependency/softbus/softbus_connector.cpp",
         "src/device_manager_service_impl_lite.cpp",
         "src/devicestate/dm_device_state_manager.cpp",

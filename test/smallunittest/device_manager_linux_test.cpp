@@ -73,10 +73,71 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery001, testing::ext::TestSize.L
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerImplTest, GetAvailableDeviceList001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, GetTrustDeviceList001, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.helloworld";
     std::string extra = "";
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, RequestCredential001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    std::string returnJsonStr;
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(packName, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, CheckCredential001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    std::string reqJsonStr = R"({})";
+    std::string returnJsonStr;
+    int32_t ret = DeviceManager::GetInstance().CheckCredential(packName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, ImportCredential001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    std::string reqJsonStr = R"(
+    {
+        "processType": 1,
+        "authType": 1,
+        "userId": "123",
+        "credentialData":
+        [
+            {
+                "credentialType": 1,
+                "credentialId": "104",
+                "authCode": "10F9F0576E61730193D2052B7F771887124A68F1607EFCF7796C1491F834CD92",
+                "serverPk": "",
+                "pkInfoSignature": "",
+                "pkInfo": "",
+                "peerDeviceId": ""
+            }
+        ]
+    }
+    )";
+    std::string returnJsonStr;
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(packName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, DeleteCredential001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
+    std::string reqJsonStr = R"({"isDeleteAll:true"})";
+    std::string returnJsonStr;
+    int32_t ret = DeviceManager::GetInstance().DeleteCredential(packName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetAvailableDeviceList001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.helloworld";
     std::vector<DmDeviceBasicInfo> deviceList;
     int32_t ret = DeviceManager::GetInstance().GetAvailableDeviceList(packName, deviceList);
     EXPECT_EQ(ret, DM_OK);
