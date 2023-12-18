@@ -22,6 +22,7 @@
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
 #include "softbus_listener.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,7 +43,6 @@ public:
     // interfaces from ISoftbusDiscoveringCallback
     void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override;
     void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override;
-
     int32_t StartDiscovering(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);
     int32_t StopDiscovering(const std::string &pkgName, uint16_t subscribeId);

@@ -184,7 +184,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
     return ERR_DM_FAILED;
 }
 
-int MineHiChainConnector::RequestCredential(std::string returnJsonStr)
+int MineHiChainConnector::RequestCredential(std::string &returnJsonStr)
 {
     if (g_deviceGroupManager == nullptr) {
         LOGE("HiChainConnector::g_deviceGroupManager is nullptr.");

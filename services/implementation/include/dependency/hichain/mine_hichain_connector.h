@@ -69,7 +69,7 @@ public:
      * @tc.desc: Request Credential HiChain Callback of the HiChain Connector
      * @tc.type: FUNC
      */
-    int RequestCredential(std::string returnJsonStr);
+    int RequestCredential(std::string &returnJsonStr);
 
     /**
      * @tc.name: MineHiChainConnector::CheckCredential
