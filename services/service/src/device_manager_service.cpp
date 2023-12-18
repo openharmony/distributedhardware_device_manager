@@ -280,7 +280,7 @@ int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::
         deviceId = "";
         return ret;
     }
-    deviceId = listener_->CalcDeviceId(pkgName, static_cast<std::string>(udidHash));
+    deviceId = udidHash;
     return DM_OK;
 }
 
