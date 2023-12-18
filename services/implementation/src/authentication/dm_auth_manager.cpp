@@ -1512,7 +1512,11 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
     ConnectionAddr addr;
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %s.", GetAnonyString(targetId.wifiIp).c_str());
-        addr.type = static_cast<ConnectionAddrType>(std::stoi(addrType));
+        if (!addrType.empty()) {
+            addr.type = static_cast<ConnectionAddrType>(std::stoi(addrType));
+        }else {
+            addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
+        }
         memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
         addr.info.ip.port = targetId.wifiPort;
         deviceInfo->addr[index] = addr;
