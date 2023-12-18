@@ -270,18 +270,19 @@ ON_IPC_SERVER_CMD(IMPORT_CREDENTIAL, IpcIo &req, IpcIo &reply)
     std::map<std::string, std::string> requestParam;
     ParseMapFromJsonString(reqParaStr, requestParam);
     std::string returnJsonStr;
-    std::map<std::string, std::string> outputResult;
+    std::string outParamStr;
     int32_t ret = DM_OK;
     if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
         DeviceManagerService::GetInstance().ImportCredential(pkgName, requestParam[DM_CREDENTIAL_REQJSONSTR],
                                                              returnJsonStr);
+        std::map<std::string, std::string> outputResult;
         outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
         outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
-        returnJsonStr = ConvertMapToJsonString(outputResult);
+        outParamStr = ConvertMapToJsonString(outputResult);
     }
     WriteInt32(&reply, ret);
     if (ret == DM_OK) {
-        WriteString(&reply, returnJsonStr.c_str());
+        WriteString(&reply, outParamStr.c_str());
     }
 }
 
@@ -292,19 +293,20 @@ ON_IPC_SERVER_CMD(DELETE_CREDENTIAL, IpcIo &req, IpcIo &reply)
     std::string reqParaStr = (const char *)ReadString(&req, nullptr);
     std::map<std::string, std::string> requestParam;
     ParseMapFromJsonString(reqParaStr, requestParam);
-    std::map<std::string, std::string> outputResult;
     std::string returnJsonStr;
+    std::string outParamStr;
     int32_t ret = DM_OK;
     if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
         DeviceManagerService::GetInstance().DeleteCredential(pkgName, requestParam[DM_CREDENTIAL_REQJSONSTR],
                                                              returnJsonStr);
+        std::map<std::string, std::string> outputResult;
         outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
         outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
-        returnJsonStr = ConvertMapToJsonString(outputResult);
+        outParamStr = ConvertMapToJsonString(outputResult);
     }
     WriteInt32(&reply, ret);
     if (ret == DM_OK) {
-        WriteString(&reply, returnJsonStr.c_str());
+        WriteString(&reply, outParamStr.c_str());
     }
 }
 } // namespace DistributedHardware
