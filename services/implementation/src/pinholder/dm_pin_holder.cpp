@@ -175,7 +175,7 @@ int32_t DmPinHolder::CreateGeneratePinHolderMsg()
         return ERR_DM_FAILED;
     }
 
-    timer_->DeleteTimer(PINHOLDER_CREATE_TIMEOUT_TASK);
+    timer_->DeleteAll();
     timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
         [this] (std::string name) {
             DmPinHolder::CloseSession(name);
@@ -321,6 +321,7 @@ void DmPinHolder::CloseSession(const std::string &name)
         return;
     }
     session_->CloseSessionServer(sessionId_);
+    timer_->DeleteAll();
     sessionId_ = SESSION_ID_INVALID;
     sinkState_ = SINK_INIT;
     sourceState_ = SOURCE_INIT;
@@ -447,6 +448,11 @@ int32_t DmPinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+void DmPinHolder::OnBindFinish(const std::string &pkgName)
+{
+    CloseSession(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
