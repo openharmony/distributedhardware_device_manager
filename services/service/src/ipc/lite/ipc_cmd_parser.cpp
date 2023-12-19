@@ -119,6 +119,8 @@ ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, IpcIo &reply, std::shared_ptr<IpcRs
 ON_IPC_SERVER_CMD(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
 {
     LOGI("start to register device manager service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    DeviceManagerService::GetInstance().MappingPkgName2SubMapAndPubMap(pkgName);
     int32_t errCode = RegisterDeviceManagerListener(&req, &reply);
     WriteInt32(&reply, errCode);
 }
@@ -126,6 +128,8 @@ ON_IPC_SERVER_CMD(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
 ON_IPC_SERVER_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
 {
     LOGI("start to unregister device manager service listener.");
+    std::string pkgName = (const char *)ReadString(&req, nullptr);
+    DeviceManagerService::GetInstance().UnMappingPkgName2SubMapAndPubMap(pkgName);
     int32_t errCode = UnRegisterDeviceManagerListener(&req, &reply);
     WriteInt32(&reply, errCode);
 }
