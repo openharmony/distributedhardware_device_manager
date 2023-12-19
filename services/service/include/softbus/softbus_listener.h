@@ -33,9 +33,58 @@
 #include "i_softbus_discovering_callback.h"
 #include "inner_session.h"
 #include "session.h"
+#include "nlohmann/json.hpp"
+
+using std::vector;
+using std::string;
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
+    constexpr uint32_t DM_HASH_DATA_LEN = 16;
+constexpr uint32_t DM_DEVICE_NUMBER_LEN = 11;
+constexpr uint32_t DM_DE_LEN = 16;
+
+typedef struct {
+    string type;
+    string value;
+} VertexOptionInfo;
+
+typedef struct {
+    char version;
+    char headDataLen;
+    char tlvDataLen;
+    char pkgNameHash[DM_HASH_DATA_LEN];
+    char findMode;
+    char trustFilter;
+} BroadcastHead;
+
+typedef struct {
+    string deviceAlias;
+    int32_t startNumber;
+    int32_t endNumber;
+}  ScopeOptionInfo;
+
+typedef struct {
+    char version;
+    char dataLen;
+    bool IsExistCredential;
+    char pkgNameHash[DM_HASH_DATA_LEN];
+} ReturnwaveHead;
+
+typedef struct {
+    bool snHashValid;
+    bool typeHashValid;
+    bool udidHashValid;
+    bool aliasHashValid;
+    bool numberValid;
+    char snHash[DM_HASH_DATA_LEN];
+    char typeHash[DM_HASH_DATA_LEN];
+    char udidHash[DM_HASH_DATA_LEN];
+    char aliasHash[DM_HASH_DATA_LEN];
+    char number[DM_DEVICE_NUMBER_LEN];
+} DevicePolicyInfo;
+
 class SoftbusListener {
 public:
     SoftbusListener();
@@ -78,14 +127,59 @@ public:
     int32_t PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
         const std::string &customData);
     int32_t StopPublishSoftbusLNN(int32_t publishId);
+    int32_t StartDiscovery(const string &pkgName, const string &searchJson, const DmSubscribeInfo &subscribeInfo);
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
+    static void OnPublishResult(int publishId, PublishResult reason);
+    static void OnPublishDeviceFound(const DeviceInfo *deviceInfo);
+    static void OnRePublish(void);
     static IDmRadarHelper* GetDmRadarHelperObj();
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);
 private:
     int32_t InitSoftPublishLNN();
+    int32_t ParseSearchJson(const string &pkgName, const string &searchJsonStr, char *output, size_t *outLen);
+    int32_t ParseSearchAllDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t ParseSearchScopeDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t ParseSearchVertexDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t SetBroadcastHead(const json &object, const string &pkgName, BroadcastHead &broadcastHead);
+    void AddHeadToBroadcast(const BroadcastHead &broadcastHead, char *output);
+    int32_t ParseScopeDeviceJsonArray(const std::vector<ScopeOptionInfo> &optionInfo, char *output, size_t *outLen);
+    static int32_t ParseVertexDeviceJsonArray(const std::vector<VertexOptionInfo> &optionInfo, char *output,
+                                              size_t *outLen);
+    static int32_t GetSha256Hash(const char *data, size_t len, char *output);
+    int32_t SetBroadcastTrustOptions(const json &object, BroadcastHead &broadcastHead);
+    int32_t SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead);
+    int32_t SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *output, size_t *outputLen);
+    void SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, SubscribeInfo &subscribeInfo);
+#if (defined(MINE_HARMONY))
+        int32_t PublishDeviceDiscovery(void);
+    static void MatchSearchDealTask(void);
+    static int32_t ParseBroadcastInfo(DeviceInfo &deviceInfo);
+    static bool GetBroadcastData(DeviceInfo &deviceInfo, char *output, size_t outLen);
+    static Action MatchSearchAllDevice(DeviceInfo &deviceInfo, const BroadcastHead &broadcastHead);
+    static void GetScopeDevicePolicyInfo(DevicePolicyInfo &devicePolicyInfo);
+    static Action MatchSearchScopeDevice(DeviceInfo &deviceInfo, char *output,
+        const DevicePolicyInfo &devicePolicyInfo, const BroadcastHead &broadcastHead);
+    static void GetVertexDevicePolicyInfo(DevicePolicyInfo &devicePolicyInfo);
+    static Action MatchSearchVertexDevice(DeviceInfo &deviceInfo, char *output,
+        const DevicePolicyInfo &devicePolicyInfo, const BroadcastHead &broadcastHead);
+    static int32_t SendReturnwave(DeviceInfo &deviceInfo, const BroadcastHead &broadcastHead, Action matchResult);
+    static bool GetDeviceAliasHash(char *output);
+    static bool GetDeviceSnHash(char *output);
+    static bool GetDeviceUdidHash(char *output);
+    static bool GetDeviceTypeHash(char *output);
+    static bool GetDeviceNumber(char *output);
+    static bool CheckDeviceAliasMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
+    static bool CheckDeviceNumberMatch(const DevicePolicyInfo &devicePolicyInfo,
+        int32_t startNumber, int32_t endNumber);
+    static bool ChecKDeviceSnMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
+    static bool ChecKDeviceTypeMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
+    static bool ChecKDeviceUdidMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
+    static Action GetMatchResult(const vector<int> &matchItemNum, const vector<int> &matchItemResult);
+#endif
+
 private:
     static bool isRadarSoLoad_;
     static IDmRadarHelper *dmRadarHelper_;

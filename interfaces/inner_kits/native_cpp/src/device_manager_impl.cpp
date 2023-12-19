@@ -874,10 +874,14 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
     }
 
     LOGI("start to RequestCredential.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
+    requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, reqJsonStr);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
-    req->SetCredentialParam(reqJsonStr);
+    req->SetCredentialParam(reqParaStr);
 
     int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
@@ -903,10 +907,14 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to ImportCredential.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
+    requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, credentialInfo);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetCredentialParam(credentialInfo);
+    req->SetCredentialParam(reqParaStr);
 
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
@@ -931,10 +939,14 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to DeleteCredential.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
+    requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, deleteInfo);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
     std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetCredentialParam(deleteInfo);
+    req->SetCredentialParam(reqParaStr);
 
     int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
@@ -1037,6 +1049,134 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
         return ret;
     }
     LOGI("NotifyEvent completed, pkgName: %s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, std::string &returnJsonStr)
+{
+    if (pkgName.empty()) {
+        LOGE("RequestCredential failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::RequestCredential start, pkgName: %s", pkgName.c_str());
+    LOGI("Request credential start.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(reqParaStr);
+    int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("RequestCredential Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while request credential.");
+        return ret;
+    }
+    returnJsonStr = rsp->GetCredentialResult();
+    LOGI("request device credential completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                           std::string &returnJsonStr)
+{
+    if (pkgName.empty() || reqJsonStr.empty()) {
+        LOGE("Check the credential is invalid para.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::CheckCredential start, pkgName: %s", pkgName.c_str());
+    LOGI("start to CheckCredential.");
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(reqJsonStr);
+
+    int32_t ret = ipcClientProxy_->SendRequest(SERVER_GET_DMFA_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("CheckCredential Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while Check credential.");
+        return ret;
+    }
+    returnJsonStr = rsp->GetCredentialResult();
+    LOGI("Check credential to device completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                            std::string &returnJsonStr)
+{
+    if (pkgName.empty() || reqJsonStr.empty()) {
+        LOGE("import the credential is invalid para.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::ImportCredential start, pkgName: %s", pkgName.c_str());
+    LOGI("start to ImportCredential.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+    requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, reqJsonStr);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(reqParaStr);
+
+    int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("ImportCredential Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while import credential.");
+        return ret;
+    }
+    returnJsonStr = rsp->GetCredentialResult();
+    LOGI("import credential to device completed.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                            std::string &returnJsonStr)
+{
+    if (pkgName.empty() || reqJsonStr.empty()) {
+        LOGE("Delete the credential is invalid para.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::DeleteCredential start, pkgName: %s", pkgName.c_str());
+    LOGI("start to DeleteCredential.");
+    std::map<std::string, std::string> requestParam;
+    requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+    requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, reqJsonStr);
+    std::string reqParaStr = ConvertMapToJsonString(requestParam);
+    std::shared_ptr<IpcSetCredentialReq> req = std::make_shared<IpcSetCredentialReq>();
+    std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(reqParaStr);
+
+    int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("DeleteCredential Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("failed to get return errcode while import credential.");
+        return ret;
+    }
+    returnJsonStr = rsp->GetCredentialResult();
+    LOGI("Delete credential to device completed.");
     return DM_OK;
 }
 

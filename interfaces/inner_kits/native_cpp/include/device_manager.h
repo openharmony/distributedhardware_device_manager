@@ -559,6 +559,44 @@ public:
      */
     virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload) = 0;
+
+    /**
+    * @brief Request credential information.
+    * @param pkgName       package name.
+    * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
+    * @return Returns 0 if success.
+    */
+    virtual int32_t RequestCredential(const std::string &pkgName, std::string &returnJsonStr) = 0;
+
+    /**
+     * @brief Check credential information.
+     * @param pkgName       package name.
+     * @param reqJsonStr    request credential params, the params is json string, it includes version and userId.
+     * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                    std::string &returnJsonStr) = 0;
+
+    /**
+     * @brief Import credential information.
+     * @param pkgName       package name.
+     * @param reqJsonStr    request credential params, the params is json string, it includes version and userId.
+     * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                     std::string &returnJsonStr) = 0;
+
+    /**
+     * @brief Delete credential information.
+     * @param pkgName       package name.
+     * @param reqJsonStr    request credential params, the params is json string, it includes version and userId.
+     * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                     std::string &returnJsonStr) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -22,6 +22,7 @@
 #include "dm_credential_manager.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
+#include "mine_hichain_connector.h"
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
 #include "softbus_connector.h"
@@ -70,6 +71,17 @@ public:
     void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
     int OnPinHolderSessionOpened(int sessionId, int result);
+
+    int32_t MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr);
+
+    int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
+
+    int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr);
 
     void OnPinHolderSessionClosed(int sessionId);
 
@@ -121,6 +133,7 @@ private:
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<MineHiChainConnector> mineHiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
 };
 
