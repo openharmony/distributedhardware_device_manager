@@ -44,7 +44,6 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     std::string accountId = MultipleUserConnector::GetOhosAccountId();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     queryParams["userId"] = std::to_string(userId);
-    queryParams["accountId"] = accountId;
     if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
         LOGE("DP GetAccessControlProfile failed.");
     }
@@ -399,12 +398,15 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
     offlineParam.bindType = INVALIED_TYPE;
     offlineParam.leftAclNumber = 0;
     for (auto &item : profiles) {
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && item.GetStatus() == ACTIVE) {
+        if (item.GetTrustDeviceId() != remoteDeviceId || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             LOGE("Identical account forbid unbind.");
             offlineParam.bindType = INVALIED_TYPE;
             return offlineParam;
         }
-        if (item.GetTrustDeviceId() == remoteDeviceId && item.GetStatus() == ACTIVE) {
+        if (item.GetTrustDeviceId() == remoteDeviceId) {
             offlineParam.leftAclNumber++;
             if (item.GetBindLevel() == DEVICE && item.GetBindType() != DM_IDENTICAL_ACCOUNT &&
                 item.GetAccesser().GetAccesserBundleName() == pkgName) {
