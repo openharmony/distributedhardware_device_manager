@@ -59,7 +59,7 @@ public:
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
                                  const std::string &filterOptions) = 0;
-                                 
+
    /**
      * @tc.name: IDeviceManagerServiceImpl::StopDeviceDiscovery
      * @tc.desc: Stop Device Discovery of the device manager service impl
@@ -184,6 +184,33 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo) = 0;
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::MineRequestCredential
+     * @tc.desc: MineRequestCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr) = 0;
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::CheckCredential
+     * @tc.desc: CheckCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr) = 0;
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::ImportCredential
+     * @tc.desc: ImportCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr) = 0;
+    /**
+     * @tc.name: IDeviceManagerServiceImpl::DeleteCredential
+     * @tc.desc: DeleteCredential of the Device Manager Service
+     * @tc.type: FUNC
+     */
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+        std::string &returnJsonStr) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterCredentialCallback
      * @tc.desc: RegisterCredentialCallback

@@ -640,6 +640,64 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
     return dmServiceImpl_->DeleteCredential(pkgName, deleteInfo);
 }
 
+int32_t DeviceManagerService::MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call RequestCredential.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("RequestCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->MineRequestCredential(pkgName, returnJsonStr);
+}
+
+int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %s does not have permission to call ImportCredential.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+}
+
+int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %s does not have permission to call ImportCredential.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+}
+
+int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %s does not have permission to call DeleteCredential.",
+            pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("DeleteCredential failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+}
+
 int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgName)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {

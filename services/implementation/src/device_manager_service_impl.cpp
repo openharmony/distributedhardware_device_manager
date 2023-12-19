@@ -54,6 +54,9 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (hiChainConnector_ == nullptr) {
         hiChainConnector_ = std::make_shared<HiChainConnector>();
     }
+    if (mineHiChainConnector_ == nullptr) {
+        mineHiChainConnector_ = std::make_shared<MineHiChainConnector>();
+    }
     if (deviceStateMgr_ == nullptr) {
         deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
         deviceStateMgr_->RegisterSoftbusStateCallback();
@@ -412,6 +415,61 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->DeleteCredential(pkgName, deleteInfo);
+}
+
+int32_t DeviceManagerServiceImpl::MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr)
+{
+    (void)pkgName;
+    if (mineHiChainConnector_->RequestCredential(returnJsonStr) != DM_OK) {
+        LOGE("failed to get device credential from hichain");
+        return ERR_DM_HICHAIN_CREDENTIAL_REQUEST_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    if (reqJsonStr.empty()) {
+        LOGE("reqJsonStr is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (mineHiChainConnector_->CheckCredential(reqJsonStr, returnJsonStr) != DM_OK) {
+        LOGE("failed to check devices credential status");
+        return ERR_DM_HICHAIN_CREDENTIAL_CHECK_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    if (reqJsonStr.empty()) {
+        LOGE("reqJsonStr is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (mineHiChainConnector_->ImportCredential(reqJsonStr, returnJsonStr) != DM_OK) {
+        LOGE("failed to import devices credential");
+        return ERR_DM_HICHAIN_CREDENTIAL_IMPORT_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+    std::string &returnJsonStr)
+{
+    (void)pkgName;
+    if (reqJsonStr.empty()) {
+        LOGE("reqJsonStr is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (mineHiChainConnector_->DeleteCredential(reqJsonStr, returnJsonStr) != DM_OK) {
+        LOGE("failed to delete devices credential");
+        return ERR_DM_HICHAIN_CREDENTIAL_DELETE_FAILED;
+    }
+    return DM_OK;
 }
 
 int32_t DeviceManagerServiceImpl::RegisterCredentialCallback(const std::string &pkgName)

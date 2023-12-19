@@ -278,6 +278,33 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event) override;
+    /**
+     * @tc.name: DeviceManagerImpl::RequestCredential
+     * @tc.desc: RequestCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t RequestCredential(const std::string &pkgName, std::string &returnJsonStr) override;
+    /**
+     * @tc.name: DeviceManagerImpl::CheckCredential
+     * @tc.desc: CheckCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                    std::string &returnJsonStr) override;
+    /**
+     * @tc.name: DeviceManagerImpl::ImportCredential
+     * @tc.desc: ImportCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                     std::string &returnJsonStr) override;
+    /**
+     * @tc.name: DeviceManagerImpl::DeleteCredential
+     * @tc.desc: DeleteCredential
+     * @tc.type: FUNC
+     */
+    virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
+                                     std::string &returnJsonStr) override;
 
     virtual int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
         std::string &uuid) override;

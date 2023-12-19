@@ -489,7 +489,7 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
                 discoveryDeviceIdQueue_.emplace(deviceId);
             }
             discoveryDeviceInfoMap_[deviceId] = infoPtr;
- 
+
             // Remove the earliest element when reached the max size
             if (discoveryDeviceIdQueue_.size() == SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE) {
                 discoveryDeviceInfoMap_.erase(discoveryDeviceIdQueue_.front());

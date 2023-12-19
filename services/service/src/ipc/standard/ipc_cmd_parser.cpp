@@ -689,16 +689,24 @@ ON_IPC_CMD(SERVER_USER_AUTH_OPERATION, MessageParcel &data, MessageParcel &reply
 ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
     std::string packageName = data.ReadString();
-    std::string reqJsonStr = data.ReadString();
+    std::string reqParaStr = data.ReadString();
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
     std::string returnJsonStr;
-    int32_t ret = DeviceManagerService::GetInstance().RequestCredential(reqJsonStr, returnJsonStr);
+    int32_t ret;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
+        ret = DeviceManagerService::GetInstance().RequestCredential(requestParam[DM_CREDENTIAL_REQJSONSTR],
+                                                                    returnJsonStr);
+    }
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        ret = DeviceManagerService::GetInstance().MineRequestCredential(packageName, returnJsonStr);
+    }
     if (!reply.WriteInt32(ret)) {
         LOGE("write ret failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (ret == DM_OK && !returnJsonStr.empty()) {
-        if (!reply.WriteString(returnJsonStr))
-        {
+        if (!reply.WriteString(returnJsonStr)) {
             LOGE("write returnJsonStr failed");
             return ERR_DM_IPC_WRITE_FAILED;
         }
@@ -709,11 +717,32 @@ ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
     std::string packageName = data.ReadString();
-    std::string credentialInfo = data.ReadString();
-    int32_t ret = DeviceManagerService::GetInstance().ImportCredential(packageName, credentialInfo);
+    std::string reqParaStr = data.ReadString();
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
+    std::string returnJsonStr;
+    std::map<std::string, std::string> outputResult;
+    int32_t ret;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
+        ret = DeviceManagerService::GetInstance().ImportCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR]);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
+    }
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        ret = DeviceManagerService::GetInstance().ImportCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR],
+                                                                   returnJsonStr);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+        outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
+    }
     if (!reply.WriteInt32(ret)) {
         LOGE("write ret failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (ret == DM_OK && !returnJsonStr.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(outputResult);
+        if (!reply.WriteString(outParaStr)) {
+        LOGE("write returnJsonStr failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+        }
     }
     return DM_OK;
 }
@@ -721,11 +750,51 @@ ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(DELETE_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
 {
     std::string packageName = data.ReadString();
-    std::string deleteInfo = data.ReadString();
-    int32_t ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, deleteInfo);
+    std::string reqParaStr = data.ReadString();
+    std::map<std::string, std::string> requestParam;
+    ParseMapFromJsonString(reqParaStr, requestParam);
+    std::map<std::string, std::string> outputResult;
+    std::string returnJsonStr;
+    int32_t ret;
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
+        ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR]);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
+    }
+    if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_MINE) {
+        ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR],
+                                                                   returnJsonStr);
+        outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_MINE);
+        outputResult.emplace(DM_CREDENTIAL_RETURNJSONSTR, returnJsonStr);
+    }
     if (!reply.WriteInt32(ret)) {
         LOGE("write ret failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (ret == DM_OK && !returnJsonStr.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(outputResult);
+        if (!reply.WriteString(outParaStr)) {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_GET_DMFA_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string packageName = data.ReadString();
+    std::string reqJsonStr = data.ReadString();
+    std::string returnJsonStr;
+    int32_t ret = DeviceManagerService::GetInstance().CheckCredential(packageName, reqJsonStr, returnJsonStr);
+    if (!reply.WriteInt32(ret)) {
+        LOGE("write ret failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (ret == DM_OK && !returnJsonStr.empty()) {
+        if (!reply.WriteString(returnJsonStr)) {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
     }
     return DM_OK;
 }
