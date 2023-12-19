@@ -99,26 +99,20 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
 int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
         LOGE("DiscoveryManager::StartDiscovering failed, pkgName %s does not exist in cache map.",
              pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-#endif
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     dmSubInfo.medium = DmExchangeMedium::DM_AUTO;
     dmSubInfo.freq = DmExchangeFreq::DM_SUPER_HIGH;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     dmSubInfo.subscribeId = pkgName2DiscoverySubIdMap_.find(pkgName)->second;
     LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s and subscribeId = %d.",
          pkgName.c_str(), dmSubInfo.subscribeId);
-#else
-    dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
-#endif
     if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
         int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
         dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
@@ -200,18 +194,14 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
 
 int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t subscribeId)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
         LOGE("DiscoveryManager::StopDiscovering failed, pkgName %s does not exist in cache map.",
              pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-#endif
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         subscribeId = pkgName2DiscoverySubIdMap_.find(pkgName)->second;
-#endif
         LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %s and subscribeId = %d.",
              pkgName.c_str(), subscribeId);
         if (!discoveryQueue_.empty()) {
