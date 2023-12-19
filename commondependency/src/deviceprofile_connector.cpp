@@ -398,7 +398,7 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
     offlineParam.bindType = INVALIED_TYPE;
     offlineParam.leftAclNumber = 0;
     for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != targetDeviceId || item.GetStatus() != ACTIVE) {
+        if (item.GetTrustDeviceId() != remoteDeviceId || item.GetStatus() != ACTIVE) {
             continue;
         }
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
