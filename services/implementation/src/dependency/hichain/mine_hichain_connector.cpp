@@ -97,6 +97,7 @@ int32_t MineHiChainConnector::Init(void)
         LOGE("failed to get Gm instance from hichain");
         return ERR_DM_FAILED;
     }
+#if (defined(MINE_HARMONY))
     retValue = g_deviceGroupManager->unRegCallback(DM_PKG_NAME);
     if (retValue != HC_SUCCESS) {
         LOGE("failed to register callback function to hichain with ret:%d.", retValue);
@@ -106,6 +107,7 @@ int32_t MineHiChainConnector::Init(void)
         LOGE("failed to register callback function to hichain with ret:%d.", retValue);
         return ERR_DM_FAILED;
     }
+#endif
     LOGI("init hichain modle successfully.");
     return DM_OK;
 }
@@ -117,11 +119,13 @@ int32_t MineHiChainConnector::UnInit(void)
         LOGE("g_deviceGroupManager os nullptr");
         return ERR_DM_POINT_NULL;
     }
+#if (defined(MINE_HARMONY))
     if (g_deviceGroupManager->unRegCallback(DM_PKG_NAME) != HC_SUCCESS) {
         LOGE("failed to unregister callback to hichain");
         return ERR_DM_HICHAIN_UNREGISTER_CALLBACK;
     }
     DestroyDeviceAuthService();
+#endif
     LOGI("uninit hichain modle successfully");
     return DM_OK;
 }
