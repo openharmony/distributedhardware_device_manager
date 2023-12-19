@@ -32,6 +32,7 @@ const int32_t DISCOVERY_TIMEOUT = 120;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
 constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
+const std::string TYPE_MINE = "findDeviceMode";
 
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
     std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
@@ -97,7 +98,8 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
 }
 
 int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
-    const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
+                                           const std::map<std::string, std::string> &discoverParam,
+                                           const std::map<std::string, std::string> &filterOptions)
 {
     if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
         LOGE("DiscoveryManager::StartDiscovering failed, pkgName %s does not exist in cache map.",
@@ -130,6 +132,19 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     StartDiscoveryTimer();
     int32_t ret = DM_OK;
+
+    auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
+    nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
+    if (jsonObject.contains(TYPE_MINE)) {
+        LOGI("StartDiscovering for mine meta node process.");
+        const std::string searchJson = it->second;
+        ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubInfo);
+        if (ret != DM_OK) {
+            LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
+            return ERR_DM_START_DISCOVERING_FAILED;
+        }
+        return ret;
+    }
     if (isStandardMetaNode) {
         LOGI("StartDiscovering for standard meta node process.");
         ret = StartDiscoveringNoMetaType(dmSubInfo, discoverParam);

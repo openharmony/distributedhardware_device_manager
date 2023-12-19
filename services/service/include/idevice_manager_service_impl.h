@@ -59,7 +59,7 @@ public:
      */
     virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
                                  const std::string &filterOptions) = 0;
-                                 
+
    /**
      * @tc.name: IDeviceManagerServiceImpl::StopDeviceDiscovery
      * @tc.desc: Stop Device Discovery of the device manager service impl
