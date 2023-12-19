@@ -493,6 +493,7 @@ private:
     void SrcAuthDeviceFinish();
     void SrcSyncDeleteAclDone();
     void SinkSyncDeleteAclDone();
+    void ProcessSrcBindFinish();
 
 public:
     void RequestCredential();
