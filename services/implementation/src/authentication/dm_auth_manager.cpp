@@ -1038,6 +1038,33 @@ int32_t DmAuthManager::JoinNetwork()
     return DM_OK;
 }
 
+void DmAuthManager::ProcessSrcBindFinish()
+{
+    if (isFinishOfLocal_) {
+        authMessageProcessor_->SetResponseContext(authResponseContext_);
+        std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
+        softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
+    } else {
+        authRequestContext_->reason = authResponseContext_->reply;
+    }
+    if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
+        authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
+    }
+    if (bindFinishCallback_ != nullptr) {
+        bindFinishCallback_->OnBindFinish(authRequestContext_->hostPkgName);
+    }
+    listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+        authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
+    listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
+        authResponseContext_->state, GenerateBindResultContent());
+    usleep(USLEEP_TIME_MS); // 500ms
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+    authRequestContext_ = nullptr;
+    authRequestState_ = nullptr;
+    authTimes_ = 0;
+}
+
 void DmAuthManager::AuthenticateFinish()
 {
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
@@ -1063,26 +1090,7 @@ void DmAuthManager::AuthenticateFinish()
         }
         authResponseState_ = nullptr;
     } else if (authRequestState_ != nullptr) {
-        if (isFinishOfLocal_) {
-            authMessageProcessor_->SetResponseContext(authResponseContext_);
-            std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
-            softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
-        } else {
-            authRequestContext_->reason = authResponseContext_->reply;
-        }
-        if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
-            authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
-        }
-        listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
-                                authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
-        listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
-            authResponseContext_->state, GenerateBindResultContent());
-        usleep(USLEEP_TIME_MS); // 500ms
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
-        authRequestContext_ = nullptr;
-        authRequestState_ = nullptr;
-        authTimes_ = 0;
+        ProcessSrcBindFinish();
     }
     timer_->DeleteAll();
     isFinishOfLocal_ = true;
@@ -2352,6 +2360,15 @@ void DmAuthManager::PutAccessControlList()
         accessee.trustDeviceId = localUdid;
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+void DmAuthManager::RegisterBindFinishCallback(std::shared_ptr<DmBindFinishCallback> callback)
+{
+    if (callback == nullptr) {
+        LOGE("DmAuthManager::RegisterBindFinishCallback callback is nullptr.");
+        return;
+    }
+    bindFinishCallback_ = callback;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
