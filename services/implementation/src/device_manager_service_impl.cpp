@@ -634,11 +634,6 @@ int32_t DeviceManagerServiceImpl::RegisterPinHolderCallback(const std::string &p
         LOGE("RegisterPinHolderCallback failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (authMgr_ == nullptr) {
-        LOGE("authMgr_ is nullptr");
-        return ERR_DM_POINT_NULL;
-    }
-    authMgr_->RegisterBindFinishCallback(pinHolder_);
     return pinHolder_->RegisterPinHolderCallback(pkgName);
 }
 

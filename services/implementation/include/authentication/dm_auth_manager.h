@@ -30,7 +30,6 @@
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
-#include "dm_pin_holder.h"
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
@@ -513,7 +512,6 @@ public:
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
-    void RegisterBindFinishCallback(std::shared_ptr<DmBindFinishCallback> callback);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void DeleteAllGroup(int32_t userId);
@@ -549,7 +547,6 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
-    std::shared_ptr<DmBindFinishCallback> bindFinishCallback_ = nullptr;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
     int32_t authTimes_ = 0;

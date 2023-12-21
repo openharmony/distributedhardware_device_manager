@@ -1051,9 +1051,6 @@ void DmAuthManager::ProcessSrcBindFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-    if (bindFinishCallback_ != nullptr) {
-        bindFinishCallback_->OnBindFinish(authRequestContext_->hostPkgName);
-    }
     listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
@@ -2360,15 +2357,6 @@ void DmAuthManager::PutAccessControlList()
         accessee.trustDeviceId = localUdid;
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
-}
-
-void DmAuthManager::RegisterBindFinishCallback(std::shared_ptr<DmBindFinishCallback> callback)
-{
-    if (callback == nullptr) {
-        LOGE("DmAuthManager::RegisterBindFinishCallback callback is nullptr.");
-        return;
-    }
-    bindFinishCallback_ = callback;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
