@@ -50,11 +50,6 @@ public:
         const std::map<std::string, std::string> &filterOptions);
     int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
 
-    void MappingPkgName2DiscoverySubMap(const std::string &pkgName, const uint16_t &subscribeId);
-    void UnMappingPkgName2DiscoverySubMap(const std::string &pkgName);
-    void MappingPkgName2RegisterSubMap(const std::string &pkgName, const uint16_t &subscribeId);
-    void UnMappingPkgName2RegisterSubMap(const std::string &pkgName);
-
 private:
     void StartDiscoveryTimer();
     void HandleDiscoveryTimeout(std::string name);
@@ -67,8 +62,7 @@ private:
 private:
     std::mutex locks_;
     std::shared_ptr<DmTimer> timer_;
-    std::map<std::string, uint16_t> pkgName2DiscoverySubIdMap_;
-    std::map<std::string, uint16_t> pkgName2RegisterSubIdMap_;
+    std::map<std::string, uint16_t> pkgName2SubIdMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;

@@ -47,13 +47,15 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
 
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
+    uint16_t subscribeId = 33;
+    int32_t publishId = 123;
 
     DeviceManagerNotify::GetInstance().UnRegisterDeathRecipientCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterPackageCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName);
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName);
+    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
     DeviceManagerNotify::GetInstance().UnRegisterAuthenticateCallback(pkgName, deviceId);
     DeviceManagerNotify::GetInstance().OnUiCall(pkgName, deviceId);
 }
