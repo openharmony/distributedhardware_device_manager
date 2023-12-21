@@ -58,6 +58,8 @@ public:
 private:
     void StartDiscoveryTimer();
     void HandleDiscoveryTimeout(std::string name);
+    int32_t StartDiscoveringMine(const string &pkgName, const DmSubscribeInfo &dmSubscribeInfo,
+                             const std::map<std::string, std::string> &filterOptions);
     int32_t StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo, const std::map<std::string, std::string> &param);
     int32_t StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo, const std::map<std::string, std::string> &param);
     int32_t HandleDiscoveryQueue(const std::string &pkgName, uint16_t subscribeId,
