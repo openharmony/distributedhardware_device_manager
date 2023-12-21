@@ -1087,16 +1087,10 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
 
     char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
     JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
-    std::string appOperationStr = appOperation;
-
     char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
     JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
-    std::string customDescriptionStr = customDescription;
-
     char targetPkgName[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "targetPkgName", targetPkgName, sizeof(targetPkgName));
-    std::string targetPkgNameStr = targetPkgName;
-
     char metaType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "metaType", metaType, sizeof(metaType));
     std::string metaTypeStr = metaType;
@@ -1104,41 +1098,31 @@ void DeviceManagerNapi::JsToBindParam(const napi_env &env, const napi_value &obj
 
     char pinCode[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "pinCode", pinCode, sizeof(pinCode));
-    std::string pinCodeStr = pinCode;
-
     char authToken[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "authToken", authToken, sizeof(authToken));
-    std::string authTokenStr = authToken;
-
     char brMac[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "brMac", brMac, sizeof(brMac));
-    std::string brMacStr = brMac;
-
     char bleMac[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "bleMac", bleMac, sizeof(bleMac));
-    std::string bleMacStr = bleMac;
-
     char wifiIP[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "wifiIP", wifiIP, sizeof(wifiIP));
-    std::string wifiIPStr = wifiIP;
 
     int32_t wifiPort = -1;
     JsObjectToInt(env, object, "wifiPort", wifiPort);
-
     int32_t bindLevel = 0;
     JsObjectToInt(env, object, "bindLevel", bindLevel);
 
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = bindType;
-    jsonObj[APP_OPERATION] = appOperationStr;
-    jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
-    jsonObj[PARAM_KEY_TARGET_PKG_NAME] = targetPkgNameStr;
+    jsonObj[APP_OPERATION] = std::string(appOperation);
+    jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
+    jsonObj[PARAM_KEY_TARGET_PKG_NAME] = std::string(targetPkgName);
     jsonObj[PARAM_KEY_META_TYPE] = metaTypeStr;
-    jsonObj[PARAM_KEY_PIN_CODE] = pinCodeStr;
-    jsonObj[PARAM_KEY_AUTH_TOKEN] = authTokenStr;
-    jsonObj[PARAM_KEY_BR_MAC] = brMacStr;
-    jsonObj[PARAM_KEY_BLE_MAC] = bleMacStr;
-    jsonObj[PARAM_KEY_WIFI_IP] = wifiIPStr;
+    jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
+    jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
+    jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);
+    jsonObj[PARAM_KEY_BLE_MAC] = std::string(bleMac);
+    jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
     jsonObj[BIND_LEVEL] = bindLevel;
     jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
@@ -2291,6 +2275,49 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
     return result;
 }
 
+void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId,
+    napi_env env, napi_value &object)
+{
+    LOGI("Bind devices or target start");
+    std::string bindParam;
+    bool isMetaType = false;
+    JsToBindParam(env, object, bindParam, authAsyncCallbackInfo_.authType, isMetaType);
+
+    if (isMetaType) {
+        std::shared_ptr<DmNapiBindTargetCallback> bindTargetCallback = nullptr;
+        auto iter = g_bindCallbackMap.find(deviceManagerWrapper->bundleName_);
+        if (iter == g_bindCallbackMap.end()) {
+            bindTargetCallback = std::make_shared<DmNapiBindTargetCallback>(env, deviceManagerWrapper->bundleName_);
+            g_bindCallbackMap[deviceManagerWrapper->bundleName_] = bindTargetCallback;
+        } else {
+            bindTargetCallback = iter->second;
+        }
+        
+        int32_t ret = BindTargetWarpper(deviceManagerWrapper->bundleName_, deviceId, bindParam, bindTargetCallback);
+        if (ret != 0) {
+            LOGE("BindTarget for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+            CreateBusinessError(env, ret);
+        }
+        return;
+    }
+
+    std::shared_ptr<DmNapiAuthenticateCallback> bingDeviceCallback = nullptr;
+    auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
+    if (iter == g_authCallbackMap.end()) {
+        bingDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
+        g_authCallbackMap[deviceManagerWrapper->bundleName_] = bingDeviceCallback;
+    } else {
+        bingDeviceCallback = iter->second;
+    }
+    int32_t ret = DeviceManager::GetInstance().BindDevice(deviceManagerWrapper->bundleName_,
+        authAsyncCallbackInfo_.authType, deviceId, bindParam, bingDeviceCallback);
+    if (ret != 0) {
+        LOGE("BindDevice for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
+        CreateBusinessError(env, ret);
+    }
+    return;
+}
+
 napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
@@ -2328,43 +2355,8 @@ napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
     char deviceId[DM_NAPI_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[DM_NAPI_ARGS_ZERO], deviceId, deviceIdLen + 1, &deviceIdLen);
 
-    std::string bindParam;
-    bool isMetaType = false;
-    JsToBindParam(env, argv[DM_NAPI_ARGS_ONE], bindParam, authAsyncCallbackInfo_.authType, isMetaType);
-
-    if (isMetaType) {
-        std::shared_ptr<DmNapiBindTargetCallback> bindTargetCallback = nullptr;
-        auto iter = g_bindCallbackMap.find(deviceManagerWrapper->bundleName_);
-        if (iter == g_bindCallbackMap.end()) {
-            bindTargetCallback = std::make_shared<DmNapiBindTargetCallback>(env, deviceManagerWrapper->bundleName_);
-            g_bindCallbackMap[deviceManagerWrapper->bundleName_] = bindTargetCallback;
-        } else {
-            bindTargetCallback = iter->second;
-        }
-        
-        int32_t ret = BindTargetWarpper(deviceManagerWrapper->bundleName_, deviceId, bindParam, bindTargetCallback);
-        if (ret != 0) {
-            LOGE("BindTarget for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-            CreateBusinessError(env, ret);
-        }
-        napi_get_undefined(env, &result);
-        return result;
-    }
-
-    std::shared_ptr<DmNapiAuthenticateCallback> bingDeviceCallback = nullptr;
-    auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
-    if (iter == g_authCallbackMap.end()) {
-        bingDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
-        g_authCallbackMap[deviceManagerWrapper->bundleName_] = bingDeviceCallback;
-    } else {
-        bingDeviceCallback = iter->second;
-    }
-    int32_t ret = DeviceManager::GetInstance().BindDevice(deviceManagerWrapper->bundleName_,
-        authAsyncCallbackInfo_.authType, deviceId, bindParam, bingDeviceCallback);
-    if (ret != 0) {
-        LOGE("BindDevice for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-    }
+    napi_value object = argv[DM_NAPI_ARGS_ONE];
+    BindDevOrTarget(deviceManagerWrapper, deviceId, env, object);
     napi_get_undefined(env, &result);
     return result;
 }
@@ -2961,35 +2953,11 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     return exports;
 }
 
-int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
-    const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback)
+void DeviceManagerNapi::InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)
 {
-    if (bindParam.empty()) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    nlohmann::json bindParamObj = nlohmann::json::parse(bindParam, nullptr, false);
-    if (bindParamObj.is_discarded()) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    PeerTargetId targetId;
-    targetId.deviceId = deviceId;
-    if (IsString(bindParamObj, PARAM_KEY_BR_MAC)) {
-        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].get<std::string>();
-    }
-    if (IsString(bindParamObj, PARAM_KEY_BLE_MAC)) {
-        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].get<std::string>();
-    }
-    if (IsString(bindParamObj, PARAM_KEY_WIFI_IP)) {
-        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].get<std::string>();
-    }
-    if (IsInt32(bindParamObj, PARAM_KEY_WIFI_PORT)) {
-        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].get<int32_t>());
-    }
-
-    std::map<std::string, std::string> bindParamMap;
+    LOGI("Insert map parames start");
     if (IsInt32(bindParamObj, AUTH_TYPE)) {
-        int32_t authType = (uint16_t)(bindParamObj[AUTH_TYPE].get<int32_t>());
+        int32_t authType = bindParamObj[AUTH_TYPE].get<int32_t>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     }
     if (IsString(bindParamObj, APP_OPERATION)) {
@@ -3016,6 +2984,35 @@ int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const s
         std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
     }
+}
+
+int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
+    const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback)
+{
+    if (bindParam.empty()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    nlohmann::json bindParamObj = nlohmann::json::parse(bindParam, nullptr, false);
+    if (bindParamObj.is_discarded()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    PeerTargetId targetId;
+    targetId.deviceId = deviceId;
+    if (IsString(bindParamObj, PARAM_KEY_BR_MAC)) {
+        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].get<std::string>();
+    }
+    if (IsString(bindParamObj, PARAM_KEY_BLE_MAC)) {
+        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].get<std::string>();
+    }
+    if (IsString(bindParamObj, PARAM_KEY_WIFI_IP)) {
+        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].get<std::string>();
+    }
+    if (IsInt32(bindParamObj, PARAM_KEY_WIFI_PORT)) {
+        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].get<int32_t>());
+    }
+
+    std::map<std::string, std::string> bindParamMap;
+    InsertMapParames(bindParamObj, bindParamMap);
     return DeviceManager::GetInstance().BindTarget(pkgName, targetId, bindParamMap, callback);
 }
 
