@@ -104,7 +104,6 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     AddDeathRecipient(svc, DeathCb, pkgName, &cbId);
     svcId.cbId = cbId;
     std::string strPkgName = reinterpret_cast<const char*>(name);
-    DeviceManagerService::GetInstance().MappingPkgName2SubMapAndPubMap(strPkgName);
     return IpcServerListenermgr::GetInstance().RegisterListener(strPkgName, &svcId);
 }
 
@@ -122,7 +121,6 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         LOGE("not found listener by package name.");
         return ERR_DM_FAILED;
     }
-    DeviceManagerService::GetInstance().UnMappingPkgName2SubMapAndPubMap(pkgName);
     int32_t ret = IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     if (ret == DM_OK) {
         SvcIdentity sid;
