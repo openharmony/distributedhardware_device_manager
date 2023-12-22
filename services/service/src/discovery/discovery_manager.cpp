@@ -182,7 +182,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
     LOGI("StartDiscovering for meta node process, input metaType = %s",
-         (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+         (param.find(PARAM_KEY_META_TYPE)->second).c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
