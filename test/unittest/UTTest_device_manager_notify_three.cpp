@@ -58,9 +58,9 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess1, testing::ext::TestSize.Leve
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManagerNotify OnPublishResult
@@ -97,9 +97,9 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess2, testing::ext::TestSize.Leve
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "com.ohos.test1";
@@ -132,12 +132,14 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess3, testing::ext::TestSize.Leve
     // set callback not null
     int count = 0;
     std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
+    // set publishId not null
+    int32_t publishId = 0;
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     int32_t testpublishId = 1;
@@ -175,9 +177,9 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess4, testing::ext::TestSize.Leve
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterPublishCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
@@ -215,13 +217,13 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishSuccess5, testing::ext::TestSize.Leve
     // 2. set checkMap null
     std::shared_ptr<PublishCallback> checkMap = nullptr;
     // 3. call DeviceManagerNotifyTest RegisterDiscoverCallback with parameter
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName];
+    checkMap = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(testPkgName);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(testPkgName, publishId);
     // 6. call DeviceManagerNotify OnPublishResult
     DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, 0);
     // 7. check if callback OnPublishSuccess called
@@ -918,8 +920,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound6, testing::ext::TestSize.Level0)
     uint16_t subscribeId = 0;
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
-    auto callback = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
-    EXPECT_EQ(callback == nullptr, true);
+    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(map.empty(), true);
 }
 
 /**
@@ -932,8 +934,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound7, testing::ext::TestSize.Level0)
     uint16_t subscribeId = 0;
     DmDeviceBasicInfo deviceBasicInfo;
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
-    auto callback = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
-    EXPECT_EQ(callback == nullptr, false);
+    auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
+    EXPECT_EQ(map.empty(), false);
 }
 } // namespace
 
