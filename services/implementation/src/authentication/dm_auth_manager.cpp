@@ -54,6 +54,7 @@ const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 const int32_t USLEEP_TIME_MS = 500000; // 500ms
 const int32_t SYNC_DELETE_TIMEOUT = 60;
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
+const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 
 constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -554,6 +555,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
             }
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
+            timer_->DeleteTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK));
         }
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         if (status == DM_OK && authResponseContext_->requestId == requestId &&
@@ -939,6 +941,10 @@ void DmAuthManager::StartRespAuthProcess()
         timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
             [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
+            });
+        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), SESSION_HEARTBEAT_TIMEOUT,
+            [this] (std::string name) {
+                DmAuthManager::HandleSessionHeartbeat(name);
             });
         listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
@@ -1519,7 +1525,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %s.", GetAnonyString(targetId.wifiIp).c_str());
         if (!addrType.empty()) {
             addr.type = static_cast<ConnectionAddrType>(std::stoi(addrType));
-        }else {
+        } else {
             addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
         }
         memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
@@ -2357,6 +2363,24 @@ void DmAuthManager::PutAccessControlList()
         accessee.trustDeviceId = localUdid;
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+void DmAuthManager::HandleSessionHeartbeat(std::string name)
+{
+    timer_->DeleteTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK));
+    LOGI("DmAuthManager::HandleSessionHeartbeat name %s", name.c_str());
+    nlohmann::json jsonObj;
+    jsonObj[TAG_SESSION_HEARTBEAT] = TAG_SESSION_HEARTBEAT;
+    std::string message = jsonObj.dump();
+    softbusConnector_->GetSoftbusSession()->SendHeartbeatData(authResponseContext_->sessionId, message);
+
+    if (authRequestState_ != nullptr) {
+        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), SESSION_HEARTBEAT_TIMEOUT,
+            [this] (std::string name) {
+                DmAuthManager::HandleSessionHeartbeat(name);
+            });
+    }
+    LOGI("DmAuthManager::HandleSessionHeartbeat complete");
 }
 } // namespace DistributedHardware
 } // namespace OHOS
