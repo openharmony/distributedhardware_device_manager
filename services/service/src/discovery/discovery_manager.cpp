@@ -136,28 +136,27 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
 
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     StartDiscoveryTimer();
-    int32_t ret = DM_OK;
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
     if (jsonObject.contains(TYPE_MINE)) {
-        LOGI("StartDiscovering for mine meta node process.");
-        const std::string searchJson = it->second;
-        ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubInfo);
-        if (ret != DM_OK) {
-            LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
-            return ERR_DM_START_DISCOVERING_FAILED;
-        }
-        return ret;
+        return StartDiscovering4MineMetaNode(pkgName, dmSubInfo, it->second);
     }
-    if (isStandardMetaNode) {
-        LOGI("StartDiscovering for standard meta node process.");
-        ret = StartDiscoveringNoMetaType(dmSubInfo, discoverParam);
-    } else {
-        LOGI("StartDiscovering for meta node process, input metaType = %s",
-            (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
-        ret = StartDiscovering4MetaType(dmSubInfo, discoverParam);
+
+    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(dmSubInfo, discoverParam) :
+            StartDiscovering4MetaType(dmSubInfo, discoverParam);
+    if (ret != DM_OK) {
+        LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
+        return ERR_DM_START_DISCOVERING_FAILED;
     }
+    return ret;
+}
+
+int32_t DiscoveryManager::StartDiscovering4MineMetaNode(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
+    const std::string &searchJson)
+{
+    LOGI("StartDiscovering for mine meta node process.");
+    int32_t ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
@@ -168,6 +167,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
+    LOGI("StartDiscovering for standard meta node process.");
     (void)param;
     strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
 
@@ -181,6 +181,8 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
 int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
+    LOGI("StartDiscovering for meta node process, input metaType = %s",
+         (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
