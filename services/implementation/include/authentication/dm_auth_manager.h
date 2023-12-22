@@ -492,7 +492,6 @@ private:
     void SrcAuthDeviceFinish();
     void SrcSyncDeleteAclDone();
     void SinkSyncDeleteAclDone();
-    void ProcessSrcBindFinish();
 
 public:
     void RequestCredential();
@@ -531,6 +530,8 @@ private:
     void PutAccessControlList();
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    void SinkAuthenticateFinish();
+    void SrcAuthenticateFinish();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -561,6 +562,7 @@ private:
     std::string remoteDeviceId_ = "";
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;
+    bool isAuthenticateDevice_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

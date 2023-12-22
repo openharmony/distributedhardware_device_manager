@@ -33,6 +33,7 @@ namespace DistributedHardware {
 enum {
     DM_OK = 0,
     SOFTBUS_OK = 0,
+    STOP_BIND = 1,
     ERR_DM_FAILED = -20000,
     ERR_DM_TIME_OUT = -20001,
     ERR_DM_NOT_INIT = -20002,

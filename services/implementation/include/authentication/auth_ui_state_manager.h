@@ -31,6 +31,7 @@ enum DmUiStateMsg : int32_t {
     MSG_CANCEL_PIN_CODE_SHOW,
     MSG_CANCEL_PIN_CODE_INPUT,
     MSG_DOING_AUTH,
+    MSG_CANCEL_CONFIRM_SHOW,
 };
 
 class AuthUiStateManager {

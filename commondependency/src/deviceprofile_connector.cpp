@@ -310,7 +310,6 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
         uint32_t priority = INVALIED_TYPE;
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             priority = IDENTICAL_ACCOUNT_TYPE;
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ALWAYS) {
             priority = DEVICE_PEER_TO_PEER_TYPE;
         } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {

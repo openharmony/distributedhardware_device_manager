@@ -24,6 +24,7 @@ const ACTION_ALLOW_AUTH_ONCE: number = 0
 const ACTION_CANCEL_AUTH: number = 1
 const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
 const ACTION_ALLOW_AUTH_ALWAYS: number = 6
+const MSG_CANCEL_CONFIRM_SHOW: number = 5
 
 @Entry
 @Component
@@ -54,6 +55,15 @@ struct dialogPlusPage {
         return
       }
       dmClass = dm
+      dmClass.on('uiStateChange', (data: Record<string, string>) => {
+        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
+        let tmpStr: Record<string, number> = JSON.parse(data.param)
+        let msg: number = tmpStr.uiStateMsg as number
+        if (msg === MSG_CANCEL_CONFIRM_SHOW) {
+          this.destruction()
+          return
+        }
+    })
     })
   }
 
