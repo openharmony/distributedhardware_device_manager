@@ -139,6 +139,7 @@ constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 const std::string DM_TYPE_MINE = "MINE";
 const std::string DM_TYPE_OH = "OH";
+constexpr const char* TAG_SESSION_HEARTBEAT = "session_heartbeat";
 
 //The following constant are provided only for HiLink.
 const static char *EXT_PART = "ext_part";

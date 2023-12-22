@@ -87,6 +87,8 @@ public:
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
     int32_t OpenUnbindSession(const std::string &netWorkId);
 
+    int32_t SendHeartbeatData(int32_t sessionId, std::string &message);
+
 private:
     static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
 };

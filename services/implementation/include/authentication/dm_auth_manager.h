@@ -466,6 +466,8 @@ public:
      */
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
+
+    void HandleSessionHeartbeat(std::string name);
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);

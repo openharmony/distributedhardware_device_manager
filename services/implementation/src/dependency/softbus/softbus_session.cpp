@@ -119,6 +119,16 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     return DM_OK;
 }
 
+int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &message)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
+    if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
+        LOGE("[SOFTBUS]SendHeartbeatData failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
 int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
