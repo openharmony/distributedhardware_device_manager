@@ -41,17 +41,8 @@ typedef enum PinHolderState {
     SINK_DESTROY,
 } PinHolderState;
 
-class DmBindFinishCallback {
-public:
-    virtual ~DmBindFinishCallback()
-    {
-    }
-    virtual void OnBindFinish(const std::string &pkgName) = 0;
-};
-
 class DmPinHolder final : public ISoftbusSessionCallback,
-                          public std::enable_shared_from_this<DmPinHolder>,
-                          public DmBindFinishCallback {
+                          public std::enable_shared_from_this<DmPinHolder> {
 public:
     DmPinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener);
     ~DmPinHolder();
@@ -61,7 +52,6 @@ public:
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
 public:
-    void OnBindFinish(const std::string &pkgName);
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);
     void OnDataReceived(int32_t sessionId, std::string message);
