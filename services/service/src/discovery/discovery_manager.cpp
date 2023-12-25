@@ -136,9 +136,6 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
 
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     StartDiscoveryTimer();
-    int32_t ret = StartDiscoveringMine(pkgName, dmSubInfo, filterOptions);
-    if (ret != ERR_DM_TYPE_NOT_MINE) {
-        return ret;
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
@@ -165,24 +162,6 @@ int32_t DiscoveryManager::StartDiscovering4MineMetaNode(const std::string &pkgNa
         return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
-}
-
-int32_t DiscoveryManager::StartDiscoveringMine(const string &pkgName, const DmSubscribeInfo &dmSubscribeInfo,
-                                           const std::map<std::string, std::string> &filterOptions)
-{
-    auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
-    nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
-    if (jsonObject.contains(TYPE_MINE)) {
-        LOGI("StartDiscovering for mine meta node process.");
-        const std::string searchJson = it->second;
-        int32_t ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubscribeInfo);
-        if (ret != DM_OK) {
-            LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
-            return ERR_DM_START_DISCOVERING_FAILED;
-        }
-        return DM_OK;
-    }
-    return ERR_DM_TYPE_NOT_MINE;
 }
 
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
