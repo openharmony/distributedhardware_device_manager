@@ -38,20 +38,22 @@ AdvertiseManager::~AdvertiseManager()
 int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
-    if (pkgName2PubIdMap_.count(pkgName) == 0) {
-        LOGE("AdvertiseManager::StartAdvertising failed, pkgName %s does not exist in cache map.", pkgName.c_str());
+    LOGI("AdvertiseManager::StartAdvertising begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmPublishInfo dmPubInfo;
+    dmPubInfo.publishId = -1;
     dmPubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     dmPubInfo.freq = DmExchangeFreq::DM_HIGH;
     dmPubInfo.ranging = true;
-    dmPubInfo.publishId = pkgName2PubIdMap_.find(pkgName)->second;
 
-    LOGI("AdvertiseManager::StartAdvertising begin for pkgName = %s and publishId = %d.",
-         pkgName.c_str(), dmPubInfo.publishId);
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
         LOGI("StartAdvertising input MetaType=%s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+    }
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
+        dmPubInfo.publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
     }
     std::string capability = DM_CAPABILITY_OSD;
     if (advertiseParam.find(PARAM_KEY_DISC_CAPABILITY) != advertiseParam.end()) {
@@ -88,36 +90,19 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
 
 int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t publishId)
 {
-    if (pkgName2PubIdMap_.count(pkgName) == 0) {
-        LOGE("AdvertiseManager::StopAdvertising failed, pkgName %s does not exist in cache map.", pkgName.c_str());
+    LOGI("AdvertiseManager::StopDiscovering begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    publishId = pkgName2PubIdMap_.find(pkgName)->second;
-    LOGI("AdvertiseManager::StopDiscovering begin for pkgName = %s and publishId = %d.",
-         pkgName.c_str(), publishId);
     return softbusListener_->StopPublishSoftbusLNN(publishId);
 }
 
 void AdvertiseManager::HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName,
     int32_t publishId)
 {
-    LOGI("HandleAutoStopAdvertise, auto stop advertise task timeout, timerName=%s.", timerName.c_str());
+    LOGI("HandleAutoStopAdvertise, auto stop advertise task timeout, timerName=%s", timerName.c_str());
     StopAdvertising(pkgName, publishId);
-}
-
-void AdvertiseManager::MappingPkgName2PubMap(const std::string &pkgName, const uint16_t &publishId)
-{
-    if (pkgName2PubIdMap_.count(pkgName) == 0) {
-        pkgName2PubIdMap_[pkgName] = publishId;
-    }
-}
-void AdvertiseManager::UnMappingPkgName2PubMap(const std::string &pkgName)
-{
-    if (pkgName2PubIdMap_.count(pkgName) != 0) {
-        uint16_t publishId = pkgName2PubIdMap_.find(pkgName)->second;
-        StopAdvertising(pkgName, publishId);
-        pkgName2PubIdMap_.erase(pkgName);
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

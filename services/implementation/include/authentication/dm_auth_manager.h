@@ -30,7 +30,6 @@
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
-#include "dm_pin_holder.h"
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
@@ -467,6 +466,8 @@ public:
      */
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
+
+    void HandleSessionHeartbeat(std::string name);
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
@@ -493,7 +494,6 @@ private:
     void SrcAuthDeviceFinish();
     void SrcSyncDeleteAclDone();
     void SinkSyncDeleteAclDone();
-    void ProcessSrcBindFinish();
 
 public:
     void RequestCredential();
@@ -513,7 +513,6 @@ public:
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
-    void RegisterBindFinishCallback(std::shared_ptr<DmBindFinishCallback> callback);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void DeleteAllGroup(int32_t userId);
@@ -533,6 +532,8 @@ private:
     void PutAccessControlList();
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    void SinkAuthenticateFinish();
+    void SrcAuthenticateFinish();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -549,7 +550,6 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<DmAbilityManager> dmAbilityMgr_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
-    std::shared_ptr<DmBindFinishCallback> bindFinishCallback_ = nullptr;
     bool isCryptoSupport_ = false;
     bool isFinishOfLocal_ = true;
     int32_t authTimes_ = 0;
@@ -564,6 +564,7 @@ private:
     std::string remoteDeviceId_ = "";
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;
+    bool isAuthenticateDevice_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

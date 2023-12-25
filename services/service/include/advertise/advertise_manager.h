@@ -29,16 +29,12 @@ public:
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
 
-    void MappingPkgName2PubMap(const std::string &pkgName, const uint16_t &publishId);
-    void UnMappingPkgName2PubMap(const std::string &pkgName);
-
 private:
     void HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName, int32_t publishId);
 
 private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<SoftbusListener> softbusListener_;
-    std::map<std::string, uint16_t> pkgName2PubIdMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

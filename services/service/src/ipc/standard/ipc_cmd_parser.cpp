@@ -429,7 +429,6 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
-    DeviceManagerService::GetInstance().MappingPkgName2SubMapAndPubMap(pkgName);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -442,7 +441,6 @@ ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParce
 {
     std::string pkgName = data.ReadString();
     DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    DeviceManagerService::GetInstance().UnMappingPkgName2SubMapAndPubMap(pkgName);
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -1021,7 +1019,9 @@ ON_IPC_CMD(REGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &repl
 ON_IPC_CMD(UNREGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
+    std::string extraParaStr = data.ReadString();
     std::map<std::string, std::string> extraParam;
+    ParseMapFromJsonString(extraParaStr, extraParam);
     int32_t result = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

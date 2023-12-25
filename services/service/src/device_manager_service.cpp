@@ -17,7 +17,6 @@
 
 #include <dlfcn.h>
 #include <functional>
-#include <random>
 
 #include "app_manager.h"
 #include "dm_anonymous.h"
@@ -36,25 +35,9 @@ constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
 #endif
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 
-const uint16_t DISCOVERY_MIN_RANDOM = 10000;
-const uint16_t DISCOVERY_MAX_RANDOM = 19999;
-const uint16_t REGISTER_MIN_RANDOM = 20000;
-const uint16_t REGISTER_MAX_RANDOM = 29999;
-const uint16_t PUBLISH_MIN_RANDOM = 30000;
-const uint16_t PUBLISH_MAX_RANDOM = 39999;
-const uint16_t DM_DEFAULT_ID = 0;
-
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
-
-uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
-{
-    std::random_device randDevice;
-    std::mt19937 genRand(randDevice());
-    std::uniform_int_distribution<int> disRand(randMin, randMax);
-    return disRand(genRand);
-}
 
 DeviceManagerService::~DeviceManagerService()
 {
@@ -341,78 +324,94 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
     const std::string &extra)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call StartDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
+    LOGI("DeviceManagerService::StartDeviceDiscovery begin for pkgName = %s, extra = %s", pkgName.c_str(),
+        extra.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
 
     std::map<std::string, std::string> discParam;
-    if (subscribeInfo.medium <= DmExchangeMedium::DM_MEDIUM_BUTT) {
-        discParam[PARAM_KEY_DISC_MEDIUM] = std::to_string(subscribeInfo.medium);
-    }
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID,
+        std::to_string(subscribeInfo.subscribeId)));
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_MEDIUM, std::to_string(subscribeInfo.medium)));
+
     std::map<std::string, std::string> filterOps;
-    filterOps[PARAM_KEY_FILTER_OPTIONS] = extra;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, extra));
+
     return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
                                                    const std::string &filterOptions)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller: %s does not have permission to call StartDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::map<std::string, std::string> filterOps;
-    filterOps[PARAM_KEY_FILTER_OPTIONS] = filterOptions;
+    LOGI("StartDeviceDiscovery begin for pkgName = %s, filterOptions = %s, subscribeId = %d",
+        pkgName.c_str(), filterOptions.c_str(), subscribeId);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
     std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId)));
+
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, filterOptions));
+
     return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
 int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller: %s does not have permission to call StopDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StopDeviceDiscovery begin for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
 int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call PublishDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
+    LOGI("DeviceManagerService::PublishDeviceDiscovery begin for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
     std::map<std::string, std::string> advertiseParam;
+    advertiseParam.insert(std::pair<std::string, std::string>(PARAM_KEY_PUBLISH_ID,
+        std::to_string(publishInfo.publishId)));
+
     return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
 
 int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %s does not have permission to call UnPublishDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
@@ -522,8 +521,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || params.empty()) {
-        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str(),
-            params.c_str());
+        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (IsDMServiceAdapterLoad()) {
@@ -1045,13 +1043,17 @@ void DeviceManagerService::UnloadDMServiceAdapter()
 int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StartDiscovering for pkgName = %s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
+    if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
+        LOGI("StartDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
 }
@@ -1059,27 +1061,36 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
 int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    return discoveryMgr_->StopDiscovering(pkgName, DM_DEFAULT_ID);
+    LOGI("DeviceManagerService::StopDiscovering for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    uint16_t subscribeId = -1;
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+    }
+    if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
+        LOGI("StopDiscovering input MetaType = %s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+    }
+    return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
 int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::EnableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return discoveryMgr_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
 }
@@ -1087,13 +1098,14 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
 int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::DisableDiscoveryListener for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return discoveryMgr_->DisableDiscoveryListener(pkgName, extraParam);
 }
@@ -1101,13 +1113,14 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
 int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService::StartAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
@@ -1115,15 +1128,23 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
 int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    return advertiseMgr_->StopAdvertising(pkgName, DM_DEFAULT_ID);
+    LOGI("DeviceManagerService::StopAdvertising for pkgName = %s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
+        LOGI("StopAdvertising input MetaType=%s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+    }
+    int32_t publishId = -1;
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
+        publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+    }
+    return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
 
 int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1294,28 +1315,6 @@ void DeviceManagerService::OnUnbindBytesReceived(int32_t sessionId, const void *
         return;
     }
     dmServiceImpl_->OnUnbindBytesReceived(sessionId, data, dataLen);
-}
-
-void DeviceManagerService::MappingPkgName2SubMapAndPubMap(const std::string &pkgName)
-{
-    {
-        std::lock_guard<std::mutex> autoLock(initLock_);
-        uint16_t businessId = GenRandUint(DISCOVERY_MIN_RANDOM, DISCOVERY_MAX_RANDOM);
-        discoveryMgr_->MappingPkgName2DiscoverySubMap(pkgName, businessId);
-        businessId = GenRandUint(REGISTER_MIN_RANDOM, REGISTER_MAX_RANDOM);
-        discoveryMgr_->MappingPkgName2RegisterSubMap(pkgName, businessId);
-        businessId = GenRandUint(PUBLISH_MIN_RANDOM, PUBLISH_MAX_RANDOM);
-        advertiseMgr_->MappingPkgName2PubMap(pkgName, businessId);
-    }
-}
-void DeviceManagerService::UnMappingPkgName2SubMapAndPubMap(const std::string &pkgName)
-{
-    {
-        std::lock_guard<std::mutex> autoLock(unInitLock_);
-        discoveryMgr_->UnMappingPkgName2DiscoverySubMap(pkgName);
-        discoveryMgr_->UnMappingPkgName2RegisterSubMap(pkgName);
-        advertiseMgr_->UnMappingPkgName2PubMap(pkgName);
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

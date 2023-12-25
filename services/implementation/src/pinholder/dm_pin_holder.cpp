@@ -36,9 +36,7 @@ constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER = 650;
 constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER_RESP = 651;
 
 constexpr const char* PINHOLDER_CREATE_TIMEOUT_TASK = "deviceManagerTimer:pinholdercreate";
-constexpr const char* PINHOLDER_DESTROY_TIMEOUT_TASK = "deviceManagerTimer:pinholderdestroy";
 constexpr int32_t PIN_HOLDER_SESSION_CREATE_TIMEOUT = 60;
-constexpr int32_t PIN_HOLDER_SESSION_TTL_TIMEOUT = 60;
 
 constexpr const char* TAG_PIN_TYPE = "PIN_TYPE";
 constexpr const char* TAG_PAYLOAD = "PAYLOAD";
@@ -348,10 +346,7 @@ void DmPinHolder::ProcessDestroyResMsg(const std::string &message)
         listener_->OnDestroyResult(registerPkgName_, DM_OK);
         sourceState_ = SOURCE_INIT;
         sinkState_ = SINK_INIT;
-        timer_->StartTimer(std::string(PINHOLDER_DESTROY_TIMEOUT_TASK), PIN_HOLDER_SESSION_TTL_TIMEOUT,
-            [this] (std::string name) {
-                DmPinHolder::CloseSession(name);
-            });
+        CloseSession(registerPkgName_);
     } else {
         LOGE("ProcessDestroyResMsg remote state is wrong.");
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
@@ -448,11 +443,6 @@ int32_t DmPinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
-}
-
-void DmPinHolder::OnBindFinish(const std::string &pkgName)
-{
-    CloseSession(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

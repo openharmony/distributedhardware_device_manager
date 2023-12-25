@@ -48,25 +48,27 @@ DiscoveryManager::~DiscoveryManager()
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    if (pkgName2RegisterSubIdMap_.count(pkgName) == 0) {
-        LOGE("DiscoveryManager::EnableDiscoveryListener failed, pkgName %s does not exist in cache map.",
-             pkgName.c_str());
+    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmSubscribeInfo dmSubInfo;
+    dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
     dmSubInfo.medium = DmExchangeMedium::DM_BLE;
     dmSubInfo.freq = DmExchangeFreq::DM_LOW;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
-    dmSubInfo.subscribeId = pkgName2RegisterSubIdMap_.find(pkgName)->second;
     strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_APPROACH);
-    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s and subscribeId = %d.",
-         pkgName.c_str(), dmSubInfo.subscribeId);
 
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
         LOGI("EnableDiscoveryListener, input MetaType = %s in discoverParam map.", metaType.c_str());
+    }
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+        pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
     }
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
@@ -81,17 +83,19 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
-    if (pkgName2RegisterSubIdMap_.count(pkgName) == 0) {
-        LOGE("DiscoveryManager::DisableDiscoveryListener failed, pkgName %s does not exist in cache map.",
-             pkgName.c_str());
+    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    uint16_t subscribeId = pkgName2RegisterSubIdMap_.find(pkgName)->second;
-    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %s and subscribeId = %d.",
-         pkgName.c_str(), subscribeId);
     if (extraParam.find(PARAM_KEY_META_TYPE) != extraParam.end()) {
         LOGI("DisableDiscoveryListener, input MetaType = %s", (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+    }
+    uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end()) {
+        subscribeId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+        pkgName2SubIdMap_.erase(pkgName);
     }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
     return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
@@ -101,20 +105,21 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
                                            const std::map<std::string, std::string> &discoverParam,
                                            const std::map<std::string, std::string> &filterOptions)
 {
-    if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
-        LOGE("DiscoveryManager::StartDiscovering failed, pkgName %s does not exist in cache map.",
-             pkgName.c_str());
+    LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmSubscribeInfo dmSubInfo;
+    dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     dmSubInfo.medium = DmExchangeMedium::DM_AUTO;
     dmSubInfo.freq = DmExchangeFreq::DM_SUPER_HIGH;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
-    dmSubInfo.subscribeId = pkgName2DiscoverySubIdMap_.find(pkgName)->second;
-    LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s and subscribeId = %d.",
-         pkgName.c_str(), dmSubInfo.subscribeId);
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+    }
     if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
         int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
         dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
@@ -134,15 +139,27 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     int32_t ret = StartDiscoveringMine(pkgName, dmSubInfo, filterOptions);
     if (ret != ERR_DM_TYPE_NOT_MINE) {
         return ret;
+
+    auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
+    nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
+    if (jsonObject.contains(TYPE_MINE)) {
+        return StartDiscovering4MineMetaNode(pkgName, dmSubInfo, it->second);
     }
-    if (isStandardMetaNode) {
-        LOGI("StartDiscovering for standard meta node process.");
-        ret = StartDiscoveringNoMetaType(dmSubInfo, discoverParam);
-    } else {
-        LOGI("StartDiscovering for meta node process, input metaType = %s",
-            (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
-        ret = StartDiscovering4MetaType(dmSubInfo, discoverParam);
+
+    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(dmSubInfo, discoverParam) :
+            StartDiscovering4MetaType(dmSubInfo, discoverParam);
+    if (ret != DM_OK) {
+        LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
+        return ERR_DM_START_DISCOVERING_FAILED;
     }
+    return ret;
+}
+
+int32_t DiscoveryManager::StartDiscovering4MineMetaNode(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
+    const std::string &searchJson)
+{
+    LOGI("StartDiscovering for mine meta node process.");
+    int32_t ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
@@ -171,6 +188,7 @@ int32_t DiscoveryManager::StartDiscoveringMine(const string &pkgName, const DmSu
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
+    LOGI("StartDiscovering for standard meta node process.");
     (void)param;
     strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
 
@@ -184,6 +202,8 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
 int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
+    LOGI("StartDiscovering for meta node process, input metaType = %s",
+         (param.find(PARAM_KEY_META_TYPE)->second).c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
@@ -217,16 +237,13 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
 
 int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t subscribeId)
 {
-    if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
-        LOGE("DiscoveryManager::StopDiscovering failed, pkgName %s does not exist in cache map.",
-             pkgName.c_str());
+    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        subscribeId = pkgName2DiscoverySubIdMap_.find(pkgName)->second;
-        LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %s and subscribeId = %d.",
-             pkgName.c_str(), subscribeId);
         if (!discoveryQueue_.empty()) {
             discoveryQueue_.pop();
         }
@@ -234,9 +251,9 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
             discoveryContextMap_.erase(pkgName);
             timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
         }
-        softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
-        return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
     }
+    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
+    return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
 
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
@@ -255,7 +272,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            listener_->OnDeviceFound(pkgName, DM_INVALID_FLAG_ID, info);
+            listener_->OnDeviceFound(pkgName, pkgName2SubIdMap_[pkgName], info);
             return;
         }
         discoveryContext = iter->second;
@@ -393,38 +410,6 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     }
 #endif
     return DM_OK;
-}
-
-void DiscoveryManager::MappingPkgName2DiscoverySubMap(const std::string &pkgName, const uint16_t &subscribeId)
-{
-    if (pkgName2DiscoverySubIdMap_.count(pkgName) == 0) {
-        pkgName2DiscoverySubIdMap_[pkgName] = subscribeId;
-    }
-}
-
-void DiscoveryManager::UnMappingPkgName2DiscoverySubMap(const std::string &pkgName)
-{
-    if (pkgName2DiscoverySubIdMap_.count(pkgName) != 0) {
-        uint16_t subscribeId = pkgName2DiscoverySubIdMap_.find(pkgName)->second;
-        StopDiscovering(pkgName, subscribeId);
-        pkgName2DiscoverySubIdMap_.erase(pkgName);
-    }
-}
-
-void DiscoveryManager::MappingPkgName2RegisterSubMap(const std::string &pkgName, const uint16_t &subscribeId)
-{
-    if (pkgName2RegisterSubIdMap_.count(pkgName) == 0) {
-        pkgName2RegisterSubIdMap_[pkgName] = subscribeId;
-    }
-}
-
-void DiscoveryManager::UnMappingPkgName2RegisterSubMap(const std::string &pkgName)
-{
-    if (pkgName2RegisterSubIdMap_.count(pkgName) != 0) {
-        std::map<std::string, std::string> extraParam;
-        DisableDiscoveryListener(pkgName, extraParam);
-        pkgName2RegisterSubIdMap_.erase(pkgName);
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
