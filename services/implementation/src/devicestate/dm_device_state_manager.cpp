@@ -163,15 +163,17 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         LOGE("HandleDeviceStatusChange failed, device manager client listener is null.");
         return;
     }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    if (pkgName.size() == 0) {
-        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
-    } else {
-        for (auto item : pkgName) {
-            listener_->OnDeviceStateChange(item, devState, devInfo);
+    if (softbusConnector_ != nullptr) {
+        std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+        if (pkgName.size() == 0) {
+            listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
+        } else {
+            for (auto item : pkgName) {
+                listener_->OnDeviceStateChange(item, devState, devInfo);
+            }
         }
+        softbusConnector_->ClearPkgName();
     }
-    softbusConnector_->ClearPkgName();
 }
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceId)

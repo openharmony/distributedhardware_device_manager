@@ -41,7 +41,6 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
 
     std::string authToken(reinterpret_cast<const char*>(data), size);
-    std::string authParam(reinterpret_cast<const char*>(data), size);
 
     std::shared_ptr<PinAuth> pinauth = std::make_shared<PinAuth>();
     pinauth->ShowAuthInfo(authToken, authManager);
