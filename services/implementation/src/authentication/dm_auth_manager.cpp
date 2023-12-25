@@ -806,7 +806,7 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
 void DmAuthManager::GetAuthRequestContext()
 {
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(authResponseContext_->localDeviceId, (uint8_t *)deviceIdHash);
+    DmSoftbusAdapterCrypto::GetUdidHash(authResponseContext_->localDeviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
     authRequestContext_->deviceId = static_cast<std::string>(deviceIdHash);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
     authResponseContext_->localDeviceId = authRequestContext_->localDeviceId;
@@ -834,7 +834,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     std::vector<int32_t> bindType =
         DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
-    authResponseContext_->authed = !authResponseContext_->bindType.empty();
+    authResponseContext_->authed = !bindType.empty();
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
         listener_->OnAuthResult(authResponseContext_->hostPkgName, authRequestContext_->deviceId,
             authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
@@ -1990,7 +1990,7 @@ void DmAuthManager::CompatiblePutAcl()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, (uint8_t *)mUdidHash);
+    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
     std::string localUdidHash = static_cast<std::string>(mUdidHash);
     DmAclInfo aclInfo;
     aclInfo.bindLevel = DEVICE;
@@ -2346,7 +2346,7 @@ void DmAuthManager::PutAccessControlList()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, (uint8_t *)mUdidHash);
+    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
     std::string localUdidHash = static_cast<std::string>(mUdidHash);
     DmAclInfo aclInfo;
     aclInfo.bindType = DM_ACROSS_ACCOUNT;

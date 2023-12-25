@@ -41,7 +41,6 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     LOGI("GetAccessControlProfile start.");
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
-    std::string accountId = MultipleUserConnector::GetOhosAccountId();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     queryParams["userId"] = std::to_string(userId);
     if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {

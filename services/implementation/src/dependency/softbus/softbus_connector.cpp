@@ -736,7 +736,7 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
         return info;
     }
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, (uint8_t *)deviceIdHash) != DM_OK) {
+    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
         LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceId).c_str());
         return info;
     }
