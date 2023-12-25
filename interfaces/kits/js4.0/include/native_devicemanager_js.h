@@ -340,10 +340,13 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static napi_value GetAvailableDeviceListByFilter(napi_env env, napi_callback_info info,
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
+    static void BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId, napi_env env,
+        napi_value &object);
     static bool IsSystemApp();
     static std::string GetDeviceTypeById(OHOS::DistributedHardware::DmDeviceType type);
     static int32_t BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
+    static void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 
 private:
     napi_env env_;
