@@ -385,7 +385,7 @@ private:
 
     uint16_t AddDiscoveryCallback(const std::string &pkgName, std::shared_ptr<DiscoveryCallback> callback);
     uint16_t RemoveDiscoveryCallback(const std::string &pkgName);
-    int32_t AddPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback);
+    int32_t AddPublishCallback(const std::string &pkgName);
     int32_t RemovePublishCallback(const std::string &pkgName);
 
 private:

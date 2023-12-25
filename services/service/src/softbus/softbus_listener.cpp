@@ -390,9 +390,9 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             LOGE("ReportDiscoverResCallback failed");
         }
     }
-    LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d, extraData=%s",
+    LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d",
         GetAnonyString(dmDevInfo.deviceId).c_str(), dmDevInfo.deviceName, dmDevInfo.deviceTypeId,
-        dmDevInfo.range, device->isOnline, dmDevInfo.extraData.c_str());
+        dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     CacheDiscoveredDevice(device);
