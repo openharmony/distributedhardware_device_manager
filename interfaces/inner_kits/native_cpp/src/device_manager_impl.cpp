@@ -1755,8 +1755,13 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
     }
     LOGI("DeviceManagerImpl::StartAdvertising start, pkgName %s", pkgName.c_str());
 
-    int32_t publishId = AddPublishCallback(pkgName, callback);
-    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
+    int32_t publishId;
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) == advertiseParam.end()) {
+        publishId = AddPublishCallback(pkgName);
+        advertiseParam[PARAM_KEY_PUBLISH_ID] = std::to_string(publishId);
+    } else {
+        publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+    }
     std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
@@ -1773,7 +1778,7 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
         LOGE("StartAdvertising error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     LOGI("DeviceManagerImpl::StartAdvertising completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1787,12 +1792,17 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
     }
     LOGI("DeviceManagerImpl::StopAdvertising start, pkgName: %s", pkgName.c_str());
 
-    int32_t publishId = RemovePublishCallback(pkgName);
+    int32_t publishId;
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) == advertiseParam.end()) {
+        publishId = RemovePublishCallback(pkgName);
+        advertiseParam[PARAM_KEY_PUBLISH_ID] = std::to_string(publishId);
+    } else {
+        publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+    }
     if (publishId == DM_INVALID_FLAG_ID) {
         LOGE("DeviceManagerImpl::StopAdvertising failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    advertiseParam.emplace(PARAM_KEY_PUBLISH_ID, std::to_string(publishId));
     std::string adverParaStr = ConvertMapToJsonString(advertiseParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
@@ -1809,7 +1819,7 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
         LOGE("StopAdvertising error: Failed with ret %d", ret);
         return ret;
     }
-
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
     LOGI("DeviceManagerImpl::StopAdvertising completed, pkgName: %s", pkgName.c_str());
     return DM_OK;
 }
@@ -1940,7 +1950,7 @@ uint16_t DeviceManagerImpl::RemoveDiscoveryCallback(const std::string &pkgName)
     return subscribeId;
 }
 
-int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName, std::shared_ptr<PublishCallback> callback)
+int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName)
 {
     int32_t publishId = DM_INVALID_FLAG_ID;
     {
@@ -1952,7 +1962,6 @@ int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName, std::s
             pkgName2PubIdMap_[pkgName] = publishId;
         }
     }
-    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
     return publishId;
 }
 
@@ -1966,7 +1975,7 @@ int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
             pkgName2PubIdMap_.erase(pkgName);
         }
     }
-    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+
     return publishId;
 }
 
