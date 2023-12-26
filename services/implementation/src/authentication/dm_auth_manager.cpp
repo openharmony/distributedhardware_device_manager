@@ -2273,9 +2273,9 @@ void DmAuthManager::OnUnbindSessionOpened(int sessionId, int32_t sessionSide, in
 {
     LOGI("DmAuthManager::OnUnbindSessionOpened sessionId = %d result = %d", sessionId, result);
     if (result < DM_OK) {
-        authResponseContext->reply = DM_OK;
+        authResponseContext_->reply = DM_OK;
         isFinishOfLocal_ = false;
-        authResponseContext->hostPkgName = authRequestContext_->hostPkgName;
+        authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
         return;
     }
