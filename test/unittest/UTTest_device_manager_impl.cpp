@@ -824,6 +824,37 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
 /**
  * @tc.name: StartDeviceDiscovery_102
  * @tc.desc: 1. set packName not null
+ *              set subscribeInfo null
+ *              set callback not null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.helloworld";
+    std::string extra = "{\"findDeviceMode\":1}";
+    // set subscribeInfo null
+    DmSubscribeInfo subscribeInfo;
+    // set callback not null
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    // 3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_103
+ * @tc.desc: 1. set packName not null
  *              set subscribeId 0
  *              set filterOptions null
  *              set callback not null
@@ -834,7 +865,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.helloworld";
     uint16_t subscribeId = 0;
@@ -848,7 +879,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
 }
 
 /**
- * @tc.name: StartDeviceDiscovery_103
+ * @tc.name: StartDeviceDiscovery_104
  * @tc.desc: 1. set packName not null
  *              set subscribeId 0
  *              set filterOptions null
@@ -859,7 +890,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_104, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.helloworld";
     uint16_t subscribeId = 0;
@@ -877,6 +908,18 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
  *              set subscribeId is 0
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+ *           4. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+ /**
+ * @tc.name: StartDeviceDiscovery_101
+ * @tc.desc: 1. set packName not null
+ *              set subscribeInfo null
+ *              set callback not null
+ *           2. InitDeviceManager return DM_OK
+ *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
  *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC

@@ -592,13 +592,13 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     LOGI("StopRefreshSoftbusLNN begin, subscribeId: %d.", (int32_t)subscribeId);
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
-         .funcName = "StopRefreshSoftbusLNN",
-         .hostName = SOFTBUSNAME,
-         .stageRes = (ret == DM_OK) ?
-                     static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
-         .bizState = (ret == DM_OK) ?
-                     static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
-         .errCode = ret,
+        .funcName = "StopRefreshSoftbusLNN",
+        .hostName = SOFTBUSNAME,
+        .stageRes = (ret == DM_OK) ?
+                    static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+        .bizState = (ret == DM_OK) ?
+                    static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+        .errCode = ret,
     };
     if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
         if (!GetDmRadarHelperObj()->ReportDiscoverUserRes(info)) {
@@ -1417,6 +1417,7 @@ int32_t SoftbusListener::SetBroadcastTrustOptions(const json &object, BroadcastH
     LOGE("key type is error with key: %s", FIELD_TRUST_OPTIONS);
     return ERR_DM_FAILED;
 }
+
 int32_t SoftbusListener::SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead)
 {
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
@@ -1438,7 +1439,7 @@ void SoftbusListener::SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, S
     subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
     subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
-    subscribeInfo.capability = dmSubscribeInfo.capability;
+    subscribeInfo.capability = DM_CAPABILITY_OSD;
     subscribeInfo.capabilityData = nullptr;
     subscribeInfo.dataLen = 0;
 }
