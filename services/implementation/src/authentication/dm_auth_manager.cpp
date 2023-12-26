@@ -306,10 +306,6 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
 void DmAuthManager::SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId)
 {
     LOGI("SyncDeleteAcl start.");
-    if (dmVersion_ == "") {
-        LOGE("Src and sink version is different.");
-        return;
-    }
     authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
     authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -2276,6 +2272,13 @@ void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std:
 void DmAuthManager::OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result)
 {
     LOGI("DmAuthManager::OnUnbindSessionOpened sessionId = %d result = %d", sessionId, result);
+    if (result < DM_OK) {
+        authResponseContext->reply = DM_OK;
+        isFinishOfLocal_ = false;
+        authResponseContext->hostPkgName = authRequestContext_->hostPkgName;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
+        return;
+    }
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
