@@ -106,28 +106,29 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
     if (!IsAuthTypeSupported(authType)) {
         LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
+            ERR_DM_UNSUPPORTED_AUTH_TYPE);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_UNSUPPORTED_AUTH_TYPE, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -219,7 +220,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId);
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         return DM_OK;
     }
@@ -836,7 +837,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !bindType.empty();
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
-        listener_->OnAuthResult(authResponseContext_->hostPkgName, authRequestContext_->deviceId,
+        listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
             authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
@@ -963,7 +964,7 @@ void DmAuthManager::StartRespAuthProcess()
             [this] (std::string name) {
                 DmAuthManager::HandleSessionHeartbeat(name);
             });
-        listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+        listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
         listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, DM_OK,
             STATUS_DM_SHOW_PIN_INPUT_UI, "");
@@ -1089,7 +1090,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-    listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+    listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
