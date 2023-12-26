@@ -1417,6 +1417,7 @@ int32_t SoftbusListener::SetBroadcastTrustOptions(const json &object, BroadcastH
     LOGE("key type is error with key: %s", FIELD_TRUST_OPTIONS);
     return ERR_DM_FAILED;
 }
+
 int32_t SoftbusListener::SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead)
 {
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
