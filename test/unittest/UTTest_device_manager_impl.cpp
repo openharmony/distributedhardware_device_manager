@@ -818,6 +818,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -849,6 +850,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -860,7 +862,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_DISCOVERY_REPEATED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -874,7 +876,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+    ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -905,7 +908,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_104, testing::ext::TestSize
 /**
  * @tc.name: StopDeviceDiscovery_101
  * @tc.desc: 1. set packName not null
- *              set subscribeId is 0
+ *              set subscribeInfo null
+ *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
  *           4. check ret is DM_OK
@@ -913,19 +917,38 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_104, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
- /**
- * @tc.name: StartDeviceDiscovery_101
+HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.Level0)
+{
+    // 1. set packName not null
+    std::string packName = "com.ohos.test";
+    std::string extra = "";
+    // set subscribeInfo null
+    DmSubscribeInfo subscribeInfo;
+    // set callback not null
+    std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    // 2. InitDeviceManager return DM_OK
+    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
+    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
+    // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+/**
+ * @tc.name: StopDeviceDiscovery_102
  * @tc.desc: 1. set packName not null
- *              set subscribeInfo null
- *              set callback not null
+ *              set subscribeId is 0
  *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+ *           4. check ret is ERR_DM_STOP_REFRESH_LNN_FAILED
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_102, testing::ext::TestSize.Level0)
 {
     // 1. set packName not null
     std::string packName = "com.ohos.test";
@@ -937,7 +960,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.
     // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
