@@ -532,7 +532,8 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     subscribeInfo.isSameAccount = dmSubInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubInfo.isWakeRemote;
     subscribeInfo.capability = dmSubInfo.capability;
-    subscribeInfo.capabilityData = (unsigned char *) (customData.c_str());
+    subscribeInfo.capabilityData =
+        const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(customData.c_str()));
     subscribeInfo.dataLen = customData.size();
     LOGI("RefreshSoftbusLNN begin, subscribeId: %d, mode: 0x%x, medium: %d, capability: %s.",
          subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium, subscribeInfo.capability);
