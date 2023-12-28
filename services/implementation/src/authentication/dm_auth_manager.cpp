@@ -2051,7 +2051,7 @@ void DmAuthManager::AccountIdLogoutEventCallback(int32_t userId)
     if (currentAccountId == "ohosAnonymousUid" &&
         DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, oldAccountId)) {
         DeviceProfileConnector::GetInstance().DeleteAccessControlList(userId, oldAccountId);
-        DeleteAllGroup(userId);
+        hiChainConnector_->DeleteAllGroup(userId);
     }
 }
 
@@ -2062,22 +2062,7 @@ void DmAuthManager::UserSwitchEventCallback(int32_t userId)
     int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(oldUserId, oldAccountId);
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, oldAccountId);
-    DeleteP2PGroup(userId);
-}
-
-void DmAuthManager::DeleteAllGroup(int32_t userId)
-{
-    LOGI("DmAuthManager::DeleteAllGroup");
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = static_cast<std::string>(localDeviceId);
-    std::vector<GroupInfo> groupList;
-    hiChainConnector_->GetRelatedGroups(localUdid, groupList);
-    for (auto &iter : groupList) {
-        if (hiChainConnector_->DeleteGroup(iter.groupId) != DM_OK) {
-            LOGE("Delete groupId %s failed.", iter.groupId.c_str());
-        }
-    }
+    hiChainConnector_->DeleteP2PGroup(userId);
 }
 
 void DmAuthManager::UserChangeEventCallback(int32_t userId)
@@ -2087,40 +2072,7 @@ void DmAuthManager::UserChangeEventCallback(int32_t userId)
     int32_t oldUseId = MultipleUserConnector::GetSwitchOldUserId();
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(oldUseId, oldAccountId);
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, oldAccountId);
-    DeleteP2PGroup(userId);
-}
-
-void DmAuthManager::DeleteP2PGroup(int32_t userId)
-{
-    LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
-    nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    std::string queryParams = jsonObj.dump();
-    std::vector<GroupInfo> groupList;
-
-    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
-    MultipleUserConnector::SetSwitchOldUserId(userId);
-    if (!hiChainConnector_->GetGroupInfo(oldUserId, queryParams, groupList)) {
-        LOGE("failed to get the old user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = hiChainConnector_->DeleteGroup(oldUserId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the old user id group");
-        }
-    }
-
-    if (!hiChainConnector_->GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get the user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = hiChainConnector_->DeleteGroup(userId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the user id group");
-        }
-    }
+    hiChainConnector_->DeleteP2PGroup(userId);
 }
 
 void DmAuthManager::HandleSyncDeleteTimeout(std::string name)

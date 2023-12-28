@@ -836,21 +836,21 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         napi_get_undefined(env_, &result[1]);
     }
 
-    napi_value callResult = nullptr;
-    napi_value handler = nullptr;
-    napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler);
-    if (handler != nullptr) {
-        if (reason == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
-            LOGI("update ui change, status: %d, reason: %d", status, reason);
-        } else {
+    if (reason == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
+        LOGI("update ui change, status: %d, reason: %d", status, reason);
+    } else {
+        napi_value callResult = nullptr;
+        napi_value handler = nullptr;
+        napi_get_reference_value(env_, authAsyncCallbackInfo_.callback, &handler);
+        if (handler != nullptr) {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
             napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
+            g_authCallbackMap.erase(bundleName_);
+        } else {
+            LOGE("handler is nullptr");
         }
-    } else {
-        LOGE("handler is nullptr");
     }
     napi_close_handle_scope(env_, scope);
-    g_authCallbackMap.erase(bundleName_);
 }
 
 void DeviceManagerNapi::SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
@@ -2394,7 +2394,7 @@ napi_value DeviceManagerNapi::UnBindTarget(napi_env env, napi_callback_info info
         CreateBusinessError(env, ret);
     }
 
-    napi_create_int32(env, ret, &result);
+    napi_get_undefined(env, &result);
     return result;
 }
 

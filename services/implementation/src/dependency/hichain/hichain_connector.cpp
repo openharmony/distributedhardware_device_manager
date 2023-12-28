@@ -1120,5 +1120,53 @@ int32_t HiChainConnector::GetTrustedDevicesUdid(const char* jsonStr, std::vector
     }
     return DM_OK;
 }
+
+void HiChainConnector::DeleteAllGroup(int32_t userId)
+{
+    LOGI("HiChainConnector::DeleteAllGroup");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    std::vector<GroupInfo> groupList;
+    GetRelatedGroups(localUdid, groupList);
+    for (auto &iter : groupList) {
+        if (DeleteGroup(iter.groupId) != DM_OK) {
+            LOGE("Delete groupId %s failed.", iter.groupId.c_str());
+        }
+    }
+}
+
+void HiChainConnector::DeleteP2PGroup(int32_t userId)
+{
+    LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    std::string queryParams = jsonObj.dump();
+    std::vector<GroupInfo> groupList;
+
+    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
+    MultipleUserConnector::SetSwitchOldUserId(userId);
+    if (!GetGroupInfo(oldUserId, queryParams, groupList)) {
+        LOGE("failed to get the old user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        int32_t ret = DeleteGroup(oldUserId, iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("failed to delete the old user id group");
+        }
+    }
+
+    if (!GetGroupInfo(userId, queryParams, groupList)) {
+        LOGE("failed to get the user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        int32_t ret = DeleteGroup(userId, iter->groupId);
+        if (ret != DM_OK) {
+            LOGE("failed to delete the user id group");
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
