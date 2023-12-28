@@ -155,7 +155,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     MultipleUserConnector::SetSwitchOldUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
-    authRequestContext_->bindLevel = DEVICE_PEER_TO_PEER_TYPE;
+    authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
@@ -1105,6 +1105,12 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
+    if (authResponseContext_->isOnline && softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
+        LOGI("DmAuthManager::AuthenticateFinish device is online.");
+        authResponseContext_->isOnline = true;
+    } else {
+        authResponseContext_->isOnline = false;
+    }
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel == INVALIED_TYPE &&
         authResponseContext_->isOnline) {
