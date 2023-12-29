@@ -27,17 +27,17 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
-bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
 {
     return true;
 }
@@ -47,32 +47,32 @@ bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
 {
     return true;
 }
@@ -82,17 +82,17 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
     return true;
 }
 
-bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
 {
     return true;
 }
@@ -102,22 +102,22 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
     return true;
 }
 
-bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo info)
+bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo info)
+bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo info)
+bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
 {
     return true;
 }
 
-bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo info)
+bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
 {
     return true;
 }
@@ -135,7 +135,7 @@ std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
 std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
     cJSON* deviceInfoJson = cJSON_CreateArray();
-    for (unsigned int i = 0; i < deviceInfoList.size(); i++) {
+    for (size_t i = 0; i < deviceInfoList.size(); i++) {
         cJSON* object = cJSON_CreateObject();
         std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
         cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());

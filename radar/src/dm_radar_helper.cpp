@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
-bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_IDLE)) {
@@ -69,7 +69,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
@@ -109,7 +109,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
+bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_CANCEL)) {
@@ -180,7 +180,7 @@ bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_IDLE)) {
@@ -227,7 +227,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -246,7 +246,7 @@ bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -268,7 +268,7 @@ bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -286,7 +286,7 @@ bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
@@ -319,7 +319,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_IDLE)) {
@@ -391,7 +391,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
     return true;
 }
 
-bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -409,7 +409,7 @@ bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
@@ -442,7 +442,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo info)
+bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_IDLE)) {
@@ -517,7 +517,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
     return true;
 }
 
-bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo info)
+bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -540,7 +540,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo info)
+bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -562,7 +562,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo info)
+bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -585,7 +585,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo info)
     return true;
 }
 
-bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo info)
+bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
@@ -636,7 +636,7 @@ std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
 std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
     cJSON* deviceInfoJson = cJSON_CreateArray();
-    for (unsigned int i = 0; i < deviceInfoList.size(); i++) {
+    for (size_t i = 0; i < deviceInfoList.size(); i++) {
         cJSON* object = cJSON_CreateObject();
         std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
         cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
