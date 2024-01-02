@@ -155,7 +155,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     MultipleUserConnector::SetSwitchOldUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
-    authRequestContext_->bindLevel = DEVICE_PEER_TO_PEER_TYPE;
+    authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
