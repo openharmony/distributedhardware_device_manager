@@ -150,7 +150,7 @@ bool DiscoveryFilter::FilterByDeviceState(int32_t value, bool isActive)
 
 bool DiscoveryFilter::FilterByRange(int32_t value, int32_t range)
 {
-    return ((range > 0) && (range <= value));
+    return ((range >= 0) && (range <= value));
 }
 
 bool DiscoveryFilter::FilterByDeviceType(int32_t value, int32_t deviceType)
