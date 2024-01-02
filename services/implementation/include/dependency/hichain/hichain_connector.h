@@ -226,6 +226,10 @@ public:
     std::vector<std::string> GetTrustedDevices(const std::string &localDeviceUdid);
 
     int32_t addMultiMembersExt(const std::string &credentialInfo);
+
+    void DeleteAllGroup(int32_t userId);
+
+    void DeleteP2PGroup(int32_t userId);
     
 private:
     int64_t GenRequestId();

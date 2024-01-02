@@ -515,8 +515,6 @@ public:
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
-    void DeleteAllGroup(int32_t userId);
-    void DeleteP2PGroup(int32_t userId);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     void HandleSyncDeleteTimeout(std::string name);

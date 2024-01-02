@@ -106,28 +106,29 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
     if (!IsAuthTypeSupported(authType)) {
         LOGE("DmAuthManager::CheckAuthParamVaild authType %d not support.", authType);
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
+            ERR_DM_UNSUPPORTED_AUTH_TYPE);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_UNSUPPORTED_AUTH_TYPE, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_UNSUPPORTED_AUTH_TYPE;
     }
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
     if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
         listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -219,7 +220,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId);
-        listener_->OnAuthResult(pkgName, deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
+        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(pkgName, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         return DM_OK;
     }
@@ -832,7 +833,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !bindType.empty();
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
-        listener_->OnAuthResult(authResponseContext_->hostPkgName, authRequestContext_->deviceId,
+        listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
             authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
@@ -959,7 +960,7 @@ void DmAuthManager::StartRespAuthProcess()
             [this] (std::string name) {
                 DmAuthManager::HandleSessionHeartbeat(name);
             });
-        listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+        listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
         listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, DM_OK,
             STATUS_DM_SHOW_PIN_INPUT_UI, "");
@@ -1085,7 +1086,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-    listener_->OnAuthResult(authRequestContext_->hostPkgName, authRequestContext_->deviceId,
+    listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
@@ -2046,7 +2047,7 @@ void DmAuthManager::AccountIdLogoutEventCallback(int32_t userId)
     if (currentAccountId == "ohosAnonymousUid" &&
         DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, oldAccountId)) {
         DeviceProfileConnector::GetInstance().DeleteAccessControlList(userId, oldAccountId);
-        DeleteAllGroup(userId);
+        hiChainConnector_->DeleteAllGroup(userId);
     }
 }
 
@@ -2057,22 +2058,7 @@ void DmAuthManager::UserSwitchEventCallback(int32_t userId)
     int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(oldUserId, oldAccountId);
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, oldAccountId);
-    DeleteP2PGroup(userId);
-}
-
-void DmAuthManager::DeleteAllGroup(int32_t userId)
-{
-    LOGI("DmAuthManager::DeleteAllGroup");
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = static_cast<std::string>(localDeviceId);
-    std::vector<GroupInfo> groupList;
-    hiChainConnector_->GetRelatedGroups(localUdid, groupList);
-    for (auto &iter : groupList) {
-        if (hiChainConnector_->DeleteGroup(iter.groupId) != DM_OK) {
-            LOGE("Delete groupId %s failed.", iter.groupId.c_str());
-        }
-    }
+    hiChainConnector_->DeleteP2PGroup(userId);
 }
 
 void DmAuthManager::UserChangeEventCallback(int32_t userId)
@@ -2082,40 +2068,7 @@ void DmAuthManager::UserChangeEventCallback(int32_t userId)
     int32_t oldUseId = MultipleUserConnector::GetSwitchOldUserId();
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(oldUseId, oldAccountId);
     DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, oldAccountId);
-    DeleteP2PGroup(userId);
-}
-
-void DmAuthManager::DeleteP2PGroup(int32_t userId)
-{
-    LOGI("switch user event happen and this user groups will be deleted with userId: %d", userId);
-    nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    std::string queryParams = jsonObj.dump();
-    std::vector<GroupInfo> groupList;
-
-    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
-    MultipleUserConnector::SetSwitchOldUserId(userId);
-    if (!hiChainConnector_->GetGroupInfo(oldUserId, queryParams, groupList)) {
-        LOGE("failed to get the old user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = hiChainConnector_->DeleteGroup(oldUserId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the old user id group");
-        }
-    }
-
-    if (!hiChainConnector_->GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get the user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = hiChainConnector_->DeleteGroup(userId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the user id group");
-        }
-    }
+    hiChainConnector_->DeleteP2PGroup(userId);
 }
 
 void DmAuthManager::HandleSyncDeleteTimeout(std::string name)
