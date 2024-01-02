@@ -32,41 +32,41 @@ class DeviceManagerImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp();
+    void TearDown();
 };
 
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
     virtual ~DeviceDiscoveryCallbackTest() {}
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
 class DevicePublishCallbackTest : public PublishCallback {
 public:
     DevicePublishCallbackTest() : PublishCallback() {}
     virtual ~DevicePublishCallbackTest() {}
-    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
 };
 
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
     virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override {}
+    void OnRemoteDied() override {}
 };
 
 class DeviceStateCallbackTest : public DeviceStateCallback {
 public:
     DeviceStateCallbackTest() : DeviceStateCallback() {}
-    virtual ~DeviceStateCallbackTest() override {}
-    virtual void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
+    virtual ~DeviceStateCallbackTest() {}
+    void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
 };
 
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
@@ -79,7 +79,7 @@ public:
 class CredentialCallbackTest : public CredentialCallback {
 public:
     virtual ~CredentialCallbackTest() {}
-    virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+    void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

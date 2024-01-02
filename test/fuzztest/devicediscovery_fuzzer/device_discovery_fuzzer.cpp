@@ -33,9 +33,9 @@ class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
     virtual ~DeviceDiscoveryCallbackTest() {}
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
 void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)

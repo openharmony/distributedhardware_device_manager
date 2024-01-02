@@ -30,8 +30,8 @@ class DeviceManagerImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp();
+    void TearDown();
 
 private:
     std::shared_ptr<DiscoveryCallback> test_callback_ = nullptr;
@@ -43,12 +43,12 @@ public:
     DeviceDiscoveryCallback() : DiscoveryCallback()
     {
     }
-    virtual ~DeviceDiscoveryCallback() override
+    virtual ~DeviceDiscoveryCallback()
     {
     }
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override;
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
+    void OnDiscoverySuccess(uint16_t subscribeId) override;
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
 };
 
 class DevicePublishCallback : public PublishCallback {
@@ -56,7 +56,7 @@ public:
     DevicePublishCallback() : PublishCallback()
     {
     }
-    virtual ~DevicePublishCallback() override
+    virtual ~DevicePublishCallback()
     {
     }
     void OnPublishResult(int32_t publishId, int32_t failedReason) override;

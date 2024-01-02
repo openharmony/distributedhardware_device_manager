@@ -26,7 +26,7 @@ namespace DistributedHardware {
 class CredentialCallbackFuzzTest : public CredentialCallback {
 public:
     virtual ~CredentialCallbackFuzzTest() {}
-    virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+    void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
 };
 
 void DeviceManagerCredentialFuzzTest(const uint8_t* data, size_t size)

@@ -37,8 +37,8 @@ class IpcCmdRegisterTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

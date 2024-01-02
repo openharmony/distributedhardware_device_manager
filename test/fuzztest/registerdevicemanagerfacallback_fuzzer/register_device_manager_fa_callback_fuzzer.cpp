@@ -32,8 +32,8 @@ namespace {
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
     DeviceManagerFaCallbackTest() : DeviceManagerUiCallback() {}
-    virtual ~DeviceManagerFaCallbackTest() override {}
-    virtual void OnCall(const std::string &paramJson) override {}
+    virtual ~DeviceManagerFaCallbackTest() {}
+    void OnCall(const std::string &paramJson) override {}
 };
 
 void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)

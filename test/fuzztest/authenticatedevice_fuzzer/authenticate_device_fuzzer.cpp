@@ -29,8 +29,9 @@ public:
     virtual ~AuthenticateCallbackTest()
     {
     }
-    virtual void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
-                              int32_t reason) override {}
+    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason) override
+    {
+    }
 };
 
 void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
