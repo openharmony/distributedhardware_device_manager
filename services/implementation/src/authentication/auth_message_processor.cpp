@@ -443,7 +443,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         if (IsString(json, TAG_NET_ID)) {
             authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
         }
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s",
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage groupId = %s, groupName = %s",
             GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
     }
 }

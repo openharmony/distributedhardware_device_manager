@@ -1292,7 +1292,7 @@ void SoftbusListener::AddHeadToBroadcast(const BroadcastHead &broadcastHead, cha
     }
     output[startPos++] = broadcastHead.findMode;
     output[startPos++] = broadcastHead.trustFilter;
-    LOGI("find device info with version: %d, findMode: %d,HeadLen: %d, tlvDataLen: %d, trustFilter: %d",
+    LOGI("find device info with version: %d, findMode: %d, HeadLen: %d, tlvDataLen: %d, trustFilter: %d",
          (int)(broadcastHead.version), (int)(broadcastHead.findMode), (int)(broadcastHead.headDataLen),
          (int)(broadcastHead.tlvDataLen), (int)(broadcastHead.trustFilter));
 }
