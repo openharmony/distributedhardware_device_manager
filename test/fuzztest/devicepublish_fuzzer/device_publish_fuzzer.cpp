@@ -33,7 +33,7 @@ class DevicePublishCallbackTest : public PublishCallback {
 public:
     DevicePublishCallbackTest() : PublishCallback() {}
     virtual ~DevicePublishCallbackTest() {}
-    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
 };
 
 void DevicePublishFuzzTest(const uint8_t* data, size_t size)

@@ -29,15 +29,15 @@ class IpcClientManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp();
+    void TearDown();
 };
 
 class DmInitCallbackTest : public DmInitCallback {
 public:
     explicit DmInitCallbackTest(int &count);
-    virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override;
+    virtual ~DmInitCallbackTest() {}
+    void OnRemoteDied() override;
 private:
     int *count_ = nullptr;
 };

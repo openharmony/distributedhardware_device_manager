@@ -27,8 +27,8 @@ namespace DistributedHardware {
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override {}
+    virtual ~DmInitCallbackTest() {}
+    void OnRemoteDied() override {}
 };
 
 void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)

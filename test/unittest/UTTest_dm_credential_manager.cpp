@@ -235,7 +235,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_002, testing::ext::TestSize.L
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -308,7 +308,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_005, testing::ext::TestSize.L
     {
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -342,7 +342,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_006, testing::ext::TestSize.L
         "processType" : 0,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -393,7 +393,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_003, testing::ext::TestS
     {
         "processType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -424,7 +424,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_004, testing::ext::TestS
     {
         "processType" : 1,
         "authType" : 1,
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -476,7 +476,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestS
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -554,7 +554,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::Test
     {
         "processType" : 2,
         "userId" : "123456785442435DlDFADFAsDFDsAFDjFsAjFDsFDAFDAFDAFDFAsDDFho",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
@@ -727,7 +727,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::Test
     {
         "processType" : 2,
         "authType" : 1,
-        "peerCredentialInfo" : 
+        "peerCredentialInfo" :
         [
             {
                 "peerDeviceId" : "devD"
@@ -884,7 +884,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
         "processType" : 1,
         "authType" : 1,
         "userId" : "123",
-        "credentialData" : 
+        "credentialData" :
         [
             {
                 "credentialType" : 1,
