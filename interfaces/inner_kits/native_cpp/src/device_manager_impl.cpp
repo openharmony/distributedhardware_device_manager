@@ -20,10 +20,12 @@
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
+#include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
@@ -2061,6 +2063,30 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
         LOGE("DestroyPinHolder Failed with ret %d", ret);
         return ret;
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType)
+{
+    LOGI("DpAclAdd start.");
+    if (bindType != IDENTICAL_ACCOUNT) {
+        LOGI("DeviceManagerImpl::DpAclAdd is not identical account");
+        return DM_OK;
+    }
+    std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetUdid(udid);
+    int32_t ret = ipcClientProxy_->SendRequest(DP_ACL_ADD, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("DpAclAdd error: Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("DpAclAdd error: Failed with ret %d", ret);
+        return ret;
+    }
+    LOGI("DeviceManagerImpl::DpAclAdd completed");
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -126,6 +126,7 @@ public:
     void OnUnbindSessionCloseed(int32_t sessionId);
     void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
 
+    int32_t DpAclAdd(const std::string &udid);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

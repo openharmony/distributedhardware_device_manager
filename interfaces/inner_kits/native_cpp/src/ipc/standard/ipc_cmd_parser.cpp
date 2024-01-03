@@ -19,6 +19,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
@@ -1538,5 +1539,28 @@ ON_IPC_CMD(SERVER_DESTROY_PIN_HOLDER_RESULT, MessageParcel &data, MessageParcel 
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(DP_ACL_ADD, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcAclProfileReq> pReq = std::static_pointer_cast<IpcAclProfileReq>(pBaseReq);
+    std::string udid = pReq->GetUdid();
+    if (!data.WriteString(udid)) {
+        LOGE("write udid failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(DP_ACL_ADD, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+
 } // namespace DistributedHardware
 } // namespace OHOS
