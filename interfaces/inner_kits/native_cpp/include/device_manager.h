@@ -597,6 +597,8 @@ public:
      */
     virtual int32_t DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
                                      std::string &returnJsonStr) = 0;
+
+    virtual int32_t DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

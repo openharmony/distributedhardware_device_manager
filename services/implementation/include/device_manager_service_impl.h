@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "access_control_profile.h"
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
 #include "dm_common_event_manager.h"
@@ -132,6 +133,7 @@ public:
     void OnUnbindSessionCloseed(int32_t sessionId);
     void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
 
+    int32_t DpAclAdd(const std::string &udid);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

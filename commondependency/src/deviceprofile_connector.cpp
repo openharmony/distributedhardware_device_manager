@@ -443,16 +443,13 @@ int32_t DeviceProfileConnector::DeleteAccessControlList(int32_t userId, std::str
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     queryParams["userId"] = std::to_string(userId);
-    queryParams["accountId"] = accountId;
     if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
         LOGE("DP GetAccessControlProfile failed.");
     }
     LOGI("AccessControlProfile size is %d.", profiles.size());
     for (auto &item : profiles) {
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && (item.GetAccesser().GetAccesserUserId() &&
-            item.GetAccesser().GetAccesserAccountId() == accountId)) {
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-        }
+        LOGI("AccessControlProfile bindType is : %d.", item.GetBindType());
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
     }
     return DM_OK;
 }

@@ -1316,5 +1316,21 @@ void DeviceManagerService::OnUnbindBytesReceived(int32_t sessionId, const void *
     }
     dmServiceImpl_->OnUnbindBytesReceived(sessionId, data, dataLen);
 }
+
+int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call DpAclAdd.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService DpAclAdd start.");
+    if (!IsDMServiceImplReady()) {
+        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    dmServiceImpl_->DpAclAdd(udid);
+    LOGI("DeviceManagerService::DpAclAdd completed");
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

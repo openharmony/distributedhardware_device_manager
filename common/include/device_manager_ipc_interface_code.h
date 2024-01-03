@@ -89,6 +89,7 @@ enum DMIpcCmdInterfaceCode {
     UNBIND_TARGET,
     BIND_TARGET_RESULT,
     UNBIND_TARGET_RESULT,
+    DP_ACL_ADD,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

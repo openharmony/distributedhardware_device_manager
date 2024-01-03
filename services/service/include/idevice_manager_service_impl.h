@@ -314,6 +314,7 @@ public:
     virtual void OnUnbindSessionOpened(int32_t sessionId, int32_t result) = 0;
     virtual void OnUnbindSessionCloseed(int32_t sessionId) = 0;
     virtual void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen) = 0;
+    virtual int32_t DpAclAdd(const std::string &udid) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

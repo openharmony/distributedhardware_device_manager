@@ -691,6 +691,19 @@ void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDevic
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
 }
 
+int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
+{
+    LOGI("DeviceManagerServiceImpl DpAclAdd start.");
+    MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
+    MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
+    if (softbusConnector_->CheckIsOnline(udid)) {
+        LOGI("DeviceManagerServiceImpl DpAclAdd identical account and online");
+        deviceStateMgr_->OnDeviceOnline(udid);
+    }
+    LOGI("DeviceManagerServiceImpl::DpAclAdd completed");
+    return DM_OK;
+}
+
 std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];

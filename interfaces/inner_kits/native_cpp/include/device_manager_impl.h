@@ -375,6 +375,7 @@ public:
 
     virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) override;
 
+    virtual int32_t DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

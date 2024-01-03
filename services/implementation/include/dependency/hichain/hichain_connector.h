@@ -231,6 +231,12 @@ public:
 
     void DeleteP2PGroup(int32_t userId);
     
+    int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList);
+
+    int32_t DeleteGroupExt(std::string &groupId);
+
+    int32_t GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
+        std::vector<GroupInfo> &groupList);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
