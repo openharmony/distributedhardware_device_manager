@@ -22,6 +22,7 @@
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "dm_device_info.h"
+#include "ipc_remote_broker.h"
 #include "ipc_server_stub.h"
 #include "device_manager_impl.h"
 #include "dm_constants.h"
@@ -210,7 +211,7 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_001, testing::ext::Tes
 {
     std::string pkgName = "";
     int ret = 0;
-    sptr<IRemoteObject> listener = nullptr;
+    sptr<IpcRemoteBroker> listener = nullptr;
     ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
@@ -226,7 +227,7 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_002, testing::ext::Tes
 {
     std::string pkgName = "com.ohos.test";
     int ret = 0;
-    sptr<IRemoteObject> listener = sptr<IpcClientStub>(new IpcClientStub());
+    sptr<IpcRemoteBroker> listener = sptr<IpcClientStub>(new IpcClientStub());
     ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -381,7 +382,7 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_004, testing::ext::T
     result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-    sptr<IRemoteObject> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
+    sptr<IpcRemoteBroker> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
     ASSERT_EQ(dmListener, nullptr);
 }
 
@@ -411,7 +412,7 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_005, testing::ext::T
     result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(testPkgName);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-    sptr<IRemoteObject> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
+    sptr<IpcRemoteBroker> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
     ASSERT_NE(dmListener, nullptr);
 }
 

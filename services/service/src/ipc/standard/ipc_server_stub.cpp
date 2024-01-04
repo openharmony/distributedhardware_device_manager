@@ -141,7 +141,7 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
     return state_;
 }
 
-int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<IRemoteObject> listener)
+int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<IpcRemoteBroker> listener)
 {
     if (pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
@@ -160,14 +160,14 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         } else {
             auto listener = iter->second;
             auto appRecipient = recipientIter->second;
-            listener->RemoveDeathRecipient(appRecipient);
+            listener->AsObject()->RemoveDeathRecipient(appRecipient);
             appRecipient_.erase(pkgName);
             dmListener_.erase(pkgName);
         }
     }
 
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
-    if (!listener->AddDeathRecipient(appRecipient)) {
+    if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
     }
     dmListener_[pkgName] = listener;
@@ -197,16 +197,10 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
     }
     auto listener = listenerIter->second;
     auto appRecipient = recipientIter->second;
-    listener->RemoveDeathRecipient(appRecipient);
+    listener->AsObject()->RemoveDeathRecipient(appRecipient);
     appRecipient_.erase(pkgName);
     dmListener_.erase(pkgName);
     return DM_OK;
-}
-
-const std::map<std::string, sptr<IRemoteObject>> &IpcServerStub::GetDmListener()
-{
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
-    return dmListener_;
 }
 
 int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
@@ -214,9 +208,8 @@ int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
         auto pkgName = iter.first;
-        auto remote = iter.second;
+        auto listener = iter.second;
         req->SetPkgName(pkgName);
-        sptr<IpcRemoteBroker> listener = iface_cast<IpcRemoteBroker>(remote);
         if (listener == nullptr) {
             LOGE("IpcServerStub::SendALL, listener is nullptr, pkgName : %s.", pkgName.c_str());
             continue;
@@ -247,9 +240,7 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) co
     if (iter == dmListener_.end()) {
         return nullptr;
     }
-    auto remote = iter->second;
-    sptr<IpcRemoteBroker> dmListener = iface_cast<IpcRemoteBroker>(remote);
-    return dmListener;
+    return iter->second;
 }
 
 const std::string IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
@@ -257,7 +248,7 @@ const std::string IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> 
     std::string pkgName = "";
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
-        if (iter.second == remote.promote()) {
+        if ((iter.second)->AsObject() == remote.promote()) {
             pkgName = iter.first;
             break;
         }
