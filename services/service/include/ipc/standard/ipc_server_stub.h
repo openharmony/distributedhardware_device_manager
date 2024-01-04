@@ -83,7 +83,7 @@ public:
      * @tc.desc: Register DeviceManager Listener of the IpcServerStub
      * @tc.type: FUNC
      */
-    int32_t RegisterDeviceManagerListener(std::string &pkgName, sptr<IRemoteObject> listener);
+    int32_t RegisterDeviceManagerListener(std::string &pkgName, sptr<IpcRemoteBroker> listener);
 
     /**
      * @tc.name: IpcServerStub::UnRegisterDeviceManagerListener
@@ -98,13 +98,6 @@ public:
      * @tc.type: FUNC
      */
     ServiceRunningState QueryServiceState() const;
-
-    /**
-     * @tc.name: IpcServerStub::GetDmListener
-     * @tc.desc: GetDmListener of the IpcServerStub
-     * @tc.type: FUNC
-     */
-    const std::map<std::string, sptr<IRemoteObject>> &GetDmListener();
 
     /**
      * @tc.name: IpcServerStub::SendALL
@@ -165,7 +158,7 @@ private:
     ServiceRunningState state_;
     mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
-    std::map<std::string, sptr<IRemoteObject>> dmListener_;
+    std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

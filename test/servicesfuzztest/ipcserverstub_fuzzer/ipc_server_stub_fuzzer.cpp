@@ -24,6 +24,7 @@
 #include "dm_constants.h"
 #include "if_system_ability_manager.h"
 #include "ipc_cmd_register.h"
+#include "ipc_remote_broker.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iservice_registry.h"
@@ -43,7 +44,7 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    sptr<IRemoteObject> listener = nullptr;
+    sptr<IpcRemoteBroker> listener = nullptr;
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 

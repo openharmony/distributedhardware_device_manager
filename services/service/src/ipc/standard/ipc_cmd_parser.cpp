@@ -36,6 +36,7 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
 
 #include "nlohmann/json.hpp"
@@ -429,8 +430,17 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
 {
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
+    if (listener == nullptr) {
+        LOGE("read remote object failed.");
+        return ERR_DM_POINT_NULL;
+    }
+    sptr<IpcServerClientProxy> callback(new IpcServerClientProxy(listener));
+    if (callback == nullptr) {
+        LOGE("create ipc server client proxy failed.");
+        return ERR_DM_POINT_NULL;
+    }
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
-    int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
