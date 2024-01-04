@@ -1108,7 +1108,7 @@ void DmAuthManager::AuthenticateFinish()
     isAuthenticateDevice_ = false;
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel == INVALIED_TYPE &&
-        authResponseContext_->isOnline) {
+        softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
     }
     DeleteAuthCode();
