@@ -474,7 +474,8 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
         return;
     }
     std::string deviceId = device->devId;
-    LOGI("[SOFTBUS]notify discover device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str());
+    LOGI("[SOFTBUS]notify discover device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str(),
+         device->range, device->isOnline);
     if (!device->isOnline) {
         std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
         DeviceInfo *srcInfo = infoPtr.get();

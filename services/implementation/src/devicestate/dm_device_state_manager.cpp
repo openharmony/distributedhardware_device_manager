@@ -70,8 +70,9 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
                 stateDeviceInfos_[udid] = saveInfo;
             }
         }
-        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
-            std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
+        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s",
+             GetAnonyString(std::string(info.networkId)).c_str(),
+             GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
     }
 }
 
