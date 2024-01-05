@@ -845,10 +845,10 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         if (handler != nullptr) {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
             napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
-            g_authCallbackMap.erase(bundleName_);
         } else {
             LOGE("handler is nullptr");
         }
+        g_authCallbackMap.erase(bundleName_);
     }
     napi_close_handle_scope(env_, scope);
 }
