@@ -25,8 +25,8 @@ using namespace OHOS::DistributedHardware;
 
 static void InitAll()
 {
-    const int32_t DM_SERVICE_INIT_DELAY = 5;
-    sleep(DM_SERVICE_INIT_DELAY);
+    const int32_t dmServiceInitDelay = 5;
+    sleep(dmServiceInitDelay);
     if (IpcServerStubInit() != DM_OK) {
         LOGE("IpcServerStubInit failed.");
         return;
