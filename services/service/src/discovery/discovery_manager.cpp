@@ -19,7 +19,6 @@
 #include <securec.h>
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "deviceprofile_connector.h"
 #endif
 #include "discovery_filter.h"
 #include "dm_anonymous.h"
