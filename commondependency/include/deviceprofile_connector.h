@@ -115,7 +115,7 @@ public:
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
-DECLARE_SINGLE_INSTANCE_BASE(DeviceProfileConnector);
+    DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
 public:
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile();
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
