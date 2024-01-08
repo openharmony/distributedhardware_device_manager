@@ -387,6 +387,14 @@ public:
      */
     bool IsIdenticalAccount();
 
+    void DealSourceDeviceAuthProcess();
+
+    void DealSinkDeviceAuthProcess();
+
+    int32_t CheckParamIsValid(const std::string &pkgName, int32_t authType, const std::string &deviceId);
+
+    void ParseExtraParam(const std::string &extra);
+
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
