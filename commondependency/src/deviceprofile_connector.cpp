@@ -21,21 +21,12 @@
 #include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 
+#include "distributed_device_profile_client.h"
 using namespace OHOS::DistributedDeviceProfile;
 
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
-DeviceProfileConnector::DeviceProfileConnector()
-{
-    LOGD("DeviceProfileConnector constructor.");
-}
-
-DeviceProfileConnector::~DeviceProfileConnector()
-{
-    LOGD("DeviceProfileConnector destructor.");
-}
-
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     LOGI("GetAccessControlProfile start.");
@@ -661,6 +652,11 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
         }
     }
     return false;
+}
+
+IDeviceProfileConnector *CreateDpConnectorInstance()
+{
+    return &DeviceProfileConnector::GetInstance();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

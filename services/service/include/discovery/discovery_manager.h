@@ -18,6 +18,7 @@
 
 #include <queue>
 
+#include "deviceprofile_connector.h"
 #include "discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
@@ -49,6 +50,9 @@ public:
     int32_t EnableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);
     int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
+    static IDeviceProfileConnector* GetCommonDependencyObj();
+    static bool IsCommonDependencyReady();
+    static bool CloseCommonDependencyObj();
 
 private:
     void StartDiscoveryTimer();
@@ -69,6 +73,9 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DiscoveryContext> discoveryContextMap_;
+    static bool isSoLoaded_;
+    static IDeviceProfileConnector *dpConnector_;
+    static void *dpConnectorHandle_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

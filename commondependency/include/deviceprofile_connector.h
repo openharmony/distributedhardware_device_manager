@@ -16,10 +16,6 @@
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <string>
 #include "access_control_profile.h"
-#include "accessee.h"
-#include "accesser.h"
-#include "distributed_device_profile_client.h"
-#include "distributed_device_profile_enums.h"
 #include "dm_device_info.h"
 #include "single_instance.h"
 
@@ -86,12 +82,41 @@ typedef struct DmOfflineParam {
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceProfileConnector {
+class IDeviceProfileConnector {
+public:
+    virtual ~IDeviceProfileConnector() {}
+    virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile() = 0;
+    virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
+    virtual int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee) = 0;
+    virtual int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId) = 0;
+    virtual std::map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
+        const std::string &deviceId) = 0;
+    virtual DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId) = 0;
+    virtual std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
+        std::string trustUdid) = 0;
+    virtual std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
+        std::string localDeviceId, std::string targetDeviceId) = 0;
+    virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm) = 0;
+    virtual int32_t DeleteAccessControlList(int32_t userId, std::string &accountId) = 0;
+    virtual DmOfflineParam DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
+        std::string remoteDeviceId) = 0;
+    virtual std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId) = 0;
+    virtual bool CheckIdenticalAccount(int32_t userId, const std::string &accountId) = 0;
+    virtual int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId) = 0;
+    virtual bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual int32_t DeleteTimeOutAcl(const std::string &deviceId) = 0;
+    virtual int32_t GetTrustNumber(const std::string &deviceId) = 0;
+    virtual bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId) = 0;
+    virtual std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
+        std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId,
+        std::string targetDeviceId) = 0;
+};
+
+class DeviceProfileConnector : public IDeviceProfileConnector {
 DECLARE_SINGLE_INSTANCE_BASE(DeviceProfileConnector);
 public:
-    DeviceProfileConnector();
-    ~DeviceProfileConnector();
-
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile();
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
     int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee);
@@ -127,6 +152,9 @@ private:
     void ProcessBindType(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo paramInfo,
         std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, uint32_t index);
 };
+
+extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
+using CreateDpConnectorFuncPtr = IDeviceProfileConnector *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICEPROFILE_CONNECTOR_H

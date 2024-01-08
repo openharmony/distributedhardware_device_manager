@@ -752,6 +752,7 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 
 bool DeviceManagerService::IsDMServiceImplReady()
 {
+    LOGI("DeviceManagerService::IsDMServiceImplReady");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
