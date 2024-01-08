@@ -27,6 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
     constexpr uint32_t SLEEP_TIME_US = 10 * 1000;
+    constexpr uint16_t SUBSCRIBE_ID = 22;
 }
 
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
@@ -58,7 +59,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     bundleName = "111";
-    subInfo.subscribeId = 22;
+    subInfo.subscribeId = SUBSCRIBE_ID;
     DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subInfo, extra, callback);
     usleep(SLEEP_TIME_US);
     DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subInfo.subscribeId);

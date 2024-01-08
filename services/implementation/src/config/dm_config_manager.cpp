@@ -65,6 +65,32 @@ DmConfigManager &DmConfigManager::GetInstance()
 DmConfigManager::DmConfigManager()
 {
     LOGI("DmConfigManager constructor");
+    ParseAdapterJsonConfig();
+    ParseAuthJsonConfig();
+}
+
+DmConfigManager::~DmConfigManager()
+{
+    void *so_handle = nullptr;
+    for (auto iter = soAdapterLoadInfo_.begin(); iter != soAdapterLoadInfo_.end(); iter++) {
+        std::string soPathName = (iter->second).soPath + (iter->second).soName;
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+        if (so_handle != nullptr) {
+            dlclose(so_handle);
+        }
+    }
+    for (auto iter = soAuthLoadInfo_.begin(); iter != soAuthLoadInfo_.end(); iter++) {
+        std::string soPathName = (iter->second).soPath + (iter->second).soName;
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+        if (so_handle != nullptr) {
+            dlclose(so_handle);
+        }
+    }
+    LOGI("DmAdapterManager destructor");
+}
+
+void DmConfigManager::ParseAdapterJsonConfig()
+{
     do {
         nlohmann::json adapterJsonObject = nlohmann::json::parse(adapterJsonConfigString, nullptr, false);
         if (adapterJsonObject.is_discarded()) {
@@ -93,7 +119,10 @@ DmConfigManager::DmConfigManager()
             LOGI("soAdapterLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
         }
     } while (0);
+}
 
+void DmConfigManager::ParseAuthJsonConfig()
+{
     do {
         nlohmann::json authJsonObject = nlohmann::json::parse(authJsonConfigString, nullptr, false);
         if (authJsonObject.is_discarded()) {
@@ -123,26 +152,6 @@ DmConfigManager::DmConfigManager()
             LOGI("soAuthLoadInfo authType is: %d", soLoadInfo[i].authType);
         }
     } while (0);
-}
-
-DmConfigManager::~DmConfigManager()
-{
-    void *so_handle = nullptr;
-    for (auto iter = soAdapterLoadInfo_.begin(); iter != soAdapterLoadInfo_.end(); iter++) {
-        std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
-        if (so_handle != nullptr) {
-            dlclose(so_handle);
-        }
-    }
-    for (auto iter = soAuthLoadInfo_.begin(); iter != soAuthLoadInfo_.end(); iter++) {
-        std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
-        if (so_handle != nullptr) {
-            dlclose(so_handle);
-        }
-    }
-    LOGI("DmAdapterManager destructor");
 }
 
 std::shared_ptr<IDecisionAdapter> DmConfigManager::GetDecisionAdapter(const std::string &soName)

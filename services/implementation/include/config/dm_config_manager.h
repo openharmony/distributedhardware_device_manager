@@ -80,6 +80,10 @@ public:
      */
     void GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthentication>> &authAdapter);
 
+    void ParseAdapterJsonConfig();
+
+    void ParseAuthJsonConfig();
+
 private:
     DmConfigManager();
 
