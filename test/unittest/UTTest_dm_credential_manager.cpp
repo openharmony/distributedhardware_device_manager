@@ -373,7 +373,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestS
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
     {
-        "processType",1,
+        "processType", 1,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -514,7 +514,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType",2,
+        "processType", 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -636,7 +636,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType",2,
+        "processType", 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
