@@ -18,8 +18,6 @@
 #include <dlfcn.h>
 #include <securec.h>
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#endif
 #include "discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
