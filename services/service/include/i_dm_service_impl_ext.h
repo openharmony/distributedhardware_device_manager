@@ -44,56 +44,6 @@ public:
     virtual int32_t Release() = 0;
 
     /**
-     * @tc.name: IDMServiceImplExt::StartDiscoveringExt
-     * @tc.desc: StartDiscoveringExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartDiscoveringExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam,
-        const std::map<std::string, std::string> &filterOptions) = 0;
-
-    /**
-     * @tc.name: IDMServiceImplExt::StopDiscoveringExt
-     * @tc.desc: StopDiscoveringExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t StopDiscoveringExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam) = 0;
-
-    /**
-     * @tc.name: IDMServiceImplExt::EnableDiscoveryListenerExt
-     * @tc.desc: EnableDiscoveryListenerExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t EnableDiscoveryListenerExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &discoverParam,
-        const std::map<std::string, std::string> &filterOptions) = 0;
-
-    /**
-     * @tc.name: IDMServiceImplExt::DisableDiscoveryListenerExt
-     * @tc.desc: DisableDiscoveryListenerExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t DisableDiscoveryListenerExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &extraParam) = 0;
-
-    /**
-     * @tc.name: IDMServiceImplExt::StartAdvertisingExt
-     * @tc.desc: StartAdvertisingExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartAdvertisingExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &advertiseParam) = 0;
-
-    /**
-     * @tc.name: IDMServiceImplExt::StopAdvertisingExt
-     * @tc.desc: StopAdvertisingExt
-     * @tc.type: FUNC
-     */
-    virtual int32_t StopAdvertisingExt(const std::string &pkgName,
-        const std::map<std::string, std::string> &advertiseParam) = 0;
-
-    /**
      * @tc.name: IDMServiceImplExt::BindTargetExt
      * @tc.desc: BindTargetExt
      * @tc.type: FUNC
