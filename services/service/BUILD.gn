@@ -50,6 +50,7 @@ if (defined(ohos_lite)) {
         "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
         "${devicemanager_path}/radar/include",
+        "${devicemanager_path}/commondependency/include",
       ]
 
       sources = [
