@@ -41,6 +41,14 @@ public:
     static void TearDownTestCase();
     virtual void SetUp() override;
     virtual void TearDown() override;
+
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+
+    std::shared_ptr<DmAuthManager> authManager_ =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

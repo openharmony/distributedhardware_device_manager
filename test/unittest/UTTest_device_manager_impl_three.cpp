@@ -1088,9 +1088,11 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback001, testing::ext::T
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::TestSize.Level0)
 {
+    DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = nullptr;
     std::string pkgName = "pkgName";
     int32_t ret =  DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }
 } // namespace
 } // namespace DistributedHardware

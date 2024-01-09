@@ -42,6 +42,7 @@ group("unittest") {
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_timer",
+    ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
     ":UTTest_ipc_client_manager",
     ":UTTest_ipc_client_proxy",
@@ -203,6 +204,25 @@ ohos_unittest("UTTest_device_manager_service") {
 }
 
 ## UnitTest UTTest_device_manager_service }}}
+
+## UnitTest UTTest_hichain_auth_connector {{{
+ohos_unittest("UTTest_hichain_auth_connector") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_hichain_auth_connector.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+}
+
+## UnitTest UTTest_hichain_auth_connector }}}
 
 ## UnitTest UTTest_hichain_connector {{{
 ohos_unittest("UTTest_hichain_connector") {
