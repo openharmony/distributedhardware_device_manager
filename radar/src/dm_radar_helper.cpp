@@ -86,7 +86,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
             "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
-            "PEER_NET_ID", info.peerNetId);
+            "PEER_NET_ID", GetAnonyUdid(info.peerNetId));
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -98,6 +98,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
     }
@@ -123,7 +124,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
-            "BIZ_STATE", info.bizState,
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS));
     } else if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
         res = HiSysEventWrite(
@@ -135,7 +136,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
-            "BIZ_STATE", info.bizState);
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END));
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -147,7 +148,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
-            "BIZ_STATE", info.bizState,
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
             "ERROR_CODE", std::abs(info.errCode));
     }
@@ -531,7 +532,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
         "BIZ_STATE", info.bizState,
         "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
         "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-        "PEER_NET_ID", info.peerNetId,
+        "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "IS_TRUST", info.isTrust);
     if (res != DM_OK) {
         LOGE("ReportNetworkOnline error, res:%d", res);
@@ -554,7 +555,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
         "BIZ_STATE", info.bizState,
         "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
         "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-        "PEER_NET_ID", info.peerNetId);
+        "PEER_NET_ID", GetAnonyUdid(info.peerNetId));
     if (res != DM_OK) {
         LOGE("ReportNetworkOffline error, res:%d", res);
         return false;
@@ -576,7 +577,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "BIZ_STATE", info.bizState,
         "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
         "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-        "PEER_NET_ID", info.peerNetId,
+        "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "TO_CALL_PKG", info.toCallPkg);
     if (res != DM_OK) {
         LOGE("ReportDeleteTrustRelation error, res:%d", res);
@@ -640,7 +641,8 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
         cJSON* object = cJSON_CreateObject();
         std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
         cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
-        cJSON_AddStringToObject(object, "PEER_NET_ID", deviceInfoList[i].networkId);
+        std::string peerNetId = GetAnonyUdid(deviceInfoList[i].networkId);
+        cJSON_AddStringToObject(object, "PEER_NET_ID", peerNetId.c_str());
         std::string devType = ConvertHexToString(deviceInfoList[i].deviceTypeId);
         cJSON_AddStringToObject(object, "PEER_DEV_TYPE", devType.c_str());
         cJSON_AddStringToObject(object, "PEER_DEV_NAME", deviceInfoList[i].deviceName);

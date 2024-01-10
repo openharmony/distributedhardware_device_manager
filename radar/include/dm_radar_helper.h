@@ -27,9 +27,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string ORGPKGNAME = "ohos.distributedhardware.devicemanager";
-const std::string SOFTBUSNAME = "ohos.softbus";
-const std::string HICHAINNAME = "ohos.hichain";
+const std::string ORGPKGNAME = "deviceManager";
+const std::string SOFTBUSNAME = "dsoftbus";
+const std::string HICHAINNAME = "hichain";
 const std::string DM_DISCOVER_BEHAVIOR = "DM_DISCOVER_BEHAVIOR";
 const std::string DM_AUTHCATION_BEHAVIOR = "DM_AUTHCATION_BEHAVIOR";
 constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
