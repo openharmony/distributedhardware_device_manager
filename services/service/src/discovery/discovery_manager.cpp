@@ -31,14 +31,12 @@ const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
 constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const std::string TYPE_MINE = "findDeviceMode";
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 static std::mutex comDependencyLoadLock;
+constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.z.so";
 bool DiscoveryManager::isSoLoaded_ = false;
 IDeviceProfileConnector* DiscoveryManager::dpConnector_ = nullptr;
 void* DiscoveryManager::dpConnectorHandle_ = nullptr;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.z.so";
-#else
-constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.so";
 #endif
 
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
@@ -401,6 +399,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     return DM_OK;
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
 {
     return dpConnector_;
@@ -456,5 +455,6 @@ bool DiscoveryManager::CloseCommonDependencyObj()
     LOGI("close libdevicemanagerdependency so success.");
     return true;
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
