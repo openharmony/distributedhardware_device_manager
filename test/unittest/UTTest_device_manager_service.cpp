@@ -324,6 +324,23 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Leve
  */
 HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Level0)
 {
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "DeviceManagerServiceTest",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
     std::string pkgName = "com.ohos.test";
     std::string callerId = "com.ohos.test";
     bool isRefresh = true;
