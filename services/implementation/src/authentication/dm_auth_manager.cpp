@@ -832,6 +832,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !bindType.empty();
+    authResponseContext_->bindType = bindType;
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
         listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
             authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
