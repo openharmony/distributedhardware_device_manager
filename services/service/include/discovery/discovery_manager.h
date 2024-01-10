@@ -76,7 +76,7 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DiscoveryContext> discoveryContextMap_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))    
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     static bool isSoLoaded_;
     static IDeviceProfileConnector *dpConnector_;
     static void *dpConnectorHandle_;

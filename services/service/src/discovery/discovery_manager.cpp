@@ -47,7 +47,9 @@ DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListe
 
 DiscoveryManager::~DiscoveryManager()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     CloseCommonDependencyObj();
+#endif
     LOGI("DiscoveryManager destructor.");
 }
 
