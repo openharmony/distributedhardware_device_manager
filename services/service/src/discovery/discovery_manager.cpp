@@ -409,7 +409,7 @@ IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
 
 bool DiscoveryManager::IsCommonDependencyReady()
 {
-    LOGI("DiscoveryManager::IsCommonDependencyReady start.");
+    LOGI("DiscoveryManager::IsCommonDependencyReady.");
     std::lock_guard<std::mutex> lock(comDependencyLoadLock);
     if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
         LOGI("IsCommonDependencyReady already.");
@@ -434,7 +434,7 @@ bool DiscoveryManager::IsCommonDependencyReady()
     }
     dpConnector_ = func();
     isSoLoaded_ = true;
-    LOGI("IsCommonDependencyReady ready success.");
+    LOGI("IsCommonDependencyReady success.");
     return true;
 }
 
