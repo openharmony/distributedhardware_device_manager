@@ -30,7 +30,7 @@ const MSG_CANCEL_CONFIRM_SHOW: number = 5
 @Component
 struct dialogPlusPage {
   @State message: string = '是否信任此设备？'
-  @State allowOnce: string = '仅本次信任'
+  @State allowOnce: string = '临时信任'
   @State allowAlways: string = '始终信任'
   @State peerAppOperation: string = '想要连接本机。'
   @State peerCustomDescription: string = ''
