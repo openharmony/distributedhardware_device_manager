@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,9 @@ constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int HEXIFY_UNIT_LEN = 2;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int DEC_MAX_NUM = 10;
+constexpr int HEX_MAX_BIT_NUM = 4;
+
+#define UN_HEXIFY_LEN(len) ((len) / HEXIFY_UNIT_LEN)
 #define HEXIFY_LEN(len) ((len) * HEXIFY_UNIT_LEN + 1)
 } // namespace
 
@@ -88,6 +91,46 @@ int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned
         }
         ++inBuf;
         inLen--;
+    }
+    return DM_OK;
+}
+
+int32_t DmSoftbusAdapterCrypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLen, const char *inBuf,
+    uint32_t inLen)
+{
+    (void)outBufLen;
+    if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEXIFY_UNIT_LEN != 0)) {
+        LOGE("invalid param");
+        return ERR_DM_FAILED;
+    }
+
+    uint32_t outLen = UN_HEXIFY_LEN(inLen);
+    uint32_t i = 0;
+    while (i < outLen) {
+        unsigned char c = *inBuf++;
+        if ((c >= '0') && (c <= '9')) {
+            c -= '0';
+        } else if ((c >= 'a') && (c <= 'f')) {
+            c -= 'a' - DEC_MAX_NUM;
+        } else if ((c >= 'A') && (c <= 'F')) {
+            c -= 'A' - DEC_MAX_NUM;
+        } else {
+            LOGE("HexToString Error! %c", c);
+            return ERR_DM_FAILED;
+        }
+        unsigned char c2 = *inBuf++;
+        if ((c2 >= '0') && (c2 <= '9')) {
+            c2 -= '0';
+        } else if ((c2 >= 'a') && (c2 <= 'f')) {
+            c2 -= 'a' - DEC_MAX_NUM;
+        } else if ((c2 >= 'A') && (c2 <= 'F')) {
+            c2 -= 'A' - DEC_MAX_NUM;
+        } else {
+            LOGE( "HexToString Error! %c", c2);
+            return ERR_DM_FAILED;
+        }
+        *outBuf++ = (c << HEX_MAX_BIT_NUM) | c2;
+        i++;
     }
     return DM_OK;
 }

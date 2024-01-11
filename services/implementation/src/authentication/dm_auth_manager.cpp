@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1533,7 +1533,7 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     } else if (!targetId.deviceId.empty()) {
         return AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
     } else {
-        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::BindTarget failed, targetId is error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 }
@@ -1566,6 +1566,10 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         LOGI("DmAuthManager::ParseConnectAddr parse bleMac: %s.", GetAnonyString(targetId.bleMac).c_str());
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
+        if (!targetId.deviceId.empty()) {
+            DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
+                targetId.deviceId.c_str(), targetId.deviceId.length());
+        }
         deviceInfo->addr[index] = addr;
         deviceId = targetId.bleMac;
         index++;

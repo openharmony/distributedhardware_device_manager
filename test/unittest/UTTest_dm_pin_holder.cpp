@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,6 +130,22 @@ HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.
     ret = DeviceManager::GetInstance().RegisterPinHolderCallback(packName, pinHolderCallback);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+
+    std::shared_ptr<DmPinHolderCallbackTest> pinHolderCallback = std::make_shared<DmPinHolderCallbackTest>();
+    ret = DeviceManager::GetInstance().RegisterPinHolderCallback(packName, pinHolderCallback);
+    PeerTargetId targetId;
+    DmPinType pinType = NUMBER_PIN_CODE;
+    std::string payload = "";
+    ret = DeviceManager::GetInstance().CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 } // namespace

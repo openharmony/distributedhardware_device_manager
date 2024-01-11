@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
 #include "softbus_connector.h"
 
@@ -141,6 +142,10 @@ int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, Connec
     } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
+        if (!targetId.deviceId.empty()) {
+            DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
+                targetId.deviceId.c_str(), targetId.deviceId.length());
+        }
     } else if (!targetId.deviceId.empty()) {
         std::string connectAddr;
         ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(targetId.deviceId, connectAddr);
