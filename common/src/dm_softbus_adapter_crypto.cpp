@@ -33,7 +33,6 @@ constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int DEC_MAX_NUM = 10;
 constexpr int HEX_MAX_BIT_NUM = 4;
 
-#define UN_HEXIFY_LEN(len) ((len) / HEXIFY_UNIT_LEN)
 #define HEXIFY_LEN(len) ((len) * HEXIFY_UNIT_LEN + 1)
 } // namespace
 
@@ -104,7 +103,7 @@ int32_t DmSoftbusAdapterCrypto::ConvertHexStringToBytes(unsigned char *outBuf, u
         return ERR_DM_FAILED;
     }
 
-    uint32_t outLen = UN_HEXIFY_LEN(inLen);
+    uint32_t outLen = inLen / HEXIFY_UNIT_LEN;
     uint32_t i = 0;
     while (i < outLen) {
         unsigned char c = *inBuf++;
@@ -126,7 +125,7 @@ int32_t DmSoftbusAdapterCrypto::ConvertHexStringToBytes(unsigned char *outBuf, u
         } else if ((c2 >= 'A') && (c2 <= 'F')) {
             c2 -= 'A' - DEC_MAX_NUM;
         } else {
-            LOGE( "HexToString Error! %c", c2);
+            LOGE("HexToString Error! %c", c2);
             return ERR_DM_FAILED;
         }
         *outBuf++ = (c << HEX_MAX_BIT_NUM) | c2;
