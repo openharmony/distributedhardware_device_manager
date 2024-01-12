@@ -263,11 +263,12 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStateCallback_.count(pkgName) == 0) {
+        auto iter = deviceStateCallback_.find(pkgName);
+        if (iter == deviceStateCallback_.end()) {
             LOGE("OnDeviceOnline error, device state callback not register.");
             return;
         }
-        tempCbk = deviceStateCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceOnline error, registered device state callback is nullptr.");
@@ -286,11 +287,12 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStatusCallback_.count(pkgName) == 0) {
+        auto iter = deviceStatusCallback_.find(pkgName);
+        if (iter == deviceStatusCallback_.end()) {
             LOGE("OnDeviceOnline error, device status callback not register.");
             return;
         }
-        tempCbk = deviceStatusCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceOnline error, registered device status callback is nullptr.");
@@ -309,11 +311,12 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStateCallback_.count(pkgName) == 0) {
+        auto iter = deviceStateCallback_.find(pkgName);
+        if (iter == deviceStateCallback_.end()) {
             LOGE("OnDeviceOffline error, device state callback not register.");
             return;
         }
-        tempCbk = deviceStateCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceOffline error, registered device state callback is nullptr.");
@@ -332,11 +335,12 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStatusCallback_.count(pkgName) == 0) {
+        auto iter = deviceStatusCallback_.find(pkgName);
+        if (iter == deviceStatusCallback_.end()) {
             LOGE("OnDeviceOffline error, device status callback not register.");
             return;
         }
-        tempCbk = deviceStatusCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceOffline error, registered device status callback is nullptr.");
@@ -355,11 +359,12 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStateCallback_.count(pkgName) == 0) {
+        auto iter = deviceStateCallback_.find(pkgName);
+        if (iter == deviceStateCallback_.end()) {
             LOGE("OnDeviceChanged error, device state callback not register.");
             return;
         }
-        tempCbk = deviceStateCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceChanged error, registered device state callback is nullptr.");
@@ -378,11 +383,12 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStatusCallback_.count(pkgName) == 0) {
+        auto iter = deviceStatusCallback_.find(pkgName);
+        if (iter == deviceStatusCallback_.end()) {
             LOGE("OnDeviceChanged error, device state callback not register.");
             return;
         }
-        tempCbk = deviceStatusCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceChanged error, registered device state callback is nullptr.");
@@ -401,11 +407,12 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStateCallback_.count(pkgName) == 0) {
+        auto iter = deviceStateCallback_.find(pkgName);
+        if (iter == deviceStateCallback_.end()) {
             LOGE("OnDeviceReady error, device state callback not register.");
             return;
         }
-        tempCbk = deviceStateCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceReady error, registered device state callback is nullptr.");
@@ -424,11 +431,12 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceStatusCallback_.count(pkgName) == 0) {
+        auto iter = deviceStatusCallback_.find(pkgName);
+        if (iter == deviceStatusCallback_.end()) {
             LOGE("OnDeviceReady error, device status callback not register.");
             return;
         }
-        tempCbk = deviceStatusCallback_[pkgName];
+        tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
         LOGE("OnDeviceReady error, registered device status callback is nullptr.");
