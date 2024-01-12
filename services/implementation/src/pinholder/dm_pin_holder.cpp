@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -317,6 +317,12 @@ void DmPinHolder::CloseSession(const std::string &name)
     if (session_ == nullptr) {
         LOGE("CloseSession session is nullptr.");
         return;
+    }
+    nlohmann::json jsonObj;
+    jsonObj[DM_CONNECTION_DISCONNECTED] = true;
+    std::string payload = jsonObj.dump();
+    if (listener_ != nullptr) {
+        listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);
     }
     session_->CloseSessionServer(sessionId_);
     timer_->DeleteAll();
