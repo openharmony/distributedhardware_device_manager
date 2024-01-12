@@ -169,7 +169,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
     ]

@@ -15,11 +15,9 @@
 
 #include "discovery_manager.h"
 
+#include <dlfcn.h>
 #include <securec.h>
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "deviceprofile_connector.h"
-#endif
 #include "discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -33,6 +31,13 @@ const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
 constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const std::string TYPE_MINE = "findDeviceMode";
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+static std::mutex comDependencyLoadLock;
+constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.z.so";
+bool DiscoveryManager::isSoLoaded_ = false;
+IDeviceProfileConnector* DiscoveryManager::dpConnector_ = nullptr;
+void* DiscoveryManager::dpConnectorHandle_ = nullptr;
+#endif
 
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
     std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
@@ -42,6 +47,9 @@ DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListe
 
 DiscoveryManager::~DiscoveryManager()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    CloseCommonDependencyObj();
+#endif
     LOGI("DiscoveryManager destructor.");
 }
 
@@ -383,12 +391,72 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     discoveryInfo.pkgname = pkgName;
     discoveryInfo.localDeviceId = requestDeviceId;
     discoveryInfo.remoteDeviceIdHash = deviceId;
-    if (DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm) != DM_OK) {
-        LOGE("GetDeviceAclParam failed.");
-        return ERR_DM_FAILED;
+    if (DiscoveryManager::IsCommonDependencyReady() && DiscoveryManager::GetCommonDependencyObj() != nullptr) {
+        if (DiscoveryManager::GetCommonDependencyObj()->GetDeviceAclParam(discoveryInfo, isonline, authForm) != DM_OK) {
+            LOGE("GetDeviceAclParam failed.");
+            return ERR_DM_FAILED;
+        }
     }
 #endif
     return DM_OK;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
+{
+    return dpConnector_;
+}
+
+bool DiscoveryManager::IsCommonDependencyReady()
+{
+    LOGI("DiscoveryManager::IsCommonDependencyReady.");
+    std::lock_guard<std::mutex> lock(comDependencyLoadLock);
+    if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
+        LOGI("IsCommonDependencyReady already.");
+        return true;
+    }
+    char path[PATH_MAX + 1] = {0x00};
+    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_COMDENPENDENCY_NAME);
+    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
+        LOGE("File %s canonicalization failed.", soName.c_str());
+        return false;
+    }
+    dpConnectorHandle_ = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    if (dpConnectorHandle_ == nullptr) {
+        LOGE("load libdevicemanagerdependency so %s failed, errMsg: %s.", soName.c_str(), dlerror());
+        return false;
+    }
+    auto func = (CreateDpConnectorFuncPtr)dlsym(dpConnectorHandle_, "CreateDpConnectorInstance");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(dpConnectorHandle_);
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+    dpConnector_ = func();
+    isSoLoaded_ = true;
+    LOGI("IsCommonDependencyReady success.");
+    return true;
+}
+
+bool DiscoveryManager::CloseCommonDependencyObj()
+{
+    LOGI("DiscoveryManager::CloseCommonDependencyObj start.");
+    std::lock_guard<std::mutex> lock(comDependencyLoadLock);
+    if (!isSoLoaded_ && (dpConnector_ == nullptr) && (dpConnectorHandle_ == nullptr)) {
+        return true;
+    }
+
+    int32_t ret = dlclose(dpConnectorHandle_);
+    if (ret != 0) {
+        LOGE("close libdevicemanagerdependency failed ret = %d.", ret);
+        return false;
+    }
+    isSoLoaded_ = false;
+    dpConnector_ = nullptr;
+    dpConnectorHandle_ = nullptr;
+    LOGI("close libdevicemanagerdependency so success.");
+    return true;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -17,7 +17,9 @@
 #define OHOS_DISCOVERY_MANAGER_H
 
 #include <queue>
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "deviceprofile_connector.h"
+#endif
 #include "discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
@@ -49,6 +51,11 @@ public:
     int32_t EnableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);
     int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    static IDeviceProfileConnector* GetCommonDependencyObj();
+    static bool IsCommonDependencyReady();
+    static bool CloseCommonDependencyObj();
+#endif
 
 private:
     void StartDiscoveryTimer();
@@ -69,6 +76,11 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DiscoveryContext> discoveryContextMap_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    static bool isSoLoaded_;
+    static IDeviceProfileConnector *dpConnector_;
+    static void *dpConnectorHandle_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
