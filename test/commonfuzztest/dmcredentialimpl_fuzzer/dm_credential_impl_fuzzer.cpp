@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,15 +34,16 @@ void DeviceManagerCredentialFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string szData(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<CredentialCallbackFuzzTest> callback = std::make_shared<CredentialCallbackFuzzTest>();
+    std::string pkgName(reinterpret_cast<const char*>(data), size);
+    std::string reqJsonStr;
     std::string returnJsonStr;
+    std::shared_ptr<CredentialCallbackFuzzTest> callback = std::make_shared<CredentialCallbackFuzzTest>();
 
-    DeviceManager::GetInstance().RequestCredential(szData, szData, returnJsonStr);
-    DeviceManager::GetInstance().ImportCredential(szData, szData);
-    DeviceManager::GetInstance().DeleteCredential(szData, szData);
-    DeviceManager::GetInstance().RegisterCredentialCallback(szData, callback);
-    DeviceManager::GetInstance().UnRegisterCredentialCallback(szData);
+    DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);
+    DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    DeviceManager::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
 }
 }
 }
