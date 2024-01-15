@@ -380,10 +380,10 @@ void DiscoveryManager::HandleDiscoveryTimeout(std::string name)
 }
 
 int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::string deviceId,
-    bool &isonline, int32_t &authForm)
+    bool &isOnline, int32_t &authForm)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("Get deviceId = %s isonline and authForm.", GetAnonyString(deviceId).c_str());
+    LOGI("Get deviceId = %s isOnline and authForm.", GetAnonyString(deviceId).c_str());
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = static_cast<std::string>(localDeviceId);
@@ -392,7 +392,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     discoveryInfo.localDeviceId = requestDeviceId;
     discoveryInfo.remoteDeviceIdHash = deviceId;
     if (DiscoveryManager::IsCommonDependencyReady() && DiscoveryManager::GetCommonDependencyObj() != nullptr) {
-        if (DiscoveryManager::GetCommonDependencyObj()->GetDeviceAclParam(discoveryInfo, isonline, authForm) != DM_OK) {
+        if (DiscoveryManager::GetCommonDependencyObj()->GetDeviceAclParam(discoveryInfo, isOnline, authForm) != DM_OK) {
             LOGE("GetDeviceAclParam failed.");
             return ERR_DM_FAILED;
         }

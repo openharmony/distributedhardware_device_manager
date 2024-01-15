@@ -15,6 +15,7 @@
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <string>
+#include <algorithm>
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "single_instance.h"
@@ -96,7 +97,7 @@ public:
         std::string trustUdid) = 0;
     virtual std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId) = 0;
-    virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm) = 0;
+    virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
     virtual int32_t DeleteAccessControlList(int32_t userId, std::string &accountId) = 0;
     virtual DmOfflineParam DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
         std::string remoteDeviceId) = 0;
@@ -127,7 +128,7 @@ public:
         std::string trustUdid);
     std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId);
-    int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm);
+    int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
     int32_t DeleteAccessControlList(int32_t userId, std::string &accountId);
     DmOfflineParam DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
         std::string remoteDeviceId);
@@ -143,10 +144,7 @@ public:
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
 private:
-    void InsertDeviceIdMap(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &pkgName,
-        const std::string &deviceId, std::map<std::string, DmAuthForm> &deviceIdMap, std::string trustDeviceId);
-    void HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo,
-        bool &isonline, int32_t &authForm);
+    int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string pkgName,
         std::string requestDeviceId, std::vector<int32_t> &bindTypeVec);
     void ProcessBindType(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo paramInfo,
