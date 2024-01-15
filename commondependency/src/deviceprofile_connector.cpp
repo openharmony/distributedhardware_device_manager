@@ -95,7 +95,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
         if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
             continue;
         }
-        int32_t bindType = HandleDmAuthForm(item, discoveryInfo, isOnline, authForm);
+        int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
         if (bindType == DmAuthForm::INVALID_TYPE) {
             continue;
         }
