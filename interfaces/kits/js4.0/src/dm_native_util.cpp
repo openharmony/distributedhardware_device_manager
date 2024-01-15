@@ -16,7 +16,6 @@
 #include "dm_native_util.h"
 
 #include "dm_constants.h"
-#include "dm_device_info.h"
 #include "dm_log.h"
 #include "ipc_skeleton.h"
 #include "nlohmann/json.hpp"

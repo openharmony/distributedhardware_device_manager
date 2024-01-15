@@ -21,7 +21,9 @@
 #include <mutex>
 #include <string>
 
+#include "dm_device_info.h"
 #include "napi/native_api.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -45,10 +47,10 @@ enum DMBussinessErrorCode {
 };
 
 void DeviceBasicInfoToJsArray(const napi_env &env,
-                                    const std::vector<OHOS::DistributedHardware::DmDeviceBasicInfo> &vecDevInfo,
+                                    const std::vector<DmDeviceBasicInfo> &vecDevInfo,
                                     const int32_t idx, napi_value &arrayResult);
-bool DmAuthParamDetection(const OHOS::DistributedHardware::DmAuthParam &authParam);
-void DmAuthParamToJsAuthParam(const napi_env &env, const OHOS::DistributedHardware::DmAuthParam &authParam,
+bool DmAuthParamDetection(const DmAuthParam &authParam);
+void DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
                                          napi_value &paramResult);
 void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
                               napi_value &result);
@@ -62,7 +64,7 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
                               int32_t &fieldRef);
 std::string JsObjectToString(const napi_env &env, const napi_value &param);
 void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
-                                  OHOS::DistributedHardware::DmPublishInfo &info);
+                                  DmPublishInfo &info);
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
         bool &isMetaType);
 void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
