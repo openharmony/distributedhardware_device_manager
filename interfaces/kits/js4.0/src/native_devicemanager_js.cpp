@@ -21,7 +21,6 @@
 #include <mutex>
 
 #include "device_manager.h"
-#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -1052,7 +1051,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-    std::vector<OHOS::DistributedHardware::DmDeviceBasicInfo> devList;
+    std::vector<DmDeviceBasicInfo> devList;
     ret = DeviceManager::GetInstance().GetAvailableDeviceList(deviceManagerWrapper->bundleName_, devList);
     if (ret != 0) {
         LOGE("GetTrustedDeviceList for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);

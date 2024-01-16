@@ -15,14 +15,18 @@
 
 #include "dm_native_util.h"
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_skeleton.h"
-#include "nlohmann/json.hpp"
+#include "js_native_api.h"
+#include "tokenid_kit.h"
+
+using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
-
+namespace {
 const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
 const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
 const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
@@ -35,28 +39,12 @@ const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
 const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
-
-void DeviceBasicInfoToJsArray(const napi_env &env,
-    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx, napi_value &arrayResult)
-{
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-
-    SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
-    SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
-    SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo[idx].deviceTypeId));
-    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
-
-    napi_status status = napi_set_element(env, arrayResult, idx, result);
-    if (status != napi_ok) {
-        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
-    }
-}
+const int32_t DM_NAPI_DESCRIPTION_BUF_LENGTH = 16384;
+const int32_t DM_NAPI_BUF_LENGTH = 256;
 
 bool DmAuthParamDetection(const DmAuthParam &authParam)
 {
-    LOGI("DeviceManagerNapi::DmAuthParamDetection");
+    LOGI("DmAuthParamDetection");
     const uint32_t maxIntValueLen = 10;
     const std::string maxAuthToken = "2147483647";
     if (authParam.authToken.length() > maxIntValueLen) {
@@ -75,11 +63,31 @@ bool DmAuthParamDetection(const DmAuthParam &authParam)
     }
     return true;
 }
+}
+
+void DeviceBasicInfoToJsArray(const napi_env &env,
+    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
+        napi_value &arrayResult)
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
+    SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo[idx].deviceTypeId));
+    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
+
+    napi_status status = napi_set_element(env, arrayResult, idx, result);
+    if (status != napi_ok) {
+        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
+    }
+}
 
 void DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
                                                  napi_value &paramResult)
 {
-    LOGI("DeviceManagerNapi::DmAuthParamToJsAuthParam");
+    LOGI("DmAuthParamToJsAuthParam");
     if (!DmAuthParamDetection(authParam)) {
         LOGE("The authToken is Error");
         return;
@@ -486,7 +494,7 @@ bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, c
     return true;
 }
 
-napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &errMsg, bool isAsync = true)
+napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &errMsg, bool isAsync)
 {
     LOGI("CreateErrorForCall code:%d, message:%s", code, errMsg.c_str());
     napi_value error = nullptr;
@@ -498,7 +506,7 @@ napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &err
     return error;
 }
 
-napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true)
+napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
 {
     napi_value error = nullptr;
     switch (errCode) {

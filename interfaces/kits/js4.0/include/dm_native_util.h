@@ -22,11 +22,13 @@
 #include <string>
 
 #include "dm_device_info.h"
+#include "dm_publish_info.h"
 #include "napi/native_api.h"
+#include "napi/native_node_api.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
-
 enum DMBussinessErrorCode {
     // Permission verify failed.
     ERR_NO_PERMISSION = 201,
@@ -49,7 +51,6 @@ enum DMBussinessErrorCode {
 void DeviceBasicInfoToJsArray(const napi_env &env,
                                     const std::vector<DmDeviceBasicInfo> &vecDevInfo,
                                     const int32_t idx, napi_value &arrayResult);
-bool DmAuthParamDetection(const DmAuthParam &authParam);
 void DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
                                          napi_value &paramResult);
 void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,

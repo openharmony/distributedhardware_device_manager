@@ -33,7 +33,6 @@
 #include "nlohmann/json.hpp"
 #define DM_NAPI_BUF_LENGTH (256)
 #define DM_NAPI_CREDENTIAL_BUF_LENGTH (6000)
-#define DM_NAPI_DESCRIPTION_BUF_LENGTH (16384)
 
 struct AsyncCallbackInfo {
     napi_env env = nullptr;
@@ -280,16 +279,7 @@ public:
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);
-    static void DeviceBasicInfoToJsArray(const napi_env &env,
-                                    const std::vector<OHOS::DistributedHardware::DmDeviceBasicInfo> &vecDevInfo,
-                                    const int32_t idx, napi_value &arrayResult);
     static bool DmAuthParamDetection(const OHOS::DistributedHardware::DmAuthParam &authParam);
-    static void DmAuthParamToJsAuthParam(const napi_env &env, const OHOS::DistributedHardware::DmAuthParam &authParam,
-                                         napi_value &paramResult);
-    static void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
-                              napi_value &result);
-    static void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                                   napi_value &result);
     static void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr, char *dest,
                                  const int32_t destLen);
     static void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
@@ -299,13 +289,9 @@ public:
     static std::string JsObjectToString(const napi_env &env, const napi_value &param);
     static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
                                   OHOS::DistributedHardware::DmPublishInfo &info);
-    static void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
-        bool &isMetaType);
     static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
     static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                nlohmann::json &jsonObj);
-    static void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
-    static bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
     void OnDeviceStatusChange(DmNapiDevStatusChange action,
                              const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
@@ -327,8 +313,6 @@ private:
         DeviceBasicInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo);
     static void BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId, napi_env env,
         napi_value &object);
-    static bool IsSystemApp();
-    static std::string GetDeviceTypeById(OHOS::DistributedHardware::DmDeviceType type);
     static int32_t BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
 
