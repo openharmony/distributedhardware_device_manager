@@ -37,6 +37,7 @@
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "nativetoken_kit.h"
+#include "nlohmann/json.hpp"
 #include "securec.h"
 #include "token_setproc.h"
 
@@ -107,6 +108,14 @@ void DeviceDiscoveryCallbackTest::OnDeviceFound(uint16_t subscribeId, const DmDe
     std::cout << "pin holder test ondeviceFound start." << std::endl;
 }
 
+constexpr int32_t MSG_TYPE_CREATE_PIN_HOLDER = 600;
+constexpr int32_t MSG_TYPE_CREATE_PIN_HOLDER_RESP = 601;
+constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER = 650;
+constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER_RESP = 651;
+
+constexpr const char* TAG_PIN_TYPE = "PIN_TYPE";
+constexpr const char* TAG_PAYLOAD = "PAYLOAD";
+constexpr const char* TAG_REPLY = "REPLY";
 namespace {
 /**
  * @tc.name: InitDeviceManager_001
@@ -133,6 +142,26 @@ HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_102, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->session_ = nullptr;
+    int32_t ret = dmPinHolder->RegisterPinHolderCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_103, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->session_ = std::make_shared<PinHolderSession>();
+    int32_t ret = dmPinHolder->RegisterPinHolderCallback(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.dmtest";
@@ -147,6 +176,535 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level0)
     ret = DeviceManager::GetInstance().CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_102, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId;
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = "";
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_103, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId;
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = "dmtest";
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_105, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "",
+        .brMac = "",
+        .bleMac = "",
+        .wifiIp = "",
+    };
+
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_106, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    dmPinHolder->listener_ = nullptr;
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_107, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    dmPinHolder->session_ = nullptr;
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreatePinholder_108, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    dmPinHolder->sourceState_ = SOURCE_CREATE;
+    int32_t ret = dmPinHolder->CreatePinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_101, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->listener_ = nullptr;
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_102, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->session_ = nullptr;
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_103, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = "";
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_104, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = "dmtest";
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_105, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "",
+        .brMac = "",
+        .bleMac = "",
+        .wifiIp = "",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_106, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.dmtest";
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    DmPinType pinType = DmPinType::NUMBER_PIN_CODE;
+    std::string payload;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->registerPkgName_ = packName;
+    int32_t sessionId = 0;
+    dmPinHolder->sessionId_ = sessionId;
+    dmPinHolder->sourceState_ = SOURCE_DESTROY;
+    dmPinHolder->listener_ = std::make_shared<IDeviceManagerServiceListenerTest>();
+    int32_t ret = dmPinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->listener_ = nullptr;
+    int32_t ret = dmPinHolder->CreateGeneratePinHolderMsg();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    dmPinHolder->session_ = nullptr;
+    int32_t ret = dmPinHolder->CreateGeneratePinHolderMsg();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, ParseMsgType_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string message;
+    int32_t ret = dmPinHolder->ParseMsgType(message);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string message;
+    dmPinHolder->listener_ = nullptr;
+    dmPinHolder->ProcessCreateMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string message;
+    dmPinHolder->session_ = nullptr;
+    dmPinHolder->ProcessCreateMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessCreateMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_104, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_PIN_TYPE] = "TAG_PIN_TYPE";
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessCreateMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_105, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
+    jsonObject[TAG_PAYLOAD] = DmPinType::SUPER_SONIC;
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessCreateMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessCreateRespMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
+    std::string message = jsonObject.dump();
+    dmPinHolder->listener_ = nullptr;
+    dmPinHolder->ProcessCreateRespMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_REPLY] = DmPinType::SUPER_SONIC;
+    std::string message = jsonObject.dump();
+    dmPinHolder->session_ = nullptr;
+    dmPinHolder->ProcessCreateRespMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_104, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
+    std::string message = jsonObject.dump();
+    dmPinHolder->session_ = nullptr;
+    dmPinHolder->ProcessCreateRespMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string message;
+    dmPinHolder->listener_ = nullptr;
+    dmPinHolder->ProcessDestroyMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string message;
+    dmPinHolder->session_ = nullptr;
+    dmPinHolder->ProcessDestroyMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessDestroyMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_104, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_PIN_TYPE] = "TAG_PIN_TYPE";
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessDestroyMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_105, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    nlohmann::json jsonObject;
+    jsonObject[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
+    jsonObject[TAG_PAYLOAD] = DmPinType::SUPER_SONIC;
+    std::string message = jsonObject.dump();
+    dmPinHolder->ProcessDestroyMsg(message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, CloseSession_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    std::string name;
+    dmPinHolder->session_ = nullptr;
+    dmPinHolder->CloseSession(name);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnDataReceived_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
+    std::string message = jsonObject.dump();
+    dmPinHolder->OnDataReceived(sessionId, message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnDataReceived_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER_RESP;
+    std::string message = jsonObject.dump();
+    dmPinHolder->OnDataReceived(sessionId, message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnDataReceived_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
+    std::string message = jsonObject.dump();
+    dmPinHolder->OnDataReceived(sessionId, message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnDataReceived_104, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
+    std::string message = jsonObject.dump();
+    dmPinHolder->OnDataReceived(sessionId, message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnDataReceived_105, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    int32_t data = 300;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = data;
+    std::string message = jsonObject.dump();
+    dmPinHolder->OnDataReceived(sessionId, message);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, GetPeerDeviceId_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    std::string udidHash;
+    dmPinHolder->GetPeerDeviceId(sessionId, udidHash);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnSessionOpened_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    int32_t sessionSide = 0;
+    int32_t result = 0;
+    dmPinHolder->OnSessionOpened(sessionId, sessionSide, result);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+HWTEST_F(DmPinHolderTest, OnSessionOpened_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    int32_t sessionId = 1;
+    int32_t sessionSide = 1;
+    int32_t result = 1;
+    dmPinHolder ->listener_ = nullptr;
+    dmPinHolder->OnSessionOpened(sessionId, sessionSide, result);
+    ASSERT_NE(dmPinHolder->timer_, nullptr);
+}
+
+
+HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    PeerTargetId targetId = {
+        .deviceId = "",
+        .brMac = "",
+        .bleMac = "",
+        .wifiIp = "",
+    };
+    int32_t ret = dmPinHolder->CheckTargetIdVaild(targetId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<DmPinHolder> dmPinHolder = std::make_shared<DmPinHolder>(listener);
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    int32_t ret = dmPinHolder->CheckTargetIdVaild(targetId);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
