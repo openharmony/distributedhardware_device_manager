@@ -43,60 +43,48 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
 std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
-    LOGI("GetAppTrustDeviceList Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("DeviceProfileConnector::GetAppTrustDeviceList, AccessControlProfile size is %d.", profiles.size());
     std::map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {
             continue;
         }
-        InsertDeviceIdMap(item, pkgName, deviceId, deviceIdMap, trustDeviceId);
+        DmDiscoveryInfo discoveryInfo = {pkgName, deviceId};
+        int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
+        if (bindType == DmAuthForm::INVALID_TYPE) {
+            continue;
+        }
+        if (deviceIdMap.find(trustDeviceId) == deviceIdMap.end()) {
+            deviceIdMap[trustDeviceId] = static_cast<DmAuthForm>(bindType);
+            continue;
+        }
+        DmAuthForm authForm = deviceIdMap.at(trustDeviceId);
+        if (bindType == authForm) {
+            continue;
+        }
+        if (bindType == DmAuthForm::IDENTICAL_ACCOUNT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
+            continue;
+        }
+        if (bindType == DmAuthForm::PEER_TO_PEER && authForm == DmAuthForm::ACROSS_ACCOUNT) {
+            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+            continue;
+        }
     }
     LOGI("GetAppTrustDeviceList size is %d.", deviceIdMap.size());
     return deviceIdMap;
 }
 
-void DeviceProfileConnector::InsertDeviceIdMap(AccessControlProfile profiles, const std::string &pkgName,
-    const std::string &deviceId, std::map<std::string, DmAuthForm> &deviceIdMap, std::string trustDeviceId)
-{
-    if (profiles.GetBindType() == IDENTICAL_ACCOUNT) {
-        deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
-    }
-    if (profiles.GetBindLevel() == DEVICE) {
-        if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
-        }
-        if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
-        }
-    }
-    if (profiles.GetBindLevel() == APP) {
-        if (profiles.GetAccesser().GetAccesserBundleName() == pkgName &&
-            profiles.GetAccesser().GetAccesserDeviceId() == deviceId) {
-            if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-                deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
-            }
-            if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-                deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
-            }
-        }
-        if (profiles.GetAccessee().GetAccesseeBundleName() == pkgName &&
-            profiles.GetAccessee().GetAccesseeDeviceId() == deviceId) {
-            if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-                deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
-            }
-            if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-                deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
-            }
-        }
-    }
-}
-
-int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isonline, int32_t &authForm)
+int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("DeviceProfileConnector::GetDeviceAclParam, AccessControlProfile size is %d.", profiles.size());
+    if (profiles.size() == 0) {
+        return DM_OK;
+    }
+    std::vector<int32_t> bindTypes;
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
@@ -107,60 +95,77 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
         if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
             continue;
         }
-        HandleDmAuthForm(item, discoveryInfo, isonline, authForm);
+        int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
+        if (bindType == DmAuthForm::INVALID_TYPE) {
+            continue;
+        }
+        bindTypes.push_back(bindType);
     }
+    if (std::count(bindTypes.begin(), bindTypes.end(), DmAuthForm::IDENTICAL_ACCOUNT) > 0) {
+        isOnline = true;
+        authForm = DmAuthForm::IDENTICAL_ACCOUNT;
+        LOGI("GetDeviceAclParam, The found device is identical account device bind type.");
+        return DM_OK;
+    }
+    if (std::count(bindTypes.begin(), bindTypes.end(), DmAuthForm::PEER_TO_PEER) > 0) {
+        isOnline = true;
+        authForm = DmAuthForm::PEER_TO_PEER;
+        LOGI("GetDeviceAclParam, The found device is peer-to-peer device bind-level.");
+        return DM_OK;
+    }
+    if (std::count(bindTypes.begin(), bindTypes.end(), DmAuthForm::ACROSS_ACCOUNT) > 0) {
+        isOnline = true;
+        authForm = DmAuthForm::ACROSS_ACCOUNT;
+        LOGI("GetDeviceAclParam, The found device is across-account device bind-level.");
+        return DM_OK;
+    }
+    authForm = DmAuthForm::INVALID_TYPE;
     return DM_OK;
 }
 
-void DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo,
-    bool &isonline, int32_t &authForm)
+int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo)
 {
     if (profiles.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-        isonline = true;
-        authForm = DmAuthForm::IDENTICAL_ACCOUNT;
+        LOGI("The found device is identical account device bind type.");
+        return DmAuthForm::IDENTICAL_ACCOUNT;
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
         if (profiles.GetBindLevel() == DEVICE) {
             LOGI("The found device is peer-to-peer device bind-level.");
-            isonline = true;
-            authForm = DmAuthForm::PEER_TO_PEER;
+            return DmAuthForm::PEER_TO_PEER;
         }
         if (profiles.GetBindLevel() == APP) {
             if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
                 discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
                 LOGI("The found device is peer-to-peer app bind-level.");
-                isonline = true;
-                authForm = DmAuthForm::PEER_TO_PEER;
+                return DmAuthForm::PEER_TO_PEER;
             }
             if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
                 discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
                 LOGI("The found device is peer-to-peer app bind-level.");
-                isonline = true;
-                authForm = DmAuthForm::PEER_TO_PEER;
+                return DmAuthForm::PEER_TO_PEER;
             }
         }
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
         if (profiles.GetBindLevel() == DEVICE) {
-            LOGI("The found device is acrooc-account device bind-level.");
-            isonline = true;
-            authForm = DmAuthForm::ACROSS_ACCOUNT;
+            LOGI("The found device is across-account device bind-level.");
+            return DmAuthForm::ACROSS_ACCOUNT;
         }
         if (profiles.GetBindLevel() == APP) {
             if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
                 discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
-                LOGI("The found device is acrooc-account app bind-level.");
-                isonline = true;
-                authForm = DmAuthForm::ACROSS_ACCOUNT;
+                LOGI("The found device is across-account app bind-level.");
+                return DmAuthForm::ACROSS_ACCOUNT;
             }
             if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
                 discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
-                LOGI("The found device is acrooc-account app bind-level.");
-                isonline = true;
-                authForm = DmAuthForm::ACROSS_ACCOUNT;
+                LOGI("The found device is across-account app bind-level.");
+                return DmAuthForm::ACROSS_ACCOUNT;
             }
         }
     }
+    return DmAuthForm::INVALID_TYPE;
 }
 
 uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::string requestDeviceId)
