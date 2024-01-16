@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -37,6 +37,7 @@ group("unittest") {
     ":UTTest_dm_dfx",
     ":UTTest_dm_discovery_filter",
     ":UTTest_dm_discovery_manager",
+    ":UTTest_dm_distributed_hardware_load",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
     ":UTTest_dm_publish_manager",
@@ -824,6 +825,26 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
 ## UnitTest UTTest_dm_discovery_manager }}}
 
+## UnitTest UTTest_dm_distributed_hardware_load {{{
+ohos_unittest("UTTest_dm_distributed_hardware_load") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_distributed_hardware_load.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_dm_distributed_hardware_load }}}
+
 ## UnitTest UTTest_dm_publish_manager {{{
 ohos_unittest("UTTest_dm_publish_manager") {
   module_out_path = module_out_path
@@ -870,6 +891,8 @@ config("device_manager_test_common_public_config") {
     "${innerkits_path}/native_cpp/include/notify",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
+    "${utils_path}/include/crypto",
+    "${utils_path}/include/fwkload/standard",
     "${utils_path}/include/timer",
     "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/credential",

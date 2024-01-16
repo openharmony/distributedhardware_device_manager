@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -325,6 +325,324 @@ HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_003, testing::ext::TestSize.Level
     bool isOnline = true;
     discoveryMgr_->OnDeviceFound(pkgName, info, range, isOnline);
     EXPECT_EQ(discoveryMgr_->discoveryContextMap_.empty(), false);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, EnableDiscoveryListener_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, EnableDiscoveryListener_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    discoverParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
+    discoverParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, EnableDiscoveryListener_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    std::map<std::string, std::string> extraParam;
+    int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, DisableDiscoveryListener_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> extraParam;
+    extraParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
+    extraParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
+    int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
+    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, DisableDiscoveryListener_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> extraParam;
+    int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
+    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscovering_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscovering_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    discoverParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
+    discoverParam.insert(std::pair<std::string, std::string>("DISC_MEDIUM", "ohos.test"));
+    discoverParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
+    discoverParam.insert(std::pair<std::string, std::string>("FILTER_OPTIONS", "ohos.test"));
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscovering_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = manager->StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscovering4MineMetaNode_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    DmSubscribeInfo dmSubInfo;
+    std::string searchJson;
+    int32_t ret = manager->StartDiscovering4MineMetaNode(pkgName, dmSubInfo, searchJson);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscoveringNoMetaType_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    DmSubscribeInfo dmSubInfo;
+    std::map<std::string, std::string> param;
+    param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_SHARE)));
+    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscoveringNoMetaType_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    DmSubscribeInfo dmSubInfo;
+    std::map<std::string, std::string> param;
+    param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_WEAR)));
+    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscoveringNoMetaType_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    DmSubscribeInfo dmSubInfo;
+    std::map<std::string, std::string> param;
+    param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_CASTPLUS)));
+    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscoveringNoMetaType_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    DmSubscribeInfo dmSubInfo;
+    std::map<std::string, std::string> param;
+    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StopDiscovering_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    int32_t ret = manager->StopDiscovering(pkgName, subscribeId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, OnDeviceFound_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    DmDeviceInfo info;
+    bool isOnline = true;
+    manager->OnDeviceFound(pkgName, info, isOnline);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, OnDiscoveringResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    int32_t subscribeId = 1;
+    int32_t result = 0;
+    manager->OnDiscoveringResult(pkgName, subscribeId, result);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, OnDiscoveringResult_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    int32_t subscribeId = 1;
+    int32_t result = 0;
+    manager->listener_ = nullptr;
+    manager->OnDiscoveringResult(pkgName, subscribeId, result);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, OnDiscoveringResult_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    int32_t subscribeId = 1;
+    int32_t result = 0;
+    manager->OnDiscoveringResult(pkgName, subscribeId, result);
+    EXPECT_NE(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    int32_t subscribeId = 1;
+    int32_t result = 1;
+    manager->OnDiscoveringResult(pkgName, subscribeId, result);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, StartDiscoveryTimer_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    manager->timer_ = nullptr;
+    manager->StartDiscoveryTimer();
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryQueue_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName = "pkgName";
+    uint16_t subscribeId = 0;
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>("FILTER_OPTIONS", pkgName));
+    int32_t ret = manager->HandleDiscoveryQueue(pkgName, subscribeId, filterOps);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string name = "name";
+    manager->HandleDiscoveryTimeout(name);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string pkgName;
+    std::string deviceId;
+    bool isonline = true;
+    int32_t authForm = 0;
+    int32_t ret = manager->GetDeviceAclParam(pkgName, deviceId, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, GetCommonDependencyObj_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    auto ret = manager->GetCommonDependencyObj();
+    EXPECT_EQ(ret, nullptr);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, IsCommonDependencyReady_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    manager->isSoLoaded_ = false;
+    bool ret = manager->IsCommonDependencyReady();
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DmDiscoveryManagerTest, CloseCommonDependencyObj_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    bool ret = manager->CloseCommonDependencyObj();
+    EXPECT_EQ(ret, true);
 }
 } // namespace
 } // namespace DistributedHardware

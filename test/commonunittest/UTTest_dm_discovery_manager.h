@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 
 #include "softbus_connector.h"
 #include "device_manager_service_listener.h"
+#include "discovery_manager.h"
 #include "dm_discovery_manager.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
