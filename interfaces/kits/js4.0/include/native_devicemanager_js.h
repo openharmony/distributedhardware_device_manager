@@ -279,19 +279,6 @@ public:
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
     static void ReleaseDmCallback(std::string &bundleName, std::string &eventType);
-    static bool DmAuthParamDetection(const OHOS::DistributedHardware::DmAuthParam &authParam);
-    static void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr, char *dest,
-                                 const int32_t destLen);
-    static void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                               bool &fieldRef);
-    static void JsObjectToInt(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                              int32_t &fieldRef);
-    static std::string JsObjectToString(const napi_env &env, const napi_value &param);
-    static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
-                                  OHOS::DistributedHardware::DmPublishInfo &info);
-    static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
-    static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                               nlohmann::json &jsonObj);
     void OnDeviceStatusChange(DmNapiDevStatusChange action,
                              const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);
     void OnDeviceFound(uint16_t subscribeId, const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo);

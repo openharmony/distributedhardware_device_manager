@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,30 +47,16 @@ enum DMBussinessErrorCode {
     // Publish invalid.
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
-
 void DeviceBasicInfoToJsArray(const napi_env &env,
                                     const std::vector<DmDeviceBasicInfo> &vecDevInfo,
                                     const int32_t idx, napi_value &arrayResult);
-void DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
-                                         napi_value &paramResult);
 void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
                               napi_value &result);
 void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
                                    napi_value &result);
-void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr, char *dest,
-                                 const int32_t destLen);
-void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                               bool &fieldRef);
-void JsObjectToInt(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                              int32_t &fieldRef);
-std::string JsObjectToString(const napi_env &env, const napi_value &param);
-void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
-                                  DmPublishInfo &info);
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
         bool &isMetaType);
-void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
-void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                               nlohmann::json &jsonObj);
+void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info);
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
 bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
@@ -81,6 +67,8 @@ bool IsSystemApp();
 std::string GetDeviceTypeById(DmDeviceType type);
 bool IsFunctionType(napi_env env, napi_value value);
 void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
+void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
+bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_NATIVE_UTIL_H

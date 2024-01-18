@@ -544,11 +544,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
-    SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
-    SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
-    SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
-    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
+    SetDmDeviceBasicObject(env_, deviceBasicInfo, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
@@ -565,11 +561,7 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
-    SetValueUtf8String(env_, "deviceId", deviceBasicInfo.deviceId, device);
-    SetValueUtf8String(env_, "networkId", deviceBasicInfo.networkId, device);
-    SetValueUtf8String(env_, "deviceName", deviceBasicInfo.deviceName, device);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(deviceBasicInfo.deviceTypeId));
-    SetValueUtf8String(env_, "deviceType", deviceType.c_str(), device);
+    SetDmDeviceBasicObject(env_, deviceBasicInfo, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("discoverSuccess", DM_NAPI_ARGS_ONE, &result);
@@ -798,22 +790,13 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     if (!CheckArgsType(env, valueType == napi_number, "action", "number")) {
         return nullptr;
     }
-
-    napi_valuetype strType;
-    napi_typeof(env, argv[1], &strType);
-    NAPI_ASSERT(env, strType == napi_string, "Wrong argument type, string expected.");
-
     int32_t action = 0;
     napi_get_value_int32(env, argv[0], &action);
 
-    size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[1], nullptr, 0, &typeLen);
-    NAPI_ASSERT(env, typeLen > 0, "typeLen == 0");
-    NAPI_ASSERT(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char type[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[1], type, typeLen + 1, &typeLen);
-
-    std::string params = type;
+    std::string params;
+    if (!JsToStringAndCheck(env, argv[1], "actionResult", params)) {
+        return nullptr;
+    }
     napi_value result = nullptr;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -1255,17 +1238,10 @@ napi_value DeviceManagerNapi::GetDeviceName(napi_env env, napi_callback_info inf
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-    napi_valuetype networkIdType = napi_undefined;
-    napi_typeof(env, argv[0], &networkIdType);
-    if (!CheckArgsType(env, networkIdType == napi_string, "networkId", "string")) {
+    std::string networkId;
+    if (!JsToStringAndCheck(env, argv[0], "networkId", networkId)) {
         return nullptr;
     }
-
-    size_t networkIdLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &networkIdLen);
-    NAPI_ASSERT(env, networkIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char networkId[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], networkId, networkIdLen + 1, &networkIdLen);
 
     int32_t ret = DeviceManager::GetInstance().GetDeviceName(deviceManagerWrapper->bundleName_, networkId, deviceName);
     if (ret != 0) {
@@ -1292,18 +1268,10 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-
-    napi_valuetype networkIdType = napi_undefined;
-    napi_typeof(env, argv[0], &networkIdType);
-    if (!CheckArgsType(env, networkIdType == napi_string, "networkId", "string")) {
+    std::string networkId;
+    if (!JsToStringAndCheck(env, argv[0], "networkId", networkId)) {
         return nullptr;
     }
-
-    size_t networkIdLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &networkIdLen);
-    NAPI_ASSERT(env, networkIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char networkId[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], networkId, networkIdLen + 1, &networkIdLen);
 
     int32_t ret = DeviceManager::GetInstance().GetDeviceType(deviceManagerWrapper->bundleName_, networkId, deviceType);
     if (ret != 0) {
@@ -1530,23 +1498,15 @@ napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE,  "Wrong number of arguments, required 3")) {
         return nullptr;
     }
-    napi_value result = nullptr;
-    napi_valuetype deviceIdType = napi_undefined;
-    napi_typeof(env, argv[DM_NAPI_ARGS_ZERO], &deviceIdType);
-    if (!CheckArgsType(env, deviceIdType == napi_string, "deviceId", "string")) {
-        return nullptr;
-    }
-
     napi_valuetype bindPramType = napi_undefined;
     napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &bindPramType);
     if (!CheckArgsType(env, bindPramType == napi_object, "bindParam", "object")) {
         return nullptr;
     }
-
     if (!IsFunctionType(env, argv[DM_NAPI_ARGS_TWO])) {
         return nullptr;
     }
-
+    napi_value result = nullptr;
     authAsyncCallbackInfo_.env = env;
     napi_create_reference(env, argv[DM_NAPI_ARGS_TWO], 1, &authAsyncCallbackInfo_.callback);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
@@ -1554,12 +1514,10 @@ napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-
-    size_t deviceIdLen = 0;
-    napi_get_value_string_utf8(env, argv[DM_NAPI_ARGS_ZERO], nullptr, 0, &deviceIdLen);
-    NAPI_ASSERT(env, deviceIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char deviceId[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[DM_NAPI_ARGS_ZERO], deviceId, deviceIdLen + 1, &deviceIdLen);
+    std::string deviceId;
+    if (!JsToStringAndCheck(env, argv[DM_NAPI_ARGS_ZERO], "deviceId", deviceId)) {
+        return nullptr;
+    }
 
     napi_value object = argv[DM_NAPI_ARGS_ONE];
     BindDevOrTarget(deviceManagerWrapper, deviceId, env, object);
@@ -1575,17 +1533,10 @@ napi_value DeviceManagerNapi::UnBindTarget(napi_env env, napi_callback_info info
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
-    napi_valuetype deviceIdType = napi_undefined;
-    napi_typeof(env, argv[0], &deviceIdType);
-    if (!CheckArgsType(env, deviceIdType == napi_string, "deviceId", "string")) {
+    std::string deviceId;
+    if (!JsToStringAndCheck(env, argv[0], "deviceId", deviceId)) {
         return nullptr;
     }
-
-    size_t deviceIdLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &deviceIdLen);
-    NAPI_ASSERT(env, deviceIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char deviceId[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], deviceId, deviceIdLen + 1, &deviceIdLen);
 
     LOGI("UnBindDevice deviceId = %s", GetAnonyString(deviceId).c_str());
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
@@ -1606,19 +1557,11 @@ napi_value DeviceManagerNapi::UnBindTarget(napi_env env, napi_callback_info info
 
 napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[])
 {
-    size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
-
-    if (!CheckArgsVal(env, typeLen > 0, "type", "typeLen == 0")) {
+    std::string eventType;
+    if (!JsToStringAndCheck(env, argv[0], "type", eventType)) {
         return nullptr;
     }
-    if (!CheckArgsVal(env, typeLen < DM_NAPI_BUF_LENGTH, "type", "typeLen >= MAXLEN")) {
-        return nullptr;
-    }
-    char type[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
 
-    std::string eventType = type;
     napi_value result = nullptr;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -1631,14 +1574,10 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
 
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         if (num == 1) {
-            size_t extraLen = 0;
-            napi_get_value_string_utf8(env, argv[1], nullptr, 0, &extraLen);
-            if (!CheckArgsVal(env, extraLen < DM_NAPI_BUF_LENGTH, "extra", "extraLen >= MAXLEN")) {
+            std::string extraString;
+            if (!JsToStringAndCheck(env, argv[1], "extra", extraString)) {
                 return nullptr;
             }
-            char extra[DM_NAPI_BUF_LENGTH] = {0};
-            napi_get_value_string_utf8(env, argv[1], extra, extraLen + 1, &extraLen);
-            std::string extraString = extra;
             LOGI("extra = %s", extraString.c_str());
             CreateDmCallback(env, deviceManagerWrapper->bundleName_, eventType, extraString);
         } else {
@@ -1707,19 +1646,11 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
         CreateBusinessError(env, ret);
         return nullptr;
     }
-    size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
-    if (!CheckArgsVal(env, typeLen > 0, "type", "typeLen == 0")) {
+    std::string eventType;
+    if (!JsToStringAndCheck(env, argv[0], "type", eventType)) {
         return nullptr;
     }
-    if (!CheckArgsVal(env, typeLen < DM_NAPI_BUF_LENGTH, "type", "typeLen >= MAXLEN")) {
-        return nullptr;
-    }
-    char type[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], type, typeLen + 1, &typeLen);
-
     napi_value result = nullptr;
-    std::string eventType = type;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1835,22 +1766,14 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
-    napi_valuetype bundleNameValueType = napi_undefined;
-    napi_typeof(env, argv[0], &bundleNameValueType);
-    if (!CheckArgsType(env, bundleNameValueType == napi_string, "bundleName", "string")) {
+    std::string bundleName;
+    if (!JsToStringAndCheck(env, argv[0], "bundleName", bundleName)) {
         return nullptr;
     }
-    size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &typeLen);
-    NAPI_ASSERT(env, typeLen > 0, "typeLen == 0");
-    NAPI_ASSERT(env, typeLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char name[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], name, typeLen + 1, &typeLen);
-    std::string bundleName = name;
     std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
     if (ret != 0) {
-        LOGE("CreateDeviceManager for bundleName %s failed, ret %d.", name, ret);
+        LOGE("CreateDeviceManager for bundleName %s failed, ret %d.", bundleName.c_str(), ret);
         CreateBusinessError(env, ret);
         return nullptr;
     }
@@ -1862,10 +1785,10 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
     napi_value napiName = nullptr;
     napi_value result = nullptr;
     napi_get_reference_value(env, sConstructor_, &ctor);
-    napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &napiName);
+    napi_create_string_utf8(env, bundleName.c_str(), NAPI_AUTO_LENGTH, &napiName);
     napi_status status = napi_new_instance(env, ctor, DM_NAPI_ARGS_ONE, &napiName, &result);
     if (status != napi_ok) {
-        LOGE("Create DeviceManagerNapi for bundleName %s failed", name);
+        LOGE("Create DeviceManagerNapi for bundleName %s failed", bundleName.c_str());
     }
     return result;
 }
@@ -1877,24 +1800,18 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_string, "bundleName", "string")) {
+    std::string bundleName;
+    if (!JsToStringAndCheck(env, argv[0], "bundleName", bundleName)) {
         return nullptr;
     }
 
-    char bundleName[DM_NAPI_BUF_LENGTH] = {0};
-    size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[0], bundleName, sizeof(bundleName), &typeLen);
-
-    LOGI("create DeviceManagerNapi for packageName:%s", bundleName);
+    LOGI("create DeviceManagerNapi for packageName:%s", bundleName.c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
     }
 
-    obj->bundleName_ = std::string(bundleName);
+    obj->bundleName_ = bundleName;
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     g_deviceManagerMap[obj->bundleName_] = obj;
     napi_wrap(

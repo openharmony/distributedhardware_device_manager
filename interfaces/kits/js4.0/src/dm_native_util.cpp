@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,123 +38,8 @@ const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
-const int32_t DM_AUTH_DIRECTION_CLIENT = 1;
 const int32_t DM_NAPI_DESCRIPTION_BUF_LENGTH = 16384;
 const int32_t DM_NAPI_BUF_LENGTH = 256;
-
-bool DmAuthParamDetection(const DmAuthParam &authParam)
-{
-    LOGI("DmAuthParamDetection");
-    const uint32_t maxIntValueLen = 10;
-    const std::string maxAuthToken = "2147483647";
-    if (authParam.authToken.length() > maxIntValueLen) {
-        LOGE("The authToken is illegal");
-        return false;
-    } else {
-        if (!IsNumberString(authParam.authToken)) {
-            LOGE("The authToken is Error");
-            return false;
-        } else {
-            if (authParam.authToken > maxAuthToken) {
-                LOGE("The authToken is Cross the border");
-                return false;
-            }
-        }
-    }
-    return true;
-}
-}
-
-void DeviceBasicInfoToJsArray(const napi_env &env,
-    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
-        napi_value &arrayResult)
-{
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-
-    SetValueUtf8String(env, "deviceId", vecDevInfo[idx].deviceId, result);
-    SetValueUtf8String(env, "networkId", vecDevInfo[idx].networkId, result);
-    SetValueUtf8String(env, "deviceName", vecDevInfo[idx].deviceName, result);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo[idx].deviceTypeId));
-    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
-
-    napi_status status = napi_set_element(env, arrayResult, idx, result);
-    if (status != napi_ok) {
-        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
-    }
-}
-
-void DmAuthParamToJsAuthParam(const napi_env &env, const DmAuthParam &authParam,
-                                                 napi_value &paramResult)
-{
-    LOGI("DmAuthParamToJsAuthParam");
-    if (!DmAuthParamDetection(authParam)) {
-        LOGE("The authToken is Error");
-        return;
-    }
-    napi_value extraInfo = nullptr;
-    napi_create_object(env, &extraInfo);
-    SetValueInt32(env, "direction", authParam.direction, extraInfo);
-    SetValueInt32(env, "authType", authParam.authType, paramResult);
-    SetValueInt32(env, "pinToken", stoi(authParam.authToken), extraInfo);
-
-    if (authParam.direction == DM_AUTH_DIRECTION_CLIENT) {
-        napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
-        return;
-    }
-
-    SetValueUtf8String(env, "packageName", authParam.packageName, extraInfo);
-    SetValueUtf8String(env, "appName", authParam.appName, extraInfo);
-    SetValueUtf8String(env, "appDescription", authParam.appDescription, extraInfo);
-    SetValueInt32(env, "business", authParam.business, extraInfo);
-    SetValueInt32(env, "pinCode", authParam.pincode, extraInfo);
-    napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
-
-    size_t appIconLen = static_cast<size_t>(authParam.imageinfo.GetAppIconLen());
-    if (appIconLen > 0) {
-        void *appIcon = nullptr;
-        napi_value appIconBuffer = nullptr;
-        napi_create_arraybuffer(env, appIconLen, &appIcon, &appIconBuffer);
-        if (appIcon != nullptr &&
-            memcpy_s(appIcon, appIconLen, reinterpret_cast<const void *>(authParam.imageinfo.GetAppIcon()),
-                     appIconLen) == 0) {
-            napi_value appIconArray = nullptr;
-            napi_create_typedarray(env, napi_uint8_array, appIconLen, appIconBuffer, 0, &appIconArray);
-            napi_set_named_property(env, paramResult, "appIcon", appIconArray);
-        }
-    }
-
-    size_t appThumbnailLen = static_cast<size_t>(authParam.imageinfo.GetAppThumbnailLen());
-    if (appThumbnailLen > 0) {
-        void *appThumbnail = nullptr;
-        napi_value appThumbnailBuffer = nullptr;
-        napi_create_arraybuffer(env, appThumbnailLen, &appThumbnail, &appThumbnailBuffer);
-        if (appThumbnail != nullptr &&
-            memcpy_s(appThumbnail, appThumbnailLen,
-                     reinterpret_cast<const void *>(authParam.imageinfo.GetAppThumbnail()), appThumbnailLen) == 0) {
-            napi_value appThumbnailArray = nullptr;
-            napi_create_typedarray(env, napi_uint8_array, appThumbnailLen, appThumbnailBuffer, 0, &appThumbnailArray);
-            napi_set_named_property(env, paramResult, "appThumbnail", appThumbnailArray);
-        }
-    }
-    return;
-}
-
-void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
-                   napi_value &result)
-{
-    napi_value value = nullptr;
-    napi_create_int32(env, intValue, &value);
-    napi_set_named_property(env, result, fieldStr.c_str(), value);
-}
-
-void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                                           napi_value &result)
-{
-    napi_value value = nullptr;
-    napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
-    napi_set_named_property(env, result, fieldStr.c_str(), value);
-}
 
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                                          char *dest, const int32_t destLen)
@@ -175,40 +60,6 @@ void JsObjectToString(const napi_env &env, const napi_value &object, const std::
     } else {
         LOGE("devicemanager napi js to str no property: %s", fieldStr.c_str());
     }
-}
-
-std::string JsObjectToString(const napi_env &env, const napi_value &param)
-{
-    LOGI("JsObjectToString in.");
-    size_t size = 0;
-    if (napi_get_value_string_utf8(env, param, nullptr, 0, &size) != napi_ok) {
-        return "";
-    }
-    if (size == 0) {
-        return "";
-    }
-    char *buf = new (std::nothrow) char[size + 1];
-    if (buf == nullptr) {
-        return "";
-    }
-    int32_t ret = memset_s(buf, (size + 1), 0, (size + 1));
-    if (ret != 0) {
-        LOGE("devicemanager memset_s error.");
-        delete[] buf;
-        buf = nullptr;
-        return "";
-    }
-    bool rev = napi_get_value_string_utf8(env, param, buf, size + 1, &size) == napi_ok;
-
-    std::string value;
-    if (rev) {
-        value = buf;
-    } else {
-        value = "";
-    }
-    delete[] buf;
-    buf = nullptr;
-    return value;
 }
 
 void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
@@ -249,6 +100,46 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
     } else {
         LOGE("devicemanager napi js to int no property: %s", fieldStr.c_str());
     }
+}
+}
+
+void DeviceBasicInfoToJsArray(const napi_env &env,
+    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
+        napi_value &arrayResult)
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+    SetDmDeviceBasicObject(env, vecDevInfo[idx], result);
+
+    napi_status status = napi_set_element(env, arrayResult, idx, result);
+    if (status != napi_ok) {
+        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
+    }
+}
+
+void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result)
+{
+    SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
+    SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo.deviceTypeId));
+    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
+}
+
+void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
+                   napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_int32(env, intValue, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
+}
+
+void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
+                                           napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
 }
 
 void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info)
@@ -318,75 +209,6 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     jsonObj[BIND_LEVEL] = bindLevel;
     jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     bindParam = jsonObj.dump();
-}
-
-void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra)
-{
-    LOGI("%s called.", __func__);
-    int32_t authType = -1;
-    int32_t token = -1;
-
-    JsObjectToInt(env, object, "authType", authType);
-    JsObjectToInt(env, object, "token", token);
-    nlohmann::json jsonObj;
-    jsonObj[AUTH_TYPE] = authType;
-    jsonObj[PIN_TOKEN] = token;
-    JsToJsonObject(env, object, "extraInfo", jsonObj);
-    extra = jsonObj.dump();
-}
-
-void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                       nlohmann::json &jsonObj)
-{
-    bool hasProperty = false;
-    NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
-    if (!hasProperty) {
-        LOGE("devicemanager napi js to str no property: %s", fieldStr.c_str());
-        return;
-    }
-
-    napi_value jsonField = nullptr;
-    napi_get_named_property(env, object, fieldStr.c_str(), &jsonField);
-    napi_valuetype jsValueType = napi_undefined;
-    napi_value jsProNameList = nullptr;
-    uint32_t jsProCount = 0;
-    napi_get_property_names(env, jsonField, &jsProNameList);
-    napi_get_array_length(env, jsProNameList, &jsProCount);
-
-    napi_value jsProName = nullptr;
-    napi_value jsProValue = nullptr;
-    for (uint32_t index = 0; index < jsProCount; index++) {
-        napi_get_element(env, jsProNameList, index, &jsProName);
-        std::string strProName = JsObjectToString(env, jsProName);
-        napi_get_named_property(env, jsonField, strProName.c_str(), &jsProValue);
-        napi_typeof(env, jsProValue, &jsValueType);
-        int32_t numberValue = 0;
-        bool boolValue = false;
-        std::string stringValue = "";
-        switch (jsValueType) {
-            case napi_string:
-                stringValue = JsObjectToString(env, jsProValue);
-                LOGI("Property name = %s, string, value = %s", strProName.c_str(), stringValue.c_str());
-                jsonObj[strProName] = stringValue;
-                break;
-            case napi_boolean:
-                napi_get_value_bool(env, jsProValue, &boolValue);
-                LOGI("Property name = %s, boolean, value = %d.", strProName.c_str(), boolValue);
-                jsonObj[strProName] = boolValue;
-                break;
-            case napi_number:
-                if (napi_get_value_int32(env, jsProValue, &numberValue) != napi_ok) {
-                    LOGE("Property name = %s, Property int32_t parse error", strProName.c_str());
-                } else {
-                    jsonObj[strProName] = numberValue;
-                    LOGI("Property name = %s, number, value = %d.", strProName.c_str(), numberValue);
-                }
-                break;
-            default:
-                LOGE("Property name = %s, value type not support.", strProName.c_str());
-                break;
-        }
-    }
 }
 
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
@@ -606,6 +428,27 @@ void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::s
         std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
     }
+}
+
+bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue)
+{
+    napi_valuetype deviceIdType = napi_undefined;
+    napi_typeof(env, value, &deviceIdType);
+    if (!CheckArgsType(env, deviceIdType == napi_string, valueName, "string")) {
+        return false;
+    }
+    size_t valueLen = 0;
+    napi_get_value_string_utf8(env, value, nullptr, 0, &valueLen);
+    if (!CheckArgsVal(env, valueLen > 0, valueName, "len == 0")) {
+        return false;
+    }
+    if (!CheckArgsVal(env, valueLen < DM_NAPI_BUF_LENGTH, valueName, "len >= MAXLEN")) {
+        return false;
+    }
+    char temp[DM_NAPI_BUF_LENGTH] = {0};
+    napi_get_value_string_utf8(env, value, temp, valueLen + 1, &valueLen);
+    strValue = temp;
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
