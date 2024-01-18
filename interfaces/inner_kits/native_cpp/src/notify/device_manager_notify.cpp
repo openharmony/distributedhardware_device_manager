@@ -887,5 +887,12 @@ void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t re
     }
     tempCbk->OnDestroyResult(result);
 }
+
+std::map<std::string, std::shared_ptr<DmInitCallback>> DeviceManagerNotify::GetDmInitCallback()
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    std::map<std::string, std::shared_ptr<DmInitCallback>> currentDmInitCallback = dmInitCallback_;
+    return currentDmInitCallback;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

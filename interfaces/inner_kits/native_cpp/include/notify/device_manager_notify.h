@@ -86,6 +86,7 @@ public:
     void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload);
     void OnCreateResult(const std::string &pkgName, int32_t result);
     void OnDestroyResult(const std::string &pkgName, int32_t result);
+    std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
 
 private:
 #if !defined(__LITEOS_M__)
