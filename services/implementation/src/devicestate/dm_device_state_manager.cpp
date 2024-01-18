@@ -143,6 +143,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             RegisterOffLineTimer(devInfo);
             SaveOnlineDeviceInfo(devInfo);
             devInfo.authForm = GetAuthForm(devInfo.networkId);
+            DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             break;
         case DEVICE_STATE_OFFLINE:
             StartOffLineTimer(devInfo);
@@ -194,7 +195,6 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         }
         saveInfo = iter->second;
     }
-    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
         listener_->OnDeviceStateChange(pkgName, state, saveInfo);
