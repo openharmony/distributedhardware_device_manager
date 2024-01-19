@@ -42,7 +42,7 @@ const int32_t DM_NAPI_DESCRIPTION_BUF_LENGTH = 16384;
 const int32_t DM_NAPI_BUF_LENGTH = 256;
 
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                         char *dest, const int32_t destLen)
+                      char *dest, const int32_t destLen)
 {
     bool hasProperty = false;
     NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
@@ -63,7 +63,7 @@ void JsObjectToString(const napi_env &env, const napi_value &object, const std::
 }
 
 void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                       bool &fieldRef)
+                    bool &fieldRef)
 {
     bool hasProperty = false;
     NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
@@ -83,7 +83,7 @@ void JsObjectToBool(const napi_env &env, const napi_value &object, const std::st
 }
 
 void JsObjectToInt(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                      int32_t &fieldRef)
+                   int32_t &fieldRef)
 {
     bool hasProperty = false;
     NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
@@ -104,8 +104,8 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
 }
 
 void DeviceBasicInfoToJsArray(const napi_env &env,
-    const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
-        napi_value &arrayResult)
+                              const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
+                              napi_value &arrayResult)
 {
     napi_value result = nullptr;
     napi_create_object(env, &result);
@@ -135,7 +135,7 @@ void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32
 }
 
 void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                                           napi_value &result)
+                        napi_value &result)
 {
     napi_value value = nullptr;
     napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
@@ -161,7 +161,7 @@ void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishI
 }
 
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
-    int32_t &bindType, bool &isMetaType)
+                   int32_t &bindType, bool &isMetaType)
 {
     int32_t bindTypeTemp = -1;
     JsObjectToInt(env, object, "bindType", bindTypeTemp);

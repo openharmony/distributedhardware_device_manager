@@ -48,14 +48,14 @@ enum DMBussinessErrorCode {
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
 void DeviceBasicInfoToJsArray(const napi_env &env,
-                                    const std::vector<DmDeviceBasicInfo> &vecDevInfo,
-                                    const int32_t idx, napi_value &arrayResult);
+                              const std::vector<DmDeviceBasicInfo> &vecDevInfo,
+                              const int32_t idx, napi_value &arrayResult);
 void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
-                              napi_value &result);
+                   napi_value &result);
 void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                                   napi_value &result);
+                        napi_value &result);
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
-        bool &isMetaType);
+                   bool &isMetaType);
 void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info);
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
 bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);

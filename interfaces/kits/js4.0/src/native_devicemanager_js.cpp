@@ -939,9 +939,11 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
     if (deviceBasicInfoListAsyncCallbackInfo->eventHandleType == napi_function) {
         napi_value callResult = nullptr;
         napi_value handler = nullptr;
-        NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceBasicInfoListAsyncCallbackInfo->callback, &handler));
+        NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceBasicInfoListAsyncCallbackInfo->callback,
+            &handler));
         if (handler != nullptr) {
-            NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0], &callResult));
+            NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0],
+                &callResult));
             NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceBasicInfoListAsyncCallbackInfo->callback));
         } else {
             LOGE("handler is nullptr");
