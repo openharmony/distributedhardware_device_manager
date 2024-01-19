@@ -135,174 +135,6 @@ bool CheckArgsVal(napi_env env, bool assertion, const std::string &param, const 
 }
 }
 
-void DeviceBasicInfoToJsArray(const napi_env &env,
-                              const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
-                              napi_value &arrayResult)
-{
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-    SetDmDeviceBasicObject(env, vecDevInfo[idx], result);
-
-    napi_status status = napi_set_element(env, arrayResult, idx, result);
-    if (status != napi_ok) {
-        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
-    }
-}
-
-void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result)
-{
-    SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
-    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
-    SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo.deviceTypeId));
-    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
-}
-
-void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
-                   napi_value &result)
-{
-    napi_value value = nullptr;
-    napi_create_int32(env, intValue, &value);
-    napi_set_named_property(env, result, fieldStr.c_str(), value);
-}
-
-void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                        napi_value &result)
-{
-    napi_value value = nullptr;
-    napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
-    napi_set_named_property(env, result, fieldStr.c_str(), value);
-}
-
-void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info)
-{
-    int32_t publishId = -1;
-    JsObjectToInt(env, object, "publishId", publishId);
-    info.publishId = publishId;
-
-    int32_t mode = -1;
-    JsObjectToInt(env, object, "mode", mode);
-    info.mode = static_cast<DmDiscoverMode>(mode);
-
-    int32_t freq = -1;
-    JsObjectToInt(env, object, "freq", freq);
-    info.freq = static_cast<DmExchangeFreq>(freq);
-
-    JsObjectToBool(env, object, "ranging", info.ranging);
-    return;
-}
-
-void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
-                   int32_t &bindType, bool &isMetaType)
-{
-    int32_t bindTypeTemp = -1;
-    JsObjectToInt(env, object, "bindType", bindTypeTemp);
-    bindType = bindTypeTemp;
-
-    char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
-    char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
-    char targetPkgName[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "targetPkgName", targetPkgName, sizeof(targetPkgName));
-    char metaType[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "metaType", metaType, sizeof(metaType));
-    std::string metaTypeStr = metaType;
-    isMetaType = !metaTypeStr.empty();
-
-    char pinCode[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "pinCode", pinCode, sizeof(pinCode));
-    char authToken[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "authToken", authToken, sizeof(authToken));
-    char brMac[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "brMac", brMac, sizeof(brMac));
-    char bleMac[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "bleMac", bleMac, sizeof(bleMac));
-    char wifiIP[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "wifiIP", wifiIP, sizeof(wifiIP));
-
-    int32_t wifiPort = -1;
-    JsObjectToInt(env, object, "wifiPort", wifiPort);
-    int32_t bindLevel = 0;
-    JsObjectToInt(env, object, "bindLevel", bindLevel);
-
-    nlohmann::json jsonObj;
-    jsonObj[AUTH_TYPE] = bindType;
-    jsonObj[APP_OPERATION] = std::string(appOperation);
-    jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
-    jsonObj[PARAM_KEY_TARGET_PKG_NAME] = std::string(targetPkgName);
-    jsonObj[PARAM_KEY_META_TYPE] = metaTypeStr;
-    jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
-    jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
-    jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);
-    jsonObj[PARAM_KEY_BLE_MAC] = std::string(bleMac);
-    jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
-    jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
-    jsonObj[BIND_LEVEL] = bindLevel;
-    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
-    bindParam = jsonObj.dump();
-}
-
-void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
-{
-    nlohmann::json jsonObj;
-    int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
-    JsObjectToInt(env, object, "availableStatus", availableStatus);
-    if (availableStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
-        jsonObj["credible"] = availableStatus;
-    }
-
-    int32_t discoverDistance = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
-    JsObjectToInt(env, object, "discoverDistance", discoverDistance);
-    if (discoverDistance != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
-        jsonObj["range"] = discoverDistance;
-    }
-
-    int32_t authenticationStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
-    JsObjectToInt(env, object, "authenticationStatus", authenticationStatus);
-    if (authenticationStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
-        jsonObj["isTrusted"] = authenticationStatus;
-    }
-
-    int32_t authorizationType = DM_NAPI_DISCOVER_EXTRA_INIT_TWO;
-    JsObjectToInt(env, object, "authorizationType", authorizationType);
-    if (authorizationType != DM_NAPI_DISCOVER_EXTRA_INIT_TWO) {
-        jsonObj["authForm"] = authorizationType;
-    }
-
-    int32_t deviceType = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
-    JsObjectToInt(env, object, "deviceType", deviceType);
-    if (deviceType != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
-        jsonObj["deviceType"] = deviceType;
-    }
-    extra = jsonObj.dump();
-    LOGI("JsToDmDiscoveryExtra, extra :%s", extra.c_str());
-}
-
-bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType)
-{
-    napi_valuetype objectType = napi_undefined;
-    napi_typeof(env, object, &objectType);
-    if (!(CheckArgsType(env, objectType == napi_object, "discoverParameter", "object or undefined"))) {
-        return false;
-    }
-    bool hasProperty = false;
-    napi_has_named_property(env, object, "discoverTargetType", &hasProperty);
-    if (hasProperty) {
-        napi_value field = nullptr;
-        napi_valuetype valueType = napi_undefined;
-        napi_get_named_property(env, object, "discoverTargetType", &field);
-        napi_typeof(env, field, &valueType);
-        if (!CheckArgsType(env, valueType == napi_number, "discoverTargetType", "number")) {
-            return false;
-        }
-        napi_get_value_int32(env, field, &discoverTargetType);
-        return true;
-    }
-    LOGE("discoverTargetType is invalid.");
-    return false;
-}
-
 napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &msg)
 {
     napi_value businessError = nullptr;
@@ -384,17 +216,185 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
     return error;
 }
 
+bool IsFunctionType(napi_env env, napi_value value)
+{
+    napi_valuetype eventHandleType = napi_undefined;
+    napi_typeof(env, value, &eventHandleType);
+    return CheckArgsType(env, eventHandleType == napi_function, "callback", "function");
+}
+
+void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
+                        napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
+}
+
+void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
+                   napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_int32(env, intValue, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
+}
+
+void DeviceBasicInfoToJsArray(const napi_env &env,
+                              const std::vector<DmDeviceBasicInfo> &vecDevInfo, const int32_t idx,
+                              napi_value &arrayResult)
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+    SetDmDeviceBasicObject(env, vecDevInfo[idx], result);
+
+    napi_status status = napi_set_element(env, arrayResult, idx, result);
+    if (status != napi_ok) {
+        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
+    }
+}
+
+void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result)
+{
+    SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
+    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
+    SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo.deviceTypeId));
+    SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
+}
+
+void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info)
+{
+    int32_t publishId = -1;
+    JsObjectToInt(env, object, "publishId", publishId);
+    info.publishId = publishId;
+
+    int32_t mode = -1;
+    JsObjectToInt(env, object, "mode", mode);
+    info.mode = static_cast<DmDiscoverMode>(mode);
+
+    int32_t freq = -1;
+    JsObjectToInt(env, object, "freq", freq);
+    info.freq = static_cast<DmExchangeFreq>(freq);
+
+    JsObjectToBool(env, object, "ranging", info.ranging);
+    return;
+}
+
+void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
+                   int32_t &bindType, bool &isMetaType)
+{
+    int32_t bindTypeTemp = -1;
+    JsObjectToInt(env, object, "bindType", bindTypeTemp);
+    bindType = bindTypeTemp;
+
+    char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
+    char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
+    char targetPkgName[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "targetPkgName", targetPkgName, sizeof(targetPkgName));
+    char metaType[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "metaType", metaType, sizeof(metaType));
+    std::string metaTypeStr = metaType;
+    isMetaType = !metaTypeStr.empty();
+
+    char pinCode[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "pinCode", pinCode, sizeof(pinCode));
+    char authToken[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "authToken", authToken, sizeof(authToken));
+    char brMac[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "brMac", brMac, sizeof(brMac));
+    char bleMac[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "bleMac", bleMac, sizeof(bleMac));
+    char wifiIP[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "wifiIP", wifiIP, sizeof(wifiIP));
+
+    int32_t wifiPort = -1;
+    JsObjectToInt(env, object, "wifiPort", wifiPort);
+    int32_t bindLevel = 0;
+    JsObjectToInt(env, object, "bindLevel", bindLevel);
+
+    nlohmann::json jsonObj;
+    jsonObj[AUTH_TYPE] = bindType;
+    jsonObj[APP_OPERATION] = std::string(appOperation);
+    jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
+    jsonObj[PARAM_KEY_TARGET_PKG_NAME] = std::string(targetPkgName);
+    jsonObj[PARAM_KEY_META_TYPE] = metaTypeStr;
+    jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
+    jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
+    jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);
+    jsonObj[PARAM_KEY_BLE_MAC] = std::string(bleMac);
+    jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
+    jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
+    jsonObj[BIND_LEVEL] = bindLevel;
+    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
+    bindParam = jsonObj.dump();
+}
+
 bool IsSystemApp()
 {
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
 }
 
-bool IsFunctionType(napi_env env, napi_value value)
+bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType)
 {
-    napi_valuetype eventHandleType = napi_undefined;
-    napi_typeof(env, value, &eventHandleType);
-    return CheckArgsType(env, eventHandleType == napi_function, "callback", "function");
+    napi_valuetype objectType = napi_undefined;
+    napi_typeof(env, object, &objectType);
+    if (!(CheckArgsType(env, objectType == napi_object, "discoverParameter", "object or undefined"))) {
+        return false;
+    }
+    bool hasProperty = false;
+    napi_has_named_property(env, object, "discoverTargetType", &hasProperty);
+    if (hasProperty) {
+        napi_value field = nullptr;
+        napi_valuetype valueType = napi_undefined;
+        napi_get_named_property(env, object, "discoverTargetType", &field);
+        napi_typeof(env, field, &valueType);
+        if (!CheckArgsType(env, valueType == napi_number, "discoverTargetType", "number")) {
+            return false;
+        }
+        napi_get_value_int32(env, field, &discoverTargetType);
+        return true;
+    }
+    LOGE("discoverTargetType is invalid.");
+    return false;
+}
+
+void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
+{
+    nlohmann::json jsonObj;
+    int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "availableStatus", availableStatus);
+    if (availableStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["credible"] = availableStatus;
+    }
+
+    int32_t discoverDistance = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "discoverDistance", discoverDistance);
+    if (discoverDistance != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["range"] = discoverDistance;
+    }
+
+    int32_t authenticationStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "authenticationStatus", authenticationStatus);
+    if (authenticationStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["isTrusted"] = authenticationStatus;
+    }
+
+    int32_t authorizationType = DM_NAPI_DISCOVER_EXTRA_INIT_TWO;
+    JsObjectToInt(env, object, "authorizationType", authorizationType);
+    if (authorizationType != DM_NAPI_DISCOVER_EXTRA_INIT_TWO) {
+        jsonObj["authForm"] = authorizationType;
+    }
+
+    int32_t deviceType = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
+    JsObjectToInt(env, object, "deviceType", deviceType);
+    if (deviceType != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
+        jsonObj["deviceType"] = deviceType;
+    }
+    extra = jsonObj.dump();
+    LOGI("JsToDmDiscoveryExtra, extra :%s", extra.c_str());
 }
 
 void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)

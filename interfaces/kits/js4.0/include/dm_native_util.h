@@ -54,17 +54,17 @@ void SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32
                    napi_value &result);
 void SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
                         napi_value &result);
+void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info);
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam, int32_t &bindType,
                    bool &isMetaType);
-void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info);
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
 bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
+bool IsSystemApp();
+void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
-bool IsSystemApp();
 bool IsFunctionType(napi_env env, napi_value value);
-void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
 bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue);
 } // namespace DistributedHardware
