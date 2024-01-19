@@ -101,6 +101,38 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
         LOGE("devicemanager napi js to int no property: %s", fieldStr.c_str());
     }
 }
+
+std::string GetDeviceTypeById(DmDeviceType type)
+{
+    const static std::pair<DmDeviceType, std::string> mapArray[] = {
+        {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
+        {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
+        {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
+        {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
+        {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
+        {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
+        {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
+        {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
+        {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
+        {DEVICE_TYPE_2IN1, DEVICE_TYPE_2IN1_STRING},
+    };
+    for (const auto& item : mapArray) {
+        if (item.first == type) {
+            return item.second;
+        }
+    }
+    return DEVICE_TYPE_UNKNOWN_STRING;
+}
+
+bool CheckArgsVal(napi_env env, bool assertion, const std::string &param, const std::string &msg)
+{
+    if (!(assertion)) {
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + "The value of " + param + ": " + msg;
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return false;
+    }
+    return true;
+}
 }
 
 void DeviceBasicInfoToJsArray(const napi_env &env,
@@ -285,16 +317,6 @@ napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &m
     return businessError;
 }
 
-bool CheckArgsVal(napi_env env, bool assertion, const std::string &param, const std::string &msg)
-{
-    if (!(assertion)) {
-        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + "The value of " + param + ": " + msg;
-        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
-        return false;
-    }
-    return true;
-}
-
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message)
 {
     if (!(assertion)) {
@@ -366,28 +388,6 @@ bool IsSystemApp()
 {
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
-}
-
-std::string GetDeviceTypeById(DmDeviceType type)
-{
-    const static std::pair<DmDeviceType, std::string> mapArray[] = {
-        {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
-        {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
-        {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
-        {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
-        {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
-        {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
-        {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
-        {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
-        {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
-        {DEVICE_TYPE_2IN1, DEVICE_TYPE_2IN1_STRING},
-    };
-    for (const auto& item : mapArray) {
-        if (item.first == type) {
-            return item.second;
-        }
-    }
-    return DEVICE_TYPE_UNKNOWN_STRING;
 }
 
 bool IsFunctionType(napi_env env, napi_value value)

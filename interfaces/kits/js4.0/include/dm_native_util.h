@@ -60,11 +60,9 @@ void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishI
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
 bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
-bool CheckArgsVal(napi_env env, bool assertion, const std::string &param, const std::string &msg);
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
 bool IsSystemApp();
-std::string GetDeviceTypeById(DmDeviceType type);
 bool IsFunctionType(napi_env env, napi_value value);
 void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
