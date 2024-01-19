@@ -906,10 +906,12 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/devicestate",
     "${services_path}/include",
     "${services_path}/include/softbus",
+    "${services_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/dependency/multipleuser",
+    "${servicesimpl_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock/",
     "//third_party/json/include",
   ]
