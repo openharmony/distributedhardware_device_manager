@@ -66,7 +66,7 @@ if (defined(ohos_lite)) {
         "src/ipc/lite/ipc_server_main.cpp",
         "src/ipc/lite/ipc_server_stub.cpp",
         "src/permission/lite/permission_manager.cpp",
-        "src/pinholder/dm_pin_holder.cpp",
+        "src/pinholder/pin_holder.cpp",
         "src/pinholder/pin_holder_session.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
@@ -161,7 +161,7 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_server_listener.cpp",
       "src/ipc/standard/ipc_server_stub.cpp",
       "src/permission/standard/permission_manager.cpp",
-      "src/pinholder/dm_pin_holder.cpp",
+      "src/pinholder/pin_holder.cpp",
       "src/pinholder/pin_holder_session.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
