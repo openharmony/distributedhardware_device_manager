@@ -27,7 +27,6 @@
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
-#include "dm_pin_holder.h"
 #include "dm_publish_manager.h"
 #include "idevice_manager_service_impl.h"
 #include "single_instance.h"
@@ -123,11 +122,6 @@ public:
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
 
-    int32_t RegisterPinHolderCallback(const std::string &pkgName);
-    int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType, const std::string &payload);
-    int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType, const std::string &payload);
     std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
     void OnUnbindSessionOpened(int32_t sessionId, int32_t result);
     void OnUnbindSessionCloseed(int32_t sessionId);
@@ -152,7 +146,6 @@ private:
     std::shared_ptr<MineHiChainConnector> mineHiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
-    std::shared_ptr<DmPinHolder> pinHolder_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
 };
 

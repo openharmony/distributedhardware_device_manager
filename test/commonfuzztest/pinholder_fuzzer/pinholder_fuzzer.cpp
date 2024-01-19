@@ -15,6 +15,7 @@
 
 #include "pinholder_fuzzer.h"
 
+#include "device_manager.h"
 #include "device_manager_callback.h"
 #include "dm_ability_manager.h"
 #include "dm_constants.h"

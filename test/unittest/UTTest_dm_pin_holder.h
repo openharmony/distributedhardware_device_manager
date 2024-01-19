@@ -25,6 +25,7 @@
 #include "device_manager.h"
 #include "single_instance.h"
 #include "dm_pin_holder.h"
+#include "pin_holder.h"
 
 namespace OHOS {
 namespace DistributedHardware {
