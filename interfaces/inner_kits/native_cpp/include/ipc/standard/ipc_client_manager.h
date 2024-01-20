@@ -26,6 +26,7 @@
 #include "ipc_def.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -44,6 +45,12 @@ public:
 class IpcClientManager : public IpcClient {
     friend class DmDeathRecipient;
     DECLARE_IPC_INTERFACE(IpcClientManager);
+public:
+    class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+    public:
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    };
 
 public:
     /**
@@ -69,12 +76,14 @@ public:
 private:
     bool IsInit(const std::string &pkgName);
     int32_t ClientInit();
-
+    void SubscribeDMSAChangeListener();
 private:
     std::mutex lock_;
     std::map<std::string, sptr<IpcClientStub>> dmListener_;
     sptr<IpcRemoteBroker> dmInterface_ { nullptr };
     sptr<DmDeathRecipient> dmRecipient_ { nullptr };
+    std::atomic<bool> isSubscribeDMSAChangeListener = false;
+    sptr<SystemAbilityListener> saListenerCallback = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
