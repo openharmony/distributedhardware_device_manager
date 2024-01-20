@@ -411,7 +411,7 @@ HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_102, testing::ext::TestSize
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     pinHolder->session_ = nullptr;
     int32_t ret = pinHolder->CreateGeneratePinHolderMsg();
-    ASSERT_EQ(ret, ERR_DM_FAILED); 
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmPinHolderTest, ParseMsgType_101, testing::ext::TestSize.Level0)
