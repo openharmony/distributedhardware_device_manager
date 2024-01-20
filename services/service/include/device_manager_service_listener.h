@@ -18,6 +18,7 @@
 
 #include <map>
 #include <string>
+#include<unordered_set>
 #include <mutex>
 
 #include "dm_device_info.h"
@@ -83,6 +84,8 @@ private:
     static std::map<std::string, std::string> dmListenerMap_;
     static std::mutex udidHashMapLock_;
     static std::map<std::string, std::map<std::string, std::string>> udidHashMap_;
+    static std::mutex alreadyOnlineSetLock_;
+    static std::unordered_set<std::string> alreadyOnlineSet_;
 #endif
 };
 } // namespace DistributedHardware

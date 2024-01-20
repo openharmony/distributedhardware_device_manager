@@ -37,6 +37,8 @@ std::mutex DeviceManagerServiceListener::dmListenerMapLock_;
 std::mutex DeviceManagerServiceListener::udidHashMapLock_;
 std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ = {};
 std::map<std::string, std::map<std::string, std::string>> DeviceManagerServiceListener::udidHashMap_ = {};
+std::mutex DeviceManagerServiceListener::alreadyOnlineSetLock_;
+std::unordered_set<std::string> DeviceManagerServiceListener::alreadyOnlineSet_ = {};
 
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
@@ -68,7 +70,22 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
     ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, deviceBasicInfo);
     if (pkgName == std::string(DM_PKG_NAME)) {
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        if (state == DEVICE_STATE_OFFLINE) {
+            {
+                std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
+                alreadyOnlineSet_.clear();
+            }
+        }
         for (const auto &it : PkgNameVec) {
+            std::string notifyKey =  it + "_" + info.deviceId;
+            {
+                std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
+                if (state == DEVICE_STATE_ONLINE && alreadyOnlineSet_.find(notifyKey) != alreadyOnlineSet_.end()) {
+                    continue;
+                } else if (state == DEVICE_STATE_ONLINE) {
+                    alreadyOnlineSet_.insert(notifyKey);
+                }
+            }
             pReq->SetPkgName(it);
             pReq->SetDeviceState(state);
             pReq->SetDeviceInfo(info);
@@ -76,6 +93,15 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
+        std::string notifyKey =  pkgName + "_" + info.deviceId;
+        {
+            std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
+            if (state == DEVICE_STATE_ONLINE) {
+                alreadyOnlineSet_.insert(notifyKey);
+            } else if (state == DEVICE_STATE_OFFLINE) {
+                alreadyOnlineSet_.erase(notifyKey);
+            }
+        }
         pReq->SetPkgName(pkgName);
         pReq->SetDeviceState(state);
         pReq->SetDeviceInfo(info);
