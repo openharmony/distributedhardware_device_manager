@@ -74,7 +74,7 @@ private:
     int32_t GetAddrByTargetId(const PeerTargetId &targetId, ConnectionAddr &addrInfo);
 
 private:
-    static std::shared_ptr<IPinholderSessionCallback> sessionCallback_;
+    static std::shared_ptr<IPinholderSessionCallback> pinholderSessionCallback_;
 };
 }
 }

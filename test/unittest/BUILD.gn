@@ -126,7 +126,11 @@ ohos_unittest("UTTest_ipc_cmd_register") {
 ohos_unittest("UTTest_dm_pin_holder") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_pin_holder.cpp" ]
+  sources = [
+    "UTTest_dm_pin_holder.cpp",
+    "${services_path}/src/pinholder/pin_holder.cpp",
+    "${services_path}/src/pinholder/pin_holder_session.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 

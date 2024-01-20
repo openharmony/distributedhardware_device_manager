@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-std::shared_ptr<IPinholderSessionCallback> PinHolderSession::sessionCallback_ = nullptr;
+std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
 PinHolderSession::PinHolderSession()
 {
     LOGD("PinHolderSession constructor.");
@@ -36,13 +36,13 @@ PinHolderSession::~PinHolderSession()
 
 int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback)
 {
-    sessionCallback_ = callback;
+    pinholderSessionCallback_ = callback;
     return DM_OK;
 }
 
 int32_t PinHolderSession::UnRegisterSessionCallback()
 {
-    sessionCallback_ = nullptr;
+    pinholderSessionCallback_ = nullptr;
     return DM_OK;
 }
 
@@ -71,12 +71,12 @@ int32_t PinHolderSession::CloseSessionServer(int32_t sessionId)
 
 int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnSessionOpened error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
     }
     int32_t sessionSide = GetSessionSide(sessionId);
-    sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
+    pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
     LOGI("OnSessionOpened, success, sessionId: %d.", sessionId);
     return DM_OK;
 }
@@ -84,11 +84,11 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %d", sessionId);
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnSessionClosed error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
     }
-    sessionCallback_->OnSessionClosed(sessionId);
+    pinholderSessionCallback_->OnSessionClosed(sessionId);
     return;
 }
 
@@ -98,13 +98,13 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
         LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
         return;
     }
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnBytesReceived error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    sessionCallback_->OnDataReceived(sessionId, message);
+    pinholderSessionCallback_->OnDataReceived(sessionId, message);
     return;
 }
 

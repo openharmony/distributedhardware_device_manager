@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PIN_HOLDER_H
-#define OHOS_DM_PIN_HOLDER_H
+#ifndef OHOS_PIN_HOLDER_H
+#define OHOS_PIN_HOLDER_H
 
 #include "dm_timer.h"
 #include "idevice_manager_service_listener.h"
 #include "pin_holder_session.h"
+#include "pinholder_session_callback.h"
 
 #include <map>
 #include <mutex>
@@ -35,7 +36,7 @@ typedef enum PinHolderState {
 } PinHolderState;
 
 class PinHolder final : public IPinholderSessionCallback,
-                          public std::enable_shared_from_this<PinHolder> {
+                        public std::enable_shared_from_this<PinHolder> {
 public:
     PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener);
     ~PinHolder();
@@ -74,4 +75,4 @@ private:
 };
 }
 }
-#endif // OHOS_DM_PIN_HOLDER_H
+#endif // OHOS_PIN_HOLDER_H

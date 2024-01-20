@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
-#define OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
+#ifndef OHOS_PIN_HOLDER_SESSION_CALLBACK_H
+#define OHOS_PIN_HOLDER_SESSION_CALLBACK_H
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,4 +26,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
+#endif // OHOS_PIN_HOLDER_SESSION_CALLBACK_H
