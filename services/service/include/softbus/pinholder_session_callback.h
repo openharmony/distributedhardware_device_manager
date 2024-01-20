@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,30 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_SERVICE_H
-#define OHOS_UTTEST_DM_SERVICE_H
 
-#include <gtest/gtest.h>
-#include <refbase.h>
+#ifndef OHOS_PIN_HOLDER_SESSION_CALLBACK_H
+#define OHOS_PIN_HOLDER_SESSION_CALLBACK_H
 
-#include <string>
-#include <vector>
-
-#define private public
-#include "device_manager_service.h"
-#undef private
-
-#include "device_manager_service_listener.h"
-#include "single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceManagerServiceTest : public testing::Test {
+class IPinholderSessionCallback {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
+    virtual void OnSessionClosed(int32_t sessionId) = 0;
+    virtual void OnDataReceived(int32_t sessionId, std::string message) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_PIN_HOLDER_SESSION_CALLBACK_H

@@ -26,6 +26,7 @@
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
+#include "pin_holder.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
 #include "i_dm_service_impl_ext.h"
@@ -209,6 +210,7 @@ private:
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
     std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
     std::string localDeviceId_;
+    std::shared_ptr<PinHolder> pinHolder_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

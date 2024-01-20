@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,11 +20,10 @@
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
-#include "softbus_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-std::shared_ptr<ISoftbusSessionCallback> PinHolderSession::sessionCallback_ = nullptr;
+std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
 PinHolderSession::PinHolderSession()
 {
     LOGD("PinHolderSession constructor.");
@@ -35,15 +34,15 @@ PinHolderSession::~PinHolderSession()
     LOGD("PinHolderSession destructor.");
 }
 
-int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback)
+int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback)
 {
-    sessionCallback_ = callback;
+    pinholderSessionCallback_ = callback;
     return DM_OK;
 }
 
 int32_t PinHolderSession::UnRegisterSessionCallback()
 {
-    sessionCallback_ = nullptr;
+    pinholderSessionCallback_ = nullptr;
     return DM_OK;
 }
 
@@ -72,12 +71,12 @@ int32_t PinHolderSession::CloseSessionServer(int32_t sessionId)
 
 int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnSessionOpened error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
     }
     int32_t sessionSide = GetSessionSide(sessionId);
-    sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
+    pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
     LOGI("OnSessionOpened, success, sessionId: %d.", sessionId);
     return DM_OK;
 }
@@ -85,11 +84,11 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %d", sessionId);
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnSessionClosed error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
     }
-    sessionCallback_->OnSessionClosed(sessionId);
+    pinholderSessionCallback_->OnSessionClosed(sessionId);
     return;
 }
 
@@ -99,13 +98,13 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
         LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
         return;
     }
-    if (sessionCallback_ == nullptr) {
-        LOGE("OnBytesReceived error, sessionCallback_ is nullptr.");
+    if (pinholderSessionCallback_ == nullptr) {
+        LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    sessionCallback_->OnDataReceived(sessionId, message);
+    pinholderSessionCallback_->OnDataReceived(sessionId, message);
     return;
 }
 
@@ -146,14 +145,6 @@ int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, Connec
             DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());
         }
-    } else if (!targetId.deviceId.empty()) {
-        std::string connectAddr;
-        ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(targetId.deviceId, connectAddr);
-        if (addrInfo == nullptr) {
-            LOGE("GetConnectAddr failed.");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
-        addr = *addrInfo;
     }
     return DM_OK;
 }
