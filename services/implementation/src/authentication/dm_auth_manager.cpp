@@ -23,6 +23,7 @@
 #include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
+#include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "dm_radar_helper.h"
@@ -1245,7 +1246,6 @@ void DmAuthManager::ShowConfigDialog()
         return;
     }
     LOGI("ShowConfigDialog start");
-    dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
     jsonObj[TAG_TOKEN] = authResponseContext_->token;
@@ -1260,8 +1260,8 @@ void DmAuthManager::ShowConfigDialog()
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, localUdid, remoteDeviceId_);
-    std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
-    showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowConfirmDialog(params);
     struct RadarInfo info = {
         .funcName = "ShowConfigDialog",
         .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
@@ -1293,7 +1293,8 @@ void DmAuthManager::ShowAuthInfoDialog()
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = jsonObj.dump();
-    authPtr_->ShowAuthInfo(authParam, shared_from_this());
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowPinDialog(std::to_string(authResponseContext_->code));
 }
 
 void DmAuthManager::ShowStartAuthDialog()
@@ -1317,7 +1318,8 @@ void DmAuthManager::ShowStartAuthDialog()
         return;
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
-    authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowInputDialog("");
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
@@ -1333,7 +1335,6 @@ int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
         return AddMember(pinCode);
     }
 }
-
 
 int32_t DmAuthManager::AuthDevice(int32_t pinCode)
 {

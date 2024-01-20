@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-import Want from '@ohos.app.ability.Want';
-import window from '@ohos.window';
-import Context from '@ohos.app.ability.common';
+import Constants from '../common/constant';
+import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
+import mediaquery from '@ohos.mediaquery';
+import deviceInfo from '@ohos.deviceInfo';
 
-let that: dialogPlusPage;
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>'
 const ACTION_CANCEL_PINCODE_INPUT: number = 4
@@ -25,44 +25,30 @@ const ACTION_DONE_PINCODE_INPUT: number = 5
 const MSG_PIN_CODE_ERROR: number = 0
 const MSG_CANCEL_PIN_CODE_INPUT: number = 3
 const MSG_DOING_AUTH: number = 4
-@Entry
-@Component
-struct dialogPlusPage {
-  @State messageTitle: string = 'PIN码连接'
-  @State messageTips: string = '请输入另一个设备显示的PIN码进行验证'
+
+@CustomDialog
+struct InputCustomDialog {
+  @State password: string = '';
+  @State passwordCircle: string[] = ['', '', '', '', '', ''];
+  @State connect: string = '连接'
+  @State messageTips: string = '请输入对端设备上显示的连接码'
   @State isTimes: number = 3
-  @State isShow: boolean = true
-  @State errorTips: string = 'PIN码输入错误，请重新输入(3次：还有' + this.isTimes + '次机会)'
-  @State errorTipsVisible: number = Visibility.Hidden
-  @State inputPinCode: string = ''
-  @State ok: string = '确定'
-  @State cancel: string = '取消'
+  @State errorTips: string = '连接码错误，还可以尝试' + this.isTimes + '次';
+  @State errorTipsVisible: Visibility = Visibility.None
+  @State cancelBtn: string = '取消'
+  @State heightNum: number = 600;
+  listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
+  controller?: CustomDialogController
+
+  onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean) {
+      this.heightNum = 300;
+    } else {
+      this.heightNum = 800;
+    }
+  }
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear aboutToAppear')
-    that = this
-    this.initStatue()
-  }
-
-  aboutToDisappear() {
-    console.log(TAG + 'aboutToDisappear aboutToDisappear')
-    if (dmClass != null) {
-      try {
-        dmClass.off('uiStateChange')
-        dmClass.release()
-      } catch (error) {
-        console.log('dmClass release failed')
-      }
-      dmClass = null
-    }
-  }
-
-  initStatue() {
-    console.log('initStatue')
-    if (dmClass) {
-      console.log('deviceManager exist')
-      return
-    }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
@@ -80,35 +66,23 @@ struct dialogPlusPage {
           return
         }
         if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
-          this.destruction()
+          this.cancel()
           return
         }
         if (msg === MSG_PIN_CODE_ERROR) {
           this.isTimes--
-          this.errorTips = 'PIN码输入错误，请重新输入(3次：还有' + this.isTimes + '次机会)'
-          this.inputPinCode = ''
+          this.errorTips = '连接码错误，还可以尝试' + this.isTimes + '次'
+          this.password = ''
           this.errorTipsVisible = Visibility.Visible
         }
-    })
+      })
     });
+    this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.onPortrait(mediaQueryResult);
+    })
   }
 
-  onDone() {
-    console.log('Done')
-    if(this.inputPinCode == null || this.inputPinCode == '') {
-      return;
-    }
-    if (dmClass) {
-      console.log('deviceManager exist')
-    } else {
-      console.log('createDeviceManager is null')
-      return
-    }
-    console.log('Done' + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
-    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.inputPinCode)
-  }
-
-  onCancel() {
+  cancel() {
     console.log('cancle')
     if (dmClass) {
       console.log('deviceManager exist')
@@ -121,9 +95,24 @@ struct dialogPlusPage {
     this.destruction()
   }
 
+  confirm() {
+    console.log('confirm')
+    if (this.password == null || this.password == '') {
+      return;
+    }
+    if (dmClass) {
+      console.log('deviceManager exist')
+    } else {
+      console.log('createDeviceManager is null')
+      return
+    }
+    console.log('confirm' + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.password)
+  }
+
   setUserOperation(operation: number, extra: string) {
-    console.log('setUserOperation: ' + operation + 'inputPinCode'+ extra)
-    if(dmClass == null) {
+    console.log('setUserOperation: ' + operation + 'password' + extra)
+    if (dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null')
       return;
     }
@@ -135,69 +124,168 @@ struct dialogPlusPage {
   }
 
   destruction() {
-    let temporaryWindow: window.Window = AppStorage.get('inputWin') as window.Window
-    temporaryWindow.destroy()
-    let context: Context.UIAbilityContext = AppStorage.get('inputContext') as Context.UIAbilityContext
-    context.terminateSelf()
+    let session = AppStorage.get<UIExtensionContentSession>('inputSession');
+    if (session) {
+      session.terminateSelf();
+    }
+  }
+
+  isNumberSix(str: string): boolean {
+    console.info(TAG + 'isNumber6 in');
+    const reg: RegExp = new RegExp('^[0-9]{6}$');
+    return reg.test(str);
+  }
+
+  passwordOnChange(value: string) {
+    console.info(TAG + 'passwordOnChange in');
+    this.password = value;
+    if (this.isNumberSix(this.password)) {
+      this.confirm();
+    }
   }
 
   build() {
-    Row() {
+    Column() {
       Column() {
-          Text(this.messageTitle)
-            .fontSize(35)
-            .fontWeight(FontWeight.Bold)
-            .height('25%')
-          Text(this.messageTips)
-            .fontSize(25)
-            .fontWeight(FontWeight.Medium)
-            .height('20%')
-          Row() {}.height('2%')
-          TextInput({text: this.inputPinCode})
-            .fontSize(25)
-            .defaultFocus(true)
-            .fontWeight(FontWeight.Bold)
-            .maxLength(6)
-            .height('20%')
-            .type(InputType.Number)
-            .onChange((value) => {
-              this.inputPinCode = value
-              console.info(this.inputPinCode)
-            })
-          Text(this.errorTips)
-            .fontSize(15)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(0xff0000)
-            .visibility(this.errorTipsVisible)
-            .height('10%')
-          Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-            Row() {
-              Button(this.cancel)
-                .fontSize(25)
-                .backgroundColor(0xffffff)
-                .fontColor(0x0000ff)
-                .height(50)
-                .margin({left: '10%'})
-                .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-                .fontWeight(FontWeight.Normal)
-                .onClick(() => {
-                  this.onCancel()
-                }).width('30%')
-              Button(this.ok)
-                .fontSize(25)
-                .fontColor(0xffffff)
-                .height(50)
-                .margin({left: '20%'})
-                .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-                .fontWeight(FontWeight.Normal)
-                .onClick(() => {
-                  this.onDone()
-                }).width('30%')
-            }.width('100%')
-          }.width('100%').height('20%')
-          Row() {}.height('3%')
-        }.width('100%')
-      }.width('100%')
-      .height('100%')
+        Text(this.connect)
+          .fontSize(20)
+          .fontWeight(FontWeight.Medium)
+          .margin({ top: 12, bottom: 8 })
+          .width('100%')
+          .textAlign(TextAlign.Start)
+
+        Text(this.messageTips)
+          .fontSize(14)
+          .fontWeight(FontWeight.Regular)
+          .margin({ bottom: 8 })
+          .width('100%')
+      }
+      .margin({ left: 24 })
+
+      Stack() {
+        List() {
+          ListItem() {
+            Flex({ justifyContent: FlexAlign.Center }) {
+              ForEach(this.passwordCircle, (item: string) => {
+                Column()
+                  .width(12)
+                  .height(12)
+                  .backgroundColor(item === '' ? 'white' : 'black')
+                  .border({ width: 2, color: 'black', radius: 12})
+                  .margin({ right: 24, top: 2})
+              })
+            }
+          }
+          .margin({ left: 24, top: 24, bottom: 24})
+        }
+        TextInput({ placeholder: '', text: this.password})
+          .defaultFocus(true)
+          .type(8)
+          .height(60)
+          .width(200)
+          .opacity(0)
+          .fontColor(('rgba(0,0,0,0)'))
+          .backgroundColor(('rgba(0,0,0,0)'))
+          .caretColor(('rgba(0,0,0,0)'))
+          .maxLength(6)
+          .margin({ bottom: 8 })
+          .onChange((value: string) => {
+            this.password = value;
+            if (value.length > 6) {
+              return;
+            }
+            let length = value.length;
+            for (let i = 0; i < 6; i++) {
+              if (i < length) {
+                this.passwordCircle[i] = value[i];
+              } else {
+                this.passwordCircle[i] = '';
+              }
+            }
+            let gThis = this;
+            setTimeout(()=> {
+              gThis.passwordOnChange(value);
+            }, 1)
+            console.log(TAG + 'this.password: ' + this.password);
+          })
+      }
+
+      Text(this.errorTips)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#FA2A2D')
+          .visibility(this.errorTipsVisible)
+
+      Flex({ justifyContent: FlexAlign.Center }) {
+        Button(this.cancelBtn)
+          .height(40)
+          .fontSize(16)
+          .onClick(() => {
+            if (this.controller) {
+              this.controller.close();
+            }
+            this.cancel();
+          })
+          .backgroundColor(Color.Transparent)
+          .fontColor('#007DFF')
+      }.margin({ bottom: 10 })
+    }.constraintSize({ maxHeight: `${this.heightNum}`})
+  }
+}
+
+@Entry
+@Component
+struct dialogPlusPage {
+  @State connect: string = '连接'
+  @State messageTips: string = '请输入对端设备上显示的连接码';
+  @State isTimes: number = 3;
+  @State errorTips: string = '连接码错误，还可以尝试' + this.isTimes + '次';
+  @State errorTipsVisible: number = Visibility.Hidden;
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: InputCustomDialog(),
+    cancel: this.onCancel,
+    autoCancel: false,
+    alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
+      DialogAlignment.Bottom : DialogAlignment.Center,
+    offset: { dx: 0, dy: -20 },
+    gridCount: 4,
+    customStyle: false
+  });
+
+  aboutToAppear() {
+    console.log(TAG + 'aboutToAppear aboutToAppear')
+  }
+
+  aboutToDisappear() {
+    console.log(TAG + 'aboutToDisappear aboutToDisappear')
+    if (dmClass != null) {
+      try {
+        dmClass.off('uiStateChange');
+        dmClass.release();
+      } catch (error) {
+        console.log('dmClass release failed');
+      }
+      dmClass = null
+    }
+  }
+
+  onDone() {
+    console.log('Done')
+  }
+
+  onCancel() {
+    console.log('cancle')
+  }
+
+  build() {
+    GridRow({
+      columns: { xs: 4, sm: 4, md: 8 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['360vp', '400vp']}
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: 4 } }) {
+        Column(this.dialogController.open())
+      }
+    }
   }
 }

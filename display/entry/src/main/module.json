@@ -2,7 +2,7 @@
   "module": {
     "name": "entry",
     "type": "entry",
-    "srcEntrance": "./ets/Application/MyAbilityStage.ts",
+    "srcEntrance": "",
     "description": "$string:entry_desc",
     "mainElement": "MainAbility",
     "deviceTypes":  ["default","tablet", "2in1"],
@@ -13,9 +13,9 @@
     "abilities": [
       {
           "name": "com.ohos.devicemanagerui.MainAbility",
-          "startWindowBackground": "$color:default_background_color",
+          "startWindowBackground": "$color:start_window_background",
           "startWindowIcon": "$media:icon",
-          "srcEntrance": "./ets/MainAbility/MainAbility.ts",
+          "srcEntrance": "",
           "description": "$string:MainAbility_desc",
           "icon": "$media:icon",
           "ic_device_earphone_hero":"$media:ic_device_earphone_hero",
@@ -25,7 +25,6 @@
           "ic_public_car": "$media:ic_public_car",
           "ic_device_smartscreen": "$media:ic_device_smartscreen",
           "ic_device_soundx": "$media:ic_device_soundx",
-          "ic_device_pc": "$media:ic_device_pc",
           "ic_device_glass": "$media:ic_device_glass",
           "label": "$string:MainAbility_label",
           "visible": false,
@@ -34,31 +33,31 @@
     ],
     "extensionAbilities": [
       {
-        "name": "com.ohos.devicemanagerui.ConfirmServiceExtAbility",
-        "srcEntrance": "./ets/ServiceExtAbility/ConfirmServiceExtAbility.ts",
+        "name": "com.ohos.devicemanagerui.InputUIExtAbility",
+        "srcEntry": "./ets/UIExtAbility/InputUIExtAbility.ets",
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
-        "type": "service"
+        "exported": true,
+        "type": "sysDialog/common"
       },
       {
-        "name": "com.ohos.devicemanagerui.PincodeServiceExtAbility",
-        "srcEntrance": "./ets/ServiceExtAbility/PincodeServiceExtAbility.ts",
+        "name": "com.ohos.devicemanagerui.PincodeUIExtAbility",
+        "srcEntry": "./ets/UIExtAbility/PincodeUIExtAbility.ets",
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
-        "type": "service"
+        "exported": true,
+        "type": "sysDialog/common"
       },
       {
-        "name": "com.ohos.devicemanagerui.InputServiceExtAbility",
-        "srcEntrance": "./ets/ServiceExtAbility/InputServiceExtAbility.ts",
+        "name": "com.ohos.devicemanagerui.ConfirmUIExtAbility",
+        "srcEntry": "./ets/UIExtAbility/ConfirmUIExtAbility.ets",
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
-        "type": "service"
+        "exported": true,
+        "type": "sysDialog/common"
       },
       {
         "name": "com.ohos.devicemanagerui.BluetoothDialogAbility",
