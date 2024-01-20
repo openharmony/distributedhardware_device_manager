@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,58 +13,167 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-import Context from '@ohos.app.ability.common';
-import Want from '@ohos.app.ability.Want';
-import window from '@ohos.window';
+import { BusinessError } from '@ohos.base';
+import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
+import deviceInfo from '@ohos.deviceInfo';
 
 let dmClass: deviceManager.DeviceManager | null;
-let TAG = '[DeviceManagerUI:PinDialog]==>'
-
+let TAG = '[DeviceManagerUI:PinDialog]==>';
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3
 const MSG_CANCEL_PIN_CODE_SHOW: number = 2
-@Entry
-@Component
-struct dialogPlusPage {
-  @State messageTitle: string = 'PIN码连接'
-  @State messageTips: string = '请在设备端输入连接码进行验证'
-  @State pinCode: string = ''
-  @State allow: string = '允许'
-  @State cancel: string = '取消'
-  @State isShow: boolean = true
 
-  aboutToAppear() {
-    this.initStatue()
-    console.log('aboutToAppear execute')
-    let globalWant: Want = AppStorage.get('abilityWant') as Want
-    if (globalWant != null && globalWant.parameters != undefined) {
-      this.pinCode = globalWant.parameters['PinCode'] as string
+@CustomDialog
+struct PinCustomDialog {
+  @State messageTitle: string = '连接码';
+  @State pinCode: string = '';
+  @State cancel_str: string = '取消';
+  @State isShow: boolean = true;
+  @State displayWidth:number = 0;
+  @State displayHeight:number = 0;
+  @State topRect_height:number=0;
+  @State pinCodeArr:Array<string> = [];
+
+  controller?: CustomDialogController
+
+  cancel() {
+    console.log(TAG+'destruction()');
+    try {
+      console.log(TAG+'pin dialog terminateSelf');
+      let session = AppStorage.get<UIExtensionContentSession>('pinSession');
+      if (session) {
+        session.terminateSelf();
+      }
+    } catch(err) {
+      console.log(TAG+'dialog cancel failed: ' + JSON.stringify(err));
     }
   }
 
+  aboutToAppear() {
+    console.log(TAG+'aboutToAppear execute PinCustomDialog')
+    // 获取pinCode
+    this.pinCode = AppStorage.get('pinCode') as string;
+    this.pinCodeArr = this.pinCode.split('');
+    console.log(TAG+'this.pinCodeArr'+this.pinCodeArr);
+  }
+
+  setUserOperation(operation: number) {
+    console.log(TAG+'setUserOperation: ' + operation)
+    if (dmClass == null) {
+      console.log(TAG+'setUserOperation: ' + 'dmClass null')
+      return;
+    }
+    try {
+      dmClass.setUserOperation(operation, 'extra');
+    } catch (error) {
+      console.log(TAG+'dmClass setUserOperation failed')
+    }
+  }
+
+  build() {
+    Column() {
+      Flex({direction:FlexDirection.Row,alignItems:ItemAlign.Center,justifyContent:FlexAlign.Start}){
+        Text(this.messageTitle)
+          .fontSize(20)
+          .fontColor('#182431')
+          .fontWeight(FontWeight.Medium)
+          .margin({
+            top:14,
+            bottom:14,
+            left:24,
+            right:24
+          })
+      }
+      .height(56)
+      .margin({bottom:24})
+
+      Row(){
+        Flex({direction:FlexDirection.Row,alignItems:ItemAlign.Center,justifyContent:FlexAlign.Center}){
+          ForEach(this.pinCodeArr,(item:string,index)=>{
+            Text(item)
+              .fontSize(24)
+              .fontColor('#1e1e1e')
+              .fontWeight(FontWeight.Medium)
+              .height(26)
+              .margin({right:24})
+          })
+        }
+      }
+      .margin({bottom:24})
+
+      Row(){
+        Button(this.cancel_str)
+          .fontSize(16)
+          .fontColor("#007DFF")
+          .onClick(() => {
+            if (this.controller) {
+              this.controller.close();
+            }
+            this.cancel();
+            this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY)
+          })
+          .height(40)
+          .margin({left: 16, right: 16})
+          .backgroundColor(Color.Transparent)
+      }
+    }
+    .constraintSize({maxHeight: `${300}`})
+  }
+}
+
+
+@Entry
+@Component
+struct dialogPlusPage {
+  @State cancel: string = '取消';
+  @State isShow: boolean = true;
+
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: PinCustomDialog(),
+    cancel: this.onCancel,
+    autoCancel: false,
+    alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
+      DialogAlignment.Bottom : DialogAlignment.Center,
+    offset: { dx: 0, dy: -20 },
+    gridCount: 4,
+    customStyle: false
+  });
+
+  onCancel() {
+    this.destruction();
+  }
+
+  aboutToAppear() {
+    this.initStatue();
+    console.log(TAG+'aboutToAppear execute')
+  }
+
   aboutToDisappear() {
-    console.log(TAG + 'aboutToDisappear executed')
+    console.log(TAG+ 'aboutToDisappear executed')
     if (dmClass != null) {
       try {
         dmClass.off('uiStateChange')
-        dmClass.release()
+        try {
+          dmClass.release();
+        } catch (err) {
+          let e: BusinessError = err as BusinessError;
+          console.error(TAG+'release device manager errCode:' + e.code + ',errMessage:' + e.message);
+        }
       } catch (error) {
-        console.log('dmClass release failed')
+        console.log(TAG+'dmClass release failed')
       }
       dmClass = null
     }
   }
 
   initStatue() {
-    let globalWindowNum: number = AppStorage.get('pinWindowNum') as number
-    console.log('initStatue' + 'pinWindowNum:' + globalWindowNum)
     if (dmClass) {
-      console.log('deviceManager exist')
-      return
+      console.log(TAG+'deviceManager exist');
+      return;
     }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.pin',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
+        console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
         return
       }
       dmClass = dm
@@ -80,52 +189,40 @@ struct dialogPlusPage {
   }
 
   setUserOperation(operation: number) {
-    console.log('setUserOperation: ' + operation)
-    if(dmClass == null) {
-      console.log('setUserOperation: ' + 'dmClass null')
+    console.log(TAG+'setUserOperation: ' + operation)
+    if (dmClass == null) {
+      console.log(TAG+'setUserOperation: ' + 'dmClass null')
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra')
+      dmClass.setUserOperation(operation, 'extra');
     } catch (error) {
-      console.log('dmClass setUserOperation failed')
+      console.log(TAG+'dmClass setUserOperation failed')
     }
   }
 
   destruction() {
-    let temporaryWindow: window.Window = AppStorage.get('pinWin') as window.Window
-    temporaryWindow.destroy()
-    let context: Context.UIAbilityContext = AppStorage.get('pinContext') as Context.UIAbilityContext
-    context.terminateSelf()
+    console.log(TAG+'destruction()');
+    try {
+      console.log(TAG+'pin dialog terminateSelf');
+      let session = AppStorage.get<UIExtensionContentSession>('pinSession');
+      if (session) {
+        session.terminateSelf();
+      }
+    } catch(err) {
+      console.log(TAG+'dialog cancel failed: ' + JSON.stringify(err));
+    }
   }
 
   build() {
-    Row() {
-      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-        Column() {
-          Text(this.messageTitle)
-            .fontSize(35)
-            .fontWeight(FontWeight.Bold)
-          Text(this.messageTips)
-            .fontSize(30)
-            .fontWeight(FontWeight.Medium)
-          Row() {}.height('2%')
-          Text(this.pinCode)
-            .fontSize(30)
-            .fontWeight(FontWeight.Bold)
-          Row() {}.height('2%')
-          Button(this.cancel)
-            .fontSize(25)
-            .fontColor(0xffffff)
-            .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-            .fontWeight(FontWeight.Normal)
-            .onClick(() => {
-              this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY)
-              this.destruction()
-            })
-        }.width('100%')
-      }.width('100%')
-      .height('100%')
-    }.width('100%')
+    GridRow({
+      columns: { xs: 4, sm: 4, md: 8 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['360vp', '400vp']}
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: 4 } }) {
+        Column(this.dialogController.open())
+      }
+    }
   }
 }

@@ -107,7 +107,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_004, testing::ext::TestSize.Level0)
     jsonObject[PIN_CODE_KEY] = 123456;
     std::string authToken = jsonObject.dump();
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(PinAuthTest, StartAuth_002, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     std::string authToken = "";
     int32_t ret = pinAuth->StartAuth(authToken, authManager);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 }
 } // namespace DistributedHardware

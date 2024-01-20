@@ -153,6 +153,7 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dm_adapter_crypto.cpp",
       "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "src/ability/standard/dm_ability_manager.cpp",
+      "src/ability/standard/dm_dialog_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",
       "src/authentication/auth_message_processor.cpp",
       "src/authentication/auth_request_state.cpp",
