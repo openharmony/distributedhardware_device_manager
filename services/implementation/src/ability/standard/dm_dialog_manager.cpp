@@ -136,7 +136,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         return;
     }
     if (isDialogShow_.load()) {
-        auto status = dialogContition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
+        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
             [] () { return isDialogShow_.load(); });
         if (status) {
             LOGE("wait dm dialog close failed.");
