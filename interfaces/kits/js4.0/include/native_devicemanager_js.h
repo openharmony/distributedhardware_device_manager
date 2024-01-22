@@ -32,7 +32,6 @@
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 #define DM_NAPI_BUF_LENGTH (256)
-#define DM_NAPI_CREDENTIAL_BUF_LENGTH (6000)
 
 struct AsyncCallbackInfo {
     napi_env env = nullptr;
@@ -44,18 +43,6 @@ struct AsyncCallbackInfo {
     napi_ref callback = nullptr;
     int32_t status = -1;
     int32_t ret = 0;
-};
-
-struct CredentialAsyncCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-
-    std::string bundleName;
-    std::string reqInfo;
-    std::string returnJsonStr;
-    int32_t status = -1;
-    int32_t ret = 0;
-    napi_ref callback = nullptr;
 };
 
 struct DeviceBasicInfoListAsyncCallbackInfo {
@@ -103,15 +90,6 @@ struct DmNapiPublishJsCallback {
 
     DmNapiPublishJsCallback(std::string bundleName, int32_t publishId, int32_t reason)
         : bundleName_(bundleName), publishId_(publishId), reason_(reason) {}
-};
-
-struct DmNapiCredentialJsCallback {
-    std::string bundleName_;
-    int32_t action_;
-    std::string credentialResult_;
-
-    DmNapiCredentialJsCallback(std::string bundleName, int32_t action, std::string credentialResult)
-        : bundleName_(bundleName), action_(action), credentialResult_(credentialResult) {}
 };
 
 struct DmNapiAuthJsCallback {
@@ -208,19 +186,6 @@ private:
     std::string bundleName_;
 };
 
-class DmNapiCredentialCallback : public OHOS::DistributedHardware::CredentialCallback {
-public:
-    explicit DmNapiCredentialCallback(napi_env env, const std::string &bundleName) : env_(env), bundleName_(bundleName)
-    {
-    }
-    ~DmNapiCredentialCallback() override {};
-    void OnCredentialResult(int32_t &action, const std::string &credentialResult) override;
-
-private:
-    napi_env env_;
-    std::string bundleName_;
-};
-
 class DmNapiAuthenticateCallback : public OHOS::DistributedHardware::AuthenticateCallback {
 public:
     explicit DmNapiAuthenticateCallback(napi_env env, std::string &bundleName) : env_(env), bundleName_(bundleName)
@@ -307,8 +272,6 @@ private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;
     std::string bundleName_;
-    static std::mutex creMapLocks_;
     static AuthAsyncCallbackInfo authAsyncCallbackInfo_;
-    static CredentialAsyncCallbackInfo creAsyncCallbackInfo_;
 };
 #endif // OHOS_DM_NATIVE_DEVICEMANAGER_JS_H

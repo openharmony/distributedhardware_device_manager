@@ -65,7 +65,6 @@ std::map<std::string, std::shared_ptr<DmNapiPublishCallback>> g_publishCallbackM
 std::map<std::string, std::shared_ptr<DmNapiAuthenticateCallback>> g_authCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiBindTargetCallback>> g_bindCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCallbackMap;
-std::map<std::string, std::shared_ptr<DmNapiCredentialCallback>> g_creCallbackMap;
 
 std::mutex g_initCallbackMapMutex;
 std::mutex g_deviceManagerMapMutex;
@@ -113,8 +112,6 @@ bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi
 
 thread_local napi_ref DeviceManagerNapi::sConstructor_ = nullptr;
 AuthAsyncCallbackInfo DeviceManagerNapi::authAsyncCallbackInfo_;
-CredentialAsyncCallbackInfo DeviceManagerNapi::creAsyncCallbackInfo_;
-std::mutex DeviceManagerNapi::creMapLocks_;
 
 void DmNapiInitCallback::OnRemoteDied()
 {
@@ -936,7 +933,13 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
     } else {
         array[0] = CreateBusinessError(env, deviceBasicInfoListAsyncCallbackInfo->ret, false);
     }
-    if (deviceBasicInfoListAsyncCallbackInfo->eventHandleType == napi_function) {
+    if (deviceBasicInfoListAsyncCallbackInfo->deferred) {
+        if (deviceBasicInfoListAsyncCallbackInfo->status == 0) {
+            napi_resolve_deferred(env, deviceBasicInfoListAsyncCallbackInfo->deferred, array[1]);
+        } else {
+            napi_reject_deferred(env, deviceBasicInfoListAsyncCallbackInfo->deferred, array[0]);
+        }
+    } else {
         napi_value callResult = nullptr;
         napi_value handler = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceBasicInfoListAsyncCallbackInfo->callback,
@@ -947,12 +950,6 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
             NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceBasicInfoListAsyncCallbackInfo->callback));
         } else {
             LOGE("handler is nullptr");
-        }
-    } else {
-        if (deviceBasicInfoListAsyncCallbackInfo->status == 0) {
-            napi_resolve_deferred(env, deviceBasicInfoListAsyncCallbackInfo->deferred, array[1]);
-        } else {
-            napi_reject_deferred(env, deviceBasicInfoListAsyncCallbackInfo->deferred, array[0]);
         }
     }
 }
@@ -1006,7 +1003,6 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
     if (eventHandleType == napi_function) {
         LOGI("CallDeviceList for argc %d Type = %d", argc, (int)eventHandleType);
         napi_create_reference(env, argv[0], 1, &deviceBasicInfoListAsyncCallbackInfo->callback);
-        deviceBasicInfoListAsyncCallbackInfo->eventHandleType = napi_function;
         CallAsyncWork(env, deviceBasicInfoListAsyncCallbackInfo);
     }
     napi_get_undefined(env, &result);
@@ -1061,7 +1057,6 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListPromise(napi_env env,
     napi_value promise = 0;
     napi_create_promise(env, &deferred, &promise);
     deviceBasicInfoListAsyncCallbackInfo->deferred = deferred;
-    deviceBasicInfoListAsyncCallbackInfo->eventHandleType = napi_undefined;
     CallAsyncWork(env, deviceBasicInfoListAsyncCallbackInfo);
     return promise;
 }
@@ -1752,10 +1747,6 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     g_publishCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_authCallbackMap.erase(deviceManagerWrapper->bundleName_);
     g_bindCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    {
-        std::lock_guard<std::mutex> autoLock(creMapLocks_);
-        g_creCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    }
     napi_get_undefined(env, &result);
     NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
     return result;
