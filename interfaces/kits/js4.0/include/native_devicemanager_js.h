@@ -59,7 +59,6 @@ struct DeviceBasicInfoListAsyncCallbackInfo {
     napi_deferred deferred = nullptr;
     int32_t status = -1;
     int32_t ret = 0;
-    napi_valuetype eventHandleType;
 };
 
 struct AuthAsyncCallbackInfo {
