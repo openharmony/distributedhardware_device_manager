@@ -24,6 +24,7 @@
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
 #include "softbus_listener.h"
+#include "mine_softbus_listener.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -62,7 +63,7 @@ private:
     void HandleDiscoveryTimeout(std::string name);
     int32_t StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo, const std::map<std::string, std::string> &param);
     int32_t StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo, const std::map<std::string, std::string> &param);
-    int32_t StartDiscovering4MineMetaNode(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
+    int32_t StartDiscovering4MineLibary(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
                                           const std::string &searchJson);
     int32_t HandleDiscoveryQueue(const std::string &pkgName, uint16_t subscribeId,
         const std::map<std::string, std::string> &filterOps);
@@ -73,6 +74,7 @@ private:
     std::shared_ptr<DmTimer> timer_;
     std::map<std::string, uint16_t> pkgName2SubIdMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;
+    std::shared_ptr<MineSoftbusListener> mineSoftbusListener_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::queue<std::string> discoveryQueue_;
     std::map<std::string, DiscoveryContext> discoveryContextMap_;

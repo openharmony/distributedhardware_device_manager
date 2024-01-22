@@ -29,6 +29,7 @@ if (defined(ohos_lite)) {
         "include/softbus",
         "include/ipc/lite",
         "include/permission/lite",
+        "include/pinholder",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
@@ -65,6 +66,9 @@ if (defined(ohos_lite)) {
         "src/ipc/lite/ipc_server_main.cpp",
         "src/ipc/lite/ipc_server_stub.cpp",
         "src/permission/lite/permission_manager.cpp",
+        "src/pinholder/pin_holder.cpp",
+        "src/pinholder/pin_holder_session.cpp",
+        "src/softbus/mine_softbus_listener.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
 
@@ -72,7 +76,7 @@ if (defined(ohos_lite)) {
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerservice\"",
-        "LOG_DOMAIN=0xD004100",
+        "LOG_DOMAIN=0xD004110",
       ]
 
       deps = [
@@ -112,6 +116,7 @@ if (defined(ohos_lite)) {
       "include/ipc",
       "include/ipc/standard",
       "include/permission/standard",
+      "include/pinholder",
       "include/softbus",
       "${common_path}/include",
       "${common_path}/include/dfx",
@@ -157,6 +162,9 @@ if (defined(ohos_lite)) {
       "src/ipc/standard/ipc_server_listener.cpp",
       "src/ipc/standard/ipc_server_stub.cpp",
       "src/permission/standard/permission_manager.cpp",
+      "src/pinholder/pin_holder.cpp",
+      "src/pinholder/pin_holder_session.cpp",
+      "src/softbus/mine_softbus_listener.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
 
@@ -165,7 +173,7 @@ if (defined(ohos_lite)) {
     defines = [
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerservice\"",
-      "LOG_DOMAIN=0xD004100",
+      "LOG_DOMAIN=0xD004110",
     ]
 
     deps = [

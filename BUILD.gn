@@ -45,7 +45,7 @@ if (defined(ohos_lite)) {
 } else {
   if (defined(harmony_industry_project) &&
       harmony_industry_project == "MINE_HARMONY") {
-    defines += "MINE_HARMONY"
+    defines += [ "MINE_HARMONY" ]
   }
   group("device_manager") {
     deps = [
