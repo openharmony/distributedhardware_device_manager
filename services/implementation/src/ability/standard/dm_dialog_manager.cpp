@@ -44,7 +44,7 @@ std::string DmDialogManager::deviceName_ = "";
 std::string DmDialogManager::appOperationStr_ = "";
 std::string DmDialogManager::customDescriptionStr_ = "";
 std::string DmDialogManager::pinCode_ = "";
-std::atomic<bool> DmDialogManager::isDialogShow_(false);
+std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
 std::condition_variable DmDialogManager::dialogCondition_;
 int32_t DmDialogManager::deviceType_ = -1;
 
@@ -135,10 +135,10 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         LOGE("remoteObject is nullptr");
         return;
     }
-    if (isDialogShow_.load()) {
+    if (!isDialogDestroy_.load()) {
         auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
-            [] () { return isDialogShow_.load(); });
-        if (status) {
+            [] () { return isDialogDestroy_.load(); });
+        if (!status) {
             LOGE("wait dm dialog close failed.");
             return;
         }
@@ -168,7 +168,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         LOGE("show dm dialog is failed: %{public}d", ret);
         return;
     }
-    isDialogShow_.store(true);
+    isDialogDestroy_.store(false);
     LOGI("show dm dialog is success");
 }
 
@@ -177,7 +177,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityDisconnectDone(
 {
     LOGI("OnAbilityDisconnectDone");
     std::lock_guard<std::mutex> lock(mutex_);
-    isDialogShow_.store(false);
+    isDialogDestroy_.store(true);
     dialogCondition_.notify_all();
 }
 }

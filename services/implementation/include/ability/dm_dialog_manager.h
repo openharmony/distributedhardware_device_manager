@@ -86,7 +86,7 @@ private:
     static std::string customDescriptionStr_;
     static std::string pinCode_;
     static int32_t deviceType_;
-    static std::atomic<bool> isDialogShow_;
+    static std::atomic<bool> isDialogDestroy_;
     static std::condition_variable dialogCondition_;
     sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ {nullptr};
 };
