@@ -72,7 +72,7 @@ ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"ShiftLNNGearDeviceServiceFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 

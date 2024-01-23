@@ -51,7 +51,7 @@ ohos_fuzztest("SoftbusConnectorRegisterFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SoftbusConnectorRegisterFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 

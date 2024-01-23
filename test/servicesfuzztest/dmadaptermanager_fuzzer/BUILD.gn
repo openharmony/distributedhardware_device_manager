@@ -56,7 +56,7 @@ ohos_fuzztest("DmAdapterManagerFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DmAdapterManagerFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 
   external_deps = [

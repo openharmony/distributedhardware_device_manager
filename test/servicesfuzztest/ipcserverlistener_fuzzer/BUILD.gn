@@ -78,7 +78,7 @@ ohos_fuzztest("IpcServerListenerFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"IpcServerListenerFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 
   public_deps = [ "//third_party/googletest:gmock" ]

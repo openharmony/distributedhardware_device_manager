@@ -939,7 +939,7 @@ config("device_manager_test_common_public_config") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"device_manager_UTtest\"",
-    "LOG_DOMAIN=0xD004190",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 
