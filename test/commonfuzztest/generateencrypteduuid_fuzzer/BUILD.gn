@@ -46,7 +46,7 @@ ohos_fuzztest("GenerateEncryptedUuidFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"GenerateEncryptedUuidFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 
