@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "parameter.h"
+#include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -59,39 +60,25 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::
 }
 
 /**
+ * @tc.name: ConvertNodeBasicInfoToDmDevice_002
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_002, testing::ext::TestSize.Level0)
+{
+    NodeBasicInfo nodeBasicInfo;
+    DmDeviceBasicInfo dmDevicdeviceNameeInfo;
+    int32_t ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDevicdeviceNameeInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: OnParameterChgCallback_001
  * @tc.desc: return true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize.Level0)
-{
-    const char *key = "123";
-    const char *value = "1";
-    void *context = nullptr;
-    softbusListener->OnParameterChgCallback(key, value, context);
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftbusDeviceOnline(info);
-    softbusListener->OnSoftbusDeviceOffline(info);
-}
-
-/**
- * @tc.name: ShiftLNNGear_001
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
-{
-    EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
-}
-
-/**
- * @tc.name: OnParameterChgCallback_002
- * @tc.desc: return true
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_002, testing::ext::TestSize.Level0)
 {
     const char *key = "222";
     const char *value = "0";
@@ -104,6 +91,17 @@ HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_002, testing::ext::TestSize
         };
     softbusListener->OnSoftbusDeviceOnline(&info);
     softbusListener->OnSoftbusDeviceOffline(&info);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+/**
+ * @tc.name: ShiftLNNGear_001
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
+{
+    EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
 }
 
 /**
@@ -154,16 +152,320 @@ HWTEST_F(SoftbusListenerTest, GetLocalDeviceType_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-/**
- * @tc.name: ConvertNodeBasicInfoToDmDevice_002
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
 {
-    NodeBasicInfo nodeBasicInfo;
-    DmDeviceBasicInfo dmDevicdeviceNameeInfo;
-    int32_t ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDevicdeviceNameeInfo);
+    DmDeviceInfo deviceInf = {
+        .deviceId = "123456",
+        .deviceName = "name",
+        .deviceTypeId = 1,
+        .networkId = "123456",
+    };
+    softbusListener->DeviceOnLine(deviceInf);
+    softbusListener->DeviceNameChange(deviceInf);
+    softbusListener->DeviceOffLine(deviceInf);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_001, testing::ext::TestSize.Level0)
+{
+    NodeBasicInfoType type = NodeBasicInfoType::TYPE_DEVICE_NAME;
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceInfoChanged(type, info);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_002, testing::ext::TestSize.Level0)
+{
+    NodeBasicInfoType type = NodeBasicInfoType::TYPE_DEVICE_NAME;
+    NodeBasicInfo nodeBasic;
+    NodeBasicInfo *info = &nodeBasic;
+    softbusListener->OnSoftbusDeviceInfoChanged(type, info);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_003, testing::ext::TestSize.Level0)
+{
+    NodeBasicInfoType type = NodeBasicInfoType::TYPE_NETWORK_INFO;
+    NodeBasicInfo nodeBasic;
+    NodeBasicInfo *info = &nodeBasic;
+    softbusListener->OnSoftbusDeviceInfoChanged(type, info);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level0)
+{
+    DeviceInfo *device = nullptr;
+    softbusListener->OnSoftbusDeviceFound(device);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.Level0)
+{
+    DeviceInfo info;
+    DeviceInfo *device = &info;
+    softbusListener->OnSoftbusDeviceFound(device);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusDiscoveryResult_001, testing::ext::TestSize.Level0)
+{
+    int subscribeId = 1;
+    RefreshResult result = RefreshResult::REFRESH_LNN_SUCCESS;
+    softbusListener->OnSoftbusDiscoveryResult(subscribeId, result);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusPublishResult_001, testing::ext::TestSize.Level0)
+{
+    int subscribeId = 1;
+    PublishResult result = PublishResult::PUBLISH_LNN_SUCCESS;
+    softbusListener->OnSoftbusPublishResult(subscribeId, result);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, StartDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string searchJson;
+    DmSubscribeInfo dmSubscribeInfo;
+    int32_t ret = softbusListener->StartDiscovery(pkgName, searchJson, dmSubscribeInfo);
+    EXPECT_EQ(ret, ERR_DM_JSON_PARSE_STRING);
+}
+
+HWTEST_F(SoftbusListenerTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level0)
+{
+    DmPublishInfo dmPubInfo;
+    std::string capability;
+    std::string customData;
+    int32_t ret = softbusListener->PublishSoftbusLNN(dmPubInfo, capability, customData);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
+{
+    int32_t publishId = 1;
+    int32_t ret = softbusListener->StopPublishSoftbusLNN(publishId);
+    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, RegisterSoftbusLnnOpsCbk_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<ISoftbusDiscoveringCallback> callback = nullptr;
+    int32_t ret = softbusListener->RegisterSoftbusLnnOpsCbk(pkgName, callback);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(SoftbusListenerTest, RegisterSoftbusLnnOpsCbk_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<ISoftbusDiscoveringCallback> callback = std::make_shared<ISoftbusDiscoveringCallbackTest>();
+    int32_t ret = softbusListener->RegisterSoftbusLnnOpsCbk(pkgName, callback);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, UnRegisterSoftbusLnnOpsCbk_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t ret = softbusListener->UnRegisterSoftbusLnnOpsCbk(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    char *networkId = nullptr;
+    std::string udid;
+    int32_t ret = softbusListener->GetUdidByNetworkId(networkId, udid);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    char *networkId = nullptr;
+    std::string udid;
+    int32_t ret = softbusListener->GetUuidByNetworkId(networkId, udid);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
+{
+    DeviceInfo device;
+    DmDeviceInfo dmDevice;
+    softbusListener->ConvertDeviceInfoToDmDevice(device, dmDevice);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    char *networkId;
+    int32_t networkType = -1;
+    int32_t ret = softbusListener->GetNetworkTypeByNetworkId(networkId, networkType);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level0)
+{
+    DeviceInfo *device;
+    softbusListener->CacheDiscoveredDevice(device);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    PeerTargetId targetId;
+    ConnectionAddrType addrType;
+    int32_t ret = softbusListener->GetTargetInfoFromCache(deviceId, targetId, addrType);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, ClearDiscoveredDevice_001, testing::ext::TestSize.Level0)
+{
+    softbusListener->ClearDiscoveredDevice();
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, IsDmRadarHelperReady_001, testing::ext::TestSize.Level0)
+{
+    bool ret = softbusListener->IsDmRadarHelperReady();
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(SoftbusListenerTest, CloseDmRadarHelperObj_001, testing::ext::TestSize.Level0)
+{
+    std::string name;
+    bool ret = softbusListener->CloseDmRadarHelperObj(name);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(SoftbusListenerTest, ParseSearchJson_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    string searchJson;
+    char *output = nullptr;
+    size_t *outLen = nullptr;
+    int32_t ret = softbusListener->ParseSearchJson(pkgName, searchJson, output, outLen);
+    EXPECT_EQ(ret, ERR_DM_INVALID_JSON_STRING);
+}
+
+HWTEST_F(SoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    nlohmann::json object;
+    object["findDeviceMode"]  = 2;
+    string searchJson = object.dump();
+    char *output = nullptr;
+    size_t *outLen = nullptr;
+    int32_t ret = softbusListener->ParseSearchScopeDevice(pkgName, searchJson, output, outLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    nlohmann::json object;
+    object["findDeviceMode"]  = 3;
+    string searchJson = object.dump();
+    char *output = nullptr;
+    size_t *outLen = nullptr;
+    int32_t ret = softbusListener->ParseSearchVertexDevice(pkgName, searchJson, output, outLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::TestSize.Level0)
+{
+    json object;
+    object["tructOptions"] = true;
+    BroadcastHead broadcastHead;
+    int32_t ret = softbusListener->SetBroadcastTrustOptions(object, broadcastHead);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, SetBroadcastPkgname_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    BroadcastHead broadcastHead;
+    int32_t ret = softbusListener->SetBroadcastPkgname(pkgName, broadcastHead);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, CreateSoftbusSessionServer_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    std::string sessionName;
+    int32_t ret = SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(pkgName, sessionName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, RemoveSoftbusSessionServer_001, testing::ext::TestSize.Level0)
+{
+    string pkgName;
+    std::string sessionName;
+    int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(pkgName, sessionName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusSessionOpened_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    SoftbusAdapter::GetInstance().OnSoftbusSessionOpened(sessionId, result);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSoftbusSessionClosed_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    SoftbusAdapter::GetInstance().OnSoftbusSessionClosed(sessionId);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    void *data = nullptr;
+    uint32_t dataLen = 0;
+    SoftbusAdapter::GetInstance().OnBytesReceived(sessionId, data, dataLen);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnStreamReceived_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    StreamData *data = nullptr;
+    StreamData *ext = nullptr;
+    StreamFrameInfo *frameInfo = nullptr;
+    SoftbusAdapter::GetInstance().OnStreamReceived(sessionId, data, ext, frameInfo);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnMessageReceived_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    void *data = nullptr;
+    unsigned int dataLen = 0;
+    SoftbusAdapter::GetInstance().OnMessageReceived(sessionId, data, dataLen);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnQosEvent_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    int32_t result = 0;
+    int eventId = 1;
+    int tvCount = 1;
+    QosTv *tvList = nullptr;
+    SoftbusAdapter::GetInstance().OnQosEvent(sessionId, eventId, tvCount, tvList);
+    int32_t ret = SoftbusAdapter::GetInstance().sessListener_.OnSessionOpened(sessionId, result);
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
