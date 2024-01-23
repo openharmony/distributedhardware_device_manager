@@ -66,7 +66,7 @@ struct InputCustomDialog {
           return
         }
         if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
-          this.cancel()
+          this.destruction()
           return
         }
         if (msg === MSG_PIN_CODE_ERROR) {
