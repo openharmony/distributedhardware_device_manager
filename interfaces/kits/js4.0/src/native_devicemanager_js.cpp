@@ -541,7 +541,7 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
-    SetDmDeviceBasicObject(env_, deviceBasicInfo, device);
+    DmDeviceBasicToJsObject(env_, deviceBasicInfo, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
@@ -558,7 +558,7 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
 
     napi_value device = nullptr;
     napi_create_object(env_, &device);
-    SetDmDeviceBasicObject(env_, deviceBasicInfo, device);
+    DmDeviceBasicToJsObject(env_, deviceBasicInfo, device);
 
     napi_set_named_property(env_, result, "device", device);
     OnEvent("discoverSuccess", DM_NAPI_ARGS_ONE, &result);

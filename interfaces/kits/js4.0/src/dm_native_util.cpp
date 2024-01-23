@@ -245,7 +245,7 @@ void DeviceBasicInfoToJsArray(const napi_env &env,
 {
     napi_value result = nullptr;
     napi_create_object(env, &result);
-    SetDmDeviceBasicObject(env, vecDevInfo[idx], result);
+    DmDeviceBasicToJsObject(env, vecDevInfo[idx], result);
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
@@ -253,12 +253,12 @@ void DeviceBasicInfoToJsArray(const napi_env &env,
     }
 }
 
-void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result)
+void DmDeviceBasicToJsObject(napi_env env, const DmDeviceBasicInfo &devInfo, napi_value &result)
 {
-    SetValueUtf8String(env, "deviceId", vecDevInfo.deviceId, result);
-    SetValueUtf8String(env, "networkId", vecDevInfo.networkId, result);
-    SetValueUtf8String(env, "deviceName", vecDevInfo.deviceName, result);
-    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(vecDevInfo.deviceTypeId));
+    SetValueUtf8String(env, "deviceId", devInfo.deviceId, result);
+    SetValueUtf8String(env, "networkId", devInfo.networkId, result);
+    SetValueUtf8String(env, "deviceName", devInfo.deviceName, result);
+    std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(devInfo.deviceTypeId));
     SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
 }
 

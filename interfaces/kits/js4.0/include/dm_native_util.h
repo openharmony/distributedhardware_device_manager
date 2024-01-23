@@ -65,7 +65,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
 bool IsFunctionType(napi_env env, napi_value value);
-void SetDmDeviceBasicObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
+void DmDeviceBasicToJsObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
 bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue);
 } // namespace DistributedHardware
 } // namespace OHOS
