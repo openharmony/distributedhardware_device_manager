@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,9 +33,9 @@ class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
 public:
     DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
     virtual ~DeviceDiscoveryCallbackTest() {}
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override {}
 };
 
 void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
@@ -44,6 +44,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
+    uint16_t subscriptionId = 22;
 
     DmSubscribeInfo subInfo;
     subInfo.subscribeId = *(reinterpret_cast<const uint16_t*>(data));
@@ -58,7 +59,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     bundleName = "111";
-    subInfo.subscribeId = 22;
+    subInfo.subscribeId = subscriptionId;
     DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subInfo, extra, callback);
     usleep(SLEEP_TIME_US);
     DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subInfo.subscribeId);

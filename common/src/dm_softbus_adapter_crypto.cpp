@@ -137,13 +137,14 @@ int32_t DmSoftbusAdapterCrypto::ConvertHexStringToBytes(unsigned char *outBuf, u
 int32_t DmSoftbusAdapterCrypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     char hashResult[SHA_HASH_LEN] = {0};
-    int32_t ret = DmGenerateStrHash((const uint8_t *)udid.c_str(), strlen(udid.c_str()), (uint8_t *)hashResult);
+    int32_t ret = DmGenerateStrHash(reinterpret_cast<const uint8_t *>(udid.c_str()), strlen(udid.c_str()),
+        reinterpret_cast<uint8_t *>(hashResult));
     if (ret != DM_OK) {
         LOGE("GenerateStrHash failed");
         return ret;
     }
-    ret = ConvertBytesToHexString((char *)udidHash, SHORT_DEVICE_ID_HASH_LENGTH + 1, (const uint8_t *)hashResult,
-        SHORT_DEVICE_ID_HASH_LENGTH / HEXIFY_UNIT_LEN);
+    ret = ConvertBytesToHexString(reinterpret_cast<char *>(udidHash), SHORT_DEVICE_ID_HASH_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hashResult), SHORT_DEVICE_ID_HASH_LENGTH / HEXIFY_UNIT_LEN);
     if (ret != DM_OK) {
         LOGE("ConvertBytesToHexString failed");
         return ret;
