@@ -17,13 +17,14 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 import deviceInfo from '@ohos.deviceInfo';
 
 let dmClass: deviceManager.DeviceManager | null;
-let gThis: dialogPlusPage;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
-const ACTION_ALLOW_AUTH_ONCE: number = 0
-const ACTION_CANCEL_AUTH: number = 1
-const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
-const ACTION_ALLOW_AUTH_ALWAYS: number = 6
-const MSG_CANCEL_CONFIRM_SHOW: number = 5
+const ACTION_ALLOW_AUTH_ONCE: number = 0;
+const ACTION_CANCEL_AUTH: number = 1;
+const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2;
+const ACTION_ALLOW_AUTH_ALWAYS: number = 6;
+const MSG_CANCEL_CONFIRM_SHOW: number = 5;
+const DEVICE_TYPE_2IN1: number = 0xA2F;
+const DEVICE_TYPE_PC: number = 0x0C;
 
 @CustomDialog
 struct ConfirmCustomDialog {
@@ -34,11 +35,11 @@ struct ConfirmCustomDialog {
   @State peerCustomDescription: string = '';
   @State peerDeviceName: string = '';
   @State peerDeviceType: number = 0;
-  @State secondsNum: number = 60;
+  @State secondsNum: number = 30;
   @State times: number = 0;
-  @State selectIndex: number = 0;
+  @State selectIndex: number = -1;
   @State isAvailableType: boolean = false;
-
+  @state btnColor: ResourceColor = Color.Transparent;
   controller?: CustomDialogController
 
   aboutToAppear() {
@@ -73,6 +74,7 @@ struct ConfirmCustomDialog {
         console.info('click cancel times run out');
       }
     }, 1000)
+    console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
   }
 
   onAllowOnce() {
@@ -159,6 +161,12 @@ struct ConfirmCustomDialog {
     } else if (peerdeviceType == deviceManager.DeviceType.TV) {
       this.isAvailableType = true
       return $r('app.media.ic_device_smartscreen')
+    } else if (peerdeviceType == DEVICE_TYPE_PC) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_matebook')
+    } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_matebook')
     } else {
       this.isAvailableType = false
       return $r('app.media.icon')
@@ -166,81 +174,142 @@ struct ConfirmCustomDialog {
   }
 
   build() {
-    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center, direction: FlexDirection.Column }) {
+    Column() {
       Image(this.getImages(this.peerDeviceType))
-      .width(24)
-      .height(24)
-      .margin({bottom: 16})
-      .visibility(this.isAvailableType == false? Visibility.None : Visibility.Visible)
+        .width(24)
+        .height(24)
+        .margin({ bottom: 16, top: 24 })
+        .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
       Column() {
         Text(this.peerDeviceName + this.peerAppOperation + this.message)
           .textAlign(TextAlign.Start)
-          .fontColor("#182431")
+          .fontColor($r('sys.color.ohos_id_color_text_primary'))
           .fontWeight(FontWeight.Medium)
-          .fontSize(16)
+          .fontSize($r('sys.float.ohos_id_text_size_body1'))
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
         Text(this.peerCustomDescription)
           .textAlign(TextAlign.Start)
+          .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+          .fontWeight(FontWeight.Regular)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(14)
+          .fontSize($r('sys.float.ohos_id_text_size_body2'))
           .maxLines(3)
           .constraintSize({ maxHeight: 45 })
           .width('100%')
-          .opacity(0.6)
-          .margin({top:2})
+          .margin({ top: 2 })
           .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
-      }.margin({bottom: 16})
-      .width('100%')
+      }.margin({ bottom: 16, left: 24, right: 24 })
 
-      Button(this.allowAlways)
-        .margin({ bottom: 2 })
-        .onClick(() => {
-          this.onAllowAlways();
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 0
-          }
-        })
-        .backgroundColor(this.selectIndex == 0 ? '#007DFF' : 0xffffff)
-        .fontColor(this.selectIndex == 0 ? 0xffffff : '#007DFF')
-        .height(40)
-        .width('100%')
-      Button(this.allowOnce)
-        .margin({ bottom: 2, left: 16, right: 16 })
-        .onClick(() => {
-          this.onAllowOnce();
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 1
-          }
-        })
-        .backgroundColor(this.selectIndex == 1 ? '#007DFF' : 0xffffff)
-        .fontColor(this.selectIndex == 1 ? 0xffffff : '#007DFF')
-        .height(40)
-        .width('100%')
-      Button('不信任(' + this.secondsNum + '秒)')
-        .margin({ left: 16, right: 16 })
-        .backgroundColor(this.selectIndex == 2 ? '#007DFF' : 0xffffff)
-        .fontColor(this.selectIndex == 2 ? 0xffffff : '#007DFF')
-        .onClick(() => {
-          this.onCancel();
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 2
-          }
-        })
-        .height(40)
-        .width('100%')
+      Column() {
+        Button(this.allowAlways)
+          .margin({ bottom: 4 })
+          .onClick(() => {
+            this.onAllowAlways();
+          })
+          .onTouch((event?: TouchEvent | undefined) => {
+            if (event != undefined && event.type === TouchType.Down) {
+              this.selectIndex = 0;
+            }
+            if (event != undefined && event.type === TouchType.Up) {
+              this.selectIndex = -1;
+            }
+          })
+          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+          .height(40)
+          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
+          .backgroundColor(this.btnColor)
+          .onHover((isHover?: boolean, event?: HoverEvent): void => {
+            if (isHover) {
+              this.btnColor = $r('sys.color.ohos_id_color_hover');
+            } else {
+              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+            }
+          })
+          .stateStyles({
+            pressed: {
+              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+            },
+            normal: {
+              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+            }
+          })
+        Button(this.allowOnce)
+          .margin({ bottom: 4 })
+          .onClick(() => {
+            this.onAllowOnce();
+          })
+          .onTouch((event?: TouchEvent | undefined) => {
+            if (event != undefined && event.type === TouchType.Down) {
+              this.selectIndex = 1;
+            }
+            if (event != undefined && event.type === TouchType.Up) {
+              this.selectIndex = -1;
+            }
+          })
+          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+          .height(40)
+          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
+          .backgroundColor(this.btnColor)
+          .onHover((isHover?: boolean, event?: HoverEvent): void => {
+            if (isHover) {
+              this.btnColor = $r('sys.color.ohos_id_color_hover');
+            } else {
+              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+            }
+          })
+          .stateStyles({
+            pressed: {
+              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+            },
+            normal: {
+              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+            }
+          })
+        Button('不信任(' + this.secondsNum + ' 秒)')
+          .margin({ left: 16, right: 16 })
+          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+          .onClick(() => {
+            this.onCancel();
+          })
+          .onTouch((event?: TouchEvent | undefined) => {
+            if (event != undefined && event.type === TouchType.Down) {
+              this.selectIndex = 2;
+            }
+            if (event != undefined && event.type === TouchType.Up) {
+              this.selectIndex = -1;
+            }
+          })
+          .height(40)
+          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
+          .backgroundColor(this.btnColor)
+          .onHover((isHover?: boolean, event?: HoverEvent): void => {
+            if (isHover) {
+              this.btnColor = $r('sys.color.ohos_id_color_hover');
+            } else {
+              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+            }
+          })
+          .stateStyles({
+            pressed: {
+              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+            },
+            normal: {
+              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+            }
+          })
+      }
+      .margin({
+        left: 16,
+        right: 16,
+        bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 24 : 8
+      })
     }
-    .padding({ top: 12, bottom: 12, left: 16, right: 16 })
-    .height(300)
     .width('100%')
-    .borderRadius(24)
+    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+    .backgroundColor($r('sys.color.ohos_id_color_mask_thin'))
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
   }
 }
 
@@ -249,13 +318,13 @@ struct ConfirmCustomDialog {
 struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: ConfirmCustomDialog(),
-    cancel: this.onCancel,
     autoCancel: false,
     alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
-      DialogAlignment.Bottom : DialogAlignment.Center,
+    DialogAlignment.Bottom : DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
-    gridCount: 4,
-    customStyle: false
+    gridCount: (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 3 : 4,
+    customStyle: false,
+    maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
   initStatue() {
@@ -265,39 +334,25 @@ struct dialogPlusPage {
     }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm',
       (err: Error, dm: deviceManager.DeviceManager) => {
-      if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
-        return
-      }
-      dmClass = dm
-      dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
-        let tmpStr: Record<string, number> = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg as number
-        if (msg === MSG_CANCEL_CONFIRM_SHOW) {
-          this.destruction()
+        if (err) {
+          console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
           return
         }
+        dmClass = dm
+        dmClass.on('uiStateChange', (data: Record<string, string>) => {
+          console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
+          let tmpStr: Record<string, number> = JSON.parse(data.param)
+          let msg: number = tmpStr.uiStateMsg as number
+          if (msg === MSG_CANCEL_CONFIRM_SHOW) {
+            this.destruction()
+            return
+          }
+        })
       })
-    })
-  }
-
-  onAllowOnce() {
-    console.log('allow once')
-  }
-
-  onAllowAlways() {
-    console.log('allow always')
-  }
-
-  onCancel() {
-    console.log('cancel')
   }
 
   onPageShow() {
     console.log('onPageShow')
-    gThis = this
-
     this.initStatue()
   }
 
@@ -320,7 +375,7 @@ struct dialogPlusPage {
     GridRow({
       columns: { xs: 4, sm: 4, md: 8 },
       gutter: { x: 4 },
-      breakpoints: { value: ['360vp', '400vp']}
+      breakpoints: { value: ['360vp', '400vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: 4 } }) {
         Column(this.dialogController.open())
