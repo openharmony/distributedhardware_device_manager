@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -653,6 +653,77 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSi
     std::string udidHash;
     std::string str = softbusConnector->GetDeviceUdidByUdidHash(udidHash);
     EXPECT_EQ(str.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterSoftbusStateCallback_001
+ * @tc.desc: set callback null
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<ISoftbusStateCallback> callback = nullptr;
+    int32_t ret = softbusConnector->RegisterSoftbusStateCallback(callback);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UnRegisterSoftbusStateCallback_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = softbusConnector->UnRegisterSoftbusStateCallback();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: OnSoftbusJoinLNNResult_001
+ * @tc.desc: set addr null
+ * @tc.desc: set networkId null
+ * @tc.desc: set result 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSize.Level0)
+{
+    ConnectionAddr *addr = nullptr;
+    char *networkId = nullptr;
+    int32_t result = 0;
+    softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+}
+
+/**
+ * @tc.name: GetLocalDeviceTypeId_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = softbusConnector->GetLocalDeviceTypeId();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: AddMemberToDiscoverMap_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    std::shared_ptr<DeviceInfo> deviceInfo = nullptr;
+    int32_t ret = softbusConnector->AddMemberToDiscoverMap(deviceId, deviceInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetPkgName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, SetPkgName_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    softbusConnector->SetPkgName(pkgName);
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), false);
 }
 } // namespace
 } // namespace DistributedHardware
