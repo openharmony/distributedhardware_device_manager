@@ -268,7 +268,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGE("ReportDeleteTrustRelation failed");
     }
     if (!DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, deviceUdid)) {
-        LOGE("The pkgname %s cannot unbind.", pkgName.c_str());
+        LOGE("The pkgName %s cannot unbind.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     remoteDeviceId_ = deviceUdid;
@@ -327,7 +327,8 @@ void DmAuthManager::SyncDeleteAcl(const std::string &pkgName, const std::string 
 
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
-    LOGI("DmAuthManager::OnSessionOpened sessionId = %d result = %d", sessionId, result);
+    LOGI("DmAuthManager::OnSessionOpened, sessionId = %d and sessionSide = %d result = %d",
+         sessionId, sessionSide, result);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
