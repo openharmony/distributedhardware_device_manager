@@ -362,7 +362,8 @@ std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &
 
 DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId)
 {
-    LOGI("GetOfflineParamFromAcl start.");
+    LOGI("DeviceProfileConnector::GetOfflineParamFromAcl, trustDeviceId = %s and requestDeviceId = %s",
+         GetAnonyString(trustDeviceId).c_str(), GetAnonyString(requestDeviceId).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
     DmOfflineParam offlineParam;
@@ -381,8 +382,6 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
         } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
             priority = DEVICE_PEER_TO_PEER_TYPE;
             offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-            offlineParam.leftAclNumber--;
         } else if ((item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
             item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
             (item.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
