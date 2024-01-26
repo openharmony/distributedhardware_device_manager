@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -567,7 +567,7 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
     }
 
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(udid, (uint8_t *)udidHash) != DM_OK) {
+    if (DmSoftbusAdapterCrypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(udid).c_str());
         return "";
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -232,8 +232,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         char udidHash[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId,
-            (uint8_t *)udidHash) == DM_OK) {
+        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
             localDeviceId_ = udidHash;
         }
     }
@@ -261,7 +260,7 @@ int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     char udidHash[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, (uint8_t *)udidHash);
+    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
     if (ret != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(localDeviceId).c_str());
         deviceId = "";
