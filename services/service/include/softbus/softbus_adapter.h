@@ -22,10 +22,6 @@
 
 #include "session.h"
 #include "single_instance.h"
-
-#include "dm_constants.h"
-#include "dm_device_info.h"
-#include "dm_log.h"
 namespace OHOS {
 namespace DistributedHardware {
 class SoftbusAdapter {

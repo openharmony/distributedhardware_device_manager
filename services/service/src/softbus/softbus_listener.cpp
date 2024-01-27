@@ -32,7 +32,7 @@
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "dm_softbus_adapter_crypto.h"
-#include "softbus_adapte.cpp"
+#include "softbus_adapter.cpp"
 #include "softbus_common.h"
 #include "softbus_bus_center.h"
 #include "dm_radar_helper.h"
@@ -540,7 +540,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
     struct RadarInfo info = {
         .funcName = "RefreshSoftbusLNN",
-        .toCallPkg = SOFTBUSNAME,
+        .toCallPkg = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
                     static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
@@ -594,7 +594,7 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopRefreshSoftbusLNN",
-        .hostName = SOFTBUSNAME,
+        .hostName = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
                     static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?

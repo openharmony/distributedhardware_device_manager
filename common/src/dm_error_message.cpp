@@ -24,7 +24,7 @@ typedef struct ERROR_INFO {
     std::string errMsg;
 } ERROR_INFO;
 
-static ERROR_INFO g_errorMessages[] = {
+ERROR_INFO g_errorMessages[] = {
     {ERR_DM_FAILED, "dm process execution failed."},
     {ERR_DM_TIME_OUT, "dm process execution timeout."},
     {ERR_DM_NOT_INIT, "dm service is not initialized, please try again later."},

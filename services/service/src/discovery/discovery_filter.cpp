@@ -15,11 +15,9 @@
 
 #include "discovery_filter.h"
 
-#include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_device_info.h"
-#include "dm_log.h"
 #include "nlohmann/json.hpp"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -27,7 +25,8 @@ const std::string FILTERS_KEY = "filters";
 const std::string FILTER_OP_KEY = "filter_op";
 const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
-
+const int32_t DM_OK = 0;
+const int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
 enum DmDiscoveryDeviceFilter {
     DM_INVALID_DEVICE = 0,
     DM_VALID_DEVICE = 1,

@@ -170,7 +170,7 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryCallback_);
     struct RadarInfo info = {
         .funcName = "StartDiscovery",
-        .toCallPkg = SOFTBUSNAME,
+        .toCallPkg = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
@@ -204,7 +204,7 @@ int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
     int32_t ret = ::RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusDiscoveryByIdCallback_);
     struct RadarInfo info = {
         .funcName = "StartDiscovery",
-        .toCallPkg = SOFTBUSNAME,
+        .toCallPkg = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
@@ -228,7 +228,7 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopDiscovery",
-        .hostName = SOFTBUSNAME,
+        .hostName = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
             static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?

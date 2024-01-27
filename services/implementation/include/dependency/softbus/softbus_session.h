@@ -34,11 +34,11 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void Encrypt(char* plainText, char* cipherText);
-    static void Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText);
     static void GetRealMessage(const void* data, unsigned int dataLen, std::string& message);
     static void OnUnbindSessionOpened(int sessionId, int result);
     static AesGcmCipherKey GetSessionKeyAndIv();
+    static void Encrypt(char* plainText, char* cipherText);
+    static void Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText); 
 
 public:
     SoftbusSession();
@@ -86,7 +86,6 @@ public:
      */
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
     int32_t OpenUnbindSession(const std::string &netWorkId);
-
     int32_t SendHeartbeatData(int32_t sessionId, std::string &message);
 
 private:

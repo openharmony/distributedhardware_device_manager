@@ -54,10 +54,10 @@ typedef struct {
 
 class DmAdapterCrypto {
 public:
-    static int32_t MbedAesGcmEncrypt(AesGcmCipherKey *cipherKey, const unsigned char *plainText, int32_t plainTextSize,
+    static void MbedAesGcmEncrypt(AesGcmCipherKey *cipherKey, const unsigned char *plainText, int32_t plainTextSize,
         unsigned char *cipherText, int32_t cipherTextLen);
 
-    static int32_t MbedAesGcmDecrypt(AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
+    static void MbedAesGcmDecrypt(AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
         int32_t cipherTextSize, unsigned char *plain, int32_t plainLen);
 #endif // !AES_GCM_H
 };

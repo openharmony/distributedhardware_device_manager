@@ -15,9 +15,8 @@
 
 #include "dm_log.h"
 
-#include "dm_constants.h"
 #include "securec.h"
-
+#include <string>
 #ifdef HI_LOG_ENABLE
 #include "hilog/log.h"
 #else

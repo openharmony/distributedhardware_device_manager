@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "dm_constants.h"
 #include "dm_distributed_hardware_load.h"
 
 namespace OHOS {
