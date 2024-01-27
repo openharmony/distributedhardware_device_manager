@@ -146,25 +146,14 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("IpcClientManager::SendRequest in");
-    std::string pkgName = req->GetPkgName();
-    if (!IsInit(pkgName)) {
-        LOGE("IpcClientManager::SendRequest ERR_DM_INIT_FAILED");
+
+    if (dmInterface_ != nullptr) {
+        LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
+        return dmInterface_->SendCmd(cmdCode, req, rsp);
+    } else {
+        LOGE("dmInterface_ is not init.");
         return ERR_DM_INIT_FAILED;
     }
-
-    LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
-    return dmInterface_->SendCmd(cmdCode, req, rsp);
-}
-
-bool IpcClientManager::IsInit(const std::string &pkgName)
-{
-    (void)pkgName;
-    if (dmInterface_ == nullptr) {
-        LOGE("DeviceManager not Init");
-        return false;
-    }
-
-    return true;
 }
 
 int32_t IpcClientManager::OnDmServiceDied()

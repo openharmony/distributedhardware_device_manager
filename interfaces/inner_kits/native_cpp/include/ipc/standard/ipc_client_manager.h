@@ -74,7 +74,6 @@ public:
 
     virtual int32_t OnDmServiceDied() override;
 private:
-    bool IsInit(const std::string &pkgName);
     int32_t ClientInit();
     void SubscribeDMSAChangeListener();
 private:
