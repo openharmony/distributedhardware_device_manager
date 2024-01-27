@@ -37,9 +37,8 @@ struct ConfirmCustomDialog {
   @State peerDeviceType: number = 0;
   @State secondsNum: number = 30;
   @State times: number = 0;
-  @State selectIndex: number = -1;
   @State isAvailableType: boolean = false;
-  @state btnColor: ResourceColor = Color.Transparent;
+  @State btnColor: ResourceColor = Color.Transparent;
   controller?: CustomDialogController
 
   aboutToAppear() {
@@ -208,14 +207,6 @@ struct ConfirmCustomDialog {
           .onClick(() => {
             this.onAllowAlways();
           })
-          .onTouch((event?: TouchEvent | undefined) => {
-            if (event != undefined && event.type === TouchType.Down) {
-              this.selectIndex = 0;
-            }
-            if (event != undefined && event.type === TouchType.Up) {
-              this.selectIndex = -1;
-            }
-          })
           .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
           .height(40)
           .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
@@ -239,14 +230,6 @@ struct ConfirmCustomDialog {
           .margin({ bottom: 4 })
           .onClick(() => {
             this.onAllowOnce();
-          })
-          .onTouch((event?: TouchEvent | undefined) => {
-            if (event != undefined && event.type === TouchType.Down) {
-              this.selectIndex = 1;
-            }
-            if (event != undefined && event.type === TouchType.Up) {
-              this.selectIndex = -1;
-            }
           })
           .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
           .height(40)
@@ -272,14 +255,6 @@ struct ConfirmCustomDialog {
           .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
           .onClick(() => {
             this.onCancel();
-          })
-          .onTouch((event?: TouchEvent | undefined) => {
-            if (event != undefined && event.type === TouchType.Down) {
-              this.selectIndex = 2;
-            }
-            if (event != undefined && event.type === TouchType.Up) {
-              this.selectIndex = -1;
-            }
           })
           .height(40)
           .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
