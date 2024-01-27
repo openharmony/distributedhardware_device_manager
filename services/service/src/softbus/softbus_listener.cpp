@@ -251,6 +251,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    LOGI("OnSoftbusDeviceOnline, extraData = %s", dmDeviceInfo.extraData);
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -873,6 +874,14 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
+    std::string extraData = devInfo.extraData;
+    nlohmann::json extraJson;
+    if (!extraData.empty()) {
+        extraJson = nlohmann::json::parse(extraData);
+    }
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+    devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
 
