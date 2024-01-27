@@ -27,11 +27,8 @@ struct PinCustomDialog {
   @State messageTitle: string = '连接码';
   @State pinCode: string = '';
   @State cancel_str: string = '取消';
-  @State isShow: boolean = true;
-  @State displayWidth: number = 0;
-  @State displayHeight: number = 0;
-  @State topRect_height: number = 0;
   @State pinCodeArr: Array<string> = [];
+  @State btnColor: ResourceColor = Color.Transparent;
   controller?: CustomDialogController
 
   cancel() {
@@ -56,15 +53,15 @@ struct PinCustomDialog {
   }
 
   setUserOperation(operation: number) {
-    console.log(TAG + 'setUserOperation: ' + operation)
+    console.log(TAG + 'setUserOperation: ' + operation);
     if (dmClass == null) {
-      console.log(TAG + 'setUserOperation: ' + 'dmClass null')
+      console.log(TAG + 'setUserOperation: ' + 'dmClass null');
       return;
     }
     try {
       dmClass.setUserOperation(operation, 'extra');
     } catch (error) {
-      console.log(TAG + 'dmClass setUserOperation failed')
+      console.log(TAG + 'dmClass setUserOperation failed');
     }
   }
 
@@ -72,12 +69,10 @@ struct PinCustomDialog {
     Column() {
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Start }) {
         Text(this.messageTitle)
-          .fontSize(20)
-          .fontColor('#182431')
+          .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+          .fontColor($r('sys.color.ohos_id_color_text_primary'))
           .fontWeight(FontWeight.Medium)
           .margin({
-            top: 14,
-            bottom: 14,
             left: 24,
             right: 24
           })
@@ -87,44 +82,64 @@ struct PinCustomDialog {
 
       Row() {
         Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-          ForEach(this.pinCodeArr, (item: string, index) => {
-            Text(item)
-              .fontSize(24)
-              .fontColor('#1e1e1e')
-              .fontWeight(FontWeight.Medium)
-              .height(26)
-              .margin({ right: 24 })
+          ForEach(this.pinCodeArr, (item: string) => {
+            Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+              Text(item)
+                .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                .fontWeight(FontWeight.Medium)
+                .height(26)
+            }.width('10%')
+            .height('100%')
           })
-        }
+        }.height(48)
       }
-      .margin({ bottom: 24 })
+      .margin({ bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 16 : 8 })
 
-      Row() {
+      Flex({ justifyContent: FlexAlign.Center }) {
         Button(this.cancel_str)
-          .fontSize(16)
-          .fontColor("#007DFF")
+          .fontSize($r('sys.float.ohos_id_text_size_button1'))
+          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+          .height(40)
+          .width('100%')
+          .backgroundColor(this.btnColor)
           .onClick(() => {
             if (this.controller) {
               this.controller.close();
             }
             this.cancel();
-            this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY)
+            this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
           })
-          .height(40)
-          .margin({ left: 16, right: 16 })
-          .backgroundColor(Color.Transparent)
-      }
+          .onHover((isHover?: boolean, event?: HoverEvent): void => {
+            if (isHover) {
+              this.btnColor = $r('sys.color.ohos_id_color_hover');
+            } else {
+              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+            }
+          })
+          .stateStyles({
+            pressed: {
+              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+            },
+            normal: {
+              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+            }
+          })
+      }.margin({
+        left: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
+        right: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
+        bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 24 : 16 })
     }
     .constraintSize({ maxHeight: `${300}` })
+    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.ohos_id_color_mask_thin'))
   }
 }
-
 
 @Entry
 @Component
 struct dialogPlusPage {
-  @State cancel: string = '取消';
-  @State isShow: boolean = true;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: PinCustomDialog(),
     cancel: this.onCancel,

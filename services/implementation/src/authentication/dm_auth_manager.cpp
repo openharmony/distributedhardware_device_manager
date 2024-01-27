@@ -710,6 +710,7 @@ void DmAuthManager::AbilityNegotiate()
         authResponseContext_->isAuthCodeReady = false;
     }
     authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
+    authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
 }
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
@@ -1320,7 +1321,7 @@ void DmAuthManager::ShowStartAuthDialog()
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     DmDialogManager dialogMgr;
-    dialogMgr.ShowInputDialog("");
+    dialogMgr.ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)

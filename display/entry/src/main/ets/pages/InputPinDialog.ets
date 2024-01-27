@@ -30,15 +30,17 @@ const MSG_DOING_AUTH: number = 4
 struct InputCustomDialog {
   @State password: string = '';
   @State passwordCircle: string[] = ['', '', '', '', '', ''];
-  @State connect: string = '连接'
-  @State messageTips: string = '请输入对端设备上显示的连接码'
-  @State isTimes: number = 3
-  @State errorTips: string = '连接码错误，还可以尝试' + this.isTimes + '次';
-  @State errorTipsVisible: Visibility = Visibility.None
-  @State cancelBtn: string = '取消'
+  @State connect: string = '连接';
+  @State messageTips: string = '请输入对端设备上显示的连接码';
+  @State isTimes: number = 3;
+  @State errorTips: string = '连接码错误，还可以尝试 ' + this.isTimes + ' 次';
+  @State errorTipsVisible: Visibility = Visibility.None;
+  @State cancelBtn: string = '取消';
   @State heightNum: number = 600;
+  @State targetDeviceName: string = '';
+  @State btnColor: ResourceColor = Color.Transparent;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
-  controller?: CustomDialogController
+  controller?: CustomDialogController;
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
@@ -49,77 +51,81 @@ struct InputCustomDialog {
   }
 
   aboutToAppear() {
+    if (AppStorage.get('targetDeviceName') != null) {
+      this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
+      console.log('targetDeviceName is ' + this.targetDeviceName);
+    }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}')
-        return
+        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}');
+        return;
       }
-      dmClass = dm
+      dmClass = dm;
       dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
-        let tmpStr: Record<string, number> = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg as number
+        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data));
+        let tmpStr: Record<string, number> = JSON.parse(data.param);
+        let msg: number = tmpStr.uiStateMsg as number;
         if (msg === MSG_DOING_AUTH) {
-          this.errorTips = '正在认证中，请稍候……'
-          this.errorTipsVisible = Visibility.Visible
-          return
+          this.errorTips = '正在认证中，请稍候……';
+          this.errorTipsVisible = Visibility.Visible;
+          return;
         }
         if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
-          this.destruction()
-          return
+          this.destruction();
+          return;
         }
         if (msg === MSG_PIN_CODE_ERROR) {
-          this.isTimes--
-          this.errorTips = '连接码错误，还可以尝试' + this.isTimes + '次'
-          this.password = ''
-          this.errorTipsVisible = Visibility.Visible
+          this.isTimes--;
+          this.errorTips = '连接码错误，还可以尝试 ' + this.isTimes + ' 次';
+          this.password = '';
+          this.errorTipsVisible = Visibility.Visible;
         }
       })
     });
     this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPortrait(mediaQueryResult);
-    })
+    });
   }
 
   cancel() {
-    console.log('cancle')
+    console.log('cancle');
     if (dmClass) {
-      console.log('deviceManager exist')
+      console.log('deviceManager exist');
     } else {
-      console.log('createDeviceManager is null')
-      return
+      console.log('createDeviceManager is null');
+      return;
     }
-    console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT)
-    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra')
-    this.destruction()
+    console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT);
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra');
+    this.destruction();
   }
 
   confirm() {
-    console.log('confirm')
+    console.log('confirm');
     if (this.password == null || this.password == '') {
       return;
     }
     if (dmClass) {
-      console.log('deviceManager exist')
+      console.log('deviceManager exist');
     } else {
-      console.log('createDeviceManager is null')
-      return
+      console.log('createDeviceManager is null');
+      return;
     }
-    console.log('confirm' + JSON.stringify(ACTION_DONE_PINCODE_INPUT))
-    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.password)
+    console.log('confirm' + JSON.stringify(ACTION_DONE_PINCODE_INPUT));
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.password);
   }
 
   setUserOperation(operation: number, extra: string) {
-    console.log('setUserOperation: ' + operation + 'password' + extra)
+    console.log('setUserOperation: ' + operation + 'password' + extra);
     if (dmClass == null) {
-      console.log('setUserOperation: ' + 'dmClass null')
+      console.log('setUserOperation: ' + 'dmClass null');
       return;
     }
     try {
-      dmClass.setUserOperation(operation, extra)
+      dmClass.setUserOperation(operation, extra);
     } catch (error) {
-      console.log('dmClass setUserOperation failed')
+      console.log('dmClass setUserOperation failed');
     }
   }
 
@@ -147,48 +153,62 @@ struct InputCustomDialog {
   build() {
     Column() {
       Column() {
-        Text(this.connect)
-          .fontSize(20)
+        Text(this.connect + ' ' + this.targetDeviceName)
+          .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
           .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.ohos_id_color_text_primary'))
           .margin({ top: 12, bottom: 8 })
           .width('100%')
           .textAlign(TextAlign.Start)
 
         Text(this.messageTips)
-          .fontSize(14)
+          .fontSize($r('sys.float.ohos_id_text_size_body2'))
           .fontWeight(FontWeight.Regular)
+          .fontColor($r('sys.color.ohos_id_color_text_secondary'))
           .margin({ bottom: 8 })
           .width('100%')
       }
-      .margin({ left: 24 })
+      .margin({ left: 24, right: 24 })
 
       Stack() {
         List() {
           ListItem() {
             Flex({ justifyContent: FlexAlign.Center }) {
+              ForEach(this.passwordCircle, (item:string) => {
+                Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                  Text(item)
+                    .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .fontWeight(FontWeight.Medium)
+                    .height(26)
+                }.width('10%')
+                .height('100%')
+                .visibility(item === '' ? Visibility.None : Visibility.Visible)
+              })
               ForEach(this.passwordCircle, (item: string) => {
-                Column()
-                  .width(12)
-                  .height(12)
-                  .backgroundColor(item === '' ? 'white' : 'black')
-                  .border({ width: 2, color: 'black', radius: 12})
-                  .margin({ right: 24, top: 2})
+                Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                  Column()
+                    .width(12)
+                    .height(12)
+                    .border({ width: 2, color: $r('sys.color.ohos_id_color_primary'), radius: 12})
+                }.width('10%')
+                .height('100%')
+                .visibility(item === '' ? Visibility.Visible : Visibility.None)
               })
             }
           }
-          .margin({ left: 24, top: 24, bottom: 24})
         }
         TextInput({ placeholder: '', text: this.password})
           .defaultFocus(true)
           .type(8)
           .height(60)
-          .width(200)
           .opacity(0)
           .fontColor(('rgba(0,0,0,0)'))
           .backgroundColor(('rgba(0,0,0,0)'))
           .caretColor(('rgba(0,0,0,0)'))
           .maxLength(6)
           .margin({ bottom: 8 })
+          .width('100%')
           .onChange((value: string) => {
             this.password = value;
             if (value.length > 6) {
@@ -205,50 +225,69 @@ struct InputCustomDialog {
             let gThis = this;
             setTimeout(()=> {
               gThis.passwordOnChange(value);
-            }, 1)
+            }, 50)
             console.log(TAG + 'this.password: ' + this.password);
           })
-      }
+      }.height(48)
+      .margin({ top: 12, bottom: 16})
 
-      Text(this.errorTips)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#FA2A2D')
-          .visibility(this.errorTipsVisible)
+      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+        Text(this.errorTips)
+            .fontSize($r('sys.float.ohos_id_text_size_body2'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.ohos_id_color_warning'))
+      }.visibility(this.errorTipsVisible)
+      .margin({ bottom: 16 })
 
       Flex({ justifyContent: FlexAlign.Center }) {
         Button(this.cancelBtn)
           .height(40)
-          .fontSize(16)
+          .fontSize($r('sys.float.ohos_id_text_size_button1'))
           .onClick(() => {
             if (this.controller) {
               this.controller.close();
             }
             this.cancel();
           })
-          .backgroundColor(Color.Transparent)
-          .fontColor('#007DFF')
-      }.margin({ bottom: 10 })
+          .width('100%')
+          .backgroundColor(this.btnColor)
+          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+          .onHover((isHover?: boolean, event?: HoverEvent): void => {
+            if (isHover) {
+              this.btnColor = $r('sys.color.ohos_id_color_hover');
+            } else {
+              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+            }
+          })
+          .stateStyles({
+            pressed: {
+              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+            },
+            normal: {
+              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+            }
+          })
+      }.margin({
+        left: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
+        right: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
+        bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 24 : 16 })
     }.constraintSize({ maxHeight: `${this.heightNum}`})
+    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.ohos_id_color_mask_thin'))
   }
 }
 
 @Entry
 @Component
 struct dialogPlusPage {
-  @State connect: string = '连接'
-  @State messageTips: string = '请输入对端设备上显示的连接码';
-  @State isTimes: number = 3;
-  @State errorTips: string = '连接码错误，还可以尝试' + this.isTimes + '次';
-  @State errorTipsVisible: number = Visibility.Hidden;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
-    cancel: this.onCancel,
     autoCancel: false,
     alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
       DialogAlignment.Bottom : DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
-    gridCount: 4,
+    gridCount: (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 3 : 4,
     customStyle: false
   });
 
@@ -267,14 +306,6 @@ struct dialogPlusPage {
       }
       dmClass = null
     }
-  }
-
-  onDone() {
-    console.log('Done')
-  }
-
-  onCancel() {
-    console.log('cancle')
   }
 
   build() {
