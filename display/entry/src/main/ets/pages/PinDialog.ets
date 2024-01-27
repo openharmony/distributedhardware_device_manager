@@ -78,7 +78,7 @@ struct PinCustomDialog {
           })
       }
       .height(56)
-      .margin({ bottom: 24 })
+      .margin({ bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 16 : 8 })
 
       Row() {
         Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
