@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-import Constants from '../common/constant';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import mediaquery from '@ohos.mediaquery';
 import deviceInfo from '@ohos.deviceInfo';
+import inputMethod from '@ohos.inputMethod';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>'
@@ -244,6 +244,8 @@ struct InputCustomDialog {
           .height(40)
           .fontSize($r('sys.float.ohos_id_text_size_button1'))
           .onClick(() => {
+            let inputMethodController = inputMethod.getController();
+            inputMethodController.hideTextInput();
             if (this.controller) {
               this.controller.close();
             }
