@@ -31,14 +31,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
-const std::string ORGPKGNAME = "deviceManager";
-const std::string SOFTBUSNAME = "dsoftbus";
-const std::string HICHAINNAME = "hichain";
-const std::string DM_DISCOVER_BEHAVIOR = "DM_DISCOVER_BEHAVIOR";
-const std::string DM_AUTHCATION_BEHAVIOR = "DM_AUTHCATION_BEHAVIOR";
-constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
-constexpr int32_t INVALID_UDID_LENGTH = 10;
-constexpr int32_t SUBSTR_UDID_LENGTH = 5;
 bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
