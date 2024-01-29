@@ -43,6 +43,7 @@ std::string DmDialogManager::abilityName_ = "";
 std::string DmDialogManager::deviceName_ = "";
 std::string DmDialogManager::appOperationStr_ = "";
 std::string DmDialogManager::customDescriptionStr_ = "";
+std::string DmDialogManager::targetDeviceName_ = "";
 std::string DmDialogManager::pinCode_ = "";
 std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
 std::condition_variable DmDialogManager::dialogCondition_;
@@ -95,7 +96,7 @@ void DmDialogManager::ShowPinDialog(const std::string param)
 
 void DmDialogManager::ShowInputDialog(const std::string param)
 {
-    (void)param;
+    targetDeviceName_ = param;
     bundleName_ = dmUiBundleName;
     abilityName_ = inputAbilityName;
     ConnectExtension();
@@ -159,6 +160,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     param["appOperationStr"] = DmDialogManager::GetAppOperationStr();
     param["customDescriptionStr"] = DmDialogManager::GetCustomDescriptionStr();
     param["deviceType"] = DmDialogManager::GetDeviceType();
+    param[TAG_TARGET_DEVICE_NAME] = DmDialogManager::GetTargetDeviceName();
     std::string paramStr = param.dump();
     data.WriteString16(Str8ToStr16(paramStr));
     LOGI("show dm dialog is begin");
