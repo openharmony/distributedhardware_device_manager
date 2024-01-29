@@ -29,9 +29,6 @@ namespace DistributedHardware {
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 
-const int32_t ENCRY_FLAG_LEN = 16;
-constexpr const unsigned char ENCRY_FLAG[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
-
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
