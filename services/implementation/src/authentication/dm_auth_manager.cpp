@@ -1976,18 +1976,6 @@ void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
     deviceId = remoteDeviceId_;
 }
 
-AesGcmCipherKey DmAuthManager::GetSessionKeyAndLen()
-{
-    AesGcmCipherKey cipherKey = { 0 };
-    if (sessionKey_ == nullptr || sessionKeyLen_ == 0) {
-        LOGE("GetSessionKeyAndIv");
-        return cipherKey;
-    }
-    cipherKey.keyLen = SESSION_KEY_LENGTH;
-    memcpy_s(cipherKey.key, cipherKey.keyLen, sessionKey_, cipherKey.keyLen);
-    return cipherKey;
-}
-
 void DmAuthManager::CompatiblePutAcl()
 {
     LOGI("DmAuthManager::CompatiblePutAcl");

@@ -509,7 +509,6 @@ public:
     int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-    AesGcmCipherKey GetSessionKeyAndLen();
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
