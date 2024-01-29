@@ -27,9 +27,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
-constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
-constexpr int32_t INVALID_UDID_LENGTH = 10;
-constexpr int32_t SUBSTR_UDID_LENGTH = 5;
 bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     return true;

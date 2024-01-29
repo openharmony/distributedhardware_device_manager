@@ -36,9 +36,6 @@ public:
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
     static void GetRealMessage(const void* data, unsigned int dataLen, std::string& message);
     static void OnUnbindSessionOpened(int sessionId, int result);
-    static AesGcmCipherKey GetSessionKeyAndIv();
-    static void Encrypt(char* plainText, char* cipherText);
-    static void Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText);
 
 public:
     SoftbusSession();

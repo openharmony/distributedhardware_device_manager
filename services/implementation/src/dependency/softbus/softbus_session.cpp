@@ -200,50 +200,6 @@ void SoftbusSession::GetRealMessage(const void* data, unsigned int dataLen, std:
     message = reinterpret_cast<char*>(plainText);
 }
 
-AesGcmCipherKey SoftbusSession::GetSessionKeyAndIv()
-{
-    AesGcmCipherKey cipherKey = sessionCallback_->GetSessionKeyAndLen();
-    memcpy_s(cipherKey.iv, GCM_IV_LEN, cipherKey.key, GCM_IV_LEN);
-    return cipherKey;
-}
-
-void SoftbusSession::Encrypt(char* plainText, char* cipherText)
-{
-    AesGcmCipherKey cipherKey = GetSessionKeyAndIv();
-    int32_t encryptDataGCMLen = strlen(plainText) + OVERHEAD_LEN;
-    int32_t realEncryptDataGCMLen = strlen(plainText) + TAG_LEN;
-    unsigned char encryptDataGCM[realEncryptDataGCMLen];
-    DmAdapterCrypto::MbedAesGcmEncrypt(&cipherKey, reinterpret_cast<unsigned char*>(plainText), strlen(plainText),
-        encryptDataGCM, encryptDataGCMLen);
-    int32_t ret = memcpy_s(cipherText, ENCRY_FLAG_LEN, (char*)ENCRY_FLAG, ENCRY_FLAG_LEN);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]Encrypt failed, ret: %d.", ret);
-        return;
-    }
-    ret = memcpy_s(cipherText + ENCRY_FLAG_LEN, realEncryptDataGCMLen, (char*)encryptDataGCM,
-        realEncryptDataGCMLen);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]Encrypt failed, ret: %d.", ret);
-        return;
-    }
-    cipherText[ENCRY_FLAG_LEN + realEncryptDataGCMLen] = '\0';
-}
-void SoftbusSession::Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText)
-{
-    int32_t realCipherTextLen = static_cast<int32_t>(cipherTextLen) - ENCRY_FLAG_LEN;
-    char realCipherText[realCipherTextLen];
-    int32_t ret = memcpy_s(realCipherText, realCipherTextLen, cipherText + ENCRY_FLAG_LEN, realCipherTextLen);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS] decrypt failed, ret: %d.", ret);
-        return;
-    }
-    AesGcmCipherKey cipherKey = GetSessionKeyAndIv();
-    unsigned char* cipherText_uc = reinterpret_cast<unsigned char*>(realCipherText);
-    DmAdapterCrypto::MbedAesGcmDecrypt(&cipherKey, cipherText_uc, realCipherTextLen,
-        reinterpret_cast<unsigned char*>(plainText), realCipherTextLen);
-    plainText[realCipherTextLen - TAG_LEN] = '\0';
-}
-
 void SoftbusSession::OnUnbindSessionOpened(int sessionId, int result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
