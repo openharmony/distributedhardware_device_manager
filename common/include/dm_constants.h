@@ -217,7 +217,7 @@ constexpr const char* PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
 constexpr const char* BIND_LEVEL = "bindLevel";
 constexpr const char* TOKENID = "tokenId";
-constexpr const char* DM_BIND_RESULT_NETW ORK_ID = "DM_BIND_RESULT_NETWORK_ID";
+constexpr const char* DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
