@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -212,6 +212,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
     json[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
+    json[TAG_TARGET_DEVICE_NAME] = authResponseContext_->targetDeviceName;
     for (uint32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
         auto itemStr = std::to_string(item);
         json[itemStr] = authResponseContext_->bindType[item];
@@ -546,6 +547,9 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
     }
     if (IsString(json, TAG_NET_ID)) {
         authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
+    }
+    if (IsString(json, TAG_TARGET_DEVICE_NAME)) {
+        authResponseContext_->targetDeviceName = json[TAG_TARGET_DEVICE_NAME].get<std::string>();
     }
 
     ParsePkgNegotiateMessage(json);

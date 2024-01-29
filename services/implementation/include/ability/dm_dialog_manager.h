@@ -68,6 +68,11 @@ public:
     {
         return deviceType_;
     }
+
+    static std::string GetTargetDeviceName()
+    {
+        return targetDeviceName_;
+    }
 private:
     class DialogAbilityConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
@@ -82,6 +87,7 @@ private:
     static std::string bundleName_;
     static std::string abilityName_;
     static std::string deviceName_;
+    static std::string targetDeviceName_;
     static std::string appOperationStr_;
     static std::string customDescriptionStr_;
     static std::string pinCode_;
