@@ -15,13 +15,13 @@
 
 #include "dm_hisysevent.h"
 
-#include "dm_constants.h"  // for DM_OK
 #include "dm_log.h"        // for LOGE
 #include "hisysevent.h"    // for HiSysEvent, HiSysEvent::Domain, HiSysEvent...
 #include "unistd.h"        // for getpid, getuid
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr int32_t DM_OK = 0;
 void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg)
 {
     int32_t res = HiSysEventWrite(

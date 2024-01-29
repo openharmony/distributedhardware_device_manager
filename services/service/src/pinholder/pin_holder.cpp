@@ -16,11 +16,9 @@
 #include "pin_holder.h"
 
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
-#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,6 +38,14 @@ constexpr int32_t PIN_HOLDER_SESSION_CREATE_TIMEOUT = 60;
 constexpr const char* TAG_PIN_TYPE = "PIN_TYPE";
 constexpr const char* TAG_PAYLOAD = "PAYLOAD";
 constexpr const char* TAG_REPLY = "REPLY";
+
+constexpr int32_t DM_OK = 0;
+constexpr int32_t ERR_DM_FAILED = -20000;
+constexpr int32_t ERR_DM_AUTH_OPEN_SESSION_FAILED = -20020;
+constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
+constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
+constexpr int32_t DEVICE_UUID_LENGTH = 65;
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
 PinHolder::PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener): listener_(listener)
 {
     if (session_ == nullptr) {

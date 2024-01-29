@@ -256,7 +256,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo info = {
         .funcName = "UnAuthenticateDevice",
-        .toCallPkg = HICHAINNAME,
+        .toCallPkg = "hichain",
         .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
         .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),

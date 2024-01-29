@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 
-#include "nlohmann/json.hpp"
+#include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {

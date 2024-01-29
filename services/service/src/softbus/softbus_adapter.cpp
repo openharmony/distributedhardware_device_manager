@@ -14,7 +14,7 @@
  */
 
 #include "softbus_adapter.h"
-
+#include "dm_log.h"
 #include <securec.h>
 #include <unistd.h>
 

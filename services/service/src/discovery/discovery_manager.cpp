@@ -18,12 +18,9 @@
 #include <dlfcn.h>
 #include <securec.h>
 
-#include "discovery_filter.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_log.h"
 #include "parameter.h"
-#include "dm_radar_helper.h"
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t DISCOVERY_TIMEOUT = 120;

@@ -25,7 +25,6 @@
 #include "mbedtls/platform.h"
 #include "md.h"
 #include "dm_log.h"
-#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -60,7 +59,7 @@ namespace DistributedHardware {
 #define EVP_AES_128_KEYLEN 16
 #define EVP_AES_256_KEYLEN 32
 
-int32_t DmAdapterCrypto::MbedAesGcmEncrypt(AesGcmCipherKey *cipherKey, const unsigned char *plainText,
+void DmAdapterCrypto::MbedAesGcmEncrypt(AesGcmCipherKey *cipherKey, const unsigned char *plainText,
     int32_t plainTextSize, unsigned char *cipherText, int32_t cipherTextLen)
 {
     mbedtls_cipher_context_t ctx;
@@ -73,10 +72,9 @@ int32_t DmAdapterCrypto::MbedAesGcmEncrypt(AesGcmCipherKey *cipherKey, const uns
     mbedtls_cipher_auth_encrypt_ext(&ctx, cipherKey->iv, GCM_IV_LEN, NULL, 0, plainText, plainTextSize, cipherText,
         cipherTextLen, &olen, TAG_LEN);
     mbedtls_cipher_free(&ctx);
-    return DM_OK;
 }
 
-int32_t DmAdapterCrypto::MbedAesGcmDecrypt(AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
+void DmAdapterCrypto::MbedAesGcmDecrypt(AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
     int32_t cipherTextSize, unsigned char *plain, int32_t plainLen)
 {
     mbedtls_cipher_context_t ctx;
@@ -92,7 +90,6 @@ int32_t DmAdapterCrypto::MbedAesGcmDecrypt(AesGcmCipherKey *cipherKey, const uns
         LOGI("MbedAesGcmDEcrypt result :%d", ret);
     }
     mbedtls_cipher_free(&ctx);
-    return DM_OK;
 }
 }; // namespace DistributeHardware
 }; // namespace OHOS
