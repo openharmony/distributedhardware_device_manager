@@ -709,6 +709,7 @@ void DmAuthManager::AbilityNegotiate()
         authResponseContext_->isAuthCodeReady = false;
     }
     authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
+    authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
 }
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
@@ -1022,7 +1023,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         .funcName = "AddMember",
         .stageRes = (ret == 0) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
-        .peerUdid = authResponseContext_->deviceId,
+        .peerUdid = authResponseContext_ == nullptr ? "" : authResponseContext_->deviceId,
         .errCode = ERR_DM_ADD_GROUP_FAILED,
     };
     if (!DmRadarHelper::GetInstance().ReportAuthAddGroup(info)) {
@@ -1319,7 +1320,7 @@ void DmAuthManager::ShowStartAuthDialog()
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     DmDialogManager dialogMgr;
-    dialogMgr.ShowInputDialog("");
+    dialogMgr.ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
