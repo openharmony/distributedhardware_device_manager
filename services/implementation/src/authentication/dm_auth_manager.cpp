@@ -1522,7 +1522,7 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     int32_t authType = -1;
     if (ParseAuthType(bindParam, authType) != DM_OK) {
-        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     peerTargetId_ = targetId;
@@ -1594,20 +1594,20 @@ int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &b
 {
     auto iter = bindParam.find(PARAM_KEY_AUTH_TYPE);
     if (iter == bindParam.end()) {
-        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string authTypeStr = iter->second;
     if (authTypeStr.empty()) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authTypeStr.length() > 1) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!isdigit(authTypeStr[0])) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     authType = std::stoi(authTypeStr);
