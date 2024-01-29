@@ -33,7 +33,6 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void GetRealMessage(const void* data, unsigned int dataLen, std::string& message);
     static void OnUnbindSessionOpened(int sessionId, int result);
 
 public:

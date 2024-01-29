@@ -152,8 +152,7 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("Start decryption.");
     }
-    std::string message = "";
-    GetRealMessage(data, dataLen, message);
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
@@ -170,34 +169,6 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         sessionCallback_->OnDataReceived(sessionId, message);
     }
     LOGI("completed.");
-}
-
-void SoftbusSession::GetRealMessage(const void* data, unsigned int dataLen, std::string& message)
-{
-    char encryFlag[ENCRY_FLAG_LEN + 1];
-    memcpy_s(encryFlag, ENCRY_FLAG_LEN, reinterpret_cast<const char*>(data), ENCRY_FLAG_LEN);
-    encryFlag[ENCRY_FLAG_LEN] = '\0';
-
-    char encryFlagConst[ENCRY_FLAG_LEN + 1];
-    if (memcpy_s(encryFlagConst, ENCRY_FLAG_LEN, ENCRY_FLAG, ENCRY_FLAG_LEN) != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    encryFlagConst[ENCRY_FLAG_LEN] = '\0';
-    if (strcmp(encryFlag, encryFlagConst) != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    int32_t plainTextLen = static_cast<int32_t>(dataLen) - TAG_LEN - ENCRY_FLAG_LEN;
-    char plainText[plainTextLen + 1];
-    char cipherText[dataLen];
-    int32_t ret = memcpy_s(cipherText, dataLen, reinterpret_cast<const char*>(data), dataLen);
-    if (ret != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    Decrypt(cipherText, dataLen, plainText);
-    message = reinterpret_cast<char*>(plainText);
 }
 
 void SoftbusSession::OnUnbindSessionOpened(int sessionId, int result)
