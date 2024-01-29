@@ -157,7 +157,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     struct RadarInfo info = {
         .funcName = "CreateGroup",
-        .toCallPkg = "hichain",
+        .toCallPkg = HICHAINNAME,
         .stageRes = (ret != 0) ?
             static_cast<int32_t>(StageRes::STAGE_FAIL) : static_cast<int32_t>(StageRes::STAGE_IDLE),
         .bizState = (ret != 0) ?

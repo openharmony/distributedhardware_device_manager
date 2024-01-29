@@ -61,7 +61,6 @@ constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
-const int32_t SESSION_KEY_LENGTH = 16;
 constexpr const char* DM_VERSION = "4.1.5.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -256,7 +255,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo info = {
         .funcName = "UnAuthenticateDevice",
-        .toCallPkg = "hichain",
+        .toCallPkg = HICHAINNAME,
         .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
         .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
@@ -1523,7 +1522,7 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     int32_t authType = -1;
     if (ParseAuthType(bindParam, authType) != DM_OK) {
-        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     peerTargetId_ = targetId;
@@ -1595,20 +1594,20 @@ int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &b
 {
     auto iter = bindParam.find(PARAM_KEY_AUTH_TYPE);
     if (iter == bindParam.end()) {
-        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string authTypeStr = iter->second;
     if (authTypeStr.empty()) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authTypeStr.length() > 1) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!isdigit(authTypeStr[0])) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     authType = std::stoi(authTypeStr);
@@ -1974,18 +1973,6 @@ void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
 {
     LOGI("GetRemoteDeviceId start.");
     deviceId = remoteDeviceId_;
-}
-
-AesGcmCipherKey DmAuthManager::GetSessionKeyAndLen()
-{
-    AesGcmCipherKey cipherKey = { 0 };
-    if (sessionKey_ == nullptr || sessionKeyLen_ == 0) {
-        LOGE("GetSessionKeyAndIv");
-        return cipherKey;
-    }
-    cipherKey.keyLen = SESSION_KEY_LENGTH;
-    memcpy_s(cipherKey.key, cipherKey.keyLen, sessionKey_, cipherKey.keyLen);
-    return cipherKey;
 }
 
 void DmAuthManager::CompatiblePutAcl()
