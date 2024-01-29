@@ -17,7 +17,6 @@
 
 #include <random>
 
-#include "dm_constants.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 
@@ -27,6 +26,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr uint32_t ERR_DM_FAILED = -20000;
+constexpr int32_t DM_OK = 0;
 int32_t GenRandInt(int32_t randMin, int32_t randMax)
 {
 #if defined(__LITEOS_M__)

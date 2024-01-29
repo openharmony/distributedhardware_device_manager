@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "dm_adapter_crypto.h"
 #include "inner_session.h"
 #include "session.h"
 #include "softbus_session_callback.h"
@@ -34,11 +33,7 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void Encrypt(char* plainText, char* cipherText);
-    static void Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText);
-    static void GetRealMessage(const void* data, unsigned int dataLen, std::string& message);
     static void OnUnbindSessionOpened(int sessionId, int result);
-    static AesGcmCipherKey GetSessionKeyAndIv();
 
 public:
     SoftbusSession();

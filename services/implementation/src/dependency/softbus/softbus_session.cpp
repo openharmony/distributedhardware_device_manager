@@ -29,9 +29,6 @@ namespace DistributedHardware {
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 
-const int32_t ENCRY_FLAG_LEN = 16;
-constexpr const unsigned char ENCRY_FLAG[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
-
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
@@ -152,8 +149,7 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("Start decryption.");
     }
-    std::string message = "";
-    GetRealMessage(data, dataLen, message);
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
@@ -170,78 +166,6 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         sessionCallback_->OnDataReceived(sessionId, message);
     }
     LOGI("completed.");
-}
-
-void SoftbusSession::GetRealMessage(const void* data, unsigned int dataLen, std::string& message)
-{
-    char encryFlag[ENCRY_FLAG_LEN + 1];
-    memcpy_s(encryFlag, ENCRY_FLAG_LEN, reinterpret_cast<const char*>(data), ENCRY_FLAG_LEN);
-    encryFlag[ENCRY_FLAG_LEN] = '\0';
-
-    char encryFlagConst[ENCRY_FLAG_LEN + 1];
-    if (memcpy_s(encryFlagConst, ENCRY_FLAG_LEN, ENCRY_FLAG, ENCRY_FLAG_LEN) != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    encryFlagConst[ENCRY_FLAG_LEN] = '\0';
-    if (strcmp(encryFlag, encryFlagConst) != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    int32_t plainTextLen = static_cast<int32_t>(dataLen) - TAG_LEN - ENCRY_FLAG_LEN;
-    char plainText[plainTextLen + 1];
-    char cipherText[dataLen];
-    int32_t ret = memcpy_s(cipherText, dataLen, reinterpret_cast<const char*>(data), dataLen);
-    if (ret != 0) {
-        message = std::string(reinterpret_cast<const char*>(data), dataLen);
-        return;
-    }
-    Decrypt(cipherText, dataLen, plainText);
-    message = reinterpret_cast<char*>(plainText);
-}
-
-AesGcmCipherKey SoftbusSession::GetSessionKeyAndIv()
-{
-    AesGcmCipherKey cipherKey = sessionCallback_->GetSessionKeyAndLen();
-    memcpy_s(cipherKey.iv, GCM_IV_LEN, cipherKey.key, GCM_IV_LEN);
-    return cipherKey;
-}
-
-void SoftbusSession::Encrypt(char* plainText, char* cipherText)
-{
-    AesGcmCipherKey cipherKey = GetSessionKeyAndIv();
-    int32_t encryptDataGCMLen = strlen(plainText) + OVERHEAD_LEN;
-    int32_t realEncryptDataGCMLen = strlen(plainText) + TAG_LEN;
-    unsigned char encryptDataGCM[realEncryptDataGCMLen];
-    DmAdapterCrypto::MbedAesGcmEncrypt(&cipherKey, reinterpret_cast<unsigned char*>(plainText), strlen(plainText),
-        encryptDataGCM, encryptDataGCMLen);
-    int32_t ret = memcpy_s(cipherText, ENCRY_FLAG_LEN, (char*)ENCRY_FLAG, ENCRY_FLAG_LEN);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]Encrypt failed, ret: %d.", ret);
-        return;
-    }
-    ret = memcpy_s(cipherText + ENCRY_FLAG_LEN, realEncryptDataGCMLen, (char*)encryptDataGCM,
-        realEncryptDataGCMLen);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]Encrypt failed, ret: %d.", ret);
-        return;
-    }
-    cipherText[ENCRY_FLAG_LEN + realEncryptDataGCMLen] = '\0';
-}
-void SoftbusSession::Decrypt(char* cipherText, unsigned int cipherTextLen, char* plainText)
-{
-    int32_t realCipherTextLen = static_cast<int32_t>(cipherTextLen) - ENCRY_FLAG_LEN;
-    char realCipherText[realCipherTextLen];
-    int32_t ret = memcpy_s(realCipherText, realCipherTextLen, cipherText + ENCRY_FLAG_LEN, realCipherTextLen);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS] decrypt failed, ret: %d.", ret);
-        return;
-    }
-    AesGcmCipherKey cipherKey = GetSessionKeyAndIv();
-    unsigned char* cipherText_uc = reinterpret_cast<unsigned char*>(realCipherText);
-    DmAdapterCrypto::MbedAesGcmDecrypt(&cipherKey, cipherText_uc, realCipherTextLen,
-        reinterpret_cast<unsigned char*>(plainText), realCipherTextLen);
-    plainText[realCipherTextLen - TAG_LEN] = '\0';
 }
 
 void SoftbusSession::OnUnbindSessionOpened(int sessionId, int result)

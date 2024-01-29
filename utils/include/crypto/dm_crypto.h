@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_CRYPTO_H
 #define OHOS_DM_CRYPTO_H
 #include <string>
-#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {

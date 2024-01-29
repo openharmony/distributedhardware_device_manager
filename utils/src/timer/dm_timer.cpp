@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_timer.h"
 
@@ -24,7 +23,8 @@ namespace OHOS {
 namespace DistributedHardware {
 
 constexpr const char* TIMER_RUNNING = "TimerRunning";
-
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int32_t DM_OK = 0;
 Timer::Timer(std::string name, int32_t time, TimerCallback callback)
     : timerName_(name), expire_(steadyClock::now()), state_(true), timeOut_(time), callback_(callback) {};
 

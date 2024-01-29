@@ -26,7 +26,6 @@
 #include "idevice_manager_service_listener.h"
 #include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
-#include "dm_adapter_crypto.h"
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -509,7 +508,6 @@ public:
     int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-    AesGcmCipherKey GetSessionKeyAndLen();
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);

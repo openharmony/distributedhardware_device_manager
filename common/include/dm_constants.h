@@ -137,8 +137,8 @@ constexpr const char* DEVICE_MANAGER_GROUPNAME = "DMSameAccountGroup";
 constexpr const char* FIELD_CREDENTIAL_EXISTS = "isCredentialExists";
 constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
-const std::string DM_TYPE_MINE = "MINE";
-const std::string DM_TYPE_OH = "OH";
+constexpr const char* DM_TYPE_MINE = "MINE";
+constexpr const char* DM_TYPE_OH = "OH";
 constexpr const char* TAG_SESSION_HEARTBEAT = "session_heartbeat";
 
 //The following constant are provided only for HiLink.
@@ -179,45 +179,45 @@ constexpr const char* EVENT_CANCEL_CODE = "1";
 constexpr const char* EVENT_INIT_CODE = "2";
 
 // Key of filter parameter
-const std::string FILTER_PARA_RANGE = "FILTER_RANGE";
-const std::string FILTER_PARA_DEVICE_TYPE = "FILTER_DEVICE_TYPE";
-const std::string FILTER_PARA_INCLUDE_TRUST = "FILTER_INCLUDE_TRUST";
+constexpr const char* FILTER_PARA_RANGE = "FILTER_RANGE";
+constexpr const char* FILTER_PARA_DEVICE_TYPE = "FILTER_DEVICE_TYPE";
+constexpr const char* FILTER_PARA_INCLUDE_TRUST = "FILTER_INCLUDE_TRUST";
 
 // Connection address type
-const std::string CONN_ADDR_TYPE_ID = "ID_TYPE";
-const std::string CONN_ADDR_TYPE_BR = "BR_TYPE";
-const std::string CONN_ADDR_TYPE_BLE = "BLE_TYPE";
-const std::string CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
-const std::string CONN_ADDR_TYPE_ETH_IP = "ETH_IP_TYPE";
+constexpr const char* CONN_ADDR_TYPE_ID = "ID_TYPE";
+constexpr const char* CONN_ADDR_TYPE_BR = "BR_TYPE";
+constexpr const char* CONN_ADDR_TYPE_BLE = "BLE_TYPE";
+constexpr const char* CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
+constexpr const char* CONN_ADDR_TYPE_ETH_IP = "ETH_IP_TYPE";
 
 // Parameter Key
-const std::string PARAM_KEY_META_TYPE = "META_TYPE";
-const std::string PARAM_KEY_TARGET_ID = "TARGET_ID";
-const std::string PARAM_KEY_BR_MAC = "BR_MAC";
-const std::string PARAM_KEY_BLE_MAC = "BLE_MAC";
-const std::string PARAM_KEY_WIFI_IP = "WIFI_IP";
-const std::string PARAM_KEY_WIFI_PORT = "WIFI_PORT";
-const std::string PARAM_KEY_AUTH_TOKEN = "AUTH_TOKEN";
-const std::string PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
-const std::string PARAM_KEY_PIN_CODE = "PIN_CODE";
-const std::string PARAM_KEY_APP_OPER = "APP_OPER";
-const std::string PARAM_KEY_APP_DESC = "APP_DESC";
-const std::string PARAM_KEY_BLE_UDID_HASH = "BLE_UDID_HASH";
-const std::string PARAM_KEY_CUSTOM_DATA = "CUSTOM_DATA";
-const std::string PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
-const std::string PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
-const std::string PARAM_KEY_SUBSCRIBE_ID = "SUBSCRIBE_ID";
-const std::string PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
-const std::string PARAM_KEY_DISC_FREQ = "DISC_FREQ";
-const std::string PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
-const std::string PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
-const std::string PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
-const std::string PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
-const std::string PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
-const std::string DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
-const std::string BIND_LEVEL = "bindLevel";
-const std::string TOKENID = "tokenId";
-const std::string DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
+constexpr const char* PARAM_KEY_META_TYPE = "META_TYPE";
+constexpr const char* PARAM_KEY_TARGET_ID = "TARGET_ID";
+constexpr const char* PARAM_KEY_BR_MAC = "BR_MAC";
+constexpr const char* PARAM_KEY_BLE_MAC = "BLE_MAC";
+constexpr const char* PARAM_KEY_WIFI_IP = "WIFI_IP";
+constexpr const char* PARAM_KEY_WIFI_PORT = "WIFI_PORT";
+constexpr const char* PARAM_KEY_AUTH_TOKEN = "AUTH_TOKEN";
+constexpr const char* PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
+constexpr const char* PARAM_KEY_PIN_CODE = "PIN_CODE";
+constexpr const char* PARAM_KEY_APP_OPER = "APP_OPER";
+constexpr const char* PARAM_KEY_APP_DESC = "APP_DESC";
+constexpr const char* PARAM_KEY_BLE_UDID_HASH = "BLE_UDID_HASH";
+constexpr const char* PARAM_KEY_CUSTOM_DATA = "CUSTOM_DATA";
+constexpr const char* PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
+constexpr const char* PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
+constexpr const char* PARAM_KEY_SUBSCRIBE_ID = "SUBSCRIBE_ID";
+constexpr const char* PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
+constexpr const char* PARAM_KEY_DISC_FREQ = "DISC_FREQ";
+constexpr const char* PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
+constexpr const char* PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
+constexpr const char* PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
+constexpr const char* PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
+constexpr const char* PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
+constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
+constexpr const char* BIND_LEVEL = "bindLevel";
+constexpr const char* TOKENID = "tokenId";
+constexpr const char* DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
