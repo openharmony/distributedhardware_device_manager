@@ -16,8 +16,6 @@
 #ifndef OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
 #define OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
 
-#include "dm_adapter_crypto.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 class ISoftbusSessionCallback {

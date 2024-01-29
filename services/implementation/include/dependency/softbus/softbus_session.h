@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "dm_adapter_crypto.h"
 #include "inner_session.h"
 #include "session.h"
 #include "softbus_session_callback.h"

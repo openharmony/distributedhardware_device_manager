@@ -26,7 +26,6 @@
 #include "idevice_manager_service_listener.h"
 #include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
-#include "dm_adapter_crypto.h"
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
