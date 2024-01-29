@@ -1024,7 +1024,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         .funcName = "AddMember",
         .stageRes = (ret == 0) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
-        .peerUdid = authResponseContext_->deviceId,
+        .peerUdid = authResponseContext_ == nullptr ? "" : authResponseContext_->deviceId,
         .errCode = ERR_DM_ADD_GROUP_FAILED,
     };
     if (!DmRadarHelper::GetInstance().ReportAuthAddGroup(info)) {
