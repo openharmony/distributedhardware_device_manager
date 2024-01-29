@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,6 +154,7 @@ constexpr const char* PIN_CODE_KEY = "pinCode";
 constexpr int32_t CHECK_AUTH_ALWAYS_POS = 0;
 constexpr const char AUTH_ALWAYS = '1';
 constexpr const char AUTH_ONCE = '0';
+constexpr const char* TAG_TARGET_DEVICE_NAME = "targetDeviceName";
 
 // HiChain
 constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
