@@ -61,7 +61,6 @@ constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
-const int32_t SESSION_KEY_LENGTH = 16;
 constexpr const char* DM_VERSION = "4.1.5.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
