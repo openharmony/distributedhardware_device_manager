@@ -251,7 +251,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    LOGI("OnSoftbusDeviceOnline, extraData = %s", dmDeviceInfo.extraData);
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
