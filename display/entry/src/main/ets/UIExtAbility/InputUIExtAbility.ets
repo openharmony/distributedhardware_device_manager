@@ -20,6 +20,9 @@ const TAG: string = '[DeviceManagerUI:Input]==>'
 export default class InputUIExtAbility extends UIExtensionAbility {
     onSessionCreate(want: Want, session: UIExtensionContentSession) {
         console.log(TAG, `UIExtAbility onSessionCreate, want: ${JSON.stringify(want)}`)
+        if (want.parameters && want.parameters.targetDeviceName) {
+            AppStorage.setOrCreate('targetDeviceName', want.parameters.targetDeviceName);
+        }
 
         let param: Record<string, UIExtensionContentSession> = {
             'session': session
