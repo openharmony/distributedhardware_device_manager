@@ -58,7 +58,7 @@ static DeviceAuthCallback g_deviceAuthCallback = {
     .onRequest = NULL,
 };
 
-static int InitHichainModle(void)
+int InitHichainModle(void)
 {
     int retValue = DM_OK;
     int ret = InitDeviceAuthService();
@@ -163,7 +163,7 @@ int ParseReturnJson(const char *returnJsonStr, int authForm) // hichain groupTyp
     return DM_OK;
 }
 
-static int GetAuthFormByDeviceId(const char *deviceId, int authForm)
+int GetAuthFormByDeviceId(const char *deviceId, int authForm)
 {
     int resultFlag = ERR_DM_FAILED;
     char *returnJsonStr = NULL;

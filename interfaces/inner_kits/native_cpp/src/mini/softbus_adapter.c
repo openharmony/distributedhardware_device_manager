@@ -146,7 +146,7 @@ static void InitDmBindLock(void)
     DMLOGI("InitDmBindLock successfully.");
 }
 
-static int LockDmGlobalLock(void)
+int LockDmGlobalLock(void)
 {
     if (g_dmGlobalLock == NULL) {
         InitDmGlobalLock();
@@ -161,7 +161,7 @@ static int LockDmGlobalLock(void)
     return DM_OK;
 }
 
-static int UnlockDmGlobalLock(void)
+int UnlockDmGlobalLock(void)
 {
     if (g_dmGlobalLock == NULL) {
         return ERR_DM_FAILED;
@@ -176,7 +176,7 @@ static int UnlockDmGlobalLock(void)
     return DM_OK;
 }
 
-static int LockDmBindLock(void)
+int LockDmBindLock(void)
 {
     if (g_dmBindLock == NULL) {
         InitDmBindLock();
@@ -191,7 +191,7 @@ static int LockDmBindLock(void)
     return DM_OK;
 }
 
-static int UnlockDmBindLock(void)
+int UnlockDmBindLock(void)
 {
     if (g_dmBindLock == NULL) {
         return ERR_DM_FAILED;
@@ -271,7 +271,7 @@ ISessionListener g_sessionListener = {
 OnJoinLNNResult g_joinLNNResult = OnJoinLNNCallback;
 OnLeaveLNNResult g_leaveLNNResult = OnLeaveLNNCallback;
 
-static int InitSoftbusModle(void)
+int InitSoftbusModle(void)
 {
     int retValue = DM_OK;
     g_discoveryCallbackMap.valid = false;
@@ -334,7 +334,7 @@ int UnInitSoftbusModle(void)
     return DM_OK;
 }
 
-static int RegisterSoftbusDevStateCallback(const char *pkgName, DevStatusCallback callback)
+int RegisterSoftbusDevStateCallback(const char *pkgName, DevStatusCallback callback)
 {
     DMLOGI("RegisterSoftbusDevStateCallback start.");
     if (!IsPkgNameValid(pkgName)) {
@@ -368,7 +368,7 @@ static int RegisterSoftbusDevStateCallback(const char *pkgName, DevStatusCallbac
     return DM_OK;
 }
 
-static int UnRegisterSoftbusDevStateCallback(const char *pkgName)
+int UnRegisterSoftbusDevStateCallback(const char *pkgName)
 {
     if (!IsPkgNameValid(pkgName)) {
         DMLOGE("pkgName is invalid.");
@@ -397,7 +397,7 @@ static int UnRegisterSoftbusDevStateCallback(const char *pkgName)
     return DM_OK;
 }
 
-static int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen,
+int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen,
     int *trustListLen)
 {
     DMLOGI("GetSoftbusTrustedDeviceList.");
@@ -425,7 +425,7 @@ static int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *d
     return DM_OK;
 }
 
-static int StartSoftbusDiscovery(const char *pkgName, const int subscribeId, const char *filterOption,
+int StartSoftbusDiscovery(const char *pkgName, const int subscribeId, const char *filterOption,
     OnTargetFound callback)
 {
     DMLOGI("StartSoftbusDiscovery start.");
@@ -515,7 +515,7 @@ static int StartSoftbusDiscovering(const char *pkgName, const int subscribeId, O
     return DM_OK;
 }
 
-static int StopSoftbusDiscovery(const char *pkgName, const int subscribeId)
+int StopSoftbusDiscovery(const char *pkgName, const int subscribeId)
 {
     DMLOGI("StopSoftbusDiscovery start.");
     if (!IsPkgNameValid(pkgName)) {
@@ -894,7 +894,7 @@ static bool ImportPkgNameToBindMap(const char *pkgName, OnBindResult cb)
     return true;
 }
 
-static int StartSoftbusPublish(const char *pkgName, OnAdvertisingResult cb)
+int StartSoftbusPublish(const char *pkgName, OnAdvertisingResult cb)
 {
     DMLOGI("StartSoftbusPublish start.");
     if (!IsPkgNameValid(pkgName)) {
@@ -923,7 +923,7 @@ static int StartSoftbusPublish(const char *pkgName, OnAdvertisingResult cb)
     return DM_OK;
 }
 
-static int StopSoftbusPublish(const char *pkgName)
+int StopSoftbusPublish(const char *pkgName)
 {
     DMLOGI("StopSoftbusPublish start.");
     if (!g_publishLNNFlag) {
@@ -1083,7 +1083,7 @@ static bool IsValidBindTargetInput(const char *pkgName, const char *deviceId, On
     return true;
 }
 
-static int SoftbusBindTarget(const char *pkgName, const char *deviceId, const int bindType, OnBindResult callback)
+int SoftbusBindTarget(const char *pkgName, const char *deviceId, const int bindType, OnBindResult callback)
 {
     DMLOGI("SoftbusBindTarget start.");
     if (!IsValidBindTargetInput(pkgName, deviceId, callback)) {
@@ -1187,9 +1187,9 @@ static char* CreateRespNegotiateMsg(const int bindType)
         cJSON_Delete(msg);
         return NULL;
     }
-    int reply = AbilityNegotiate(bindType)
+    int reply = AbilityNegotiate(bindType);
     if (reply != DM_OK) {
-        DMLOGE("failed to AbilityNegotiate with ret: %d.", retValue);
+        DMLOGE("failed to AbilityNegotiate with ret: %d.", reply);
         cJSON_Delete(msg);
         return NULL;
     }
@@ -1355,7 +1355,7 @@ static void OnLeaveLNNCallback(const char *networkId, int32_t retCode)
     DMLOGI("leave LNN called, networkId: %s, retCode: %d.", networkId, retCode);
 }
 
-static int SoftbusUnBindTarget(const char *pkgName, const char *networkId)
+int SoftbusUnBindTarget(const char *pkgName, const char *networkId)
 {
     DMLOGI("SoftbusUnBindTarget start.");
     if (!IsPkgNameValid(pkgName)) {

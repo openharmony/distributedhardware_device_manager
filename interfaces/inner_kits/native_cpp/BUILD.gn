@@ -22,7 +22,7 @@ if (defined(ohos_lite)) {
   if (ohos_kernel_type == "liteos_m") {
     static_library("devicemanagersdk") {
       include_dirs = [
-        "${innerkits_path}/native_cpp/include/lite",
+        "${innerkits_path}/native_cpp/include/mini",
         "//third_party/cJSON",
         "//kernel/liteos_m/kal/cmsis",
         "//utils/native/lite/include",
@@ -43,16 +43,16 @@ if (defined(ohos_lite)) {
       ]
 
       sources = [
-        "${innerkits_path}/native_cpp/src/lite/device_manager_impl_lite_m.c",
-        "${innerkits_path}/native_cpp/src/lite/hichain_adapter.c",
-        "${innerkits_path}/native_cpp/src/lite/softbus_adapter.c",
+        "${innerkits_path}/native_cpp/src/mini/device_manager_impl_lite_m.c",
+        "${innerkits_path}/native_cpp/src/mini/hichain_adapter.c",
+        "${innerkits_path}/native_cpp/src/mini/softbus_adapter.c",
       ]
 
-      external_deps = [
-        "hilog_lite:hilog_static",
-        "ipc:ipc_single",
-        "napi:ace_napi",
-        "utils_lite:utils",
+      deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//commonlibrary/utils_lite:utils",
+        "//foundation/systemabilitymgr/samgr_lite/samgr",
+        "//third_party/bounds_checking_function:libsec_static",
       ]
 
       cflags = [

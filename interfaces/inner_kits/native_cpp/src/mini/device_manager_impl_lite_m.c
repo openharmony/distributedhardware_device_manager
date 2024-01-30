@@ -31,7 +31,7 @@ static const char * const FILED_SUBSCRIBE_ID = "subscribeId";
 
 static volatile bool g_deviceManagerInitFlag = false;
 
-static int InitDeviceManager(void)
+int InitDeviceManager(void)
 {
     DMLOGI("init device manager start.");
     if (g_deviceManagerInitFlag) {
@@ -52,7 +52,7 @@ static int InitDeviceManager(void)
     return DM_OK;
 }
 
-static int UnInitDeviceManager(void)
+int UnInitDeviceManager(void)
 {
     DMLOGI("device manager UnInitDeviceManager start.");
     if (!g_deviceManagerInitFlag) {
@@ -65,7 +65,7 @@ static int UnInitDeviceManager(void)
     return DM_OK;
 }
 
-static int RegisterDevStateCallback(const char *pkgName, const char *extra, DevStatusCallback callback)
+int RegisterDevStateCallback(const char *pkgName, const char *extra, DevStatusCallback callback)
 {
     DMLOGI("device manager RegisterDevStateCallback start.");
     (void)extra;
@@ -76,7 +76,7 @@ static int RegisterDevStateCallback(const char *pkgName, const char *extra, DevS
     return RegisterSoftbusDevStateCallback(pkgName, callback);
 }
 
-static int UnRegisterDevStateCallback(const char *pkgName)
+int UnRegisterDevStateCallback(const char *pkgName)
 {
     DMLOGI("device manager UnRegisterDevStateCallback start.");
     if (!g_deviceManagerInitFlag) {
@@ -86,8 +86,7 @@ static int UnRegisterDevStateCallback(const char *pkgName)
     return UnRegisterSoftbusDevStateCallback(pkgName);
 }
 
-static int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen,
-    int *trustListLen)
+int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen, int *trustListLen)
 {
     DMLOGI("device manager GetTrustedList start.");
     if (!g_deviceManagerInitFlag) {
@@ -97,7 +96,7 @@ static int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, co
     return GetSoftbusTrustedDeviceList(pkgName, deviceList, deviceListLen, trustListLen);
 }
 
-static int StartAdvertising(const char *advParam, const char *filterOption, OnAdvertisingResult cb)
+int StartAdvertising(const char *advParam, const char *filterOption, OnAdvertisingResult cb)
 {
     DMLOGI("device manager StartAdvertising start.");
     (void)filterOption;
@@ -123,7 +122,7 @@ static int StartAdvertising(const char *advParam, const char *filterOption, OnAd
     return StartSoftbusPublish(pkgName, cb);
 }
 
-static int StopAdvertising(const char *pkgName)
+int StopAdvertising(const char *pkgName)
 {
     DMLOGI("device manager stop advertising start.");
     if (!g_deviceManagerInitFlag) {
@@ -133,7 +132,7 @@ static int StopAdvertising(const char *pkgName)
     return StopSoftbusPublish(pkgName);
 }
 
-static int StartDiscovering(const char *discoverParam, const char *filterOption, OnTargetFound callback)
+int StartDiscovering(const char *discoverParam, const char *filterOption, OnTargetFound callback)
 {
     DMLOGI("device manager start discovering start.");
     if (!g_deviceManagerInitFlag) {
@@ -164,7 +163,7 @@ static int StartDiscovering(const char *discoverParam, const char *filterOption,
     return StartSoftbusDiscovery(pkgName, subscribeId, filterOption, callback);
 }
 
-static int StopDiscovering(const char *pkgName, const int subscribeId)
+int StopDiscovering(const char *pkgName, const int subscribeId)
 {
     DMLOGI("device manager StopDiscovering start.");
     if (!g_deviceManagerInitFlag) {
@@ -174,7 +173,7 @@ static int StopDiscovering(const char *pkgName, const int subscribeId)
     return StopSoftbusDiscovery(pkgName, subscribeId);
 }
 
-static int BindTarget(const char *pkgName, const char *deviceId, const char *bindParam, OnBindResult cb)
+int BindTarget(const char *pkgName, const char *deviceId, const char *bindParam, OnBindResult cb)
 {
     DMLOGI("device manager BindTarget start.");
     if (!g_deviceManagerInitFlag) {
@@ -199,7 +198,7 @@ static int BindTarget(const char *pkgName, const char *deviceId, const char *bin
     return SoftbusBindTarget(pkgName, deviceId, bindType, cb);
 }
 
-static int UnBindTarget(const char *pkgName, const char *networkId)
+int UnBindTarget(const char *pkgName, const char *networkId)
 {
     DMLOGI("device manager UnBindTarget start.");
     if (!g_deviceManagerInitFlag) {
