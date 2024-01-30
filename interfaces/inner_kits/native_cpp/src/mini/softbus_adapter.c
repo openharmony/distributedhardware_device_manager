@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -271,7 +271,7 @@ ISessionListener g_sessionListener = {
 OnJoinLNNResult g_joinLNNResult = OnJoinLNNCallback;
 OnLeaveLNNResult g_leaveLNNResult = OnLeaveLNNCallback;
 
-int InitSoftbusModle()
+int InitSoftbusModle(void)
 {
     int retValue = DM_OK;
     g_discoveryCallbackMap.valid = false;
@@ -314,7 +314,7 @@ int InitSoftbusModle()
     return DM_OK;
 }
 
-int UnInitSoftbusModle()
+int UnInitSoftbusModle(void)
 {
     int returnResult = DM_OK;
     int retValue = UnregNodeDeviceStateCb(&g_softbusStatusChangeCb);
@@ -1127,7 +1127,7 @@ int SoftbusBindTarget(const char *pkgName, const char *deviceId, const int bindT
     return DM_OK;
 }
 
-static char* CreateNegotiateMsg()
+static char* CreateNegotiateMsg(void)
 {
     cJSON *msg = cJSON_CreateObject();
     if (msg == NULL) {
@@ -1187,9 +1187,9 @@ static char* CreateRespNegotiateMsg(const int bindType)
         cJSON_Delete(msg);
         return NULL;
     }
-    int reply = AbilityNegotiate(bindType)
+    int reply = AbilityNegotiate(bindType);
     if (reply != DM_OK) {
-        DMLOGE("failed to AbilityNegotiate with ret: %d.", retValue);
+        DMLOGE("failed to AbilityNegotiate with ret: %d.", reply);
         cJSON_Delete(msg);
         return NULL;
     }

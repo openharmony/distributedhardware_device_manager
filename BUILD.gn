@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,11 +14,11 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   if (ohos_kernel_type == "liteos_m") {
-    lite_component("devicemanager_mini") {
-      features = [
-        "utils:devicemanagerutils_mini",
-        "interfaces/inner_kits/native_cpp:devicemanagersdk_mini",
-      ]
+    lite_component("device_manager") {
+      features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
+    }
+    lite_component("device_manager_fwk") {
+      features = []
     }
     group("device_manager_test") {
       testonly = true
