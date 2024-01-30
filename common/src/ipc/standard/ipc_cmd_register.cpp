@@ -18,7 +18,6 @@
 #include <utility>         // for pair
 
 #include "device_manager_ipc_interface_code.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_def.h"
 namespace OHOS { class MessageParcel; }
@@ -26,7 +25,10 @@ namespace OHOS { class MessageParcel; }
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
-
+constexpr int32_t DM_OK = 0;
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int32_t ERR_DM_UNSUPPORTED_IPC_COMMAND = -20015;
+constexpr int32_t ERR_DM_POINT_NULL = -20005;
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     int32_t ret = DM_OK;

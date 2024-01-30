@@ -31,7 +31,6 @@
 #include "idevice_manager_service_impl.h"
 #include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
-#include "softbus_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {

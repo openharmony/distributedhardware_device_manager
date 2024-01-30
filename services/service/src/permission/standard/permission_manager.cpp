@@ -17,7 +17,6 @@
 
 #include "accesstoken_kit.h"
 #include "access_token.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "hap_token_info.h"
 #include "ipc_skeleton.h"
@@ -29,7 +28,9 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
-
+constexpr int32_t DM_OK = 0;
+constexpr int32_t ERR_DM_FAILED = -20000;
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";

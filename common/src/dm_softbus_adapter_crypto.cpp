@@ -15,7 +15,6 @@
 
 #include "dm_softbus_adapter_crypto.h"
 
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "md.h"
 #include "securec.h"
@@ -32,7 +31,9 @@ constexpr int HEXIFY_UNIT_LEN = 2;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int DEC_MAX_NUM = 10;
 constexpr int HEX_MAX_BIT_NUM = 4;
-
+constexpr int ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int DM_OK = 0;
+constexpr int ERR_DM_FAILED = -20000;
 #define HEXIFY_LEN(len) ((len) * HEXIFY_UNIT_LEN + 1)
 } // namespace
 

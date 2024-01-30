@@ -16,7 +16,6 @@
 #include "pin_holder_session.h"
 
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
@@ -24,6 +23,10 @@
 namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
+constexpr int32_t DM_OK = 0;
+constexpr int32_t ERR_DM_FAILED = -20000;
+constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
+constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager.pinholder";
 PinHolderSession::PinHolderSession()
 {
     LOGD("PinHolderSession constructor.");

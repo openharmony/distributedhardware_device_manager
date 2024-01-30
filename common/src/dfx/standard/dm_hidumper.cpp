@@ -19,12 +19,13 @@
 #include <utility>             // for pair
 
 #include "dm_anonymous.h"      // for GetAnonyString
-#include "dm_constants.h"      // for DM_OK, ERR_DM_FAILED
 #include "dm_log.h"            // for LOGI, LOGE
 
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
+constexpr int32_t DM_OK = 0;
+constexpr int32_t ERR_DM_FAILED = -20000;
 int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDumpHelper start.");
