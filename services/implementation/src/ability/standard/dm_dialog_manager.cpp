@@ -29,6 +29,7 @@ namespace DistributedHardware {
 static constexpr int32_t INVALID_USERID = -1;
 static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 static constexpr int32_t WAIT_DIALOG_CLOSE_TIME_S = 10;
+const int32_t USLEEP_SHOW_PIN_TIME_US = 50000;  // 50ms
 const std::string dmUiBundleName = "com.ohos.devicemanagerui";
 const std::string comfirmAbilityName = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
 const std::string pinAbilityName = "com.ohos.devicemanagerui.PincodeUIExtAbility";
@@ -143,6 +144,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
             LOGE("wait dm dialog close failed.");
             return;
         }
+        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
     }
     MessageParcel data;
     MessageParcel reply;

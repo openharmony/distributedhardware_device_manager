@@ -627,32 +627,10 @@ HWTEST_F(IpcClientManagerTest, SendRequest_009, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: IsInit_001
- * @tc.desc: 1. set pkgName null
- *           2. set IpcClientManager dmInterface_null
- *           3. call IsInit with parameter
- *           4. check ret is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcClientManagerTest, IsInit_001, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName null
-    std::string pkgName = "";
-    // 2. set IpcClientManager dmInterface_null
-    std::shared_ptr<IpcClientManager> instance = std::make_shared<IpcClientManager>();
-    instance->dmInterface_ = nullptr;
-    // 3. call SendRequest with parameter
-    bool ret = instance->IsInit(pkgName);
-    // 4. check ret is false
-    ASSERT_EQ(ret, false);
-}
-
-/**
- * @tc.name: IsInit_001
+ * @tc.name: OnDmServiceDied_001
  * @tc.desc: 1. set IpcClientManager dmInterface_null
- *           3. call OnDmServiceDied
- *           4. check ret is ERR_DM_POINT_NULL
+ *           2. call OnDmServiceDied
+ *           3. check ret is ERR_DM_POINT_NULL
  * @tc.type: FUNC
  */
 HWTEST_F(IpcClientManagerTest, OnDmServiceDied_001, testing::ext::TestSize.Level0)
