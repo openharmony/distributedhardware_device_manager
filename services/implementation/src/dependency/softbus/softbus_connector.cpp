@@ -777,6 +777,14 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
     }
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
+    std::string extraData = dmDeviceInfo.extraData;
+    nlohmann::json extraJson;
+    if (!extraData.empty()) {
+        extraJson = nlohmann::json::parse(extraData);
+    }
+    extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
+    dmDeviceInfo.extraData = to_string(extraJson);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
