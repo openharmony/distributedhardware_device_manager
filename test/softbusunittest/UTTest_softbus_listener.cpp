@@ -352,7 +352,7 @@ HWTEST_F(SoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::TestSize
 {
     string pkgName;
     nlohmann::json object;
-    object["findDeviceMode"]  = 2;
+    object["findDeviceMode"] = 2;
     string searchJson = object.dump();
     char *output = nullptr;
     size_t *outLen = nullptr;
@@ -364,7 +364,7 @@ HWTEST_F(SoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::TestSiz
 {
     string pkgName;
     nlohmann::json object;
-    object["findDeviceMode"]  = 3;
+    object["findDeviceMode"] = 3;
     string searchJson = object.dump();
     char *output = nullptr;
     size_t *outLen = nullptr;

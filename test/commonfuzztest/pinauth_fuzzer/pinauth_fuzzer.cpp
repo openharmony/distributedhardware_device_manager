@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,15 +33,8 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-
+    std::shared_ptr<DmAuthManager> authManager = nullptr;
     std::string authToken(reinterpret_cast<const char*>(data), size);
-
     std::shared_ptr<PinAuth> pinauth = std::make_shared<PinAuth>();
     pinauth->ShowAuthInfo(authToken, authManager);
     pinauth->StartAuth(authToken, authManager);

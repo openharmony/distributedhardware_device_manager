@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,7 +115,7 @@ BENCHMARK_F(DeviceManagerTest, GetUdidByNetworkIdTestCase)(benchmark::State &sta
     while (state.KeepRunning()) {
         std::string netWorkId = "netWorkId_";
         std::string udid = "udid_";
-        int32_t ret =  DeviceManager::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
+        int32_t ret = DeviceManager::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");
         }
@@ -128,7 +128,7 @@ BENCHMARK_F(DeviceManagerTest, GetUuidByNetworkIdTestCase)(benchmark::State &sta
     while (state.KeepRunning()) {
         std::string netWorkId = "netWorkId_";
         std::string uuid = "uuid_";
-        int32_t ret =  DeviceManager::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
+        int32_t ret = DeviceManager::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
         if (ret != DM_OK) {
             state.SkipWithError("SetUserOperationTestCase failed.");
         }
