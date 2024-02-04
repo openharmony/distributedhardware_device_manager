@@ -650,12 +650,12 @@ int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const 
     std::string &returnJsonStr)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %s does not have permission to call ImportCredential.",
+        LOGE("The caller: %s does not have permission to call CheckCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ImportCredential failed, instance not init or init failed.");
+        LOGE("CheckCredential failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
@@ -1273,31 +1273,31 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
     return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
-void DeviceManagerService::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+void DeviceManagerService::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindSessionOpened failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindSessionOpened(sessionId, result);
+    dmServiceImpl_->OnUnbindSessionOpened(socket, info);
 }
 
-void DeviceManagerService::OnUnbindSessionCloseed(int32_t sessionId)
+void DeviceManagerService::OnUnbindSessionCloseed(int32_t socket)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindSessionCloseed failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindSessionCloseed(sessionId);
+    dmServiceImpl_->OnUnbindSessionCloseed(socket);
 }
 
-void DeviceManagerService::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void DeviceManagerService::OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindBytesReceived failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindBytesReceived(sessionId, data, dataLen);
+    dmServiceImpl_->OnUnbindBytesReceived(socket, data, dataLen);
 }
 
 int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
@@ -1308,7 +1308,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
     }
     LOGI("DeviceManagerService DpAclAdd start.");
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("DpAclAdd failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     dmServiceImpl_->DpAclAdd(udid);

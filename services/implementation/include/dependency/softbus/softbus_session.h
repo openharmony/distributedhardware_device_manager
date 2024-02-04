@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 
 #include "inner_session.h"
 #include "session.h"
+#include "socket.h"
 #include "softbus_session_callback.h"
 
 namespace OHOS {
@@ -33,7 +34,7 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void OnUnbindSessionOpened(int sessionId, int result);
+    static void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
 
 public:
     SoftbusSession();
@@ -81,10 +82,12 @@ public:
      */
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
     int32_t OpenUnbindSession(const std::string &netWorkId);
+    int32_t CloseUnbindSession(int32_t socket);
     int32_t SendHeartbeatData(int32_t sessionId, std::string &message);
 
 private:
     static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
+    ISocketListener iSocketListener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
