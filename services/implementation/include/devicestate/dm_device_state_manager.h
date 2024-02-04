@@ -81,7 +81,7 @@ public:
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
-    void OnDbReady(const std::string &pkgName, const std::string &deviceUUID);
+    void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
     void DeleteTimeOutGroup(std::string name);

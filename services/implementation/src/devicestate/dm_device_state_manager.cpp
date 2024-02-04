@@ -183,20 +183,20 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
-void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceUUID)
+void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
-    LOGI("OnDbReady function is called with pkgName: %s and deviceUUID = %s",
-         pkgName.c_str(), GetAnonyString(deviceUUID).c_str());
-    if (pkgName.empty() || deviceUUID.empty()) {
-        LOGE("On db ready pkgName is empty or deviceUUID is empty");
+    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s",
+         pkgName.c_str(), GetAnonyString(uuid).c_str());
+    if (pkgName.empty() || uuid.empty()) {
+        LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
     DmDeviceInfo saveInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        auto iter = remoteDeviceInfos_.find(deviceUUID);
+        auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnDbReady complete not find deviceUUID: %s", GetAnonyString(deviceUUID).c_str());
+            LOGE("OnDbReady complete not find uuid: %s", GetAnonyString(uuid).c_str());
             return;
         }
         saveInfo = iter->second;
