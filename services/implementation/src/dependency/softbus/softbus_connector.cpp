@@ -780,7 +780,7 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
     std::string extraData = dmDeviceInfo.extraData;
     nlohmann::json extraJson;
     if (!extraData.empty()) {
-        extraJson = nlohmann::json::parse(extraData);
+        extraJson = nlohmann::json::parse(extraData, nullptr, false);
     }
     extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
