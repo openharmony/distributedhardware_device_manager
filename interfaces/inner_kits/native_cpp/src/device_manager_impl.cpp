@@ -285,7 +285,8 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
 
     deviceInfo = rsp->GetDeviceInfo();
     LOGI("DeviceManagerImpl::GetDeviceInfo completed, pkgname = %s networKId = %s deviceName = %s",
-         req->GetPkgName().c_str(), GetAnonyString(req->GetNetWorkId()).c_str(), GetAnonyString(deviceInfo.deviceName).c_str());
+         req->GetPkgName().c_str(), GetAnonyString(req->GetNetWorkId()).c_str(),
+         GetAnonyString(deviceInfo.deviceName).c_str());
     return DM_OK;
 }
 
@@ -1544,7 +1545,8 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
 int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
     if (authCode.empty() || pkgName.empty()) {
-        LOGE("ImportAuthCode error: Invalid para, authCode: %s, pkgName: %s", GetAnonyString(authCode).c_str(), pkgName.c_str());
+        LOGE("ImportAuthCode error: Invalid para, authCode: %s, pkgName: %s",
+            GetAnonyString(authCode).c_str(), pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("ImportAuthCode start, authCode: %s", GetAnonyString(authCode).c_str());

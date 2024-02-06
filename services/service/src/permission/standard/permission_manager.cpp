@@ -17,6 +17,7 @@
 
 #include "accesstoken_kit.h"
 #include "access_token.h"
+#include "dm_anonymous.h"
 #include "dm_log.h"
 #include "hap_token_info.h"
 #include "ipc_skeleton.h"

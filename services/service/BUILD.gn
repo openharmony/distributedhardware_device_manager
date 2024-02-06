@@ -54,6 +54,7 @@ if (defined(ohos_lite)) {
       ]
 
       sources = [
+        "${common_path}/src/dm_anonymous.cpp",
         "${common_path}/src/dm_softbus_adapter_crypto.cpp",
         "src/advertise/advertise_manager.cpp",
         "src/device_manager_service.cpp",
