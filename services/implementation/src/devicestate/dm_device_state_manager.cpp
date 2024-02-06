@@ -185,12 +185,12 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
-    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s",
-         pkgName.c_str(), GetAnonyString(uuid).c_str());
     if (pkgName.empty() || uuid.empty()) {
         LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
+    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s", pkgName.c_str(),
+         GetAnonyString(uuid).c_str());
     DmDeviceInfo saveInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
