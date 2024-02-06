@@ -80,21 +80,26 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
     LOGI("DeleteOfflineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+    std::string deviceId = std::string(info.deviceId);
     for (auto iter: remoteDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
+        if (std::string(iter.second.deviceId) == deviceId) {
             remoteDeviceInfos_.erase(iter.first);
-            LOGI("DeleteOfflineDeviceInfo complete");
+            LOGI("Delete remoteDeviceInfos complete");
             break;
         }
     }
-    if (stateDeviceInfos_.find(info.deviceId) != stateDeviceInfos_.end()) {
-        stateDeviceInfos_.erase(info.deviceId);
+    for (auto iter: stateDeviceInfos_) {
+        if (std::string(iter.second.deviceId) == deviceId) {
+            stateDeviceInfos_.erase(iter.first);
+            LOGI("Delete stateDeviceInfos complete");
+            break;
+        }
     }
 }
 
 void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOnline");
+    LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
@@ -115,7 +120,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOffline");
+    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %s", GetAnonyString(deviceId).c_str());
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
@@ -178,19 +183,20 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
-void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceId)
+void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
-    LOGI("OnDbReady function is called with pkgName: %s", pkgName.c_str());
-    if (pkgName.empty() || deviceId.empty()) {
-        LOGE("On db ready pkgName is empty or deviceId is deviceId");
+    if (pkgName.empty() || uuid.empty()) {
+        LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
+    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s", pkgName.c_str(),
+         GetAnonyString(uuid).c_str());
     DmDeviceInfo saveInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        auto iter = remoteDeviceInfos_.find(deviceId);
+        auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnDbReady complete not find deviceId: %s", GetAnonyString(deviceId).c_str());
+            LOGE("OnDbReady complete not find uuid: %s", GetAnonyString(uuid).c_str());
             return;
         }
         saveInfo = iter->second;

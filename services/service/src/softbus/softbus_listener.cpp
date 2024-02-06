@@ -873,6 +873,14 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
+    std::string extraData = devInfo.extraData;
+    nlohmann::json extraJson;
+    if (!extraData.empty()) {
+        extraJson = nlohmann::json::parse(extraData, nullptr, false);
+    }
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+    devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
 
