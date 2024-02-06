@@ -251,6 +251,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    LOGI("device online networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -288,6 +289,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    LOGI("device offline networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
@@ -335,6 +337,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+        LOGI("device changed networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
@@ -768,7 +771,8 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
         }
     }
     FreeNodeInfo(nodeInfo);
-    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", info.deviceName, info.deviceTypeId);
+    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", GetAnonyString(info.deviceName).c_str(),
+        info.deviceTypeId);
     return ret;
 }
 

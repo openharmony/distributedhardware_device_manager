@@ -232,7 +232,7 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
         LOGE("[HICHAIN]return groups info number is zero.");
         return false;
     }
-    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%u)", groupVec, num);
+    LOGI("HiChainConnector::GetGroupInfo groupNum(%u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
@@ -271,7 +271,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
         LOGE("[HICHAIN]return groups info number is zero.");
         return false;
     }
-    LOGI("HiChainConnector::GetGroupInfo group(%s), groupNum(%ud)", groupVec, num);
+    LOGI("HiChainConnector::GetGroupInfo groupNum(%u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);

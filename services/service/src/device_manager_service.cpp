@@ -186,7 +186,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
 {
     LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %s, callerId = %s, isRefresh = %d", pkgName.c_str(),
-        callerId.c_str(), isRefresh);
+        GetAnonyString(callerId).c_str(), isRefresh);
     if (pkgName.empty() || callerId.empty()) {
         LOGE("Invalid parameter, parameter is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
