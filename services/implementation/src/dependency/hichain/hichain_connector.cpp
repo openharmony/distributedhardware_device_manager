@@ -875,7 +875,7 @@ int32_t HiChainConnector::GetGroupId(const std::string &userId, const int32_t gr
         return ERR_DM_FAILED;
     }
     for (auto &groupinfo : groupList) {
-        LOGI("groupinfo.groupId:%s", groupinfo.groupId.c_str());
+        LOGI("groupinfo.groupId:%s", GetAnonyString(groupinfo.groupId).c_str());
         if (groupinfo.userId == userId) {
             groupId = groupinfo.groupId;
             return DM_OK;
@@ -962,7 +962,7 @@ int32_t HiChainConnector::GetGroupIdExt(const std::string &userId, const int32_t
         return ERR_DM_FAILED;
     }
     for (auto &groupinfo : groupList) {
-        LOGI("groupinfo.groupId:%s", groupinfo.groupId.c_str());
+        LOGI("groupinfo.groupId:%s", GetAnonyString(groupinfo.groupId).c_str());
         if (groupinfo.userId == userId) {
             groupId = groupinfo.groupId;
             groupOwner = groupinfo.groupOwner;
@@ -1118,14 +1118,14 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     GetRelatedGroups(localUdid, groupList);
     for (auto &iter : groupList) {
         if (DeleteGroup(iter.groupId) != DM_OK) {
-            LOGE("Delete groupId %s failed.", iter.groupId.c_str());
+            LOGE("Delete groupId %s failed.", GetAnonyString(iter.groupId).c_str());
         }
     }
     std::vector<GroupInfo> groupListExt;
     GetRelatedGroupsExt(localUdid, groupListExt);
     for (auto &iter : groupListExt) {
         if (DeleteGroupExt(iter.groupId) != DM_OK) {
-            LOGE("DeleteGroupExt groupId %s failed.", iter.groupId.c_str());
+            LOGE("DeleteGroupExt groupId %s failed.", GetAnonyString(iter.groupId).c_str());
         }
     }
 }

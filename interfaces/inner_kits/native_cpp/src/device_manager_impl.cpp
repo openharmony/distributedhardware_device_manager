@@ -285,7 +285,7 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
 
     deviceInfo = rsp->GetDeviceInfo();
     LOGI("DeviceManagerImpl::GetDeviceInfo completed, pkgname = %s networKId = %s deviceName = %s",
-         req->GetPkgName().c_str(), GetAnonyString(req->GetNetWorkId()).c_str(), deviceInfo.deviceName);
+         req->GetPkgName().c_str(), GetAnonyString(req->GetNetWorkId()).c_str(), GetAnonyString(deviceInfo.deviceName).c_str());
     return DM_OK;
 }
 
@@ -773,8 +773,8 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
                                               std::string &uuid)
 {
     if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s, uuid: %s",
-            pkgName.c_str(), GetAnonyString(netWorkId).c_str(), uuid.c_str());
+        LOGE("DeviceManagerImpl::GetUuidByNetworkId error: Invalid para, pkgName: %s, netWorkId: %s",
+            pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("GetUuidByNetworkId start, pkgName: %s", pkgName.c_str());
@@ -871,7 +871,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
 {
     if (pkgName.empty() || reqJsonStr.empty()) {
         LOGE("DeviceManagerImpl::RequestCredential error: Invalid para, pkgName is %s, reqJsonStr is %s",
-            pkgName.c_str(), reqJsonStr.c_str());
+            pkgName.c_str(), GetAnonyString(reqJsonStr).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to RequestCredential.");
@@ -904,7 +904,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
 {
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
-            pkgName.c_str(), credentialInfo.c_str());
+            pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to ImportCredential.");
@@ -936,7 +936,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
 {
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
-            pkgName.c_str(), deleteInfo.c_str());
+            pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to DeleteCredential.");
@@ -1544,10 +1544,10 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
 int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
     if (authCode.empty() || pkgName.empty()) {
-        LOGE("ImportAuthCode error: Invalid para, authCode: %s, pkgName: %s", authCode.c_str(), pkgName.c_str());
+        LOGE("ImportAuthCode error: Invalid para, authCode: %s, pkgName: %s", GetAnonyString(authCode).c_str(), pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("ImportAuthCode start, authCode: %s", authCode.c_str());
+    LOGI("ImportAuthCode start, authCode: %s", GetAnonyString(authCode).c_str());
     int32_t length = authCode.length();
     if (length != DM_IMPORT_AUTH_CODE_LENGTH) {
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
@@ -1600,7 +1600,7 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
     }
 
     authCode = rsp->GetAuthCode();
-    LOGI("ExportAuthCode success, authCode: %s.", authCode.c_str());
+    LOGI("ExportAuthCode success, authCode: %s.", GetAnonyString(authCode).c_str());
     return DM_OK;
 }
 

@@ -445,7 +445,8 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
             authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
         }
         LOGI("AuthMessageProcessor::ParseAuthResponseMessage groupId = %s, groupName = %s",
-            GetAnonyString(authResponseContext_->groupId).c_str(), authResponseContext_->groupName.c_str());
+            GetAnonyString(authResponseContext_->groupId).c_str(),
+            GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
 

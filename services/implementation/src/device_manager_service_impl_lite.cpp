@@ -231,7 +231,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 {
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
-            pkgName.c_str(), credentialInfo.c_str());
+            pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
@@ -245,7 +245,7 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
 {
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
-            pkgName.c_str(), deleteInfo.c_str());
+            pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {

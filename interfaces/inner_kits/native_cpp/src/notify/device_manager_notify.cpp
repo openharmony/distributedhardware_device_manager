@@ -602,7 +602,7 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
                                        const std::string &token, int32_t status, int32_t reason)
 {
     if (pkgName.empty() || token.empty() || deviceId.empty()) {
-        LOGE("Invalid para, pkgName: %s, token: %s", pkgName.c_str(), token.c_str());
+        LOGE("Invalid para, pkgName: %s, token: %s", pkgName.c_str(), GetAnonyString(token).c_str());
         return;
     }
     LOGI("DeviceManagerNotify::OnAuthResult in, pkgName:%s, status:%d, reason:%d", pkgName.c_str(), status, reason);

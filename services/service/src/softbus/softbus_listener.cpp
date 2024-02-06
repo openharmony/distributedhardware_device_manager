@@ -391,8 +391,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         }
     }
     LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d",
-        GetAnonyString(dmDevInfo.deviceId).c_str(), dmDevInfo.deviceName, dmDevInfo.deviceTypeId,
-        dmDevInfo.range, device->isOnline);
+        GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
+        dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     CacheDiscoveredDevice(device);
@@ -758,7 +758,7 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
     for (int32_t i = 0; i < nodeInfoCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         if (networkId == nodeBasicInfo->networkId) {
-            LOGI("GetDeviceInfo name : %s.", nodeBasicInfo->deviceName);
+            LOGI("GetDeviceInfo name : %s.", GetAnonyString(nodeBasicInfo->deviceName).c_str());
             if (memcpy_s(info.deviceName, sizeof(info.deviceName), nodeBasicInfo->deviceName,
                 std::min(sizeof(info.deviceName), sizeof(nodeBasicInfo->deviceName))) != DM_OK) {
                 LOGE("GetDeviceInfo deviceName copy deviceName data failed.");
@@ -1307,7 +1307,8 @@ int32_t SoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionInfo>
     for (size_t i = 0; i < arraySize; i++) {
         if (GetSha256Hash(optionInfo[i].deviceAlias.c_str(),
                           optionInfo[i].deviceAlias.size(), sha256Out) != DM_OK) {
-            LOGE("failed to get sha256 hash with index: %d, value: %s.", i, optionInfo[i].deviceAlias.c_str());
+            LOGE("failed to get sha256 hash with index: %d, value: %s.", i,
+                GetAnonyString(optionInfo[i].deviceAlias).c_str());
             return ERR_DM_FAILED;
         }
         output[(*outLen)++] = DEVICE_ALIAS_NUMBER;

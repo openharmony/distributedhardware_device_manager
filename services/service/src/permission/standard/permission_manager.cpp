@@ -54,7 +54,7 @@ bool PermissionManager::CheckPermission(void)
     if (tokenCaller == 0) {
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
+    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -74,7 +74,7 @@ bool PermissionManager::CheckNewPermission(void)
     if (tokenCaller == 0) {
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
+    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -94,7 +94,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     if (tokenCaller == 0) {
         return ERR_DM_FAILED;
     }
-    LOGI("PermissionManager::tokenCaller ID == %d", tokenCaller);
+    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;

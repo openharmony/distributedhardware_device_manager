@@ -691,12 +691,12 @@ static bool ImportToDevIdMap(const char *networkId, const char *deviceId)
         }
         errno_t retValue = strcpy_s(g_devIdMap[i].networkId, DM_MAX_DEVICE_NETWORKID_LEN, networkId);
         if (retValue != EOK) {
-            DMLOGE("failed to copy networkId: %s to discovery map.", networkId);
+            DMLOGE("failed to copy networkId to discovery map.");
             return false;
         }
         retValue = strcpy_s(g_devIdMap[i].deviceId, DM_MAX_DEVICE_ID_LEN, deviceId);
         if (retValue != EOK) {
-            DMLOGE("failed to copy deviceId: %s to discovery map.", deviceId);
+            DMLOGE("failed to copy deviceId to discovery map.");
             return false;
         }
         g_devIdMap[i].valid = true;
@@ -716,7 +716,7 @@ static int GetDeviceIdByNetworkId(const char *networkId, char *deviceId)
         }
         errno_t retValue = strcpy_s(deviceId, DM_MAX_DEVICE_NETWORKID_LEN, g_devIdMap[i].deviceId);
         if (retValue != EOK) {
-            DMLOGE("failed to copy deviceId: %s.", deviceId);
+            DMLOGE("failed to copy deviceId.");
             return false;
         }
         return true;
@@ -774,7 +774,7 @@ static bool ImportDeviceToAddrMap(const DmDeviceInfo *deviceInfo)
     const char *deviceId = deviceInfo->deviceId;
     for (int i = 0; i < DM_MAX_DEVICE_SIZE; i++) {
         if (g_deviceIdAddrMap[i].valid && strcmp(g_deviceIdAddrMap[i].deviceId, deviceId) == 0) {
-            DMLOGE("deviceId: %s has been exist in addr map.", deviceId);
+            DMLOGE("deviceId has been exist in addr map.");
             return false;
         }
     }
@@ -784,14 +784,14 @@ static bool ImportDeviceToAddrMap(const DmDeviceInfo *deviceInfo)
         }
         errno_t retValue = strcpy_s(g_deviceIdAddrMap[i].deviceId, DM_MAX_DEVICE_ID_LEN, deviceId);
         if (retValue != EOK) {
-            DMLOGE("failed to copy deviceId: %s to addr map.", deviceId);
+            DMLOGE("failed to copy deviceId to addr map.");
             return false;
         }
         g_deviceIdAddrMap[i].valid = true;
         g_deviceIdAddrMap[i].connectAddr = deviceInfo->connectAddr;
         return true;
     }
-    DMLOGE("addr map not memory for a new deviceid: %s.", deviceId);
+    DMLOGE("addr map not memory for a new deviceid.");
     return false;
 }
 
@@ -805,7 +805,7 @@ static int GetConnAddrByDeviceId(const char *deviceId, ConnectionAddr *addr)
     }
     for (int i = 0; i < DM_MAX_DEVICE_SIZE; i++) {
         if (g_deviceIdAddrMap[i].valid && strcmp(g_deviceIdAddrMap[i].deviceId, deviceId) == 0) {
-            DMLOGE("deviceId: %s has been exist in addr map.", deviceId);
+            DMLOGE("deviceId has been exist in addr map.");
             addr = &(g_deviceIdAddrMap[i].connectAddr);
             return DM_OK;
         }
@@ -1243,7 +1243,7 @@ static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLe
         DMLOGE("on byte received empty msg.");
         return;
     }
-    DMLOGI("on byte received sessionId: %d, msg: %s.", sessionId, (char *)data);
+    DMLOGI("on byte received sessionId: %d.", sessionId);
     cJSON *msg = cJSON_Parse(data);
     if (msg == NULL) {
         DMLOGE("on byte received parse msg failed.");
@@ -1352,7 +1352,7 @@ static void ProcessSourceMsg(const char *data, unsigned int dataLen)
 
 static void OnLeaveLNNCallback(const char *networkId, int32_t retCode)
 {
-    DMLOGI("leave LNN called, networkId: %s, retCode: %d.", networkId, retCode);
+    DMLOGI("leave LNN called, retCode: %d.", retCode);
 }
 
 int SoftbusUnBindTarget(const char *pkgName, const char *networkId)
