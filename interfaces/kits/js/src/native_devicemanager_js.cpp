@@ -2904,7 +2904,7 @@ void DeviceManagerNapi::CallGetDeviceInfoPromise(napi_env env, napi_status &stat
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
 
     LOGI("DeviceManager::CallGetDeviceInfoSync deviceName:%s deviceTypeId:%d ",
-         GetAnonyString(std::string(networkIdAsyncCallbackInfo->deviceInfo.deviceName)).c_str(),
+         GetAnonyString(networkIdAsyncCallbackInfo->deviceInfo.deviceName).c_str(),
          networkIdAsyncCallbackInfo->deviceInfo.deviceTypeId);
 
     if (networkIdAsyncCallbackInfo->status == 0) {
