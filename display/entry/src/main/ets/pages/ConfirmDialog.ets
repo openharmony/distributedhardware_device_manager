@@ -150,13 +150,13 @@ struct ConfirmCustomDialog {
       return $r('app.media.ic_device_soundx')
     } else if (peerdeviceType == deviceManager.DeviceType.PHONE) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_device_phone')
+      return $r('app.media.ic_public_devices_phone')
     } else if (peerdeviceType == deviceManager.DeviceType.TABLET) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_device_pad')
+      return $r('app.media.ic_device_pad')
     } else if (peerdeviceType == deviceManager.DeviceType.WEARABLE) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_device_watch')
+      return $r('app.media.ic_device_watch')
     } else if (peerdeviceType == deviceManager.DeviceType.CAR) {
       this.isAvailableType = true
       return $r('app.media.ic_public_car')
@@ -165,10 +165,10 @@ struct ConfirmCustomDialog {
       return $r('app.media.ic_device_smartscreen')
     } else if (peerdeviceType == DEVICE_TYPE_PC) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_device_matebook')
+      return $r('app.media.ic_device_matebook')
     } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_device_matebook')
+      return $r('app.media.ic_device_matebook')
     } else {
       this.isAvailableType = false
       return $r('app.media.icon')
