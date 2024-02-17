@@ -15,6 +15,7 @@
 import deviceManager from '@ohos.distributedHardware.deviceManager';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
 import deviceInfo from '@ohos.deviceInfo';
+import Constant from '../common/constant';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -39,7 +40,8 @@ struct ConfirmCustomDialog {
   @State times: number = 0;
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
-  controller?: CustomDialogController
+  controller?: CustomDialogController;
+  isPC: boolean = false;
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
@@ -74,6 +76,7 @@ struct ConfirmCustomDialog {
       }
     }, 1000)
     console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
+    this.isPC = Constant.isPC();
   }
 
   onAllowOnce() {
@@ -147,13 +150,13 @@ struct ConfirmCustomDialog {
       return $r('app.media.ic_device_soundx')
     } else if (peerdeviceType == deviceManager.DeviceType.PHONE) {
       this.isAvailableType = true
-      return $r('app.media.ic_public_devices_phone')
+      return $r('app.media.ic_public_device_phone')
     } else if (peerdeviceType == deviceManager.DeviceType.TABLET) {
       this.isAvailableType = true
-      return $r('app.media.ic_device_pad')
+      return $r('app.media.ic_public_device_pad')
     } else if (peerdeviceType == deviceManager.DeviceType.WEARABLE) {
       this.isAvailableType = true
-      return $r('app.media.ic_device_watch')
+      return $r('app.media.ic_public_device_watch')
     } else if (peerdeviceType == deviceManager.DeviceType.CAR) {
       this.isAvailableType = true
       return $r('app.media.ic_public_car')
@@ -162,10 +165,10 @@ struct ConfirmCustomDialog {
       return $r('app.media.ic_device_smartscreen')
     } else if (peerdeviceType == DEVICE_TYPE_PC) {
       this.isAvailableType = true
-      return $r('app.media.ic_device_matebook')
+      return $r('app.media.ic_public_device_matebook')
     } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
       this.isAvailableType = true
-      return $r('app.media.ic_device_matebook')
+      return $r('app.media.ic_public_device_matebook')
     } else {
       this.isAvailableType = false
       return $r('app.media.icon')
@@ -173,118 +176,127 @@ struct ConfirmCustomDialog {
   }
 
   build() {
-    Column() {
-      Image(this.getImages(this.peerDeviceType))
-        .width(24)
-        .height(24)
-        .margin({ bottom: 16, top: 24 })
-        .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
-      Column() {
-        Text(this.peerDeviceName + this.peerAppOperation + this.message)
-          .textAlign(TextAlign.Start)
-          .fontColor($r('sys.color.ohos_id_color_text_primary'))
-          .fontWeight(FontWeight.Medium)
-          .fontSize($r('sys.float.ohos_id_text_size_body1'))
-          .maxLines(2)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .width('100%')
-        Text(this.peerCustomDescription)
-          .textAlign(TextAlign.Start)
-          .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-          .fontWeight(FontWeight.Regular)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize($r('sys.float.ohos_id_text_size_body2'))
-          .maxLines(3)
-          .constraintSize({ maxHeight: 45 })
-          .width('100%')
-          .margin({ top: 2 })
-          .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
-      }.margin({ bottom: 16, left: 24, right: 24 })
+    GridRow({
+      columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['520vp', '840vp'] }
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
+        Column() {
+          Image(this.getImages(this.peerDeviceType))
+            .width(24)
+            .height(24)
+            .margin({ bottom: 16, top: 24 })
+            .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
+          Column() {
+            Text(this.peerDeviceName + this.peerAppOperation + this.message)
+              .textAlign(TextAlign.Start)
+              .fontColor($r('sys.color.ohos_id_color_text_primary'))
+              .fontWeight(FontWeight.Medium)
+              .fontSize($r('sys.float.ohos_id_text_size_body1'))
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('100%')
+            Text(this.peerCustomDescription)
+              .textAlign(TextAlign.Start)
+              .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+              .fontWeight(FontWeight.Regular)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .maxLines(3)
+              .constraintSize({ maxHeight: 45 })
+              .width('100%')
+              .margin({ top: 2 })
+              .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
+          }.margin({
+            top: this.isAvailableType ? 0 : 24,
+            bottom: 16, left: 24, right: 24 })
 
-      Column() {
-        Button(this.allowAlways)
-          .margin({ bottom: 4 })
-          .onClick(() => {
-            this.onAllowAlways();
+          Column() {
+            Button(this.allowAlways)
+              .margin({ bottom: 4 })
+              .onClick(() => {
+                this.onAllowAlways();
+              })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+            Button(this.allowOnce)
+              .margin({ bottom: 4 })
+              .onClick(() => {
+                this.onAllowOnce();
+              })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+            Button('不信任(' + this.secondsNum + ' 秒)')
+              .margin({ left: 16, right: 16 })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .onClick(() => {
+                this.onCancel();
+              })
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+          }
+          .margin({
+            left: 16,
+            right: 16,
+            bottom: this.isPC ? 24 : 8
           })
-          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-          .height(40)
-          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
-          .backgroundColor(this.btnColor)
-          .onHover((isHover?: boolean, event?: HoverEvent): void => {
-            if (isHover) {
-              this.btnColor = $r('sys.color.ohos_id_color_hover');
-            } else {
-              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-            }
-          })
-          .stateStyles({
-            pressed: {
-              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-            },
-            normal: {
-              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-            }
-          })
-        Button(this.allowOnce)
-          .margin({ bottom: 4 })
-          .onClick(() => {
-            this.onAllowOnce();
-          })
-          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-          .height(40)
-          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
-          .backgroundColor(this.btnColor)
-          .onHover((isHover?: boolean, event?: HoverEvent): void => {
-            if (isHover) {
-              this.btnColor = $r('sys.color.ohos_id_color_hover');
-            } else {
-              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-            }
-          })
-          .stateStyles({
-            pressed: {
-              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-            },
-            normal: {
-              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-            }
-          })
-        Button('不信任(' + this.secondsNum + ' 秒)')
-          .margin({ left: 16, right: 16 })
-          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-          .onClick(() => {
-            this.onCancel();
-          })
-          .height(40)
-          .width((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 250 : '100%')
-          .backgroundColor(this.btnColor)
-          .onHover((isHover?: boolean, event?: HoverEvent): void => {
-            if (isHover) {
-              this.btnColor = $r('sys.color.ohos_id_color_hover');
-            } else {
-              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-            }
-          })
-          .stateStyles({
-            pressed: {
-              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-            },
-            normal: {
-              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-            }
-          })
+        }
+        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
-      .margin({
-        left: 16,
-        right: 16,
-        bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 24 : 8
-      })
     }
-    .width('100%')
-    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
-    .backgroundColor($r('sys.color.ohos_id_color_mask_thin'))
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
   }
 }
 
@@ -294,11 +306,9 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: ConfirmCustomDialog(),
     autoCancel: false,
-    alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
-    DialogAlignment.Bottom : DialogAlignment.Center,
+    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
-    gridCount: (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 3 : 4,
-    customStyle: false,
+    customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
@@ -347,14 +357,6 @@ struct dialogPlusPage {
   }
 
   build() {
-    GridRow({
-      columns: { xs: 4, sm: 4, md: 8 },
-      gutter: { x: 4 },
-      breakpoints: { value: ['360vp', '400vp'] }
-    }) {
-      GridCol({ span: { xs: 4, sm: 4, md: 4 } }) {
-        Column(this.dialogController.open())
-      }
-    }
+    Column(this.dialogController.open())
   }
 }

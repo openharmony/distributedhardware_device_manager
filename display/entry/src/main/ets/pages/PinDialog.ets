@@ -16,11 +16,12 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 import { BusinessError } from '@ohos.base';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
 import deviceInfo from '@ohos.deviceInfo';
+import Constant from '../common/constant';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
-const ACTION_CANCEL_PINCODE_DISPLAY: number = 3
-const MSG_CANCEL_PIN_CODE_SHOW: number = 2
+const ACTION_CANCEL_PINCODE_DISPLAY: number = 3;
+const MSG_CANCEL_PIN_CODE_SHOW: number = 2;
 
 @CustomDialog
 struct PinCustomDialog {
@@ -29,6 +30,7 @@ struct PinCustomDialog {
   @State cancel_str: string = '取消';
   @State pinCodeArr: Array<string> = [];
   @State btnColor: ResourceColor = Color.Transparent;
+  @State isPC: boolean = false;
   controller?: CustomDialogController
 
   cancel() {
@@ -45,7 +47,8 @@ struct PinCustomDialog {
   }
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear execute PinCustomDialog')
+    console.log(TAG + 'aboutToAppear execute PinCustomDialog');
+    this.isPC = Constant.isPC();
     // 获取pinCode
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
@@ -66,74 +69,82 @@ struct PinCustomDialog {
   }
 
   build() {
-    Column() {
-      Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Start }) {
-        Text(this.messageTitle)
-          .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-          .fontColor($r('sys.color.ohos_id_color_text_primary'))
-          .fontWeight(FontWeight.Medium)
-          .margin({
-            left: 24,
-            right: 24
-          })
-      }
-      .height(56)
-      .margin({ bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 16 : 8 })
+    GridRow({
+      columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['520vp', '840vp'] }
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
+        Column() {
+          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Start }) {
+            Text(this.messageTitle)
+              .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                left: 24,
+                right: 24
+              })
+          }
+          .height(56)
+          .margin({ bottom: this.isPC ? 16 : 8 })
 
-      Row() {
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-          ForEach(this.pinCodeArr, (item: string) => {
-            Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-              Text(item)
-                .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .fontWeight(FontWeight.Medium)
-                .height(26)
-            }.width('10%')
-            .height('100%')
-          })
-        }.height(48)
-      }
-      .margin({ bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 16 : 8 })
+          Row() {
+            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+              ForEach(this.pinCodeArr, (item: string) => {
+                Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                  Text(item)
+                    .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .fontWeight(FontWeight.Medium)
+                    .height(26)
+                }.width('10%')
+                .height('100%')
+              })
+            }.height(48)
+          }
+          .margin({ bottom: this.isPC ? 16 : 8 })
 
-      Flex({ justifyContent: FlexAlign.Center }) {
-        Button(this.cancel_str)
-          .fontSize($r('sys.float.ohos_id_text_size_button1'))
-          .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-          .height(40)
-          .width('100%')
-          .backgroundColor(this.btnColor)
-          .onClick(() => {
-            if (this.controller) {
-              this.controller.close();
-            }
-            this.cancel();
-            this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
-          })
-          .onHover((isHover?: boolean, event?: HoverEvent): void => {
-            if (isHover) {
-              this.btnColor = $r('sys.color.ohos_id_color_hover');
-            } else {
-              this.btnColor = (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-            }
-          })
-          .stateStyles({
-            pressed: {
-              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-            },
-            normal: {
-              .backgroundColor((deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-            }
-          })
-      }.margin({
-        left: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
-        right: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 72 : 16,
-        bottom: deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc' ? 24 : 16 })
+          Flex({ justifyContent: FlexAlign.Center }) {
+            Button(this.cancel_str)
+              .fontSize($r('sys.float.ohos_id_text_size_button1'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width('100%')
+              .backgroundColor(this.btnColor)
+              .onClick(() => {
+                if (this.controller) {
+                  this.controller.close();
+                }
+                this.cancel();
+                this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+              })
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+          }.margin({
+            left: this.isPC ? 72 : 16,
+            right: this.isPC ? 72 : 16,
+            bottom: this.isPC ? 24 : 16 })
+        }
+        .constraintSize({ maxHeight: `${300}` })
+        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+      }
     }
-    .constraintSize({ maxHeight: `${300}` })
-    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .backgroundColor($r('sys.color.ohos_id_color_mask_thin'))
   }
 }
 
@@ -144,11 +155,10 @@ struct dialogPlusPage {
     builder: PinCustomDialog(),
     cancel: this.onCancel,
     autoCancel: false,
-    alignment: (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default') ?
-    DialogAlignment.Bottom : DialogAlignment.Center,
+    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
-    gridCount: (deviceInfo.deviceType === '2in1' || deviceInfo.deviceType === 'pc') ? 3 : 4,
-    customStyle: false
+    customStyle: true,
+    maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
   onCancel() {
@@ -228,14 +238,6 @@ struct dialogPlusPage {
   }
 
   build() {
-    GridRow({
-      columns: { xs: 4, sm: 4, md: 8 },
-      gutter: { x: 4 },
-      breakpoints: { value: ['360vp', '400vp'] }
-    }) {
-      GridCol({ span: { xs: 4, sm: 4, md: 4 } }) {
-        Column(this.dialogController.open())
-      }
-    }
+    Column(this.dialogController.open())
   }
 }

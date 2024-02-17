@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import deviceInfo from '@ohos.deviceInfo';
+
 export default class Constant {
   static readonly DIALOG_HEIGHT_PROPORTION = 0.8;
   static readonly HALF = 0.5;
@@ -24,4 +26,10 @@ export default class Constant {
   static readonly SHARE_RADIUS = 24;
   static readonly DIALOG_TITLE_FONT_SIZE = 20;
   static readonly DIALOG_TIPS_FONT_SIZE = 14;
+  static isPhone(): boolean {
+    return (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default');
+  }
+  static isPC(): boolean {
+    return (deviceInfo.deviceType === 'pc' || deviceInfo.deviceType === '2in1');
+  }
 };
