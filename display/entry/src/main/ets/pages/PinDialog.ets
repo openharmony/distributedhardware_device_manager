@@ -80,7 +80,7 @@ struct PinCustomDialog {
             Text(this.messageTitle)
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .fontWeight(FontWeight.Medium)
+              .fontWeight(FontWeight.Bold)
               .margin({
                 left: 24,
                 right: 24

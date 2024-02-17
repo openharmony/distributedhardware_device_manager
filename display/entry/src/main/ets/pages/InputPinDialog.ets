@@ -165,11 +165,13 @@ struct InputCustomDialog {
           Column() {
             Text(this.connect + ' ' + this.targetDeviceName)
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .fontWeight(FontWeight.Medium)
+              .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .margin({ top: 12, bottom: 8 })
+              .margin({ top: 12, bottom: 2 })
               .width('100%')
               .textAlign(TextAlign.Start)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Text(this.messageTips)
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -177,8 +179,11 @@ struct InputCustomDialog {
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
               .margin({ bottom: 8 })
               .width('100%')
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
           .margin({ left: 24, right: 24 })
+          .height(72)
 
           Stack() {
             List() {
