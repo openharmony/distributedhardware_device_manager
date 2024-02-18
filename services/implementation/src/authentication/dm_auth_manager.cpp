@@ -798,9 +798,8 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     }
 
     listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
-            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
-    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_,
-            DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+        authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
     timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
@@ -873,9 +872,8 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
     listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
-            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
-    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_,
-            DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+        authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
     timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
         [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
