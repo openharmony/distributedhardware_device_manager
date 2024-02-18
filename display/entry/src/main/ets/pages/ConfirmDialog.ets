@@ -189,7 +189,7 @@ struct ConfirmCustomDialog {
             .margin({ bottom: 16, top: 24 })
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
-            Text(this.peerDeviceName + this.peerAppOperation + this.message)
+            Text(this.peerDeviceName + ' ' + this.peerAppOperation + this.message)
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
