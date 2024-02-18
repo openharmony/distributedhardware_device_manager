@@ -1311,8 +1311,7 @@ int32_t SoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionInfo>
     for (size_t i = 0; i < arraySize; i++) {
         if (GetSha256Hash(optionInfo[i].deviceAlias.c_str(),
                           optionInfo[i].deviceAlias.size(), sha256Out) != DM_OK) {
-            LOGE("failed to get sha256 hash with index: %d, value: %s.", i,
-                GetAnonyString(optionInfo[i].deviceAlias).c_str());
+            LOGE("failed to get sha256 hash with index: %d, value: %s.", i, optionInfo[i].deviceAlias.c_str());
             return ERR_DM_FAILED;
         }
         output[(*outLen)++] = DEVICE_ALIAS_NUMBER;
