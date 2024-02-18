@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -173,7 +173,11 @@ int32_t IpcClientManager::OnDmServiceDied()
 
 void IpcClientManager::SubscribeDMSAChangeListener()
 {
-    saListenerCallback = new(std::nothrow) SystemAbilityListener();
+    saListenerCallback = new (std::nothrow) SystemAbilityListener();
+    if (saListenerCallback == nullptr) {
+        LOGE("saListenerCallback is nullptr.");
+        return;
+    }
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 
