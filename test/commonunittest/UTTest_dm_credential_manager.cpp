@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -356,7 +356,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestS
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
     {
-        "processType" , 1,
+        "processType", 1,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -497,7 +497,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType" , 2,
+        "processType", 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -677,7 +677,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::Test
 {
     std::string credentialInfo = R"(
     {
-        "processType" , 2,
+        "processType", 2,
     }
     )";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -1094,7 +1094,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.
 {
     std::string credentialInfo = R"(
     {
-        "processType" , 1,
+        "processType", 1,
         "authType" : 1,
         "userId" : "123",
         "version" : "1.2.3",

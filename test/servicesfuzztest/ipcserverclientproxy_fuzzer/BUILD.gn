@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -62,12 +62,12 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "${devicemanager_path}/services/service/src/ipc/standard/ipc_server_client_proxy.cpp",
-    "ipc_server_client_proxy_fuzzer.cpp",
-  ]
+  sources = [ "ipc_server_client_proxy_fuzzer.cpp" ]
 
-  deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
+  deps = [
+    "${devicemanager_path}/services/service:devicemanagerservice",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,7 +70,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level0
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<DmAuthRequestContext> context =  std::make_shared<DmAuthRequestContext>();
+    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authRequestState->SetAuthContext(context);
     int32_t ret = authRequestState->context_.use_count();
@@ -107,7 +107,7 @@ HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level0
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<DmAuthRequestContext> context =  std::make_shared<DmAuthRequestContext>();
+    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authRequestState->GetAuthContext();
     int32_t ret = authRequestState->context_.use_count();
