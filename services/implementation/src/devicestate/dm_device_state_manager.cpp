@@ -68,9 +68,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
         {
             std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
             remoteDeviceInfos_[uuid] = saveInfo;
-            if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
-                stateDeviceInfos_[udid] = saveInfo;
-            }
+            stateDeviceInfos_[udid] = saveInfo;
         }
         LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s",
              GetAnonyString(std::string(info.networkId)).c_str(),
@@ -105,9 +103,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
-            stateDeviceInfos_[deviceId] = devInfo;
-        }
+        stateDeviceInfos_[deviceId] = devInfo;
     }
     std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
     if (pkgName.size() == 0) {
