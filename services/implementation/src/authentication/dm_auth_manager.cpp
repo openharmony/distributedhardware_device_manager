@@ -708,8 +708,6 @@ void DmAuthManager::AbilityNegotiate()
     } else {
         authResponseContext_->isAuthCodeReady = false;
     }
-    authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
-    authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
 }
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
@@ -721,6 +719,8 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     LOGI("DmAuthManager::RespNegotiate sessionid %d", sessionId);
     dmVersion_ = authResponseContext_->dmVersion;
     remoteDeviceId_ = authResponseContext_->localDeviceId;
+    authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
+    authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
     if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
         ProRespNegotiateExt(sessionId);
     } else {
@@ -750,10 +750,6 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     } else {
         ProcessAuthRequest(sessionId);
     }
-    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
-        [this] (std::string name) {
-            DmAuthManager::HandleAuthenticateTimeout(name);
-        });
 }
 
 void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
@@ -800,6 +796,15 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
+
+    listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
+            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_,
+            DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
+        [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
 }
 
 void DmAuthManager::GetAuthRequestContext()
@@ -867,6 +872,14 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
+    listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
+            authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_,
+            DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
+        [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
 }
 
 int32_t DmAuthManager::ConfirmProcess(const int32_t &action)
