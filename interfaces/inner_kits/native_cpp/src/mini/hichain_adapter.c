@@ -189,7 +189,7 @@ int GetAuthFormByDeviceId(const char *deviceId, int authForm)
             resultFlag = ERR_DM_HICHAIN_FAILED;
             break;
         }
-        DMLOGI("get related groups size %d.", groupNumber);
+        DMLOGI("get related groups size %ud.", groupNumber);
         ret = ParseReturnJson(returnJsonStr, authForm);
         if (ret != DM_OK) {
             DMLOGE("parse group infomation failed.");
