@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -193,8 +193,8 @@ HWTEST_F(DeviceProfileConnectorTest, CheckDeviceIdInAcl_001, testing::ext::TestS
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId);
-    EXPECT_EQ(ret, false);
+    DmOfflineParam ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId);
+    EXPECT_EQ(ret.leftAclNumber, 0);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetTrustNumber_001, testing::ext::TestSize.Level0)
