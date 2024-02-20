@@ -32,14 +32,10 @@
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "softbus_listener.h"
-#include "dm_softbus_adapter_crypto.h"
-#include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
-#if (defined(MINE_HARMONY))
-#include "base64.h"
-#include "sha256.h"
-#include "md.h"
-#endif
+#include "dm_crypto.h"
+#include "openssl/sha.h"
+#include "openssl/evp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -53,26 +49,20 @@ constexpr uint32_t DM_MAX_VERTEX_TLV_NUM = 6;
 constexpr int32_t SHA256_OUT_DATA_LEN = 32;
 constexpr int32_t MAX_RETRY_TIMES = 30;
 constexpr int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
-#if (defined(MINE_HARMONY))
 constexpr int32_t DM_MAX_DEVICE_ALIAS_LEN = 65;
 constexpr int32_t DM_MAX_DEVICE_UDID_LEN = 65;
 constexpr int32_t DM_INVALID_DEVICE_NUMBER = -1;
-constexpr int32_t DM_SEARCH_BROADCAST_MIN_LEN = 18;
 constexpr int32_t DM_TLV_VERTEX_DATA_OFFSET = 2;
 constexpr int32_t DM_TLV_SCOPE_DATA_OFFSET = 4;
 constexpr int32_t MAX_SOFTBUS_DELAY_TIME = 10;
+#if (defined(MINE_HARMONY))
+constexpr int32_t DM_SEARCH_BROADCAST_MIN_LEN = 18;
 #endif
 constexpr const char* FIELD_DEVICE_MODE = "findDeviceMode";
 constexpr const char* FIELD_TRUST_OPTIONS = "tructOptions";
 constexpr const char* FIELD_FILTER_OPTIONS = "filterOptions";
-#if (defined(MINE_HARMONY))
 constexpr const char* DEVICE_ALIAS = "persist.devicealias";
 constexpr const char* DEVICE_NUMBER = "persist.devicenumber";
-constexpr const char* DM_DISCOVER_TYPE = "DISCOVER_TYPE";
-constexpr const char* DM_DISCOVER_SEARCHJSON = "SEARCHJSON";
-constexpr const char* DM_DISCOVER_EXTRA = "EXTRA";
-constexpr const char* DM_DISCOVER_SUBSCRIBEID = "SUBSCRIBEID";
-#endif
 constexpr char BROADCAST_VERSION = 1;
 constexpr char FIND_ALL_DEVICE = 1;
 constexpr char FIND_SCOPE_DEVICE = 2;
@@ -94,10 +84,10 @@ std::condition_variable g_matchDealNotify;
 std::condition_variable g_publishLnnNotify;
 
 static IPublishCb publishLNNCallback_ = {
+    .OnPublishResult = MineSoftbusListener::OnPublishResult,
 #if (defined(MINE_HARMONY))
-        .OnPublishResult = OnPublishResult,
-        .OndeviceFound = OnPublishDeviceFound,
-        .onRePublish = OnRePublish
+    .OndeviceFound = MineSoftbusListener::OnPublishDeviceFound,
+    .onRePublish = MineSoftbusListener::OnRePublish
 #endif
 };
 
@@ -132,6 +122,33 @@ void from_json(const json &object, ScopeOptionInfo &optionInfo)
     object["deviceAlias"].get_to(optionInfo.deviceAlias);
     object["startNumber"].get_to(optionInfo.startNumber);
     object["endNumber"].get_to(optionInfo.endNumber);
+}
+
+MineSoftbusListener::MineSoftbusListener()
+{
+    if (PublishDeviceDiscovery() != DM_OK) {
+        LOGE("failed to publish device sn sha256 hash to softbus");
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_matchWaitDeviceLock);
+        g_matchDealFlag = true;
+        std::thread(MatchSearchDealTask).detach();
+    }
+    LOGI("MineSoftbusListener constructor");
+}
+
+MineSoftbusListener::~MineSoftbusListener()
+{
+#if (defined(MINE_HARMONY))
+    if (StopPublishLNN(DM_PKG_NAME.c_str(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) != DM_OK) {
+        LOGI("fail to unregister service public callback");
+    }
+#endif
+    {
+        std::lock_guard<std::mutex> autoLock(g_matchWaitDeviceLock);
+        g_matchDealFlag = false;
+    }
+    LOGI("SoftbusConnector destructor");
 }
 
 int32_t MineSoftbusListener::RefreshSoftbusLNN(const string &pkgName, const string &searchJson,
@@ -432,37 +449,14 @@ int32_t MineSoftbusListener::ParseVertexDeviceJsonArray(const std::vector<Vertex
 
 int32_t MineSoftbusListener::GetSha256Hash(const char *data, size_t len, char *output)
 {
-#if (defined(MINE_HARMONY))
-    int mbedtlsHmacType = 0;
-    mbedtls_md_context_t mdContext;
-    const mbedtls_md_info_t* mdInfo = NULL;
-    mbedtls_md_init(&mdContext);
-    mdInfo = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    int retValue = mbedtls_md_setup(&mdContext, mdInfo, mbedtlsHmacType);
-    if (retValue != 0) {
-        LOGE("failed to setup mbedtls md with ret: %d.", retValue);
-        return ERR_DM_FAILED;
+    if (data == nullptr || output == nullptr || len == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
-    retValue = mbedtls_md_starts(&mdContext);
-    if (retValue != 0) {
-        LOGE("failed to start mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    retValue = mbedtls_md_update(&mdContext, (const unsigned char *)data, len);
-    if (retValue != 0) {
-        LOGE("failed to update mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    retValue = mbedtls_md_finish(&mdContext, (unsigned char*)output);
-    if (retValue != 0) {
-        LOGE("failed to finish mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    mbedtls_md_free(&mdContext);
-#endif
+    SHA256_CTX ctx;
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, data, len);
+    SHA256_Final((unsigned char *)output, &ctx);
     return DM_OK;
 }
 
@@ -485,7 +479,7 @@ int32_t MineSoftbusListener::SetBroadcastTrustOptions(const json &object, Broadc
 int32_t MineSoftbusListener::SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead)
 {
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
-    if (GetSha256Hash((const char*)pkgName.c_str(), pkgName.size(), sha256Out) != DM_OK) {
+    if (GetSha256Hash((const char *)pkgName.c_str(), pkgName.size(), sha256Out) != DM_OK) {
         LOGE("failed to get search pkgName sha256 hash while search all device.");
         return ERR_DM_FAILED;
     }
@@ -513,14 +507,13 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
 {
     size_t base64OutLen = 0;
     int retValue;
-#if (defined(MINE_HARMONY))
     char base64Out[DISC_MAX_CUST_DATA_LEN] = {0};
-    retValue = mbedtls_base64_encode((unsigned char*)base64Out, DISC_MAX_CUST_DATA_LEN, &base64OutLen,
-        (const unsigned char*)output, outputLen);
+    retValue = DmBase64Encode(base64Out, DISC_MAX_CUST_DATA_LEN, output, outputLen, base64OutLen);
     if (retValue != 0) {
-    LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
+        LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
+#if (defined(MINE_HARMONY))
     subscribeInfo.custData = base64Out;
     subscribeInfo.custDataLen = base64OutLen;
 #endif
@@ -535,7 +528,67 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
     return DM_OK;
 }
 
-#if (defined(MINE_HARMONY))
+int32_t MineSoftbusListener::DmBase64Encode(char *output, size_t outputLen, const char *input,
+    size_t inputLen, size_t &base64OutLen)
+{
+    LOGI("MineSoftbusListener::DmBase64Encode");
+    if (output == nullptr || input == nullptr || outputLen == 0 || inputLen == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t outLen = 0;
+    base64OutLen = 0;
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    if (ctx == nullptr) {
+        LOGE("create ctx failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    EVP_EncodeInit(ctx);
+    if (EVP_EncodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != 1) {
+        LOGE("EVP_EncodeUpdate failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    EVP_EncodeFinal(ctx, (unsigned char *)(output + outLen), &outLen);
+    base64OutLen += outLen;
+    EVP_ENCODE_CTX_free(ctx);
+    return DM_OK;
+}
+
+int32_t MineSoftbusListener::DmBase64Decode(char *output, size_t outputLen, const char *input,
+    size_t inputLen, size_t &base64OutLen)
+{
+    LOGI("MineSoftbusListener::DmBase64Decode");
+    if (output == nullptr || outputLen == 0 || input == nullptr || inputLen == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    base64OutLen = 0;
+    int32_t outLen = 0;
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    if (ctx == nullptr) {
+        LOGE("create ctx failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    EVP_DecodeInit(ctx);
+    if (EVP_DecodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != 1) {
+        LOGE("EVP_DecodeUpdate failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    if (EVP_DecodeFinal(ctx, (unsigned char *)(output + outLen), &outLen) != 1) {
+        LOGE("EVP_DecodeFinal failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    EVP_ENCODE_CTX_free(ctx);
+    return DM_OK;
+}
 
 int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
 {
@@ -564,15 +617,15 @@ int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
 
 void MineSoftbusListener::MatchSearchDealTask(void)
 {
-    DeviceInfo tempDeviceInfo;
     LOGI("the match deal task has started to run.");
-
+#if (defined(MINE_HARMONY))
+    DeviceInfo tempDeviceInfo;
     while (true) {
         {
             std::unique_lock<std::mutex> autoLock(g_matchWaitDeviceLock);
             if (!g_matchDealFlag) {
                 LOGI("the match deal task will stop to run.");
-                break;
+                return;
             }
             g_matchDealNotify.wait(autoLock, [] { return !g_matchQueue.empty(); });
             tempDeviceInfo = g_matchQueue.front();
@@ -582,6 +635,7 @@ void MineSoftbusListener::MatchSearchDealTask(void)
             LOGE("failed to parse broadcast info.");
         }
     }
+#endif
 }
 
 int32_t MineSoftbusListener::ParseBroadcastInfo(DeviceInfo &deviceInfo)
@@ -593,7 +647,7 @@ int32_t MineSoftbusListener::ParseBroadcastInfo(DeviceInfo &deviceInfo)
     }
     DevicePolicyInfo devicePolicyInfo;
     Action matchResult = BUSINESS_EXACT_NOT_MATCH;
-    BroadcastHead broadcastHead = *(BroadcastHead*)output;
+    BroadcastHead broadcastHead = *(BroadcastHead *)output;
     LOGI("parse device info with version: %d, findMode: %d, HeadLen: %d, tlvDataLen: %d, trustFilter: %d",
          (int)(broadcastHead.version), (int)(broadcastHead.findMode), (int)(broadcastHead.headDataLen),
          (int)(broadcastHead.tlvDataLen), (int)broadcastHead.trustFilter);
@@ -627,24 +681,24 @@ int32_t MineSoftbusListener::ParseBroadcastInfo(DeviceInfo &deviceInfo)
 bool MineSoftbusListener::GetBroadcastData(DeviceInfo &deviceInfo, char *output, size_t outLen)
 {
     size_t base64OutLen = 0;
-    size_t dataLen = deviceInfo.businessDataLen;
 #if (defined(MINE_HARMONY))
-    unsigned char* data = (unsigned char*)deviceInfo.businessData;
-    int retValue = mbedtls_base64_decode((unsigned char*)output, outLen, &base64OutLen, data, dataLen);
+    size_t dataLen = deviceInfo.businessDataLen;
+    unsigned char *data = (unsigned char *)deviceInfo.businessData;
+    int retValue = DmBase64Decode(output, outLen, data, dataLen, base64OutLen);
     if (retValue != 0) {
         LOGE("failed to with ret: %d.", retValue);
         return false;
     }
-#endif
     if (base64OutLen < DM_SEARCH_BROADCAST_MIN_LEN) {
         LOGE("data length too short with outLen: %u.", base64OutLen);
         return false;
     }
-    BroadcastHead *broadcastHead = (BroadcastHead*)output;
+#endif
+    BroadcastHead *broadcastHead = (BroadcastHead *)output;
     size_t hDataLen = broadcastHead->headDataLen;
     size_t tlvDataLen = broadcastHead->tlvDataLen;
     if (hDataLen >= DISC_MAX_CUST_DATA_LEN || tlvDataLen >= DISC_MAX_CUST_DATA_LEN ||
-            (hDataLen + tlvDataLen) != base64OutLen) {
+        (hDataLen + tlvDataLen) != base64OutLen) {
         LOGE("data lenght is not valid with: headDataLen: %u, tlvDataLen: %u, base64OutLen: %d.",
              hDataLen, tlvDataLen, base64OutLen);
         return false;
@@ -689,12 +743,12 @@ Action MineSoftbusListener::MatchSearchScopeDevice(DeviceInfo &deviceInfo, char 
     if ((deviceInfo.isOnline) && (broadcastHead.trustFilter == FIND_NOTRUST_DEVICE)) {
         return BUSINESS_EXACT_NOT_MATCH;
     } else if (!(deviceInfo.isOnline) && (broadcastHead.trustFilter == FIND_TRUST_DEVICE)) {
-        return  BUSINESS_EXACT_NOT_MATCH;
+        return BUSINESS_EXACT_NOT_MATCH;
     }
 
     size_t tlvLen = broadcastHead.tlvDataLen;
     const size_t ONE_TLV_DATA_LEN = DM_TLV_SCOPE_DATA_OFFSET + DM_HASH_DATA_LEN +
-            DM_DEVICE_NUMBER_LEN + DM_DEVICE_NUMBER_LEN;
+        DM_DEVICE_NUMBER_LEN + DM_DEVICE_NUMBER_LEN;
     for (size_t i = 0; (i + ONE_TLV_DATA_LEN) <= tlvLen; i += ONE_TLV_DATA_LEN) {
         if (output[i] == DEVICE_ALIAS_NUMBER) {
             size_t dataPosition = i + DM_TLV_SCOPE_DATA_OFFSET;
@@ -746,9 +800,9 @@ Action MineSoftbusListener::MatchSearchVertexDevice(DeviceInfo &deviceInfo, char
     vector<int> matchItemResult(DM_MAX_VERTEX_TLV_NUM, 0);
 
     if ((deviceInfo.isOnline) && (broadcastHead.trustFilter == FIND_NOTRUST_DEVICE)) {
-        return  BUSINESS_EXACT_NOT_MATCH;
+        return BUSINESS_EXACT_NOT_MATCH;
     } else if (!(deviceInfo.isOnline) && (broadcastHead.trustFilter == FIND_TRUST_DEVICE)) {
-        return  BUSINESS_EXACT_NOT_MATCH;
+        return BUSINESS_EXACT_NOT_MATCH;
     }
 
     size_t tlvLen = broadcastHead.tlvDataLen;
@@ -787,6 +841,8 @@ int32_t MineSoftbusListener::SendReturnwave(DeviceInfo &deviceInfo, const Broadc
     unsigned char outData[DISC_MAX_CUST_DATA_LEN] = {0};
     outData[outLen++] = BROADCAST_VERSION;
     outData[outLen++] = sizeof(ReturnwaveHead);
+    size_t base64OutLen = 0;
+#if (defined(MINE_HARMONY))
     if (HiChainConnector::IsCredentialExist()) {
         outData[outLen++] = true;
     } else {
@@ -795,22 +851,20 @@ int32_t MineSoftbusListener::SendReturnwave(DeviceInfo &deviceInfo, const Broadc
     for (int i = 0; i < DM_HASH_DATA_LEN; i++) {
         outData[outLen++] = broadcastHead.pkgNameHash[i];
     }
-
-    size_t base64OutLen = 0;
     int retValue;
-#if (defined(MINE_HARMONY))
-    int retValue = mbedtls_base64_encode((unsigned char*)(deviceInfo.businessData), DISC_MAX_CUST_DATA_LEN,
-        &base64OutLen, outData, outLen);
+
+    int retValue = DmBase64Encode((char *)(deviceInfo.businessData), DISC_MAX_CUST_DATA_LEN,
+        outData, outLen, base64OutLen);
     if (retValue != 0) {
         LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
     deviceInfo.businessData[base64OutLen] = '\0';
-#endif
     retValue = SetDiscoveryPolicy(DM_PKG_NAME, &deviceInfo, (int32_t)matchResult);
     if (retValue != SOFTBUS_OK) {
         LOGE("failed to set discovery policy with ret: %d.", retValue);
     }
+#endif
     LOGI("set discovery policy successfully with dataLen: %u.", base64OutLen);
     return DM_OK;
 }
@@ -819,12 +873,12 @@ bool MineSoftbusListener::GetDeviceAliasHash(char *output)
 {
     char deviceAlias[DM_MAX_DEVICE_ALIAS_LEN + 1] = {0};
     int32_t retValue = GetParameter(DEVICE_ALIAS, "not exist", deviceAlias, DM_MAX_DEVICE_ALIAS_LEN);
-    if (retValue < 0 || strcmp((const char*)deviceAlias, "not exist") == 0) {
+    if (retValue < 0 || strcmp((const char *)deviceAlias, "not exist") == 0) {
         LOGE("failed to get device alias from system parameter with ret: %d.", retValue);
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
-    if (GetSha256Hash((const char*)deviceAlias, strlen(deviceAlias), sha256Out) != DM_OK) {
+    if (GetSha256Hash((const char *)deviceAlias, strlen(deviceAlias), sha256Out) != DM_OK) {
         LOGE("failed to generated device alias sha256 hash.");
         return false;
     }
@@ -836,13 +890,13 @@ bool MineSoftbusListener::GetDeviceAliasHash(char *output)
 
 bool MineSoftbusListener::GetDeviceSnHash(char *output)
 {
-    const char* deviceSn = GetSerial();
+    const char *deviceSn = GetSerial();
     if (deviceSn == NULL) {
         LOGE("failed to get device sn from system parameter.");
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
-    if (GetSha256Hash((const char*)deviceSn, strlen(deviceSn), sha256Out) != DM_OK) {
+    if (GetSha256Hash((const char *)deviceSn, strlen(deviceSn), sha256Out) != DM_OK) {
         LOGE("failed to generated device sn sha256 hash.");
         return false;
     }
@@ -861,7 +915,7 @@ bool MineSoftbusListener::GetDeviceUdidHash(char *output)
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
-    if (GetSha256Hash((const char*)deviceUdid, strlen(deviceUdid), sha256Out) != DM_OK) {
+    if (GetSha256Hash((const char *)deviceUdid, strlen(deviceUdid), sha256Out) != DM_OK) {
         LOGE("failed to generated device udid sha256 hash.");
         return false;
     }
@@ -873,13 +927,13 @@ bool MineSoftbusListener::GetDeviceUdidHash(char *output)
 
 bool MineSoftbusListener::GetDeviceTypeHash(char *output)
 {
-    const char* deviceType = GetDeviceType();
+    const char *deviceType = GetDeviceType();
     if (deviceType == NULL) {
         LOGE("failed to get device type from system parameter.");
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
-    if (GetSha256Hash((const char*)deviceType, strlen(deviceType), sha256Out) != DM_OK) {
+    if (GetSha256Hash((const char *)deviceType, strlen(deviceType), sha256Out) != DM_OK) {
         LOGE("failed to generated device type sha256 hash.");
         return false;
     }
@@ -893,11 +947,11 @@ bool MineSoftbusListener::GetDeviceNumber(char *output)
 {
     char deviceNumber[DM_DEVICE_NUMBER_LEN + 1] = {0};
     int32_t retValue = GetParameter(DEVICE_NUMBER, "not exist", deviceNumber, DM_DEVICE_NUMBER_LEN);
-    if (retValue < 0 || strcmp((const char*)deviceNumber, "not exist") == 0) {
+    if (retValue < 0 || strcmp((const char *)deviceNumber, "not exist") == 0) {
         LOGE("failed to get device number from system parameter with ret: %d.", retValue);
         return false;
     }
-    for (size_t i = 0; i < DM_DEVICE_NUMBER; i++) {
+    for (size_t i = 0; i < DM_DEVICE_NUMBER_LEN; i++) {
         output[i] = deviceNumber[i];
     }
     return true;
@@ -1006,6 +1060,5 @@ Action MineSoftbusListener::GetMatchResult(const vector<int> &matchItemNum, cons
         return BUSINESS_PARTIAL_MATCH;
     }
 }
-#endif
 } // namespace DistributedHardware
 } // namespace OHOS

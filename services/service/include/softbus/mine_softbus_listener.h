@@ -45,7 +45,6 @@ constexpr uint32_t DM_HASH_DATA_LEN = 16;
 constexpr uint32_t DM_DEVICE_NUMBER_LEN = 11;
 constexpr uint32_t DM_DE_LEN = 16;
 
-
 typedef struct {
     string type;
     string value;
@@ -64,12 +63,12 @@ typedef struct {
     string deviceAlias;
     int32_t startNumber;
     int32_t endNumber;
-}  ScopeOptionInfo;
+} ScopeOptionInfo;
 
 typedef struct {
     char version;
     char dataLen;
-    bool IsExistCredential;
+    bool isExistCredential;
     char pkgNameHash[DM_HASH_DATA_LEN];
 } ReturnwaveHead;
 
@@ -85,6 +84,12 @@ typedef struct {
     char aliasHash[DM_HASH_DATA_LEN];
     char number[DM_DEVICE_NUMBER_LEN];
 } DevicePolicyInfo;
+
+typedef enum {
+    BUSINESS_EXACT_MATCH = 0x01,
+    BUSINESS_PARTIAL_MATCH,
+    BUSINESS_EXACT_NOT_MATCH,
+} Action;
 
 class MineSoftbusListener {
 public:
@@ -111,14 +116,12 @@ private:
     int32_t SetBroadcastHead(const json &object, const string &pkgName, BroadcastHead &broadcastHead);
     void AddHeadToBroadcast(const BroadcastHead &broadcastHead, char *output);
     int32_t ParseScopeDeviceJsonArray(const std::vector<ScopeOptionInfo> &optionInfo, char *output, size_t *outLen);
-    static int32_t ParseVertexDeviceJsonArray(const std::vector<VertexOptionInfo> &optionInfo,
-        char *output, size_t *outLen);
+    int32_t ParseVertexDeviceJsonArray(const std::vector<VertexOptionInfo> &optionInfo, char *output, size_t *outLen);
     static int32_t GetSha256Hash(const char *data, size_t len, char *output);
     int32_t SetBroadcastTrustOptions(const json &object, BroadcastHead &broadcastHead);
     int32_t SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead);
     int32_t SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *output, size_t outputLen);
     void SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, SubscribeInfo &subscribeInfo);
-#if (defined(MINE_HARMONY))
     int32_t PublishDeviceDiscovery(void);
     static void MatchSearchDealTask(void);
     static int32_t ParseBroadcastInfo(DeviceInfo &deviceInfo);
@@ -143,14 +146,8 @@ private:
     static bool CheckDeviceTypeMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
     static bool CheckDeviceUdidMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
     static Action GetMatchResult(const vector<int> &matchItemNum, const vector<int> &matchItemResult);
-#endif
-
-private:
-    static bool isRadarSoLoad_;
-    static IDmRadarHelper *dmRadarHelper_;
-    static std::shared_ptr<DmTimer> timer_;
-    static void *radarHandle_;
-    std::shared_ptr<SoftbusListener> softbusListener_;
+    int32_t DmBase64Encode(char *output, size_t outputLen, const char *input, size_t inputLen, size_t &base64OutLen);
+    int32_t DmBase64Decode(char *output, size_t outputLen, const char *input, size_t inputLen, size_t &base64OutLen);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

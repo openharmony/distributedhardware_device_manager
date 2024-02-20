@@ -89,6 +89,7 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/mbedtls:mbedtls_shared",
+        "//third_party/openssl:libcrypto_shared",
       ]
 
       cflags = [
@@ -179,6 +180,7 @@ if (defined(ohos_lite)) {
     deps = [
       "${utils_path}:devicemanagerutils",
       "//third_party/mbedtls:mbedtls_shared",
+      "//third_party/openssl:libcrypto_shared",
     ]
 
     external_deps = [
