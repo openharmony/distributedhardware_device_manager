@@ -260,9 +260,8 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             LOGI("remove hichain group with deviceId: %s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            DmOfflineParam offlineParam =
-                    DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
-            if (offlineParam.leftAclNumber == 0) {
+            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
+            if (res == 0) {
                 hiChainAuthConnector_->DeleteCredential(iter->first,
                                                         MultipleUserConnector::GetCurrentAccountUserID());
             }

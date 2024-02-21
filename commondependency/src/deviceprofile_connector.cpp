@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -596,25 +596,23 @@ bool DeviceProfileConnector::CheckDeviceIdInAcl(const std::string &pkgName, cons
     return (CheckSinkDeviceIdInAcl(pkgName, deviceId) || CheckSrcDeviceIdInAcl(pkgName, deviceId));
 }
 
-DmOfflineParam DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
+uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
     LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
-    DmOfflineParam offlineParam;
-    offlineParam.leftAclNumber = 0;
-    offlineParam.bindType = INVALIED_TYPE;
+    uint32_t res = 0;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != deviceId || item.GetStatus() != ACTIVE) {
             continue;
         }
-        offlineParam.leftAclNumber++;
+        res++;
         if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
-            offlineParam.leftAclNumber--;
+            res--;
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
-    return offlineParam;
+    return res;
 }
 
 int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
