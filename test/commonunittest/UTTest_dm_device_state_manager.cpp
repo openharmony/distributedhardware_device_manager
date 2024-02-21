@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,8 +49,9 @@ namespace {
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
 std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
 std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
-    std::make_shared<DmDeviceStateManager>(softbusConnector, listener_, hiChainConnector_);
+    std::make_shared<DmDeviceStateManager>(softbusConnector, listener_, hiChainConnector_, hiChainAuthConnector);
 
 /**
  * @tc.name: DmDeviceStateManager_001
@@ -61,7 +62,7 @@ std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_,
-        hiChainConnector_);
+        hiChainConnector_, hiChainAuthConnector);
     ASSERT_NE(p, nullptr);
 }
 
@@ -74,7 +75,7 @@ HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_001, testing::ext::TestS
 HWTEST_F(DmDeviceStateManagerTest, DmDeviceStateManager_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmDeviceStateManager> p = std::make_shared<DmDeviceStateManager>(softbusConnector, listener_,
-        hiChainConnector_);
+        hiChainConnector_, hiChainAuthConnector);
     p.reset();
     EXPECT_EQ(p, nullptr);
 }

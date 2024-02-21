@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,8 @@
 #include "softbus_connector.h"
 #include "dm_timer.h"
 #include "hichain_connector.h"
+#include "hichain_auth_connector.h"
+#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -74,14 +76,15 @@ class DmDeviceStateManager final : public ISoftbusStateCallback,
 public:
     DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                          std::shared_ptr<IDeviceManagerServiceListener> listener,
-                         std::shared_ptr<HiChainConnector> hiChainConnector);
+                         std::shared_ptr<HiChainConnector> hiChainConnector,
+                         std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector);
     ~DmDeviceStateManager();
 
     int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId);
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
-    void OnDbReady(const std::string &pkgName, const std::string &deviceUUID);
+    void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
     void DeleteTimeOutGroup(std::string name);
@@ -109,6 +112,7 @@ private:
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::string decisionSoName_;
     NotifyTask eventTask_;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -876,11 +876,13 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     std::string extraData = devInfo.extraData;
     nlohmann::json extraJson;
     if (!extraData.empty()) {
-        extraJson = nlohmann::json::parse(extraData);
+        extraJson = nlohmann::json::parse(extraData, nullptr, false);
     }
-    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
-    devInfo.extraData = to_string(extraJson);
+    if (!extraJson.is_discarded()) {
+        extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+        extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+        devInfo.extraData = to_string(extraJson);
+    }
     return DM_OK;
 }
 

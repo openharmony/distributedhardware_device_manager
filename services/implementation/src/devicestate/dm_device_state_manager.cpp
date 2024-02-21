@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,8 +32,10 @@ const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
 const uint32_t DM_EVENT_WAIT_TIMEOUT = 2;
 constexpr const char* THREAD_LOOP = "ThreadLoop";
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
-    std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector)
-    : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector)
+    std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector,
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector)
+    : softbusConnector_(softbusConnector), listener_(listener), hiChainConnector_(hiChainConnector),
+    hiChainAuthConnector_(hiChainAuthConnector)
 {
     decisionSoName_ = "libdevicemanagerext_decision.z.so";
     StartEventThread();
@@ -66,9 +68,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
         {
             std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
             remoteDeviceInfos_[uuid] = saveInfo;
-            if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
-                stateDeviceInfos_[udid] = saveInfo;
-            }
+            stateDeviceInfos_[udid] = saveInfo;
         }
         LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s",
              GetAnonyString(std::string(info.networkId)).c_str(),
@@ -103,9 +103,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
-            stateDeviceInfos_[deviceId] = devInfo;
-        }
+        stateDeviceInfos_[deviceId] = devInfo;
     }
     std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
     if (pkgName.size() == 0) {
@@ -183,20 +181,20 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
-void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &deviceUUID)
+void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
-    LOGI("OnDbReady function is called with pkgName: %s and deviceUUID = %s",
-         pkgName.c_str(), GetAnonyString(deviceUUID).c_str());
-    if (pkgName.empty() || deviceUUID.empty()) {
-        LOGE("On db ready pkgName is empty or deviceUUID is empty");
+    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s",
+         pkgName.c_str(), GetAnonyString(uuid).c_str());
+    if (pkgName.empty() || uuid.empty()) {
+        LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
     DmDeviceInfo saveInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        auto iter = remoteDeviceInfos_.find(deviceUUID);
+        auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnDbReady complete not find deviceUUID: %s", GetAnonyString(deviceUUID).c_str());
+            LOGE("OnDbReady complete not find uuid: %s", GetAnonyString(uuid).c_str());
             return;
         }
         saveInfo = iter->second;
@@ -262,7 +260,11 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             LOGI("remove hichain group with deviceId: %s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            DeviceProfileConnector::GetInstance().DeleteTimeOutAcl((iter->first).c_str());
+            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
+            if (res == 0) {
+                hiChainAuthConnector_->DeleteCredential(iter->first,
+                                                        MultipleUserConnector::GetCurrentAccountUserID());
+            }
 #endif
             stateTimerInfoMap_.erase(iter);
             break;
