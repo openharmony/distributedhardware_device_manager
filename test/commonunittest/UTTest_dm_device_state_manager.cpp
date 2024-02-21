@@ -162,6 +162,83 @@ HWTEST_F(DmDeviceStateManagerTest, DeleteOfflineDeviceInfo_001, testing::ext::Te
         }
     }
 }
+
+HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    dmDeviceStateManager->OnDeviceOnline(deviceId);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, OnDeviceOffline_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    dmDeviceStateManager->OnDeviceOffline(deviceId);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, StartOffLineTimer_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo deviceInfo;
+    dmDeviceStateManager->timer_ = nullptr;
+    dmDeviceStateManager->StartOffLineTimer(deviceInfo);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level0)
+{
+    std::string name = "name";
+    dmDeviceStateManager->DeleteTimeOutGroup(name);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, AddTask_001, testing::ext::TestSize.Level0)
+{
+    int32_t eventId = 0;
+    std::string deviceId = "deviceId";
+    std::shared_ptr<NotifyEvent> task = std::make_shared<NotifyEvent>(eventId, deviceId);
+    int32_t ret = dmDeviceStateManager->AddTask(task);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, RunTask_001, testing::ext::TestSize.Level0)
+{
+    int32_t eventId = 0;
+    std::string deviceId = "deviceId";
+    std::shared_ptr<NotifyEvent> task = std::make_shared<NotifyEvent>(eventId, deviceId);
+    dmDeviceStateManager->RunTask(task);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, GetAuthForm_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId;
+    dmDeviceStateManager->hiChainConnector_ = nullptr;
+    int32_t ret = dmDeviceStateManager->GetAuthForm(networkId);
+    EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, GetAuthForm_002, testing::ext::TestSize.Level0)
+{
+    std::string networkId;
+    int32_t ret = dmDeviceStateManager->GetAuthForm(networkId);
+    EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, GetAuthForm_003, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkId";
+    int32_t ret = dmDeviceStateManager->GetAuthForm(networkId);
+    EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
+}
+
+HWTEST_F(DmDeviceStateManagerTest, ProcNotifyEvent_001, testing::ext::TestSize.Level0)
+{
+    int32_t eventId = 0;
+    std::string deviceId;
+    int32_t ret = dmDeviceStateManager->ProcNotifyEvent(eventId, deviceId);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

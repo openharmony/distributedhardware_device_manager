@@ -26,6 +26,7 @@
 #undef private
 
 #include "device_manager_service_listener.h"
+#include "device_manager_service_impl.h"
 #include "single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include "softbus_adapter.h"
 #include "softbus_bus_center.h"
 #include "softbus_listener.h"
 #include "dm_device_info.h"
@@ -38,6 +39,25 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+};
+
+class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
+public:
+    virtual ~ISoftbusDiscoveringCallbackTest()
+    {
+    }
+    void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override
+    {
+        (void)pkgName;
+        (void)info;
+        (void)isOnline;
+    }
+    void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override
+    {
+        (void)pkgName;
+        (void)subscribeId;
+        (void)result;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
