@@ -960,7 +960,7 @@ HWTEST_F(DeviceManagerImplTest, VerifyAuthentication001, testing::ext::TestSize.
     std::string pkgName;
     std::string authPara;
     std::shared_ptr<VerifyAuthCallback> callback = nullptr;
-    int32_t ret =  DeviceManager::GetInstance().VerifyAuthentication(pkgName, authPara, callback);
+    int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(pkgName, authPara, callback);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -968,7 +968,7 @@ HWTEST_F(DeviceManagerImplTest, GetFaParam001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     DmAuthParam dmFaParam;
-    int32_t ret =  DeviceManager::GetInstance().GetFaParam(pkgName, dmFaParam);
+    int32_t ret = DeviceManager::GetInstance().GetFaParam(pkgName, dmFaParam);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -976,7 +976,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback001, testing::ext::TestS
 {
     std::string pkgName;
     std::string extra;
-    int32_t ret =  DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
+    int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -984,7 +984,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback001, testing::ext::Tes
 {
     std::string pkgName;
     std::string extra;
-    int32_t ret =  DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterDevStateCallback(pkgName, extra);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -993,7 +993,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential001, testing::ext::TestSize.Lev
     std::string pkgName;
     std::string reqJsonStr;
     std::string returnJsonStr;
-    int32_t ret =  DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1002,7 +1002,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential002, testing::ext::TestSize.Lev
     std::string pkgName = "pkgName";
     std::string reqJsonStr;
     std::string returnJsonStr;
-    int32_t ret =  DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1011,7 +1011,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential003, testing::ext::TestSize.Lev
     std::string pkgName = "pkgName";
     std::string reqJsonStr = "reqJsonStr";
     std::string returnJsonStr;
-    int32_t ret =  DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
     EXPECT_NE(ret, DM_OK);
 }
 
@@ -1019,7 +1019,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential001, testing::ext::TestSize.Leve
 {
     std::string pkgName;
     std::string credentialInfo;
-    int32_t ret =  DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1027,7 +1027,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential002, testing::ext::TestSize.Leve
 {
     std::string pkgName = "pkgName";
     std::string credentialInfo;
-    int32_t ret =  DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1035,7 +1035,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential003, testing::ext::TestSize.Leve
 {
     std::string pkgName = "pkgName";
     std::string credentialInfo = "credentialInfo";
-    int32_t ret =  DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
     EXPECT_NE(ret, DM_OK);
 }
 
@@ -1043,7 +1043,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential001, testing::ext::TestSize.Leve
 {
     std::string pkgName;
     std::string deleteInfo;
-    int32_t ret =  DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
+    int32_t ret = DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1051,7 +1051,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential002, testing::ext::TestSize.Leve
 {
     std::string pkgName = "pkgName";
     std::string deleteInfo;
-    int32_t ret =  DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
+    int32_t ret = DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1059,7 +1059,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential003, testing::ext::TestSize.Leve
 {
     std::string pkgName = "pkgName";
     std::string deleteInfo = "deleteInfo";
-    int32_t ret =  DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
+    int32_t ret = DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
     EXPECT_NE(ret, DM_OK);
 }
 
@@ -1067,7 +1067,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback001, testing::ext::Tes
 {
     std::string pkgName;
     std::shared_ptr<CredentialCallback> callback = nullptr;
-    int32_t ret =  DeviceManager::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialCallback(pkgName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1075,14 +1075,14 @@ HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback002, testing::ext::Tes
 {
     std::string pkgName = "pkgName";
     std::shared_ptr<CredentialCallback> callback = nullptr;
-    int32_t ret =  DeviceManager::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialCallback(pkgName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    int32_t ret =  DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1090,7 +1090,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
 {
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = nullptr;
     std::string pkgName = "pkgName";
-    int32_t ret =  DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }

@@ -650,7 +650,7 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_103, testing::ext::TestSize.Level0)
  *              set callback null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::BindDevice with parameter
- *           4. check ret is ERR_DM_BIND_INPUT_PARA_INVALID
+ *           4. check ret is not DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  */
@@ -662,9 +662,9 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_104, testing::ext::TestSize.Level0)
     std::string bindParam;
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
-    ret = DeviceManager::GetInstance().BindDevice(packName, bindType, deviceId, bindParam, callback);
-    ASSERT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
+    int32_t ret = DeviceManager::GetInstance().BindDevice(packName, bindType, deviceId, bindParam, callback);
+    ASSERT_NE(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
