@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,8 @@
 extern "C" {
 #endif
 
-int InitSoftbusModle();
-int UnInitSoftbusModle();
+int InitSoftbusModle(void);
+int UnInitSoftbusModle(void);
 int StartSoftbusPublish(const char *pkgName, OnAdvertisingResult cb);
 int StopSoftbusPublish(const char *pkgName);
 int StartSoftbusDiscovery(const char *pkgName, const int subscribeId, const char *filterOption,

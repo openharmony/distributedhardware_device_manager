@@ -23,6 +23,7 @@
 #include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
+#include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "dm_softbus_adapter_crypto.h"
 #include "dm_radar_helper.h"
@@ -60,7 +61,6 @@ constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
-const int32_t SESSION_KEY_LENGTH = 16;
 constexpr const char* DM_VERSION = "4.1.5.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -267,7 +267,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGE("ReportDeleteTrustRelation failed");
     }
     if (!DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, deviceUdid)) {
-        LOGE("The pkgname %s cannot unbind.", pkgName.c_str());
+        LOGE("The pkgName %s cannot unbind.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     remoteDeviceId_ = deviceUdid;
@@ -326,7 +326,8 @@ void DmAuthManager::SyncDeleteAcl(const std::string &pkgName, const std::string 
 
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
-    LOGI("DmAuthManager::OnSessionOpened sessionId = %d result = %d", sessionId, result);
+    LOGI("DmAuthManager::OnSessionOpened, sessionId = %d and sessionSide = %d result = %d",
+         sessionId, sessionSide, result);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
@@ -707,7 +708,6 @@ void DmAuthManager::AbilityNegotiate()
     } else {
         authResponseContext_->isAuthCodeReady = false;
     }
-    authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
 }
 
 void DmAuthManager::RespNegotiate(const int32_t &sessionId)
@@ -719,6 +719,8 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     LOGI("DmAuthManager::RespNegotiate sessionid %d", sessionId);
     dmVersion_ = authResponseContext_->dmVersion;
     remoteDeviceId_ = authResponseContext_->localDeviceId;
+    authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
+    authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
     if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
         ProRespNegotiateExt(sessionId);
     } else {
@@ -748,10 +750,6 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     } else {
         ProcessAuthRequest(sessionId);
     }
-    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
-        [this] (std::string name) {
-            DmAuthManager::HandleAuthenticateTimeout(name);
-        });
 }
 
 void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
@@ -798,6 +796,14 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
+
+    listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
+        authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
+        [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
 }
 
 void DmAuthManager::GetAuthRequestContext()
@@ -865,6 +871,13 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
     }
+    listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
+        authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
+    listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
+        [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
 }
 
 int32_t DmAuthManager::ConfirmProcess(const int32_t &action)
@@ -1021,7 +1034,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         .funcName = "AddMember",
         .stageRes = (ret == 0) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
-        .peerUdid = authResponseContext_->deviceId,
+        .peerUdid = authResponseContext_ == nullptr ? "" : authResponseContext_->deviceId,
         .errCode = ERR_DM_ADD_GROUP_FAILED,
     };
     if (!DmRadarHelper::GetInstance().ReportAuthAddGroup(info)) {
@@ -1245,7 +1258,6 @@ void DmAuthManager::ShowConfigDialog()
         return;
     }
     LOGI("ShowConfigDialog start");
-    dmAbilityMgr_ = std::make_shared<DmAbilityManager>();
     nlohmann::json jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
     jsonObj[TAG_TOKEN] = authResponseContext_->token;
@@ -1260,8 +1272,8 @@ void DmAuthManager::ShowConfigDialog()
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, localUdid, remoteDeviceId_);
-    std::shared_ptr<ShowConfirm> showConfirm_ = std::make_shared<ShowConfirm>();
-    showConfirm_->ShowConfirmDialog(params, shared_from_this(), dmAbilityMgr_);
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowConfirmDialog(params);
     struct RadarInfo info = {
         .funcName = "ShowConfigDialog",
         .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
@@ -1293,7 +1305,8 @@ void DmAuthManager::ShowAuthInfoDialog()
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = jsonObj.dump();
-    authPtr_->ShowAuthInfo(authParam, shared_from_this());
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowPinDialog(std::to_string(authResponseContext_->code));
 }
 
 void DmAuthManager::ShowStartAuthDialog()
@@ -1317,7 +1330,8 @@ void DmAuthManager::ShowStartAuthDialog()
         return;
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
-    authPtr_->StartAuth(authResponseContext_->authToken, shared_from_this());
+    DmDialogManager dialogMgr;
+    dialogMgr.ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
@@ -1333,7 +1347,6 @@ int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
         return AddMember(pinCode);
     }
 }
-
 
 int32_t DmAuthManager::AuthDevice(int32_t pinCode)
 {
@@ -1520,7 +1533,7 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     }
     int32_t authType = -1;
     if (ParseAuthType(bindParam, authType) != DM_OK) {
-        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::BindTarget failed, key: %s error.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     peerTargetId_ = targetId;
@@ -1592,20 +1605,20 @@ int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &b
 {
     auto iter = bindParam.find(PARAM_KEY_AUTH_TYPE);
     if (iter == bindParam.end()) {
-        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param key: %s not exist.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string authTypeStr = iter->second;
     if (authTypeStr.empty()) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s is empty.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authTypeStr.length() > 1) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s length is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!isdigit(authTypeStr[0])) {
-        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE.c_str());
+        LOGE("DmAuthManager::ParseAuthType bind param %s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     authType = std::stoi(authTypeStr);
@@ -1971,18 +1984,6 @@ void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
 {
     LOGI("GetRemoteDeviceId start.");
     deviceId = remoteDeviceId_;
-}
-
-AesGcmCipherKey DmAuthManager::GetSessionKeyAndLen()
-{
-    AesGcmCipherKey cipherKey = { 0 };
-    if (sessionKey_ == nullptr || sessionKeyLen_ == 0) {
-        LOGE("GetSessionKeyAndIv");
-        return cipherKey;
-    }
-    cipherKey.keyLen = SESSION_KEY_LENGTH;
-    memcpy_s(cipherKey.key, cipherKey.keyLen, sessionKey_, cipherKey.keyLen);
-    return cipherKey;
 }
 
 void DmAuthManager::CompatiblePutAcl()

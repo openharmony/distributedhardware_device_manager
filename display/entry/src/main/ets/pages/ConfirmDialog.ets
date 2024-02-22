@@ -13,58 +13,70 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-import Context from '@ohos.app.ability.common';
-import Want from '@ohos.app.ability.Want';
-import window from '@ohos.window';
+import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
+import deviceInfo from '@ohos.deviceInfo';
+import Constant from '../common/constant';
 
 let dmClass: deviceManager.DeviceManager | null;
-let gThis: dialogPlusPage;
+let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
+const ACTION_ALLOW_AUTH_ONCE: number = 0;
+const ACTION_CANCEL_AUTH: number = 1;
+const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2;
+const ACTION_ALLOW_AUTH_ALWAYS: number = 6;
+const MSG_CANCEL_CONFIRM_SHOW: number = 5;
+const DEVICE_TYPE_2IN1: number = 0xA2F;
+const DEVICE_TYPE_PC: number = 0x0C;
 
-const ACTION_ALLOW_AUTH_ONCE: number = 0
-const ACTION_CANCEL_AUTH: number = 1
-const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2
-const ACTION_ALLOW_AUTH_ALWAYS: number = 6
-const MSG_CANCEL_CONFIRM_SHOW: number = 5
+@CustomDialog
+struct ConfirmCustomDialog {
+  @State message: string = '是否信任此设备？';
+  @State allowOnce: string = '临时信任';
+  @State allowAlways: string = '始终信任';
+  @State peerAppOperation: string = '想要连接本机。';
+  @State peerCustomDescription: string = '';
+  @State peerDeviceName: string = '';
+  @State peerDeviceType: number = 0;
+  @State secondsNum: number = 30;
+  @State times: number = 0;
+  @State isAvailableType: boolean = false;
+  @State btnColor: ResourceColor = Color.Transparent;
+  controller?: CustomDialogController;
+  isPC: boolean = false;
 
-@Entry
-@Component
-struct dialogPlusPage {
-  @State message: string = '是否信任此设备？'
-  @State allowOnce: string = '临时信任'
-  @State allowAlways: string = '始终信任'
-  @State peerAppOperation: string = '想要连接本机。'
-  @State peerCustomDescription: string = ''
-  @State peerDeviceName: string = ''
-  @State peerDeviceType: number = 0
-  @State seconds: number = 60
-  @State times: number = 0
-  @State selectIndex: number = 0
-  @State isAvailableType: boolean = false
-
-  initStatue() {
-    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
-    console.log('initStatue' + 'windowNum:' + globalWindowNum)
-    if (dmClass) {
-      console.log('deviceManager exist')
-      return
+  aboutToAppear() {
+    console.log(TAG + 'aboutToAppear execute PinCustomDialog')
+    if (AppStorage.get('deviceName') != null) {
+      this.peerDeviceName = AppStorage.get('deviceName') as string
+      console.log('peerDeviceName is ' + this.peerDeviceName)
     }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm',
-      (err: Error, dm: deviceManager.DeviceManager) => {
-      if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
-        return
+
+    if (AppStorage.get('deviceType') != null) {
+      this.peerDeviceType = AppStorage.get('deviceType') as number
+      console.log('peerDeviceType is ' + this.peerDeviceType)
+    }
+
+    if (AppStorage.get('appOperationStr') != null) {
+      this.peerAppOperation = AppStorage.get('appOperationStr') as string
+      console.log('peerAppOperation is ' + this.peerAppOperation)
+    }
+
+    if (AppStorage.get('customDescriptionStr') != null) {
+      this.peerCustomDescription = AppStorage.get('customDescriptionStr') as string
+      console.log('peerCustomDescription is ' + this.peerCustomDescription)
+    }
+    this.times = setInterval(() => {
+      console.info('devicemanagerui confirm dialog run seconds:' + this.secondsNum);
+      this.secondsNum--;
+      if (this.secondsNum === 0) {
+        clearInterval(this.times);
+        this.times = 0;
+        this.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT);
+        this.destruction();
+        console.info('click cancel times run out');
       }
-      dmClass = dm
-      dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
-        let tmpStr: Record<string, number> = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg as number
-        if (msg === MSG_CANCEL_CONFIRM_SHOW) {
-          this.destruction()
-          return
-        }
-    })
-    })
+    }, 1000)
+    console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
+    this.isPC = Constant.isPC();
   }
 
   onAllowOnce() {
@@ -74,8 +86,6 @@ struct dialogPlusPage {
       return
     }
 
-    let globalWant: Want = AppStorage.get('abilityWant') as Want
-    console.log('onAllowOnce execute' + JSON.stringify(globalWant.parameters))
     console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
     this.setUserOperation(ACTION_ALLOW_AUTH_ONCE)
     this.destruction()
@@ -88,8 +98,6 @@ struct dialogPlusPage {
       return
     }
 
-    let globalWant: Want = AppStorage.get('abilityWant') as Want
-    console.log('onAllowAlways execute' + JSON.stringify(globalWant.parameters))
     console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
     this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
     this.destruction()
@@ -108,80 +116,30 @@ struct dialogPlusPage {
   }
 
   setUserOperation(operation: number) {
-    console.log('setUserOperation: ' + operation)
-    if(dmClass == null) {
-      console.log('setUserOperation: ' + 'dmClass null')
+    console.log(TAG + 'setUserOperation: ' + operation)
+    if (dmClass == null) {
+      console.log(TAG + 'setUserOperation: ' + 'dmClass null')
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra')
+      dmClass.setUserOperation(operation, 'extra');
     } catch (error) {
-      console.log('dmClass setUserOperation failed')
+      console.log(TAG + 'dmClass setUserOperation failed')
     }
-  }
-
-  run() {
-    console.info('devicemanagerui confirm dialog run seconds:' + gThis.seconds)
-    gThis.seconds--;
-    if (gThis.seconds == 0) {
-      clearInterval(gThis.times)
-      gThis.times = 0
-      gThis.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT)
-      gThis.destruction()
-      console.info('click cancel times run out')
-    }
-  }
-
-  onPageShow() {
-    console.log('onPageShow')
-
-    let globalWant: Want = AppStorage.get('abilityWant') as Want
-    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceName != null) {
-      this.peerDeviceName = globalWant.parameters.deviceName as string
-      console.log('peerDeviceName is ' + this.peerDeviceName)
-    }
-
-    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.deviceType != null) {
-      this.peerDeviceType = globalWant.parameters.deviceType as number
-      console.log('peerDeviceType is ' + this.peerDeviceType)
-    }
-
-    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.appOperation != null) {
-      this.peerAppOperation = globalWant.parameters.appOperation as string
-      console.log('peerAppOperation is ' + this.peerAppOperation)
-    }
-
-    if (globalWant != null && globalWant.parameters != undefined && globalWant.parameters.customDescription != null) {
-      this.peerCustomDescription = globalWant.parameters.customDescription as string
-      console.log('peerCustomDescription is ' + this.peerCustomDescription)
-    }
-
-    this.initStatue()
-    gThis = this
-    if(this.times) {
-      return;
-    }
-    this.times = setInterval(this.run, 1000)
   }
 
   destruction() {
     if (dmClass != null) {
       try {
-        dmClass.release()
-        dmClass = null
+        dmClass.release();
+        dmClass = null;
       } catch (error) {
         console.log('dmClass release failed')
       }
     }
-    let temporaryWindow: window.Window = AppStorage.get('confirmWin') as window.Window
-    temporaryWindow.destroy()
-    let globalWindowNum: number = AppStorage.get('confirmWindowNum') as number
-    globalWindowNum--
-    AppStorage.SetOrCreate('confirmWindowNum', globalWindowNum)
-    console.info('confirmWindowNum:' + globalWindowNum)
-    if(globalWindowNum == 0) {
-      let context: Context.UIAbilityContext = AppStorage.get('confirmContext') as Context.UIAbilityContext
-      context.terminateSelf()
+    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
+    if (session) {
+      session.terminateSelf();
     }
   }
 
@@ -205,6 +163,12 @@ struct dialogPlusPage {
     } else if (peerdeviceType == deviceManager.DeviceType.TV) {
       this.isAvailableType = true
       return $r('app.media.ic_device_smartscreen')
+    } else if (peerdeviceType == DEVICE_TYPE_PC) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_matebook')
+    } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
+      this.isAvailableType = true
+      return $r('app.media.ic_device_matebook')
     } else {
       this.isAvailableType = false
       return $r('app.media.icon')
@@ -212,74 +176,187 @@ struct dialogPlusPage {
   }
 
   build() {
-    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center, direction: FlexDirection.Column }) {
-      Image(this.getImages(this.peerDeviceType))
-      .width(24)
-      .height(24)
-      .margin({bottom: 16})
-      .visibility(this.isAvailableType == false? Visibility.None : Visibility.Visible)
-      Text(this.peerDeviceName + this.peerAppOperation + this.message)
-        .textAlign(TextAlign.Start)
-        .fontSize(16)
-        .maxLines(3)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .width('100%')
-        .opacity(0.9)
-      Text(this.peerCustomDescription)
-        .textAlign(TextAlign.Start)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(14)
-        .maxLines(3)
-        .constraintSize({ maxHeight: 45 })
-        .margin({bottom: 16})
-        .width('100%')
-        .opacity(0.6)
-      Button(this.allowAlways)
-        .margin({bottom: 2})
-        .onClick(() => {
-          this.onAllowAlways()
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 0
+    GridRow({
+      columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['520vp', '840vp'] }
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
+        Column() {
+          Image(this.getImages(this.peerDeviceType))
+            .width(24)
+            .height(24)
+            .margin({ bottom: 16, top: 24 })
+            .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
+          Column() {
+            Text(this.peerDeviceName + ' ' + this.peerAppOperation + this.message)
+              .textAlign(TextAlign.Start)
+              .fontColor($r('sys.color.ohos_id_color_text_primary'))
+              .fontWeight(FontWeight.Medium)
+              .fontSize($r('sys.float.ohos_id_text_size_body1'))
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('100%')
+            Text(this.peerCustomDescription)
+              .textAlign(TextAlign.Start)
+              .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+              .fontWeight(FontWeight.Regular)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .maxLines(3)
+              .constraintSize({ maxHeight: 45 })
+              .width('100%')
+              .margin({ top: 2 })
+              .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
+          }.margin({
+            top: this.isAvailableType ? 0 : 24,
+            bottom: 16, left: 24, right: 24 })
+
+          Column() {
+            Button(this.allowAlways)
+              .margin({ bottom: 4 })
+              .onClick(() => {
+                this.onAllowAlways();
+              })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+            Button(this.allowOnce)
+              .margin({ bottom: 4 })
+              .onClick(() => {
+                this.onAllowOnce();
+              })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+            Button('不信任(' + this.secondsNum + ' 秒)')
+              .margin({ left: 16, right: 16 })
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .onClick(() => {
+                this.onCancel();
+              })
+              .height(40)
+              .width(this.isPC ? 250 : '100%')
+              .backgroundColor(this.btnColor)
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
           }
-        })
-        .backgroundColor(this.selectIndex == 0 ? 0x0000ff : 0xffffff)
-        .fontColor(this.selectIndex == 0 ? 0xffffff : 0x0000ff)
-        .height(30)
-        .width('100%')
-      Button(this.allowOnce)
-        .margin({bottom: 2, left: 16, right: 16})
-        .onClick(() => {
-          this.onAllowOnce()
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 1
-          }
-        })
-        .backgroundColor(this.selectIndex == 1 ? 0x0000ff : 0xffffff)
-        .fontColor(this.selectIndex == 1 ? 0xffffff : 0x0000ff)
-        .height(30)
-        .width('100%')
-      Button('不信任(' + this.seconds + '秒)')
-        .margin({left: 16, right: 16})
-        .backgroundColor(this.selectIndex == 2 ? 0x0000ff : 0xffffff)
-        .fontColor(this.selectIndex == 2 ? 0xffffff : 0x0000ff)
-        .onClick(() => {
-          this.onCancel()
-        })
-        .onTouch((event?: TouchEvent | undefined) => {
-          if (event != undefined && event.type === TouchType.Down) {
-            this.selectIndex = 2
-          }
-        })
-        .height(30)
-        .width('100%')
+          .margin({
+            left: 16,
+            right: 16,
+            bottom: this.isPC ? 24 : 8
+          })
+        }
+        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+      }
     }
-    .padding({top:12, bottom:12, left: 16, right: 16})
-    .height('100%')
-    .width('100%')
-    .borderRadius(24)
+  }
+}
+
+@Entry
+@Component
+struct dialogPlusPage {
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: ConfirmCustomDialog(),
+    autoCancel: false,
+    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
+    offset: { dx: 0, dy: -20 },
+    customStyle: true,
+    maskColor: $r('sys.color.ohos_id_color_mask_thin')
+  });
+
+  initStatue() {
+    if (dmClass) {
+      console.log(TAG + 'deviceManager exist')
+      return
+    }
+    deviceManager.createDeviceManager('com.ohos.devicemanagerui.confirm',
+      (err: Error, dm: deviceManager.DeviceManager) => {
+        if (err) {
+          console.log('createDeviceManager err:' + JSON.stringify(err) + ' --fail:' + JSON.stringify(dm))
+          return
+        }
+        dmClass = dm
+        dmClass.on('uiStateChange', (data: Record<string, string>) => {
+          console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
+          let tmpStr: Record<string, number> = JSON.parse(data.param)
+          let msg: number = tmpStr.uiStateMsg as number
+          if (msg === MSG_CANCEL_CONFIRM_SHOW) {
+            this.destruction()
+            return
+          }
+        })
+      })
+  }
+
+  onPageShow() {
+    console.log('onPageShow')
+    this.initStatue()
+  }
+
+  destruction() {
+    if (dmClass != null) {
+      try {
+        dmClass.release();
+        dmClass = null;
+      } catch (error) {
+        console.log('dmClass release failed')
+      }
+    }
+    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
+    if (session) {
+      session.terminateSelf();
+    }
+  }
+
+  build() {
+    Column(this.dialogController.open())
   }
 }

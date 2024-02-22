@@ -126,7 +126,11 @@ ohos_unittest("UTTest_ipc_cmd_register") {
 ohos_unittest("UTTest_dm_pin_holder") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_pin_holder.cpp" ]
+  sources = [
+    "${services_path}/src/pinholder/pin_holder.cpp",
+    "${services_path}/src/pinholder/pin_holder_session.cpp",
+    "UTTest_dm_pin_holder.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -352,6 +356,7 @@ ohos_unittest("UTTest_dm_anonymous") {
 
   sources = [
     "${common_path}/src/dm_anonymous.cpp",
+    "${common_path}/src/dm_error_message.cpp",
     "${devicemanager_path}/test/commonunittest/UTTest_dm_anonymous.cpp",
   ]
 
@@ -906,10 +911,12 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/devicestate",
     "${services_path}/include",
     "${services_path}/include/softbus",
+    "${services_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/dependency/multipleuser",
+    "${servicesimpl_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock/",
     "//third_party/json/include",
   ]
@@ -933,7 +940,7 @@ config("device_manager_test_common_public_config") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"device_manager_UTtest\"",
-    "LOG_DOMAIN=0xD004190",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 

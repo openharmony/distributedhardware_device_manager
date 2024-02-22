@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_timer.h"
 
@@ -24,6 +23,8 @@ namespace OHOS {
 namespace DistributedHardware {
 
 constexpr const char* TIMER_RUNNING = "TimerRunning";
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int32_t DM_OK = 0;
 
 Timer::Timer(std::string name, int32_t time, TimerCallback callback)
     : timerName_(name), expire_(steadyClock::now()), state_(true), timeOut_(time), callback_(callback) {};
@@ -112,22 +113,28 @@ int32_t DmTimer::TimerRunning()
         }
         while (!timerQueue_.empty() && timerState_) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TICK_MILLSECONDS));
-            while (std::chrono::duration_cast<timerDuration>(steadyClock::now() -
+            timerMutex_.lock();
+            while (!timerQueue_.empty() && (std::chrono::duration_cast<timerDuration>(steadyClock::now() -
                 timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_ ||
-                !timerQueue_.top()->state_) {
+                !timerQueue_.top()->state_)) {
                 std::string name = timerQueue_.top()->timerName_;
                 LOGI("DmTimer TimerRunning timer.name = %s", name.c_str());
+                TimerCallback callBack = nullptr;
                 if (timerQueue_.top()->state_) {
-                    timerQueue_.top()->callback_(name);
+                    callBack = timerQueue_.top()->callback_;
                 }
-
-                std::lock_guard<std::mutex> locker(timerMutex_);
                 timerQueue_.pop();
                 DeleteVector(name);
+                timerMutex_.unlock();
+                if (callBack != nullptr) {
+                    callBack(name);
+                }
+                timerMutex_.lock();
                 if (timerQueue_.empty()) {
                     break;
                 }
             }
+            timerMutex_.unlock();
         }
         {
             timerState_ = false;

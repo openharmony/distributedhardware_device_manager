@@ -71,7 +71,7 @@ ohos_fuzztest("DeviceDiscoveryFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DeviceDiscoveryFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 
   external_deps = [

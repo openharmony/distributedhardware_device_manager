@@ -132,12 +132,12 @@ typedef struct {
 
 int InitDeviceManager(void);
 int UnInitDeviceManager(void);
-int RegisterDevStateCallback(const char *pkgName, const char *extra, DevStatusCallback cb);
+int RegisterDevStateCallback(const char *pkgName, const char *extra, DevStatusCallback callback);
 int UnRegisterDevStateCallback(const char *pkgName);
 int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen, int *trustListLen);
 int StartAdvertising(const char *advParam, const char *filterOption, OnAdvertisingResult cb);
 int StopAdvertising(const char *pkgName);
-int StartDiscovering(const char *discoverParam, const char *filterOption, OnTargetFound cb);
+int StartDiscovering(const char *discoverParam, const char *filterOption, OnTargetFound callback);
 int StopDiscovering(const char *pkgName, const int subscribeId);
 int BindTarget(const char *pkgName, const char *deviceId, const char *bindParam, OnBindResult cb);
 int UnBindTarget(const char *pkgName, const char *networkId);

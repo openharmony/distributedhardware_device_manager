@@ -53,7 +53,6 @@ if (defined(ohos_lite)) {
       ]
 
       sources = [
-        "${common_path}/src/dm_adapter_crypto.cpp",
         "${common_path}/src/dm_softbus_adapter_crypto.cpp",
         "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
         "src/ability/lite/dm_ability_manager.cpp",
@@ -70,7 +69,7 @@ if (defined(ohos_lite)) {
         "LITE_DEVICE",
         "DH_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerserviceimpl\"",
-        "LOG_DOMAIN=0xD004100",
+        "LOG_DOMAIN=0xD004110",
       ]
 
       deps = [
@@ -120,7 +119,6 @@ if (defined(ohos_lite)) {
       "include/dependency/multipleuser",
       "include/dependency/hichain",
       "include/dependency/softbus",
-      "include/pinholder",
       "${common_path}/include",
       "${common_path}/include/ipc",
       "${common_path}/include/ipc/model",
@@ -151,9 +149,9 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
-      "${common_path}/src/dm_adapter_crypto.cpp",
       "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "src/ability/standard/dm_ability_manager.cpp",
+      "src/ability/standard/dm_dialog_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",
       "src/authentication/auth_message_processor.cpp",
       "src/authentication/auth_request_state.cpp",
@@ -173,8 +171,6 @@ if (defined(ohos_lite)) {
       "src/devicestate/dm_device_state_manager.cpp",
       "src/discovery/dm_discovery_filter.cpp",
       "src/discovery/dm_discovery_manager.cpp",
-      "src/pinholder/dm_pin_holder.cpp",
-      "src/pinholder/pin_holder_session.cpp",
       "src/publish/dm_publish_manager.cpp",
     ]
 
@@ -183,7 +179,7 @@ if (defined(ohos_lite)) {
     defines = [
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerserviceimpl\"",
-      "LOG_DOMAIN=0xD004100",
+      "LOG_DOMAIN=0xD004110",
     ]
 
     deps = [

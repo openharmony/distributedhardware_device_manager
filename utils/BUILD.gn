@@ -59,7 +59,7 @@ if (defined(ohos_lite)) {
         "LITE_DEVICE",
         "hI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerutils\"",
-        "lOG_DOMAIN=0xD004100",
+        "lOG_DOMAIN=0xD004110",
       ]
 
       deps = [
@@ -78,12 +78,6 @@ if (defined(ohos_lite)) {
       "include/appInfo/standard",
       "include/timer",
       "${common_path}/include",
-      "${common_path}/include/ipc",
-      "${common_path}/include/ipc/model",
-      "${common_path}/include/ipc/standard",
-      "${common_path}/include/dfx",
-      "${common_path}/include/dfx/standard",
-      "${innerkits_path}/native_cpp/include",
       "//third_party/mbedtls/include/mbedtls",
       "//third_party/json/include",
     ]
@@ -102,13 +96,7 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
-      "${common_path}/src/dfx/standard/dm_hidumper.cpp",
-      "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
-      "${common_path}/src/dfx/standard/dm_hitrace.cpp",
-      "${common_path}/src/dm_anonymous.cpp",
-      "${common_path}/src/dm_error_message.cpp",
       "${common_path}/src/dm_log.cpp",
-      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
@@ -124,7 +112,7 @@ if (defined(ohos_lite)) {
     defines = [
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
-      "LOG_DOMAIN=0xD004100",
+      "LOG_DOMAIN=0xD004110",
     ]
 
     deps = [
@@ -133,13 +121,10 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "ability_base:want",
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "hilog:libhilog",
-      "hisysevent:libhisysevent",
-      "hitrace:hitrace_meter",
       "ipc:ipc_core",
       "ipc:ipc_single",
       "samgr:samgr_proxy",

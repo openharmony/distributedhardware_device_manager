@@ -259,7 +259,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceOnline in, pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManagerNotify::OnDeviceOnline with DmDeviceInfo, pkgName:%s", pkgName.c_str());
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -274,6 +274,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device state callback is nullptr.");
         return;
     }
+    LOGI("DeviceManagerNotify::OnDeviceOnline complete with DmDeviceInfo, pkgName:%s", pkgName.c_str());
     tempCbk->OnDeviceOnline(deviceInfo);
 }
 
@@ -283,7 +284,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceOnline in, pkgName:%s", pkgName.c_str());
+    LOGI("DeviceManagerNotify::OnDeviceOnline with DmDeviceBasicInfo, pkgName:%s", pkgName.c_str());
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -298,6 +299,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device status callback is nullptr.");
         return;
     }
+    LOGI("DeviceManagerNotify::OnDeviceOnline complete with DmDeviceBasicInfo, pkgName:%s", pkgName.c_str());
     tempCbk->OnDeviceOnline(deviceBasicInfo);
 }
 
@@ -886,6 +888,13 @@ void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t re
         return;
     }
     tempCbk->OnDestroyResult(result);
+}
+
+std::map<std::string, std::shared_ptr<DmInitCallback>> DeviceManagerNotify::GetDmInitCallback()
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    std::map<std::string, std::shared_ptr<DmInitCallback>> currentDmInitCallback = dmInitCallback_;
+    return currentDmInitCallback;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

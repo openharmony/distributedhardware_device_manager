@@ -69,7 +69,7 @@ ohos_fuzztest("DeviceListRefreshFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DeviceListRefreshFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 
   external_deps = [

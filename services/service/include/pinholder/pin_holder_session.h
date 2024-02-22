@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,12 @@
 #ifndef OHOS_PIN_HOLDER_SESSION_H
 #define OHOS_PIN_HOLDER_SESSION_H
 
-#include "device_manager.h"
-
-#include "softbus_bus_center.h"
 #include "dm_device_info.h"
-#include "softbus_session_callback.h"
+#include "pinholder_session_callback.h"
+
 #include "inner_session.h"
 #include "session.h"
+#include "softbus_bus_center.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,7 +40,7 @@ public:
      * @tc.desc: RegisterSessionCallback of the Softbus Session
      * @tc.type: FUNC
      */
-    int32_t RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback);
+    int32_t RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback);
 
     /**
      * @tc.name: PinHolderSession::UnRegisterSessionCallback
@@ -75,7 +74,7 @@ private:
     int32_t GetAddrByTargetId(const PeerTargetId &targetId, ConnectionAddr &addrInfo);
 
 private:
-    static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
+    static std::shared_ptr<IPinholderSessionCallback> pinholderSessionCallback_;
 };
 }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -593,6 +593,18 @@ HWTEST_F(IpcServerStubTest, GetAllPkgName_001, testing::ext::TestSize.Level0)
     std::vector<std::string>  pkgName;
     pkgName = IpcServerStub::GetInstance().GetAllPkgName();
     ASSERT_EQ(pkgName.empty(), false);
+}
+
+/**
+ * @tc.name: Dump_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcServerStubTest, Dump_001, testing::ext::TestSize.Level0)
+{
+    int32_t fd = 0;
+    std::vector<std::u16string> args;
+    int32_t ret = IpcServerStub::GetInstance().Dump(fd, args);
+    ASSERT_NE(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

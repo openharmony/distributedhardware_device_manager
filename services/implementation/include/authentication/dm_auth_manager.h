@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@
 #include "idevice_manager_service_listener.h"
 #include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
-#include "dm_adapter_crypto.h"
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -176,6 +175,7 @@ typedef struct DmAuthResponseContext {
     std::vector<int32_t> bindType;
     std::string remoteAccountId;
     int32_t remoteUserId;
+    std::string targetDeviceName;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -509,7 +509,6 @@ public:
     int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-    AesGcmCipherKey GetSessionKeyAndLen();
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);

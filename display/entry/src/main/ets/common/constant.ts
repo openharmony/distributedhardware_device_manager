@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import deviceInfo from '@ohos.deviceInfo';
+
 export default class Constant {
   static readonly DIALOG_HEIGHT_PROPORTION = 0.8;
   static readonly HALF = 0.5;
@@ -22,4 +24,12 @@ export default class Constant {
   static readonly SHARE_WIDTH_PAD = 519;
   static readonly SHARE_HEIGHT_PAD = 355;
   static readonly SHARE_RADIUS = 24;
+  static readonly DIALOG_TITLE_FONT_SIZE = 20;
+  static readonly DIALOG_TIPS_FONT_SIZE = 14;
+  static isPhone(): boolean {
+    return (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default');
+  }
+  static isPC(): boolean {
+    return (deviceInfo.deviceType === 'pc' || deviceInfo.deviceType === '2in1');
+  }
 };

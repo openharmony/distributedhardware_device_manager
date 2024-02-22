@@ -16,7 +16,6 @@
 #include "app_manager.h"
 
 #include "accesstoken_kit.h"
-#include "dm_log.h"
 #include "ipc_skeleton.h"
 
 using namespace OHOS::Security::AccessToken;
@@ -28,14 +27,12 @@ IMPLEMENT_SINGLE_INSTANCE(AppManager);
 const std::string AppManager::GetAppId()
 {
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
-    LOGI("AppManager::tokenCaller ID == %d", tokenId);
     if (AccessTokenKit::GetTokenTypeFlag(tokenId) != TOKEN_HAP) {
         return "";
     }
     HapTokenInfo tokenInfo;
     auto result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
     if (result != RET_SUCCESS) {
-        LOGE("GetHapTokenInfo, tokenId = %d, result = %d, ", tokenId, result);
         return "";
     }
 

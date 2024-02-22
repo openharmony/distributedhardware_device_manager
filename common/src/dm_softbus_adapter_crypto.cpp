@@ -15,7 +15,6 @@
 
 #include "dm_softbus_adapter_crypto.h"
 
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "md.h"
 #include "securec.h"
@@ -32,7 +31,9 @@ constexpr int HEXIFY_UNIT_LEN = 2;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int DEC_MAX_NUM = 10;
 constexpr int HEX_MAX_BIT_NUM = 4;
-
+constexpr int ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int DM_OK = 0;
+constexpr int ERR_DM_FAILED = -20000;
 #define HEXIFY_LEN(len) ((len) * HEXIFY_UNIT_LEN + 1)
 } // namespace
 
@@ -137,13 +138,14 @@ int32_t DmSoftbusAdapterCrypto::ConvertHexStringToBytes(unsigned char *outBuf, u
 int32_t DmSoftbusAdapterCrypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     char hashResult[SHA_HASH_LEN] = {0};
-    int32_t ret = DmGenerateStrHash((const uint8_t *)udid.c_str(), strlen(udid.c_str()), (uint8_t *)hashResult);
+    int32_t ret = DmGenerateStrHash(reinterpret_cast<const uint8_t *>(udid.c_str()), strlen(udid.c_str()),
+        reinterpret_cast<uint8_t *>(hashResult));
     if (ret != DM_OK) {
         LOGE("GenerateStrHash failed");
         return ret;
     }
-    ret = ConvertBytesToHexString((char *)udidHash, SHORT_DEVICE_ID_HASH_LENGTH + 1, (const uint8_t *)hashResult,
-        SHORT_DEVICE_ID_HASH_LENGTH / HEXIFY_UNIT_LEN);
+    ret = ConvertBytesToHexString(reinterpret_cast<char *>(udidHash), SHORT_DEVICE_ID_HASH_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hashResult), SHORT_DEVICE_ID_HASH_LENGTH / HEXIFY_UNIT_LEN);
     if (ret != DM_OK) {
         LOGE("ConvertBytesToHexString failed");
         return ret;

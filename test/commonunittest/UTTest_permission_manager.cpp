@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,6 +68,71 @@ HWTEST_F(PremissionManagerTest, CheckPermission_001, testing::ext::TestSize.Leve
 {
     bool ret = PermissionManager::GetInstance().CheckPermission();
     ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: PinAuthUi::GetCallerProcessName_001
+ * @tc.desc: the return value is not DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, GetCallerProcessName_001, testing::ext::TestSize.Level0)
+{
+    std::string processName;
+    int32_t ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_001
+ * @tc.desc: the return value is false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ext::TestSize.Level0)
+{
+    std::string processName;
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_002
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ext::TestSize.Level0)
+{
+    std::string processName = "processName";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_001
+ * @tc.desc: the return value is false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::ext::TestSize.Level0)
+{
+    std::string processName;
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_002
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::ext::TestSize.Level0)
+{
+    std::string processName = "processName";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_EQ(ret, false);
 }
 }
 } // namespace DistributedHardware

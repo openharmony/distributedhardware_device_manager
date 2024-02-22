@@ -1030,28 +1030,6 @@ HWTEST_F(DmAuthManagerTest, GetRemoteDeviceId001, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: DmAuthManager::GetSessionKeyAndLen001
- * @tc.type: FUNC
- */
-HWTEST_F(DmAuthManagerTest, GetSessionKeyAndLen001, testing::ext::TestSize.Level0)
-{
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
-    auto ret = authManager_->GetSessionKeyAndLen();
-    ASSERT_EQ(ret.keyLen, DM_OK);
-}
-
-/**
- * @tc.name: DmAuthManager::GetSessionKeyAndLen002
- * @tc.type: FUNC
- */
-HWTEST_F(DmAuthManagerTest, GetSessionKeyAndLen002, testing::ext::TestSize.Level0)
-{
-    authManager_->sessionKey_ = nullptr;
-    auto ret = authManager_->GetSessionKeyAndLen();
-    ASSERT_EQ(ret.keyLen, DM_OK);
-}
-
-/**
  * @tc.name: DmAuthManager::CompatiblePutAcl001
  * @tc.type: FUNC
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ void OnSessionOpenedFuzzTest(const uint8_t* data, size_t size)
 
     softbusSession->RegisterSessionCallback(discoveryMgr);
     int sessionId = *(reinterpret_cast<const int*>(data));
-    int result =  *(reinterpret_cast<const int*>(data));
+    int result = *(reinterpret_cast<const int*>(data));
     softbusSession->OnSessionOpened(sessionId, result);
     softbusSession->OnSessionClosed(sessionId);
 }

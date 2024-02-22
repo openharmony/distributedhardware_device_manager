@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,19 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_PIN_HOLDER_H
-#define OHOS_DM_PIN_HOLDER_H
+#ifndef OHOS_PIN_HOLDER_H
+#define OHOS_PIN_HOLDER_H
 
-#include "device_manager.h"
-#include "dm_adapter_crypto.h"
-#include "softbus_bus_center.h"
-#include "dm_device_info.h"
-#include "dm_subscribe_info.h"
 #include "dm_timer.h"
 #include "idevice_manager_service_listener.h"
-#include "inner_session.h"
 #include "pin_holder_session.h"
-#include "session.h"
+#include "pinholder_session_callback.h"
 
 #include <map>
 #include <mutex>
@@ -41,11 +35,11 @@ typedef enum PinHolderState {
     SINK_DESTROY,
 } PinHolderState;
 
-class DmPinHolder final : public ISoftbusSessionCallback,
-                          public std::enable_shared_from_this<DmPinHolder> {
+class PinHolder final : public IPinholderSessionCallback,
+                        public std::enable_shared_from_this<PinHolder> {
 public:
-    DmPinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener);
-    ~DmPinHolder();
+    PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener);
+    ~PinHolder();
     int32_t RegisterPinHolderCallback(const std::string &pkgName);
     int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
@@ -55,23 +49,6 @@ public:
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);
     void OnDataReceived(int32_t sessionId, std::string message);
-    bool GetIsCryptoSupport()
-    {
-        return false;
-    }
-    AesGcmCipherKey GetSessionKeyAndLen()
-    {
-        AesGcmCipherKey cipherKey = { 0 };
-        return cipherKey;
-    }
-    void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result)
-    {
-        return;
-    }
-    void OnAuthDeviceDataReceived(int32_t sessionId, std::string message)
-    {
-        return;
-    }
 
 private:
     int32_t CreateGeneratePinHolderMsg();
@@ -98,4 +75,4 @@ private:
 };
 }
 }
-#endif // OHOS_DM_PIN_HOLDER_H
+#endif // OHOS_PIN_HOLDER_H

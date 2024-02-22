@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@
 #include "iremote_object.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include <unistd.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,8 +35,6 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
     (void)remote;
-    DeviceManagerImpl::GetInstance().OnDmServiceDied();
-    DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
 int32_t IpcClientManager::ClientInit()
@@ -71,6 +70,7 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
+    SubscribeDMSAChangeListener();
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -146,25 +146,14 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("IpcClientManager::SendRequest in");
-    std::string pkgName = req->GetPkgName();
-    if (!IsInit(pkgName)) {
-        LOGE("IpcClientManager::SendRequest ERR_DM_INIT_FAILED");
+
+    if (dmInterface_ != nullptr) {
+        LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
+        return dmInterface_->SendCmd(cmdCode, req, rsp);
+    } else {
+        LOGE("dmInterface_ is not init.");
         return ERR_DM_INIT_FAILED;
     }
-
-    LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
-    return dmInterface_->SendCmd(cmdCode, req, rsp);
-}
-
-bool IpcClientManager::IsInit(const std::string &pkgName)
-{
-    (void)pkgName;
-    if (dmInterface_ == nullptr) {
-        LOGE("DeviceManager not Init");
-        return false;
-    }
-
-    return true;
 }
 
 int32_t IpcClientManager::OnDmServiceDied()
@@ -181,6 +170,58 @@ int32_t IpcClientManager::OnDmServiceDied()
     dmInterface_ = nullptr;
     LOGI("IpcClientManager::OnDmServiceDied complete");
     return DM_OK;
+}
+
+void IpcClientManager::SubscribeDMSAChangeListener()
+{
+    saListenerCallback = new (std::nothrow) SystemAbilityListener();
+    if (saListenerCallback == nullptr) {
+        LOGE("saListenerCallback is nullptr.");
+        return;
+    }
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+
+    if (systemAbilityManager == nullptr) {
+        LOGE("get system ability manager failed.");
+        return;
+    }
+
+    if (!isSubscribeDMSAChangeListener.load()) {
+        LOGI("try subscribe source sa change listener, sa id: %d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        int32_t ret = systemAbilityManager->SubscribeSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID,
+            saListenerCallback);
+        if (ret != DM_OK) {
+            LOGE("subscribe source sa change failed: %d", ret);
+            return;
+        }
+        isSubscribeDMSAChangeListener.store(true);
+    }
+}
+
+void IpcClientManager::SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId)
+{
+    if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
+        DeviceManagerImpl::GetInstance().OnDmServiceDied();
+    }
+    LOGI("sa %d is removed.", systemAbilityId);
+}
+
+void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    LOGI("sa %d is added.", systemAbilityId);
+    if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
+        std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback
+        = DeviceManagerNotify::GetInstance().GetDmInitCallback();
+        if (dmInitCallback.size() == 0) {
+            LOGI("dmInitCallback is empty when ReInit");
+            return;
+        }
+        for (auto iter : dmInitCallback) {
+            DeviceManagerImpl::GetInstance().InitDeviceManager(iter.first, iter.second);
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

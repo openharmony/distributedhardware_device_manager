@@ -26,13 +26,8 @@
 #undef private
 
 #include "device_manager_service_listener.h"
-#include "dm_auth_manager.h"
-#include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
-#include "dm_publish_manager.h"
+#include "device_manager_service_impl.h"
 #include "single_instance.h"
-#include "softbus_connector.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceTest : public testing::Test {

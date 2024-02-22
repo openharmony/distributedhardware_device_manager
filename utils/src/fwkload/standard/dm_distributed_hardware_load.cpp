@@ -15,7 +15,6 @@
 
 #include "dm_distributed_hardware_load.h"
 
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "if_system_ability_manager.h"      // for ISystemAbilityManager
 #include "iservice_registry.h"              // for SystemAbilityManagerClient
@@ -24,8 +23,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
-const uint32_t MAX_LOAD_VALUE = 3;
-
+constexpr uint32_t MAX_LOAD_VALUE = 3;
+constexpr int32_t DM_OK = 0;
 void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
     LOGI("enter DmDistributedHardwareLoad::LoadDistributedHardwareFwk");

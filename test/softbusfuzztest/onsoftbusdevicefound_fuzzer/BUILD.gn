@@ -55,7 +55,7 @@ ohos_fuzztest("OnSoftbusDeviceFoundFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"OnSoftbusDeviceFoundFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
 }
 

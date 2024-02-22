@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,6 +80,10 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener_, listener_);
     }
+    if (pinHolder_ == nullptr) {
+        pinHolder_ = std::make_shared<PinHolder>(listener_);
+    }
+
     LOGI("DeviceManagerServiceListener init success.");
     return DM_OK;
 }
@@ -228,8 +232,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         char udidHash[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId,
-            (uint8_t *)udidHash) == DM_OK) {
+        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
             localDeviceId_ = udidHash;
         }
     }
@@ -257,7 +260,7 @@ int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     char udidHash[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, (uint8_t *)udidHash);
+    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
     if (ret != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(localDeviceId).c_str());
         deviceId = "";
@@ -573,29 +576,20 @@ void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsi
 
 int DeviceManagerService::OnPinHolderSessionOpened(int sessionId, int result)
 {
-    if (!IsDMServiceImplReady()) {
-        LOGE("OnPinHolderSessionOpened failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->OnPinHolderSessionOpened(sessionId, result);
+    LOGI("DeviceManagerService::OnPinHolderSessionOpened");
+    return PinHolderSession::OnSessionOpened(sessionId, result);
 }
 
 void DeviceManagerService::OnPinHolderSessionClosed(int sessionId)
 {
-    if (!IsDMServiceImplReady()) {
-        LOGE("OnPinHolderSessionClosed failed, instance not init or init failed.");
-        return;
-    }
-    dmServiceImpl_->OnPinHolderSessionClosed(sessionId);
+    LOGI("DeviceManagerService::OnPinHolderSessionClosed");
+    PinHolderSession::OnSessionClosed(sessionId);
 }
 
 void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    if (!IsDMServiceImplReady()) {
-        LOGE("OnPinHolderBytesReceived failed, instance not init or init failed.");
-        return;
-    }
-    dmServiceImpl_->OnPinHolderBytesReceived(sessionId, data, dataLen);
+    LOGI("DeviceManagerService::OnPinHolderBytesReceived");
+    PinHolderSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
 int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
@@ -1228,11 +1222,7 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
         LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("RegisterPinHolderCallback failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->RegisterPinHolderCallback(pkgName);
+    return pinHolder_->RegisterPinHolderCallback(pkgName);
 }
 
 int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1256,11 +1246,7 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
         LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CreatePinHolder failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->CreatePinHolder(pkgName, targetId, pinType, payload);
+    return pinHolder_->CreatePinHolder(pkgName, targetId, pinType, payload);
 }
 
 int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1284,11 +1270,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("Invalid parameter, pkgName: %s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("DestroyPinHolder failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->DestroyPinHolder(pkgName, targetId, pinType, payload);
+    return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
 void DeviceManagerService::OnUnbindSessionOpened(int32_t sessionId, int32_t result)

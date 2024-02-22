@@ -146,27 +146,6 @@ public:
     virtual void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionOpened
-     * @tc.desc: Send Session Opened event to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int OnPinHolderSessionOpened(int sessionId, int result) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderSessionClosed
-     * @tc.desc: Send Session Closed event to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual void OnPinHolderSessionClosed(int sessionId) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::OnPinHolderBytesReceived
-     * @tc.desc: Send Bytes Received event to the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::RequestCredential
      * @tc.desc: RequestCredential of the Device Manager Service
      * @tc.type: FUNC
@@ -288,28 +267,6 @@ public:
      */
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
 
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::RegisterPinHolderCallback
-     * @tc.desc: RegisterPinHolderCallback
-     * @tc.type: FUNC
-     */
-    virtual int32_t RegisterPinHolderCallback(const std::string &pkgName) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::CreatePinHolder
-     * @tc.desc: CreatePinHolder
-     * @tc.type: FUNC
-     */
-    virtual int32_t CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType, const std::string &payload) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::DestroyPinHolder
-     * @tc.desc: DestroyPinHolder
-     * @tc.type: FUNC
-     */
-    virtual int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
-        DmPinType pinType, const std::string &payload) = 0;
     virtual std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual void OnUnbindSessionOpened(int32_t sessionId, int32_t result) = 0;
     virtual void OnUnbindSessionCloseed(int32_t sessionId) = 0;

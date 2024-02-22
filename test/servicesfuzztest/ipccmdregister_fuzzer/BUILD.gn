@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -64,16 +64,15 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
-    "ipc_cmd_register_fuzzer.cpp",
-  ]
+  sources = [ "ipc_cmd_register_fuzzer.cpp" ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"IpcCmdRegisterFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004110",
   ]
+
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   external_deps = [
     "c_utils:utils",
