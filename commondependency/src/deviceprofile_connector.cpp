@@ -16,9 +16,8 @@
 #include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 
 #include "distributed_device_profile_client.h"
@@ -87,7 +86,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     std::vector<int32_t> bindTypes;
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
+        if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
             DM_OK) {
             LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;

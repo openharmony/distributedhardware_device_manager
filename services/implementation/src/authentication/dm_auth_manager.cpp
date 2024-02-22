@@ -23,9 +23,9 @@
 #include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "dm_radar_helper.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
@@ -809,7 +809,7 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
 void DmAuthManager::GetAuthRequestContext()
 {
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(authResponseContext_->localDeviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
+    Crypto::GetUdidHash(authResponseContext_->localDeviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
     authRequestContext_->deviceId = static_cast<std::string>(deviceIdHash);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
     authResponseContext_->localDeviceId = authRequestContext_->localDeviceId;
@@ -1482,7 +1482,7 @@ bool DmAuthManager::IsIdenticalAccount()
     }
     for (auto &groupInfo : groupList) {
         for (nlohmann::json::iterator it = jsonPeerGroupIdObj.begin(); it != jsonPeerGroupIdObj.end(); ++it) {
-            if ((*it) == DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId)) {
+            if ((*it) == Crypto::GetGroupIdHash(groupInfo.groupId)) {
                 LOGI("Is identical Account.");
                 return true;
             }
@@ -1508,7 +1508,7 @@ std::string DmAuthManager::GetAccountGroupIdHash()
     }
     nlohmann::json jsonAccountObj;
     for (auto &groupInfo : groupList) {
-        jsonAccountObj.push_back(DmSoftbusAdapterCrypto::GetGroupIdHash(groupInfo.groupId));
+        jsonAccountObj.push_back(Crypto::GetGroupIdHash(groupInfo.groupId));
     }
     return jsonAccountObj.dump();
 }
@@ -1581,7 +1581,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
         if (!targetId.deviceId.empty()) {
-            DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
+            Crypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());
         }
         deviceInfo->addr[index] = addr;
@@ -1993,7 +1993,7 @@ void DmAuthManager::CompatiblePutAcl()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
+    Crypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
     std::string localUdidHash = static_cast<std::string>(mUdidHash);
     DmAclInfo aclInfo;
     aclInfo.bindLevel = DEVICE;
@@ -2308,7 +2308,7 @@ void DmAuthManager::PutAccessControlList()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     char mUdidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
+    Crypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
     std::string localUdidHash = static_cast<std::string>(mUdidHash);
     DmAclInfo aclInfo;
     aclInfo.bindType = DM_ACROSS_ACCOUNT;

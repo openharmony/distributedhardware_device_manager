@@ -85,5 +85,35 @@ HWTEST_F(DmDistributedHardwareLoadTest, GetCryptoAdapter_001, testing::ext::Test
     EXPECT_EQ(ret, nullptr);
 }
 
+HWTEST_F(DmDistributedHardwareLoadTest, GetUdidHash_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    auto ret = Crypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmDistributedHardwareLoadTest, GetUdidHash_002, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    unsigned char *udidHash = nullptr;
+    auto ret = Crypto::GetUdidHash(deviceId, udidHash);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmDistributedHardwareLoadTest, GetGroupIdHash_001, testing::ext::TestSize.Level0)
+{
+    std::string groupId = "123456789";
+    std::string str = Crypto::GetGroupIdHash(groupId);
+    EXPECT_EQ(str.empty(), false);
+}
+
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_001, testing::ext::TestSize.Level0)
+{
+    unsigned char *outBuf = nullptr;
+    const char *inBuf = nullptr;
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, 0, inBuf, 0);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

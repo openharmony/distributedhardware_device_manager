@@ -23,7 +23,6 @@
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
 #include "parameter.h"
@@ -624,7 +623,7 @@ void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDevic
 {
     LOGI("DeviceManagerServiceImpl::PutIdenticalAccountAcl start.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(requestDeviceId, reinterpret_cast<uint8_t *>(localDeviceId));
+    Crypto::GetUdidHash(requestDeviceId, reinterpret_cast<uint8_t *>(localDeviceId));
     std::string localUdidHash = static_cast<std::string>(localDeviceId);
     DmAclInfo aclInfo;
     aclInfo.bindType = IDENTICAL_ACCOUNT;

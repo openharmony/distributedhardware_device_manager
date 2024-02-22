@@ -24,7 +24,6 @@
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "parameter.h"
 #include "permission_manager.h"
 
@@ -232,7 +231,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         char udidHash[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
+        if (Crypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
             localDeviceId_ = udidHash;
         }
     }
@@ -260,7 +259,7 @@ int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     char udidHash[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
+    int32_t ret = Crypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
     if (ret != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(localDeviceId).c_str());
         deviceId = "";

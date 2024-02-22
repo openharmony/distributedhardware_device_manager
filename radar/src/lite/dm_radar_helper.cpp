@@ -20,8 +20,8 @@
 #include <iomanip>
 #include <cJSON.h>
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "parameter.h"
 
 namespace OHOS {
@@ -151,7 +151,7 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
 std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
 {
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
         return "";
     }
     return GetAnonyUdid(std::string(udidHash));

@@ -16,8 +16,8 @@
 #include "pin_holder_session.h"
 
 #include "dm_anonymous.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -145,7 +145,7 @@ int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, Connec
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
         if (!targetId.deviceId.empty()) {
-            DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
+            Crypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());
         }
     }

@@ -27,8 +27,6 @@ if (defined(ohos_lite)) {
         "//kernel/liteos_m/kal/cmsis",
         "//utils/native/lite/include",
         "//kernel/liteos_m/kal/posix/include",
-        "//third_party/mbedtls/include",
-        "//third_party/mbedtls/include/mbedtls",
         "//third_party/musl/porting/liteos_m/kernel/include",
         "//device/bestechnic/bes2600w/sdk_liteos/bsp/platform/hal",
         "//foundation/communication/wifi_lite/interfaces/wifiservice",
@@ -123,7 +121,6 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/mbedtls:mbedtls_shared",
       ]
     }
   }

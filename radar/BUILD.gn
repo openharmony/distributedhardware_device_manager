@@ -25,13 +25,11 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
         "${c_utils_path}/include",
+        "${utils_path}/include/crypto",
         "//third_party/cJSON",
       ]
 
-      sources = [
-        "${common_path}/src/dm_softbus_adapter_crypto.cpp",
-        "src/lite/dm_radar_helper.cpp",
-      ]
+      sources = [ "src/lite/dm_radar_helper.cpp" ]
 
       defines = [
         "LITE_DEVICE",
@@ -43,7 +41,7 @@ if (defined(ohos_lite)) {
         "${utils_path}:devicemanagerutils",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
-        "//third_party/mbedtls:mbedtls_shared",
+        "//third_party/bounds_checking_function:libsec_shared",
       ]
     }
   }
@@ -57,10 +55,7 @@ if (defined(ohos_lite)) {
       "//third_party/cJSON",
     ]
 
-    sources = [
-      "${common_path}/src/dm_softbus_adapter_crypto.cpp",
-      "src/dm_radar_helper.cpp",
-    ]
+    sources = [ "src/dm_radar_helper.cpp" ]
 
     defines = [
       "HI_LOG_ENABLE",
@@ -69,7 +64,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "${mbedtls_path}:mbedtls_shared",
       "${utils_path}:devicemanagerutils",
       "//third_party/cJSON:cjson",
     ]

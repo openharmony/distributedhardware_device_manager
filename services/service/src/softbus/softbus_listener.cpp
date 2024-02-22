@@ -31,16 +31,13 @@
 #include "dm_log.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "softbus_adapter.cpp"
 #include "softbus_common.h"
 #include "softbus_bus_center.h"
 #include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 #if (defined(MINE_HARMONY))
-#include "base64.h"
 #include "sha256.h"
-#include "md.h"
 #endif
 
 namespace OHOS {
@@ -1382,35 +1379,14 @@ int32_t SoftbusListener::ParseVertexDeviceJsonArray(const std::vector<VertexOpti
 int32_t SoftbusListener::GetSha256Hash(const char *data, size_t len, char *output)
 {
 #if (defined(MINE_HARMONY))
-    int mbedtlsHmacType = 0;
-    mbedtls_md_context_t mdContext;
-    const mbedtls_md_info_t* mdInfo = NULL;
-    mbedtls_md_init(&mdContext);
-    mdInfo = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    int retValue = mbedtls_md_setup(&mdContext, mdInfo, mbedtlsHmacType);
-    if (retValue != 0) {
-        LOGE("failed to setup mbedtls md with ret: %d.", retValue);
-        return ERR_DM_FAILED;
+    if (data == nullptr || output == nullptr || len == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
-    retValue = mbedtls_md_starts(&mdContext);
-    if (retValue != 0) {
-        LOGE("failed to start mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    retValue = mbedtls_md_update(&mdContext, (const unsigned char *)data, len);
-    if (retValue != 0) {
-        LOGE("failed to update mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    retValue = mbedtls_md_finish(&mdContext, (unsigned char*)output);
-    if (retValue != 0) {
-        LOGE("failed to finish mbedtls md with ret: %d.", retValue);
-        mbedtls_md_free(&mdContext);
-        return ERR_DM_FAILED;
-    }
-    mbedtls_md_free(&mdContext);
+    SHA256_CTX ctx;
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, data, len);
+    SHA256_Final(output, &ctx);
 #endif
     return DM_OK;
 }
@@ -1464,8 +1440,7 @@ int32_t SoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeInfo 
     int retValue;
 #if (defined(MINE_HARMONY))
     char base64Out[DISC_MAX_CUST_DATA_LEN] = {0};
-    retValue = mbedtls_base64_encode((unsigned char*)base64Out, DISC_MAX_CUST_DATA_LEN, &base64OutLen,
-        (const unsigned char*)output, outputLen);
+    retValue = DmBase64Encode(base64Out, DISC_MAX_CUST_DATA_LEN, output, *outputLen, base64OutLen);
     if (retValue != 0) {
     LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
         return ERR_DM_FAILED;
@@ -1484,6 +1459,68 @@ int32_t SoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeInfo 
 }
 
 #if (defined(MINE_HARMONY))
+
+int32_t SoftbusListener::DmBase64Encode(char *output, size_t outputLen, const char *input,
+    size_t inputLen, size_t &base64OutLen)
+{
+    LOGD(SoftbusListener::DmBase64Encode);
+    if (output == nullptr || input == nullptr || outputLen == 0 || inputLen == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t outLen = 0;
+    base64OutLen = 0;
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    if (ctx == nullptr) {
+        LOGE("create ctx failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    EVP_EncodeInit(ctx);
+    if (EVP_EncodeUpdate(ctx, output, &outLen, input, inputLen) != 1) {
+        LOGE("EVP_EncodeUpdata failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    EVP_EncodeFinal(ctx, outLen + outLen, &outLen);
+    base64OutLen += outLen;
+    EVP_ENCODE_CTX_free(ctx);
+    return DM_OK;
+}
+
+int32_t SoftbusListener::DmBase64Decode(char *output, size_t outputLen, const char *input,
+    size_t inputLen, size_t &base64OutLen)
+{
+    LOGD(SoftbusListener::DmBase64Decode);
+    if (output == nullptr || outputLen == 0 || input == nullptr || inputLen == 0) {
+        LOGE("Input param invalied.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    base64OutLen = 0;
+    int32_t outLen = 0;
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    if (ctx == nullptr) {
+        LOGE("create ctx failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    EVP_DecodeInit(ctx);
+    if (EVP_DecodeUpdate(ctx, output, &outLen, input, inputLen) == -1) {
+        LOGE("EVP_DecodeUpdata failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    if (EVP_DecodeFinal(ctx, output + outLen, &outLen) != 1) {
+        LOGE("EVP_DecodeFinal failed.");
+        EVP_ENCODE_CTX_free(ctx);
+        return ERR_DM_FAILED;
+    }
+    base64OutLen += outLen;
+    EVP_ENCODE_CTX_free(ctx);
+    return DM_OK;
+}
 
 int32_t SoftbusListener::PublishDeviceDiscovery(void)
 {
@@ -1578,7 +1615,7 @@ bool SoftbusListener::GetBroadcastData(DeviceInfo &deviceInfo, char *output, siz
     size_t dataLen = deviceInfo.businessDataLen;
 #if (defined(MINE_HARMONY))
     unsigned char* data = (unsigned char*)deviceInfo.businessData;
-    int retValue = mbedtls_base64_decode((unsigned char*)output, outLen, &base64OutLen, data, dataLen);
+    int retValue = DmBase64Decode(output, outLen, data, dataLen, base64OutLen);
     if (retValue != 0) {
         LOGE("failed to with ret: %d.", retValue);
         return false;
@@ -1747,8 +1784,8 @@ int32_t SoftbusListener::SendReturnwave(DeviceInfo &deviceInfo, const BroadcastH
     size_t base64OutLen = 0;
     int retValue;
 #if (defined(MINE_HARMONY))
-    int retValue = mbedtls_base64_encode((unsigned char*)(deviceInfo.businessData), DISC_MAX_CUST_DATA_LEN,
-        &base64OutLen, outData, outLen);
+    int retValue = DmBase64Encode((char*)(deviceInfo.businessData), DISC_MAX_CUST_DATA_LEN,
+        outData, outLen, base64OutLen);
     if (retValue != 0) {
         LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
         return ERR_DM_FAILED;
