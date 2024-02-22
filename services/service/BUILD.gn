@@ -172,7 +172,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [ "${utils_path}:devicemanagerutils" ]
+    deps = [
+      "${utils_path}:devicemanagerutils",
+      "//third_party/openssl:libcrypto_shared",
+    ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",

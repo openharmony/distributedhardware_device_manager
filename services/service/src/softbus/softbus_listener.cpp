@@ -37,7 +37,8 @@
 #include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 #if (defined(MINE_HARMONY))
-#include "sha256.h"
+#include "openssl/sha.h"
+#include "openssl/evp.h"
 #endif
 
 namespace OHOS {
@@ -1386,7 +1387,7 @@ int32_t SoftbusListener::GetSha256Hash(const char *data, size_t len, char *outpu
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, data, len);
-    SHA256_Final(output, &ctx);
+    SHA256_Final((unsigned char *)output, &ctx);
 #endif
     return DM_OK;
 }
@@ -1433,14 +1434,14 @@ void SoftbusListener::SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, S
     subscribeInfo.dataLen = 0;
 }
 
-int32_t SoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *output,
-    size_t *outputLen)
+int32_t SoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *input,
+    size_t *inputLen)
 {
     size_t base64OutLen = 0;
     int retValue;
 #if (defined(MINE_HARMONY))
     char base64Out[DISC_MAX_CUST_DATA_LEN] = {0};
-    retValue = DmBase64Encode(base64Out, DISC_MAX_CUST_DATA_LEN, output, *outputLen, base64OutLen);
+    retValue = DmBase64Encode(base64Out, DISC_MAX_CUST_DATA_LEN, input, *inputLen, base64OutLen);
     if (retValue != 0) {
     LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
         return ERR_DM_FAILED;
@@ -1463,7 +1464,7 @@ int32_t SoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeInfo 
 int32_t SoftbusListener::DmBase64Encode(char *output, size_t outputLen, const char *input,
     size_t inputLen, size_t &base64OutLen)
 {
-    LOGD(SoftbusListener::DmBase64Encode);
+    LOGD("SoftbusListener::DmBase64Encode");
     if (output == nullptr || input == nullptr || outputLen == 0 || inputLen == 0) {
         LOGE("Input param invalied.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1477,22 +1478,22 @@ int32_t SoftbusListener::DmBase64Encode(char *output, size_t outputLen, const ch
         return ERR_DM_FAILED;
     }
     EVP_EncodeInit(ctx);
-    if (EVP_EncodeUpdate(ctx, output, &outLen, input, inputLen) != 1) {
+    if (EVP_EncodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != 1) {
         LOGE("EVP_EncodeUpdata failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
     base64OutLen += outLen;
-    EVP_EncodeFinal(ctx, outLen + outLen, &outLen);
+    EVP_EncodeFinal(ctx, (unsigned char *)(output + outLen), &outLen);
     base64OutLen += outLen;
     EVP_ENCODE_CTX_free(ctx);
     return DM_OK;
 }
 
-int32_t SoftbusListener::DmBase64Decode(char *output, size_t outputLen, const char *input,
+int32_t SoftbusListener::DmBase64Decode(char *output, size_t outputLen, const unsigned char *input,
     size_t inputLen, size_t &base64OutLen)
 {
-    LOGD(SoftbusListener::DmBase64Decode);
+    LOGD("SoftbusListener::DmBase64Decode");
     if (output == nullptr || outputLen == 0 || input == nullptr || inputLen == 0) {
         LOGE("Input param invalied.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1506,13 +1507,13 @@ int32_t SoftbusListener::DmBase64Decode(char *output, size_t outputLen, const ch
         return ERR_DM_FAILED;
     }
     EVP_DecodeInit(ctx);
-    if (EVP_DecodeUpdate(ctx, output, &outLen, input, inputLen) == -1) {
+    if (EVP_DecodeUpdate(ctx, (unsigned char *)output, &outLen, input, inputLen) == -1) {
         LOGE("EVP_DecodeUpdata failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
     base64OutLen += outLen;
-    if (EVP_DecodeFinal(ctx, output + outLen, &outLen) != 1) {
+    if (EVP_DecodeFinal(ctx, (unsigned char *)(output + outLen), &outLen) != 1) {
         LOGE("EVP_DecodeFinal failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
@@ -1527,7 +1528,7 @@ int32_t SoftbusListener::PublishDeviceDiscovery(void)
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-    publishInfo.medium = ExchanageMedium::AUTO;
+    publishInfo.medium = ExchangeMedium::AUTO;
     publishInfo.freq = ExchangeFreq::HIGH;
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.capabilityData = nullptr;
@@ -1878,7 +1879,7 @@ bool SoftbusListener::GetDeviceNumber(char *output)
 {
     char deviceNumber[DM_DEVICE_NUMBER_LEN + 1] = {0};
     int32_t retValue = GetParameter(DEVICE_NUMBER, "not exist", deviceNumber, DM_DEVICE_NUMBER_LEN);
-    if (retValue < 0 || strcmp((const char*)deviceAlias, "not exist") == 0) {
+    if (retValue < 0 || strcmp((const char*)deviceNumber, "not exist") == 0) {
         LOGE("failed to get device alias from system parameter with ret: %d.", retValue);
         return false;
     }
