@@ -910,7 +910,7 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
     for (unsigned int i = 0; i < deviceBasicInfoListAsyncCallbackInfo->devList.size(); i++) {
         LOGI("DeviceManager::GetAvailableDeviceList deviceId:%s deviceName:%s deviceTypeId:%d ",
              GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceId).c_str(),
-             deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceName,
+             GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceName).c_str(),
              deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceTypeId);
     }
 

@@ -82,7 +82,7 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
     }
     for (unsigned int i = 0; i < nodeInfos_.size(); ++i) {
         result.append("\n{\n    deviceId          : ").append(GetAnonyString(nodeInfos_[i].deviceId).c_str());
-        result.append("\n{\n    deviceName        : ").append(nodeInfos_[i].deviceName);
+        result.append("\n{\n    deviceName        : ").append(GetAnonyString(nodeInfos_[i].deviceName).c_str());
         result.append("\n{\n    networkId         : ").append(GetAnonyString(nodeInfos_[i].networkId).c_str());
         std::string deviceType = GetDeviceType(nodeInfos_[i].deviceTypeId);
         result.append("\n{\n    deviceType        : ").append(deviceType);

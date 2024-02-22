@@ -1290,7 +1290,7 @@ void DmAuthManager::ShowAuthInfoDialog()
         LOGE("failed to ShowAuthInfoDialog because authResponseContext_ is nullptr");
         return;
     }
-    LOGI("DmAuthManager::ShowAuthInfoDialog start %d", authResponseContext_->code);
+    LOGI("DmAuthManager::ShowAuthInfoDialog start");
     if (!authResponseContext_->isShowDialog) {
         LOGI("not show dialog.");
         return;

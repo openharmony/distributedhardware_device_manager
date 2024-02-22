@@ -97,7 +97,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("extrasJson error, message: %s.", message.c_str());
+        LOGE("extrasJson error, message: %s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
