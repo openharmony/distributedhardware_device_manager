@@ -55,7 +55,6 @@ if (defined(ohos_lite)) {
 
       sources = [
         "${common_path}/src/dm_anonymous.cpp",
-        "${common_path}/src/dm_softbus_adapter_crypto.cpp",
         "src/advertise/advertise_manager.cpp",
         "src/device_manager_service.cpp",
         "src/device_manager_service_listener.cpp",
@@ -88,7 +87,6 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/mbedtls:mbedtls_shared",
       ]
 
       cflags = [
@@ -150,7 +148,6 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/dm_log.cpp",
-      "${common_path}/src/dm_softbus_adapter_crypto.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "src/advertise/advertise_manager.cpp",
       "src/device_manager_service.cpp",
@@ -177,7 +174,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${utils_path}:devicemanagerutils",
-      "//third_party/mbedtls:mbedtls_shared",
+      "//third_party/openssl:libcrypto_shared",
     ]
 
     external_deps = [

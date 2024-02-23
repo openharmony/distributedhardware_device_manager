@@ -153,7 +153,7 @@ private:
     static int32_t GetSha256Hash(const char *data, size_t len, char *output);
     int32_t SetBroadcastTrustOptions(const json &object, BroadcastHead &broadcastHead);
     int32_t SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead);
-    int32_t SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *output, size_t *outputLen);
+    int32_t SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *input, size_t *inputLen);
     void SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, SubscribeInfo &subscribeInfo);
 #if (defined(MINE_HARMONY))
         int32_t PublishDeviceDiscovery(void);
@@ -180,6 +180,10 @@ private:
     static bool ChecKDeviceTypeMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
     static bool ChecKDeviceUdidMatch(const DevicePolicyInfo &devicePolicyInfo, const char *data);
     static Action GetMatchResult(const vector<int> &matchItemNum, const vector<int> &matchItemResult);
+    static int32_t DmBase64Encode(char *output, size_t outputLen, const char *input,
+        size_t inputLen, size_t &base64OutLen);
+    static int32_t DmBase64Decode(char *output, size_t outputLen, const unsigned char *input,
+        size_t inputLen, size_t &base64OutLen);
 #endif
 
 private:

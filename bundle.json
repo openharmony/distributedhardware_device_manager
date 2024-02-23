@@ -47,7 +47,6 @@
                 "cJSON",
                 "json",
                 "node",
-                "mbedtls",
                 "openssl",
                 "bounds_checking_function"
             ]

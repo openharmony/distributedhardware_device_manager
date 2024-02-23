@@ -18,6 +18,7 @@ ohos_shared_library("devicemanagerdependency") {
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include",
+    "${utils_path}/include/crypto",
   ]
 
   if (os_account_part_exists) {
@@ -28,7 +29,6 @@ ohos_shared_library("devicemanagerdependency") {
   }
 
   sources = [
-    "${common_path}/src/dm_softbus_adapter_crypto.cpp",
     "src/deviceprofile_connector.cpp",
     "src/multiple_user_connector.cpp",
   ]
@@ -41,7 +41,7 @@ ohos_shared_library("devicemanagerdependency") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${mbedtls_path}:mbedtls_shared",
+    "${utils_path}:devicemanagerutils",
   ]
 
   external_deps = [
