@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1158,18 +1158,10 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived001, testing::ext::TestSize.
  */
 HWTEST_F(DmAuthManagerTest, OnUnbindSessionOpened001, testing::ext::TestSize.Level0)
 {
-    int32_t sessionId = 1;
-    std::string name = "nameTest";
-    std::string networkId = "159753681387291";
-    std::string pkgName = "com.ohos.test";
-    PeerSocketInfo info = {
-        .name = const_cast<char*>(name.c_str()),
-        .pkgName = const_cast<char*>(pkgName.c_str()),
-        .networkId = const_cast<char*>(networkId.c_str()),
-    };
-    authManager_->authResponseState_ = nullptr;
-    authManager_->authRequestState_ = nullptr;
-    authManager_->OnUnbindSessionOpened(sessionId, info);
+    int sessionId = 1;
+    int32_t sessionSide = 1;
+    int result = 0;
+    authManager_->OnUnbindSessionOpened(sessionId, sessionSide, result);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
@@ -1205,29 +1197,6 @@ HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Leve
 {
     authManager_->PutAccessControlList();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-/**
- * @tc.name: DmAuthManager::BindSocketFail_001
- * @tc.type: FUNC
- */
-HWTEST_F(DmAuthManagerTest, BindSocketFail_001, testing::ext::TestSize.Level0)
-{
-    authManager_->BindSocketFail();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, false);
-}
-
-/**
- * @tc.name: DmAuthManager::BindSocketSuccess_001
- * @tc.type: FUNC
- */
-HWTEST_F(DmAuthManagerTest, BindSocketSuccess_001, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    authManager_->authResponseState_ = nullptr;
-    authManager_->authRequestState_ = std::make_shared<AuthRequestDeleteInit>();
-    authManager_->BindSocketSuccess(socket);
-    ASSERT_EQ(authManager_->authRequestContext_->sessionId, socket);
 }
 } // namespace
 } // namespace DistributedHardware

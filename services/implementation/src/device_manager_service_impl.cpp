@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -664,19 +664,19 @@ std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdL
     return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
+void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
 {
-    SoftbusSession::OnUnbindSessionOpened(socket, info);
+    SoftbusSession::OnUnbindSessionOpened(sessionId, result);
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t socket)
+void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t sessionId)
 {
-    SoftbusSession::OnSessionClosed(socket);
+    SoftbusSession::OnSessionClosed(sessionId);
 }
 
-void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen)
+void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
-    SoftbusSession::OnBytesReceived(socket, data, dataLen);
+    SoftbusSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()

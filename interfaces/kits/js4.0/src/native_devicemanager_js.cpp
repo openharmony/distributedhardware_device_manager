@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1472,16 +1472,16 @@ void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper,
         return;
     }
 
-    std::shared_ptr<DmNapiAuthenticateCallback> bindDeviceCallback = nullptr;
+    std::shared_ptr<DmNapiAuthenticateCallback> bingDeviceCallback = nullptr;
     auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
     if (iter == g_authCallbackMap.end()) {
-        bindDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
-        g_authCallbackMap[deviceManagerWrapper->bundleName_] = bindDeviceCallback;
+        bingDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
+        g_authCallbackMap[deviceManagerWrapper->bundleName_] = bingDeviceCallback;
     } else {
-        bindDeviceCallback = iter->second;
+        bingDeviceCallback = iter->second;
     }
     int32_t ret = DeviceManager::GetInstance().BindDevice(deviceManagerWrapper->bundleName_,
-        authAsyncCallbackInfo_.authType, deviceId, bindParam, bindDeviceCallback);
+        authAsyncCallbackInfo_.authType, deviceId, bindParam, bingDeviceCallback);
     if (ret != 0) {
         LOGE("BindDevice for bundleName %s failed, ret %d", deviceManagerWrapper->bundleName_.c_str(), ret);
         CreateBusinessError(env, ret);

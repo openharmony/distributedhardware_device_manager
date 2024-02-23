@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,6 @@
 
 #include <string>
 #include <vector>
-
-#include "socket.h"
 
 #include "idevice_manager_service_listener.h"
 #include "dm_device_info.h"
@@ -270,9 +268,9 @@ public:
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
 
     virtual std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
-    virtual void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) = 0;
-    virtual void OnUnbindSessionCloseed(int32_t socket) = 0;
-    virtual void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen) = 0;
+    virtual void OnUnbindSessionOpened(int32_t sessionId, int32_t result) = 0;
+    virtual void OnUnbindSessionCloseed(int32_t sessionId) = 0;
+    virtual void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
 };
 

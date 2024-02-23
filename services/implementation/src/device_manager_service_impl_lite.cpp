@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -415,10 +415,10 @@ std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdL
     return tmp;
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, PeerSocketInfo info)
+void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
 {
     (void)sessionId;
-    (void)info;
+    (void)result;
 }
 
 void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t sessionId)

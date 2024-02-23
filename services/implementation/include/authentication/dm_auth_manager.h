@@ -511,9 +511,7 @@ public:
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     void CommonEventCallback(int32_t userId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
-    void BindSocketSuccess(int32_t socket);
-    void BindSocketFail();
+    void OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
