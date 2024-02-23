@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -297,7 +297,7 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
         return false;
     }
     if (!IsInt32(jsonObject, "result")) {
-        LOGI("Hichain delete credential result json key is invalied.");
+        LOGI("Hichain delete credential result json key is invalid.");
         return ERR_DM_FAILED;
     }
     return jsonObject["result"].get<int32_t>();

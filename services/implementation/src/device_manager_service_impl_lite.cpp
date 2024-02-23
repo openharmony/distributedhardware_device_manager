@@ -46,8 +46,12 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (mineHiChainConnector_ == nullptr) {
         mineHiChainConnector_ = std::make_shared<MineHiChainConnector>();
     }
+    if (hiChainAuthConnector_ == nullptr) {
+        hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
+    }
     if (deviceStateMgr_ == nullptr) {
-        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
+        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener,
+                                                                 hiChainConnector_, hiChainAuthConnector_);
     }
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);

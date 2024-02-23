@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,7 +106,7 @@ public:
     virtual int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId) = 0;
     virtual bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
     virtual bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
-    virtual int32_t DeleteTimeOutAcl(const std::string &deviceId) = 0;
+    virtual uint32_t DeleteTimeOutAcl(const std::string &deviceId) = 0;
     virtual int32_t GetTrustNumber(const std::string &deviceId) = 0;
     virtual bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
     virtual bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId) = 0;
@@ -137,7 +137,7 @@ public:
     int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId);
     bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
     bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
-    int32_t DeleteTimeOutAcl(const std::string &deviceId);
+    uint32_t DeleteTimeOutAcl(const std::string &deviceId);
     int32_t GetTrustNumber(const std::string &deviceId);
     bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
     bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId);
