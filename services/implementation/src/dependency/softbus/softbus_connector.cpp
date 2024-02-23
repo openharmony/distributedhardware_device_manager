@@ -637,7 +637,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
 
 std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId)
 {
-    LOGI("Check the device is online.");
+    LOGI("SoftbusConnector::GetNetworkIdByDeviceId");
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {

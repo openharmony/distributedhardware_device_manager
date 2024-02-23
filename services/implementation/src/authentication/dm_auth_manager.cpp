@@ -1074,7 +1074,7 @@ int32_t DmAuthManager::JoinNetwork()
 
 void DmAuthManager::SinkAuthenticateFinish()
 {
-    LOGI("DmAuthManager::SinkAuthenticateFinish");
+    LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %d", isFinishOfLocal_);
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
@@ -1089,6 +1089,7 @@ void DmAuthManager::SinkAuthenticateFinish()
 
 void DmAuthManager::SrcAuthenticateFinish()
 {
+    LOGI("DmAuthManager::SrcAuthenticateFinish, isFinishOfLocal: %d", isFinishOfLocal_);
     if (isFinishOfLocal_) {
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
@@ -1759,7 +1760,7 @@ void DmAuthManager::RequestSyncDeleteAcl()
 
 void DmAuthManager::SrcSyncDeleteAclDone()
 {
-    LOGI("DmAuthManager::SrcSyncDeleteAclDone");
+    LOGI("DmAuthManager::SrcSyncDeleteAclDone, isFinishOfLocal: %d", isFinishOfLocal_);
     if (isFinishOfLocal_) {
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
@@ -1776,7 +1777,7 @@ void DmAuthManager::SrcSyncDeleteAclDone()
         }
         DeleteAcl(authResponseContext_->hostPkgName, remoteDeviceId_);
     }
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+    softbusConnector_->GetSoftbusSession()->CloseUnbindSession(authRequestContext_->sessionId);
     timer_->DeleteAll();
     isFinishOfLocal_ = true;
     authRequestContext_ = nullptr;
@@ -1787,7 +1788,7 @@ void DmAuthManager::SrcSyncDeleteAclDone()
 
 void DmAuthManager::SinkSyncDeleteAclDone()
 {
-    LOGI("DmAuthManager::SinkSyncDeleteAclDone");
+    LOGI("DmAuthManager::SinkSyncDeleteAclDone, isFinishOfLocal: %d", isFinishOfLocal_);
     if (isFinishOfLocal_) {
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
@@ -2228,53 +2229,58 @@ void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std:
     hiChainAuthConnector_->ProcessAuthData(authResponseContext_->requestId, authData, osAccountId);
 }
 
-void DmAuthManager::OnUnbindSessionOpened(int sessionId, int32_t sessionSide, int result)
+void DmAuthManager::BindSocketFail()
 {
-    LOGI("DmAuthManager::OnUnbindSessionOpened sessionId = %d result = %d", sessionId, result);
-    if (result < DM_OK) {
-        authResponseContext_->reply = DM_OK;
-        isFinishOfLocal_ = false;
+    LOGE("BindSocketFail");
+    authResponseContext_->reply = DM_OK;
+    isFinishOfLocal_ = false;
+    authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
+    authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
+}
+
+void DmAuthManager::BindSocketSuccess(int32_t socket)
+{
+    LOGI("BindSocketSuccess");
+    if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
+        authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_DELETE_INIT) {
+        authRequestContext_->sessionId = socket;
+        authRequestState_->SetAuthContext(authRequestContext_);
+        authMessageProcessor_->SetRequestContext(authRequestContext_);
+        authResponseContext_->localDeviceId = authRequestContext_->localDeviceId;
         authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
-        return;
-    }
-    if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
-        if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
-            authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
-            authResponseState_ = std::make_shared<AuthResponseInitState>();
-            authResponseState_->SetAuthManager(shared_from_this());
-            authResponseState_->Enter();
-            authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-            if (timer_ == nullptr) {
-                timer_ = std::make_shared<DmTimer>();
-            }
-            timer_->StartTimer(std::string(SYNC_DELETE_TIMEOUT_TASK), SYNC_DELETE_TIMEOUT,
-                [this] (std::string name) {
-                    DmAuthManager::HandleSyncDeleteTimeout(name);
-                });
-        } else {
-            std::shared_ptr<AuthMessageProcessor> authMessageProcessor =
-                std::make_shared<AuthMessageProcessor>(shared_from_this());
-            std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
-            authResponseContext->reply = ERR_DM_SYNC_DELETE_DEVICE_REPEATED;
-            authMessageProcessor->SetResponseContext(authResponseContext);
-            std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
-            softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-        }
+        authMessageProcessor_->SetResponseContext(authResponseContext_);
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAcl>());
     } else {
-        if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
-            authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_DELETE_INIT) {
-            authRequestContext_->sessionId = sessionId;
-            authRequestState_->SetAuthContext(authRequestContext_);
-            authMessageProcessor_->SetRequestContext(authRequestContext_);
-            authResponseContext_->localDeviceId = authRequestContext_->localDeviceId;
-            authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
-            authMessageProcessor_->SetResponseContext(authResponseContext_);
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAcl>());
-        } else {
-            softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
-            LOGE("DmAuthManager::OnSessionOpened but request state is wrong");
+        softbusConnector_->GetSoftbusSession()->CloseUnbindSession(socket);
+        LOGE("DmAuthManager::BindSocketSuccess but request state is wrong");
+    }
+}
+
+void DmAuthManager::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
+{
+    LOGI("DmAuthManager::OnUnbindSessionOpened socket: %d, peerSocketName: %s, peerNetworkId: %s, peerPkgName: %s",
+        socket, info.name, GetAnonyString(info.networkId).c_str(), info.pkgName);
+    if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
+        authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
+        authResponseState_ = std::make_shared<AuthResponseInitState>();
+        authResponseState_->SetAuthManager(shared_from_this());
+        authResponseState_->Enter();
+        authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
         }
+        timer_->StartTimer(std::string(SYNC_DELETE_TIMEOUT_TASK), SYNC_DELETE_TIMEOUT,
+            [this] (std::string name) {
+                DmAuthManager::HandleSyncDeleteTimeout(name);
+            });
+    } else {
+        std::shared_ptr<AuthMessageProcessor> authMessageProcessor =
+            std::make_shared<AuthMessageProcessor>(shared_from_this());
+        std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+        authResponseContext->reply = ERR_DM_SYNC_DELETE_DEVICE_REPEATED;
+        authMessageProcessor->SetResponseContext(authResponseContext);
+        std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_SYNC_DELETE_DONE);
+        softbusConnector_->GetSoftbusSession()->SendData(socket, message);
     }
 }
 
