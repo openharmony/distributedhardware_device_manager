@@ -782,9 +782,11 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
     if (!extraData.empty()) {
         extraJson = nlohmann::json::parse(extraData, nullptr, false);
     }
-    extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
-    dmDeviceInfo.extraData = to_string(extraJson);
+    if (!extraJson.is_discarded()) {
+        extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
+        extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
+        dmDeviceInfo.extraData = to_string(extraJson);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
