@@ -181,7 +181,7 @@ private:
     static Action GetMatchResult(const vector<int> &matchItemNum, const vector<int> &matchItemResult);
     static int32_t DmBase64Encode(char *output, size_t outputLen, const char *input,
         size_t inputLen, size_t &base64OutLen);
-    static int32_t DmBase64Decode(char *output, size_t outputLen, const char *input,
+    static int32_t DmBase64Decode(char *output, size_t outputLen, const unsigned char *input,
         size_t inputLen, size_t &base64OutLen);
 #endif
 
