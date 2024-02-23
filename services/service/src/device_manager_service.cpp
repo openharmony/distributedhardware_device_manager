@@ -761,6 +761,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         LOGE("load libdevicemanagerserviceimpl so %s failed, errMsg: %s.", soName.c_str(), dlerror());
         return false;
     }
+    dlerror();
     auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
     if (dlerror() != nullptr || func == nullptr) {
         dlclose(so_handle);
