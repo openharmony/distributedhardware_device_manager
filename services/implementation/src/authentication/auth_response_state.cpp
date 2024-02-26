@@ -51,9 +51,10 @@ int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
+    std::shared_ptr<DmAuthResponseContext> contextTemp = GetAuthContext();
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthResponseState(state);
-    state->SetAuthContext(context_);
+    state->SetAuthContext(contextTemp);
     this->Leave();
     state->Enter();
     return DM_OK;
