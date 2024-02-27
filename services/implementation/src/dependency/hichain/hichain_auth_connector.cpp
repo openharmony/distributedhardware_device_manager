@@ -241,7 +241,7 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
         LOGI("Credential not exist.");
         return ERR_DM_FAILED;
     }
-    publicKey = jsonObject["publicKey"];
+    publicKey = jsonObject["publicKey"].get<std::string>();
     return DM_OK;
 }
 
