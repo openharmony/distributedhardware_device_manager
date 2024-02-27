@@ -64,7 +64,6 @@ if (defined(ohos_lite)) {
 
       deps = [
         "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/mbedtls:mbedtls_shared",
         "//third_party/openssl:libcrypto_shared",
       ]
     }
@@ -78,7 +77,6 @@ if (defined(ohos_lite)) {
       "include/appInfo/standard",
       "include/timer",
       "${common_path}/include",
-      "//third_party/mbedtls/include/mbedtls",
       "//third_party/json/include",
     ]
   }
@@ -115,10 +113,7 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [
-      "//third_party/mbedtls:mbedtls_shared",
-      "//third_party/openssl:libcrypto_shared",
-    ]
+    deps = [ "//third_party/openssl:libcrypto_shared" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",

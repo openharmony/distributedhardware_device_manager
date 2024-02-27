@@ -16,8 +16,8 @@
 #include "pin_holder.h"
 
 #include "dm_anonymous.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -399,7 +399,7 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
     }
     std::string deviceId = peerDeviceId;
     char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
+    if (Crypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(deviceId).c_str());
         udidHash = "";
         return;

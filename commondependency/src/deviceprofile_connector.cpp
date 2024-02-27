@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,8 @@
 #include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 
 #include "distributed_device_profile_client.h"
@@ -87,7 +86,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     std::vector<int32_t> bindTypes;
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (DmSoftbusAdapterCrypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
+        if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
             DM_OK) {
             LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;
@@ -388,10 +387,6 @@ DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustD
             item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
             priority = APP_PEER_TO_PEER_TYPE;
             offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
-            if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
-                DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-                offlineParam.leftAclNumber--;
-            }
         }
         if (priority > offlineParam.bindType) {
             offlineParam.bindType = priority;
@@ -600,18 +595,23 @@ bool DeviceProfileConnector::CheckDeviceIdInAcl(const std::string &pkgName, cons
     return (CheckSinkDeviceIdInAcl(pkgName, deviceId) || CheckSrcDeviceIdInAcl(pkgName, deviceId));
 }
 
-int32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
+uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
     LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %d.", profiles.size());
+    uint32_t res = 0;
     for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
-            item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
+        if (item.GetTrustDeviceId() != deviceId || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        res++;
+        if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
+            res--;
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
-    return DM_OK;
+    return res;
 }
 
 int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)

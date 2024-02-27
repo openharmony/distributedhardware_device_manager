@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,6 @@
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
 #include "parameter.h"
@@ -57,10 +56,6 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (mineHiChainConnector_ == nullptr) {
         mineHiChainConnector_ = std::make_shared<MineHiChainConnector>();
     }
-    if (deviceStateMgr_ == nullptr) {
-        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener, hiChainConnector_);
-        deviceStateMgr_->RegisterSoftbusStateCallback();
-    }
     if (discoveryMgr_ == nullptr) {
         discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
     }
@@ -69,6 +64,11 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     }
     if (hiChainAuthConnector_ == nullptr) {
         hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
+    }
+    if (deviceStateMgr_ == nullptr) {
+        deviceStateMgr_ = std::make_shared<DmDeviceStateManager>(softbusConnector_, listener,
+                                                                 hiChainConnector_, hiChainAuthConnector_);
+        deviceStateMgr_->RegisterSoftbusStateCallback();
     }
     if (authMgr_ == nullptr) {
         authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener,
@@ -375,7 +375,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 {
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
-            pkgName.c_str(), credentialInfo.c_str());
+            pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
@@ -389,7 +389,7 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
 {
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
-            pkgName.c_str(), deleteInfo.c_str());
+            pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (credentialMgr_== nullptr) {
@@ -624,7 +624,7 @@ void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDevic
 {
     LOGI("DeviceManagerServiceImpl::PutIdenticalAccountAcl start.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    DmSoftbusAdapterCrypto::GetUdidHash(requestDeviceId, reinterpret_cast<uint8_t *>(localDeviceId));
+    Crypto::GetUdidHash(requestDeviceId, reinterpret_cast<uint8_t *>(localDeviceId));
     std::string localUdidHash = static_cast<std::string>(localDeviceId);
     DmAclInfo aclInfo;
     aclInfo.bindType = IDENTICAL_ACCOUNT;
@@ -663,19 +663,19 @@ std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdL
     return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
 {
-    SoftbusSession::OnUnbindSessionOpened(sessionId, result);
+    SoftbusSession::OnUnbindSessionOpened(socket, info);
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t sessionId)
+void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t socket)
 {
-    SoftbusSession::OnSessionClosed(sessionId);
+    SoftbusSession::OnSessionClosed(socket);
 }
 
-void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen)
 {
-    SoftbusSession::OnBytesReceived(sessionId, data, dataLen);
+    SoftbusSession::OnBytesReceived(socket, data, dataLen);
 }
 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()

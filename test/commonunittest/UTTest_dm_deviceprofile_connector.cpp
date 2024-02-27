@@ -455,8 +455,8 @@ HWTEST_F(DeviceProfileConnectorTest, CheckDeviceIdInAcl_001, testing::ext::TestS
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId);
-    EXPECT_EQ(ret, false);
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetTrustNumber_001, testing::ext::TestSize.Level0)

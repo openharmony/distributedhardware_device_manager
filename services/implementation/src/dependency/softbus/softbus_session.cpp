@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,12 +26,45 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+static QosTV g_qosInfo[] = {
+    { .qos = QOS_TYPE_MIN_BW, .value = 64 * 1024 },
+    { .qos = QOS_TYPE_MAX_LATENCY, .value = 10000 },
+    { .qos = QOS_TYPE_MIN_LATENCY, .value = 2500 },
+};
+static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
+}
+
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
+constexpr int32_t INTERCEPT_STRING_LENGTH = 20;
+
+static void OnShutdown(int32_t socket, ShutdownReason reason)
+{
+    LOGI("[SOFTBUS]OnShutdown socket : %d, reason: %d", socket, (int32_t)reason);
+    SoftbusSession::OnSessionClosed(socket);
+}
+
+static void OnBytes(int32_t socket, const void *data, uint32_t dataLen)
+{
+    LOGI("[SOFTBUS]OnBytes socket : %d", socket);
+    SoftbusSession::OnBytesReceived(socket, data, dataLen);
+}
+
+static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t qosCount)
+{
+    LOGI("[SOFTBUS]OnQos, socket: %d, QoSEvent: %d, qosCount: %u", socket, (int32_t)eventId, qosCount);
+    for (uint32_t idx = 0; idx < qosCount; idx++) {
+        LOGI("QosTV: type: %d, value: %d", (int32_t)qos[idx].qos, qos[idx].value);
+    }
+}
 
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
+    iSocketListener_.OnShutdown = OnShutdown;
+    iSocketListener_.OnBytes = OnBytes;
+    iSocketListener_.OnQos = OnQos;
 }
 
 SoftbusSession::~SoftbusSession()
@@ -73,8 +106,15 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
 
 int32_t SoftbusSession::CloseAuthSession(int32_t sessionId)
 {
-    LOGD("CloseAuthSession.");
+    LOGI("CloseAuthSession.");
     ::CloseSession(sessionId);
+    return DM_OK;
+}
+
+int32_t SoftbusSession::CloseUnbindSession(int32_t socket)
+{
+    LOGI("CloseUnbindSession.");
+    Shutdown(socket);
     return DM_OK;
 }
 
@@ -97,7 +137,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("extrasJson error, message: %s.", message.c_str());
+        LOGE("extrasJson error, message: %s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
@@ -168,38 +208,39 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
     LOGI("completed.");
 }
 
-void SoftbusSession::OnUnbindSessionOpened(int sessionId, int result)
+void SoftbusSession::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
 {
-    int32_t sessionSide = GetSessionSide(sessionId);
-    sessionCallback_->OnUnbindSessionOpened(sessionId, sessionSide, result);
-    LOGD("OnUnbindSessionOpened, success, sessionId: %d.", sessionId);
+    sessionCallback_->OnUnbindSessionOpened(socket, info);
+    LOGI("SoftbusSession::OnUnbindSessionOpened success, socket: %d.", socket);
 }
 
 int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
 {
-    int dataType = TYPE_BYTES;
-    int streamType = INVALID;
-    SessionAttribute attr = { 0 };
-    attr.dataType = dataType;
-    attr.linkTypeNum = LINK_TYPE_MAX;
-    LinkType linkTypeList[LINK_TYPE_MAX] = {
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_WLAN_2G,
-        LINK_TYPE_BR,
+    std::string localSessionName = DM_UNBIND_SESSION_NAME + netWorkId.substr(0, INTERCEPT_STRING_LENGTH);
+    SocketInfo info = {
+        .name = const_cast<char*>(localSessionName.c_str()),
+        .peerName = const_cast<char*>(DM_UNBIND_SESSION_NAME),
+        .peerNetworkId = const_cast<char*>(netWorkId.c_str()),
+        .pkgName = const_cast<char*>(DM_PKG_NAME),
+        .dataType = DATA_TYPE_BYTES
     };
-    if (memcpy_s(attr.linkType, sizeof(attr.linkType), linkTypeList, sizeof(linkTypeList)) != DM_OK) {
-        LOGE("OpenUnbindSession: Data copy failed.");
+
+    int32_t socket = Socket(info);
+    if (socket <= 0) {
+        LOGE("[SOFTBUS]create socket failed, socket: %d", socket);
         return ERR_DM_FAILED;
     }
-    attr.attr.streamAttr.streamType = streamType;
-    int32_t sessionId = OpenSession(DM_UNBIND_SESSION_NAME, DM_UNBIND_SESSION_NAME, netWorkId.c_str(), "0", &attr);
-    if (sessionId < 0) {
-        LOGE("[SOFTBUS]open OpenUnbindSession error, sessionId: %d.", sessionId);
-        return sessionId;
+
+    int32_t ret = Bind(socket, g_qosInfo, g_QosTV_Param_Index, &iSocketListener_);
+    if (ret < DM_OK) {
+        LOGE("[SOFTBUS]OpenUnbindSession failed, netWorkId: %s, socket: %d", GetAnonyString(netWorkId).c_str(), socket);
+        sessionCallback_->BindSocketFail();
+        Shutdown(socket);
+        return ERR_DM_FAILED;
     }
-    LOGI("OpenUnbindSession success. sessionId: %d.", sessionId);
-    return sessionId;
+    LOGI("OpenUnbindSession success. socket: %d.", socket);
+    sessionCallback_->BindSocketSuccess(socket);
+    return socket;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

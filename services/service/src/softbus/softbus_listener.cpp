@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,6 +154,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    LOGI("device online networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -191,6 +192,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    LOGI("device offline networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
@@ -238,6 +240,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+        LOGI("device changed networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
@@ -294,8 +297,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         }
     }
     LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d",
-        GetAnonyString(dmDevInfo.deviceId).c_str(), dmDevInfo.deviceName, dmDevInfo.deviceTypeId,
-        dmDevInfo.range, device->isOnline);
+        GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
+        dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     CacheDiscoveredDevice(device);
@@ -632,7 +635,7 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
     for (int32_t i = 0; i < nodeInfoCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         if (networkId == nodeBasicInfo->networkId) {
-            LOGI("GetDeviceInfo name : %s.", nodeBasicInfo->deviceName);
+            LOGI("GetDeviceInfo name : %s.", GetAnonyString(nodeBasicInfo->deviceName).c_str());
             if (memcpy_s(info.deviceName, sizeof(info.deviceName), nodeBasicInfo->deviceName,
                 std::min(sizeof(info.deviceName), sizeof(nodeBasicInfo->deviceName))) != DM_OK) {
                 LOGE("GetDeviceInfo deviceName copy deviceName data failed.");
@@ -642,7 +645,8 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
         }
     }
     FreeNodeInfo(nodeInfo);
-    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", info.deviceName, info.deviceTypeId);
+    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", GetAnonyString(info.deviceName).c_str(),
+        info.deviceTypeId);
     return ret;
 }
 
@@ -752,9 +756,11 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     if (!extraData.empty()) {
         extraJson = nlohmann::json::parse(extraData, nullptr, false);
     }
-    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
-    devInfo.extraData = to_string(extraJson);
+    if (!extraJson.is_discarded()) {
+        extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+        extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+        devInfo.extraData = to_string(extraJson);
+    }
     return DM_OK;
 }
 

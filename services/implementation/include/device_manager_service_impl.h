@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -123,9 +123,9 @@ public:
         const std::map<std::string, std::string> &bindParam);
 
     std::map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
-    void OnUnbindSessionOpened(int32_t sessionId, int32_t result);
-    void OnUnbindSessionCloseed(int32_t sessionId);
-    void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
+    void OnUnbindSessionCloseed(int32_t socket);
+    void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);
 
     int32_t DpAclAdd(const std::string &udid);
 private:

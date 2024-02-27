@@ -30,11 +30,15 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         let storage: LocalStorage = new LocalStorage(param);
         session.loadContent('pages/PinDialog', storage);
         session.setWindowBackgroundColor('#00000000');
+        let extensionHostWindow = session.getUIExtensionHostWindowProxy();
+        extensionHostWindow.hideNonSecureWindows(true);
         AppStorage.setOrCreate('pinSession',session);
         console.log(TAG+"AppStorage.get<UIExtensionContentSession>('pinSession')"+AppStorage.get<UIExtensionContentSession>('pinSession'));
     }
 
     onSessionDestroy(session: UIExtensionContentSession) {
+        let extensionHostWindow = session.getUIExtensionHostWindowProxy();
+        extensionHostWindow.hideNonSecureWindows(false);
         console.log(TAG, `UIExtAbility onSessionDestroy`)
     }
 }

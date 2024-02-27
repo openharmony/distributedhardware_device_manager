@@ -42,10 +42,14 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         let storage: LocalStorage = new LocalStorage(param);
         session.loadContent('pages/ConfirmDialog', storage);
         session.setWindowBackgroundColor('#00000000');
+        let extensionHostWindow = session.getUIExtensionHostWindowProxy();
+        extensionHostWindow.hideNonSecureWindows(true);
         AppStorage.setOrCreate('ConfirmSession',session);
     }
 
     onSessionDestroy(session: UIExtensionContentSession) {
+        let extensionHostWindow = session.getUIExtensionHostWindowProxy();
+        extensionHostWindow.hideNonSecureWindows(false);
         console.log(TAG, `UIExtAbility onSessionDestroy`)
     }
 }

@@ -20,9 +20,9 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
@@ -567,7 +567,7 @@ std::string SoftbusConnector::GetDeviceUdidHashByUdid(const std::string &udid)
     }
 
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(udid).c_str());
         return "";
     }
@@ -637,7 +637,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
 
 std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId)
 {
-    LOGI("Check the device is online.");
+    LOGI("SoftbusConnector::GetNetworkIdByDeviceId");
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
@@ -737,7 +737,7 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
         return info;
     }
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (DmSoftbusAdapterCrypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
+    if (Crypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
         LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceId).c_str());
         return info;
     }
@@ -782,9 +782,11 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
     if (!extraData.empty()) {
         extraJson = nlohmann::json::parse(extraData, nullptr, false);
     }
-    extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
-    dmDeviceInfo.extraData = to_string(extraJson);
+    if (!extraJson.is_discarded()) {
+        extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
+        extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
+        dmDeviceInfo.extraData = to_string(extraJson);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

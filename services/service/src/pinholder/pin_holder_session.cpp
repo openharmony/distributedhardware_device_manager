@@ -16,8 +16,8 @@
 #include "pin_holder_session.h"
 
 #include "dm_anonymous.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -115,7 +115,7 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
 {
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("extrasJson error, message: %s.", message.c_str());
+        LOGE("extrasJson error, message: %s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
@@ -145,7 +145,7 @@ int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, Connec
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
         if (!targetId.deviceId.empty()) {
-            DmSoftbusAdapterCrypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
+            Crypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());
         }
     }

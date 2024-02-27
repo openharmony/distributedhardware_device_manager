@@ -24,7 +24,6 @@
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
-#include "dm_softbus_adapter_crypto.h"
 #include "parameter.h"
 #include "permission_manager.h"
 
@@ -186,7 +185,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
 {
     LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %s, callerId = %s, isRefresh = %d", pkgName.c_str(),
-        callerId.c_str(), isRefresh);
+        GetAnonyString(callerId).c_str(), isRefresh);
     if (pkgName.empty() || callerId.empty()) {
         LOGE("Invalid parameter, parameter is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -232,7 +231,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         char udidHash[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-        if (DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
+        if (Crypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash)) == DM_OK) {
             localDeviceId_ = udidHash;
         }
     }
@@ -260,7 +259,7 @@ int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     char udidHash[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    int32_t ret = DmSoftbusAdapterCrypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
+    int32_t ret = Crypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
     if (ret != DM_OK) {
         LOGE("get udidhash by udid: %s failed.", GetAnonyString(localDeviceId).c_str());
         deviceId = "";
@@ -650,12 +649,12 @@ int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const 
     std::string &returnJsonStr)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %s does not have permission to call ImportCredential.",
+        LOGE("The caller: %s does not have permission to call CheckCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ImportCredential failed, instance not init or init failed.");
+        LOGE("CheckCredential failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
@@ -762,6 +761,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         LOGE("load libdevicemanagerserviceimpl so %s failed, errMsg: %s.", soName.c_str(), dlerror());
         return false;
     }
+    dlerror();
     auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
     if (dlerror() != nullptr || func == nullptr) {
         dlclose(so_handle);
@@ -918,7 +918,7 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
     }
     LOGI("DeviceManagerService::ImportAuthCode begin.");
     if (authCode.empty() || pkgName.empty()) {
-        LOGE("Invalid parameter, authCode: %s.", authCode.c_str());
+        LOGE("Invalid parameter, authCode: %s.", GetAnonyString(authCode).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
@@ -1273,31 +1273,31 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
     return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
-void DeviceManagerService::OnUnbindSessionOpened(int32_t sessionId, int32_t result)
+void DeviceManagerService::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindSessionOpened failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindSessionOpened(sessionId, result);
+    dmServiceImpl_->OnUnbindSessionOpened(socket, info);
 }
 
-void DeviceManagerService::OnUnbindSessionCloseed(int32_t sessionId)
+void DeviceManagerService::OnUnbindSessionCloseed(int32_t socket)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindSessionCloseed failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindSessionCloseed(sessionId);
+    dmServiceImpl_->OnUnbindSessionCloseed(socket);
 }
 
-void DeviceManagerService::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void DeviceManagerService::OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("OnUnbindBytesReceived failed, instance not init or init failed.");
         return;
     }
-    dmServiceImpl_->OnUnbindBytesReceived(sessionId, data, dataLen);
+    dmServiceImpl_->OnUnbindBytesReceived(socket, data, dataLen);
 }
 
 int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
@@ -1308,7 +1308,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
     }
     LOGI("DeviceManagerService DpAclAdd start.");
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("DpAclAdd failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     dmServiceImpl_->DpAclAdd(udid);
