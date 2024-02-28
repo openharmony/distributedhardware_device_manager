@@ -126,6 +126,7 @@ void from_json(const json &object, ScopeOptionInfo &optionInfo)
 
 MineSoftbusListener::MineSoftbusListener()
 {
+#if (defined(MINE_HARMONY))
     if (PublishDeviceDiscovery() != DM_OK) {
         LOGE("failed to publish device sn sha256 hash to softbus");
     }
@@ -134,6 +135,7 @@ MineSoftbusListener::MineSoftbusListener()
         g_matchDealFlag = true;
         std::thread(MatchSearchDealTask).detach();
     }
+#endif
     LOGI("MineSoftbusListener constructor");
 }
 
@@ -143,11 +145,11 @@ MineSoftbusListener::~MineSoftbusListener()
     if (StopPublishLNN(DM_PKG_NAME.c_str(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) != DM_OK) {
         LOGI("fail to unregister service public callback");
     }
-#endif
     {
         std::lock_guard<std::mutex> autoLock(g_matchWaitDeviceLock);
         g_matchDealFlag = false;
     }
+#endif
     LOGI("SoftbusConnector destructor");
 }
 
