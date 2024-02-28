@@ -575,7 +575,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
 /**
  * @tc.name: SetUserOperation_003
  * @tc.desc: Make success for SetUserOperation，The return value is
- * ERR_DM_NOT_INIT
+ * DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -584,8 +584,12 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_003, testing::ext::TestSize.
     std::string pkgName = "com.ohos.test";
     int32_t action = 0;
     const std::string param = "extra";
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = true;
+    DeviceManagerService::GetInstance().dmServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().dmServiceImpl_ = nullptr;
 }
 
 /**
