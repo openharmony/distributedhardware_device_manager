@@ -985,7 +985,6 @@ ohos_static_library("device_manager_test_common") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
