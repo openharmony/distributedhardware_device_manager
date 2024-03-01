@@ -704,7 +704,7 @@ ON_IPC_CMD(REQUEST_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
     std::map<std::string, std::string> requestParam;
     ParseMapFromJsonString(reqParaStr, requestParam);
     std::string returnJsonStr;
-    int32_t ret;
+    int32_t ret = ERR_DM_FAILED;
     if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
         ret = DeviceManagerService::GetInstance().RequestCredential(requestParam[DM_CREDENTIAL_REQJSONSTR],
                                                                     returnJsonStr);
@@ -733,7 +733,7 @@ ON_IPC_CMD(IMPORT_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
     ParseMapFromJsonString(reqParaStr, requestParam);
     std::string returnJsonStr;
     std::map<std::string, std::string> outputResult;
-    int32_t ret;
+    int32_t ret = ERR_DM_FAILED;
     if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
         ret = DeviceManagerService::GetInstance().ImportCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR]);
         outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
@@ -766,7 +766,7 @@ ON_IPC_CMD(DELETE_CREDENTIAL, MessageParcel &data, MessageParcel &reply)
     ParseMapFromJsonString(reqParaStr, requestParam);
     std::map<std::string, std::string> outputResult;
     std::string returnJsonStr;
-    int32_t ret;
+    int32_t ret = ERR_DM_FAILED;
     if (requestParam[DM_CREDENTIAL_TYPE] == DM_TYPE_OH) {
         ret = DeviceManagerService::GetInstance().DeleteCredential(packageName, requestParam[DM_CREDENTIAL_REQJSONSTR]);
         outputResult.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
