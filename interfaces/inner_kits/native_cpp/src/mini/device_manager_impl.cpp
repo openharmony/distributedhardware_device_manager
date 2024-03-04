@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -211,8 +211,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
                                               std::shared_ptr<AuthenticateCallback> callback)
 {
     LOGI("DeviceManagerImpl::AuthenticateDevice start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -299,8 +299,8 @@ int32_t DeviceManagerImpl::VerifyAuthentication(const std::string &pkgName, cons
                                                 std::shared_ptr<VerifyAuthCallback> callback)
 {
     LOGI("DeviceManagerImpl::VerifyAuthentication start, pkgName: %s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("VerifyAuthentication error: Invalid para");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 

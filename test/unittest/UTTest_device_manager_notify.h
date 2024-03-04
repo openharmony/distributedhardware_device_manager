@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,6 +106,14 @@ public:
 class VerifyAuthCallbackTest : public VerifyAuthCallback {
 public:
     void OnVerifyAuthResult(const std::string &deviceId, int32_t resultCode, int32_t flag) override {}
+};
+
+class DeviceStatusCallbackTest : public DeviceStatusCallback {
+public:
+    void OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceOffline(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

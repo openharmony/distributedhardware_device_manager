@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,8 +27,8 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || dmInitCallback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -48,8 +48,8 @@ void DeviceManagerNotify::UnRegisterDeathRecipientCallback(const std::string &pk
 void DeviceManagerNotify::RegisterDeviceStateCallback(const std::string &pkgName,
                                                       std::shared_ptr<DeviceStateCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -79,8 +79,8 @@ void DeviceManagerNotify::UnRegisterDeviceStatusCallback(const std::string &pkgN
 void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgName,
     std::shared_ptr<DeviceStatusCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -90,8 +90,8 @@ void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgNam
 void DeviceManagerNotify::RegisterDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId,
                                                     std::shared_ptr<DiscoveryCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -120,8 +120,8 @@ void DeviceManagerNotify::RegisterPublishCallback(const std::string &pkgName,
                                                   int32_t publishId,
                                                   std::shared_ptr<PublishCallback> callback)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -149,7 +149,7 @@ void DeviceManagerNotify::UnRegisterPublishCallback(const std::string &pkgName, 
 void DeviceManagerNotify::RegisterAuthenticateCallback(const std::string &pkgName, const std::string &deviceId,
                                                        std::shared_ptr<AuthenticateCallback> callback)
 {
-    if (pkgName.empty() || deviceId.empty()) {
+    if (pkgName.empty() || deviceId.empty() || callback == nullptr) {
         LOGE("DeviceManagerNotify::RegisterAuthenticateCallback error: Invalid parameter, pkgName: %s, deviceId: %s",
             pkgName.c_str(), GetAnonyString(deviceId).c_str());
         return;
@@ -195,6 +195,10 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
 void DeviceManagerNotify::RegisterVerifyAuthenticationCallback(const std::string &pkgName, const std::string &authPara,
                                                                std::shared_ptr<VerifyAuthCallback> callback)
 {
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
     (void)authPara;
     std::lock_guard<std::mutex> autoLock(lock_);
     verifyAuthCallback_[pkgName] = callback;
@@ -230,12 +234,20 @@ void DeviceManagerNotify::UnRegisterDeviceManagerFaCallback(const std::string &p
 void DeviceManagerNotify::RegisterCredentialCallback(const std::string &pkgName,
                                                      std::shared_ptr<CredentialCallback> callback)
 {
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     credentialCallback_[pkgName] = callback;
 }
 
 void DeviceManagerNotify::UnRegisterCredentialCallback(const std::string &pkgName)
 {
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
     std::lock_guard<std::mutex> autoLock(lock_);
     credentialCallback_.erase(pkgName);
 }
