@@ -137,7 +137,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/standard",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
-      "//third_party/json/include",
     ]
   }
 
@@ -188,6 +187,8 @@ if (defined(ohos_lite)) {
       "ipc:libdbinder",
       "samgr:samgr_proxy",
     ]
+
+    public_external_deps = [ "json:nlohmann_json_static" ]
 
     subsystem_name = "distributedhardware"
 
