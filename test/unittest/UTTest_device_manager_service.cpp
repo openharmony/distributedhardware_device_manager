@@ -1572,6 +1572,35 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level0)
     int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid);
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: GetDeviceSecurityLevel_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId;
+    int32_t securityLevel = -1;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, networkId, securityLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: GetDeviceSecurityLevel_002
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string invalidNetworkId = "12345";
+    int32_t securityLevel = -1;
+    int32_t ret = DeviceManagerService::GetInstance()
+            .GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

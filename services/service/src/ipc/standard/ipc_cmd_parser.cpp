@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1399,6 +1399,21 @@ ON_IPC_CMD(DP_ACL_ADD, MessageParcel &data, MessageParcel &reply)
     int32_t result = DeviceManagerService::GetInstance().DpAclAdd(udid);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_SECURITY_LEVEL, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string networkId = data.ReadString();
+    int32_t securityLevel = -1;
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, networkId, securityLevel);
+    if (!reply.WriteInt32(result)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(securityLevel)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

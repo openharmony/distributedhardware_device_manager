@@ -984,6 +984,19 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
     return DM_OK;
 }
 
+int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
+{
+    int32_t tempSecurityLevel = -1;
+    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
+                       reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return ERR_DM_FAILED;
+    }
+    securityLevel = tempSecurityLevel;
+    LOGI("GetDeviceSecurityLevel success, securityLevel = %d.", securityLevel);
+    return DM_OK;
+}
+
 void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
 {
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();

@@ -1315,5 +1315,25 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
     LOGI("DeviceManagerService::DpAclAdd completed");
     return DM_OK;
 }
+
+int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
+                                                     int32_t &securityLevel)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %s does not have permission to call GetDeviceSecurityLevel.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %s, networkId: %s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService::GetDeviceSecurityLevel begin for pkgName = %s", pkgName.c_str());
+    int32_t ret = softbusListener_->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
+    if (ret != DM_OK) {
+        LOGE("GetDeviceSecurityLevel failed, ret = %d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

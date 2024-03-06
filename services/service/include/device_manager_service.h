@@ -191,6 +191,8 @@ public:
     void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);
 
     int32_t DpAclAdd(const std::string &udid);
+
+    int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
