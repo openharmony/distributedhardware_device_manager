@@ -440,18 +440,6 @@ HWTEST_F(DmDiscoveryManagerTest, StartDiscovering_003, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
 }
 
-HWTEST_F(DmDiscoveryManagerTest, StartDiscovering4MineMetaNode_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
-    std::string pkgName;
-    DmSubscribeInfo dmSubInfo;
-    std::string searchJson;
-    int32_t ret = manager->StartDiscovering4MineMetaNode(pkgName, dmSubInfo, searchJson);
-    EXPECT_NE(ret, DM_OK);
-}
-
 HWTEST_F(DmDiscoveryManagerTest, StartDiscoveringNoMetaType_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();

@@ -68,6 +68,7 @@ if (defined(ohos_lite)) {
         "src/permission/lite/permission_manager.cpp",
         "src/pinholder/pin_holder.cpp",
         "src/pinholder/pin_holder_session.cpp",
+        "src/softbus/mine_softbus_listener.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
 
@@ -87,6 +88,7 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/openssl:libcrypto_shared",
       ]
 
       cflags = [
@@ -161,6 +163,7 @@ if (defined(ohos_lite)) {
       "src/permission/standard/permission_manager.cpp",
       "src/pinholder/pin_holder.cpp",
       "src/pinholder/pin_holder_session.cpp",
+      "src/softbus/mine_softbus_listener.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
 

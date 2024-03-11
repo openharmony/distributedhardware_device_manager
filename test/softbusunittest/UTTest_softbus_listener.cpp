@@ -223,15 +223,6 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusPublishResult_001, testing::ext::TestSize
     EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
-HWTEST_F(SoftbusListenerTest, StartDiscovery_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string searchJson;
-    DmSubscribeInfo dmSubscribeInfo;
-    int32_t ret = softbusListener->StartDiscovery(pkgName, searchJson, dmSubscribeInfo);
-    EXPECT_EQ(ret, ERR_DM_JSON_PARSE_STRING);
-}
-
 HWTEST_F(SoftbusListenerTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level0)
 {
     DmPublishInfo dmPubInfo;
@@ -338,60 +329,9 @@ HWTEST_F(SoftbusListenerTest, CloseDmRadarHelperObj_001, testing::ext::TestSize.
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(SoftbusListenerTest, ParseSearchJson_001, testing::ext::TestSize.Level0)
-{
-    string pkgName;
-    string searchJson;
-    char *output = nullptr;
-    size_t *outLen = nullptr;
-    int32_t ret = softbusListener->ParseSearchJson(pkgName, searchJson, output, outLen);
-    EXPECT_EQ(ret, ERR_DM_INVALID_JSON_STRING);
-}
-
-HWTEST_F(SoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::TestSize.Level0)
-{
-    string pkgName;
-    nlohmann::json object;
-    object["findDeviceMode"] = 2;
-    string searchJson = object.dump();
-    char *output = nullptr;
-    size_t *outLen = nullptr;
-    int32_t ret = softbusListener->ParseSearchScopeDevice(pkgName, searchJson, output, outLen);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(SoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::TestSize.Level0)
-{
-    string pkgName;
-    nlohmann::json object;
-    object["findDeviceMode"] = 3;
-    string searchJson = object.dump();
-    char *output = nullptr;
-    size_t *outLen = nullptr;
-    int32_t ret = softbusListener->ParseSearchVertexDevice(pkgName, searchJson, output, outLen);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(SoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::TestSize.Level0)
-{
-    json object;
-    object["tructOptions"] = true;
-    BroadcastHead broadcastHead;
-    int32_t ret = softbusListener->SetBroadcastTrustOptions(object, broadcastHead);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(SoftbusListenerTest, SetBroadcastPkgname_001, testing::ext::TestSize.Level0)
-{
-    string pkgName;
-    BroadcastHead broadcastHead;
-    int32_t ret = softbusListener->SetBroadcastPkgname(pkgName, broadcastHead);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(SoftbusListenerTest, CreateSoftbusSessionServer_001, testing::ext::TestSize.Level0)
 {
-    string pkgName;
+    std::string pkgName;
     std::string sessionName;
     int32_t ret = SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(pkgName, sessionName);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -399,7 +339,7 @@ HWTEST_F(SoftbusListenerTest, CreateSoftbusSessionServer_001, testing::ext::Test
 
 HWTEST_F(SoftbusListenerTest, RemoveSoftbusSessionServer_001, testing::ext::TestSize.Level0)
 {
-    string pkgName;
+    std::string pkgName;
     std::string sessionName;
     int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(pkgName, sessionName);
     EXPECT_EQ(ret, ERR_DM_FAILED);

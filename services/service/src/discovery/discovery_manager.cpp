@@ -145,7 +145,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
     if (jsonObject.contains(TYPE_MINE)) {
-        return StartDiscovering4MineMetaNode(pkgName, dmSubInfo, it->second);
+        return StartDiscovering4MineLibary(pkgName, dmSubInfo, it->second);
     }
 
     int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(dmSubInfo, discoverParam) :
@@ -157,11 +157,11 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     return ret;
 }
 
-int32_t DiscoveryManager::StartDiscovering4MineMetaNode(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
+int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::string &searchJson)
 {
     LOGI("StartDiscovering for mine meta node process.");
-    int32_t ret = softbusListener_->StartDiscovery(pkgName, searchJson, dmSubInfo);
+    int32_t ret = mineSoftbusListener_->RefreshSoftbusLNN(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
@@ -237,7 +237,11 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
         }
     }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
+#if (defined(MINE_HARMONY))
+    return mineSoftbusListener_->StopRefreshSoftbusLNN(subscribeId);
+#else
     return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+#endif
 }
 
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
