@@ -531,8 +531,9 @@ private:
         const std::string &extra);
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
-
+    static void OpenAuthSession();
 private:
+    static std::shared_ptr<AuthRequestState> sessionState_;
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr_;
