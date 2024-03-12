@@ -83,7 +83,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     GetJsonObj(jsonObj);
-    jsonStrVec.push_back(jsonObj.dump());
+    jsonStrVec.push_back(jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore));
 
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
         nlohmann::json jsonThumbnailObj;
