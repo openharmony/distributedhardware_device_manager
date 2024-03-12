@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -527,7 +527,8 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
         return;
     }
     std::string deviceId = device->devId;
-    LOGI("[SOFTBUS]notify discover device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str());
+    LOGI("[SOFTBUS]notify discover device: %s found, range: %d, isOnline: %d.", GetAnonyString(deviceId).c_str(),
+        device->range, device->isOnline);
     if (!device->isOnline) {
         std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
         DeviceInfo *srcInfo = infoPtr.get();

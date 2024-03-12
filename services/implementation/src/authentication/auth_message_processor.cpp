@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,8 +154,8 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage %s, %s", GetAnonyString(groupId).c_str(),
-            GetAnonyString(authResponseContext_->groupName).c_str());
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage groupId = %s, groupName = %s",
+            GetAnonyString(groupId).c_str(), GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
 

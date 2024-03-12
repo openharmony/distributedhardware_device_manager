@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,8 +63,9 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const std::string &pkgName, cons
 #endif
             remoteDeviceInfos_[uuid] = saveInfo;
         }
-        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s", GetAnonyString(
-            std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
+        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s",
+            GetAnonyString(std::string(info.networkId)).c_str(), GetAnonyString(udid).c_str(),
+            GetAnonyString(uuid).c_str());
     }
 }
 
