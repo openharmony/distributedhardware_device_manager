@@ -17,6 +17,7 @@
 
 #include <string>
 #include <unistd.h>
+#include <thread>
 
 #include "auth_message_processor.h"
 #include "dm_ability_manager.h"
@@ -62,6 +63,8 @@ constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* DM_VERSION = "4.1.5.1";
+constexpr const char* DM_OPEN_AUTH_SESSION = "dmOpenAuthSession";
+std::shared_ptr<AuthRequestState> DmAuthManager::sessionState_ = nullptr;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<HiChainConnector> hiChainConnector,
@@ -203,8 +206,19 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     if (!DmRadarHelper::GetInstance().ReportAuthStart(deviceId)) {
         LOGE("ReportAuthStart failed");
     }
-    authRequestState_->Enter();
+    sessionState_ = authRequestState_;
+    std::thread openAuthSession(OpenAuthSession);
+    if (pthread_setname_np(openAuthSession.native_handle(), DM_OPEN_AUTH_SESSION) != DM_OK) {
+        LOGE("OpenAuthSession setname failed.");
+    }
+    openAuthSession.detach();
     LOGI("DmAuthManager::AuthenticateDevice complete");
+}
+
+void DmAuthManager::OpenAuthSession()
+{
+    LOGI("DmAuthManager::OpenAuthSession, state %d.", sessionState_->GetStateType());
+    sessionState_->Enter();
 }
 
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
@@ -1136,6 +1150,7 @@ void DmAuthManager::AuthenticateFinish()
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
+    sessionState_ = nullptr;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
