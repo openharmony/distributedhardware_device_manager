@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,21 @@ typedef struct DiscoveryContext {
     std::string filterOp;
     std::vector<DeviceFilters> filters;
 } DiscoveryContext;
+
+typedef enum {
+    PROXY_TRANSMISION = 0,
+    PROXY_HEARTBEAT = 1,
+    PROXY_HICAR = 2,
+    PROXY_ACS = 3,
+    PROXY_SHARE = 4,
+    PROXY_CASTPLUS = 5,
+    PROXY_DM = 6,
+    PROXY_WEAR = 7,
+    PROXY_WINPC = 8,
+    PROXY_COLLABORATION_FWK = 9,
+    PROXY_DMSDP = 10,
+    CUSTOM_UNKNOWN,
+} MetaNodeType;
 
 class DiscoveryManager : public ISoftbusDiscoveringCallback, public std::enable_shared_from_this<DiscoveryManager> {
 public:
