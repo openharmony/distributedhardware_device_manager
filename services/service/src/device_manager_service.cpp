@@ -514,8 +514,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || params.empty()) {
-        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str(),
-            params.c_str());
+        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
