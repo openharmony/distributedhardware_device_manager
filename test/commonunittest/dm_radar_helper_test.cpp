@@ -75,7 +75,7 @@ HWTEST_F(DmRadarHelperTest, ReportDiscoverUserRes_002, testing::ext::TestSize.Le
 }
 HWTEST_F(DmRadarHelperTest, ReportAuthStart_001, testing::ext::TestSize.Level0)
 {
-    bool res = DmRadarHelper::GetInstance().ReportAuthStart("udid");
+    bool res = DmRadarHelper::GetInstance().ReportAuthStart("udid", "pkgname");
     EXPECT_EQ(res, true);
 }
 HWTEST_F(DmRadarHelperTest, ReportAuthOpenSession_001, testing::ext::TestSize.Level0)

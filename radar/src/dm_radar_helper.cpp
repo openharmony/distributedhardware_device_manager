@@ -40,6 +40,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             DM_DISCOVER_BEHAVIOR,
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
@@ -159,7 +160,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
+bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::string &pkgName)
 {
     int32_t res = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -167,6 +168,7 @@ bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", "AuthenticateDevice",
+        "HOST_PKG", pkgName,
         "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_START),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -370,7 +372,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
-            "HOST_NAME", HICHAINNAME);
+            "HOST_PKG", HICHAINNAME);
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -381,7 +383,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
-            "HOST_NAME", HICHAINNAME,
+            "HOST_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_CREATE_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
     }
@@ -496,7 +498,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "HOST_NAME", HICHAINNAME);
+            "HOST_PKG", HICHAINNAME);
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -507,7 +509,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
-            "HOST_NAME", HICHAINNAME,
+            "HOST_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_ADD_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
     }
@@ -570,6 +572,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         DM_AUTHCATION_BEHAVIOR,
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
+        "HOST_PKG", info.hostName,
         "FUNC", info.funcName,
         "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DELET_TRUST_RELATION),
         "BIZ_STAGE", static_cast<int32_t>(DeleteTrust::DELETE_TRUST),

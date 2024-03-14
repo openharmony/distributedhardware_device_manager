@@ -87,10 +87,13 @@ public:
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);
     static IRefreshCallback &GetSoftbusRefreshCb();
+    static void SetHostPkgName(const std::string hostName);
+    static std::string GetHostPkgName();
 private:
     int32_t InitSoftPublishLNN();
 
 private:
+    static std::string hostName_;
     static bool isRadarSoLoad_;
     static IDmRadarHelper *dmRadarHelper_;
     static std::shared_ptr<DmTimer> timer_;
