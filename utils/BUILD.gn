@@ -77,7 +77,6 @@ if (defined(ohos_lite)) {
       "include/appInfo/standard",
       "include/timer",
       "${common_path}/include",
-      "//third_party/json/include",
     ]
   }
 
@@ -113,8 +112,6 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [ "//third_party/openssl:libcrypto_shared" ]
-
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
@@ -122,8 +119,11 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "openssl:libcrypto_shared",
       "samgr:samgr_proxy",
     ]
+
+    public_external_deps = [ "json:nlohmann_json_static" ]
 
     if (support_jsapi) {
       external_deps += [ "bundle_framework:appexecfwk_core" ]

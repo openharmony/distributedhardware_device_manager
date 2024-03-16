@@ -130,7 +130,6 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
       "${utils_path}/include/timer",
-      "//third_party/json/include",
     ]
   }
 
@@ -175,10 +174,7 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [
-      "${utils_path}:devicemanagerutils",
-      "//third_party/openssl:libcrypto_shared",
-    ]
+    deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
@@ -191,9 +187,12 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "openssl:libcrypto_shared",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
+
+    public_external_deps = [ "json:nlohmann_json_static" ]
 
     subsystem_name = "distributedhardware"
 

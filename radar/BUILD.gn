@@ -51,7 +51,6 @@ if (defined(ohos_lite)) {
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
-      "${c_utils_path}/include",
       "//third_party/cJSON",
     ]
 

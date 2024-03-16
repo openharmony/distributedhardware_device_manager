@@ -34,7 +34,6 @@ ohos_shared_library("distributeddevicemanager") {
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/ipc/standard",
     "//third_party/node/src",
-    "//third_party/json/include",
   ]
 
   sources = [
@@ -45,10 +44,7 @@ ohos_shared_library("distributeddevicemanager") {
     "src/native_devicemanager_js.cpp",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -58,8 +54,10 @@ ohos_shared_library("distributeddevicemanager") {
 
   external_deps = [
     "access_token:libtokenid_sdk",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "ipc:ipc_core",
+    "json:nlohmann_json_static",
     "napi:ace_napi",
   ]
 

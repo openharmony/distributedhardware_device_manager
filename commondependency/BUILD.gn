@@ -32,13 +32,6 @@ ohos_shared_library("devicemanagerdependency") {
     "${utils_path}/include/crypto",
   ]
 
-  if (os_account_part_exists) {
-    include_dirs += [
-      "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
-      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-    ]
-  }
-
   sources = [
     "src/deviceprofile_connector.cpp",
     "src/multiple_user_connector.cpp",
