@@ -36,7 +36,6 @@ ohos_fuzztest("DeviceListFuzzTest") {
     "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/discovery",
     "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/dependency/softbus",
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include",
