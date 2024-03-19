@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -129,10 +129,9 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
     }
 
     uint16_t index = 0;
-    size_t len = 0;
     for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
-        len = strnlen(g_authCodeWhiteList[index], PKG_NAME_SIZE_MAX);
-        if (strncmp(processName.c_str(), g_authCodeWhiteList[index], len) == 0) {
+        std::string tmp(g_authCodeWhiteList[index]);
+        if (processName == tmp) {
             return true;
         }
     }
@@ -150,10 +149,9 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     }
 
     uint16_t index = 0;
-    size_t len = 0;
     for (; index < PIN_HOLDER_WHITE_LIST_NUM; ++index) {
-        len = strnlen(g_pinHolderWhiteList[index], PKG_NAME_SIZE_MAX);
-        if (strncmp(processName.c_str(), g_pinHolderWhiteList[index], len) == 0) {
+        std::string tmp(g_pinHolderWhiteList[index]);
+        if (processName == tmp) {
             return true;
         }
     }
