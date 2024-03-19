@@ -33,8 +33,8 @@ namespace {
 class BenchmarkDmInit : public DmInitCallback {
 public:
     BenchmarkDmInit() : DmInitCallback() {}
-    virtual ~BenchmarkDmInit() override {}
-    virtual void OnRemoteDied() override {}
+    virtual ~BenchmarkDmInit() {}
+    void OnRemoteDied() override {}
 };
 class DeviceManagerTest : public benchmark::Fixture {
 public:

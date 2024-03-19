@@ -32,8 +32,8 @@ class DeviceManagerImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp() override;
+    void TearDown() override;
 };
 
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
@@ -50,37 +50,37 @@ class DevicePublishCallbackTest : public PublishCallback {
 public:
     DevicePublishCallbackTest() : PublishCallback() {}
     virtual ~DevicePublishCallbackTest() {}
-    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
 };
 
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
-    virtual void OnRemoteDied() override {}
+    virtual ~DmInitCallbackTest() {}
+    void OnRemoteDied() override {}
 };
 
 class DeviceStateCallbackTest : public DeviceStateCallback {
 public:
     DeviceStateCallbackTest() : DeviceStateCallback() {}
-    virtual ~DeviceStateCallbackTest() override {}
-    virtual void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
-    virtual void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
+    virtual ~DeviceStateCallbackTest() {}
+    void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
+    void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override {}
 };
 
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
     DeviceManagerFaCallbackTest() : DeviceManagerUiCallback() {}
-    virtual ~DeviceManagerFaCallbackTest() override {}
-    virtual void OnCall(const std::string &paramJson) override {}
+    virtual ~DeviceManagerFaCallbackTest() {}
+    void OnCall(const std::string &paramJson) override {}
 };
 
 class CredentialCallbackTest : public CredentialCallback {
 public:
     virtual ~CredentialCallbackTest() {}
-    virtual void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
+    void OnCredentialResult(int32_t &action, const std::string &credentialResult) override {}
 };
 
 class DeviceStatusCallbackTest : public DeviceStatusCallback {

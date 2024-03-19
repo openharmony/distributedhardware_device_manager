@@ -34,6 +34,7 @@ int SetParameter(const char *key, const char *value)
 int WatchParameter(const char *keyprefix, ParameterChgPtr callback, void *context)
 {
     (void)keyprefix;
+    (void)callback;
     (void)context;
     return 0;
 }

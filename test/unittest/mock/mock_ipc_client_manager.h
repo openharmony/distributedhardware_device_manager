@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class MockIpcClientManager : public IpcClientServerProxy {
 public:
-    explicit MockIpcClientManager (const sptr<IRemoteObject> &impl): IpcClientServerProxy(impl) {};
+    explicit MockIpcClientManager(const sptr<IRemoteObject> &impl): IpcClientServerProxy(impl) {};
     MOCK_METHOD3(SendCmd, int32_t(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp));
 };
 } // namespace DistributedHardware

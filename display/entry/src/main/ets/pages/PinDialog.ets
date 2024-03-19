@@ -27,7 +27,7 @@ const MSG_CANCEL_PIN_CODE_SHOW: number = 2;
 struct PinCustomDialog {
   @State messageTitle: string = '连接码';
   @State pinCode: string = '';
-  @State cancel_str: string = '取消';
+  @State cancelStr: string = '取消';
   @State pinCodeArr: Array<string> = [];
   @State btnColor: ResourceColor = Color.Transparent;
   @State isPC: boolean = false;
@@ -106,7 +106,7 @@ struct PinCustomDialog {
           .margin({ bottom: this.isPC ? 16 : 8 })
 
           Flex({ justifyContent: FlexAlign.Center }) {
-            Button(this.cancel_str)
+            Button(this.cancelStr)
               .fontSize($r('sys.float.ohos_id_text_size_button1'))
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .height(40)

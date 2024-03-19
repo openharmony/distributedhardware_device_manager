@@ -29,7 +29,7 @@ static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MAX_LATENCY, .value = 10000 },
     { .qos = QOS_TYPE_MIN_LATENCY, .value = 2500 },
 };
-static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
+static uint32_t g_qosTVParamIndex = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
 }
 IMPLEMENT_SINGLE_INSTANCE(SoftbusAdapter);
 static void DmOnSoftbusSessionBind(int32_t socket, PeerSocketInfo info)
@@ -72,6 +72,7 @@ SoftbusAdapter::SoftbusAdapter()
     iSocketListener_.OnMessage = DmOnMessageReceived;
     iSocketListener_.OnStream = DmOnStreamReceived;
     iSocketListener_.OnQos = DmOnQosEvent;
+    iSocketListener_.OnFile = nullptr;
 }
 
 SoftbusAdapter::~SoftbusAdapter()
@@ -92,7 +93,7 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgname, c
         LOGE("[SOFTBUS]create socket failed, socket: %d", socket);
         return ERR_DM_FAILED;
     }
-    int32_t ret = Listen(socket, g_qosInfo, g_QosTV_Param_Index, &iSocketListener_);
+    int32_t ret = Listen(socket, g_qosInfo, g_qosTVParamIndex, &iSocketListener_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]Socket Listen failed, ret: %d, socket: %d.", ret, socket);
         Shutdown(socket);

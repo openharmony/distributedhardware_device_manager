@@ -238,6 +238,10 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
             LOGE("DecodeRequestAuth jsonStr error");
             return;
         }
+        if (!IsString(jsonObject, TAG_GROUP_ID)) {
+            LOGE("err json string.");
+            return;
+        }
         groupId = jsonObject[TAG_GROUP_ID].get<std::string>();
         json[TAG_NET_ID] = authResponseContext_->networkId;
         json[TAG_REQUEST_ID] = authResponseContext_->requestId;

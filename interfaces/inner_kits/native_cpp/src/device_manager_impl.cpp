@@ -1550,7 +1550,7 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("ImportAuthCode start, authCode: %s", GetAnonyString(authCode).c_str());
-    int32_t length = authCode.length();
+    int32_t length = static_cast<int32_t>(authCode.length());
     if (length != DM_IMPORT_AUTH_CODE_LENGTH) {
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
         return ERR_DM_INPUT_PARA_INVALID;

@@ -32,7 +32,7 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
-        AppStorage.setOrCreate('inputSession',session);
+        AppStorage.setOrCreate('inputSession', session);
     }
 
     onSessionDestroy(session: UIExtensionContentSession) {
