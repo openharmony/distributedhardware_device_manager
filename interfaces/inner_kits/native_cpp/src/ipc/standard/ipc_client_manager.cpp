@@ -70,12 +70,12 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
-    SubscribeDMSAChangeListener();
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
+    SubscribeDMSAChangeListener();
     int32_t ret = ClientInit();
     if (ret != DM_OK) {
         LOGE("InitDeviceManager Failed with ret %d", ret);
