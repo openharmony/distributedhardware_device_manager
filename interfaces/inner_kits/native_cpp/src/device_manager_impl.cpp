@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2089,6 +2089,37 @@ int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::st
         return ret;
     }
     LOGI("DeviceManagerImpl::DpAclAdd completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
+                                                  int32_t &securityLevel)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("DeviceManagerImpl::GetDeviceSecurityLevel error: pkgName: %s, networkId: %s", pkgName.c_str(),
+             GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerImpl::GetDeviceSecurityLevel start: pkgName: %s, networkId: %s", pkgName.c_str(),
+         GetAnonyString(networkId).c_str());
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_SECURITY_LEVEL, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("GetDeviceSecurityLevel Send Request failed ret: %d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetDeviceSecurityLevel Failed with ret %d", ret);
+        return ret;
+    }
+    securityLevel = rsp->GetSecurityLevel();
     return DM_OK;
 }
 } // namespace DistributedHardware
