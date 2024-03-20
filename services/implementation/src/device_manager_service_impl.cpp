@@ -85,11 +85,11 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (userId > 0) {
         LOGI("get current account user id success");
         MultipleUserConnector::SetSwitchOldUserId(userId);
+        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     SubscribeCommonEvent();
 #endif
-
     LOGI("Init success, singleton initialized");
     return DM_OK;
 }
