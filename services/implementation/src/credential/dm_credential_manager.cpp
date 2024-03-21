@@ -120,7 +120,7 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
     std::lock_guard<std::mutex> autoLock(locks_);
     std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);
     if (iter == credentialVec_.end()) {
-        LOGE("credentialInfo not found by pkgName %s", GetAnonyString(pkgName).c_str());
+        LOGE("credentialInfo not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return ERR_DM_FAILED;
     }
     pkgName_ = pkgName;
@@ -210,7 +210,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
     std::lock_guard<std::mutex> autoLock(locks_);
     std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);
     if (iter == credentialVec_.end()) {
-        LOGE("credentialInfo not found by pkgName %s", GetAnonyString(pkgName).c_str());
+        LOGE("credentialInfo not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return ERR_DM_FAILED;
     }
     pkgName_ = pkgName;
@@ -246,7 +246,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
 
 void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &resultInfo)
 {
-    LOGI("DmCredentialManager::OnGroupResultExt action %d, resultInfo %s.", action, resultInfo.c_str());
+    LOGI("DmCredentialManager::OnGroupResultExt action %{public}d, resultInfo %{public}s.", action, resultInfo.c_str());
     listener_->OnCredentialResult(pkgName_, action, resultInfo);
 }
 
@@ -266,7 +266,7 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
         LOGE("DmCredentialManager::RegisterCredentialCallback input param is empty");
         return ERR_DM_FAILED;
     }
-    LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %s", GetAnonyString(pkgName).c_str());
+    LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %{public}s", GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         credentialVec_.push_back(pkgName);
@@ -280,7 +280,8 @@ int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkg
         LOGE("DmCredentialManager::UnRegisterCredentialStateCallback input param is empty");
         return ERR_DM_FAILED;
     }
-    LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName = %s", GetAnonyString(pkgName).c_str());
+    LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName = %{public}s",
+        GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         std::vector<std::string>::iterator iter = std::find(credentialVec_.begin(), credentialVec_.end(), pkgName);

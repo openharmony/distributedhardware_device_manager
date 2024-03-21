@@ -54,14 +54,14 @@ int32_t PinHolderSession::OpenSessionServer(const PeerTargetId &targetId)
     int32_t sessionId = -1;
     ConnectionAddr addrInfo;
     if (GetAddrByTargetId(targetId, addrInfo) != DM_OK) {
-        LOGE("[SOFTBUS]open session error, sessionId: %d.", sessionId);
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
     }
     sessionId = ::OpenAuthSession(DM_PIN_HOLDER_SESSION_NAME, &addrInfo, 1, nullptr);
     if (sessionId < 0) {
-        LOGE("[SOFTBUS]open session error, sessionId: %d.", sessionId);
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
         return sessionId;
     }
-    LOGI("OpenAuthSession success. sessionId: %d.", sessionId);
+    LOGI("OpenAuthSession success. sessionId: %{public}d.", sessionId);
     return sessionId;
 }
 
@@ -80,13 +80,13 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
     }
     int32_t sessionSide = GetSessionSide(sessionId);
     pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
-    LOGI("OnSessionOpened, success, sessionId: %d.", sessionId);
+    LOGI("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
 
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
-    LOGI("[SOFTBUS]OnSessionClosed sessionId: %d", sessionId);
+    LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
@@ -98,14 +98,15 @@ void PinHolderSession::OnSessionClosed(int sessionId)
 void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
-        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
+        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
+            dataLen);
         return;
     }
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
     }
-    LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     pinholderSessionCallback_->OnDataReceived(sessionId, message);
     return;
@@ -115,7 +116,7 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
 {
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("extrasJson error, message: %s.", GetAnonyString(message).c_str());
+        LOGE("extrasJson error, message: %{public}s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
@@ -123,10 +124,10 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
-    LOGI("start, msgType: %d.", msgType);
+    LOGI("start, msgType: %{public}d.", msgType);
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     return ret;

@@ -68,7 +68,8 @@ void MineHiChainConnector::onFinish(int64_t requestId, int operationCode, const 
         g_createGroupNotify.notify_one();
         LOGI("Create group success");
     }
-    LOGI("OnFinish callback complete with requestId: %lld, operation: %d.", requestId, operationCode);
+    LOGI("OnFinish callback complete with requestId: %{public}" PRId64 ", operation: %{public}d.", requestId,
+        operationCode);
 }
 
 void MineHiChainConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
@@ -81,15 +82,15 @@ void MineHiChainConnector::onError(int64_t requestId, int operationCode, int err
         g_createGroupNotify.notify_one();
         LOGI("failed to create group");
     }
-    LOGI("OnError callback complete with requestId: %lld, operation: %d, errorCode: %d.", requestId, operationCode,
-         errorCode);
+    LOGI("OnError callback complete with requestId: %{public}" PRId64 ", operation: %{public}d, errorCode: %{public}d.",
+        requestId, operationCode, errorCode);
 }
 
 int32_t MineHiChainConnector::Init(void)
 {
     int retValue = InitDeviceAuthService();
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to init device auth service with ret:%d.", retValue);
+        LOGE("failed to init device auth service with ret:%{public}d.", retValue);
         return ERR_DM_FAILED;
     }
     g_deviceGroupManager = GetGmInstance();
@@ -100,11 +101,11 @@ int32_t MineHiChainConnector::Init(void)
 #if (defined(MINE_HARMONY))
     retValue = g_deviceGroupManager->unRegCallback(DM_PKG_NAME);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to register callback function to hichain with ret:%d.", retValue);
+        LOGE("failed to register callback function to hichain with ret:%{public}d.", retValue);
     }
     retValue = g_deviceGroupManager->regCallback(DM_PKG_NAME, &g_deviceAuthCallback);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to register callback function to hichain with ret:%d.", retValue);
+        LOGE("failed to register callback function to hichain with ret:%{public}d.", retValue);
         return ERR_DM_FAILED;
     }
 #endif
@@ -139,7 +140,7 @@ int32_t MineHiChainConnector::DeleteCredentialAndGroup(void)
     char *returnInfo = nullptr;
     int32_t retValue = g_deviceGroupManager->processCredential(DELETE_SELF_CREDENTIAL, params.c_str(), &returnInfo);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to delete hichain credential and group with ret:%d.", retValue);
+        LOGE("failed to delete hichain credential and group with ret:%{public}d.", retValue);
         return ERR_DM_FAILED;
     }
 #endif
@@ -162,7 +163,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
     }
     int32_t retValue = GetDevUdid(deviceUdid, DEVICE_UDID_LENGTH);
     if (retValue != 0) {
-        LOGE("failed to local device Udid with ret: %d", retValue);
+        LOGE("failed to local device Udid with ret: %{public}d", retValue);
         return ERR_DM_FAILED;
     }
 
@@ -174,7 +175,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
     std::string createParams = jsonObj.dump();
     retValue = g_deviceGroupManager->createGroup(DEFAULT_OS_ACCOUNT, requestId, DM_PKG_NAME, createParams.c_str());
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to create group with ret:%d.", retValue);
+        LOGE("failed to create group with ret:%{public}d.", retValue);
         return ERR_DM_FAILED;
     }
 
@@ -200,13 +201,13 @@ int MineHiChainConnector::RequestCredential(std::string &returnJsonStr)
     char *returnInfo = nullptr;
     int32_t retValue = g_deviceGroupManager->getRegisterInfo(&returnInfo);
     if (retValue != HC_SUCCESS || returnInfo == nullptr) {
-        LOGE("failed to request hichain credential with ret:%d.", retValue);
+        LOGE("failed to request hichain credential with ret:%{public}d.", retValue);
         return ERR_DM_HICHAIN_GET_REGISTER_INFO;
     }
     returnJsonStr = returnInfo;
     g_deviceGroupManager->destroyInfo(&returnInfo);
 #endif
-    LOGI("request hichain device credential successfully with JsonStrLen:%u.", returnJsonStr.size());
+    LOGI("request hichain device credential successfully with JsonStrLen:%{public}zu", returnJsonStr.size());
     return DM_OK;
 }
 
@@ -222,13 +223,13 @@ int MineHiChainConnector::CheckCredential(std::string reqJsonStr, std::string &r
     int32_t retValue = g_deviceGroupManager->processCredential(QUERY_SELF_CREDENTIAL_INFO,
         reqJsonStr.c_str(), &returnInfo);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to check device credential info with ret:%d.", retValue);
+        LOGE("failed to check device credential info with ret:%{public}d.", retValue);
         return ERR_DM_HICHAIN_GET_REGISTER_INFO;
     }
     returnJsonStr = returnInfo;
     g_deviceGroupManager->destroyInfo(&returnInfo);
 #endif
-    LOGI("check device credential info successfully with JsonStrLen:%u.", returnJsonStr.size());
+    LOGI("check device credential info successfully with JsonStrLen:%{public}zu", returnJsonStr.size());
     return DM_OK;
 }
 
@@ -249,7 +250,7 @@ int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &
     }
     int32_t retValue = g_deviceGroupManager->regCallback(DM_PKG_NAME, &g_deviceAuthCallback);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to register callback function to hichain with ret:%d.", retValue);
+        LOGE("failed to register callback function to hichain with ret:%{public}d.", retValue);
         return ERR_DM_HICHAIN_REGISTER_CALLBACK;
     }
     LOGI("start to import device credential info to hichain.");
@@ -257,7 +258,7 @@ int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &
     char *returnInfo = nullptr;
     retValue = g_deviceGroupManager->processCredential(IMPORT_SELF_CREDENTIAL, reqJsonStr.c_str(), &returnInfo);
     if (retValue != HC_SUCCESS) {
-        LOGE("failed to import hichain credential with ret:%d.", retValue);
+        LOGE("failed to import hichain credential with ret:%{public}d.", retValue);
         return ERR_DM_HICHAIN_GROUP_CREATE_FAILED;
     }
     if (CreateGroup(reqJsonStr) != DM_OK) {
@@ -300,7 +301,7 @@ bool MineHiChainConnector::IsCredentialExist(void)
     int32_t retValue = g_deviceGroupManager->processCredential(QUERY_SELF_CREDENTIAL_INFO,
         reqJsonStr.c_str(), &returnInfo);
     if (retValue != HC_SUCCESS || returnInfo == nullptr) {
-        LOGE("failed to check device credential info with ret:%d.", retValue);
+        LOGE("failed to check device credential info with ret:%{public}d.", retValue);
         return resultFlag;
     }
 
@@ -311,7 +312,7 @@ bool MineHiChainConnector::IsCredentialExist(void)
             break;
         }
         if (!jsonObject.contains(FIELD_CREDENTIAL_EXISTS) || !jsonObject[FIELD_CREDENTIAL_EXISTS].is_boolean()) {
-            LOGE("failed to get key:%s from import json object.", FIELD_CREDENTIAL_EXISTS);
+            LOGE("failed to get key:%{public}s from import json object.", FIELD_CREDENTIAL_EXISTS);
             break;
         }
         if (!jsonObject[FIELD_CREDENTIAL_EXISTS]) {

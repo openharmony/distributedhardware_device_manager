@@ -16,28 +16,26 @@
 #ifndef OHOS_DM_LOG_H
 #define OHOS_DM_LOG_H
 
+#include "hilog/log.h"
+#include <inttypes.h>
+
 namespace OHOS {
 namespace DistributedHardware {
-typedef enum {
-    DM_LOG_DEBUG,
-    DM_LOG_INFO,
-    DM_LOG_WARN,
-    DM_LOG_ERROR,
-} DmLogLevel;
+#undef LOG_TAG
+#define LOG_TAG "DHDM"
 
-void DmLog(DmLogLevel logLevel, const char *fmt, ...);
+#define LOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define LOGD(fmt, ...) \
-    DmLog(DM_LOG_DEBUG, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define LOGI(fmt, ...) HILOG_INFO(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define LOGI(fmt, ...) \
-    DmLog(DM_LOG_INFO, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define LOGW(fmt, ...) HILOG_WARN(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define LOGW(fmt, ...) \
-    DmLog(DM_LOG_WARN, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define LOGE(fmt, ...) HILOG_ERROR(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define LOGE(fmt, ...) \
-    DmLog(DM_LOG_ERROR, (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_LOG_H

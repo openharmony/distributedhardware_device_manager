@@ -89,12 +89,12 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgname, c
     };
     int32_t socket = Socket(info);
     if (socket <= 0) {
-        LOGE("[SOFTBUS]create socket failed, socket: %d", socket);
+        LOGE("[SOFTBUS]create socket failed, socket: %{public}d", socket);
         return ERR_DM_FAILED;
     }
     int32_t ret = Listen(socket, g_qosInfo, g_QosTV_Param_Index, &iSocketListener_);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]Socket Listen failed, ret: %d, socket: %d.", ret, socket);
+        LOGE("[SOFTBUS]Socket Listen failed, ret: %{public}d, socket: %{public}d.", ret, socket);
         Shutdown(socket);
         return ERR_DM_FAILED;
     }
@@ -115,20 +115,20 @@ int32_t SoftbusAdapter::RemoveSoftbusSessionServer(const std::string &pkgname, c
 
 void SoftbusAdapter::OnSoftbusSessionOpened(int32_t socket, PeerSocketInfo info)
 {
-    LOGI("SoftbusAdapter::OnSoftbusSessionOpened socket: %d", socket);
+    LOGI("SoftbusAdapter::OnSoftbusSessionOpened socket: %{public}d", socket);
     DeviceManagerService::GetInstance().OnUnbindSessionOpened(socket, info);
 }
 
 void SoftbusAdapter::OnSoftbusSessionClosed(int32_t socket, ShutdownReason reason)
 {
     (void)reason;
-    LOGI("SoftbusAdapter::OnSoftbusSessionClosed socket: %d", socket);
+    LOGI("SoftbusAdapter::OnSoftbusSessionClosed socket: %{public}d", socket);
     DeviceManagerService::GetInstance().OnUnbindSessionCloseed(socket);
 }
 
 void SoftbusAdapter::OnBytesReceived(int32_t socket, const void *data, uint32_t dataLen)
 {
-    LOGI("SoftbusAdapter::OnBytesReceived socket: %d", socket);
+    LOGI("SoftbusAdapter::OnBytesReceived socket: %{public}d", socket);
     DeviceManagerService::GetInstance().OnUnbindBytesReceived(socket, data, dataLen);
 }
 
@@ -138,14 +138,14 @@ void SoftbusAdapter::OnStreamReceived(int32_t socket, const StreamData *data, co
     (void)data;
     (void)ext;
     (void)frameInfo;
-    LOGI("SoftbusAdapter::OnStreamReceived, socket: %d", socket);
+    LOGI("SoftbusAdapter::OnStreamReceived, socket: %{public}d", socket);
 }
 
 void SoftbusAdapter::OnMessageReceived(int32_t socket, const void *data, unsigned int dataLen) const
 {
     (void)data;
     (void)dataLen;
-    LOGI("SoftbusAdapter::OnMessageReceived, socket: %d", socket);
+    LOGI("SoftbusAdapter::OnMessageReceived, socket: %{public}d", socket);
 }
 
 void SoftbusAdapter::OnQosEvent(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t qosCount) const
@@ -153,7 +153,7 @@ void SoftbusAdapter::OnQosEvent(int32_t socket, QoSEvent eventId, const QosTV *q
     (void)eventId;
     (void)qos;
     (void)qosCount;
-    LOGI("SoftbusAdapter::OnQosEvent, socket: %d", socket);
+    LOGI("SoftbusAdapter::OnQosEvent, socket: %{public}d", socket);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

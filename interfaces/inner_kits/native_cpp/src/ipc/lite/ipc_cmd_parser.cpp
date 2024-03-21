@@ -470,7 +470,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply)
             DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, deviceInfo);
             break;
         default:
-            LOGE("unknown device state:%d", deviceState);
+            LOGE("unknown device state:%{public}d", deviceState);
             break;
     }
 }

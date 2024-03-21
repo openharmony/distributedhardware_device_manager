@@ -53,10 +53,11 @@ int32_t DmPublishManager::CheckPublishQueue(const std::string &pkgName)
     }
 
     if (pkgName == publishQueue_.front()) {
-        LOGE("DmPublishManager::pkgName : %s PublishDeviceDiscovery repeated", pkgName.c_str());
+        LOGE("DmPublishManager::pkgName : %{public}s PublishDeviceDiscovery repeated", pkgName.c_str());
         return ERR_DM_PUBLISH_REPEATED;
     } else {
-        LOGI("DmPublishManager::UnPublishDeviceDiscovery the preview pkgName : %s", publishQueue_.front().c_str());
+        LOGI("DmPublishManager::UnPublishDeviceDiscovery the preview pkgName : %{public}s",
+            publishQueue_.front().c_str());
         UnPublishDeviceDiscovery(publishQueue_.front(),
                                  publishContextMap_[publishQueue_.front()].publishInfo.publishId);
         return DM_OK;
@@ -103,7 +104,8 @@ void DmPublishManager::OnPublishResult(const std::string &pkgName, int32_t publi
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DmPublishManager::OnPublishResult, publishId = %d, publishResult = %d", publishId, publishResult);
+    LOGI("DmPublishManager::OnPublishResult, publishId = %{public}d, publishResult = %{public}d", publishId,
+        publishResult);
     if (publishResult != 0) {
         UnPublishDeviceDiscovery(pkgName, publishId);
     }
@@ -122,7 +124,7 @@ void DmPublishManager::HandlePublishTimeout(std::string name)
     std::string pkgName = publishQueue_.front();
     auto iter = publishContextMap_.find(pkgName);
     if (iter == publishContextMap_.end()) {
-        LOGE("HandleDiscoveryTimeout:pkgName %s fail to publish", GetAnonyString(pkgName).c_str());
+        LOGE("HandleDiscoveryTimeout:pkgName %{public}s fail to publish", GetAnonyString(pkgName).c_str());
         return;
     }
     UnPublishDeviceDiscovery(pkgName, iter->second.publishInfo.publishId);

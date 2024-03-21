@@ -37,7 +37,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     if (IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply) == DM_OK) {
         return DM_OK;
     }
-    LOGW("unsupported code: %u", code);
+    LOGW("unsupported code: %{public}u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
@@ -50,14 +50,14 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
-    LOGI("SendCmd cmdCode: %d", cmdCode);
+    LOGI("SendCmd cmdCode: %{public}d", cmdCode);
 
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
-    LOGI("cmdCode = %d, flags = %d.", cmdCode, option.GetFlags());
+    LOGI("cmdCode = %{public}d, flags = %{public}d.", cmdCode, option.GetFlags());
     if (IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply) == DM_OK) {
         LOGE("on ipc cmd success");
         return DM_OK;

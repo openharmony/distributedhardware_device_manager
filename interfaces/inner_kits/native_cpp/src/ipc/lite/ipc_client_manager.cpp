@@ -44,12 +44,13 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     req->SetSvcIdentity(IpcClientStub::GetInstance().GetSvcIdentity());
     int32_t ret = serverProxy_.SendCmd(REGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
     if (ret != DM_OK) {
-        LOGE("InitDeviceManager: RegisterDeviceManagerListener Failed with ret %d", ret);
+        LOGE("InitDeviceManager: RegisterDeviceManagerListener Failed with ret %{public}d", ret);
         return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::InitDeviceManager completed, pkgName: %s, ret = %d", pkgName.c_str(), ret);
+        LOGE("DeviceManager::InitDeviceManager completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
+            ret);
         return ret;
     }
     packageInitSet_.emplace(pkgName);
@@ -58,7 +59,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
 
 int32_t IpcClientManager::UnInit(const std::string &pkgName)
 {
-    LOGI("UnInitDeviceManager in, pkgName %s", pkgName.c_str());
+    LOGI("UnInitDeviceManager in, pkgName %{public}s", pkgName.c_str());
     if (!IsInit(pkgName)) {
         return ERR_DM_FAILED;
     }
@@ -67,12 +68,13 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     req->SetPkgName(pkgName);
     int32_t ret = serverProxy_.SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
     if (ret != DM_OK) {
-        LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
+        LOGE("UnRegisterDeviceManagerListener Failed with ret %{public}d", ret);
         return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::UnInitDeviceManager completed, pkgName: %s, ret = %d", pkgName.c_str(), ret);
+        LOGE("DeviceManager::UnInitDeviceManager completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
+            ret);
         return ret;
     }
     packageInitSet_.erase(pkgName);

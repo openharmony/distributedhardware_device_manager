@@ -74,7 +74,7 @@ AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
     AAFwk::AbilityManagerClient::GetInstance()->Connect();
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (result != 0) {
-        LOGE("Start Ability failed, error value = %d", (int32_t)result);
+        LOGE("Start Ability failed, error value = %{public}d", (int32_t)result);
         return AbilityStatus::ABILITY_STATUS_FAILED;
     }
     return AbilityStatus::ABILITY_STATUS_SUCCESS;

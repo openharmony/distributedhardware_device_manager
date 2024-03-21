@@ -41,21 +41,22 @@ constexpr int32_t INTERCEPT_STRING_LENGTH = 20;
 
 static void OnShutdown(int32_t socket, ShutdownReason reason)
 {
-    LOGI("[SOFTBUS]OnShutdown socket : %d, reason: %d", socket, (int32_t)reason);
+    LOGI("[SOFTBUS]OnShutdown socket : %{public}d, reason: %{public}d", socket, (int32_t)reason);
     SoftbusSession::OnSessionClosed(socket);
 }
 
 static void OnBytes(int32_t socket, const void *data, uint32_t dataLen)
 {
-    LOGI("[SOFTBUS]OnBytes socket : %d", socket);
+    LOGI("[SOFTBUS]OnBytes socket : %{public}d", socket);
     SoftbusSession::OnBytesReceived(socket, data, dataLen);
 }
 
 static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t qosCount)
 {
-    LOGI("[SOFTBUS]OnQos, socket: %d, QoSEvent: %d, qosCount: %u", socket, (int32_t)eventId, qosCount);
+    LOGI("[SOFTBUS]OnQos, socket: %{public}d, QoSEvent: %{public}d, qosCount: %{public}u", socket, (int32_t)eventId,
+        qosCount);
     for (uint32_t idx = 0; idx < qosCount; idx++) {
-        LOGI("QosTV: type: %d, value: %d", (int32_t)qos[idx].qos, qos[idx].value);
+        LOGI("QosTV: type: %{public}d, value: %{public}d", (int32_t)qos[idx].qos, qos[idx].value);
     }
 }
 
@@ -91,16 +92,16 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
     std::string connectAddr;
     ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(deviceId, connectAddr);
     if (addrInfo == nullptr) {
-        LOGE("[SOFTBUS]addrInfo is nullptr. sessionId: %d.", sessionId);
+        LOGE("[SOFTBUS]addrInfo is nullptr. sessionId: %{public}d.", sessionId);
         return sessionId;
     }
     sessionId = ::OpenAuthSession(DM_SESSION_NAME, addrInfo, 1, nullptr);
     if (sessionId < 0) {
-        LOGE("[SOFTBUS]open session error, sessionId: %d.", sessionId);
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
         return sessionId;
     }
     DmTraceEnd();
-    LOGI("OpenAuthSession success. sessionId: %d.", sessionId);
+    LOGI("OpenAuthSession success. sessionId: %{public}d.", sessionId);
     return sessionId;
 }
 
@@ -124,11 +125,11 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
     int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
     if (ret == DM_OK) {
         peerDevId = peerDeviceId;
-        LOGI("[SOFTBUS]GetPeerDeviceId success for session: %d, peerDeviceId: %s.", sessionId,
+        LOGI("[SOFTBUS]GetPeerDeviceId success for session: %{public}d, peerDeviceId: %{public}s.", sessionId,
             GetAnonyString(peerDevId).c_str());
         return ERR_DM_FAILED;
     }
-    LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %d, ret: %d.", sessionId, ret);
+    LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d, ret: %{public}d.", sessionId, ret);
     peerDevId = "";
     return DM_OK;
 }
@@ -137,7 +138,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
-        LOGE("extrasJson error, message: %s.", GetAnonyString(message).c_str());
+        LOGE("extrasJson error, message: %{public}s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
@@ -145,7 +146,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
-    LOGI("start, msgType: %d.", msgType);
+    LOGI("start, msgType: %{public}d.", msgType);
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SendData Start encryption.");
     }
@@ -170,22 +171,23 @@ int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
     sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
-    LOGD("OnSessionOpened, success, sessionId: %d.", sessionId);
+    LOGD("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
 
 void SoftbusSession::OnSessionClosed(int sessionId)
 {
-    LOGD("OnSessionClosed, sessionId: %d.", sessionId);
+    LOGD("OnSessionClosed, sessionId: %{public}d.", sessionId);
 }
 
 void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
-        LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %d, dataLen: %d.", sessionId, dataLen);
+        LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
+            dataLen);
         return;
     }
-    LOGI("start, sessionId: %d, dataLen: %d.", sessionId, dataLen);
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("Start decryption.");
     }
@@ -211,7 +213,7 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
 void SoftbusSession::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
 {
     sessionCallback_->OnUnbindSessionOpened(socket, info);
-    LOGI("SoftbusSession::OnUnbindSessionOpened success, socket: %d.", socket);
+    LOGI("SoftbusSession::OnUnbindSessionOpened success, socket: %{public}d.", socket);
 }
 
 int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
@@ -227,18 +229,19 @@ int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
 
     int32_t socket = Socket(info);
     if (socket <= 0) {
-        LOGE("[SOFTBUS]create socket failed, socket: %d", socket);
+        LOGE("[SOFTBUS]create socket failed, socket: %{public}d", socket);
         return ERR_DM_FAILED;
     }
 
     int32_t ret = Bind(socket, g_qosInfo, g_QosTV_Param_Index, &iSocketListener_);
     if (ret < DM_OK) {
-        LOGE("[SOFTBUS]OpenUnbindSession failed, netWorkId: %s, socket: %d", GetAnonyString(netWorkId).c_str(), socket);
+        LOGE("[SOFTBUS]OpenUnbindSession failed, netWorkId: %{public}s, socket: %{public}d",
+            GetAnonyString(netWorkId).c_str(), socket);
         sessionCallback_->BindSocketFail();
         Shutdown(socket);
         return ERR_DM_FAILED;
     }
-    LOGI("OpenUnbindSession success. socket: %d.", socket);
+    LOGI("OpenUnbindSession success. socket: %{public}d.", socket);
     sessionCallback_->BindSocketSuccess(socket);
     return socket;
 }

@@ -168,7 +168,7 @@ static TaskConfig GetTaskConfig(Service *service)
 
 static int32_t OnRemoteRequestLite(IServerProxy *iProxy, int32_t funcId, void *origin, IpcIo *req, IpcIo *reply)
 {
-    LOGI("Receive funcId:%d", funcId);
+    LOGI("Receive funcId:%{public}d", funcId);
     (void)origin;
     return IpcCmdRegister::GetInstance().OnIpcServerCmd(funcId, *req, *reply);
 }
@@ -199,14 +199,14 @@ static void DevMgrSvcInit(void)
     };
 
     if (!SAMGR_GetInstance()->RegisterService((Service *)&service)) {
-        LOGE("%s, RegisterService failed", DEVICE_MANAGER_SERVICE_NAME);
+        LOGE("%{public}s, RegisterService failed", DEVICE_MANAGER_SERVICE_NAME);
         return;
     }
     if (!SAMGR_GetInstance()->RegisterDefaultFeatureApi(DEVICE_MANAGER_SERVICE_NAME, GET_IUNKNOWN(service))) {
-        LOGE("%s, RegisterDefaultFeatureApi failed", DEVICE_MANAGER_SERVICE_NAME);
+        LOGE("%{public}s, RegisterDefaultFeatureApi failed", DEVICE_MANAGER_SERVICE_NAME);
         return;
     }
-    LOGI("%s, init success", DEVICE_MANAGER_SERVICE_NAME);
+    LOGI("%{public}s, init success", DEVICE_MANAGER_SERVICE_NAME);
 }
 
 SYSEX_SERVICE_INIT(DevMgrSvcInit);
