@@ -25,6 +25,12 @@ extern "C" {
 int InitHichainModle(void);
 int UnInitHichainModle(void);
 int GetAuthFormByDeviceId(const char *deviceId, int authForm);
+bool IsHichainCredentialExist(void);
+int RequestHichainCredential(char **returnJsonStr);
+void FreeHichainJsonStringMemory(char **jsonStr);
+int CheckHichainCredential(const char *reqJsonStr, char **returnJsonStr);
+int ImportHichainCredential(const char *reqJsonStr, char **returnJsonStr);
+int DeleteHichainCredential(const char *reqJsonStr, char **returnJsonStr);
 
 #ifdef __cplusplus
 }
