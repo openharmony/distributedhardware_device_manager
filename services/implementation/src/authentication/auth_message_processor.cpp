@@ -96,7 +96,8 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
-        LOGI("TAG_APP_THUMBNAIL encode, idx %d, sliceLen %d, thumbnailSize %d", idx, (uint32_t)sliceLen, thumbnailSize);
+        LOGI("TAG_APP_THUMBNAIL encode, idx %{public}d, sliceLen %{public}d, thumbnailSize %{public}d", idx,
+            (uint32_t)sliceLen, thumbnailSize);
         jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
         jsonStrVec.push_back(jsonThumbnailObj.dump());
     }
@@ -105,7 +106,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 
 std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
 {
-    LOGI("AuthMessageProcessor::CreateSimpleMessage start. msgType is %d", msgType);
+    LOGI("AuthMessageProcessor::CreateSimpleMessage start. msgType is %{public}d", msgType);
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = msgType;
@@ -232,7 +233,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
     json[TAG_TOKEN] = authResponseContext_->token;
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
-        LOGI("AuthMessageProcessor::CreateResponseAuthMessage groupId %s", GetAnonyString(groupId).c_str());
+        LOGI("AuthMessageProcessor::CreateResponseAuthMessage groupId %{public}s", GetAnonyString(groupId).c_str());
         nlohmann::json jsonObject = nlohmann::json::parse(groupId, nullptr, false);
         if (jsonObject.is_discarded()) {
             LOGE("DecodeRequestAuth jsonStr error");
@@ -244,7 +245,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
         json[TAG_GROUP_ID] = groupId;
         json[TAG_GROUP_NAME] = authResponseContext_->groupName;
         json[TAG_AUTH_TOKEN] = authResponseContext_->authToken;
-        LOGI("AuthMessageProcessor::CreateResponseAuthMessage %s, %s", GetAnonyString(groupId).c_str(),
+        LOGI("AuthMessageProcessor::CreateResponseAuthMessage %{public}s, %{public}s", GetAnonyString(groupId).c_str(),
             GetAnonyString(authResponseContext_->groupName).c_str());
     }
 }
@@ -267,7 +268,7 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
     authResponseContext_->msgType = msgType;
-    LOGI("AuthMessageProcessor::ParseMessage message type %d", authResponseContext_->msgType);
+    LOGI("AuthMessageProcessor::ParseMessage message type %{public}d", authResponseContext_->msgType);
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
             ParseNegotiateMessage(jsonObject);
@@ -444,7 +445,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(nlohmann::json &json)
         if (IsString(json, TAG_NET_ID)) {
             authResponseContext_->networkId = json[TAG_NET_ID].get<std::string>();
         }
-        LOGI("AuthMessageProcessor::ParseAuthResponseMessage groupId = %s, groupName = %s",
+        LOGI("AuthMessageProcessor::ParseAuthResponseMessage groupId = %{public}s, groupName = %{public}s",
             GetAnonyString(authResponseContext_->groupId).c_str(),
             GetAnonyString(authResponseContext_->groupName).c_str());
     }
@@ -578,7 +579,7 @@ std::shared_ptr<DmAuthRequestContext> AuthMessageProcessor::GetRequestContext()
 
 std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen)
 {
-    LOGI("CreateDeviceAuthMessage start, msgType %d.", msgType);
+    LOGI("CreateDeviceAuthMessage start, msgType %{public}d.", msgType);
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = msgType;
     std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);

@@ -83,12 +83,12 @@ void DmConfigManager::ParseAdapterConfig()
         }
         soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
-        LOGI("soAdapterLoadInfo name is: %s", soLoadInfo[i].name.c_str());
-        LOGI("soAdapterLoadInfo type is: %s", soLoadInfo[i].type.c_str());
-        LOGI("soAdapterLoadInfo version is: %s", soLoadInfo[i].version.c_str());
-        LOGI("soAdapterLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
-        LOGI("soAdapterLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
-        LOGI("soAdapterLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
+        LOGI("soAdapterLoadInfo name is: %{public}s", soLoadInfo[i].name.c_str());
+        LOGI("soAdapterLoadInfo type is: %{public}s", soLoadInfo[i].type.c_str());
+        LOGI("soAdapterLoadInfo version is: %{public}s", soLoadInfo[i].version.c_str());
+        LOGI("soAdapterLoadInfo funcName is: %{public}s", soLoadInfo[i].funcName.c_str());
+        LOGI("soAdapterLoadInfo soName is: %{public}s", soLoadInfo[i].soName.c_str());
+        LOGI("soAdapterLoadInfo soPath is: %{public}s", soLoadInfo[i].soPath.c_str());
     }
 }
 
@@ -113,13 +113,13 @@ void DmConfigManager::ParseAuthConfig()
         }
         soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
-        LOGI("soAuthLoadInfo name is: %s", soLoadInfo[i].name.c_str());
-        LOGI("soAuthLoadInfo type is: %s", soLoadInfo[i].type.c_str());
-        LOGI("soAuthLoadInfo version is: %s", soLoadInfo[i].version.c_str());
-        LOGI("soAuthLoadInfo funcName is: %s", soLoadInfo[i].funcName.c_str());
-        LOGI("soAuthLoadInfo soName is: %s", soLoadInfo[i].soName.c_str());
-        LOGI("soAuthLoadInfo soPath is: %s", soLoadInfo[i].soPath.c_str());
-        LOGI("soAuthLoadInfo authType is: %d", soLoadInfo[i].authType);
+        LOGI("soAuthLoadInfo name is: %{public}s", soLoadInfo[i].name.c_str());
+        LOGI("soAuthLoadInfo type is: %{public}s", soLoadInfo[i].type.c_str());
+        LOGI("soAuthLoadInfo version is: %{public}s", soLoadInfo[i].version.c_str());
+        LOGI("soAuthLoadInfo funcName is: %{public}s", soLoadInfo[i].funcName.c_str());
+        LOGI("soAuthLoadInfo soName is: %{public}s", soLoadInfo[i].soName.c_str());
+        LOGI("soAuthLoadInfo soPath is: %{public}s", soLoadInfo[i].soPath.c_str());
+        LOGI("soAuthLoadInfo authType is: %{public}d", soLoadInfo[i].authType);
     }
 }
 
@@ -143,7 +143,7 @@ DmConfigManager::~DmConfigManager()
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
         if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
             (realpath(soPathName.c_str(), path) == nullptr)) {
-            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
         so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
@@ -157,7 +157,7 @@ DmConfigManager::~DmConfigManager()
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
         if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
             (realpath(soPathName.c_str(), path) == nullptr)) {
-            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
         so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
@@ -193,12 +193,12 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
     std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
     if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
         (realpath(soPathName.c_str(), path) == nullptr)) {
-        LOGE("File %s canonicalization failed.", soPathName.c_str());
+        LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
         return nullptr;
     }
     so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load crypto so %s failed", soName.c_str());
+        LOGE("load crypto so %{public}s failed", soName.c_str());
         return nullptr;
     }
 
@@ -228,12 +228,12 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
         std::string soPathName = (iter->second).soPath + (iter->second).soName;
         if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
             (realpath(soPathName.c_str(), path) == nullptr)) {
-            LOGE("File %s canonicalization failed.", soPathName.c_str());
+            LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
         so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
         if (so_handle == nullptr) {
-            LOGE("load auth so %s failed", (iter->second).soName.c_str());
+            LOGE("load auth so %{public}s failed", (iter->second).soName.c_str());
             continue;
         }
 
@@ -246,7 +246,7 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
 
         std::shared_ptr<IAuthentication> iAuthentication(func());
         authAdapter[iter->first] = iAuthentication;
-        LOGI("so name: %s, auth type: %d", (iter->second).soName.c_str(), iter->first);
+        LOGI("so name: %{public}s, auth type: %{public}d", (iter->second).soName.c_str(), iter->first);
     }
 }
 } // namespace DistributedHardware

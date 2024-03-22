@@ -46,7 +46,6 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dfx/lite/dm_hitrace.cpp",
         "${common_path}/src/dm_anonymous.cpp",
         "${common_path}/src/dm_error_message.cpp",
-        "${common_path}/src/dm_log.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
         "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
@@ -63,6 +62,7 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/openssl:libcrypto_shared",
       ]
@@ -76,6 +76,7 @@ if (defined(ohos_lite)) {
       "include/fwkload/standard",
       "include/appInfo/standard",
       "include/timer",
+      "${innerkits_path}/native_cpp/include",
       "${common_path}/include",
     ]
   }
@@ -93,7 +94,6 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
-      "${common_path}/src/dm_log.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",

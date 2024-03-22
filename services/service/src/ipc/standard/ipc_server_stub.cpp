@@ -60,7 +60,7 @@ void IpcServerStub::OnStart()
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnAddSystemAbility systemAbilityId:%d added!", systemAbilityId);
+    LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
     }
@@ -68,7 +68,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnRemoveSystemAbility systemAbilityId:%d removed!", systemAbilityId);
+    LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
     } else if (systemAbilityId == DISTRIBUTED_HARDWARE_SA_ID) {
@@ -108,7 +108,7 @@ int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     }
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(static_cast<int32_t>(code), data, reply);
     if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
-        LOGW("unsupported code: %d", code);
+        LOGW("unsupported code: %{public}d", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     return ret;
@@ -120,7 +120,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageParcel reply;
     MessageOption option;
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %d", (int32_t)cmdCode);
+        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %{public}d", (int32_t)cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
 
@@ -130,7 +130,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     }
     int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
     if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
-        LOGW("unsupported code: %d", cmdCode);
+        LOGW("unsupported code: %{public}d", cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
     return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
@@ -148,7 +148,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         return ERR_DM_POINT_NULL;
     }
 
-    LOGI("Register device manager listener for package name: %s", pkgName.c_str());
+    LOGI("Register device manager listener for package name: %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(pkgName);
     if (iter != dmListener_.end()) {
@@ -182,7 +182,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %s", pkgName.c_str());
+    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(pkgName);
     if (listenerIter == dmListener_.end()) {
@@ -211,7 +211,7 @@ int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
         auto listener = iter.second;
         req->SetPkgName(pkgName);
         if (listener == nullptr) {
-            LOGE("IpcServerStub::SendALL, listener is nullptr, pkgName : %s.", pkgName.c_str());
+            LOGE("IpcServerStub::SendALL, listener is nullptr, pkgName : %{public}s.", pkgName.c_str());
             continue;
         }
         listener->SendCmd(cmdCode, req, rsp);
@@ -267,10 +267,10 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
     std::string result("");
     int ret = DeviceManagerService::GetInstance().DmHiDumper(argsStr, result);
     if (ret != DM_OK) {
-        LOGE("Dump error, ret = %d", ret);
+        LOGE("Dump error, ret = %{public}d", ret);
     }
 
-    ret = dprintf(fd, "%s\n", result.c_str());
+    ret = dprintf(fd, "%{public}s\n", result.c_str());
     if (ret < 0) {
         LOGE("HiDumper dprintf error");
         ret = ERR_DM_FAILED;
@@ -281,7 +281,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
-    LOGI("AppDeathRecipient: OnRemoteDied for %s", pkgName.c_str());
+    LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
 }
 } // namespace DistributedHardware

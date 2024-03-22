@@ -53,7 +53,7 @@ DiscoveryManager::~DiscoveryManager()
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -69,7 +69,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
 
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
-        LOGI("EnableDiscoveryListener, input MetaType = %s in discoverParam map.", metaType.c_str());
+        LOGI("EnableDiscoveryListener, input MetaType = %{public}s in discoverParam map.", metaType.c_str());
     }
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
         dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
@@ -78,7 +78,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
-        LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %d.", ret);
+        LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
         return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
     }
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
@@ -88,14 +88,15 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
-    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %s.", pkgName.c_str());
+    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (extraParam.find(PARAM_KEY_META_TYPE) != extraParam.end()) {
-        LOGI("DisableDiscoveryListener, input MetaType = %s", (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+        LOGI("DisableDiscoveryListener, input MetaType = %{public}s",
+            (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     uint16_t subscribeId = DM_INVALID_FLAG_ID;
     if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end()) {
@@ -110,7 +111,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
                                            const std::map<std::string, std::string> &discoverParam,
                                            const std::map<std::string, std::string> &filterOptions)
 {
-    LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %s.", pkgName.c_str());
+    LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -151,7 +152,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(dmSubInfo, discoverParam) :
             StartDiscovering4MetaType(dmSubInfo, discoverParam);
     if (ret != DM_OK) {
-        LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
+        LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
@@ -163,7 +164,7 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
     LOGI("StartDiscovering for mine meta node process.");
     int32_t ret = mineSoftbusListener_->RefreshSoftbusLNN(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
-        LOGE("StartDiscovering for meta node process failed, ret = %d", ret);
+        LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
@@ -178,7 +179,7 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
-        LOGE("StartDiscoveringNoMetaType failed, softbus refresh lnn ret: %d.", ret);
+        LOGE("StartDiscoveringNoMetaType failed, softbus refresh lnn ret: %{public}d.", ret);
     }
     return ret;
 }
@@ -186,7 +187,7 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
 int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    LOGI("StartDiscovering for meta node process, input metaType = %s",
+    LOGI("StartDiscovering for meta node process, input metaType = %{public}s",
          (param.find(PARAM_KEY_META_TYPE)->second).c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
@@ -203,7 +204,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
             strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_CASTPLUS);
             break;
         default:
-            LOGE("StartDiscovering4MetaType failed, unsupport meta type : %d.", metaType);
+            LOGE("StartDiscovering4MetaType failed, unsupport meta type : %{public}d.", metaType);
             return ERR_DM_UNSUPPORTED_METHOD;
     }
 
@@ -214,14 +215,14 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, customData);
     if (ret != DM_OK) {
-        LOGE("StartDiscovering4MetaType failed, softbus refresh lnn ret: %d.", ret);
+        LOGE("StartDiscovering4MetaType failed, softbus refresh lnn ret: %{public}d.", ret);
     }
     return ret;
 }
 
 int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %s.", pkgName.c_str());
+    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -272,7 +273,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
 
 void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
 {
-    LOGI("DiscoveryManager::OnDiscoveringResult, subscribeId = %d, result = %d.", subscribeId, result);
+    LOGI("DiscoveryManager::OnDiscoveringResult, subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
     if (pkgName.empty() || (listener_ == nullptr)) {
         LOGE("DiscoveryManager::OnDiscoveringResult failed, IDeviceManagerServiceListener is null.");
         return;
@@ -342,7 +343,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
         frontPkgName = discoveryQueue_.front();
         frontSubscribeId = discoveryContextMap_[frontPkgName].subscribeId;
         if (pkgName == frontPkgName) {
-            LOGE("DiscoveryManager::HandleDiscoveryQueue repeated, pkgName : %s.", pkgName.c_str());
+            LOGE("DiscoveryManager::HandleDiscoveryQueue repeated, pkgName : %{public}s.", pkgName.c_str());
             return ERR_DM_DISCOVERY_REPEATED;
         }
     }
@@ -372,7 +373,8 @@ void DiscoveryManager::HandleDiscoveryTimeout(std::string name)
         pkgName = discoveryQueue_.front();
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s.", GetAnonyString(pkgName).c_str());
+            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %{public}s.",
+                GetAnonyString(pkgName).c_str());
             return;
         }
         subscribeId = discoveryContextMap_[pkgName].subscribeId;
@@ -384,7 +386,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     bool &isOnline, int32_t &authForm)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("Get deviceId = %s isOnline and authForm.", GetAnonyString(deviceId).c_str());
+    LOGI("Get deviceId = %{public}s isOnline and authForm.", GetAnonyString(deviceId).c_str());
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = static_cast<std::string>(localDeviceId);
@@ -419,12 +421,12 @@ bool DiscoveryManager::IsCommonDependencyReady()
     char path[PATH_MAX + 1] = {0x00};
     std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_COMDENPENDENCY_NAME);
     if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %s canonicalization failed.", soName.c_str());
+        LOGE("File %{public}s canonicalization failed.", soName.c_str());
         return false;
     }
     dpConnectorHandle_ = dlopen(path, RTLD_NOW | RTLD_NODELETE);
     if (dpConnectorHandle_ == nullptr) {
-        LOGE("load libdevicemanagerdependency so %s failed, errMsg: %s.", soName.c_str(), dlerror());
+        LOGE("load libdevicemanagerdependency so %{public}s failed, errMsg: %{public}s.", soName.c_str(), dlerror());
         return false;
     }
     dlerror();
@@ -450,7 +452,7 @@ bool DiscoveryManager::CloseCommonDependencyObj()
 
     int32_t ret = dlclose(dpConnectorHandle_);
     if (ret != 0) {
-        LOGE("close libdevicemanagerdependency failed ret = %d.", ret);
+        LOGE("close libdevicemanagerdependency failed ret = %{public}d.", ret);
         return false;
     }
     isSoLoaded_ = false;

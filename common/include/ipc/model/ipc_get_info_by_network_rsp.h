@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,10 +86,31 @@ public:
         networkType_ = networkType;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::GetNetworkType
+     * @tc.desc: Get NetworkType for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
+    int32_t GetSecurityLevel() const
+    {
+        return securityLevel_;
+    }
+
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetNetworkType
+     * @tc.desc: Set NetworkType for Ipc to get information through NetWorkRsp
+     * @tc.type: FUNC
+     */
+    void SetSecurityLevel(const int32_t &securityLevel)
+    {
+        securityLevel_ = securityLevel;
+    }
+
 private:
     std::string udid_;
     std::string uuid_;
     int32_t networkType_;
+    int32_t securityLevel_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

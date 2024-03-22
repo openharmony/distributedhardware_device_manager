@@ -45,7 +45,7 @@ DmTimer::~DmTimer()
 
 int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
-    LOGI("DmTimer StartTimer %s", name.c_str());
+    LOGI("DmTimer StartTimer %{public}s", name.c_str());
     if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
         LOGI("DmTimer StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -78,7 +78,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    LOGI("DmTimer DeleteTimer name %s", timerName.c_str());
+    LOGI("DmTimer DeleteTimer name %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     for (auto iter : timerVec_) {
         if (iter->timerName_ == timerName) {
@@ -93,7 +93,7 @@ int32_t DmTimer::DeleteAll()
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
     for (auto iter : timerVec_) {
-        LOGI("DmTimer DeleteAll timer.name = %s ", iter->timerName_.c_str());
+        LOGI("DmTimer DeleteAll timer.name = %{public}s ", iter->timerName_.c_str());
         iter->state_ = false;
     }
     return DM_OK;
@@ -118,7 +118,7 @@ int32_t DmTimer::TimerRunning()
                 timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_ ||
                 !timerQueue_.top()->state_)) {
                 std::string name = timerQueue_.top()->timerName_;
-                LOGI("DmTimer TimerRunning timer.name = %s", name.c_str());
+                LOGI("DmTimer TimerRunning timer.name = %{public}s", name.c_str());
                 TimerCallback callBack = nullptr;
                 if (timerQueue_.top()->state_) {
                     callBack = timerQueue_.top()->callback_;

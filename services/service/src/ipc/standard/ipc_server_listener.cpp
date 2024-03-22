@@ -38,7 +38,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     }
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
     if (listener == nullptr) {
-        LOGI("cannot get listener for package:%s.", pkgName.c_str());
+        LOGI("cannot get listener for package:%{public}s.", pkgName.c_str());
         return ERR_DM_POINT_NULL;
     }
     return listener->SendCmd(cmdCode, req, rsp);

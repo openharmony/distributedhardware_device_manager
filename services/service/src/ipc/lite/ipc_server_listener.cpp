@@ -53,7 +53,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     IpcIo io;
     uint8_t data[MAX_DM_IPC_LEN] = {0};
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
-        LOGE("SetRequest failed cmdCode:%d", cmdCode);
+        LOGE("SetRequest failed cmdCode:%{public}d", cmdCode);
         return ERR_DM_FAILED;
     }
 
@@ -61,7 +61,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
     if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
-        LOGI("SendRequest failed cmdCode:%d", cmdCode);
+        LOGI("SendRequest failed cmdCode:%{public}d", cmdCode);
     }
     return DM_OK;
 }
@@ -77,7 +77,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
 
         req->SetPkgName(pkgName);
         if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
-            LOGE("SetRequest failed cmdCode:%d", cmdCode);
+            LOGE("SetRequest failed cmdCode:%{public}d", cmdCode);
             continue;
         }
         CommonSvcId svcId = kv.second;
@@ -86,7 +86,7 @@ int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req,
         MessageOptionInit(&option);
         option.flags = TF_OP_ASYNC;
         if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
-            LOGI("SendRequest failed cmdCode:%d", cmdCode);
+            LOGI("SendRequest failed cmdCode:%{public}d", cmdCode);
         }
     }
     return DM_OK;
