@@ -58,7 +58,7 @@ void JsObjectToString(const napi_env &env, const napi_value &object, const std::
         size_t result = 0;
         NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, field, dest, destLen, &result));
     } else {
-        LOGE("devicemanager napi js to str no property: %s", fieldStr.c_str());
+        LOGE("devicemanager napi js to str no property: %{public}s", fieldStr.c_str());
     }
 }
 
@@ -78,7 +78,7 @@ void JsObjectToBool(const napi_env &env, const napi_value &object, const std::st
         }
         napi_get_value_bool(env, field, &fieldRef);
     } else {
-        LOGE("devicemanager napi js to bool no property: %s", fieldStr.c_str());
+        LOGE("devicemanager napi js to bool no property: %{public}s", fieldStr.c_str());
     }
 }
 
@@ -98,7 +98,7 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
         }
         napi_get_value_int32(env, field, &fieldRef);
     } else {
-        LOGE("devicemanager napi js to int no property: %s", fieldStr.c_str());
+        LOGE("devicemanager napi js to int no property: %{public}s", fieldStr.c_str());
     }
 }
 
@@ -172,7 +172,7 @@ bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, c
 
 napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &errMsg, bool isAsync)
 {
-    LOGI("CreateErrorForCall code:%d, message:%s", code, errMsg.c_str());
+    LOGI("CreateErrorForCall code:%{public}d, message:%{public}s", code, errMsg.c_str());
     napi_value error = nullptr;
     if (isAsync) {
         napi_throw_error(env, std::to_string(code).c_str(), errMsg.c_str());
@@ -249,7 +249,7 @@ void DeviceBasicInfoToJsArray(const napi_env &env,
 
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
-        LOGE("DmDeviceBasicInfo To JsArray set element error: %d", status);
+        LOGE("DmDeviceBasicInfo To JsArray set element error: %{public}d", status);
     }
 }
 
@@ -394,7 +394,7 @@ void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::st
         jsonObj["deviceType"] = deviceType;
     }
     extra = jsonObj.dump();
-    LOGI("JsToDmDiscoveryExtra, extra :%s", extra.c_str());
+    LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
 }
 
 void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)

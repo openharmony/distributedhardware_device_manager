@@ -39,6 +39,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "${utils_path}:devicemanagerutils",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
         "//third_party/bounds_checking_function:libsec_shared",
@@ -51,6 +52,7 @@ if (defined(ohos_lite)) {
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
+      "${utils_path}/include/crypto",
       "//third_party/cJSON",
     ]
 

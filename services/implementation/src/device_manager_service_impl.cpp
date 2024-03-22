@@ -179,8 +179,8 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
     const std::string &deviceId, const std::string &extra)
 {
     if (pkgName.empty() || deviceId.empty()) {
-        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %s, deviceId is %s, extra is %s",
-             pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
+        LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %{public}s, deviceId is %{public}s,"
+            "extra is %{public}s", pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     struct RadarInfo info = {
@@ -197,7 +197,7 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
     if (pkgName.empty() || networkId.empty()) {
-        LOGE("DeviceManagerServiceImpl::UnAuthenticateDevice failed, pkgName is %s, networkId is %s",
+        LOGE("DeviceManagerServiceImpl::UnAuthenticateDevice failed, pkgName is %{public}s, networkId is %{public}s",
             pkgName.c_str(), GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -208,8 +208,8 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
     const std::string &bindParam)
 {
     if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerServiceImpl::BindDevice failed, pkgName is %s, udidHash is %s, bindParam is %s",
-             pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
+        LOGE("DeviceManagerServiceImpl::BindDevice failed, pkgName is %{public}s, udidHash is %{public}s, bindParam is"
+            "%{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -219,7 +219,7 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
 int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
     if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %s, udidHash is %s",
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udidHash is %{public}s",
             pkgName.c_str(), GetAnonyString(udidHash).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -230,8 +230,8 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
     const std::string &params)
 {
     if (pkgName.empty() || params.empty()) {
-        LOGE("DeviceManagerServiceImpl::SetUserOperation error: Invalid parameter, pkgName: %s, extra: %s",
-            pkgName.c_str(), params.c_str());
+        LOGE("DeviceManagerServiceImpl::SetUserOperation error: Invalid parameter, pkgName: %{public}s, extra:"
+            "%{public}s", pkgName.c_str(), params.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authMgr_ != nullptr) {
@@ -253,7 +253,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
     std::string requestDeviceId = static_cast<std::string>(localUdid);
     DmOfflineParam offlineParam =
         DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
-    LOGI("The offline device bind type is %d.", offlineParam.bindType);
+    LOGI("The offline device bind type is %{public}d.", offlineParam.bindType);
     if (offlineParam.leftAclNumber == 0 && offlineParam.bindType == INVALIED_TYPE) {
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     } else if (offlineParam.bindType == IDENTICAL_ACCOUNT_TYPE) {
@@ -285,7 +285,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = static_cast<std::string>(localUdid);
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
-    LOGI("The online device bind type is %d.", bindType);
+    LOGI("The online device bind type is %{public}d.", bindType);
     if (bindType == INVALIED_TYPE) {
         LOGI("The online device is identical account.");
         PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
@@ -317,7 +317,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     }
     std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
     }
     if (devState == DEVICE_STATE_ONLINE) {
         HandleOnline(devState, devInfo);
@@ -337,7 +337,7 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
     std::string udid = "";
     int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
     if (ret != DM_OK) {
-        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
         return "";
     }
     return softbusConnector_->GetDeviceUdidHashByUdid(udid);
@@ -374,7 +374,7 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
     if (pkgName.empty() || credentialInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
+        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %{public}s, credentialInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -388,7 +388,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
     if (pkgName.empty() || deleteInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
+        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %{public}s, deleteInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -527,7 +527,7 @@ int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event,
 int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const int32_t eventId,
     const std::string &event)
 {
-    LOGI("NotifyEvent begin, pkgName : %s, eventId : %d", pkgName.c_str(), eventId);
+    LOGI("NotifyEvent begin, pkgName : %{public}s, eventId : %{public}d", pkgName.c_str(), eventId);
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("NotifyEvent eventId invalid");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -564,12 +564,12 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         std::string udid = "";
         int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
         if (ret != DM_OK) {
-            LOGE("GetUdidByNetworkId failed ret: %d", ret);
+            LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
             return ERR_DM_FAILED;
         }
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
         if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-            LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+            LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }
@@ -585,7 +585,7 @@ int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, 
     std::string udid = "";
     int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId, udid);
     if (ret != DM_OK) {
-        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
         return ERR_DM_FAILED;
     }
     deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
@@ -606,7 +606,7 @@ int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
 {
     int32_t ret = authMgr_->GeneratePincode();
     authCode = std::to_string(ret);
-    LOGI("ExportAuthCode success, authCode: %s.", GetAnonyString(authCode).c_str());
+    LOGI("ExportAuthCode success, authCode: %{public}s.", GetAnonyString(authCode).c_str());
     return DM_OK;
 }
 

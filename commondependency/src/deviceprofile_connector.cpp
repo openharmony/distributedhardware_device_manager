@@ -43,7 +43,7 @@ std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
     const std::string &deviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("DeviceProfileConnector::GetAppTrustDeviceList, AccessControlProfile size is %d.", profiles.size());
+    LOGI("DeviceProfileConnector::GetAppTrustDeviceList, AccessControlProfile size is %{public}zu", profiles.size());
     std::map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
@@ -72,14 +72,14 @@ std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
             continue;
         }
     }
-    LOGI("GetAppTrustDeviceList size is %d.", deviceIdMap.size());
+    LOGI("GetAppTrustDeviceList size is %{public}zu", deviceIdMap.size());
     return deviceIdMap;
 }
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("DeviceProfileConnector::GetDeviceAclParam, AccessControlProfile size is %d.", profiles.size());
+    LOGI("DeviceProfileConnector::GetDeviceAclParam, AccessControlProfile size is %{public}zu", profiles.size());
     if (profiles.size() == 0) {
         return DM_OK;
     }
@@ -88,7 +88,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
             DM_OK) {
-            LOGE("get deviceIdHash by deviceId: %s failed.", GetAnonyString(deviceIdHash).c_str());
+            LOGE("get deviceIdHash by deviceId: %{public}s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;
         }
         if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
@@ -171,7 +171,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 {
     LOGI("CheckBindType start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     uint32_t highestPriority = INVALIED_TYPE;
     for (auto &item : profiles) {
         if (trustDeviceId != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
@@ -201,7 +201,7 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
 {
     LOGI("GetBindTypeByPkgName start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<int32_t> bindTypeVec;
     for (auto &item : profiles) {
         if (trustUdid != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
@@ -317,7 +317,7 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
 {
     LOGI("SyncAclByBindType start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<int32_t> sinkBindType;
     std::vector<int32_t> bindType;
     std::vector<int32_t> bindTypeIndex =
@@ -343,7 +343,7 @@ std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &
 {
     LOGI("GetPkgNameFromAcl start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<std::string> pkgNameVec;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != targetDeviceId || item.GetStatus() != ACTIVE) {
@@ -361,10 +361,10 @@ std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &
 
 DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId)
 {
-    LOGI("DeviceProfileConnector::GetOfflineParamFromAcl, trustDeviceId = %s and requestDeviceId = %s",
+    LOGI("DeviceProfileConnector::GetOfflineParamFromAcl, trustDeviceId = %{public}s and requestDeviceId = %{public}s",
          GetAnonyString(trustDeviceId).c_str(), GetAnonyString(requestDeviceId).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     DmOfflineParam offlineParam;
     offlineParam.leftAclNumber = 0;
     offlineParam.bindType = INVALIED_TYPE;
@@ -436,9 +436,9 @@ int32_t DeviceProfileConnector::DeleteAccessControlList(int32_t userId, std::str
     if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
         LOGE("DP GetAccessControlProfile failed.");
     }
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
-        LOGI("AccessControlProfile bindType is : %d.", item.GetBindType());
+        LOGI("AccessControlProfile bindType is : %{public}d.", item.GetBindType());
         DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
     }
     return DM_OK;
@@ -449,7 +449,7 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
 {
     LOGI("DeleteAccessControlList by pkgName, localDeviceId, remoteDeviceId.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     DmOfflineParam offlineParam;
     offlineParam.bindType = INVALIED_TYPE;
     offlineParam.leftAclNumber = 0;
@@ -499,7 +499,7 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
 {
     LOGI("UpdateAccessControlList by userId and accountId.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if ((item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserAccountId() == oldAccountId) ||
@@ -564,7 +564,7 @@ bool DeviceProfileConnector::CheckSrcDeviceIdInAcl(const std::string &pkgName, c
 {
     LOGI("DeviceProfileConnector::CheckSrcDeviceIdInAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
             item.GetBindLevel() == DEVICE && item.GetAccessee().GetAccesseeBundleName() == pkgName &&
@@ -579,7 +579,7 @@ bool DeviceProfileConnector::CheckSinkDeviceIdInAcl(const std::string &pkgName, 
 {
     LOGI("DeviceProfileConnector::CheckSinkDeviceIdInAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE &&
             item.GetBindLevel() == DEVICE && item.GetAccesser().GetAccesserBundleName() == pkgName &&
@@ -599,7 +599,7 @@ uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
     LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     uint32_t res = 0;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != deviceId || item.GetStatus() != ACTIVE) {
@@ -618,7 +618,7 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 {
     LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     int32_t trustNumber = 0;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == deviceId && item.GetStatus() == ACTIVE) {
@@ -633,7 +633,7 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
 {
     LOGI("DeviceProfileConnector::CheckPkgnameInAcl");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %d.", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteDeviceId && item.GetStatus() != ACTIVE) {
             continue;
@@ -641,17 +641,17 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
         if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
             item.GetBindLevel() == DEVICE && (item.GetAccesser().GetAccesserBundleName() == pkgName ||
             item.GetAccessee().GetAccesseeBundleName() == pkgName)) {
-            LOGI("The pkgname %s is peer-to-peer device unbind.", pkgName.c_str());
+            LOGI("The pkgname %{public}s is peer-to-peer device unbind.", pkgName.c_str());
             return true;
         } else if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
             item.GetBindLevel() == APP && item.GetAccesser().GetAccesserBundleName() == pkgName &&
             item.GetAccesser().GetAccesserDeviceId() == localDeviceId) {
-            LOGI("The pkgname %s is peer-to-peer app unbind.", pkgName.c_str());
+            LOGI("The pkgname %{public}s is peer-to-peer app unbind.", pkgName.c_str());
             return true;
         } else if ((item.GetBindType() == DM_POINT_TO_POINT || item.GetBindType() == DM_ACROSS_ACCOUNT) &&
             item.GetBindLevel() == APP && item.GetAccessee().GetAccesseeBundleName() == pkgName &&
             item.GetAccessee().GetAccesseeDeviceId() == localDeviceId) {
-            LOGI("The pkgname %s is peer-to-peer app unbind.", pkgName.c_str());
+            LOGI("The pkgname %{public}s is peer-to-peer app unbind.", pkgName.c_str());
             return true;
         }
     }

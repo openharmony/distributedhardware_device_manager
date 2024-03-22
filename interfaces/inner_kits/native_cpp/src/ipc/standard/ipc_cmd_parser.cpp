@@ -666,7 +666,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
             DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceBasicInfo);
             break;
         default:
-            LOGE("unknown device state:%d", deviceState);
+            LOGE("unknown device state:%{public}d", deviceState);
             break;
     }
     reply.WriteInt32(DM_OK);

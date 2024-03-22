@@ -178,7 +178,7 @@ bool DmDiscoveryFilter::FilterByDeviceType(int32_t value, int32_t deviceType)
 
 bool DmDiscoveryFilter::FilterByType(const DmDeviceFilters &filters, const DmDeviceFilterPara &filterPara)
 {
-    LOGI("DmDiscoveryFilter::FilterByType: type: %s, value: %d", filters.type.c_str(), filters.value);
+    LOGI("DmDiscoveryFilter::FilterByType: type: %{public}s, value: %{public}d", filters.type.c_str(), filters.value);
     if (filters.type == "credible") {
         return FilterByDeviceState(filters.value, filterPara.isOnline);
     }
@@ -220,9 +220,9 @@ bool DmDiscoveryFilter::FilterAnd(const std::vector<DmDeviceFilters> &filters, c
 bool DmDiscoveryFilter::IsValidDevice(const std::string &filterOp, const std::vector<DmDeviceFilters> &filters,
     const DmDeviceFilterPara &filterPara)
 {
-    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %s, isOnline: %d, range: %d, isTrusted: %d, authForm: %d, " +
-        "deviceType: %d", filterOp.c_str(), filterPara.isOnline, filterPara.range, filterPara.isTrusted,
-        filterPara.authForm, filterPara.deviceType);
+    LOGI("DmDiscoveryFilter::IsValidDevice: filterOp: %{public}s, isOnline: %{public}d, range: %{public}d, isTrusted:"
+        "%{public}d, authForm: %{public}d, deviceType: %{public}d", filterOp.c_str(), filterPara.isOnline,
+        filterPara.range, filterPara.isTrusted, filterPara.authForm, filterPara.deviceType);
     if (filterOp == FILTERS_TYPE_OR) {
         return FilterOr(filters, filterPara);
     }

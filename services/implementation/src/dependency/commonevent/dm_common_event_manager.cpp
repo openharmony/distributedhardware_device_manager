@@ -50,7 +50,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
     }
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
-        LOGE("failed to subscribe commom eventName size: %d.", eventNameVec.size());
+        LOGE("failed to subscribe commom eventName size: %{public}zu", eventNameVec.size());
         return false;
     }
 
@@ -85,7 +85,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
     }
     eventNameVec_ = eventNameVec;
     eventValidFlag_ = true;
-    LOGI("success to subscribe commom event name size: %d", eventNameVec.size());
+    LOGI("success to subscribe commom event name size: %{public}zu", eventNameVec.size());
     return true;
 }
 
@@ -93,16 +93,17 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
 {
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
-        LOGE("failed to unsubscribe commom event name size: %d because event is invalid.", eventNameVec_.size());
+        LOGE("failed to unsubscribe commom event name size: %{public}zu because event is invalid.",
+            eventNameVec_.size());
         return false;
     }
     if (subscriber_ != nullptr) {
-        LOGI("start to unsubscribe commom event name size: %d", eventNameVec_.size());
+        LOGI("start to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
         if (!CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
-            LOGE("failed to unsubscribe commom event name size: %d", eventNameVec_.size());
+            LOGE("failed to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
             return false;
         }
-        LOGI("success to unsubscribe commom event name size: %d", eventNameVec_.size());
+        LOGI("success to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
         subscriber_ = nullptr;
     }
     if (statusChangeListener_ != nullptr) {
@@ -113,13 +114,13 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
         }
         int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
         if (ret != ERR_OK) {
-            LOGE("failed to unsubscribe system ability COMMON_EVENT_SERVICE_ID ret:%d", ret);
+            LOGE("failed to unsubscribe system ability COMMON_EVENT_SERVICE_ID ret:%{public}d", ret);
             return false;
         }
         statusChangeListener_ = nullptr;
     }
 
-    LOGI("success to unsubscribe commom event name size: %d", eventNameVec_.size());
+    LOGI("success to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
     eventValidFlag_ = false;
     return true;
 }
@@ -127,7 +128,7 @@ bool DmCommonEventManager::UnsubscribeServiceEvent()
 void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
-    LOGI("Received event: %s", receiveEvent.c_str());
+    LOGI("Received event: %{public}s", receiveEvent.c_str());
     int32_t userId = data.GetCode();
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         userId = data.GetCode();
@@ -149,7 +150,7 @@ void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 void DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("systemAbility is added with said: %d.", systemAbilityId);
+    LOGI("systemAbility is added with said: %{public}d.", systemAbilityId);
     if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
         return;
     }
@@ -158,9 +159,9 @@ void DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility
         return;
     }
     std::vector<std::string> eventNameVec = changeSubscriber_->GetSubscriberEventNameVec();
-    LOGI("start to subscribe commom eventName: %d", eventNameVec.size());
+    LOGI("start to subscribe commom eventName: %{public}zu", eventNameVec.size());
     if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
-        LOGE("failed to subscribe commom event: %d", eventNameVec.size());
+        LOGE("failed to subscribe commom event: %{public}zu", eventNameVec.size());
         return;
     }
 }
@@ -168,7 +169,7 @@ void DmCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility
 void DmCommonEventManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("systemAbility is removed with said: %d.", systemAbilityId);
+    LOGI("systemAbility is removed with said: %{public}d.", systemAbilityId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

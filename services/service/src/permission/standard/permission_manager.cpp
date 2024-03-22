@@ -55,7 +55,7 @@ bool PermissionManager::CheckPermission(void)
     if (tokenCaller == 0) {
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -75,7 +75,7 @@ bool PermissionManager::CheckNewPermission(void)
     if (tokenCaller == 0) {
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -95,7 +95,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     if (tokenCaller == 0) {
         return ERR_DM_FAILED;
     }
-    LOGI("PermissionManager::tokenCaller ID == %s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;
@@ -116,7 +116,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
 
-    LOGI("Get process name: %s success.", processName.c_str());
+    LOGI("Get process name: %{public}s success.", processName.c_str());
     return DM_OK;
 }
 
@@ -136,7 +136,7 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
         }
     }
 
-    LOGE("CheckProcessNameValidOnAuthCode process name: %s invalid.", processName.c_str());
+    LOGE("CheckProcessNameValidOnAuthCode process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -156,7 +156,7 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
         }
     }
 
-    LOGE("CheckProcessNameValidOnPinHolder process name: %s invalid.", processName.c_str());
+    LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 } // namespace DistributedHardware
