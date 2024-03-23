@@ -49,11 +49,17 @@ std::string DmDialogManager::pinCode_ = "";
 std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
 std::condition_variable DmDialogManager::dialogCondition_;
 int32_t DmDialogManager::deviceType_ = -1;
+DmDialogManager DmDialogManager::dialogMgr_;
 
 DmDialogManager::DmDialogManager() : dialogConnectionCallback_(new DialogAbilityConnection()) {}
 DmDialogManager::~DmDialogManager()
 {
     dialogConnectionCallback_ = nullptr;
+}
+
+DmDialogManager &DmDialogManager::GetInstance()
+{
+    return dialogMgr_;
 }
 
 void DmDialogManager::ShowConfirmDialog(const std::string param)
