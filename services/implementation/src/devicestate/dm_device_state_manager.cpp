@@ -59,7 +59,7 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("SaveOnlineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("SaveOnlineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -70,7 +70,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
             remoteDeviceInfos_[uuid] = saveInfo;
             stateDeviceInfos_[udid] = saveInfo;
         }
-        LOGI("SaveOnlineDeviceInfo complete, networkId = %s, udid = %s, uuid = %s",
+        LOGI("SaveOnlineDeviceInfo complete, networkId = %{public}s, udid = %{public}s, uuid = %{public}s",
              GetAnonyString(std::string(info.networkId)).c_str(),
              GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
     }
@@ -78,7 +78,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("DeleteOfflineDeviceInfo begin, deviceId = %s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("DeleteOfflineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
     std::string deviceId = std::string(info.deviceId);
     for (auto iter: remoteDeviceInfos_) {
@@ -99,7 +99,7 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 
 void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %s", GetAnonyString(deviceId).c_str());
+    LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
@@ -118,7 +118,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %s", GetAnonyString(deviceId).c_str());
+    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
@@ -140,7 +140,8 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
 
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("Handle device status change: devState=%d, deviceId=%s.", devState, GetAnonyString(devInfo.deviceId).c_str());
+    LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
+        GetAnonyString(devInfo.deviceId).c_str());
     switch (devState) {
         case DEVICE_STATE_ONLINE:
             RegisterOffLineTimer(devInfo);
@@ -161,7 +162,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             ChangeDeviceInfo(devInfo);
             break;
         default:
-            LOGE("HandleDeviceStatusChange error, unknown device state = %d", devState);
+            LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
             break;
     }
     if (listener_ == nullptr) {
@@ -187,14 +188,14 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
-    LOGI("OnDbReady function is called with pkgName: %s and uuid = %s", pkgName.c_str(),
+    LOGI("OnDbReady function is called with pkgName: %{public}s and uuid = %{public}s", pkgName.c_str(),
          GetAnonyString(uuid).c_str());
     DmDeviceInfo saveInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnDbReady complete not find uuid: %s", GetAnonyString(uuid).c_str());
+            LOGE("OnDbReady complete not find uuid: %{public}s", GetAnonyString(uuid).c_str());
             return;
         }
         saveInfo = iter->second;
@@ -213,7 +214,7 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         LOGE("fail to get udid by networkId");
         return;
     }
-    LOGI("Register offline timer for deviceUdid: %s", GetAnonyString(deviceUdid).c_str());
+    LOGI("Register offline timer for deviceUdid: %{public}s", GetAnonyString(deviceUdid).c_str());
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto &iter : stateTimerInfoMap_) {
         if ((iter.first == deviceUdid) && (timer_ != nullptr)) {
@@ -237,7 +238,7 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     std::string networkId = deviceInfo.networkId;
-    LOGI("Start offline timer for networkId: %s", GetAnonyString(networkId).c_str());
+    LOGI("Start offline timer for networkId: %{public}s", GetAnonyString(networkId).c_str());
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
@@ -257,7 +258,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto iter = stateTimerInfoMap_.begin(); iter != stateTimerInfoMap_.end(); iter++) {
         if (((iter->second).timerName == name) && (hiChainConnector_ != nullptr)) {
-            LOGI("remove hichain group with deviceId: %s", GetAnonyString(iter->first).c_str());
+            LOGI("remove hichain group with deviceId: %{public}s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
@@ -294,7 +295,7 @@ void DmDeviceStateManager::StopEventThread()
 
 int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGI("AddTask begin, eventId: %d", task->GetEventId());
+    LOGI("AddTask begin, eventId: %{public}d", task->GetEventId());
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
@@ -336,7 +337,7 @@ void DmDeviceStateManager::ThreadLoop()
 
 void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGI("RunTask begin, eventId: %d", task->GetEventId());
+    LOGI("RunTask begin, eventId: %{public}d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
@@ -366,7 +367,7 @@ DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::string &deviceId)
 {
-    LOGI("ProcNotifyEvent in, eventId: %d", eventId);
+    LOGI("ProcNotifyEvent in, eventId: %{public}d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 

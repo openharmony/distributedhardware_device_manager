@@ -160,7 +160,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     }
     std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId: %s failed", GetAnonyString(deviceId).c_str());
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
     }
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
 }
@@ -174,7 +174,7 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
     std::string udid = "";
     int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
     if (ret != DM_OK) {
-        LOGE("GetUdidByNetworkId failed ret: %d", ret);
+        LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
         return "";
     }
     return softbusConnector_->GetDeviceUdidHashByUdid(udid);
@@ -234,7 +234,7 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
     if (pkgName.empty() || credentialInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %s, credentialInfo is %s",
+        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %{public}s, credentialInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -248,7 +248,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
     if (pkgName.empty() || deleteInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %s, deleteInfo is %s",
+        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %{public}s, deleteInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }

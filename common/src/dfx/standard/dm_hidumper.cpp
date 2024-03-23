@@ -89,7 +89,7 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
     }
 
     nodeInfos_.clear();
-    LOGI("HiDumpHelper ShowAllLoadTrustedList %s", result.c_str());
+    LOGI("HiDumpHelper ShowAllLoadTrustedList %{public}s", result.c_str());
     return ret;
 }
 

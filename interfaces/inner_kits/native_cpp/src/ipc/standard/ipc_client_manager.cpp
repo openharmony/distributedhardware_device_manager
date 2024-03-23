@@ -70,15 +70,15 @@ int32_t IpcClientManager::ClientInit()
 
 int32_t IpcClientManager::Init(const std::string &pkgName)
 {
-    SubscribeDMSAChangeListener();
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
+    SubscribeDMSAChangeListener();
     int32_t ret = ClientInit();
     if (ret != DM_OK) {
-        LOGE("InitDeviceManager Failed with ret %d", ret);
+        LOGE("InitDeviceManager Failed with ret %{public}d", ret);
         return ret;
     }
 
@@ -89,7 +89,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     req->SetListener(listener);
     ret = dmInterface_->SendCmd(REGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
     if (ret != DM_OK) {
-        LOGE("InitDeviceManager: RegisterDeviceManagerListener Failed with ret %d", ret);
+        LOGE("InitDeviceManager: RegisterDeviceManagerListener Failed with ret %{public}d", ret);
         return ret;
     }
     ret = rsp->GetErrCode();
@@ -97,7 +97,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
         return ret;
     }
     dmListener_[pkgName] = listener;
-    LOGI("completed, pkgName: %s", pkgName.c_str());
+    LOGI("completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -107,7 +107,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("UnInit in, pkgName %s", pkgName.c_str());
+    LOGI("UnInit in, pkgName %{public}s", pkgName.c_str());
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
         return ERR_DM_INIT_FAILED;
@@ -120,7 +120,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         req->SetPkgName(pkgName);
         int32_t ret = dmInterface_->SendCmd(UNREGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
         if (ret != DM_OK) {
-            LOGE("UnRegisterDeviceManagerListener Failed with ret %d", ret);
+            LOGE("UnRegisterDeviceManagerListener Failed with ret %{public}d", ret);
             return ret;
         }
         dmListener_.erase(pkgName);
@@ -132,7 +132,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         }
         dmInterface_ = nullptr;
     }
-    LOGI("completed, pkgName: %s", pkgName.c_str());
+    LOGI("completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -148,7 +148,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     LOGI("IpcClientManager::SendRequest in");
 
     if (dmInterface_ != nullptr) {
-        LOGI("IpcClientManager::SendRequest cmdCode: %d", cmdCode);
+        LOGI("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
         return dmInterface_->SendCmd(cmdCode, req, rsp);
     } else {
         LOGE("dmInterface_ is not init.");
@@ -188,11 +188,11 @@ void IpcClientManager::SubscribeDMSAChangeListener()
     }
 
     if (!isSubscribeDMSAChangeListener.load()) {
-        LOGI("try subscribe source sa change listener, sa id: %d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        LOGI("try subscribe source sa change listener, sa id: %{public}d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = systemAbilityManager->SubscribeSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID,
             saListenerCallback);
         if (ret != DM_OK) {
-            LOGE("subscribe source sa change failed: %d", ret);
+            LOGE("subscribe source sa change failed: %{public}d", ret);
             return;
         }
         isSubscribeDMSAChangeListener.store(true);
@@ -205,12 +205,12 @@ void IpcClientManager::SystemAbilityListener::OnRemoveSystemAbility(int32_t syst
     if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
         DeviceManagerImpl::GetInstance().OnDmServiceDied();
     }
-    LOGI("sa %d is removed.", systemAbilityId);
+    LOGI("sa %{public}d is removed.", systemAbilityId);
 }
 
 void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    LOGI("sa %d is added.", systemAbilityId);
+    LOGI("sa %{public}d is added.", systemAbilityId);
     if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
         std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback
         = DeviceManagerNotify::GetInstance().GetDmInitCallback();

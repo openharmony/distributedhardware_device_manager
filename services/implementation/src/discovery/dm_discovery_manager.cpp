@@ -62,11 +62,11 @@ int32_t DmDiscoveryManager::CheckDiscoveryQueue(const std::string &pkgName)
 
         frontPkgName = discoveryQueue_.front();
         if (pkgName == frontPkgName) {
-            LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%s", pkgName.c_str());
+            LOGE("DmDiscoveryManager::StartDeviceDiscovery repeated, pkgName:%{public}s", pkgName.c_str());
             return ERR_DM_DISCOVERY_REPEATED;
         }
 
-        LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %s",
+        LOGI("DmDiscoveryManager::StartDeviceDiscovery stop preview discovery first, the preview pkgName is %{public}s",
             discoveryQueue_.front().c_str());
         subscribeId = discoveryContextMap_[frontPkgName].subscribeId;
     }
@@ -139,13 +139,13 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
 
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline)
 {
-    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s", GetAnonyString(info.deviceId).c_str());
+    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %{public}s", GetAnonyString(info.deviceId).c_str());
     DmDiscoveryContext discoveryContext;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            LOGE("subscribeId not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
             return;
         }
         discoveryContext = iter->second;
@@ -169,7 +169,7 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
 int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const std::string &deviceId,
     bool &isTrusted, DmAuthForm &authForm)
 {
-    LOGI("Get localDeviceId: %s auth form.", GetAnonyString(localDeviceId).c_str());
+    LOGI("Get localDeviceId: %{public}s auth form.", GetAnonyString(localDeviceId).c_str());
     isTrusted = false;
     if (localDeviceId.empty() || deviceId.empty()) {
         LOGE("Invalid parameter.");
@@ -191,7 +191,7 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
         if (udidHash == deviceId) {
             isTrusted = true;
             authForm = hiChainConnector_->GetGroupType(udid);
-            LOGI("deviceId: %s is trusted!", GetAnonyString(deviceId).c_str());
+            LOGI("deviceId: %{public}s is trusted!", GetAnonyString(deviceId).c_str());
         }
     }
 
@@ -201,14 +201,14 @@ int32_t DmDiscoveryManager::GetAuthForm(const std::string &localDeviceId, const 
 void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
     DmDeviceBasicInfo &info, const int32_t range, bool isOnline)
 {
-    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %s,isOnline %d",
+    LOGI("DmDiscoveryManager::OnDeviceFound deviceId = %{public}s,isOnline %{public}d",
         GetAnonyString(info.deviceId).c_str(), isOnline);
     DmDiscoveryContext discoveryContext;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            LOGE("subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            LOGE("subscribeId not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
             return;
         }
         discoveryContext = iter->second;
@@ -231,7 +231,8 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
 
 void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason)
 {
-    LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId = %d reason = %d", subscribeId, failedReason);
+    LOGI("DmDiscoveryManager::OnDiscoveryFailed subscribeId = %{public}d reason = %{public}d", subscribeId,
+        failedReason);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
@@ -252,7 +253,7 @@ void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t s
 
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
 {
-    LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId = %d", subscribeId);
+    LOGI("DmDiscoveryManager::OnDiscoverySuccess subscribeId = %{public}d", subscribeId);
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
@@ -276,7 +277,8 @@ void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)
         pkgName = discoveryQueue_.front();
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %s", GetAnonyString(pkgName).c_str());
+            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %{public}s",
+                GetAnonyString(pkgName).c_str());
             return;
         }
         subscribeId = discoveryContextMap_[pkgName].subscribeId;

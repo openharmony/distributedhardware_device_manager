@@ -86,7 +86,7 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
 {
     LOGI("CreatePinHolder.");
     if (registerPkgName_.empty() || registerPkgName_ != pkgName) {
-        LOGE("CreatePinHolder pkgName: %s is not register callback.", pkgName.c_str());
+        LOGE("CreatePinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     int32_t ret = CheckTargetIdVaild(targetId);
@@ -101,19 +101,19 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     }
 
     if (sourceState_ != SOURCE_INIT) {
-        LOGE("CreatePinHolder failed, state is %d.", sourceState_);
+        LOGE("CreatePinHolder failed, state is %{public}d.", sourceState_);
         return ERR_DM_FAILED;
     }
 
     if (sessionId_ != SESSION_ID_INVALID) {
-        LOGI("CreatePinHolder session already create, sessionId: %d.", sessionId_);
+        LOGI("CreatePinHolder session already create, sessionId: %{public}d.", sessionId_);
         CreateGeneratePinHolderMsg();
         return DM_OK;
     }
 
     sessionId_ = session_->OpenSessionServer(targetId);
     if (sessionId_ < 0) {
-        LOGE("[SOFTBUS]open session error, sessionId: %d.", sessionId_);
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId_);
         sessionId_ = SESSION_ID_INVALID;
         listener_->OnCreateResult(registerPkgName_, ERR_DM_AUTH_OPEN_SESSION_FAILED);
         return ERR_DM_AUTH_OPEN_SESSION_FAILED;
@@ -133,7 +133,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     }
 
     if (registerPkgName_.empty() || pkgName != registerPkgName_) {
-        LOGE("DestroyPinHolder pkgName: %s is not register callback.", pkgName.c_str());
+        LOGE("DestroyPinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
 
@@ -149,7 +149,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
         return ERR_DM_FAILED;
     }
     if (sourceState_ != SOURCE_CREATE) {
-        LOGE("DestroyPinHolder failed, state is %d.", sourceState_);
+        LOGE("DestroyPinHolder failed, state is %{public}d.", sourceState_);
         return ERR_DM_FAILED;
     }
 
@@ -161,10 +161,11 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     jsonObj[TAG_PAYLOAD] = payload;
     pinType_ = pinType;
     std::string message = jsonObj.dump();
-    LOGI("DestroyPinHolder, message type is: %d, pin type is: %d.", MSG_TYPE_DESTROY_PIN_HOLDER, pinType);
+    LOGI("DestroyPinHolder, message type is: %{public}d, pin type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER,
+        pinType);
     ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
         return ERR_DM_FAILED;
     }
@@ -188,10 +189,11 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
     jsonObj[TAG_PAYLOAD] = payload_;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
     std::string message = jsonObj.dump();
-    LOGI("CreateGeneratePinHolderMsg, message type is: %d, pin type is: %d.", MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
+    LOGI("CreateGeneratePinHolderMsg, message type is: %{public}d, pin type is: %{public}d.",
+        MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
     int32_t ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
         return ERR_DM_FAILED;
     }
@@ -243,10 +245,10 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
     }
 
     std::string msg = jsonObj.dump();
-    LOGI("ProcessCreateMsg, message type is: %d.", MSG_TYPE_CREATE_PIN_HOLDER_RESP);
+    LOGI("ProcessCreateMsg, message type is: %{public}d.", MSG_TYPE_CREATE_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         return;
     }
 }
@@ -308,17 +310,17 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
     }
 
     std::string msg = jsonObj.dump();
-    LOGI("ProcessDestroyMsg, message type is: %d.", MSG_TYPE_DESTROY_PIN_HOLDER_RESP);
+    LOGI("ProcessDestroyMsg, message type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         return;
     }
 }
 
 void PinHolder::CloseSession(const std::string &name)
 {
-    LOGI("PinHolder::CloseSession start timer name %s.", name.c_str());
+    LOGI("PinHolder::CloseSession start timer name %{public}s.", name.c_str());
     if (session_ == nullptr) {
         LOGE("CloseSession session is nullptr.");
         return;
@@ -368,7 +370,7 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
 void PinHolder::OnDataReceived(int32_t sessionId, std::string message)
 {
     int32_t msgType = ParseMsgType(message);
-    LOGI("OnDataReceived, msgType: %d.", msgType);
+    LOGI("OnDataReceived, msgType: %{public}d.", msgType);
 
     switch (msgType) {
         case MSG_TYPE_CREATE_PIN_HOLDER:
@@ -393,26 +395,26 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
     char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
     int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %d.", sessionId);
+        LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d.", sessionId);
         udidHash = "";
         return;
     }
     std::string deviceId = peerDeviceId;
     char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
     if (Crypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
-        LOGE("get udidhash by udid: %s failed.", GetAnonyString(deviceId).c_str());
+        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(deviceId).c_str());
         udidHash = "";
         return;
     }
     udidHash = udidHashTmp;
-    LOGI("GetPeerDeviceId udid hash: %s success.", GetAnonyString(udidHash).c_str());
+    LOGI("GetPeerDeviceId udid hash: %{public}s success.", GetAnonyString(udidHash).c_str());
 }
 
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     sessionId_ = sessionId;
     if (sessionSide == SESSION_SIDE_SERVER) {
-        LOGI("[SOFTBUS]onSesssionOpened success, side is sink. sessionId: %d.", sessionId);
+        LOGI("[SOFTBUS]onSesssionOpened success, side is sink. sessionId: %{public}d.", sessionId);
         GetPeerDeviceId(sessionId, remoteDeviceId_);
         return;
     }
@@ -420,7 +422,7 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
         CreateGeneratePinHolderMsg();
         return;
     }
-    LOGE("[SOFTBUS]onSesssionOpened failed. sessionId: %d.", sessionId);
+    LOGE("[SOFTBUS]onSesssionOpened failed. sessionId: %{public}d.", sessionId);
     sessionId_ = SESSION_ID_INVALID;
     if (listener_ != nullptr) {
         listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
@@ -430,7 +432,7 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
 
 void PinHolder::OnSessionClosed(int32_t sessionId)
 {
-    LOGI("[SOFTBUS]OnSessionClosed sessionId: %d.", sessionId);
+    LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d.", sessionId);
     sessionId_ = SESSION_ID_INVALID;
     sinkState_ = SINK_INIT;
     sourceState_ = SOURCE_INIT;

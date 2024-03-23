@@ -32,7 +32,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
     }
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
     if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
-        LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register SetRequestFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     return (setRequestMapIter->second)(pBaseReq, request, buffer, buffLen);
@@ -42,7 +42,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, IpcIo &reply, std::shared_
 {
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
-        LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register ReadResponseFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     return (readResponseMapIter->second)(reply, pBaseRsp);
@@ -56,7 +56,7 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, IpcIo &reply)
     }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
-        LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register OnIpcCmdFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     (onIpcCmdMapIter->second)(reply);
@@ -67,7 +67,7 @@ int32_t IpcCmdRegister::OnIpcServerCmd(int32_t cmdCode, IpcIo &req, IpcIo &reply
 {
     auto onIpcServerCmdMapIter = onIpcServerCmdFuncMap_.find(cmdCode);
     if (onIpcServerCmdMapIter == onIpcServerCmdFuncMap_.end()) {
-        LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register OnIpcCmdFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     (onIpcServerCmdMapIter->second)(req, reply);

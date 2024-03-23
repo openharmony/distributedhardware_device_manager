@@ -154,7 +154,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    LOGI("device online networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -192,7 +192,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    LOGI("device offline networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
@@ -228,7 +228,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         return;
     }
     if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
-        LOGI("DeviceInfo %d change.", type);
+        LOGI("DeviceInfo %{public}d change.", type);
         DmDeviceInfo dmDeviceInfo;
         int32_t networkType = -1;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
@@ -237,10 +237,10 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
-            LOGI("OnSoftbusDeviceInfoChanged NetworkType %d.", networkType);
+            LOGI("OnSoftbusDeviceInfoChanged NetworkType %{public}d.", networkType);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-        LOGI("device changed networkId: %s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+        LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
@@ -267,13 +267,13 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
         }
-        LOGI("[SOFTBUS]PublishLNN return ret: %d.", ret);
+        LOGI("[SOFTBUS]PublishLNN return ret: %{public}d.", ret);
     } else if (strcmp(value, DISCOVER_STATUS_OFF) == 0 && g_publishStatus != PulishStatus::NOT_ALLOW_BE_DISCOVERY) {
         int32_t ret = ::StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::NOT_ALLOW_BE_DISCOVERY;
         }
-        LOGI("[SOFTBUS]StopPublishLNN return ret: %d.", ret);
+        LOGI("[SOFTBUS]StopPublishLNN return ret: %{public}d.", ret);
     }
 }
 
@@ -296,8 +296,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             LOGE("ReportDiscoverResCallback failed");
         }
     }
-    LOGI("OnSoftbusDeviceFound: devId=%s, devName=%s, devType=%d, range=%d, isOnline=%d",
-        GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
+    LOGI("OnSoftbusDeviceFound: devId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
+        "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
         dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
@@ -318,7 +318,7 @@ void SoftbusListener::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult re
 
 void SoftbusListener::OnSoftbusPublishResult(int publishId, PublishResult result)
 {
-    LOGD("OnSoftbusPublishResult, publishId: %d, result: %d.", publishId, result);
+    LOGD("OnSoftbusPublishResult, publishId: %{public}d, result: %{public}d.", publishId, result);
 }
 
 SoftbusListener::SoftbusListener()
@@ -334,7 +334,7 @@ SoftbusListener::SoftbusListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]CreateSessionServer failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]CreateSessionServer failed, ret: %{public}d.", ret);
     }
     ISessionListener pinHolderSessionListener = {
         .OnSessionOpened = OnPinHolderSessionOpened,
@@ -345,7 +345,7 @@ SoftbusListener::SoftbusListener()
     };
     ret = CreateSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME, &pinHolderSessionListener);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %{public}d.", ret);
     }
     SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
 #endif
@@ -372,7 +372,7 @@ int32_t SoftbusListener::InitSoftbusListener()
         ret = RegNodeDeviceStateCb(DM_PKG_NAME, &softbusNodeStateCb_);
         if (ret != DM_OK) {
             ++retryTimes;
-            LOGE("[SOFTBUS]RegNodeDeviceStateCb failed with ret: %d, retryTimes: %d.", ret, retryTimes);
+            LOGE("[SOFTBUS]RegNodeDeviceStateCb failed with ret: %{public}d, retryTimes: %{public}d.", ret, retryTimes);
             usleep(SOFTBUS_CHECK_INTERVAL);
         }
     } while (ret != DM_OK);
@@ -406,19 +406,19 @@ int32_t SoftbusListener::InitSoftPublishLNN()
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
         }
-        LOGI("[SOFTBUS]service publish result, ret: %d.", ret);
+        LOGI("[SOFTBUS]service publish result, ret: %{public}d.", ret);
     } else if (strcmp(discoverStatus, DISCOVER_STATUS_ON) == 0) {
         ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
         }
-        LOGI("[SOFTBUS]service publish result, ret: %d.", ret);
+        LOGI("[SOFTBUS]service publish result, ret: %{public}d.", ret);
     } else if (strcmp(discoverStatus, DISCOVER_STATUS_OFF) == 0) {
         ret = StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::NOT_ALLOW_BE_DISCOVERY;
         }
-        LOGI("[SOFTBUS]service unpublish. ret: %d.", ret);
+        LOGI("[SOFTBUS]service unpublish. ret: %{public}d.", ret);
     }
     ret = WatchParameter(DISCOVER_STATUS_KEY, &OnParameterChgCallback, nullptr);
 #endif
@@ -428,7 +428,7 @@ int32_t SoftbusListener::InitSoftPublishLNN()
 int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo,
     const std::string &customData)
 {
-    LOGI("RefreshSoftbusLNN begin, subscribeId: %d.", dmSubInfo.subscribeId);
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
     subscribeInfo.subscribeId = dmSubInfo.subscribeId;
@@ -441,8 +441,8 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     subscribeInfo.capabilityData =
         const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(customData.c_str()));
     subscribeInfo.dataLen = customData.size();
-    LOGI("RefreshSoftbusLNN begin, subscribeId: %d, mode: 0x%x, medium: %d, capability: %s.",
-         subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium, subscribeInfo.capability);
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+        "%{public}s.", subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium, subscribeInfo.capability);
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
     struct RadarInfo info = {
         .funcName = "RefreshSoftbusLNN",
@@ -460,7 +460,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
         }
     }
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]RefreshLNN failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]RefreshLNN failed, ret: %{public}d.", ret);
         return ERR_DM_REFRESH_LNN_FAILED;
     }
     return DM_OK;
@@ -468,7 +468,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
 
 int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
-    LOGI("StopRefreshSoftbusLNN begin, subscribeId: %d.", (int32_t)subscribeId);
+    LOGI("StopRefreshSoftbusLNN begin, subscribeId: %{public}d.", (int32_t)subscribeId);
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopRefreshSoftbusLNN",
@@ -485,7 +485,7 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
         }
     }
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %{public}d.", ret);
         return ERR_DM_STOP_REFRESH_LNN_FAILED;
     }
     return DM_OK;
@@ -494,7 +494,7 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
     const std::string &customData)
 {
-    LOGI("PublishSoftbusLNN begin, publishId: %d.", dmPubInfo.publishId);
+    LOGI("PublishSoftbusLNN begin, publishId: %{public}d.", dmPubInfo.publishId);
     PublishInfo publishInfo;
     publishInfo.publishId = dmPubInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
@@ -505,12 +505,13 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     publishInfo.dataLen = customData.length();
     publishInfo.ranging = dmPubInfo.ranging;
 
-    LOGI("PublishSoftbusLNN begin, publishId: %d, mode: 0x%x, medium: %d, capability: %s, ranging: %d.",
-        publishInfo.publishId, publishInfo.mode, publishInfo.medium, publishInfo.capability, publishInfo.ranging);
+    LOGI("PublishSoftbusLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+        "%{public}s, ranging: %{public}d.", publishInfo.publishId, publishInfo.mode, publishInfo.medium,
+        publishInfo.capability, publishInfo.ranging);
 
     int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]PublishLNN failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]PublishLNN failed, ret: %{public}d.", ret);
         return ERR_DM_PUBLISH_FAILED;
     }
     return DM_OK;
@@ -518,10 +519,10 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
 
 int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
 {
-    LOGI("StopPublishSoftbusLNN begin, publishId: %d.", publishId);
+    LOGI("StopPublishSoftbusLNN begin, publishId: %{public}d.", publishId);
     int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]StopPublishLNN failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
         return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
     return DM_OK;
@@ -568,7 +569,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
                 LOGE("ReportGetTrustDeviceList failed");
             }
         }
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     DmDeviceInfo *info = static_cast<DmDeviceInfo *>(malloc(sizeof(DmDeviceInfo) * (deviceCount)));
@@ -592,7 +593,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     }
     FreeNodeInfo(nodeInfo);
     free(info);
-    LOGI("GetTrustDevices success, deviceCount: %d.", deviceCount);
+    LOGI("GetTrustDevices success, deviceCount: %{public}d.", deviceCount);
     return ret;
 }
 
@@ -602,7 +603,7 @@ int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &
     NodeBasicInfo *nodeInfo = nullptr;
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     DmDeviceBasicInfo *info = static_cast<DmDeviceBasicInfo *>(malloc(sizeof(DmDeviceBasicInfo) * (deviceCount)));
@@ -619,7 +620,7 @@ int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &
     }
     FreeNodeInfo(nodeInfo);
     free(info);
-    LOGI("GetAvailableDevices success, deviceCount: %d.", deviceCount);
+    LOGI("GetAvailableDevices success, deviceCount: %{public}d.", deviceCount);
     return ret;
 }
 
@@ -629,13 +630,13 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
     NodeBasicInfo *nodeInfo = nullptr;
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     for (int32_t i = 0; i < nodeInfoCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         if (networkId == nodeBasicInfo->networkId) {
-            LOGI("GetDeviceInfo name : %s.", GetAnonyString(nodeBasicInfo->deviceName).c_str());
+            LOGI("GetDeviceInfo name : %{public}s.", GetAnonyString(nodeBasicInfo->deviceName).c_str());
             if (memcpy_s(info.deviceName, sizeof(info.deviceName), nodeBasicInfo->deviceName,
                 std::min(sizeof(info.deviceName), sizeof(nodeBasicInfo->deviceName))) != DM_OK) {
                 LOGE("GetDeviceInfo deviceName copy deviceName data failed.");
@@ -645,8 +646,8 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
         }
     }
     FreeNodeInfo(nodeInfo);
-    LOGI("GetDeviceInfo complete, deviceName : %s, deviceTypeId : %d.", GetAnonyString(info.deviceName).c_str(),
-        info.deviceTypeId);
+    LOGI("GetDeviceInfo complete, deviceName : %{public}s, deviceTypeId : %{public}d.",
+        GetAnonyString(info.deviceName).c_str(), info.deviceTypeId);
     return ret;
 }
 
@@ -655,7 +656,7 @@ int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
@@ -667,7 +668,7 @@ int32_t SoftbusListener::GetLocalDeviceNetworkId(std::string &networkId)
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     networkId = nodeBasicInfo.networkId;
@@ -679,7 +680,7 @@ int32_t SoftbusListener::GetLocalDeviceName(std::string &deviceName)
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     deviceName = nodeBasicInfo.deviceName;
@@ -691,7 +692,7 @@ int32_t SoftbusListener::GetLocalDeviceType(int32_t &deviceType)
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     deviceType = nodeBasicInfo.deviceTypeId;
@@ -703,7 +704,7 @@ int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     udid = reinterpret_cast<char *>(mUdid);
@@ -715,7 +716,7 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %d.", ret);
+        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     uuid = reinterpret_cast<char *>(mUuid);
@@ -731,7 +732,7 @@ int32_t SoftbusListener::ShiftLNNGear()
     };
     int32_t ret = ::ShiftLNNGear(DM_PKG_NAME, DM_PKG_NAME, nullptr, &mode);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]ShiftLNNGear error, failed ret: %d", ret);
+        LOGE("[SOFTBUS]ShiftLNNGear error, failed ret: %{public}d", ret);
         return ret;
     }
     LOGI("[SOFTBUS]ShiftLNNGear success.");
@@ -842,7 +843,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
             sizeof((addrInfo->info).ble.udidHash) / sizeof(*((addrInfo->info).ble.udidHash))));
         jsonObj[PARAM_KEY_BLE_UDID_HASH] = udidHash;
     } else {
-        LOGI("Unknown connection address type: %d.", addrInfo->type);
+        LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
     dmDevice.extraData = jsonObj.dump();
 }
@@ -856,7 +857,20 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
         return ERR_DM_FAILED;
     }
     networkType = tempNetworkType;
-    LOGI("GetNetworkTypeByNetworkId networkType %d.", tempNetworkType);
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", tempNetworkType);
+    return DM_OK;
+}
+
+int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
+{
+    int32_t tempSecurityLevel = -1;
+    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
+                       reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return ERR_DM_FAILED;
+    }
+    securityLevel = tempSecurityLevel;
+    LOGI("GetDeviceSecurityLevel success, securityLevel = %{public}d.", securityLevel);
     return DM_OK;
 }
 
@@ -908,7 +922,7 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
         std::string bleMac((addrInfo->info).ble.bleMac);
         targetId.bleMac = bleMac;
     } else {
-        LOGI("Unknown connection address type: %d.", addrInfo->type);
+        LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
         return ERR_DM_BIND_COMMON_FAILED;
     }
     targetId.deviceId = deviceId;
@@ -944,12 +958,12 @@ bool SoftbusListener::IsDmRadarHelperReady()
     char path[PATH_MAX + 1] = {0x00};
     std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_RADAR_NAME);
     if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %s canonicalization failed.", soName.c_str());
+        LOGE("File %{public}s canonicalization failed.", soName.c_str());
         return false;
     }
     radarHandle_ = dlopen(path, RTLD_NOW);
     if (radarHandle_ == nullptr) {
-        LOGE("load libdevicemanagerradar so %s failed.", soName.c_str());
+        LOGE("load libdevicemanagerradar so %{public}s failed.", soName.c_str());
         return false;
     }
     dlerror();
@@ -981,7 +995,7 @@ bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
 
     int32_t ret = dlclose(radarHandle_);
     if (ret != 0) {
-        LOGE("close libdevicemanagerradar failed ret = %d.", ret);
+        LOGE("close libdevicemanagerradar failed ret = %{public}d.", ret);
         return false;
     }
     isRadarSoLoad_ = false;

@@ -28,7 +28,7 @@ HiChainAuthConnector::HiChainAuthConnector()
 {
     int32_t ret = InitDeviceAuthService();
     if (ret != HC_SUCCESS) {
-        LOGE("hichain InitDeviceAuthService failed, err %d.", ret);
+        LOGE("hichain InitDeviceAuthService failed, err %{public}d.", ret);
     }
     deviceAuthCallback_ = {.onTransmit = HiChainAuthConnector::onTransmit,
                            .onSessionKeyReturned = HiChainAuthConnector::onSessionKeyReturned,
@@ -57,10 +57,11 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
     authParamJson["pinCode"] = std::to_string(pinCode);
     authParamJson["acquireType"] = AcquireType::P2P_BIND;
     char *authParam = strdup(authParamJson.dump().c_str());
-    LOGI("StartAuthDevice authParam %s ,requestId %d.", GetAnonyString(authParam).c_str(), requestId);
+    LOGI("StartAuthDevice authParam %{public}s ,requestId %{public}" PRId64, GetAnonyString(authParam).c_str(),
+        requestId);
     int32_t ret = StartAuthDevice(requestId, authParam, &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
-        LOGE("Hichain authDevice failed, ret is %d.", ret);
+        LOGE("Hichain authDevice failed, ret is %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -74,7 +75,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
     jsonAuthParam["data"] = authData;
     int32_t ret = ProcessAuthDevice(requestId, jsonAuthParam.dump().c_str(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
-        LOGE("Hichain processData failed ret %d.", ret);
+        LOGE("Hichain processData failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -82,7 +83,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
  
 bool HiChainAuthConnector::onTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
-    LOGI("AuthDevice onTransmit, requestId %d.", requestId);
+    LOGI("AuthDevice onTransmit, requestId %{public}" PRId64, requestId);
     if (dmDeviceAuthCallback_ == nullptr) {
         LOGE("HiChainAuthConnector::onTransmit dmDeviceAuthCallback_ is nullptr.");
         return false;
@@ -117,7 +118,7 @@ char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, cons
 
 void HiChainAuthConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
 {
-    LOGI("HiChainAuthConnector::onFinish reqId:%lld, operation:%d.",
+    LOGI("HiChainAuthConnector::onFinish reqId:%{public}" PRId64 ", operation:%{public}d.",
         requestId, operationCode);
     (void)returnData;
     if (dmDeviceAuthCallback_ == nullptr) {
@@ -129,7 +130,8 @@ void HiChainAuthConnector::onFinish(int64_t requestId, int operationCode, const 
 
 void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
 {
-    LOGI("HichainAuthenCallBack::onError reqId:%lld, operation:%d, errorCode:%d.", requestId, operationCode, errorCode);
+    LOGI("HichainAuthenCallBack::onError reqId:%{public}" PRId64 ", operation:%{public}d, errorCode:%{public}d.",
+        requestId, operationCode, errorCode);
     (void)operationCode;
     (void)errorReturn;
     if (dmDeviceAuthCallback_ == nullptr) {
@@ -271,7 +273,7 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string 
     }
     int32_t result = jsonObject["result"].get<int32_t>();
     if (result != 0) {
-        LOGE("Hichain import public key result is %d.", result);
+        LOGE("Hichain import public key result is %{public}d.", result);
         return ERR_DM_FAILED;
     }
     return DM_OK;

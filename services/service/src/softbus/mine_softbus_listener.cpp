@@ -156,11 +156,11 @@ MineSoftbusListener::~MineSoftbusListener()
 int32_t MineSoftbusListener::RefreshSoftbusLNN(const string &pkgName, const string &searchJson,
     const DmSubscribeInfo &dmSubscribeInfo)
 {
-    LOGI("start to start discovery device with pkgName: %s", pkgName.c_str());
+    LOGI("start to start discovery device with pkgName: %{public}s", pkgName.c_str());
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     if (ParseSearchJson(pkgName, searchJson, output, &outLen) != DM_OK) {
-        LOGE("failed to parse searchJson with pkgName: %s", pkgName.c_str());
+        LOGE("failed to parse searchJson with pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_JSON_PARSE_STRING;
     }
     SubscribeInfo subscribeInfo;
@@ -169,7 +169,7 @@ int32_t MineSoftbusListener::RefreshSoftbusLNN(const string &pkgName, const stri
         LOGE("failed to start quick discovery beause sending broadcast info.");
         return ERR_DM_SOFTBUS_SEND_BROADCAST;
     }
-    LOGI("start discovery device successfully with pkgName: %s", pkgName.c_str());
+    LOGI("start discovery device successfully with pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -177,7 +177,7 @@ int32_t MineSoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
     int retValue = StopRefreshLNN(DM_PKG_NAME, subscribeId);
     if (retValue != SOFTBUS_OK) {
-        LOGE("failed to stop discovery device with ret: %d", retValue);
+        LOGE("failed to stop discovery device with ret: %{public}d", retValue);
         return ERR_DM_SOFTBUS_DISCOVERY_DEVICE;
     }
     return DM_OK;
@@ -188,10 +188,10 @@ void MineSoftbusListener::OnPublishResult(int publishId, PublishResult reason)
     std::unique_lock<std::mutex> locker(g_publishLnnLock);
     if (reason == PUBLISH_LNN_SUCCESS) {
         g_publishLnnFlag = true;
-        LOGI("publishLNN successfully with publishId: %d.", publishId);
+        LOGI("publishLNN successfully with publishId: %{public}d.", publishId);
     } else {
         g_publishLnnFlag = false;
-        LOGE("failed to publishLNN with publishId: %d, reason: %d.", publishId, (int)reason);
+        LOGE("failed to publishLNN with publishId: %{public}d, reason: %{public}d.", publishId, (int)reason);
     }
     g_publishLnnNotify.notify_one();
 }
@@ -205,10 +205,10 @@ void MineSoftbusListener::OnPublishDeviceFound(const DeviceInfo *deviceInfo)
 #if (defined(MINE_HARMONY))
     if (deviceInfo->businessDataLen >= DISC_MAX_CUST_DATA_LEN ||
         deviceInfo->businessDataLen < DM_SEARCH_BROADCAST_MIN_LEN) {
-        LOGE("deviceInfo data is too long or to short with dataLen: %u", deviceInfo->businessDataLen);
+        LOGE("deviceInfo data is too long or to short with dataLen: %{public}u", deviceInfo->businessDataLen);
         return;
     }
-    LOGI("broadcast data is received with DataLen: %u", deviceInfo->businessDataLen);
+    LOGI("broadcast data is received with DataLen: %{public}u", deviceInfo->businessDataLen);
 #endif
     std::unique_lock<std::mutex> autoLock(g_matchWaitDeviceLock);
     g_matchQueue.push_back(*deviceInfo);
@@ -231,7 +231,7 @@ void MineSoftbusListener::OnRePublish(void)
     while (PublishLNN(DM_PKG_NAME, &publishInfo, &publishLNNCallback_) != SOFTBUS_OK &&
         retryTimes <= MAX_RETRY_TIMES) {
         retryTimes++;
-        LOGW("failed to rePublishLNN with retryTimes: %d", retryTimes);
+        LOGW("failed to rePublishLNN with retryTimes: %{public}d", retryTimes);
         usleep(SOFTBUS_CHECK_INTERVAL);
     }
     LOGI("rePublishLNN finish");
@@ -247,7 +247,7 @@ int32_t MineSoftbusListener::ParseSearchJson(const string &pkgName, const string
     }
     int32_t retValue = DM_OK;
     uint32_t findMode = object[FIELD_DEVICE_MODE];
-    LOGI("quick search device mode is: %u", findMode);
+    LOGI("quick search device mode is: %{public}u", findMode);
     switch (findMode) {
         case FIND_ALL_DEVICE:
             retValue = ParseSearchAllDevice(object, pkgName, output, outLen);
@@ -259,13 +259,13 @@ int32_t MineSoftbusListener::ParseSearchJson(const string &pkgName, const string
             retValue = ParseSearchVertexDevice(object, pkgName, output, outLen);
             break;
         default:
-            LOGE("key type is not match key: %s.", FIELD_DEVICE_MODE);
+            LOGE("key type is not match key: %{public}s.", FIELD_DEVICE_MODE);
     }
     if (retValue != DM_OK) {
-        LOGE("fail to parse search find device with ret: %d.", retValue);
+        LOGE("fail to parse search find device with ret: %{public}d.", retValue);
         return retValue;
     }
-    LOGI("parse search json successfully with pkgName: %s, outLen: %u,", pkgName.c_str(), *outLen);
+    LOGI("parse search json successfully with pkgName: %{public}s, outLen: %{public}zu,", pkgName.c_str(), *outLen);
     return DM_OK;
 }
 
@@ -293,7 +293,7 @@ int32_t MineSoftbusListener::ParseSearchScopeDevice(const nlohmann::json &object
         return ERR_DM_FAILED;
     }
     if (!object.contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].is_array()) {
-        LOGE("failed to get %s scope cjson object or is not array.", FIELD_FILTER_OPTIONS);
+        LOGE("failed to get %{public}s scope cjson object or is not array.", FIELD_FILTER_OPTIONS);
         return ERR_DM_FAILED;
     }
     auto optionInfoVec = object[FIELD_FILTER_OPTIONS].get<std::vector<ScopeOptionInfo>>();
@@ -302,7 +302,7 @@ int32_t MineSoftbusListener::ParseSearchScopeDevice(const nlohmann::json &object
         LOGE("failed to get search josn array lenght.");
         return ERR_DM_INVALID_JSON_STRING;
     }
-    LOGI("start to parse scope search array json with size:%d.", optionInfoVecSize);
+    LOGI("start to parse scope search array json with size:%{public}zu.", optionInfoVecSize);
     if (ParseScopeDeviceJsonArray(optionInfoVec, output + sizeof(BroadcastHead), outLen) != DM_OK) {
         LOGE("failed to parse scope json array.");
         return ERR_DM_FAILED;
@@ -324,7 +324,7 @@ int32_t MineSoftbusListener::ParseSearchVertexDevice(const nlohmann::json &objec
         return ERR_DM_FAILED;
     }
     if (!object.contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].is_array()) {
-        LOGE("failed to get %s vertex cjson object or is not array.", FIELD_FILTER_OPTIONS);
+        LOGE("failed to get %{public}s vertex cjson object or is not array.", FIELD_FILTER_OPTIONS);
         return ERR_DM_FAILED;
     }
     auto optionInfoVec = object[FIELD_FILTER_OPTIONS].get<std::vector<VertexOptionInfo>>();
@@ -333,7 +333,7 @@ int32_t MineSoftbusListener::ParseSearchVertexDevice(const nlohmann::json &objec
         LOGE("failed to get search josn array lenght.");
         return ERR_DM_FAILED;
     }
-    LOGI("start to parse vertex search array json with size: %d.", optionInfoVecSize);
+    LOGI("start to parse vertex search array json with size: %{public}zu.", optionInfoVecSize);
     if (ParseVertexDeviceJsonArray(optionInfoVec, output + sizeof(BroadcastHead), outLen) != DM_OK) {
         LOGE("failed to parse vertex json array.");
         return ERR_DM_FAILED;
@@ -374,9 +374,9 @@ void MineSoftbusListener::AddHeadToBroadcast(const BroadcastHead &broadcastHead,
     }
     output[startPos++] = broadcastHead.findMode;
     output[startPos++] = broadcastHead.trustFilter;
-    LOGI("find device info with version: %d, findMode: %d, HeadLen: %d, tlvDataLen: %d, trustFilter: %d",
-         (int)(broadcastHead.version), (int)(broadcastHead.findMode), (int)(broadcastHead.headDataLen),
-         (int)(broadcastHead.tlvDataLen), (int)(broadcastHead.trustFilter));
+    LOGI("find device info with version: %{public}d, findMode: %{public}d, HeadLen: %{public}d, tlvDataLen: %{public}d,"
+        "trustFilter: %{public}d", (int)(broadcastHead.version), (int)(broadcastHead.findMode),
+        (int)(broadcastHead.headDataLen), (int)(broadcastHead.tlvDataLen), (int)(broadcastHead.trustFilter));
 }
 
 int32_t MineSoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionInfo> &optionInfo,
@@ -389,7 +389,8 @@ int32_t MineSoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionI
     for (size_t i = 0; i < arraySize; i++) {
         if (GetSha256Hash(optionInfo[i].deviceAlias.c_str(),
                           optionInfo[i].deviceAlias.size(), sha256Out) != DM_OK) {
-            LOGE("failed to get sha256 hash with index: %d, value: %s.", i, optionInfo[i].deviceAlias.c_str());
+            LOGE("failed to get sha256 hash with index: %{public}zu, value: %{public}s.", i,
+                optionInfo[i].deviceAlias.c_str());
             return ERR_DM_FAILED;
         }
         output[(*outLen)++] = DEVICE_ALIAS_NUMBER;
@@ -423,7 +424,7 @@ int32_t MineSoftbusListener::ParseVertexDeviceJsonArray(const std::vector<Vertex
 
     for (size_t i = 0; i < arraySize; i++) {
         if (optionInfo[i].type.empty() || optionInfo[i].value.empty()) {
-            LOGE("failed to get type or value cjosn object with index: %u", i);
+            LOGE("failed to get type or value cjosn object with index: %{public}zu", i);
             continue;
         }
         if (optionInfo[i].type == "deviceUdid") {
@@ -433,13 +434,13 @@ int32_t MineSoftbusListener::ParseVertexDeviceJsonArray(const std::vector<Vertex
         } else if (optionInfo[i].type == "deviceSn") {
             output[(*outLen)++] = DEVICE_SN_TYPE;
         } else {
-            LOGE("type:%s is not allowed with index: %u.", optionInfo[i].type.c_str(), i);
+            LOGE("type:%{public}s is not allowed with index: %{public}zu.", optionInfo[i].type.c_str(), i);
             return ERR_DM_FAILED;
         }
         output[(*outLen)++] = DM_HASH_DATA_LEN;
         if (GetSha256Hash((const char *) optionInfo[i].value.data(), optionInfo[i].value.size(),
                           sha256Out) != DM_OK) {
-            LOGE("failed to get value sha256 hash with index: %u", i);
+            LOGE("failed to get value sha256 hash with index: %{public}zu", i);
             return ERR_DM_GET_DATA_SHA256_HASH;
         }
         for (int j = 0; j < (int32_t)DM_HASH_DATA_LEN; j++) {
@@ -474,7 +475,7 @@ int32_t MineSoftbusListener::SetBroadcastTrustOptions(const json &object, Broadc
         broadcastHead.trustFilter = FIND_NOTRUST_DEVICE;
         return DM_OK;
     }
-    LOGE("key type is error with key: %s", FIELD_TRUST_OPTIONS);
+    LOGE("key type is error with key: %{public}s", FIELD_TRUST_OPTIONS);
     return ERR_DM_FAILED;
 }
 
@@ -512,7 +513,7 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
     char base64Out[DISC_MAX_CUST_DATA_LEN] = {0};
     retValue = DmBase64Encode(base64Out, DISC_MAX_CUST_DATA_LEN, output, outputLen, base64OutLen);
     if (retValue != 0) {
-        LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
+        LOGE("failed to get search data base64 encode type data with ret: %{public}d.", retValue);
         return ERR_DM_FAILED;
     }
 #if (defined(MINE_HARMONY))
@@ -522,11 +523,11 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
     IRefreshCallback softbusRefreshCallback_ = SoftbusListener::GetSoftbusRefreshCb();
     retValue = RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusRefreshCallback_);
     if (retValue != SOFTBUS_OK) {
-        LOGE("failed to start to refresh quick discovery with ret: %d.", retValue);
+        LOGE("failed to start to refresh quick discovery with ret: %{public}d.", retValue);
         return ERR_DM_FAILED;
     }
-    LOGI("send search broadcast info by softbus successfully with dataLen: %u, pkgName: %s.", base64OutLen,
-         pkgName.c_str());
+    LOGI("send search broadcast info by softbus successfully with dataLen: %{public}zu, pkgName: %{public}s.",
+        base64OutLen, pkgName.c_str());
     return DM_OK;
 }
 
@@ -604,7 +605,7 @@ int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
     publishInfo.dataLen = 0;
     int retValue = PublishLNN(DM_PKG_NAME, &publishInfo, &publishLNNCallback_);
     if (retValue != SOFTBUS_OK) {
-        LOGE("failed to call softbus publishLNN function with ret: %d.", retValue);
+        LOGE("failed to call softbus publishLNN function with ret: %{public}d.", retValue);
         return ERR_DM_SOFTBUS_PUBLISH_SERVICE;
     }
     std::chrono::seconds timeout = std::chrono::seconds(MAX_SOFTBUS_DELAY_TIME);
@@ -650,9 +651,9 @@ int32_t MineSoftbusListener::ParseBroadcastInfo(DeviceInfo &deviceInfo)
     DevicePolicyInfo devicePolicyInfo;
     Action matchResult = BUSINESS_EXACT_NOT_MATCH;
     BroadcastHead broadcastHead = *(BroadcastHead *)output;
-    LOGI("parse device info with version: %d, findMode: %d, HeadLen: %d, tlvDataLen: %d, trustFilter: %d",
-         (int)(broadcastHead.version), (int)(broadcastHead.findMode), (int)(broadcastHead.headDataLen),
-         (int)(broadcastHead.tlvDataLen), (int)broadcastHead.trustFilter);
+    LOGI("parse device info with version: %{public}d, findMode: %{public}d, HeadLen: %{public}d, tlvDataLen:"
+        "%{public}d, trustFilter: %{public}d", (int)(broadcastHead.version), (int)(broadcastHead.findMode),
+        (int)(broadcastHead.headDataLen), (int)(broadcastHead.tlvDataLen), (int)broadcastHead.trustFilter);
 
     char findMode = broadcastHead.findMode;
     switch (findMode) {
@@ -670,10 +671,10 @@ int32_t MineSoftbusListener::ParseBroadcastInfo(DeviceInfo &deviceInfo)
                 devicePolicyInfo, broadcastHead);
             break;
         default:
-            LOGE("key type is not match key: %s.", FIELD_DEVICE_MODE);
+            LOGE("key type is not match key: %{public}s.", FIELD_DEVICE_MODE);
             return ERR_DM_FAILED;
     }
-    LOGI("parse broadcast info matchResult: %d.", (int)matchResult);
+    LOGI("parse broadcast info matchResult: %{public}d.", (int)matchResult);
     if (matchResult == BUSINESS_EXACT_MATCH) {
         return SendReturnwave(deviceInfo, broadcastHead, matchResult);
     }
@@ -688,11 +689,11 @@ bool MineSoftbusListener::GetBroadcastData(DeviceInfo &deviceInfo, char *output,
     unsigned char *data = (unsigned char *)deviceInfo.businessData;
     int retValue = DmBase64Decode(output, outLen, data, dataLen, base64OutLen);
     if (retValue != 0) {
-        LOGE("failed to with ret: %d.", retValue);
+        LOGE("failed to with ret: %{public}d.", retValue);
         return false;
     }
     if (base64OutLen < DM_SEARCH_BROADCAST_MIN_LEN) {
-        LOGE("data length too short with outLen: %u.", base64OutLen);
+        LOGE("data length too short with outLen: %{public}zu.", base64OutLen);
         return false;
     }
 #endif
@@ -701,8 +702,8 @@ bool MineSoftbusListener::GetBroadcastData(DeviceInfo &deviceInfo, char *output,
     size_t tlvDataLen = broadcastHead->tlvDataLen;
     if (hDataLen >= DISC_MAX_CUST_DATA_LEN || tlvDataLen >= DISC_MAX_CUST_DATA_LEN ||
         (hDataLen + tlvDataLen) != base64OutLen) {
-        LOGE("data lenght is not valid with: headDataLen: %u, tlvDataLen: %u, base64OutLen: %d.",
-             hDataLen, tlvDataLen, base64OutLen);
+        LOGE("data lenght is not valid with: headDataLen: %{public}zu, tlvDataLen: %{public}zu, base64OutLen:"
+            "%{public}zu.", hDataLen, tlvDataLen, base64OutLen);
         return false;
     }
     return true;
@@ -772,7 +773,7 @@ Action MineSoftbusListener::MatchSearchScopeDevice(DeviceInfo &deviceInfo, char 
                 matchItemResult[DEVICE_ALIAS_NUMBER] = 1;
             }
         } else {
-            LOGE("the value of type is not allowed with type: %u.", output[i]);
+            LOGE("the value of type is not allowed with type: %{public}u.", output[i]);
             continue;
         }
     }
@@ -830,7 +831,7 @@ Action MineSoftbusListener::MatchSearchVertexDevice(DeviceInfo &deviceInfo, char
                 matchItemResult[DEVICE_UDID_TYPE] = 1;
             }
         } else {
-            LOGE("the value of type is not allowed with type: %u.", output[i]);
+            LOGE("the value of type is not allowed with type: %{public}u.", output[i]);
         }
     }
     return GetMatchResult(matchItemNum, matchItemResult);
@@ -858,16 +859,16 @@ int32_t MineSoftbusListener::SendReturnwave(DeviceInfo &deviceInfo, const Broadc
     int retValue = DmBase64Encode((char *)(deviceInfo.businessData), DISC_MAX_CUST_DATA_LEN,
         outData, outLen, base64OutLen);
     if (retValue != 0) {
-        LOGE("failed to get search data base64 encode type data with ret: %d.", retValue);
+        LOGE("failed to get search data base64 encode type data with ret: %{public}d.", retValue);
         return ERR_DM_FAILED;
     }
     deviceInfo.businessData[base64OutLen] = '\0';
     retValue = SetDiscoveryPolicy(DM_PKG_NAME, &deviceInfo, (int32_t)matchResult);
     if (retValue != SOFTBUS_OK) {
-        LOGE("failed to set discovery policy with ret: %d.", retValue);
+        LOGE("failed to set discovery policy with ret: %{public}d.", retValue);
     }
 #endif
-    LOGI("set discovery policy successfully with dataLen: %u.", base64OutLen);
+    LOGI("set discovery policy successfully with dataLen: %{public}zu.", base64OutLen);
     return DM_OK;
 }
 
@@ -876,7 +877,7 @@ bool MineSoftbusListener::GetDeviceAliasHash(char *output)
     char deviceAlias[DM_MAX_DEVICE_ALIAS_LEN + 1] = {0};
     int32_t retValue = GetParameter(DEVICE_ALIAS, "not exist", deviceAlias, DM_MAX_DEVICE_ALIAS_LEN);
     if (retValue < 0 || strcmp((const char *)deviceAlias, "not exist") == 0) {
-        LOGE("failed to get device alias from system parameter with ret: %d.", retValue);
+        LOGE("failed to get device alias from system parameter with ret: %{public}d.", retValue);
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
@@ -913,7 +914,7 @@ bool MineSoftbusListener::GetDeviceUdidHash(char *output)
     char deviceUdid[DM_MAX_DEVICE_UDID_LEN + 1] = {0};
     int32_t retValue = GetDevUdid(deviceUdid, DM_MAX_DEVICE_UDID_LEN);
     if (retValue != 0) {
-        LOGE("failed to get local device udid with ret: %d.", retValue);
+        LOGE("failed to get local device udid with ret: %{public}d.", retValue);
         return false;
     }
     char sha256Out[SHA256_OUT_DATA_LEN] = {0};
@@ -950,7 +951,7 @@ bool MineSoftbusListener::GetDeviceNumber(char *output)
     char deviceNumber[DM_DEVICE_NUMBER_LEN + 1] = {0};
     int32_t retValue = GetParameter(DEVICE_NUMBER, "not exist", deviceNumber, DM_DEVICE_NUMBER_LEN);
     if (retValue < 0 || strcmp((const char *)deviceNumber, "not exist") == 0) {
-        LOGE("failed to get device number from system parameter with ret: %d.", retValue);
+        LOGE("failed to get device number from system parameter with ret: %{public}d.", retValue);
         return false;
     }
     for (size_t i = 0; i < DM_DEVICE_NUMBER_LEN; i++) {

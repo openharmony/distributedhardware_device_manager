@@ -14,6 +14,7 @@
  */
 
 #include "dm_common_event_manager.h"
+#include "dm_log.h"
 #include "dm_common_event_manager_fuzzer.h"
 
 namespace OHOS {

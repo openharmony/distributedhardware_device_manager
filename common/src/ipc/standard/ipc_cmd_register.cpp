@@ -43,7 +43,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
     }
 
     if (setIpcRequestFuncMap_.count(cmdCode) == 0) {
-        LOGE("cmdCode:%d not register SetRequestFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register SetRequestFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
 
@@ -67,7 +67,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
     }
     auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
     if (readResponseMapIter == readResponseFuncMap_.end()) {
-        LOGE("cmdCode:%d not register ReadResponseFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register ReadResponseFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (readResponseMapIter->second == nullptr) {
@@ -84,7 +84,7 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
     }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
     if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
-        LOGE("cmdCode:%d not register OnIpcCmdFunc", cmdCode);
+        LOGE("cmdCode:%{public}d not register OnIpcCmdFunc", cmdCode);
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (onIpcCmdMapIter->second ==  nullptr) {

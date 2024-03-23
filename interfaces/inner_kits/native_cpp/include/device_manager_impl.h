@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -376,6 +376,9 @@ public:
     virtual int32_t CheckAccessToTarget(uint64_t tokenId, const std::string &targetId) override;
 
     virtual int32_t DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType) override;
+
+    virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
+                                           int32_t &securityLevel) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

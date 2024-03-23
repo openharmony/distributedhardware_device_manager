@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -678,7 +678,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
             DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceBasicInfo);
             break;
         default:
-            LOGE("unknown device state:%d", deviceState);
+            LOGE("unknown device state:%{public}d", deviceState);
             break;
     }
     reply.WriteInt32(DM_OK);
@@ -1573,6 +1573,26 @@ ON_IPC_READ_RESPONSE(DP_ACL_ADD, MessageParcel &reply, std::shared_ptr<IpcRsp> p
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(GET_SECURITY_LEVEL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(networkId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 
+ON_IPC_READ_RESPONSE(GET_SECURITY_LEVEL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetSecurityLevel(reply.ReadInt32());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

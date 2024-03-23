@@ -63,7 +63,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             "ERROR_CODE", std::abs(info.errCode));
     }
     if (res != DM_OK) {
-        LOGE("ReportDiscoverRegCallback error, res:%d", res);
+        LOGE("ReportDiscoverRegCallback error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -104,7 +104,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
     }
 
     if (res != DM_OK) {
-        LOGE("ReportDiscoverResCallback error, res:%d", res);
+        LOGE("ReportDiscoverResCallback error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -153,7 +153,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "ERROR_CODE", std::abs(info.errCode));
     }
     if (res != DM_OK) {
-        LOGE("ReportDiscoverUserRes error, res:%d", res);
+        LOGE("ReportDiscoverUserRes error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -175,7 +175,7 @@ bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
         "PEER_UDID", GetUdidHashByUdid(peerUdid),
         "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()));
     if (res != DM_OK) {
-        LOGE("ReportAuthStart error, res:%d", res);
+        LOGE("ReportAuthStart error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -222,7 +222,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthOpenSession error, res:%d", res);
+        LOGE("ReportAuthOpenSession error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -241,7 +241,7 @@ bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
         "STAGE_RES", info.stageRes,
         "CH_ID", info.channelId);
     if (res != DM_OK) {
-        LOGE("ReportAuthSessionOpenCb error, res:%d", res);
+        LOGE("ReportAuthSessionOpenCb error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -263,7 +263,7 @@ bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo &info)
         "IS_TRUST", static_cast<int32_t>(TrustStatus::NOT_TRUST),
         "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS));
     if (res != DM_OK) {
-        LOGE("ReportAuthSessionOpenCb error, res:%d", res);
+        LOGE("ReportAuthSessionOpenCb error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -281,7 +281,7 @@ bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo &info)
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX),
         "STAGE_RES", info.stageRes);
     if (res != DM_OK) {
-        LOGE("ReportAuthPullAuthBox error, res:%d", res);
+        LOGE("ReportAuthPullAuthBox error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -314,7 +314,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::USER))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthConfirmBox error, res:%d", res);
+        LOGE("ReportAuthConfirmBox error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -351,7 +351,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::HICHAIN))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthCreateGroup error, res:%d", res);
+        LOGE("ReportAuthCreateGroup error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -386,7 +386,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_CREATE_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthCreateGroupCb error, res:%d", res);
+        LOGE("ReportAuthCreateGroupCb error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -404,7 +404,7 @@ bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo &info)
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_BOX_START),
         "STAGE_RES", info.stageRes);
     if (res != DM_OK) {
-        LOGE("ReportAuthPullPinBox error, res:%d", res);
+        LOGE("ReportAuthPullPinBox error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -437,7 +437,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::USER))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthInputPinBox error, res:%d", res);
+        LOGE("ReportAuthInputPinBox error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -476,7 +476,7 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::HICHAIN))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthAddGroup error, res:%d", res);
+        LOGE("ReportAuthAddGroup error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -512,7 +512,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_ADD_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthAddGroupCb error, res:%d", res);
+        LOGE("ReportAuthAddGroupCb error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -535,7 +535,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "IS_TRUST", info.isTrust);
     if (res != DM_OK) {
-        LOGE("ReportNetworkOnline error, res:%d", res);
+        LOGE("ReportNetworkOnline error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -557,7 +557,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
         "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId));
     if (res != DM_OK) {
-        LOGE("ReportNetworkOffline error, res:%d", res);
+        LOGE("ReportNetworkOffline error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -580,7 +580,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "TO_CALL_PKG", info.toCallPkg);
     if (res != DM_OK) {
-        LOGE("ReportDeleteTrustRelation error, res:%d", res);
+        LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
         return false;
     }
     return true;
@@ -618,7 +618,7 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
     }
     if (res != DM_OK) {
-        LOGE("ReportDeleteTrustRelation error, res:%d", res);
+        LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
         return false;
     }
     return true;

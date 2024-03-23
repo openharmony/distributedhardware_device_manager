@@ -130,7 +130,7 @@ int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLe
         } else if ((c >= 'A') && (c <= 'F')) {
             c -= 'A' - DEC_MAX_NUM;
         } else {
-            LOGE("HexToString Error! %c", c);
+            LOGE("HexToString Error! %{public}c", c);
             return ERR_DM_FAILED;
         }
         unsigned char c2 = *inBuf++;
@@ -141,7 +141,7 @@ int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLe
         } else if ((c2 >= 'A') && (c2 <= 'F')) {
             c2 -= 'A' - DEC_MAX_NUM;
         } else {
-            LOGE("HexToString Error! %c", c2);
+            LOGE("HexToString Error! %{public}c", c2);
             return ERR_DM_FAILED;
         }
         *outBuf++ = (c << HEX_MAX_BIT_NUM) | c2;
