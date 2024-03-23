@@ -98,7 +98,12 @@ void DmDialogManager::ShowPinDialog(const std::string param)
     bundleName_ = dmUiBundleName;
     abilityName_ = pinAbilityName;
     pinCode_ = param;
-    ConnectExtension();
+    std::thread pinDilog(ConnectExtension);
+    int32_t ret = pthread_setname_np(pinDilog.native_handle(), DEVICE_ONLINE);
+    if (ret != DM_OK) {
+        LOGE("pinDilog setname failed.");
+    }
+    pinDilog.detach();
 }
 
 void DmDialogManager::ShowInputDialog(const std::string param)
