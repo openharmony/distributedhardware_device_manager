@@ -23,6 +23,7 @@
 #include "ipc_skeleton.h"
 #include "native_token_info.h"
 #include "securec.h"
+#include "tokenid_kit.h"
 
 using namespace OHOS::Security::AccessToken;
 
@@ -101,6 +102,10 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         HapTokenInfo tokenInfo;
         if (AccessTokenKit::GetHapTokenInfo(tokenCaller, tokenInfo) != EOK) {
             LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenCaller)) {
+            LOGE("GetCallerProcessName not system hap.");
             return ERR_DM_FAILED;
         }
         processName = std::move(tokenInfo.bundleName);
