@@ -86,6 +86,7 @@ private:
 
 private:
     std::mutex locks_;
+    std::mutex subIdMapLocks_;
     std::shared_ptr<DmTimer> timer_;
     std::map<std::string, uint16_t> pkgName2SubIdMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;

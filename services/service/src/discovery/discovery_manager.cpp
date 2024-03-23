@@ -73,7 +73,10 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     }
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
         dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
-        pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
+        {
+            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+            pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
+        }
     }
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
@@ -101,7 +104,10 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     uint16_t subscribeId = DM_INVALID_FLAG_ID;
     if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end()) {
         subscribeId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
-        pkgName2SubIdMap_.erase(pkgName);
+        {
+            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+            pkgName2SubIdMap_.erase(pkgName);
+        }
     }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
     return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
@@ -257,11 +263,16 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
     if (isOnline && GetDeviceAclParam(pkgName, deviceIdHash, filterPara.isOnline, filterPara.authForm) != DM_OK) {
         LOGE("The found device get online param failed.");
     }
+    uint16_t subscribeId = 0;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        subscribeId = pkgName2SubIdMap_[pkgName];
+    }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            listener_->OnDeviceFound(pkgName, pkgName2SubIdMap_[pkgName], info);
+            listener_->OnDeviceFound(pkgName, subscribeId, info);
             return;
         }
         discoveryContext = iter->second;
