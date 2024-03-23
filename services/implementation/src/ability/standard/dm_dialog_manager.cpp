@@ -115,6 +115,17 @@ void DmDialogManager::ConnectExtension()
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
+    if (!isDialogDestroy_.load()) {
+        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
+            [] () { return isDialogDestroy_.load(); });
+        if (!status) {
+            LOGE("wait dm dialog close failed.");
+            return;
+        }
+        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
+    }
     auto abilityManager = AAFwk::AbilityManagerClient::GetInstance();
     if (abilityManager == nullptr) {
         LOGE("AbilityManagerClient is nullptr");
@@ -142,15 +153,6 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     if (remoteObject == nullptr) {
         LOGE("remoteObject is nullptr");
         return;
-    }
-    if (!isDialogDestroy_.load()) {
-        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
-            [] () { return isDialogDestroy_.load(); });
-        if (!status) {
-            LOGE("wait dm dialog close failed.");
-            return;
-        }
-        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
     }
     MessageParcel data;
     MessageParcel reply;
