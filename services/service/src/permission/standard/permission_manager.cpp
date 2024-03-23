@@ -104,7 +104,8 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
             LOGE("GetHapTokenInfo failed.");
             return ERR_DM_FAILED;
         }
-        if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenCaller)) {
+        uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
+        if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
             LOGE("GetCallerProcessName not system hap.");
             return ERR_DM_FAILED;
         }
