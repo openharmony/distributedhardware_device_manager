@@ -104,12 +104,12 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
             LOGE("GetHapTokenInfo failed.");
             return ERR_DM_FAILED;
         }
+        processName = std::move(tokenInfo.bundleName);
         uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
         if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
-            LOGE("GetCallerProcessName not system hap.");
+            LOGE("GetCallerProcessName %s not system hap.", processName.c_str());
             return ERR_DM_FAILED;
         }
-        processName = std::move(tokenInfo.bundleName);
     } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         NativeTokenInfo tokenInfo;
         if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
