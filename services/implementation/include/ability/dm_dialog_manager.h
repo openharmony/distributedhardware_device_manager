@@ -28,9 +28,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class DmDialogManager {
 public:
-    DmDialogManager();
-    ~DmDialogManager();
-    void ConnectExtension();
+    static DmDialogManager &GetInstance();
+    static void ConnectExtension();
     void ShowConfirmDialog(const std::string param);
     void ShowPinDialog(const std::string param);
     void ShowInputDialog(const std::string param);
@@ -74,6 +73,8 @@ public:
         return targetDeviceName_;
     }
 private:
+    DmDialogManager();
+    ~DmDialogManager();
     class DialogAbilityConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
         void OnAbilityConnectDone(
@@ -94,7 +95,8 @@ private:
     static int32_t deviceType_;
     static std::atomic<bool> isDialogDestroy_;
     static std::condition_variable dialogCondition_;
-    sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ {nullptr};
+    static sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_;
+    static DmDialogManager dialogMgr_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
