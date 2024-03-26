@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,8 +31,15 @@ void OnSoftbusDeviceOfflineFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftbusDeviceOffline(info);
+    NodeBasicInfo info;
+    if (memcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
+        return;
+    }
+    if (memcpy_s(info.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
+        return;
+    }
+    info.deviceTypeId = *(reinterpret_cast<const uint16_t *>(data));
+    softbusListener->OnSoftbusDeviceOffline(&info);
 }
 }
 }
