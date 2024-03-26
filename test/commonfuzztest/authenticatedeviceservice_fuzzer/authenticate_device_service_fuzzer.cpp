@@ -17,25 +17,57 @@
 #include <vector>
 #include "device_manager_service.h"
 #include "authenticate_device_service_fuzzer.h"
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+void AddPermission()
+{
+    const int32_t permsNum = 3;
+    const int32_t indexZero = 0;
+    const int32_t indexOne = 1;
+    const int32_t indexTwo = 2;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[indexTwo] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "device_manager",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
 void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+
+    AddPermission();
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string udid;
     std::string network;
     std::string device;
-    int32_t authType = 123;
+    int32_t authType = 1;
     DmAuthParam authParam;
     std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
     int32_t deviceType = 0;
 
+    DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
