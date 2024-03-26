@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,26 +20,24 @@
 #include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "softbus_listener.h"
-#include "on_softbus_device_online_fuzzer.h"
+#include "publish_softbus_lnn_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void OnSoftbusDeviceOnlineFuzzTest(const uint8_t* data, size_t size)
+void PublishSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t) || (size > DM_MAX_DEVICE_ID_LEN))) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    NodeBasicInfo info;
-    if (memcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    if (memcpy_s(info.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    info.deviceTypeId = *(reinterpret_cast<const uint16_t *>(data));
-    softbusListener->OnSoftbusDeviceOnline(&info);
+
+    DmPublishInfo dmPublishInfo;
+    dmPublishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
+    std::string capability(reinterpret_cast<const char*>(data), size);
+    std::string customData(reinterpret_cast<const char*>(data), size);
+
+    softbusListener->PublishSoftbusLNN(dmPublishInfo, capability, customData);
 }
 }
 }
@@ -48,7 +46,7 @@ void OnSoftbusDeviceOnlineFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::OnSoftbusDeviceOnlineFuzzTest(data, size);
+    OHOS::DistributedHardware::PublishSoftbusLNNFuzzTest(data, size);
 
     return 0;
 }
