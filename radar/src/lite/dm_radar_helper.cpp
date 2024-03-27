@@ -42,7 +42,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
     return true;
 }
 
-bool DmRadarHelper::ReportAuthStart(std::string peerUdid)
+bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::string &pkgName)
 {
     return true;
 }

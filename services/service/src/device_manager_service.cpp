@@ -339,6 +339,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
+    SoftbusListener::SetHostPkgName(pkgName);
     std::map<std::string, std::string> discParam;
     discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID,
         std::to_string(subscribeInfo.subscribeId)));
@@ -364,6 +365,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
+    SoftbusListener::SetHostPkgName(pkgName);
     std::map<std::string, std::string> discParam;
     discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId)));
 
@@ -1093,6 +1095,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SoftbusListener::SetHostPkgName(pkgName);
     return discoveryMgr_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
 }
 
@@ -1210,7 +1213,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
 
 int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1234,7 +1237,7 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
 int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
     DmPinType pinType, const std::string &payload)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call CreatePinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1258,7 +1261,7 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
 int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
     DmPinType pinType, const std::string &payload)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call DestroyPinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }

@@ -15,6 +15,9 @@
 
 #include "dm_dialog_manager.h"
 
+#include <pthread.h>
+#include <thread>
+
 #include "ability_manager_client.h"
 #include "auth_message_processor.h"
 #include "dm_anonymous.h"
@@ -30,6 +33,7 @@ static constexpr int32_t INVALID_USERID = -1;
 static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 static constexpr int32_t WAIT_DIALOG_CLOSE_TIME_S = 10;
 const int32_t USLEEP_SHOW_PIN_TIME_US = 50000;  // 50ms
+const std::string CONNECT_PIN_DIALOG = "pinDialog";
 const std::string dmUiBundleName = "com.ohos.devicemanagerui";
 const std::string comfirmAbilityName = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
 const std::string pinAbilityName = "com.ohos.devicemanagerui.PincodeUIExtAbility";
@@ -49,11 +53,19 @@ std::string DmDialogManager::pinCode_ = "";
 std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
 std::condition_variable DmDialogManager::dialogCondition_;
 int32_t DmDialogManager::deviceType_ = -1;
+DmDialogManager DmDialogManager::dialogMgr_;
+sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
+    new (std::nothrow) DialogAbilityConnection());
 
-DmDialogManager::DmDialogManager() : dialogConnectionCallback_(new DialogAbilityConnection()) {}
+DmDialogManager::DmDialogManager() {}
 DmDialogManager::~DmDialogManager()
 {
     dialogConnectionCallback_ = nullptr;
+}
+
+DmDialogManager &DmDialogManager::GetInstance()
+{
+    return dialogMgr_;
 }
 
 void DmDialogManager::ShowConfirmDialog(const std::string param)
@@ -92,7 +104,12 @@ void DmDialogManager::ShowPinDialog(const std::string param)
     bundleName_ = dmUiBundleName;
     abilityName_ = pinAbilityName;
     pinCode_ = param;
-    ConnectExtension();
+    std::thread pinDilog(ConnectExtension);
+    int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
+    if (ret != DM_OK) {
+        LOGE("pinDilog setname failed.");
+    }
+    pinDilog.detach();
 }
 
 void DmDialogManager::ShowInputDialog(const std::string param)
@@ -105,6 +122,18 @@ void DmDialogManager::ShowInputDialog(const std::string param)
 
 void DmDialogManager::ConnectExtension()
 {
+    LOGI("DmDialogManager::ConnectExtension start.");
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
+    if (!isDialogDestroy_.load()) {
+        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
+            [] () { return isDialogDestroy_.load(); });
+        if (!status) {
+            LOGE("wait dm dialog close failed.");
+            return;
+        }
+        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
+    }
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
@@ -115,6 +144,7 @@ void DmDialogManager::ConnectExtension()
         return;
     }
 
+    LOGI("DmDialogManager::ConnectExtension abilityManager ConnectAbility begin.");
     auto ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
     if (ret != ERR_OK) {
         LOGE("ConnectExtensionAbility sceneboard failed.");
@@ -136,15 +166,6 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     if (remoteObject == nullptr) {
         LOGE("remoteObject is nullptr");
         return;
-    }
-    if (!isDialogDestroy_.load()) {
-        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
-            [] () { return isDialogDestroy_.load(); });
-        if (!status) {
-            LOGE("wait dm dialog close failed.");
-            return;
-        }
-        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
     }
     MessageParcel data;
     MessageParcel reply;

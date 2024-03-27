@@ -17,6 +17,7 @@ group("fuzztest") {
   deps = [
     "authenticatedevice_fuzzer:fuzztest",
     "authenticatedeviceservice_fuzzer:fuzztest",
+    "authenticatedeviceserviceimpl_fuzzer:fuzztest",
     "dmauthmanager_fuzzer:fuzztest",
     "dmcommoneventmanager_fuzzer:fuzztest",
     "dmcredentialimpl_fuzzer:fuzztest",

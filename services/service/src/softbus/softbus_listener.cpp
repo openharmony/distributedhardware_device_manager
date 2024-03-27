@@ -66,6 +66,7 @@ bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 std::shared_ptr<DmTimer> SoftbusListener::timer_ = std::make_shared<DmTimer>();
 void* SoftbusListener::radarHandle_ = nullptr;
+std::string SoftbusListener::hostName_ = "";
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -446,6 +447,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
     struct RadarInfo info = {
         .funcName = "RefreshSoftbusLNN",
+        .hostName = GetHostPkgName(),
         .toCallPkg = "dsoftbus",
         .stageRes = (ret == DM_OK) ?
                     static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -1003,6 +1005,18 @@ bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
     radarHandle_ = nullptr;
     LOGI("close libdevicemanagerradar so success.");
     return true;
+}
+
+void SoftbusListener::SetHostPkgName(const std::string hostName)
+{
+    hostName_ = hostName;
+    LOGI("SetHostPkgName::hostName_ :%s.", hostName_.c_str());
+}
+
+std::string SoftbusListener::GetHostPkgName()
+{
+    LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
+    return hostName_;
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()
