@@ -148,8 +148,7 @@ struct InputCustomDialog {
 
   passwordOnChange(value: string) {
     console.info(TAG + 'passwordOnChange in');
-    this.password = value;
-    if (this.isNumberSix(this.password)) {
+    if (this.isNumberSix(value)) {
       this.confirm();
     }
   }
