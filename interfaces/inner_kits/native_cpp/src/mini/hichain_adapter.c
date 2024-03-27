@@ -27,14 +27,12 @@
 
 #define HICHAIN_DELAY_TICK_COUNT (10 * LOSCFG_BASE_CORE_TICK_PER_SECOND)  // delay 10s
 
-// It is only the id of a group operator request an has no security risk.
-static const int64_t CREATE_GROUP_REQUESTID = 159357462;
 static const UINT32 HICHAIN_SEM_INIT_COUNT = 0;
 
 static const char * const HICHAIN_PKG_NAME = "com.ohos.devicemanager";
 static const char * const FILED_GROUP_TYPE = "groupType";
-static const char * const FIELD_CREDENTIAL_EXISTS = "isCredentialExists";
 static const char * const DM_GROUP_NAME = "devicemanager";
+static const char * const FIELD_CREDENTIAL_EXISTS = "isCredentialExists";
 
 static const int GROUP_TYPE_INVALID_GROUP = -1;
 static const int GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;
@@ -48,13 +46,16 @@ static const DeviceGroupManager *g_deviceGroupManager = NULL;
 static const GroupAuthManager *g_groupAuthManager = NULL;
 
 static UINT32 g_createGroupSem = LOSCFG_BASE_IPC_SEM_LIMIT;
+
+// It is only the id of a group operator request an has no security risk.
+static const int64_t CREATE_GROUP_REQUESTID = 159357462;
 static bool g_createGroupFlag = true;      // strict operating timings do not require lock protection
 
 // maximum length of JSON character string input for credential operation
 static const UINT32 DM_MAX_REQUEST_JSON_LEN = 4096;
 
-static int DeleteCredentialAndGroup(void);
-static int ImportCredentialAndGroup(const char *reqJsonStr);
+static int DeleteCredentialAndGroup(char **returnJsonStr);
+static int ImportCredentialAndGroup(const char *reqJsonStr, char **returnJsonStr);
 static int GetUserId(const cJSON *const root, char *userId);
 static int CreateGroupJsonAddObject(const cJSON *const root, cJSON **jsonRoot);
 static void OnFinish(int64_t requestId, int operationCode, const char *returnData);
@@ -315,9 +316,9 @@ int ImportHichainCredential(const char *reqJsonStr, char **returnJsonStr)
     }
 
     DMLOGI("start to import device credential info to hichain.");
-    if (ImportCredentialAndGroup(reqJsonStr) != DM_OK) {
+    if (ImportCredentialAndGroup(reqJsonStr, returnJsonStr) != DM_OK) {
         DMLOGE("failed to import hichain credential and create group.");
-        DeleteCredentialAndGroup();
+        DeleteCredentialAndGroup(returnJsonStr);
         return ERR_DM_HICHAIN_IMPORT_CREDENTIAL;
     }
     DMLOGI("import device credential info to hichain successfully.");
@@ -337,7 +338,7 @@ int DeleteHichainCredential(const char *reqJsonStr, char **returnJsonStr)
     }
 
     DMLOGI("start to delete device credential info from hichain.");
-    if (DeleteCredentialAndGroup() != DM_OK) {
+    if (DeleteCredentialAndGroup(returnJsonStr) != DM_OK) {
         DMLOGE("failed to delete device credential from hichain.");
         return ERR_DM_HICHAIN_DELETE_CREDENTIAL;
     }
@@ -420,12 +421,11 @@ static int GetUserId(const cJSON * const root, char *userId)
     return DM_OK;
 }
 
-static int ImportCredentialAndGroup(const char *reqJsonStr)
+static int ImportCredentialAndGroup(const char *reqJsonStr, char **returnJsonStr)
 {
     cJSON *root = NULL;
     cJSON *groupRoot = NULL;
     char *createParams = NULL;
-    char *returnJsonStr = NULL;
     int retValue = ERR_DM_FAILED;
 #ifdef MINE_HARMONY
     do {
@@ -434,8 +434,8 @@ static int ImportCredentialAndGroup(const char *reqJsonStr)
             DMLOGE("failed to create cjson object.");
             break;
         }
-        int ret = g_deviceGroupManager->processCredential(CREDENTIAL_SAVE, reqJsonStr, &returnJsonStr);
-        if (ret != HC_SUCCESS) {
+        int ret = g_deviceGroupManager->processCredential(CREDENTIAL_SAVE, reqJsonStr, returnJsonStr);
+        if (ret != HC_SUCCESS || returnJsonStr == NULL || *returnJsonStr == NULL) {
             DMLOGE("failed to import credential info to hichain with ret: %d.", ret);
             break;
         }
@@ -470,11 +470,10 @@ static int ImportCredentialAndGroup(const char *reqJsonStr)
 #endif
 }
 
-static int DeleteCredentialAndGroup(void)
+static int DeleteCredentialAndGroup(char **returnJsonStr)
 {
     cJSON *root = NULL;
     char *deleteParams = NULL;
-    char *returnJsonStr = NULL;
     int retValue = ERR_DM_FAILED;
 
 #ifdef MINE_HARMONY
@@ -493,8 +492,8 @@ static int DeleteCredentialAndGroup(void)
             DMLOGE("failed to print string from cjson object.");
             break;
         }
-        int ret = g_deviceGroupManager->processCredential(CREDENTIAL_CLEAR, deleteParams, &returnJsonStr);
-        if (ret != HC_SUCCESS) {
+        int ret = g_deviceGroupManager->processCredential(CREDENTIAL_CLEAR, deleteParams, returnJsonStr);
+        if (ret != HC_SUCCESS || returnJsonStr == NULL || *returnJsonStr == NULL) {
             DMLOGE("failed to delete hichain credential with ret: %d.", ret);
             break;
         }
