@@ -132,7 +132,7 @@ public:
     virtual bool ReportDiscoverRegCallback(struct RadarInfo &info) = 0;
     virtual bool ReportDiscoverResCallback(struct RadarInfo &info) = 0;
     virtual bool ReportDiscoverUserRes(struct RadarInfo &info) = 0;
-    virtual bool ReportAuthStart(std::string peerUdid) = 0;
+    virtual bool ReportAuthStart(const std::string &peerUdid, const std::string &pkgName) = 0;
     virtual bool ReportAuthOpenSession(struct RadarInfo &info) = 0;
     virtual bool ReportAuthSessionOpenCb(struct RadarInfo &info) = 0;
     virtual bool ReportAuthSendRequest(struct RadarInfo &info) = 0;
@@ -158,7 +158,7 @@ public:
     bool ReportDiscoverRegCallback(struct RadarInfo &info) override;
     bool ReportDiscoverResCallback(struct RadarInfo &info) override;
     bool ReportDiscoverUserRes(struct RadarInfo &info) override;
-    bool ReportAuthStart(std::string peerUdid) override;
+    bool ReportAuthStart(const std::string &peerUdid, const std::string &pkgName) override;
     bool ReportAuthOpenSession(struct RadarInfo &info) override;
     bool ReportAuthSessionOpenCb(struct RadarInfo &info) override;
     bool ReportAuthSendRequest(struct RadarInfo &info) override;

@@ -200,7 +200,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     authRequestState_ = std::make_shared<AuthRequestInitState>();
     authRequestState_->SetAuthManager(shared_from_this());
     authRequestState_->SetAuthContext(authRequestContext_);
-    if (!DmRadarHelper::GetInstance().ReportAuthStart(deviceId)) {
+    if (!DmRadarHelper::GetInstance().ReportAuthStart(deviceId, pkgName)) {
         LOGE("ReportAuthStart failed");
     }
     authRequestState_->Enter();
@@ -256,6 +256,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     struct RadarInfo info = {
         .funcName = "UnAuthenticateDevice",
         .toCallPkg = HICHAINNAME,
+        .hostName = pkgName,
         .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
         .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),

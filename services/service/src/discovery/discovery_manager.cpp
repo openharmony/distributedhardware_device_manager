@@ -78,7 +78,6 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
             pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
         }
     }
-
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
