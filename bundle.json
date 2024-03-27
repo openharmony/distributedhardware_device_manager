@@ -28,6 +28,7 @@
                 "access_token",
                 "bounds_checking_function",
                 "bundle_framework",
+                "cJSON",
                 "c_utils",
                 "common_event_service",
                 "device_auth",
@@ -40,16 +41,14 @@
                 "ipc",
                 "json",
                 "napi",
+                "node",
                 "openssl",
                 "os_account",
                 "safwk",
                 "samgr",
                 "resource_management"
             ],
-            "third_party": [
-                "cJSON",
-                "node"
-            ]
+            "third_party": []
         },
         "build": {
             "group_type": {

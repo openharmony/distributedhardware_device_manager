@@ -33,7 +33,6 @@ ohos_shared_library("distributeddevicemanager") {
     "${innerkits_path}/native_cpp/include",
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/ipc/standard",
-    "//third_party/node/src",
   ]
 
   sources = [
@@ -60,6 +59,7 @@ ohos_shared_library("distributeddevicemanager") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   subsystem_name = "distributedhardware"

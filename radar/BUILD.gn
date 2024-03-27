@@ -53,7 +53,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
       "${utils_path}/include/crypto",
-      "//third_party/cJSON",
     ]
 
     sources = [ "src/dm_radar_helper.cpp" ]
@@ -64,12 +63,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [
-      "${utils_path}:devicemanagerutils",
-      "//third_party/cJSON:cjson",
-    ]
+    deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
+      "cJSON:cjson",
       "c_utils:utils",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
