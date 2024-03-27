@@ -1169,12 +1169,15 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
     }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
         LOGI("BindTarget stardard begin.");
-        ConnectionAddrType addrType;
-        PeerTargetId targetIdTemp;
+        if (targetId.wifiIp.empty() || targetId.wifiIp.length() > IP_STR_MAX_LEN) {
+            return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
+        }
+        ConnectionAddrType ipAddrType;
         std::map<std::string, std::string> &noConstBindParam =
             const_cast<std::map<std::string, std::string> &>(bindParam);
-        if (SoftbusListener::GetTargetInfoFromCache(targetId.deviceId, targetIdTemp, addrType) == DM_OK) {
-            noConstBindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
+        if (SoftbusListener::GetIPAddrTypeFromCache(targetId.deviceId, targetId.wifiIp, ipAddrType) == DM_OK) {
+            noConstBindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE,
+                std::to_string(ipAddrType)));
         }
         const std::map<std::string, std::string> &constBindParam =
             const_cast<const std::map<std::string, std::string> &>(noConstBindParam);
