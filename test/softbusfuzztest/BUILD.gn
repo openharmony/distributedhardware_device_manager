@@ -15,6 +15,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "closedmradarhelperobj_fuzzer:fuzztest",
     "onbytesreceived_fuzzer:fuzztest",
     "onparameterchgcallback_fuzzer:fuzztest",
     "onsessionopened_fuzzer:fuzztest",
@@ -29,6 +30,7 @@ group("fuzztest") {
     "softbusconnectorpublish_fuzzer:fuzztest",
     "softbusconnectorregister_fuzzer:fuzztest",
     "softbusconnectorstatic_fuzzer:fuzztest",
+    "softbuslistenergetlocaldeviceinfo_fuzzer:fuzztest",
     "softbussession_fuzzer:fuzztest",
     "softbussessionobject_fuzzer:fuzztest",
     "stoprefreshsoftbuslnn_fuzzer:fuzztest",
