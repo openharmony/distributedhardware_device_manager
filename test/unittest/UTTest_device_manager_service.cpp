@@ -1304,8 +1304,10 @@ HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::Test
 
 HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterLoad_001, testing::ext::TestSize.Level0)
 {
-    auto ret = DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
-    EXPECT_NE(ret, true);
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_001, testing::ext::TestSize.Level0)
@@ -1340,6 +1342,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.Level0)

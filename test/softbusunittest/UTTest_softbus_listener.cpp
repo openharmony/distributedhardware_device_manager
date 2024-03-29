@@ -303,9 +303,15 @@ HWTEST_F(SoftbusListenerTest, CacheDiscoveredDevice_001, testing::ext::TestSize.
 
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_001, testing::ext::TestSize.Level0)
 {
-    std::string deviceId;
+    std::string deviceId = "deviceId";
+    DeviceInfo deviceInfo = {
+        .devId = "deviceId",
+        .devType = (DeviceType)1,
+        .devName = "11111"
+    };
     PeerTargetId targetId;
     ConnectionAddrType addrType;
+    softbusListener->CacheDiscoveredDevice(&deviceInfo);
     int32_t ret = softbusListener->GetTargetInfoFromCache(deviceId, targetId, addrType);
     EXPECT_EQ(ret, DM_OK);
 }
