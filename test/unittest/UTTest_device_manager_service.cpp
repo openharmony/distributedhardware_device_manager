@@ -1437,6 +1437,19 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_002, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
+HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::map<std::string, std::string> advertiseParam;
+    advertiseParam[PARAM_KEY_META_TYPE] = "metaType";
+    advertiseParam[PARAM_KEY_PUBLISH_ID] = "123456";
+    advertiseParam[PARAM_KEY_DISC_MODE] =
+        std::to_string(static_cast<int32_t>(DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE));
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().StartAdvertising(pkgName, advertiseParam);
+    EXPECT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();

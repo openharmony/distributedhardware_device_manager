@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,17 +43,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmPublishInfo dmPubInfo;
-    dmPubInfo.publishId = -1;
-    dmPubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
-    dmPubInfo.freq = DmExchangeFreq::DM_HIGH;
-    dmPubInfo.ranging = true;
-
-    if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
-        LOGI("StartAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
-    }
-    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
-        dmPubInfo.publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
-    }
+    ConfigAdvParam(advertiseParam, &dmPubInfo);
     std::string capability = DM_CAPABILITY_OSD;
     if (advertiseParam.find(PARAM_KEY_DISC_CAPABILITY) != advertiseParam.end()) {
         capability = advertiseParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
@@ -85,6 +75,30 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
             });
     }
     return DM_OK;
+}
+
+void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &advertiseParam,
+    DmPublishInfo *dmPubInfo)
+{
+    if (dmPubInfo == nullptr) {
+        LOGE("ConfigAdvParam failed, dmPubInfo is nullptr.");
+        return;
+    }
+    dmPubInfo->publishId = -1;
+    dmPubInfo->mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
+    dmPubInfo->freq = DmExchangeFreq::DM_HIGH;
+    dmPubInfo->ranging = true;
+
+    if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
+        LOGI("StartAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+    }
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
+        dmPubInfo->publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+    }
+    if (advertiseParam.find(PARAM_KEY_DISC_MODE) != advertiseParam.end()) {
+        dmPubInfo->mode =
+            static_cast<DmDiscoverMode>(std::atoi((advertiseParam.find(PARAM_KEY_DISC_MODE)->second).c_str()));
+    }
 }
 
 int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t publishId)
