@@ -1023,9 +1023,13 @@ std::string SoftbusListener::GetHostPkgName()
     return hostName_;
 }
 
-void SoftbusListener::CacheDeviceInfo(std::string deviceId, std::shared_ptr<DeviceInfo> infoPtr)
+void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_ptr<DeviceInfo> infoPtr)
 {
     if (deviceId.empty()) {
+        return;
+    }
+    if (infoPtr->addrNum <= 0) {
+        LOGE("CacheDeviceInfo failed, infoPtr->addr is empty.");
         return;
     }
     ConnectionAddrType addrType;
@@ -1035,13 +1039,14 @@ void SoftbusListener::CacheDeviceInfo(std::string deviceId, std::shared_ptr<Devi
         return;
     }
     addrType = addrInfo->type;
-    auto iter = discoveredDeviceMap.find(deviceId);
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
+    auto iter = discoveredDeviceMap.find(deviceId);
     if (iter != discoveredDeviceMap.end()) {
         deviceVec = iter->second;
         for (auto it = deviceVec.begin(); it != deviceVec.end();) {
             if (it->first == addrType) {
                 it = deviceVec.erase(it);
+                continue;
             } else {
                 it++;
             }
@@ -1050,10 +1055,10 @@ void SoftbusListener::CacheDeviceInfo(std::string deviceId, std::shared_ptr<Devi
     }
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,
-        std::vector< std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
+        std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
 }
 
-int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, std::string ip,
+int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, const std::string &ip,
     ConnectionAddrType &addrType)
 {
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);

@@ -307,7 +307,17 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_001, testing::ext::TestSize
     DeviceInfo deviceInfo = {
         .devId = "deviceId",
         .devType = (DeviceType)1,
-        .devName = "11111"
+        .devName = "11111",
+        .addrNum = 1,
+        .addr[0] = {
+            .type = ConnectionAddrType::CONNECTION_ADDR_WLAN,
+            .info {
+                .ip {
+                    .ip = "172.0.0.1",
+                    .port = 0,
+                }
+            }
+        }
     };
     PeerTargetId targetId;
     ConnectionAddrType addrType;
