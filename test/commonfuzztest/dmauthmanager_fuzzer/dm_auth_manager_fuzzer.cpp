@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,32 +16,98 @@
 #include <string>
 
 #include "device_manager_service_listener.h"
+#define private public
+#include "auth_message_processor.h"
 #include "dm_auth_manager.h"
-#include "hichain_connector.h"
+#undef private
 #include "dm_auth_manager_fuzzer.h"
+#include "dm_timer.h"
+#include "hichain_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+std::shared_ptr<SoftbusConnector> g_softbusConnector = std::make_shared<SoftbusConnector>();
+std::shared_ptr<IDeviceManagerServiceListener> g_listener = std::make_shared<DeviceManagerServiceListener>();
+std::shared_ptr<HiChainConnector> g_hiChainConnector = std::make_shared<HiChainConnector>();
+std::shared_ptr<HiChainAuthConnector> g_hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+std::shared_ptr<AuthRequestState> g_authRequestState = std::make_shared<AuthRequestNetworkState>();
+std::shared_ptr<AuthResponseState> g_authResponseState = std::make_shared<AuthResponseInitState>();
+std::shared_ptr<DmAuthManager> g_authManager =
+    std::make_shared<DmAuthManager>(g_softbusConnector, g_hiChainConnector, g_listener, g_hiChainAuthConnector);
+
+int32_t g_sessionId = 1;
+int32_t g_sessionSide = 0;
+int32_t g_result = 1;
+int32_t g_authType = 1;
+int32_t g_status = 1;
+int32_t g_pinCode = 1;
+int32_t g_action = 1;
+int32_t g_userId = 1;
+int32_t g_pageId = 1;
+int32_t g_reason = 1;
+int32_t g_state = 1;
+int64_t g_requestId = 1;
+
+std::map<std::string, std::string> g_bindParam;
+
+PeerTargetId g_targetId = {
+    .deviceId = "deviceId",
+    .brMac = "brMac",
+    .bleMac = "bleMac",
+    .wifiIp = "wifiIp",
+};
+
 void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    std::string str(reinterpret_cast<const char*>(data), size);
+    g_authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(g_authManager);
+    g_authManager->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    g_authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    g_authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    g_authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    g_authManager->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    g_authManager->hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
+    g_authManager->softbusConnector_ = std::make_shared<SoftbusConnector>();
+    g_authManager->softbusConnector_->GetSoftbusSession()->
+        RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(g_authManager));
+    g_authManager->timer_ = std::make_shared<DmTimer>();
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t sessionSide = *(reinterpret_cast<const int32_t*>(data));
-    int32_t result = *(reinterpret_cast<const int32_t*>(data));
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string udidHash(reinterpret_cast<const char*>(data), size);
-    authManager->OnSessionOpened(sessionId, sessionSide, result);
-    authManager->OnSessionClosed(sessionId);
-    authManager->UnBindDevice(pkgName, udidHash);
+    g_authManager->InitAuthState(str, g_authType, str, str);
+    g_authManager->OnSessionOpened(g_sessionId, g_sessionSide, g_result);
+    g_authManager->AuthenticateDevice(str, g_authType, str, str);
+    g_authManager->ImportAuthCode(str, str);
+    g_authManager->BindTarget(str, g_targetId, g_bindParam);
+    g_authManager->ShowConfigDialog();
+    g_authManager->ShowAuthInfoDialog();
+    g_authManager->ShowStartAuthDialog();
+    g_authManager->OnDataReceived(g_sessionId, str);
+    g_authManager->OnGroupCreated(g_requestId, str);
+    g_authManager->OnMemberJoin(g_requestId, g_status);
+    g_authManager->StartNegotiate(g_sessionId);
+    g_authManager->RespNegotiate(g_sessionId);
+    g_authManager->SendAuthRequest(g_sessionId);
+    g_authManager->SetAuthRequestState(g_authRequestState);
+    g_authManager->SetAuthResponseState(g_authResponseState);
+    g_authManager->StartAuthProcess(g_action);
+    g_authManager->StartRespAuthProcess();
+    g_authManager->CreateGroup();
+    g_authManager->ProcessPincode(g_pinCode);
+    g_authManager->UserSwitchEventCallback(g_userId);
+    g_authManager->SetPageId(g_pageId);
+    g_authManager->SetReasonAndFinish(g_reason, g_state);
+    g_authManager->IsIdenticalAccount();
+    g_authManager->OnSessionClosed(g_sessionId);
+    g_authManager->OnUserOperation(g_action, str);
+    g_authManager->GetConnectAddr(str);
+    g_authManager->HandleAuthenticateTimeout(str);
+    g_authManager->RegisterUiStateCallback(str);
+    g_authManager->UnRegisterUiStateCallback(str);
+    g_authManager->UnAuthenticateDevice(str, str);
+    g_authManager->UnBindDevice(str, str);
 }
 }
 }
