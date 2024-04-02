@@ -765,22 +765,21 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
             return;
         }
         tempCbk = iter->second;
-        bindCallback_[pkgName].erase(targetId);
-        if (bindCallback_[pkgName].empty()) {
-            bindCallback_.erase(pkgName);
+        if (result != DM_OK || status > STATUS_DM_CLOSE_PIN_INPUT_UI || status < STATUS_DM_SHOW_AUTHORIZE_UI) {
+            LOGI("notify end, result: %{public}d, status: %{public}d", result, status);
+            bindCallback_[pkgName].erase(targetId);
+            if (bindCallback_[pkgName].empty()) {
+                bindCallback_.erase(pkgName);
+            }
+            binding_ = false;
+            cv_.notify_one();
         }
-        binding_ = false;
-        cv_.notify_one();
     }
     if (tempCbk == nullptr) {
         LOGE("OnBindResult error, registered bind callback is nullptr.");
         return;
     }
     tempCbk->OnBindResult(targetId, result, status, content);
-    if (result == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
-        LOGI("notify bind status, result: %{public}d, status: %{public}d", result, status);
-        return;
-    }
 }
 
 void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId,
