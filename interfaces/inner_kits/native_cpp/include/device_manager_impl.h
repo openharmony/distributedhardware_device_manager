@@ -379,6 +379,8 @@ public:
 
     virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                            int32_t &securityLevel) override;
+
+    virtual bool IsSameAccount(const std::string &udid) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

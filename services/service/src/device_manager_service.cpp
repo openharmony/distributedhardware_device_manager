@@ -1348,5 +1348,23 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
     }
     return DM_OK;
 }
+
+int32_t DeviceManagerService::IsSameAccount(const std::string &udid)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call IsSameAccount.", GetAnonyString(udid).c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("DeviceManagerService IsSameAccount start for udid = %{public}s", GetAnonyString(udid).c_str());
+    if (udid.empty()) {
+        LOGE("DeviceManagerService::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("IsSameAccount failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->IsSameAccount(udid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

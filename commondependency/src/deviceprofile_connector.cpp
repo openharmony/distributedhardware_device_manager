@@ -658,6 +658,22 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
     return false;
 }
 
+int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
+{
+    LOGI("DeviceProfileConnector::IsSameAccount start.");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("IsSameAccount profiles size is %{public}zu", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号
+                LOGI("The udid %{public}s is identical bind.", GetAnonyString(udid).c_str());
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

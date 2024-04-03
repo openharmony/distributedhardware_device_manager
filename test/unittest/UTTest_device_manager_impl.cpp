@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2044,6 +2044,37 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_005, testing::ext::TestSize
     // 4. check ret is DEVICEMANAGER_IPC_FAILED
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
+}
+
+/**
+ * @tc.name: IsSameAccount_001
+ * @tc.desc: 1. set udid or bundleName null
+ *           2. call DeviceManagerImpl::IsSameAccount with parameter
+ *           3. check ret is false
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, IsSameAccount_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "";
+    bool ret = DeviceManager::GetInstance().IsSameAccount(udid);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsSameAccount_002
+ * @tc.desc: 1. set udid and bundleName not null
+ *           2. call DeviceManagerImpl::IsSameAccount with parameter
+ *           3. check ret is false
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, IsSameAccount_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "udidTest";
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(pkgName, initCallback);
+    bool ret = DeviceManager::GetInstance().IsSameAccount(udid);
+    ASSERT_EQ(ret, false);
 }
 } // namespace
 } // namespace DistributedHardware

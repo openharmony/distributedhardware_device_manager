@@ -655,6 +655,16 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
+{
+    if (udid.empty()) {
+        LOGE("DeviceManagerServiceImpl::CheckRelatedDevice error: udid: %{public}s", GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return DeviceProfileConnector::GetInstance().IsSameAccount(udid);
+}
+
 std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];
