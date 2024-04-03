@@ -125,7 +125,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     dmSubInfo.medium = DmExchangeMedium::DM_AUTO;
-    dmSubInfo.freq = DmExchangeFreq::DM_SUPER_HIGH;
+    dmSubInfo.freq = DmExchangeFreq::DM_MID;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
@@ -134,6 +134,10 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
         int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
         dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
+    }
+    if (discoverParam.find(PARAM_KEY_DISC_FREQ) != discoverParam.end()) {
+        int32_t freq = std::atoi((discoverParam.find(PARAM_KEY_DISC_FREQ)->second).c_str());
+        dmSubInfo.medium = static_cast<DmExchangeFreq>(medium);
     }
     if (HandleDiscoveryQueue(pkgName, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
