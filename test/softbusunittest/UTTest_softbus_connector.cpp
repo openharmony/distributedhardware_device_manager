@@ -34,6 +34,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class SoftbusStateCallbackTest : public ISoftbusStateCallback {
+public:
+    SoftbusStateCallbackTest() {}
+    virtual ~SoftbusStateCallbackTest() {}
+    void OnDeviceOnline(std::string deviceId) {}
+    void OnDeviceOffline(std::string deviceId) {}
+};
+
 void SoftbusConnectorTest::SetUp()
 {
 }
@@ -232,8 +241,8 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
 HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
 {
     const char *networkId = "123456";
-    std::string udid;
-    int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
+    std::string uuid;
+    int ret = softbusConnector->GetUuidByNetworkId(networkId, uuid);
     EXPECT_NE(ret, 0);
 }
 
@@ -481,8 +490,11 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.
     DeviceInfo device = {
         .devId = "123456",
         .devType = (DeviceType)1,
-        .devName = "11111"
+        .devName = "com.ohos.helloworld"
     };
+    std::string pkgName = "com.ohos.helloworld";
+    softbusConnector->RegisterSoftbusDiscoveryCallback(pkgName,
+        std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
     softbusConnector->OnSoftbusDeviceFound(&device);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -660,7 +672,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSi
  */
 HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<ISoftbusStateCallback> callback = nullptr;
+    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     int32_t ret = softbusConnector->RegisterSoftbusStateCallback(callback);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -722,6 +734,143 @@ HWTEST_F(SoftbusConnectorTest, SetPkgName_001, testing::ext::TestSize.Level0)
     std::string pkgName = "pkgName";
     softbusConnector->SetPkgName(pkgName);
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), false);
+}
+
+/**
+ * @tc.name: GetDeviceUdidHashByUdid_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "123456789";
+    std::string ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
+    EXPECT_EQ(ret.empty(), false);
+}
+
+/**
+ * @tc.name: EraseUdidFromMap_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "123456789";
+    softbusConnector->EraseUdidFromMap(udid);
+    EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), false);
+}
+
+/**
+ * @tc.name: GetLocalDeviceName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
+{
+    std::string ret = softbusConnector->GetLocalDeviceName();
+    EXPECT_EQ(ret.empty(), true);
+}
+
+/**
+ * @tc.name: GetNetworkIdByDeviceId_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
+    EXPECT_EQ(ret.empty(), true);
+}
+
+/**
+ * @tc.name: SetPkgNameVec_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, SetPkgNameVec_001, testing::ext::TestSize.Level0)
+{
+    std::vector<std::string> pkgNameVec;
+    softbusConnector->SetPkgNameVec(pkgNameVec);
+    EXPECT_EQ(pkgNameVec.empty(), true);
+}
+
+/**
+ * @tc.name: GetPkgName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetPkgName_001, testing::ext::TestSize.Level0)
+{
+    auto ret = softbusConnector->GetPkgName();
+    EXPECT_EQ(ret.empty(), true);
+}
+
+/**
+ * @tc.name: ClearPkgName_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, ClearPkgName_001, testing::ext::TestSize.Level0)
+{
+    softbusConnector->ClearPkgName();
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+}
+
+/**
+ * @tc.name: HandleDeviceOnline_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
+    softbusConnector->RegisterSoftbusStateCallback(callback);
+    softbusConnector->HandleDeviceOnline(deviceId);
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+}
+
+/**
+ * @tc.name: HandleDeviceOffline_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
+    softbusConnector->RegisterSoftbusStateCallback(callback);
+    softbusConnector->HandleDeviceOffline(deviceId);
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+}
+
+/**
+ * @tc.name: CheckIsOnline_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
+{
+    std::string targetDeviceId = "targetDeviceId";
+    softbusConnector->CheckIsOnline(targetDeviceId);
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+}
+
+/**
+ * @tc.name: GetDeviceInfoByDeviceId_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId);
+    EXPECT_EQ(ret.deviceId == deviceId, false);
+}
+
+/**
+ * @tc.name: ConvertNodeBasicInfoToDmDevice_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level0)
+{
+    NodeBasicInfo nodeBasicInfo = {
+        .networkId = "123456",
+        .deviceName = "name",
+    };
+    DmDeviceInfo dmDeviceInfo;
+    softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
+    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware
