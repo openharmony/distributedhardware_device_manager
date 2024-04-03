@@ -137,7 +137,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     }
     if (discoverParam.find(PARAM_KEY_DISC_FREQ) != discoverParam.end()) {
         int32_t freq = std::atoi((discoverParam.find(PARAM_KEY_DISC_FREQ)->second).c_str());
-        dmSubInfo.medium = static_cast<DmExchangeFreq>(medium);
+        dmSubInfo.freq = static_cast<DmExchangeFreq>(freq);
     }
     if (HandleDiscoveryQueue(pkgName, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
