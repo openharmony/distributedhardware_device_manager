@@ -424,6 +424,75 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level0)
     int32_t sessionSide = 0;
     int32_t result = 3;
     const int32_t closedSessionId = 11;
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->timer_ = nullptr;
+    authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
+    authManager_->OnSessionClosed(closedSessionId);
+    int32_t ret = authManager_->GeneratePincode();
+    ASSERT_LE(ret, MAX_PIN_CODE);
+    ASSERT_GE(ret, MIN_PIN_CODE);
+}
+
+/**
+ * @tc.name: DmAuthManager::GeneratePincode_002
+ * @tc.desc: Return OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GeneratePincode_002, testing::ext::TestSize.Level0)
+{
+    int32_t openedSessionId = 66;
+    int32_t sessionSide = 0;
+    int32_t result = 3;
+    const int32_t closedSessionId = 11;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager_->timer_ = std::make_shared<DmTimer>();
+    authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
+    authManager_->OnSessionClosed(closedSessionId);
+    int32_t ret = authManager_->GeneratePincode();
+    ASSERT_LE(ret, MAX_PIN_CODE);
+    ASSERT_GE(ret, MIN_PIN_CODE);
+}
+
+/**
+ * @tc.name: DmAuthManager::GeneratePincode_003
+ * @tc.desc: Return OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GeneratePincode_003, testing::ext::TestSize.Level0)
+{
+    int32_t openedSessionId = 66;
+    int32_t sessionSide = 1;
+    int32_t result = 3;
+    const int32_t closedSessionId = 11;
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->timer_ = nullptr;
+    authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
+    authManager_->OnSessionClosed(closedSessionId);
+    int32_t ret = authManager_->GeneratePincode();
+    ASSERT_LE(ret, MAX_PIN_CODE);
+    ASSERT_GE(ret, MIN_PIN_CODE);
+}
+
+/**
+ * @tc.name: DmAuthManager::GeneratePincode_004
+ * @tc.desc: Return OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAuthManagerTest, GeneratePincode_004, testing::ext::TestSize.Level0)
+{
+    int32_t openedSessionId = 66;
+    int32_t sessionSide = 1;
+    int32_t result = 3;
+    const int32_t closedSessionId = 11;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager_->timer_ = std::make_shared<DmTimer>();
     authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
     authManager_->OnSessionClosed(closedSessionId);
     int32_t ret = authManager_->GeneratePincode();
@@ -1052,10 +1121,6 @@ HWTEST_F(DmAuthManagerTest, CommonEventCallback001, testing::ext::TestSize.Level
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::AccountIdLogoutEventCallback001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, AccountIdLogoutEventCallback001, testing::ext::TestSize.Level0)
 {
     int32_t userId = 0;
@@ -1063,10 +1128,6 @@ HWTEST_F(DmAuthManagerTest, AccountIdLogoutEventCallback001, testing::ext::TestS
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::UserSwitchEventCallback001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, UserSwitchEventCallback001, testing::ext::TestSize.Level0)
 {
     int32_t userId = 0;
@@ -1074,10 +1135,6 @@ HWTEST_F(DmAuthManagerTest, UserSwitchEventCallback001, testing::ext::TestSize.L
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::UserChangeEventCallback001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, UserChangeEventCallback001, testing::ext::TestSize.Level0)
 {
     int32_t userId = 0;
@@ -1085,10 +1142,6 @@ HWTEST_F(DmAuthManagerTest, UserChangeEventCallback001, testing::ext::TestSize.L
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::HandleSyncDeleteTimeout001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, HandleSyncDeleteTimeout001, testing::ext::TestSize.Level0)
 {
     std::string name;
@@ -1096,10 +1149,6 @@ HWTEST_F(DmAuthManagerTest, HandleSyncDeleteTimeout001, testing::ext::TestSize.L
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::DeleteAcl001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -1108,10 +1157,6 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
     ASSERT_NE(ret, DM_OK);
 }
 
-/**
- * @tc.name: DmAuthManager::ProRespNegotiateExt001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, ProRespNegotiateExt001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
@@ -1119,10 +1164,6 @@ HWTEST_F(DmAuthManagerTest, ProRespNegotiateExt001, testing::ext::TestSize.Level
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::ProRespNegotiate001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, ProRespNegotiate001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
@@ -1130,20 +1171,12 @@ HWTEST_F(DmAuthManagerTest, ProRespNegotiate001, testing::ext::TestSize.Level0)
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::GenerateBindResultContent001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, GenerateBindResultContent001, testing::ext::TestSize.Level0)
 {
     auto ret = authManager_->GenerateBindResultContent();
     ASSERT_EQ(ret.empty(), false);
 }
 
-/**
- * @tc.name: DmAuthManager::OnAuthDeviceDataReceived001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
@@ -1152,10 +1185,6 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived001, testing::ext::TestSize.
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::OnUnbindSessionOpened001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, OnUnbindSessionOpened001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 1;
@@ -1173,10 +1202,6 @@ HWTEST_F(DmAuthManagerTest, OnUnbindSessionOpened001, testing::ext::TestSize.Lev
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::DeleteGroup001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, DeleteGroup001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -1185,10 +1210,6 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-/**
- * @tc.name: DmAuthManager::DeleteGroup002
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, DeleteGroup002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
@@ -1197,30 +1218,18 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup002, testing::ext::TestSize.Level0)
     ASSERT_NE(ret, DM_OK);
 }
 
-/**
- * @tc.name: DmAuthManager::PutAccessControlList001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Level0)
 {
     authManager_->PutAccessControlList();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::BindSocketFail_001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, BindSocketFail_001, testing::ext::TestSize.Level0)
 {
     authManager_->BindSocketFail();
     ASSERT_EQ(authManager_->isFinishOfLocal_, false);
 }
 
-/**
- * @tc.name: DmAuthManager::BindSocketSuccess_001
- * @tc.type: FUNC
- */
 HWTEST_F(DmAuthManagerTest, BindSocketSuccess_001, testing::ext::TestSize.Level0)
 {
     int32_t socket = 1;
@@ -1228,6 +1237,484 @@ HWTEST_F(DmAuthManagerTest, BindSocketSuccess_001, testing::ext::TestSize.Level0
     authManager_->authRequestState_ = std::make_shared<AuthRequestDeleteInit>();
     authManager_->BindSocketSuccess(socket);
     ASSERT_EQ(authManager_->authRequestContext_->sessionId, socket);
+}
+
+HWTEST_F(DmAuthManagerTest, SyncDeleteAcl_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string deviceId = "deviceId";
+    authManager_->SyncDeleteAcl(pkgName, deviceId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 200;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_002, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 501;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_003, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 90;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_004, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 104;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_005, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 503;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestCredential>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_006, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 505;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, false);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_007, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 1000;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
+    authManager_->ProcessSourceMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_001, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 80;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_002, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 100;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_003, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 104;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseFinishState>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_004, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 502;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseShowState>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_005, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 504;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_006, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 505;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_007, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->msgType = 1000;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
+    authManager_->ProcessSinkMsg();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    std::string message;
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->OnDataReceived(sessionId, message);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_002, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    std::string message;
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authMessageProcessor_ = nullptr;
+    authManager_->OnDataReceived(sessionId, message);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_003, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    std::string message;
+    authManager_->OnDataReceived(sessionId, message);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_004, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 200;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
+    authManager_->authResponseState_ = nullptr;
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_005, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 200;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 200;
+    std::string message = jsonObject.dump();
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = nullptr;
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnGroupCreated_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    std::string groupId;
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->OnGroupCreated(requestId, groupId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnGroupCreated_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    std::string groupId;
+    authManager_->authResponseState_ = nullptr;
+    authManager_->OnGroupCreated(requestId, groupId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnGroupCreated_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    std::string groupId = "{}";
+    authManager_->OnGroupCreated(requestId, groupId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnGroupCreated_004, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    std::string groupId = "groupId";
+    authManager_->authResponseContext_->isShowDialog = true;
+    authManager_->OnGroupCreated(requestId, groupId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnGroupCreated_005, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    std::string groupId = "groupId";
+    authManager_->authResponseContext_->isShowDialog = false;
+    authManager_->OnGroupCreated(requestId, groupId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 11;
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 11;
+    authManager_->authUiStateMgr_ = nullptr;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 11;
+    authManager_->authRequestState_ = std::make_shared<AuthRequestJoinState>();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authResponseContext_->authType = 5;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_004, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 11;
+    authManager_->authRequestState_ = std::make_shared<AuthRequestJoinState>();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authResponseContext_->authType = 6;
+    authManager_->authResponseContext_->requestId = 1;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_006, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 0;
+    authManager_->authRequestState_ = std::make_shared<AuthRequestJoinState>();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authResponseContext_->authType = 6;
+    authManager_->authResponseContext_->requestId = 0;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_007, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 0;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseShowState>();
+    authManager_->authResponseContext_->authType = 6;
+    authManager_->authResponseContext_->requestId = 0;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, OnMemberJoin_008, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 0;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = nullptr;
+    authManager_->OnMemberJoin(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, HandleMemberJoinImportAuthCode_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int32_t status = 0;
+    authManager_->authResponseContext_->requestId = 1;
+    authManager_->HandleMemberJoinImportAuthCode(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, HandleMemberJoinImportAuthCode_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int32_t status = 1;
+    authManager_->authResponseContext_->requestId = 1;
+    authManager_->HandleMemberJoinImportAuthCode(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, HandleMemberJoinImportAuthCode_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int32_t status = 1;
+    authManager_->authResponseContext_->requestId = 0;
+    authManager_->HandleMemberJoinImportAuthCode(requestId, status);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, RespNegotiate_001, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, RespNegotiate_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, RespNegotiate_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseContext_->dmVersion = "dmVersion";
+    authManager_->authResponseContext_->bindLevel = 1;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, RespNegotiate_004, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseContext_->dmVersion = "";
+    authManager_->authResponseContext_->bindLevel = 0;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, SendAuthRequest_001, testing::ext::TestSize.Level0)
+{
+    int64_t sessionId = 1;
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->SendAuthRequest(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, SendAuthRequest_002, testing::ext::TestSize.Level0)
+{
+    int64_t sessionId = 1;
+    authManager_->authResponseContext_->cryptoSupport = true;
+    authManager_->authResponseContext_->dmVersion = "dmVersion";
+    authManager_->authResponseContext_->bindLevel = 1;
+    authManager_->authResponseContext_->hostPkgName = "hostPkgName";
+    authManager_->authResponseContext_->localDeviceId = "123456789";
+    authManager_->authResponseContext_->deviceId = "deviceId";
+    authManager_->authResponseContext_->reply = -20018;
+    authManager_->SendAuthRequest(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, SendAuthRequest_003, testing::ext::TestSize.Level0)
+{
+    int64_t sessionId = 1;
+    authManager_->authResponseContext_->cryptoSupport = true;
+    authManager_->authResponseContext_->bindLevel = 0;
+    authManager_->authResponseContext_->dmVersion = "dmVersion";
+    authManager_->authResponseContext_->bindLevel = 1;
+    authManager_->authResponseContext_->hostPkgName = "hostPkgName";
+    authManager_->authResponseContext_->localDeviceId = "123456789";
+    authManager_->authResponseContext_->deviceId = "deviceId";
+    authManager_->authResponseContext_->reply = -20018;
+    authManager_->SendAuthRequest(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, GetAuthRequestContext_001, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_->localDeviceId = "123456789";
+    authManager_->authResponseContext_->localDeviceId = "123456789";
+    authManager_->authResponseContext_->localAccountId = "123456789";
+    authManager_->authRequestContext_->remoteAccountId = "123456789";
+    authManager_->authRequestContext_->localAccountId = "123456789";
+    authManager_->authResponseContext_->localUserId = 123456789;
+    authManager_->GetAuthRequestContext();
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessAuthRequestExt_001, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    authManager_->authResponseContext_->reply = -20018;
+    authManager_->ProcessAuthRequestExt(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessAuthRequestExt_002, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    authManager_->authResponseContext_->reply = -200;
+    authManager_->authResponseContext_->isOnline = false;
+    authManager_->authResponseContext_->authed = false;
+    authManager_->authResponseContext_->isIdenticalAccount = true;
+    authManager_->ProcessAuthRequestExt(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcessAuthRequestExt_004, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 1;
+    authManager_->authResponseContext_->reply = -200;
+    authManager_->authResponseContext_->authType = 5;
+    authManager_->authResponseContext_->isIdenticalAccount = false;
+    authManager_->authResponseContext_->isAuthCodeReady = false;
+    authManager_->ProcessAuthRequestExt(sessionId);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 } // namespace
 } // namespace DistributedHardware
