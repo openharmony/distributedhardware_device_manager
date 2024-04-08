@@ -1345,6 +1345,22 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    discoverParam[PARAM_KEY_META_TYPE] = "metaType";
+    discoverParam[PARAM_KEY_SUBSCRIBE_ID] = "123456";
+    discoverParam[PARAM_KEY_DISC_MEDIUM] =
+        std::to_string(static_cast<int32_t>(DmExchangeMedium::DM_AUTO));
+    discoverParam[PARAM_KEY_DISC_FREQ] =
+        std::to_string(static_cast<int32_t>(DmExchangeFreq::DM_LOW));
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
+}
+
 HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();
