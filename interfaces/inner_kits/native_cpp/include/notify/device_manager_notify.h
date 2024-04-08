@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,6 +86,8 @@ public:
     void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload);
     void OnCreateResult(const std::string &pkgName, int32_t result);
     void OnDestroyResult(const std::string &pkgName, int32_t result);
+    void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+                          const std::string &content);
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
 
 private:

@@ -105,9 +105,11 @@ void DmPinHolderCallbackTest::OnPinHolderCreate(const std::string &deviceId, DmP
     std::cout << "payload: " << payload << std::endl;
 }
 
-void DeviceDiscoveryCallbackTest::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
+void DmPinHolderCallbackTest::OnPinHolderEvent(DmPinHolderEvent event, int32_t result, const std::string &content)
 {
-    std::cout << "pin holder test ondeviceFound start." << std::endl;
+    std::cout << "OnPinHolderEvent" << std::endl;
+    std::cout << "result: " << result << std::endl;
+    std::cout << "content: " << content << std::endl;
 }
 
 constexpr int32_t MSG_TYPE_CREATE_PIN_HOLDER = 600;
@@ -706,6 +708,16 @@ HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level0)
     };
     int32_t ret = pinHolder->CheckTargetIdVaild(targetId);
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmPinHolderTest, NotityPinHolderEvent_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::string packName = "com.ohos.dmtest";
+    std::string event = "event";
+    int32_t ret = pinHolder->NotityPinHolderEvent(packName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

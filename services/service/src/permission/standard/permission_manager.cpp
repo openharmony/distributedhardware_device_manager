@@ -37,10 +37,11 @@ constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIB
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = -20000;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
-#define AUTH_CODE_WHITE_LIST_NUM (2)
+#define AUTH_CODE_WHITE_LIST_NUM (3)
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
+    "CollaborationFwk",
 };
 
 #define PIN_HOLDER_WHITE_LIST_NUM (1)
@@ -107,7 +108,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         processName = std::move(tokenInfo.bundleName);
         uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
         if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
-            LOGE("GetCallerProcessName %s not system hap.", processName.c_str());
+            LOGE("GetCallerProcessName %{public}s not system hap.", processName.c_str());
             return ERR_DM_FAILED;
         }
     } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {

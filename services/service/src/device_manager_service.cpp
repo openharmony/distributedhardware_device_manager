@@ -822,6 +822,10 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
         LOGE("NotifyEvent failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
+    if (eventId == DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT) {
+        LOGI("NotifyEvent on pin holder event start.");
+        return pinHolder_->NotityPinHolderEvent(pkgName, event);
+    }
     return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
 }
 

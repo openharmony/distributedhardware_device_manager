@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,10 @@ typedef enum DmNotifyEvent {
      * Device manager on ready event.
      */
     DM_NOTIFY_EVENT_ONDEVICEREADY,
+    /**
+     * Device manager on pin holder event.
+     */
+    DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT,
     // Add event here
     DM_NOTIFY_EVENT_BUTT,
 } DmNotifyEvent;
@@ -304,6 +308,15 @@ typedef enum {
     VISIBLE_LLIGHT,
     SUPER_SONIC,
 } DmPinType;
+
+typedef enum {
+    CREATE = 0,
+    CREATE_RESULT,
+    DESTROY,
+    DESTROY_RESULT,
+    PIN_TYPE_CHANGE,
+    PIN_TYPE_CHANGE_RESULT,
+} DmPinHolderEvent;
 
 typedef enum {
     STATUS_DM_AUTH_DEFAULT = 0,
