@@ -914,6 +914,30 @@ void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t re
     tempCbk->OnDestroyResult(result);
 }
 
+void DeviceManagerNotify::OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+                                           const std::string &content)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnPinHolderEvent in, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnPinHolderEvent error, pin holder callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnPinHolderEvent error, registered pin holder callback is nullptr.");
+        return;
+    }
+    tempCbk->OnPinHolderEvent(event, result, content);
+}
+
 std::map<std::string, std::shared_ptr<DmInitCallback>> DeviceManagerNotify::GetDmInitCallback()
 {
     std::lock_guard<std::mutex> autoLock(lock_);
