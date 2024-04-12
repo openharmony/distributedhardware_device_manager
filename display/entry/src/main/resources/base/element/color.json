@@ -3,14 +3,6 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
-    },
-    {
-      "name": "title",
-      "value": "#182431"
-    },
-    {
-       "name": "message_tips",
-      "value": "#99182431"
     }
   ]
 }

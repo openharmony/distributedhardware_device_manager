@@ -29,10 +29,7 @@ const DEVICE_TYPE_PC: number = 0x0C;
 
 @CustomDialog
 struct ConfirmCustomDialog {
-  @State message: string = '是否信任此设备？';
-  @State allowOnce: string = '临时信任';
-  @State allowAlways: string = '始终信任';
-  @State peerAppOperation: string = '想要连接本机。';
+  @State peerAppOperation: string|Resource = $r('app.string.dm_connect_device');
   @State peerCustomDescription: string = '';
   @State peerDeviceName: string = '';
   @State peerDeviceType: number = 0;
@@ -189,7 +186,11 @@ struct ConfirmCustomDialog {
             .margin({ bottom: 16, top: 24 })
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
-            Text(this.peerDeviceName + ' ' + this.peerAppOperation + this.message)
+            Text() {
+              Span(this.peerDeviceName)
+              Span(this.peerAppOperation)
+              Span($r('app.string.dm_is_trust_device'))
+            }
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
@@ -213,7 +214,7 @@ struct ConfirmCustomDialog {
             bottom: 16, left: 24, right: 24 })
 
           Column() {
-            Button(this.allowAlways)
+            Button($r('app.string.dm_allow_always'))
               .margin({ bottom: 4 })
               .onClick(() => {
                 this.onAllowAlways();
@@ -237,7 +238,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                 }
               })
-            Button(this.allowOnce)
+            Button($r('app.string.dm_allow_temp'))
               .margin({ bottom: 4 })
               .onClick(() => {
                 this.onAllowOnce();
@@ -261,7 +262,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                 }
               })
-            Button('不信任(' + this.secondsNum + ' 秒)')
+            Button($r('app.string.dm_not_allow', this.secondsNum))
               .margin({ left: 16, right: 16 })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .onClick(() => {
