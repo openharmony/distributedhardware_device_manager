@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ class DevicePublishCallbackTest : public PublishCallback {
 public:
     DevicePublishCallbackTest() : PublishCallback() {}
     virtual ~DevicePublishCallbackTest() {}
-    virtual void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override {}
 };
 
 void DevicePublishFuzzTest(const uint8_t* data, size_t size)

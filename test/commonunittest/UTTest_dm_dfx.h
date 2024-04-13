@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,7 @@
 #include "dm_constants.h"
 #include "dm_error_message.h"
 #include "dm_log.h"
-#define private public
 #include "dm_hidumper.h"
-#undef private
 #include "dm_hisysevent.h"
 #include "dm_hitrace.h"
 #include "hitrace_meter.h"
@@ -37,8 +35,8 @@ class DmDfxTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp();
-    virtual void TearDown();
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

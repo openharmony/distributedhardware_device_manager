@@ -22,7 +22,6 @@ group("fuzztest") {
     "devicemanagerservice_fuzzer:fuzztest",
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
-    "dmadaptermanager_fuzzer:fuzztest",
     "getlocaldeviceinfo_fuzzer:fuzztest",
     "gettrusteddevicelistservice_fuzzer:fuzztest",
     "getudidbynetworkid_fuzzer:fuzztest",

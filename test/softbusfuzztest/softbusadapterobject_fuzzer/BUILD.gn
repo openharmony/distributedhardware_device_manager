@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,41 +17,21 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DeviceListRefreshFuzzTest") {
+ohos_fuzztest("SoftbusAdapterObjectFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
-      "${devicemanager_path}/test/servicesfuzztest/devicelistrefresh_fuzzer"
+      "${devicemanager_path}/test/softbusfuzztest/softbusadapterobject_fuzzer"
 
   include_dirs = [
     "${utils_path}/include",
-    "${innerkits_path}/native_cpp/include",
-    "${innerkits_path}/native_cpp/include/ipc/standard",
-    "${innerkits_path}/native_cpp/include/ipc",
-    "${innerkits_path}/native_cpp/include/notify",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
     "${utils_path}/include/ipc/standard",
+    "${services_path}/include/softbus",
     "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/commonevent",
     "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/authentication",
-    "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/ipc/standard",
-    "${servicesimpl_path}/include/dependency/hichain",
-    "${servicesimpl_path}/include/devicestate",
-    "${devicemanager_path}/interfaces/kits/js/include",
-    "${devicemanager_path}/test/unittest/mock",
-    "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/jsframework/runtime/main/extend",
-    "//third_party/jsframework/runtime/main/extend/systemplugin",
-    "//third_party/node/benchmark",
-    "//third_party/node/src",
-    "//third_party/json/include",
   ]
 
   cflags = [
@@ -62,22 +42,21 @@ ohos_fuzztest("DeviceListRefreshFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "device_list_refresh_fuzzer.cpp" ]
 
-  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+  sources = [ "softbus_adapter_object_fuzzer.cpp" ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${services_path}:devicemanagerservice",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
+  ]
+
+  external_deps = [ "safwk:system_ability_fwk" ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DeviceListRefreshFuzzTest\"",
+    "DH_LOG_TAG=\"SoftbusAdapterObjectFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "device_auth:deviceauth_sdk",
-    "ipc:ipc_single",
-    "napi:ace_napi",
-    "safwk:system_ability_fwk",
   ]
 }
 
@@ -85,6 +64,6 @@ ohos_fuzztest("DeviceListRefreshFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":DeviceListRefreshFuzzTest" ]
+  deps = [ ":SoftbusAdapterObjectFuzzTest" ]
 }
 ###############################################################################

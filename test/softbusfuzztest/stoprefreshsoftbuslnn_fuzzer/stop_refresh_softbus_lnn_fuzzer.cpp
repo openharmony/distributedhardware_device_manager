@@ -29,11 +29,9 @@ void StopRefreshSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint16_t))) {
         return;
     }
-
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-
     uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
 
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->StopRefreshSoftbusLNN(subscribeId);
 }
 }

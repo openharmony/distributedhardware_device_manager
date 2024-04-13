@@ -50,6 +50,8 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
   cflags = [
     "-g",
     "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
