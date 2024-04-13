@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,8 +30,8 @@ class DeviceManagerImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp();
+    void TearDown();
 
 private:
     std::shared_ptr<DiscoveryCallback> test_callback_ = nullptr;
@@ -46,9 +46,9 @@ public:
     virtual ~DeviceDiscoveryCallback() override
     {
     }
-    virtual void OnDiscoverySuccess(uint16_t subscribeId) override;
-    virtual void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
-    virtual void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
+    void OnDiscoverySuccess(uint16_t subscribeId) override;
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
 };
 
 class DevicePublishCallback : public PublishCallback {

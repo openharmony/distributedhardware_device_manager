@@ -18,31 +18,48 @@
 #include <random>
 #include <vector>
 
-#define private public
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "hichain_connector.h"
-#undef private
 
 #include "hichain_connector_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class HiChainConnectorCallbackTest : public IHiChainConnectorCallback {
+public:
+    HiChainConnectorCallbackTest() {}
+    virtual ~HiChainConnectorCallbackTest() {}
+    void OnGroupCreated(int64_t requestId, const std::string &groupId) override
+    {
+        (void)requestId;
+        (void)groupId;
+    }
+    void OnMemberJoin(int64_t requestId, int32_t status) override
+    {
+        (void)requestId;
+        (void)status;
+    }
+    std::string GetConnectAddr(std::string deviceId) override
+    {
+        (void)deviceId;
+        return "";
+    }
+    int32_t GetPinCode() override
+    {
+        return DM_OK;
+    }
+};
+
 void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<DmAuthManager> authMgr =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(authMgr));
+    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     std::string userId(reinterpret_cast<const char*>(data), size);
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));

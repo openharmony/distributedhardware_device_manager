@@ -26,23 +26,58 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class SoftbusSessionCallbackTest : public ISoftbusSessionCallback {
+public:
+    SoftbusSessionCallbackTest() {}
+    virtual ~SoftbusSessionCallbackTest() {}
+    void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) override
+    {
+        (void)sessionId;
+        (void)sessionSide;
+        (void)result;
+    }
+    void OnSessionClosed(int32_t sessionId) override
+    {
+        (void)sessionId;
+    }
+    void OnDataReceived(int32_t sessionId, std::string message) override
+    {
+        (void)sessionId;
+        (void)message;
+    }
+    bool GetIsCryptoSupport() override
+    {
+        return true;
+    }
+    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) override
+    {
+        (void)socket;
+        (void)info;
+    }
+    void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) override
+    {
+        (void)sessionId;
+        (void)message;
+    }
+    void BindSocketSuccess(int32_t socket) override
+    {
+        (void)socket;
+    }
+    void BindSocketFail() override {}
+};
+
 void OnSessionOpenedFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int))) {
         return;
     }
 
-    std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<DmAuthManager> discoveryMgr =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-
-    softbusSession->RegisterSessionCallback(discoveryMgr);
     int sessionId = *(reinterpret_cast<const int*>(data));
     int result = *(reinterpret_cast<const int*>(data));
+
+    std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
+    softbusSession->RegisterSessionCallback(std::make_shared<SoftbusSessionCallbackTest>());
     softbusSession->OnSessionOpened(sessionId, result);
     softbusSession->OnSessionClosed(sessionId);
 }

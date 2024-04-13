@@ -16,10 +16,8 @@
 #include <string>
 
 #include "device_manager_service_listener.h"
-#define private public
 #include "auth_message_processor.h"
 #include "dm_auth_manager.h"
-#undef private
 #include "dm_auth_manager_fuzzer.h"
 #include "dm_timer.h"
 #include "hichain_connector.h"

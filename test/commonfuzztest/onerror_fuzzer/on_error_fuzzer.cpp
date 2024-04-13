@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,20 +26,40 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class HiChainConnectorCallbackTest : public IHiChainConnectorCallback {
+public:
+    HiChainConnectorCallbackTest() {}
+    virtual ~HiChainConnectorCallbackTest() {}
+    void OnGroupCreated(int64_t requestId, const std::string &groupId) override
+    {
+        (void)requestId;
+        (void)groupId;
+    }
+    void OnMemberJoin(int64_t requestId, int32_t status) override
+    {
+        (void)requestId;
+        (void)status;
+    }
+    std::string GetConnectAddr(std::string deviceId) override
+    {
+        (void)deviceId;
+        return "";
+    }
+    int32_t GetPinCode() override
+    {
+        return DM_OK;
+    }
+};
+
 void OnErrorFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int64_t))) {
         return;
     }
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<DmAuthManager> discoveryMgr =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(std::shared_ptr<IHiChainConnectorCallback>(discoveryMgr));
+    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
     std::random_device rd;
