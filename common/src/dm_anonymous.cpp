@@ -151,7 +151,9 @@ void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, st
         return;
     }
     for (auto &element : paramJson.items()) {
-        paramMap.insert(std::pair<std::string, std::string>(element.key(), element.value()));
+        if (element.value().is_string()) {
+            paramMap.insert(std::pair<std::string, std::string>(element.key(), element.value()));
+        }
     }
 }
 
