@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,10 +39,17 @@ void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
     ConnectionAddr *addr = nullptr;
     const char *networkId = reinterpret_cast<const char*>(data);
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
-
-    SoftbusConnector::OnSoftbusPublishResult(publishId, pResult);
-    SoftbusConnector::OnSoftbusDiscoveryResult(subscribeId, rResult);
-    SoftbusConnector::OnSoftbusJoinLNNResult(addr, networkId, result);
+    DeviceInfo device = {
+        .devId = "123456",
+        .devType = (DeviceType)1,
+        .devName = "com.ohos.helloworld"
+    };
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    softbusConnector->OnSoftbusPublishResult(publishId, pResult);
+    softbusConnector->OnSoftbusDeviceFound(&device);
+    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, rResult);
+    softbusConnector->OnSoftbusDeviceDiscovery(&device);
+    softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
 }
 }
 }

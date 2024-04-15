@@ -45,6 +45,7 @@ public:
         DmPinType pinType, const std::string &payload);
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
+    int32_t NotityPinHolderEvent(const std::string &pkgName, const std::string &event);
 public:
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);
@@ -57,6 +58,8 @@ private:
     void ProcessCreateRespMsg(const std::string &message);
     void ProcessDestroyMsg(const std::string &message);
     void ProcessDestroyResMsg(const std::string &message);
+    void ProcessChangeMsg(const std::string &message);
+    void ProcessChangeRespMsg(const std::string &message);
     void CloseSession(const std::string &name);
     void GetPeerDeviceId(int32_t sessionId, std::string &udidHash);
     int32_t CheckTargetIdVaild(const PeerTargetId &targetId);
@@ -72,6 +75,7 @@ private:
     PinHolderState sinkState_;
     PinHolderState sourceState_;
     int32_t sessionId_ = -1;
+    bool isRemoteSupported_ = false;
 };
 }
 }

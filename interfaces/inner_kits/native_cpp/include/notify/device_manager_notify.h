@@ -88,6 +88,8 @@ public:
     void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload);
     void OnCreateResult(const std::string &pkgName, int32_t result);
     void OnDestroyResult(const std::string &pkgName, int32_t result);
+    void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+                          const std::string &content);
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
 
 private:

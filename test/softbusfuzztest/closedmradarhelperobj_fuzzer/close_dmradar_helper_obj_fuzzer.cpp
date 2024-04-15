@@ -30,9 +30,8 @@ void CloseDmRadarHelperObjFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-
     std::string name(reinterpret_cast<const char*>(data), size);
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->IsDmRadarHelperReady();
     softbusListener->CloseDmRadarHelperObj(name);
 }
