@@ -187,7 +187,7 @@ struct ConfirmCustomDialog {
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
             Text() {
-              Span(this.peerDeviceName)
+              Span(this.peerDeviceName + ' ')
               Span(this.peerAppOperation)
               Span($r('app.string.dm_is_trust_device'))
             }
