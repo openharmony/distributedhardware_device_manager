@@ -3,23 +3,23 @@
   "string": [
     {
       "name": "entry_desc",
-      "value": "description"
+      "value": "entry_desc"
     },
     {
       "name": "ServiceExtAbility_desc",
-      "value": "description"
+      "value": "ServiceExtAbility_desc"
     },
     {
       "name": "ServiceExtAbility_label",
-      "value": "label"
+      "value": "ServiceExtAbility_label"
     },
     {
       "name": "MainAbility_desc",
-      "value": "manage the permissions of all applications from the permission and application dimensions"
+      "value": "manager device manager dialog"
     },
     {
       "name": "MainAbility_label",
-      "value": "permission manage"
+      "value": "device manager ui"
     },
     {
       "name": "dm_is_trust_device",
