@@ -29,8 +29,8 @@ class IpcClientManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() override;
-    void TearDown() override;
+    void SetUp();
+    void TearDown();
 };
 
 class DmInitCallbackTest : public DmInitCallback {
