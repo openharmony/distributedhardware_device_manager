@@ -2132,8 +2132,7 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
 bool DeviceManagerImpl::IsSameAccount(const std::string &udid)
 {
     if (udid.empty()) {
-        LOGE("DeviceManagerImpl::IsSameAccount error: bundleName: %{public}s, udid: %{public}s",
-            bundleName.c_str(), GetAnonyString(udid).c_str());
+        LOGE("DeviceManagerImpl::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
         return false;
     }
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
