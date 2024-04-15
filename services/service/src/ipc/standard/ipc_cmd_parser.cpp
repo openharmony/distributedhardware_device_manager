@@ -36,6 +36,7 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
 
@@ -1416,6 +1417,46 @@ ON_IPC_CMD(GET_SECURITY_LEVEL, MessageParcel &data, MessageParcel &reply)
     if (!reply.WriteInt32(securityLevel)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SERVER_ON_PIN_HOLDER_EVENT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyPinHolderEventReq> pReq = std::static_pointer_cast<IpcNotifyPinHolderEventReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    int32_t pinHolderEvent = pReq->GetPinHolderEvent();
+    int32_t result = pReq->GetResult();
+    std::string content = pReq->GetContent();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(pinHolderEvent)) {
+        LOGE("write pinHolderEvent failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(content)) {
+        LOGE("write content failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_ON_PIN_HOLDER_EVENT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

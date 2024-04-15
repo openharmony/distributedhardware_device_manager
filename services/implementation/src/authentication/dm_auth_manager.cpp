@@ -543,12 +543,12 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
 
 void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
 {
+    isAddingMember_ = false;
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to OnMemberJoin because authResponseContext_ or authUiStateMgr is nullptr");
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %{public}d", authTimes_);
-    isAddingMember_ = false;
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         CompatiblePutAcl();
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {

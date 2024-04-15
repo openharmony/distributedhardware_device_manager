@@ -24,6 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 
+constexpr uint32_t WAIT_BINDIND_TIME_OUT_SECOND = 1;
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
 {
@@ -717,7 +718,9 @@ void DeviceManagerNotify::RegisterBindCallback(const std::string &pkgName, const
             pkgName.c_str());
         return;
     }
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::unique_lock<std::mutex> ulk(bindLock_);
+    cv_.wait_for(ulk, std::chrono::seconds(WAIT_BINDIND_TIME_OUT_SECOND), [this]() {return !binding_; });
+    binding_ = true;
     if (bindCallback_.count(pkgName) == 0) {
         bindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>();
     }
@@ -749,7 +752,7 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
     LOGI("DeviceManagerNotify::OnBindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
     std::shared_ptr<BindTargetCallback> tempCbk;
     {
-        std::lock_guard<std::mutex> autoLock(lock_);
+        std::lock_guard<std::mutex> glk(bindLock_);
         if (bindCallback_.count(pkgName) == 0) {
             LOGE("DeviceManagerNotify::OnBindResult error, callback not register for pkgName %{public}s.",
                 pkgName.c_str());
@@ -762,23 +765,21 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
             return;
         }
         tempCbk = iter->second;
+        if (result != DM_OK || status > STATUS_DM_CLOSE_PIN_INPUT_UI || status < STATUS_DM_SHOW_AUTHORIZE_UI) {
+            LOGI("notify end, result: %{public}d, status: %{public}d", result, status);
+            bindCallback_[pkgName].erase(targetId);
+            if (bindCallback_[pkgName].empty()) {
+                bindCallback_.erase(pkgName);
+            }
+            binding_ = false;
+            cv_.notify_one();
+        }
     }
     if (tempCbk == nullptr) {
         LOGE("OnBindResult error, registered bind callback is nullptr.");
         return;
     }
     tempCbk->OnBindResult(targetId, result, status, content);
-    if (result == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
-        LOGI("notify bind status, result: %{public}d, status: %{public}d", result, status);
-        return;
-    }
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        bindCallback_[pkgName].erase(targetId);
-        if (bindCallback_[pkgName].empty()) {
-            bindCallback_.erase(pkgName);
-        }
-    }
 }
 
 void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId,
@@ -911,6 +912,30 @@ void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t re
         return;
     }
     tempCbk->OnDestroyResult(result);
+}
+
+void DeviceManagerNotify::OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+                                           const std::string &content)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnPinHolderEvent in, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<PinHolderCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (pinHolderCallback_.count(pkgName) == 0) {
+            LOGE("OnPinHolderEvent error, pin holder callback not register.");
+            return;
+        }
+        tempCbk = pinHolderCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnPinHolderEvent error, registered pin holder callback is nullptr.");
+        return;
+    }
+    tempCbk->OnPinHolderEvent(event, result, content);
 }
 
 std::map<std::string, std::shared_ptr<DmInitCallback>> DeviceManagerNotify::GetDmInitCallback()

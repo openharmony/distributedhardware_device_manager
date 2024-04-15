@@ -30,11 +30,11 @@ void OnParameterChgCallbackFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     const char *key = reinterpret_cast<const char*>(data);
     std::string str(reinterpret_cast<const char*>(data), size);
     const char *value = str.data();
     void *context = nullptr;
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->OnParameterChgCallback(key, value, context);
 }
 }

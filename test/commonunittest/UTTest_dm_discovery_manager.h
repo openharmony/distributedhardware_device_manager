@@ -27,7 +27,6 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
 
-#define private public
 namespace OHOS {
 namespace DistributedHardware {
 class DmDiscoveryManagerTest : public testing::Test {

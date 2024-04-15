@@ -29,14 +29,12 @@ void PublishSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-
     DmPublishInfo dmPublishInfo;
     dmPublishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
     std::string capability(reinterpret_cast<const char*>(data), size);
     std::string customData(reinterpret_cast<const char*>(data), size);
 
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->PublishSoftbusLNN(dmPublishInfo, capability, customData);
 }
 }

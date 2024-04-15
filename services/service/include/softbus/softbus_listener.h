@@ -90,6 +90,9 @@ public:
     static IRefreshCallback &GetSoftbusRefreshCb();
     static void SetHostPkgName(const std::string hostName);
     static std::string GetHostPkgName();
+    static void CacheDeviceInfo(const std::string deviceId, std::shared_ptr<DeviceInfo> infoPtr);
+    static int32_t GetIPAddrTypeFromCache(const std::string &deviceId, const std::string &ip,
+        ConnectionAddrType &addrType);
 private:
     int32_t InitSoftPublishLNN();
 

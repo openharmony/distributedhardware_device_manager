@@ -29,9 +29,6 @@ void RefreshSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint16_t))) {
         return;
     }
-
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-
     std::string pkgNameStr(reinterpret_cast<const char*>(data), size);
     const char *pkgName = pkgNameStr.c_str();
     DmSubscribeInfo dmSubInfo;
@@ -42,6 +39,7 @@ void RefreshSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     dmSubInfo.isWakeRemote = true;
     std::string customData(reinterpret_cast<const char*>(data), size);
 
+    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->RefreshSoftbusLNN(pkgName, dmSubInfo, customData);
 }
 }

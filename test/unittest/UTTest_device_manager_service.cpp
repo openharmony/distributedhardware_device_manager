@@ -1304,8 +1304,10 @@ HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::Test
 
 HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterLoad_001, testing::ext::TestSize.Level0)
 {
-    auto ret = DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
-    EXPECT_NE(ret, true);
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_001, testing::ext::TestSize.Level0)
@@ -1340,6 +1342,23 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
+}
+
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    discoverParam[PARAM_KEY_META_TYPE] = "metaType";
+    discoverParam[PARAM_KEY_SUBSCRIBE_ID] = "123456";
+    discoverParam[PARAM_KEY_DISC_MEDIUM] =
+        std::to_string(static_cast<int32_t>(DmExchangeMedium::DM_AUTO));
+    discoverParam[PARAM_KEY_DISC_FREQ] =
+        std::to_string(static_cast<int32_t>(DmExchangeFreq::DM_LOW));
+    std::map<std::string, std::string> filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.Level0)
@@ -1435,6 +1454,19 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_002, testing::ext::TestSize.
     std::map<std::string, std::string> advertiseParam;
     int32_t ret = DeviceManagerService::GetInstance().StartAdvertising(pkgName, advertiseParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::map<std::string, std::string> advertiseParam;
+    advertiseParam[PARAM_KEY_META_TYPE] = "metaType";
+    advertiseParam[PARAM_KEY_PUBLISH_ID] = "123456";
+    advertiseParam[PARAM_KEY_DISC_MODE] =
+        std::to_string(static_cast<int32_t>(DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE));
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().StartAdvertising(pkgName, advertiseParam);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level0)

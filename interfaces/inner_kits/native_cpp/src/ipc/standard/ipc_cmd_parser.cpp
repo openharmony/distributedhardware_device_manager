@@ -1594,5 +1594,17 @@ ON_IPC_READ_RESPONSE(GET_SECURITY_LEVEL, MessageParcel &reply, std::shared_ptr<I
     pRsp->SetSecurityLevel(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_CMD(SERVER_ON_PIN_HOLDER_EVENT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = data.ReadInt32();
+    DmPinHolderEvent pinHolderEvent = static_cast<DmPinHolderEvent>(data.ReadInt32());
+    std::string content = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnPinHolderEvent(pkgName, pinHolderEvent, result, content);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

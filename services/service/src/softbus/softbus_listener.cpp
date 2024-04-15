@@ -60,7 +60,8 @@ static PulishStatus g_publishStatus = PulishStatus::STATUS_UNKNOWN;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
-static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveredDeviceMap;
+static std::map<std::string,
+    std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
 bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
@@ -888,8 +889,7 @@ void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
     if (discoveredDeviceMap.size() == MAX_CACHED_DISCOVERED_DEVICE_SIZE) {
         discoveredDeviceMap.erase(discoveredDeviceMap.begin());
     }
-    discoveredDeviceMap.erase(device->devId);
-    discoveredDeviceMap.insert(std::pair<std::string, std::shared_ptr<DeviceInfo>>(device->devId, infoPtr));
+    CacheDeviceInfo(device->devId, infoPtr);
 }
 
 int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId,
@@ -901,8 +901,12 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
         LOGE("GetTargetInfoFromCache failed, cannot found device in cached discovered map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
-
-    const ConnectionAddr *addrInfo = &(iter->second->addr)[0];
+    auto deviceVectorIter = iter->second;
+    if (deviceVectorIter.size() == 0) {
+        LOGE("GetTargetInfoFromCache failed, cannot found deviceVectorIter in cached discovered map.");
+        return ERR_DM_BIND_INPUT_PARA_INVALID;
+    }
+    const ConnectionAddr *addrInfo = &((--deviceVectorIter.end())->second->addr)[0];
     if (addrInfo == nullptr) {
         LOGE("GetTargetInfoFromCache failed, connection address of discovered device is nullptr.");
         return ERR_DM_BIND_COMMON_FAILED;
@@ -1017,6 +1021,72 @@ std::string SoftbusListener::GetHostPkgName()
 {
     LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
     return hostName_;
+}
+
+void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_ptr<DeviceInfo> infoPtr)
+{
+    if (deviceId.empty()) {
+        return;
+    }
+    if (infoPtr->addrNum <= 0) {
+        LOGE("CacheDeviceInfo failed, infoPtr->addr is empty.");
+        return;
+    }
+    ConnectionAddrType addrType;
+    const ConnectionAddr *addrInfo = &(infoPtr->addr)[0];
+    if (addrInfo == nullptr) {
+        LOGE("CacheDeviceInfo failed, connection address of discovered device is nullptr.");
+        return;
+    }
+    addrType = addrInfo->type;
+    std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
+    auto iter = discoveredDeviceMap.find(deviceId);
+    if (iter != discoveredDeviceMap.end()) {
+        deviceVec = iter->second;
+        for (auto it = deviceVec.begin(); it != deviceVec.end();) {
+            if (it->first == addrType) {
+                it = deviceVec.erase(it);
+                continue;
+            } else {
+                it++;
+            }
+        }
+        discoveredDeviceMap.erase(deviceId);
+    }
+    deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
+    discoveredDeviceMap.insert(std::pair<std::string,
+        std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
+}
+
+int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, const std::string &ip,
+    ConnectionAddrType &addrType)
+{
+    std::lock_guard<std::mutex> lock(g_deviceMapMutex);
+    auto iter = discoveredDeviceMap.find(deviceId);
+    if (iter == discoveredDeviceMap.end()) {
+        LOGE("GetIPAddrTypeFromCache failed, cannot found device in cached discovered map.");
+        return ERR_DM_BIND_INPUT_PARA_INVALID;
+    }
+    auto deviceVectorIter = iter->second;
+    if (deviceVectorIter.size() == 0) {
+        LOGE("GetTargetInfoFromCache failed, cannot found deviceVectorIter in cached discovered map.");
+        return ERR_DM_BIND_INPUT_PARA_INVALID;
+    }
+    for (auto it = deviceVectorIter.begin(); it != deviceVectorIter.end(); ++it) {
+        const ConnectionAddr *addrInfo = &((it->second)->addr)[0];
+        if (addrInfo == nullptr) {
+            continue;
+        }
+        if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH ||
+            addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
+            std::string cacheIp((addrInfo->info).ip.ip);
+            if (cacheIp == ip) {
+                addrType = addrInfo->type;
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_BIND_INPUT_PARA_INVALID;
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()

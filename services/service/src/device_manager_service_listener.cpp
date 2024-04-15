@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 
 namespace OHOS {
@@ -365,6 +366,21 @@ void DeviceManagerServiceListener::OnDestroyResult(const std::string &pkgName, i
     pReq->SetPkgName(pkgName);
     pReq->SetResult(result);
     ipcServerListener_.SendRequest(SERVER_DESTROY_PIN_HOLDER_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event,
+    int32_t result, const std::string &content)
+{
+    LOGI("OnPinHolderEvent pkgName: %{public}s, event: %{public}d, result: %{public}d",
+        pkgName.c_str(), event, result);
+    std::shared_ptr<IpcNotifyPinHolderEventReq> pReq = std::make_shared<IpcNotifyPinHolderEventReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
+    pReq->SetPkgName(pkgName);
+    pReq->SetPinHolderEvent(event);
+    pReq->SetResult(result);
+    pReq->SetContent(content);
+    ipcServerListener_.SendRequest(SERVER_ON_PIN_HOLDER_EVENT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -212,6 +212,7 @@ constexpr const char* PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
 constexpr const char* PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 constexpr const char* PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
 constexpr const char* PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";
+constexpr const char* PARAM_KEY_DISC_MODE = "DISC_MODE";
 constexpr const char* PARAM_KEY_AUTO_STOP_ADVERTISE = "AUTO_STOP_ADVERTISE";
 constexpr const char* PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
 constexpr const char* PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";

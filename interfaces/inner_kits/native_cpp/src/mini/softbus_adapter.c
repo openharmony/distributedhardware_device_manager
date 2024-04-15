@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "base64.h"
 #include "cJSON.h"
 #include "cmsis_os2.h"
 #include "discovery_service.h"
@@ -28,12 +27,10 @@
 #include "los_mux.h"
 #include "los_sem.h"
 #include "los_swtmr.h"
-#include "md.h"
 #include "ohos_init.h"
 #include "parameter.h"
 #include "securec.h"
 #include "session.h"
-#include "sha256.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 #include "softbus_errcode.h"

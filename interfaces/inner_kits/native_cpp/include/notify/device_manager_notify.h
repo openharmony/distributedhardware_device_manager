@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,8 @@
 #ifndef OHOS_DM_NOTIFY_H
 #define OHOS_DM_NOTIFY_H
 
+#include <chrono>
+#include <condition_variable>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -86,6 +88,8 @@ public:
     void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload);
     void OnCreateResult(const std::string &pkgName, int32_t result);
     void OnDestroyResult(const std::string &pkgName, int32_t result);
+    void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+                          const std::string &content);
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
 
 private:
@@ -103,6 +107,9 @@ private:
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>> bindCallback_;
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>> unbindCallback_;
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
+    std::mutex bindLock_;
+    std::condition_variable cv_;
+    bool binding_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

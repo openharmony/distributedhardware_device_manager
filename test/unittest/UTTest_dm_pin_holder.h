@@ -36,16 +36,6 @@ public:
     void TearDown();
 };
 
-class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
-public:
-    DeviceDiscoveryCallbackTest() : DiscoveryCallback() {}
-    virtual ~DeviceDiscoveryCallbackTest() {}
-    void OnDiscoverySuccess(uint16_t subscribeId) override {}
-    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
-    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
-    void OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo) override{}
-};
-
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
@@ -61,6 +51,7 @@ public:
     void OnPinHolderDestroy(DmPinType pinType, const std::string &payload) override;
     void OnCreateResult(int32_t result) override;
     void OnDestroyResult(int32_t result) override;
+    void OnPinHolderEvent(DmPinHolderEvent event, int32_t result, const std::string &content) override;
 };
 
 class IDeviceManagerServiceListenerTest : public IDeviceManagerServiceListener {
@@ -178,6 +169,15 @@ public:
     {
         (void)pkgName;
         (void)result;
+    }
+
+    void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+        const std::string &content) override
+    {
+        (void)pkgName;
+        (void)event;
+        (void)result;
+        (void)content;
     }
 };
 } // namespace DistributedHardware
