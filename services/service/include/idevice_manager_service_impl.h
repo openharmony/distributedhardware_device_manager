@@ -274,6 +274,7 @@ public:
     virtual void OnUnbindSessionCloseed(int32_t socket) = 0;
     virtual void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
+    virtual int32_t IsSameAccount(const std::string &udid) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

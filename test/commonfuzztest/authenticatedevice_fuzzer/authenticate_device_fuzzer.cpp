@@ -229,6 +229,7 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().CreatePinHolder(str, g_targetId, g_pinType, str);
     DeviceManager::GetInstance().DestroyPinHolder(str, g_targetId, g_pinType, str);
     DeviceManager::GetInstance().CheckAccessToTarget(g_tokenId, str);
+    DeviceManager::GetInstance().IsSameAccount(str);
 
     DeviceManager::GetInstance().SetUserOperation(str, g_action, str);
     DeviceManager::GetInstance().RequestCredential(str, g_returnStr);

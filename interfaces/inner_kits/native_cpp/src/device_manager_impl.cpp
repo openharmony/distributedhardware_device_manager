@@ -2128,5 +2128,27 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
     securityLevel = rsp->GetSecurityLevel();
     return DM_OK;
 }
+
+bool DeviceManagerImpl::IsSameAccount(const std::string &udid)
+{
+    if (udid.empty()) {
+        LOGE("DeviceManagerImpl::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
+        return false;
+    }
+    std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetUdid(udid);
+    int32_t ret = ipcClientProxy_->SendRequest(IS_SAME_ACCOUNT, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("IsSameAccount Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("IsSameAccount Failed with ret: %{public}d", ret);
+        return false;
+    }
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
