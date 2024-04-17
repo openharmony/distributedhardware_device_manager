@@ -1481,7 +1481,7 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.
         std::to_string(static_cast<int32_t>(DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartAdvertising(pkgName, advertiseParam);
-    EXPECT_EQ(ret, ERR_DM_STOP_ADVERTISING_FAILED);
+    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level0)
