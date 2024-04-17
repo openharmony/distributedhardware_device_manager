@@ -335,6 +335,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         LOGE("RegisterDevStateCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %{public}s", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
@@ -351,7 +352,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
-    LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     LOGI("RegisterDevStateCallback completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
