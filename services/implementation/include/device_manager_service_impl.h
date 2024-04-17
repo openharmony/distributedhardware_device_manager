@@ -128,6 +128,8 @@ public:
     void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);
 
     int32_t DpAclAdd(const std::string &udid);
+    int32_t IsSameAccount(const std::string &udid);
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

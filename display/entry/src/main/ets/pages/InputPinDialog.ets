@@ -31,12 +31,9 @@ const MSG_DOING_AUTH: number = 4
 struct InputCustomDialog {
   @State password: string = '';
   @State passwordCircle: string[] = ['', '', '', '', '', ''];
-  @State connect: string = '连接';
-  @State messageTips: string = '请输入对端设备上显示的连接码';
   @State isTimes: number = 3;
-  @State errorTips: string = '连接码错误，还可以尝试 ' + this.isTimes + ' 次';
+  @State errorTips: Resource = $r('app.string.dm_incorrect_code', this.isTimes);
   @State errorTipsVisible: Visibility = Visibility.None;
-  @State cancelBtn: string = '取消';
   @State heightNum: number = 600;
   @State targetDeviceName: string = '';
   @State isPC: boolean = false;
@@ -70,7 +67,7 @@ struct InputCustomDialog {
         let tmpStr: Record<string, number> = JSON.parse(data.param);
         let msg: number = tmpStr.uiStateMsg as number;
         if (msg === MSG_DOING_AUTH) {
-          this.errorTips = '正在认证中，请稍候……';
+          this.errorTips = $r('app.string.dm_authenticating');
           this.errorTipsVisible = Visibility.Visible;
           return;
         }
@@ -80,7 +77,7 @@ struct InputCustomDialog {
         }
         if (msg === MSG_PIN_CODE_ERROR) {
           this.isTimes--;
-          this.errorTips = '连接码错误，还可以尝试 ' + this.isTimes + ' 次';
+          this.errorTips = $r('app.string.dm_incorrect_code', this.isTimes);
           this.password = '';
           this.errorTipsVisible = Visibility.Visible;
           this.passwordCircle = ['', '', '', '', '', ''];
@@ -162,7 +159,7 @@ struct InputCustomDialog {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
         Column() {
           Column() {
-            Text(this.connect + ' ' + this.targetDeviceName)
+            Text($r('app.string.dm_connect', this.targetDeviceName))
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
@@ -175,7 +172,7 @@ struct InputCustomDialog {
               .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
 
-            Text(this.messageTips)
+            Text($r('app.string.dm_enter_connect_code'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Regular)
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
@@ -258,10 +255,12 @@ struct InputCustomDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.ohos_id_color_warning'))
           }.visibility(this.errorTipsVisible)
-          .margin({ bottom: 16 })
+          .margin({ bottom: 16,
+                    left: $r('sys.float.ohos_id_corner_radius_dialog'),
+                    right: $r('sys.float.ohos_id_corner_radius_dialog') })
 
           Flex({ justifyContent: FlexAlign.Center }) {
-            Button(this.cancelBtn)
+            Button($r('app.string.dm_cancel'))
               .height(40)
               .fontSize($r('sys.float.ohos_id_text_size_button1'))
               .onClick(() => {

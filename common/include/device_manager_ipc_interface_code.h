@@ -92,6 +92,7 @@ enum DMIpcCmdInterfaceCode {
     UNBIND_TARGET_RESULT,
     DP_ACL_ADD,
     GET_SECURITY_LEVEL,
+    IS_SAME_ACCOUNT,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

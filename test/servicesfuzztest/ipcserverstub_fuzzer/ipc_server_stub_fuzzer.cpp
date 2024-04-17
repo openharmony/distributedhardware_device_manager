@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "ipc_server_stub_fuzzer.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -44,14 +45,16 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    sptr<IpcRemoteBroker> listener = nullptr;
+    sptr<IpcRemoteBroker> listener = sptr<IpcServerStub>(new IpcServerStub());
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
+    IpcServerStub::GetInstance().Init();
     IpcServerStub::GetInstance().OnRemoteRequest(code, data1, reply, option);
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
     IpcServerStub::GetInstance().GetDmListener(pkgName);
     IpcServerStub::GetInstance().SendCmd(code, req, rsp);
+    IpcServerStub::GetInstance().GetAllPkgName();
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
 }
 }

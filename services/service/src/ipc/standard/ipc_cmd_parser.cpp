@@ -1459,5 +1459,16 @@ ON_IPC_READ_RESPONSE(SERVER_ON_PIN_HOLDER_EVENT, MessageParcel &reply, std::shar
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_CMD(IS_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string udid = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().IsSameAccount(udid);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

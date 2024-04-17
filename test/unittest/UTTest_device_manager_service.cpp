@@ -1629,8 +1629,31 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId = "12345";
     int32_t securityLevel = -1;
-    int32_t ret = DeviceManagerService::GetInstance()
-            .GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: IsSameAccount_001
+ * @tc.desc: The return value is ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "";
+    int32_t ret = DeviceManagerService::GetInstance().IsSameAccount(udid);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: IsSameAccount_002
+ * @tc.desc: The return value is ERR_DM_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "udidTest";
+    int32_t ret = DeviceManagerService::GetInstance().IsSameAccount(udid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
