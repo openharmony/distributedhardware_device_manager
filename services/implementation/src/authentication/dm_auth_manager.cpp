@@ -1591,7 +1591,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    deviceInfo->addrNum = index;
+    deviceInfo->addrNum = static_cast<uint32_t>(index);
     if (softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo) != DM_OK) {
         LOGE("DmAuthManager::ParseConnectAddr failed, AddMemberToDiscoverMap failed.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2006,7 +2006,7 @@ void DmAuthManager::CompatiblePutAcl()
     aclInfo.deviceIdHash = localUdidHash;
 
     DmAccesser accesser;
-    accesser.requestTokenId = authResponseContext_->tokenId;
+    accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     accesser.requestBundleName = authResponseContext_->hostPkgName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -2017,7 +2017,7 @@ void DmAuthManager::CompatiblePutAcl()
     }
 
     DmAccessee accessee;
-    accessee.trustTokenId = authResponseContext_->tokenId;
+    accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     accessee.trustBundleName = authResponseContext_->hostPkgName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accessee.trustDeviceId = remoteDeviceId_;
@@ -2180,19 +2180,26 @@ void DmAuthManager::ProRespNegotiate(const int32_t &sessionId)
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+        return;
     }
-
+    if (!IsBool(jsonObject, TAG_CRYPTO_SUPPORT)) {
+        LOGE("err json string.");
+        softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+        return;
+    }
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
-        if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
-            jsonObject[TAG_CRYPTO_VERSION] == authResponseContext_->cryptoVer) {
-            isCryptoSupport_ = true;
-            softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-            return;
+        if (IsString(jsonObject, TAG_CRYPTO_NAME) && IsString(jsonObject, TAG_CRYPTO_VERSION)) {
+            if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
+                jsonObject[TAG_CRYPTO_VERSION] == authResponseContext_->cryptoVer) {
+                isCryptoSupport_ = true;
+                softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+                return;
+            }
         }
     }
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
@@ -2330,7 +2337,7 @@ void DmAuthManager::PutAccessControlList()
     }
     aclInfo.deviceIdHash = localUdidHash;
     DmAccesser accesser;
-    accesser.requestTokenId = authResponseContext_->tokenId;
+    accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     accesser.requestBundleName = authResponseContext_->hostPkgName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accesser.requestUserId = authRequestContext_->localUserId;
@@ -2342,7 +2349,7 @@ void DmAuthManager::PutAccessControlList()
         accesser.requestDeviceId = authResponseContext_->localDeviceId;
     }
     DmAccessee accessee;
-    accessee.trustTokenId = authResponseContext_->tokenId;
+    accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     accessee.trustBundleName = authResponseContext_->hostPkgName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accessee.trustUserId = authRequestContext_->remoteUserId;

@@ -56,14 +56,14 @@ public:
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
+    virtual ~DmInitCallbackTest() {}
     void OnRemoteDied() override {}
 };
 
 class DeviceStateCallbackTest : public DeviceStateCallback {
 public:
     DeviceStateCallbackTest() : DeviceStateCallback() {}
-    virtual ~DeviceStateCallbackTest() override {}
+    virtual ~DeviceStateCallbackTest() {}
     void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override {}
     void OnDeviceReady(const DmDeviceInfo &deviceInfo) override {}
     void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override {}
@@ -73,7 +73,7 @@ public:
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
     DeviceManagerFaCallbackTest() : DeviceManagerUiCallback() {}
-    virtual ~DeviceManagerFaCallbackTest() override {}
+    virtual ~DeviceManagerFaCallbackTest() {}
     void OnCall(const std::string &paramJson) override {}
 };
 

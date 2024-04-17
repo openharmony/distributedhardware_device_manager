@@ -417,10 +417,10 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Level0)
 {
-    std::string DeviceId = "123";
+    std::string deviceId = "123";
     std::vector<GroupInfo> groupList;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    int ret = hichainConnector->GetRelatedGroups(DeviceId, groupList);
+    int ret = hichainConnector->GetRelatedGroups(deviceId, groupList);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -432,10 +432,10 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Leve
  */
 HWTEST_F(HichainConnectorTest, GetRelatedGroups_002, testing::ext::TestSize.Level0)
 {
-    std::string DeviceId = "12345";
+    std::string deviceId = "12345";
     std::vector<GroupInfo> groupList;
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    int ret = hichainConnector->GetRelatedGroups(DeviceId, groupList);
+    int ret = hichainConnector->GetRelatedGroups(deviceId, groupList);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 

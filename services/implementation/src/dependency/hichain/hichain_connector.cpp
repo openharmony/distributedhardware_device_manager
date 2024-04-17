@@ -235,7 +235,7 @@ bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<
     LOGI("HiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
+    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
         return false;
@@ -274,7 +274,7 @@ int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &
     LOGI("HiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
+    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
         return false;
@@ -1190,7 +1190,7 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups);
+    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
         return ERR_DM_FAILED;

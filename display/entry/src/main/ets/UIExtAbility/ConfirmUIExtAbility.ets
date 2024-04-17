@@ -44,7 +44,7 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
-        AppStorage.setOrCreate('ConfirmSession',session);
+        AppStorage.setOrCreate('ConfirmSession', session);
     }
 
     onSessionDestroy(session: UIExtensionContentSession) {

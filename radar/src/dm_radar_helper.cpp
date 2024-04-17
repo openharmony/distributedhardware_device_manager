@@ -639,9 +639,18 @@ std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
 
 std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    cJSON* deviceInfoJson = cJSON_CreateArray();
+    cJSON *deviceInfoJson = cJSON_CreateArray();
+    if (deviceInfoJson == nullptr) {
+        LOGE("deviceInfoJson is nullptr.");
+        return "";
+    }
     for (size_t i = 0; i < deviceInfoList.size(); i++) {
-        cJSON* object = cJSON_CreateObject();
+        cJSON *object = cJSON_CreateObject();
+        if (object == nullptr) {
+            LOGE("object is nullptr.");
+            cJSON_Delete(deviceInfoJson);
+            return "";
+        }
         std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
         cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
         std::string peerNetId = GetAnonyUdid(deviceInfoList[i].networkId);
@@ -651,7 +660,16 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
         cJSON_AddStringToObject(object, "PEER_DEV_NAME", deviceInfoList[i].deviceName);
         cJSON_AddItemToArray(deviceInfoJson, object);
     }
-    return std::string(cJSON_PrintUnformatted(deviceInfoJson));
+    char *deviceInfoStr = cJSON_PrintUnformatted(deviceInfoJson);
+    if (deviceInfoStr == nullptr) {
+        LOGE("deviceInfoStr is nullptr.");
+        cJSON_Delete(deviceInfoJson);
+        return "";
+    }
+    std::string devInfoStr = std::string(deviceInfoStr);
+    cJSON_Delete(deviceInfoJson);
+    cJSON_free(deviceInfoStr);
+    return devInfoStr;
 }
 
 std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)

@@ -16,6 +16,7 @@
 #include "device_auth.h"
 #include "dm_constants.h"
 
+namespace {
 int32_t (*deleteGroup)(int64_t requestId, const char *appId, const char *disbandParams)
 {
     if (disbandParams == 0) {
@@ -58,4 +59,5 @@ int32_t (*getRelatedGroups)(const char *appId, const char *peerDeviceId, char **
         groupNum = 1;
         returnGroupVec = "123";
     }
+}
 }

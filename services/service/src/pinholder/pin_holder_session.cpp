@@ -55,6 +55,7 @@ int32_t PinHolderSession::OpenSessionServer(const PeerTargetId &targetId)
     ConnectionAddr addrInfo;
     if (GetAddrByTargetId(targetId, addrInfo) != DM_OK) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
+        return sessionId;
     }
     sessionId = ::OpenAuthSession(DM_PIN_HOLDER_SESSION_NAME, &addrInfo, 1, nullptr);
     if (sessionId < 0) {
@@ -137,14 +138,23 @@ int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, Connec
 {
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
-        memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
+        if (memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length()) != DM_OK) {
+            LOGE("copy wifi data failed.");
+            return ERR_DM_FAILED;
+        }
         addr.info.ip.port = targetId.wifiPort;
     } else if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BR;
-        memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length());
+        if (memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length()) != DM_OK) {
+            LOGE("copy br data failed.");
+            return ERR_DM_FAILED;
+        }
     } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
-        memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
+        if (memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length()) != DM_OK) {
+            LOGE("copy ble data failed.");
+            return ERR_DM_FAILED;
+        }
         if (!targetId.deviceId.empty()) {
             Crypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());

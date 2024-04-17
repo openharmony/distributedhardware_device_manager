@@ -1324,7 +1324,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_004, testing::ext
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 6. call checkMap OnAuthResult
-    std::string token ="1";
+    std::string token = "1";
     int32_t status = 1;
     int32_t reason = 1;
     checkMap->OnAuthResult(deviceId, token, status, reason);
@@ -1497,7 +1497,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterAuthenticateCallback_003, testing::e
     // 9 check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     // 10. call checkMap OnAuthResult
-    std::string token ="1";
+    std::string token = "1";
     int32_t status = 1;
     int32_t reason = 1;
     checkMap->OnAuthResult(deviceId, token, status, reason);

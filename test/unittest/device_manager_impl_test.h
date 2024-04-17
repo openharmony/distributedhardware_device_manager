@@ -43,7 +43,7 @@ public:
     DeviceDiscoveryCallback() : DiscoveryCallback()
     {
     }
-    virtual ~DeviceDiscoveryCallback() override
+    virtual  ~DeviceDiscoveryCallback()
     {
     }
     void OnDiscoverySuccess(uint16_t subscribeId) override;
@@ -56,7 +56,7 @@ public:
     DevicePublishCallback() : PublishCallback()
     {
     }
-    virtual ~DevicePublishCallback() override
+    virtual ~DevicePublishCallback()
     {
     }
     void OnPublishResult(int32_t publishId, int32_t failedReason) override;

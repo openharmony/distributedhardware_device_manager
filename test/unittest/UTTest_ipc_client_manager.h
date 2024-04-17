@@ -36,7 +36,7 @@ public:
 class DmInitCallbackTest : public DmInitCallback {
 public:
     explicit DmInitCallbackTest(int &count);
-    virtual ~DmInitCallbackTest() override {}
+    virtual ~DmInitCallbackTest() {}
     void OnRemoteDied() override;
 private:
     int *count_ = nullptr;

@@ -27,7 +27,7 @@ namespace DistributedHardware {
 class DmInitCallbackTest : public DmInitCallback {
 public:
     DmInitCallbackTest() : DmInitCallback() {}
-    virtual ~DmInitCallbackTest() override {}
+    virtual ~DmInitCallbackTest() {}
     void OnRemoteDied() override {}
 };
 

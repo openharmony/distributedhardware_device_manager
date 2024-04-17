@@ -41,7 +41,7 @@ public:
 class DmInitCallbackTest : public DmInitCallback {
 public:
     explicit DmInitCallbackTest(int &count);
-    virtual ~DmInitCallbackTest() override {}
+    virtual ~DmInitCallbackTest() {}
     void OnRemoteDied() override;
 private:
     int *count_ = nullptr;
@@ -50,7 +50,7 @@ private:
 class DeviceStateCallbackTest : public DeviceStateCallback {
 public:
     explicit DeviceStateCallbackTest(int &count);
-    virtual ~DeviceStateCallbackTest() override {}
+    virtual ~DeviceStateCallbackTest() {}
     void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override;
     void OnDeviceReady(const DmDeviceInfo &deviceInfo) override;
     void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override;
@@ -62,7 +62,7 @@ private:
 class DiscoveryCallbackTest : public DiscoveryCallback {
 public:
     explicit DiscoveryCallbackTest(int &count);
-    virtual ~DiscoveryCallbackTest() override {}
+    virtual ~DiscoveryCallbackTest() {}
     void OnDiscoverySuccess(uint16_t subscribeId) override;
     void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
     void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
@@ -73,7 +73,7 @@ private:
 class PublishCallbackTest : public PublishCallback {
 public:
     explicit PublishCallbackTest(int &count);
-    virtual ~PublishCallbackTest() override {}
+    virtual  ~PublishCallbackTest() {}
     void OnPublishResult(int32_t publishId, int32_t failedReason) override;
 private:
     int *count_ = nullptr;
@@ -82,8 +82,9 @@ private:
 class AuthenticateCallbackTest : public AuthenticateCallback {
 public:
     explicit AuthenticateCallbackTest(int &count);
-    virtual ~AuthenticateCallbackTest() override {}
-    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
+    virtual ~AuthenticateCallbackTest() {}
+    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
+                              int32_t reason) override;
 private:
     int *count_ = nullptr;
 };
@@ -91,7 +92,7 @@ private:
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
     explicit DeviceManagerFaCallbackTest(int &count);
-    virtual ~DeviceManagerFaCallbackTest() override {}
+    virtual ~DeviceManagerFaCallbackTest() {}
     void OnCall(const std::string &paramJson) override;
 private:
     int *count_ = nullptr;

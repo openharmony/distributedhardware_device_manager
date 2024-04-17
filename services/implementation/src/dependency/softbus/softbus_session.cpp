@@ -32,7 +32,7 @@ static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MAX_LATENCY, .value = 10000 },
     { .qos = QOS_TYPE_MIN_LATENCY, .value = 2500 },
 };
-static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
+static uint32_t g_qosTVParamIndex = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
 }
 
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
@@ -66,6 +66,7 @@ SoftbusSession::SoftbusSession()
     iSocketListener_.OnShutdown = OnShutdown;
     iSocketListener_.OnBytes = OnBytes;
     iSocketListener_.OnQos = OnQos;
+    iSocketListener_.OnFile = nullptr;
 }
 
 SoftbusSession::~SoftbusSession()
@@ -159,7 +160,6 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 
 int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &message)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
         LOGE("[SOFTBUS]SendHeartbeatData failed.");
         return ERR_DM_FAILED;
@@ -233,7 +233,7 @@ int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
         return ERR_DM_FAILED;
     }
 
-    int32_t ret = Bind(socket, g_qosInfo, g_QosTV_Param_Index, &iSocketListener_);
+    int32_t ret = Bind(socket, g_qosInfo, g_qosTVParamIndex, &iSocketListener_);
     if (ret < DM_OK) {
         LOGE("[SOFTBUS]OpenUnbindSession failed, netWorkId: %{public}s, socket: %{public}d",
             GetAnonyString(netWorkId).c_str(), socket);
