@@ -24,9 +24,6 @@ const MSG_CANCEL_PIN_CODE_SHOW: number = 2
 @Entry
 @Component
 struct dialogPlusPage {
-  @State messageTitle: string = '蓝牙未打开'
-  @State messageTips: string = '请打开蓝牙'
-  @State close: string = '关闭'
   @State isShow: boolean = true
 
   aboutToAppear() {
@@ -96,14 +93,14 @@ struct dialogPlusPage {
     Row() {
       Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
         Column() {
-          Text(this.messageTitle)
+          Text($r('app.string.dm_bt_not_open'))
             .fontSize(35)
             .fontWeight(FontWeight.Bold)
-          Text(this.messageTips)
+          Text($r('app.string.dm_open_bt'))
             .fontSize(30)
             .fontWeight(FontWeight.Medium)
           Row() {}.height('2%')
-          Button(this.close)
+          Button($r('app.string.dm_close'))
             .fontSize(25)
             .fontColor(0xffffff)
             .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })

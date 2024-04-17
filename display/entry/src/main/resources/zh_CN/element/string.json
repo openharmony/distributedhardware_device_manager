@@ -23,59 +23,59 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "Trust this device?"
+      "value": "是否信任此设备？"
     },
     {
       "name": "dm_allow_temp",
-      "value": "Allow temp"
+      "value": "临时信任"
     },
     {
       "name": "dm_allow_always",
-      "value": "Allow always"
+      "value": "始终信任"
     },
     {
       "name": "dm_connect_device",
-      "value": "would like to link with your device."
+      "value": "想要连接本机。"
     },
     {
       "name": "dm_not_allow",
-      "value": "Don't trust(%d s)"
+      "value": "不信任( %d 秒)"
     },
     {
       "name": "dm_connect",
-      "value": "Connect %s"
+      "value": "连接 %s"
     },
     {
       "name": "dm_enter_connect_code",
-      "value": "Enter the connection code displayed on the peer device"
+      "value": "请输入对端设备上显示的连接码"
     },
     {
       "name": "dm_cancel",
-      "value": "Cancel"
+      "value": "取消"
     },
     {
       "name": "dm_incorrect_code",
-      "value": "Incorrect connection code, you can try another %d times."
+      "value": "连接码错误，还可以尝试 %d 次"
     },
     {
       "name": "dm_authenticating",
-      "value": "Authenticating...Please wait."
+      "value": "正在认证中，请稍候……"
     },
     {
       "name": "dm_connect_code",
-      "value": "Connection code"
+      "value": "连接码"
     },
     {
       "name": "dm_bt_not_open",
-      "value": "Bluetooth is not turned on"
+      "value": "蓝牙未打开"
     },
     {
       "name": "dm_open_bt",
-      "value": "Please turn on Bluetooth"
+      "value": "请打开蓝牙"
     },
     {
       "name": "dm_close",
-      "value": "Close"
+      "value": "关闭"
     }
   ]
 }
