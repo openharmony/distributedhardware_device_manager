@@ -41,19 +41,19 @@ PeerTargetId peerTargetId = {
 
 std::vector<DmDeviceInfo> deviceList;
 std::map<std::string, std::string> bindParam;
-std::string returnJsonStr;
-int32_t eventId = 1;
-int32_t action = 1;
-int32_t authType = -1;
-uint16_t subscribeId = 123;
+std::string g_returnJsonStr;
+int32_t g_eventId = 1;
+int32_t g_action = 1;
+int32_t g_authType = -1;
+uint16_t g_subscribeId = 123;
 
-std::string reqJsonStr = R"(
+std::string g_reqJsonStr = R"(
 {
     "userId":"4269DC28B639681698809A67EDAD08E39F207900038F91EFF95DD042FE2874E4"
 }
 )";
 
-std::string credentialInfo = R"(
+std::string g_credentialInfo = R"(
 {
     "processType" : 1,
     "authType" : 1,
@@ -73,7 +73,7 @@ std::string credentialInfo = R"(
 }
 )";
 
-std::string deleteInfo = R"(
+std::string g_deleteInfo = R"(
 {
     "processType" : 1,
     "authType" : 1,
@@ -134,23 +134,23 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->RegisterCredentialCallback(str);
     deviceManagerServiceImpl->StartDeviceDiscovery(str, subscribeInfo, str);
     deviceManagerServiceImpl->StopDeviceDiscovery(str, subscribeInfo.subscribeId);
-    deviceManagerServiceImpl->StartDeviceDiscovery(str, subscribeId, str);
-    deviceManagerServiceImpl->StopDeviceDiscovery(str, subscribeId);
+    deviceManagerServiceImpl->StartDeviceDiscovery(str, g_subscribeId, str);
+    deviceManagerServiceImpl->StopDeviceDiscovery(str, g_subscribeId);
     deviceManagerServiceImpl->PublishDeviceDiscovery(str, publishInfo);
     deviceManagerServiceImpl->UnPublishDeviceDiscovery(str, publishInfo.publishId);
-    deviceManagerServiceImpl->AuthenticateDevice(str, authType, str, str);
+    deviceManagerServiceImpl->AuthenticateDevice(str, g_authType, str, str);
     deviceManagerServiceImpl->UnAuthenticateDevice(str, str);
-    deviceManagerServiceImpl->BindDevice(str, authType, str, str);
+    deviceManagerServiceImpl->BindDevice(str, g_authType, str, str);
     deviceManagerServiceImpl->UnBindDevice(str, str);
-    deviceManagerServiceImpl->SetUserOperation(str, action, str);
-    deviceManagerServiceImpl->RequestCredential(reqJsonStr, returnJsonStr);
-    deviceManagerServiceImpl->ImportCredential(str, credentialInfo);
-    deviceManagerServiceImpl->DeleteCredential(str, deleteInfo);
-    deviceManagerServiceImpl->MineRequestCredential(str, returnJsonStr);
-    deviceManagerServiceImpl->CheckCredential(str, reqJsonStr, returnJsonStr);
-    deviceManagerServiceImpl->ImportCredential(str, reqJsonStr, returnJsonStr);
-    deviceManagerServiceImpl->DeleteCredential(str, reqJsonStr, returnJsonStr);
-    deviceManagerServiceImpl->NotifyEvent(str, eventId, str);
+    deviceManagerServiceImpl->SetUserOperation(str, g_action, str);
+    deviceManagerServiceImpl->RequestCredential(g_reqJsonStr, g_returnJsonStr);
+    deviceManagerServiceImpl->ImportCredential(str, g_credentialInfo);
+    deviceManagerServiceImpl->DeleteCredential(str, g_deleteInfo);
+    deviceManagerServiceImpl->MineRequestCredential(str, g_returnJsonStr);
+    deviceManagerServiceImpl->CheckCredential(str, g_reqJsonStr, g_returnJsonStr);
+    deviceManagerServiceImpl->ImportCredential(str, g_reqJsonStr, g_returnJsonStr);
+    deviceManagerServiceImpl->DeleteCredential(str, g_reqJsonStr, g_returnJsonStr);
+    deviceManagerServiceImpl->NotifyEvent(str, g_eventId, str);
     deviceManagerServiceImpl->GetGroupType(deviceList);
     deviceManagerServiceImpl->GetUdidHashByNetWorkId(str.c_str(), str);
     deviceManagerServiceImpl->ImportAuthCode(str, str);

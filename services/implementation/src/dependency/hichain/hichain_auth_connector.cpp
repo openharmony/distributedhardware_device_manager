@@ -56,10 +56,10 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = std::to_string(pinCode);
     authParamJson["acquireType"] = AcquireType::P2P_BIND;
-    char *authParam = strdup(authParamJson.dump().c_str());
+    std::string authParam = authParamJson.dump();
     LOGI("StartAuthDevice authParam %{public}s ,requestId %{public}" PRId64, GetAnonyString(authParam).c_str(),
         requestId);
-    int32_t ret = StartAuthDevice(requestId, authParam, &deviceAuthCallback_);
+    int32_t ret = StartAuthDevice(requestId, authParam.c_str(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
         LOGE("Hichain authDevice failed, ret is %{public}d.", ret);
         return ERR_DM_FAILED;

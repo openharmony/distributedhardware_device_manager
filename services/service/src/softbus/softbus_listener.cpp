@@ -448,8 +448,8 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
     struct RadarInfo info = {
         .funcName = "RefreshSoftbusLNN",
-        .hostName = GetHostPkgName(),
         .toCallPkg = "dsoftbus",
+        .hostName = GetHostPkgName(),
         .stageRes = (ret == DM_OK) ?
                     static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?

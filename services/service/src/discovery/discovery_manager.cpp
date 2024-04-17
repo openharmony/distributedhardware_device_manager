@@ -154,7 +154,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
-    if (jsonObject.contains(TYPE_MINE)) {
+    if (!jsonObject.is_discarded() && jsonObject.contains(TYPE_MINE)) {
         return StartDiscovering4MineLibary(pkgName, dmSubInfo, it->second);
     }
 

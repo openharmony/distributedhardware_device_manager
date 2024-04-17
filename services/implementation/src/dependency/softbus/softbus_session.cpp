@@ -67,6 +67,10 @@ SoftbusSession::SoftbusSession()
     iSocketListener_.OnBytes = OnBytes;
     iSocketListener_.OnQos = OnQos;
     iSocketListener_.OnFile = nullptr;
+    iSocketListener_.OnMessage = nullptr;
+    iSocketListener_.OnBind = nullptr;
+    iSocketListener_.OnStream = nullptr;
+    iSocketListener_.OnError = nullptr;
 }
 
 SoftbusSession::~SoftbusSession()

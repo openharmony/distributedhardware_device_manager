@@ -119,8 +119,8 @@ struct AuthAsyncCallbackInfo {
 
 struct DmNapiStateJsCallback {
     std::string bundleName_;
-    uint16_t subscribeId_;
-    int32_t reason_;
+    uint16_t subscribeId_ = 0;
+    int32_t reason_ = 0;
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo_;
 
     DmNapiStateJsCallback(std::string bundleName, uint16_t subscribeId, int32_t reason,
@@ -354,6 +354,11 @@ public:
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
+    static void ReleaseDiscoveryCallback(std::string &bundleName);
+    static void RegisterDevStateCallback(napi_env env, std::string &bundleName);
+    static void LockMapMutex(std::string &bundleName);
+    static void LockDiscoveryCallbackMutex(napi_env env, OHOS::DistributedHardware::DmSubscribeInfo subInfo,
+                                           std::string &bundleName, std::string &extra);
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static void CallAsyncWorkSync(napi_env env, DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo);
