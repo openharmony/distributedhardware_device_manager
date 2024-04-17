@@ -270,7 +270,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
         LOGE("Dump error, ret = %{public}d", ret);
     }
 
-    ret = dprintf(fd, "%{public}s\n", result.c_str());
+    ret = dprintf(fd, "%s\n", result.c_str());
     if (ret < 0) {
         LOGE("HiDumper dprintf error");
         ret = ERR_DM_FAILED;
