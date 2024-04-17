@@ -31,6 +31,11 @@ bool PermissionManager::CheckNewPermission(void)
     return true;
 }
 
+bool PermissionManager::CheckMonitorPermission(void)
+{
+    return true;
+}
+
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)
 {
     (void)processName;

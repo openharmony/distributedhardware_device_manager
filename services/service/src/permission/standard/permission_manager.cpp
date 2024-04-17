@@ -34,6 +34,7 @@ IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
+constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = -20000;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
@@ -88,6 +89,28 @@ bool PermissionManager::CheckNewPermission(void)
     }
     LOGE("DM service access is denied, please apply for corresponding new permissions");
     return false;
+}
+
+bool PermissionManager::CheckMonitorPermission(void)
+{
+    LOGI("Enter PermissionManager::CheckMonitorPermission");
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("GetCallingTokenID error.");
+        return false;
+    }
+    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION) !=
+            PermissionState::PERMISSION_GRANTED) {
+            LOGE("DM service access is denied, please apply for corresponding permissions.");
+            return false;
+        }
+    }
+    LOGI("CheckMonitorPermission success.");
+    return true;
 }
 
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)

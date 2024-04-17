@@ -27,6 +27,7 @@ class PermissionManager {
 public:
     bool CheckPermission(void);
     bool CheckNewPermission(void);
+    bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);

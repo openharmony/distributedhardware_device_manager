@@ -736,7 +736,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStatusCallback_003, testing::ext::Tes
     std::string extra;
     std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(packName, extra, callback);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**

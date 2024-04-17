@@ -37,7 +37,9 @@ constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
-
+const int32_t NORMAL = 0;
+const int32_t SYSTEM_BASIC = 1;
+const int32_t SYSTEM_CORE = 2;
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -878,22 +880,34 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
     return DM_OK;
 }
 
-int32_t DeviceManagerService::CheckApiPermission()
+int32_t DeviceManagerService::CheckApiPermission(int32_t permissionLevel)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
+    LOGI("DeviceManagerService::CheckApiPermission permissionLevel: %{public}d", permissionLevel);
+    int32_t ret = ERR_DM_NO_PERMISSION;
+    switch (permissionLevel) {
+        case NORMAL:
+            if (PermissionManager::GetInstance().CheckNewPermission()) {
+                LOGI("The caller have permission to call");
+                ret = DM_OK;
+            }
+            break;
+        case SYSTEM_BASIC:
+            if (PermissionManager::GetInstance().CheckPermission()) {
+                LOGI("The caller have permission to call");
+                ret = DM_OK;
+            }
+            break;
+        case SYSTEM_CORE:
+            if (PermissionManager::GetInstance().CheckMonitorPermission()) {
+                LOGI("The caller have permission to call");
+                ret = DM_OK;
+            }
+            break;
+        default:
+            LOGE("DM have not this permissionLevel.");
+            break;
     }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::CheckNewApiPermission()
-{
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
-    }
-    return DM_OK;
+    return ret;
 }
 
 int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,

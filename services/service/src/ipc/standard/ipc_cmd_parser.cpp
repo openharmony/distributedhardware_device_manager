@@ -407,26 +407,6 @@ ON_IPC_CMD(GET_AVAILABLE_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(CHECK_API_ACCESS_PERMISSION, MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = DeviceManagerService::GetInstance().CheckApiPermission();
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(CHECK_API_ACCESS_NEWPERMISSION, MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = DeviceManagerService::GetInstance().CheckNewApiPermission();
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -1466,6 +1446,17 @@ ON_IPC_CMD(IS_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     int32_t result = DeviceManagerService::GetInstance().IsSameAccount(udid);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(CHECK_API_PERMISSION, MessageParcel &data, MessageParcel &reply)
+{
+    int32_t permissionLevel = data.ReadInt32();
+    int32_t result = DeviceManagerService::GetInstance().CheckApiPermission(permissionLevel);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
