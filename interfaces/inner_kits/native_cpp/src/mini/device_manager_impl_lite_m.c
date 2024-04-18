@@ -122,10 +122,13 @@ int StartAdvertising(const char *advParam, const char *filterOption, OnAdvertisi
     cJSON *pkgNameObj = cJSON_GetObjectItem(obj, FILED_PKG_NAME);
     if (pkgNameObj == NULL || !cJSON_IsString(pkgNameObj)) {
         DMLOGE("parse pkgName failed.");
+        cJSON_Delete(obj);
         return ERR_DM_INPUT_INVALID_VALUE;
     }
     char *pkgName = pkgNameObj->valuestring;
-    return StartSoftbusPublish(pkgName, cb);
+    int ret = StartSoftbusPublish(pkgName, cb);
+    cJSON_Delete(obj);
+    return ret;
 }
 
 int StopAdvertising(const char *pkgName)
@@ -156,6 +159,7 @@ int StartDiscovering(const char *discoverParam, const char *filterOption, OnTarg
     }
     cJSON *pkgNameObj = cJSON_GetObjectItem(obj, FILED_PKG_NAME);
     if (pkgNameObj == NULL || !cJSON_IsString(pkgNameObj)) {
+        cJSON_Delete(obj);
         DMLOGE("parse pkgName failed.");
         return ERR_DM_INPUT_INVALID_VALUE;
     }
@@ -163,10 +167,13 @@ int StartDiscovering(const char *discoverParam, const char *filterOption, OnTarg
     cJSON *subscribeIdObj = cJSON_GetObjectItem(obj, FILED_SUBSCRIBE_ID);
     if (subscribeIdObj == NULL || !cJSON_IsNumber(subscribeIdObj)) {
         DMLOGE("parse subscrilbe id failed.");
+        cJSON_Delete(obj);
         return ERR_DM_INPUT_INVALID_VALUE;
     }
     int subscribeId = subscribeIdObj->valueint;
-    return StartSoftbusDiscovery(pkgName, subscribeId, filterOption, callback);
+    int ret = StartSoftbusDiscovery(pkgName, subscribeId, filterOption, callback);
+    cJSON_Delete(obj);
+    return ret;
 }
 
 int StopDiscovering(const char *pkgName, const int subscribeId)
@@ -198,10 +205,13 @@ int BindTarget(const char *pkgName, const char *deviceId, const char *bindParam,
     cJSON *bindTypeObj = cJSON_GetObjectItem(obj, FILED_BIND_TYPE);
     if (bindTypeObj == NULL || !cJSON_IsNumber(bindTypeObj)) {
         DMLOGE("parse bind type failed.");
+        cJSON_Delete(obj);
         return ERR_DM_INPUT_INVALID_VALUE;
     }
     int bindType = bindTypeObj->valueint;
-    return SoftbusBindTarget(pkgName, deviceId, bindType, cb);
+    int ret = SoftbusBindTarget(pkgName, deviceId, bindType, cb);
+    cJSON_Delete(obj);
+    return ret;
 }
 
 int UnBindTarget(const char *pkgName, const char *networkId)

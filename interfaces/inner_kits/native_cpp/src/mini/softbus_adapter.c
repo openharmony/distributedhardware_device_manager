@@ -1223,8 +1223,10 @@ static int OnSessionOpened(int sessionId, int result)
     int ret = SendBytes(sessionId, msg, strlen(msg));
     if (ret != SOFTBUS_OK) {
         DMLOGE("send byte failed, ret: %d.", ret);
+        cJSON_free(msg);
         return ERR_DM_FAILED;
     }
+    cJSON_free(msg);
     return DM_OK;
 }
 
@@ -1289,8 +1291,10 @@ static void ProcessSinkMsg(const char *data, unsigned int dataLen)
 
     if (SendBytes(g_sessionId, retStr, strlen(retStr)) != SOFTBUS_OK) {
         DMLOGE("send bytes failed, cmd: %d.", MSG_NEGOTIATE_RESP);
+        cJSON_free(retStr);
         return;
     }
+    cJSON_free(retStr);
 }
 
 static void OnJoinLNNCallback(ConnectionAddr *addr, const char *networkId, int32_t retCode)
