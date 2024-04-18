@@ -55,6 +55,7 @@
 #include "ipc_start_discovery_req.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
@@ -616,32 +617,6 @@ ON_IPC_SET_REQUEST(SERVER_USER_AUTH_OPERATION, std::shared_ptr<IpcReq> pBaseReq,
 ON_IPC_READ_RESPONSE(SERVER_USER_AUTH_OPERATION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(CHECK_API_ACCESS_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    LOGI("send permission request!");
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(CHECK_API_ACCESS_PERMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    int32_t ret = reply.ReadInt32();
-    pBaseRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(CHECK_API_ACCESS_NEWPERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    LOGI("send permission request!");
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(CHECK_API_ACCESS_NEWPERMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    int32_t ret = reply.ReadInt32();
-    pBaseRsp->SetErrCode(ret);
     return DM_OK;
 }
 
@@ -1622,6 +1597,30 @@ ON_IPC_READ_RESPONSE(IS_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcR
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(CHECK_API_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is nullptr");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcPermissionReq> pReq = std::static_pointer_cast<IpcPermissionReq>(pBaseReq);
+    if (!data.WriteInt32(pReq->GetPermissionLevel())) {
+        LOGE("write permissionLevel failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(CHECK_API_PERMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is nullptr");
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());

@@ -31,15 +31,17 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
 {
-    const int32_t permsNum = 3;
+    const int32_t permsNum = 4;
     const int32_t indexZero = 0;
     const int32_t indexOne = 1;
     const int32_t indexTwo = 2;
+    const int32_t indexThree = 3;
     uint64_t tokenId;
     const char *perms[permsNum];
     perms[indexZero] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
     perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
     perms[indexTwo] = "ohos.permission.ACCESS_SERVICE_DM";
+    perms[indexThree] = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = permsNum,
@@ -796,7 +798,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
  */
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSize.Level0)
 {
-    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission();
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(0);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -1213,27 +1215,40 @@ HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_002, testing::ext::Test
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_002, testing::ext::TestSize.Level0)
 {
     DeletePermission();
-    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission();
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(0);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_003, testing::ext::TestSize.Level0)
 {
-    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission();
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, CheckNewApiPermission_001, testing::ext::TestSize.Level0)
-{
     DeletePermission();
-    int32_t ret = DeviceManagerService::GetInstance().CheckNewApiPermission();
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(1);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckNewApiPermission_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_004, testing::ext::TestSize.Level0)
 {
-    int32_t ret = DeviceManagerService::GetInstance().CheckNewApiPermission();
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_005, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(1);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_006, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_007, testing::ext::TestSize.Level0)
+{
+    int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(3);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level0)
@@ -1341,7 +1356,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1357,7 +1372,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
         std::to_string(static_cast<int32_t>(DmExchangeFreq::DM_LOW));
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1436,7 +1451,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
@@ -1466,7 +1481,7 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.
         std::to_string(static_cast<int32_t>(DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartAdvertising(pkgName, advertiseParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level0)

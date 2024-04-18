@@ -687,7 +687,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_101, testing::ext::Test
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, callback);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1720,7 +1720,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, dsCallback);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 

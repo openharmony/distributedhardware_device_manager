@@ -49,6 +49,7 @@
 #include "ipc_get_availabledevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
+#include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -62,7 +63,10 @@
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "securec.h"
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#endif
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t SLEEP_TIME_MS = 50000; // 50ms
@@ -96,7 +100,10 @@ const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
-
+const int32_t NORMAL = 0;
+const int32_t SYSTEM_BASIC = 1;
+const int32_t SYSTEM_CORE = 2;
+const int32_t USLEEP_TIME_MS = 100000; // 100ms
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
@@ -329,6 +336,22 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::RegisterDevStateCallback start, pkgName: %{public}s", pkgName.c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("Get SystemAbilityManager Failed");
+        return ERR_DM_INIT_FAILED;
+    }
+    while (samgr->CheckSystemAbility(ACCESS_TOKEN_MANAGER_SERVICE_ID) == nullptr) {
+        LOGD("Access_token SA not start.");
+        usleep(USLEEP_TIME_MS);
+    }
+    int32_t ret = CheckApiPermission(SYSTEM_CORE);
+    if (ret != DM_OK) {
+        LOGE("System SA not have permission, ret: %{public}d.", ret);
+        return ret;
+    }
+#endif
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     LOGI("RegisterDevStateCallback completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
@@ -1260,43 +1283,14 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
 
 int32_t DeviceManagerImpl::CheckAPIAccessPermission()
 {
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_PERMISSION, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Check permission failed with ret: %{public}d", ret);
-        return ret;
-    }
-    LOGI("The caller declare the DM permission!");
-    return DM_OK;
+    LOGI("DeviceManagerImpl::CheckAPIAccessPermission");
+    return CheckApiPermission(SYSTEM_BASIC);
 }
 
 int32_t DeviceManagerImpl::CheckNewAPIAccessPermission()
 {
-    LOGI("CheckNewAPIAccessPermission in");
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_ACCESS_NEWPERMISSION, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Check permission failed with ret: %{public}d", ret);
-        return ret;
-    }
-    LOGI("The caller declare the DM permission!");
-    return DM_OK;
+    LOGI("DeviceManagerImpl::CheckNewAPIAccessPermission");
+    return CheckApiPermission(NORMAL);
 }
 
 int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId)
@@ -2149,6 +2143,27 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &udid)
         return false;
     }
     return true;
+}
+
+int32_t DeviceManagerImpl::CheckApiPermission(int32_t permissionLevel)
+{
+    LOGI("DeviceManagerImpl::CheckApiPermission permissionLevel: %{public}d", permissionLevel);
+    std::shared_ptr<IpcPermissionReq> req = std::make_shared<IpcPermissionReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPermissionLevel(permissionLevel);
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_PERMISSION, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Check permission failed with ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("The caller declare the DM permission!");
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
