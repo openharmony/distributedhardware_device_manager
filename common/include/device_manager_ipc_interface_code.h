@@ -91,7 +91,7 @@ enum DMIpcCmdInterfaceCode {
     DP_ACL_ADD,
     GET_SECURITY_LEVEL,
     IS_SAME_ACCOUNT,
-	CHECK_API_PERMISSION,
+    CHECK_API_PERMISSION,
     // Add ipc msg here
     IPC_MSG_BUTT
 };
