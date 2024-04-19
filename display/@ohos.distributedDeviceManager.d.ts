@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,7 @@
  * limitations under the License.
  */
 
-import type { AsyncCallback } from './@ohos.base';
-import type { Callback } from './@ohos.base';
+import type { AsyncCallback, Callback } from './@ohos.base';
 
 /**
  * Providers interfaces to create a {@link deviceManager} instances.
@@ -103,7 +102,7 @@ declare namespace distributedDeviceManager {
    *
    * @param { string } bundleName - Indicates the bundle name of the application.
    * @returns { DeviceManager } - Return the DeviceManager object.
-   * @throws { BusinessError } 401 - Input parameter error.
+   * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter types; 3.Parameter verification failed.
    * @syscap SystemCapability.DistributedHardware.DeviceManager
    * @since 10
    */
@@ -115,7 +114,7 @@ declare namespace distributedDeviceManager {
    * @permission ohos.permission.DISTRIBUTED_DATASYNC
    * @param { DeviceManager } deviceManager - Indicates the {@code DeviceManager} instance.
    * @throws { BusinessError } 201 - User permission verify failed.
-   * @throws { BusinessError } 401 - Input parameter error.
+   * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter types; 3.Parameter verification failed.
    * @throws { BusinessError } 11600101 - Failed to execute the function.
    * @syscap SystemCapability.DistributedHardware.DeviceManager
    * @since 10
@@ -137,7 +136,7 @@ declare namespace distributedDeviceManager {
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @returns { Array<DeviceBasicInfo> } - Returns a list of available devices.
      * @throws { BusinessError } 201 - User permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter types; 3.Parameter verification failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
@@ -225,7 +224,7 @@ declare namespace distributedDeviceManager {
      * @param { string } networkId - Device network id.
      * @returns { string } - Returns device name.
      * @throws { BusinessError } 201 - User permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified networkId is greater than 255.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
@@ -239,7 +238,7 @@ declare namespace distributedDeviceManager {
      * @param { string } networkId - Device network id.
      * @returns { number } - Returns device type.
      * @throws { BusinessError } 201 - User permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified networkId is greater than 255.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
@@ -266,7 +265,7 @@ declare namespace distributedDeviceManager {
      *                                      0: Devices authenticated based on temporary negotiated session key.
      *                                      1: Devices authenticated based on the same account credential key.
      *                                      2: Devices authenticated based on different account credential keys.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600104 - Discovery repeats.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
@@ -279,7 +278,7 @@ declare namespace distributedDeviceManager {
      * Stop discovering nearby devices.
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600104 - Stop discovery repeats.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
@@ -305,7 +304,7 @@ declare namespace distributedDeviceManager {
      *      "appOperation" : "xxxx"   - The reason why the app want to bind the target package.
      *      "customDescription" : "xxxx" - The detail description of the operation.
      * @param { AsyncCallback<{deviceId: string}> } callback - indicates the callback to be invoked upon bindDevice.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified deviceId is greater than 255.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      * @throws { BusinessError } 11600103 - Bind invalid.
@@ -319,7 +318,7 @@ declare namespace distributedDeviceManager {
      *
      * @permission ohos.permission.DISTRIBUTED_DATASYNC
      * @param { string } deviceId - id of device to unbind
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified deviceId is greater than 255.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 11600101 - Failed to execute the function.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
@@ -335,7 +334,7 @@ declare namespace distributedDeviceManager {
      * @param { string } actionResult - Indicates the user operation result.
      * @throws { BusinessError } 201 - Permission verify failed.
      * @throws { BusinessError } 202 - The caller is not a system application.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified actionResult is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @systemapi this method can be used only by system applications.
      * @since 10
@@ -351,7 +350,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ action: DeviceStateChange, device: DeviceBasicInfo }> } callback
      * Indicates the device state callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -365,7 +364,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ action: DeviceStateChange, device: DeviceBasicInfo }> } callback
      * Indicates the device state callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -379,7 +378,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ subscribeId: number, device: DeviceBasicInfo }> } callback
      * Indicates the device discovery callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -393,7 +392,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ subscribeId: number, device: DeviceBasicInfo }> } callback
      * Indicates the device discovery callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -406,7 +405,7 @@ declare namespace distributedDeviceManager {
      * @param { 'deviceNameChange' } type - Changed device name.
      * @param { Callback<{ deviceName: string }> } callback - Indicates the device name change callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -419,7 +418,7 @@ declare namespace distributedDeviceManager {
      * @param { 'deviceNameChange' } type - Changed device name.
      * @param { Callback<{ deviceName: string }> } callback - Indicates the device name change callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -433,7 +432,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ subscribeId: number, reason: number }> } callback
      * Indicates the device found result callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -447,7 +446,7 @@ declare namespace distributedDeviceManager {
      * @param { Callback<{ subscribeId: number, reason: number }> } callback
      * Indicates the device found result callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -460,7 +459,7 @@ declare namespace distributedDeviceManager {
      * @param { 'serviceDie' } type - Service death.
      * @param { Callback<{}> } callback - Indicates the service error callback to register.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -473,7 +472,7 @@ declare namespace distributedDeviceManager {
      * @param { 'serviceDie' } type - Service death.
      * @param { Callback<{}> } callback - Indicates the service error callback to unregister.
      * @throws { BusinessError } 201 - Permission verify failed.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
@@ -485,7 +484,7 @@ declare namespace distributedDeviceManager {
      * @permission ohos.permission.ACCESS_SERVICE_DM
      * @param { 'replyResult' } type - Ui reply result to register.
      * @param { Callback<{ param: string }> } callback - Indicates the devicemanager ui state to register.
-     * @throws { BusinessError } 401 - Input parameter error.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
      * @throws { BusinessError } 202 - The caller is not a system application.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @systemapi this method can be used only by system applications.
@@ -499,7 +498,7 @@ declare namespace distributedDeviceManager {
       * @permission ohos.permission.ACCESS_SERVICE_DM
       * @param { 'replyResult' } type - Ui reply result to unregister.
       * @param { Callback<{ param: string }> } callback - Indicates the devicemanager ui state to unregister.
-      * @throws { BusinessError } 401 - Input parameter error.
+      * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified type is greater than 255.
       * @throws { BusinessError } 202 - The caller is not a system application. 
       * @syscap SystemCapability.DistributedHardware.DeviceManager
       * @systemapi this method can be used only by system applications.
