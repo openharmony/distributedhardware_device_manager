@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_DISCOVERY_FILTER_TEST_H
-#define OHOS_DM_DISCOVERY_FILTER_TEST_H
+#ifndef OHOS_UTTEST_DISCOVERY_MANAGER_H
+#define OHOS_UTTEST_DISCOVERY_MANAGER_H
 
-#include <map>
-#include <string>
 #include <gtest/gtest.h>
+#include <refbase.h>
+#include <queue>
 
-#include "dm_anonymous.h"
-#include "dm_constants.h"
-#include "dm_discovery_filter.h"
-#include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "device_manager_service_listener.h"
+#include "discovery_manager.h"
+#include "ipc_notify_device_found_req.h"
+#include "ipc_notify_discover_result_req.h"
+#include "softbus_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmDiscoveryFilterTest : public testing::Test {
+class DiscoveryManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -37,4 +37,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_UTTEST_DISCOVERY_MANAGER_H

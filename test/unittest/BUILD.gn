@@ -27,6 +27,8 @@ group("unittest") {
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_impl",
     ":UTTest_device_manager_service_listener",
+    ":UTTest_discovery_filter",
+    ":UTTest_discovery_manager",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager",
@@ -773,6 +775,49 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
 }
 
 ## UTTest_dm_radar_helper_test }}}
+
+## UnitTest UTTest_discovery_filter {{{
+ohos_unittest("UTTest_discovery_filter") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_discovery_filter.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+}
+
+## UnitTest UTTest_discovery_filter }}}
+
+## UnitTest UTTest_discovery_manager {{{
+ohos_unittest("UTTest_discovery_manager") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_discovery_manager.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_discovery_manager }}}
 
 ###############################
 ## UnitTest UTTest_dm_deviceprofile_connector {{{
