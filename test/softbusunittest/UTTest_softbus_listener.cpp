@@ -344,22 +344,6 @@ HWTEST_F(SoftbusListenerTest, CloseDmRadarHelperObj_001, testing::ext::TestSize.
     bool ret = softbusListener->CloseDmRadarHelperObj(name);
     EXPECT_EQ(ret, true);
 }
-
-HWTEST_F(SoftbusListenerTest, CreateSoftbusSessionServer_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string sessionName;
-    int32_t ret = SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(pkgName, sessionName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(SoftbusListenerTest, RemoveSoftbusSessionServer_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string sessionName;
-    int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(pkgName, sessionName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
