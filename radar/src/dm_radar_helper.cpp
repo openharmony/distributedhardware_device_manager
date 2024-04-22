@@ -598,11 +598,11 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR,
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
-            "FUNC", info.funcName,
+            "FUNC", "GetTrustedDeviceList",
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", info.stageRes,
-            "BIZ_STATE", info.bizState,
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
             "DISCOVERY_DEVICE_LIST", info.discoverDevList);
     } else {
@@ -611,11 +611,11 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR,
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
-            "FUNC", info.funcName,
+            "FUNC", "GetTrustedDeviceList",
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", info.stageRes,
-            "BIZ_STATE", info.bizState,
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
             "DISCOVERY_DEVICE_LIST", info.discoverDevList,
             "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));

@@ -308,16 +308,6 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
             timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
         }
     }
-    struct RadarInfo info = {
-        .funcName = "OnSoftbusDiscoveryResult",
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL),
-        .errCode = result,
-    };
-    if (SoftbusListener::IsDmRadarHelperReady() && SoftbusListener::GetDmRadarHelperObj() != nullptr) {
-        if (!SoftbusListener::GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
-            LOGE("ReportDiscoverResCallback failed");
-        }
-    }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
