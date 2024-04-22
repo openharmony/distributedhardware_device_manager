@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,8 +47,7 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
 HWTEST_F(DeviceManagerServiceImplTest, Initialize_001, testing::ext::TestSize.Level0)
 {
     auto ideviceManagerServiceListener = std::shared_ptr<IDeviceManagerServiceListener>();
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>
-    ();
+    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     deviceManagerServiceImpl->commonEventManager_ = std::make_shared<DmCommonEventManager>();
     int ret = deviceManagerServiceImpl->Initialize(ideviceManagerServiceListener);
     EXPECT_EQ(ret, DM_OK);
@@ -62,8 +61,7 @@ HWTEST_F(DeviceManagerServiceImplTest, Initialize_001, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerServiceImplTest, Initialize_002, testing::ext::TestSize.Level0)
 {
     auto ideviceManagerServiceListener = std::shared_ptr<IDeviceManagerServiceListener>();
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>
-    ();
+    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
     deviceManagerServiceImpl->commonEventManager_ = nullptr;
     int ret = deviceManagerServiceImpl->Initialize(ideviceManagerServiceListener);
     EXPECT_EQ(ret, DM_OK);
