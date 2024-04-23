@@ -66,8 +66,14 @@ std::map<std::string, std::shared_ptr<DmNapiAuthenticateCallback>> g_authCallbac
 std::map<std::string, std::shared_ptr<DmNapiBindTargetCallback>> g_bindCallbackMap;
 std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCallbackMap;
 
-std::mutex g_initCallbackMapMutex;
 std::mutex g_deviceManagerMapMutex;
+std::mutex g_initCallbackMapMutex;
+std::mutex g_deviceStatusCallbackMapMutex;
+std::mutex g_DiscoveryCallbackMapMutex;
+std::mutex g_publishCallbackMapMutex;
+std::mutex g_authCallbackMapMutex;
+std::mutex g_bindCallbackMapMutex;
+std::mutex g_dmUiCallbackMapMutex;
 
 void DeleteUvWork(uv_work_t *work)
 {
@@ -639,7 +645,10 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         } else {
             LOGE("handler is nullptr");
         }
-        g_authCallbackMap.erase(bundleName_);
+        {
+            std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
+            g_authCallbackMap.erase(bundleName_);
+        }
     }
     napi_close_handle_scope(env_, scope);
 }
@@ -648,24 +657,16 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 {
     LOGI("CreateDmCallback for bundleName %{public}s eventType %{public}s", bundleName.c_str(), eventType.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE || eventType == DM_NAPI_EVENT_DEVICE_NAME_CHANGE) {
-        if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
-            return;
-        }
-        auto callback = std::make_shared<DmNapiDeviceStatusCallback>(env, bundleName);
-        std::string extra = "";
-        int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
-        if (ret != 0) {
-            LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName.c_str());
-            return;
-        }
-        g_deviceStatusCallbackMap.erase(bundleName);
-        g_deviceStatusCallbackMap[bundleName] = callback;
+        RegisterDevStatusCallback(env, bundleName);
         return;
     }
     if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL) {
         auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
-        g_DiscoveryCallbackMap.erase(bundleName);
-        g_DiscoveryCallbackMap[bundleName] = callback;
+        {
+            std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+            g_DiscoveryCallbackMap.erase(bundleName);
+            g_DiscoveryCallbackMap[bundleName] = callback;
+        }
         std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = callback;
         discoveryCallback->IncreaseRefCount();
         return;
@@ -673,8 +674,11 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 
     if (eventType == DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_PUBLISH_FAIL) {
         auto callback = std::make_shared<DmNapiPublishCallback>(env, bundleName);
-        g_publishCallbackMap.erase(bundleName);
-        g_publishCallbackMap[bundleName] = callback;
+        {
+            std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
+            g_publishCallbackMap.erase(bundleName);
+            g_publishCallbackMap[bundleName] = callback;
+        }
         std::shared_ptr<DmNapiPublishCallback> publishCallback = callback;
         publishCallback->IncreaseRefCount();
         return;
@@ -687,9 +691,37 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
             LOGE("RegisterDeviceManagerFaCallback failed for bundleName %{public}s", bundleName.c_str());
             return;
         }
-        g_dmUiCallbackMap.erase(bundleName);
-        g_dmUiCallbackMap[bundleName] = callback;
+        {
+            std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
+            g_dmUiCallbackMap.erase(bundleName);
+            g_dmUiCallbackMap[bundleName] = callback;
+        }
+        return;
     }
+}
+
+void DeviceManagerNapi::RegisterDevStatusCallback(napi_env env, std::string &bundleName)
+{
+    LOGI("RegisterDevStatusCallback start");
+    {
+        std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+        if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
+            return;
+        }
+    }
+    auto callback = std::make_shared<DmNapiDeviceStatusCallback>(env, bundleName);
+    std::string extra = "";
+    int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
+    if (ret != 0) {
+        LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName.c_str());
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+        g_deviceStatusCallbackMap.erase(bundleName);
+        g_deviceStatusCallbackMap[bundleName] = callback;
+    }
+    return;
 }
 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
@@ -704,23 +736,48 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
             LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName.c_str());
             return;
         }
-        g_deviceStatusCallbackMap.erase(bundleName);
-        g_deviceStatusCallbackMap[bundleName] = callback;
+        {
+            std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+            g_deviceStatusCallbackMap.erase(bundleName);
+            g_deviceStatusCallbackMap[bundleName] = callback;
+        }
     }
 }
 
 void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 {
     std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
-    auto iter = g_publishCallbackMap.find(bundleName);
-    if (iter == g_publishCallbackMap.end()) {
-        return;
+    {
+        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
+        auto iter = g_publishCallbackMap.find(bundleName);
+        if (iter == g_publishCallbackMap.end()) {
+            return;
+        }
+        publishCallback = iter->second;
     }
-
-    publishCallback = iter->second;
     publishCallback->DecreaseRefCount();
     if (publishCallback->GetRefCount() == 0) {
+        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
         g_publishCallbackMap.erase(bundleName);
+    }
+    return;
+}
+
+void DeviceManagerNapi::ReleaseDiscoveryCallback(std::string &bundleName)
+{
+    std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        auto iter = g_DiscoveryCallbackMap.find(bundleName);
+        if (iter == g_DiscoveryCallbackMap.end()) {
+            return;
+        }
+        DiscoveryCallback = iter->second;
+    }
+    DiscoveryCallback->DecreaseRefCount();
+    if (DiscoveryCallback->GetRefCount() == 0) {
+        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        g_DiscoveryCallbackMap.erase(bundleName);
     }
     return;
 }
@@ -728,31 +785,28 @@ void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &eventType)
 {
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
-        auto iter = g_deviceStatusCallbackMap.find(bundleName);
-        if (iter == g_deviceStatusCallbackMap.end()) {
-            LOGE("ReleaseDmCallback: cannot find statusCallback for bundleName %{public}s", bundleName.c_str());
-            return;
+        {
+            std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+            auto iter = g_deviceStatusCallbackMap.find(bundleName);
+            if (iter == g_deviceStatusCallbackMap.end()) {
+                LOGE("ReleaseDmCallback: cannot find statusCallback for bundleName %{public}s", bundleName.c_str());
+                return;
+            }
         }
         int32_t ret = DeviceManager::GetInstance().UnRegisterDevStatusCallback(bundleName);
         if (ret != 0) {
             LOGE("UnRegisterDevStatusCallback failed for bundleName %{public}s", bundleName.c_str());
             return;
         }
-        g_deviceStatusCallbackMap.erase(bundleName);
+        {
+            std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+            g_deviceStatusCallbackMap.erase(bundleName);
+        }
         return;
     }
 
     if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL) {
-        std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
-        auto iter = g_DiscoveryCallbackMap.find(bundleName);
-        if (iter == g_DiscoveryCallbackMap.end()) {
-            return;
-        }
-        DiscoveryCallback = iter->second;
-        DiscoveryCallback->DecreaseRefCount();
-        if (DiscoveryCallback->GetRefCount() == 0) {
-            g_DiscoveryCallbackMap.erase(bundleName);
-        }
+        ReleaseDiscoveryCallback(bundleName);
         return;
     }
 
@@ -762,17 +816,23 @@ void DeviceManagerNapi::ReleaseDmCallback(std::string &bundleName, std::string &
     }
 
     if (eventType == DM_NAPI_EVENT_REPLY_RESULT) {
-        auto iter = g_dmUiCallbackMap.find(bundleName);
-        if (iter == g_dmUiCallbackMap.end()) {
-            LOGE("cannot find dmFaCallback for bundleName %{public}s", bundleName.c_str());
-            return;
+        {
+            std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
+            auto iter = g_dmUiCallbackMap.find(bundleName);
+            if (iter == g_dmUiCallbackMap.end()) {
+                LOGE("cannot find dmFaCallback for bundleName %{public}s", bundleName.c_str());
+                return;
+            }
         }
         int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(bundleName);
         if (ret != 0) {
             LOGE("UnRegisterDeviceManagerFaCallback failed for bundleName %{public}s", bundleName.c_str());
             return;
         }
-        g_dmUiCallbackMap.erase(bundleName);
+        {
+            std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
+            g_dmUiCallbackMap.erase(bundleName);
+        }
         return;
     }
 }
@@ -1287,6 +1347,30 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
+void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bundleName, std::string &extra,
+    uint32_t subscribeId)
+{
+    std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        auto iter = g_DiscoveryCallbackMap.find(bundleName);
+        if (iter == g_DiscoveryCallbackMap.end()) {
+            discoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
+            g_DiscoveryCallbackMap[bundleName] = discoveryCallback;
+        } else {
+            discoveryCallback = iter->second;
+        }
+    }
+    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, tokenId, extra, discoveryCallback);
+    if (ret != 0) {
+        LOGE("Discovery failed, bundleName %{public}s, ret %{public}d", bundleName.c_str(), ret);
+        CreateBusinessError(env, ret);
+        discoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
+    }
+    return;
+}
+
 napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_info info)
 {
     LOGI("StartDeviceDiscover in");
@@ -1319,22 +1403,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
         }
         JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
     }
-    std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
-    auto iter = g_DiscoveryCallbackMap.find(deviceManagerWrapper->bundleName_);
-    if (iter == g_DiscoveryCallbackMap.end()) {
-        DiscoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, deviceManagerWrapper->bundleName_);
-        g_DiscoveryCallbackMap[deviceManagerWrapper->bundleName_] = DiscoveryCallback;
-    } else {
-        DiscoveryCallback = iter->second;
-    }
-    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
-    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(deviceManagerWrapper->bundleName_, tokenId,
-        extra, DiscoveryCallback);
-    if (ret != 0) {
-        LOGE("Discovery failed, bundleName %{public}s, ret %{public}d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        DiscoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(subscribeId), ret);
-    }
+    LockDiscoveryCallbackMutex(env, deviceManagerWrapper->bundleName_, extra, subscribeId);
     napi_get_undefined(env, &result);
     return result;
 }
@@ -1392,14 +1461,16 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
     }
 
     std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
-    auto iter = g_publishCallbackMap.find(deviceManagerWrapper->bundleName_);
-    if (iter == g_publishCallbackMap.end()) {
-        publishCallback = std::make_shared<DmNapiPublishCallback>(env, deviceManagerWrapper->bundleName_);
-        g_publishCallbackMap[deviceManagerWrapper->bundleName_] = publishCallback;
-    } else {
-        publishCallback = iter->second;
+    {
+        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
+        auto iter = g_publishCallbackMap.find(deviceManagerWrapper->bundleName_);
+        if (iter == g_publishCallbackMap.end()) {
+            publishCallback = std::make_shared<DmNapiPublishCallback>(env, deviceManagerWrapper->bundleName_);
+            g_publishCallbackMap[deviceManagerWrapper->bundleName_] = publishCallback;
+        } else {
+            publishCallback = iter->second;
+        }
     }
-
     DmPublishInfo publishInfo;
     JsToDmPublishInfo(env, argv[0], publishInfo);
     int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishInfo,
@@ -1465,14 +1536,16 @@ void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper,
 
     if (isMetaType) {
         std::shared_ptr<DmNapiBindTargetCallback> bindTargetCallback = nullptr;
-        auto iter = g_bindCallbackMap.find(deviceManagerWrapper->bundleName_);
-        if (iter == g_bindCallbackMap.end()) {
-            bindTargetCallback = std::make_shared<DmNapiBindTargetCallback>(env, deviceManagerWrapper->bundleName_);
-            g_bindCallbackMap[deviceManagerWrapper->bundleName_] = bindTargetCallback;
-        } else {
-            bindTargetCallback = iter->second;
+        {
+            std::lock_guard<std::mutex> autoLock(g_bindCallbackMapMutex);
+            auto iter = g_bindCallbackMap.find(deviceManagerWrapper->bundleName_);
+            if (iter == g_bindCallbackMap.end()) {
+                bindTargetCallback = std::make_shared<DmNapiBindTargetCallback>(env, deviceManagerWrapper->bundleName_);
+                g_bindCallbackMap[deviceManagerWrapper->bundleName_] = bindTargetCallback;
+            } else {
+                bindTargetCallback = iter->second;
+            }
         }
-        
         int32_t ret = BindTargetWarpper(deviceManagerWrapper->bundleName_, deviceId, bindParam, bindTargetCallback);
         if (ret != 0) {
             LOGE("BindTarget for bundleName %{public}s failed, ret %{public}d",
@@ -1483,12 +1556,15 @@ void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper,
     }
 
     std::shared_ptr<DmNapiAuthenticateCallback> bindDeviceCallback = nullptr;
-    auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
-    if (iter == g_authCallbackMap.end()) {
-        bindDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
-        g_authCallbackMap[deviceManagerWrapper->bundleName_] = bindDeviceCallback;
-    } else {
-        bindDeviceCallback = iter->second;
+    {
+        std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
+        auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
+        if (iter == g_authCallbackMap.end()) {
+            bindDeviceCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
+            g_authCallbackMap[deviceManagerWrapper->bundleName_] = bindDeviceCallback;
+        } else {
+            bindDeviceCallback = iter->second;
+        }
     }
     int32_t ret = DeviceManager::GetInstance().BindDevice(deviceManagerWrapper->bundleName_,
         authAsyncCallbackInfo_.authType, deviceId, bindParam, bindDeviceCallback);
@@ -1722,6 +1798,40 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     }
 }
 
+void DeviceManagerNapi::LockMapMutex(std::string &bundleName)
+{
+    LOGI("LockMapMutex start bundleName %{public}s", bundleName.c_str());
+    {
+        std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
+        g_deviceManagerMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
+        g_initCallbackMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
+        g_deviceStatusCallbackMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        g_DiscoveryCallbackMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
+        g_publishCallbackMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
+        g_authCallbackMap.erase(bundleName);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(g_bindCallbackMapMutex);
+        g_bindCallbackMap.erase(bundleName);
+    }
+    return;
+}
+
 napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("ReleaseDeviceManager in");
@@ -1749,19 +1859,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         napi_create_uint32(env, static_cast<uint32_t>(ret), &result);
         return result;
     }
-    {
-        std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
-        g_deviceManagerMap.erase(deviceManagerWrapper->bundleName_);
-    }
-    {
-        std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
-        g_initCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    }
-    g_deviceStatusCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_DiscoveryCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_publishCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_authCallbackMap.erase(deviceManagerWrapper->bundleName_);
-    g_bindCallbackMap.erase(deviceManagerWrapper->bundleName_);
+    LockMapMutex(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
     NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
     return result;

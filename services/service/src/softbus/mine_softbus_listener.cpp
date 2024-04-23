@@ -553,9 +553,9 @@ int32_t MineSoftbusListener::DmBase64Encode(char *output, size_t outputLen, cons
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
-    base64OutLen += outLen;
+    base64OutLen += static_cast<size_t>(outLen);
     EVP_EncodeFinal(ctx, (unsigned char *)(output + outLen), &outLen);
-    base64OutLen += outLen;
+    base64OutLen += static_cast<size_t>(outLen);
     EVP_ENCODE_CTX_free(ctx);
     return DM_OK;
 }
@@ -582,13 +582,13 @@ int32_t MineSoftbusListener::DmBase64Decode(char *output, size_t outputLen, cons
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
-    base64OutLen += outLen;
+    base64OutLen += static_cast<size_t>(outLen);
     if (EVP_DecodeFinal(ctx, (unsigned char *)(output + outLen), &outLen) != 1) {
         LOGE("EVP_DecodeFinal failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
-    base64OutLen += outLen;
+    base64OutLen += static_cast<size_t>(outLen);
     EVP_ENCODE_CTX_free(ctx);
     return DM_OK;
 }

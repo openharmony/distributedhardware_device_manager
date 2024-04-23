@@ -253,6 +253,10 @@ public:
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
+    static void ReleaseDiscoveryCallback(std::string &bundleName);
+    static void LockDiscoveryCallbackMutex(napi_env env, std::string &bundleName, std::string &extra,
+                                           uint32_t subscribeId);
+    static void LockMapMutex(std::string &bundleName);
     static napi_value JsOffFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static napi_value JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[]);
     static void CallAsyncWork(napi_env env, DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
@@ -266,6 +270,7 @@ private:
         napi_value &object);
     static int32_t BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
+    static void RegisterDevStatusCallback(napi_env env, std::string &bundleName);
 
 private:
     napi_env env_;
