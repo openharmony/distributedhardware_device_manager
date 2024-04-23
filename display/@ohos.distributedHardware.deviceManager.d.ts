@@ -463,7 +463,11 @@ declare namespace deviceManager {
      * @since 10
      * @param networkId device network id.
      * @param callback Indicates the callback to be invoked upon getDeviceInfo
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified networkId is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified networkId is greater than 255.
      * @return Returns local device info.
      * @systemapi this method can be used only by system applications.
      */
@@ -474,7 +478,11 @@ declare namespace deviceManager {
      *
      * @since 10
      * @param networkId device network id.
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified networkId is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified networkId is greater than 255.
      * @return Returns local device info.
      * @systemapi this method can be used only by system applications.
      */
@@ -529,7 +537,11 @@ declare namespace deviceManager {
      * @since 10
      * @param requestInfo Request credential params.
      * @param callback Indicates the callback to be invoked upon requestCredential
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified requestInfo is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified requestInfo is greater than 255.
      * @systemapi this method can be used only by system applications.
      */
     requestCredentialRegisterInfo(requestInfo: string, callback: AsyncCallback<{ registerInfo: string }>): void;
@@ -540,7 +552,11 @@ declare namespace deviceManager {
      * @since 10
      * @param credentialInfo Import credential params.
      * @param callback Indicates the callback to be invoked upon importCredential
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified credentialInfo is greater than 5999.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified credentialInfo is greater than 5999.
      * @systemapi this method can be used only by system applications.
      */
     importCredential(credentialInfo: string, callback: AsyncCallback<{ resultInfo: string }>): void;
@@ -551,7 +567,11 @@ declare namespace deviceManager {
      * @since 10
      * @param queryInfo delete credential params.
      * @param callback Indicates the callback to be invoked upon deleteCredential
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified queryInfo is greater than 5999.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified queryInfo is greater than 5999.
      * @systemapi this method can be used only by system applications.
      */
     deleteCredential(queryInfo: string, callback: AsyncCallback<{ resultInfo: string }>): void;
@@ -596,7 +616,11 @@ declare namespace deviceManager {
      *        operateAction = 4 - cancel pincode input
      *        operateAction = 5 - confirm pincode input
      * @param params Indicates the input param of the user.
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified params is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified params is greater than 255.
      * @systemapi this method can be used only by system applications.
      */
     setUserOperation(operateAction: number, params: string): void;
@@ -607,7 +631,11 @@ declare namespace deviceManager {
      *
      * @since 9
      * @param callback Indicates the devicemanager ui state to register.
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified eventType is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified eventType is greater than 255.
      * @systemapi this method can be used only by system applications.
      */
     on(type: 'uiStateChange', callback: Callback<{ param: string }>): void;
@@ -617,7 +645,11 @@ declare namespace deviceManager {
      *
      * @since 9
      * @param callback Indicates the devicemanager ui state to unregister.
-     * @throws {BusinessError} 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameter type; 3. Parameter verification failed; 4. The size of specified eventType is greater than 255.
+     * @throws {BusinessError} 401 - Parameter error. Possible causes:
+     *                                                1. Mandatory parameters are left unspecified;
+     *                                                2. Incorrect parameter type;
+     *                                                3. Parameter verification failed;
+     *                                                4. The size of specified eventType is greater than 255.
      * @systemapi this method can be used only by system applications.
      */
     off(type: 'uiStateChange', callback?: Callback<{ param: string }>): void;
