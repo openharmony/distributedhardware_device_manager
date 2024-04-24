@@ -55,10 +55,10 @@ void GetLocalDeviceInfoFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
 
     OnSessionOpened(sessionId, result);
-    OnBytesReceived(sessionId, data, size);
+    OnBytesReceived(sessionId, str.c_str(), str.size());
     OnSessionClosed(sessionId);
     OnPinHolderSessionOpened(sessionId, result);
-    OnPinHolderBytesReceived(sessionId, data, size);
+    OnPinHolderBytesReceived(sessionId, str.c_str(), str.size());
     OnPinHolderSessionClosed(sessionId);
     
     softbusListener->GetLocalDeviceInfo(deviceInfo);
