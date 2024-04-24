@@ -34,6 +34,7 @@ fuzz_test_output_path = "device_manager/device_manager"
 
 #--------------------------softbus----------------------------------#
 softbus_path = "//foundation/communication/dsoftbus"
+
 #---------------------------hichan----------------------------------#
 
 #----------------------compilation options--------------------------#
