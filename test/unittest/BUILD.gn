@@ -56,10 +56,12 @@ group("unittest") {
     ":UTTest_ipc_server_client_proxy",
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
+    ":UTTest_mine_softbus_listener",
     ":UTTest_multiple_user_connector",
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
+    ":UTTest_softbus_adapter",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
     ":UTTest_softbus_session",
@@ -251,6 +253,61 @@ ohos_unittest("UTTest_hichain_connector") {
 }
 
 ## UnitTest UTTest_hichain_connector }}}
+
+## UnitTest UTTest_mine_softbus_listener {{{
+ohos_unittest("UTTest_mine_softbus_listener") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/test/softbusunittest",
+    "${services_path}/include",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  sources = [ "${devicemanager_path}/test/softbusunittest/UTTest_mine_softbus_listener.cpp" ]
+
+  deps = [
+    ":device_manager_test_common",
+    "${services_path}:devicemanagerservice",
+    "${utils_path}:devicemanagerutils",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "openssl:libcrypto_shared",
+  ]
+}
+
+## UnitTest UTTest_mine_softbus_listener }}}
+
+## UnitTest UTTest_softbus_adapter {{{
+ohos_unittest("UTTest_softbus_adapter") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_adapter.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_softbus_adapter }}}
 
 ## UnitTest UTTest_softbus_connector {{{
 ohos_unittest("UTTest_softbus_connector") {
