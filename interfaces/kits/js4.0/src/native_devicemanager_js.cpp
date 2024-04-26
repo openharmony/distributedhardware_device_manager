@@ -69,7 +69,7 @@ std::map<std::string, std::shared_ptr<DmNapiDeviceManagerUiCallback>> g_dmUiCall
 std::mutex g_deviceManagerMapMutex;
 std::mutex g_initCallbackMapMutex;
 std::mutex g_deviceStatusCallbackMapMutex;
-std::mutex g_DiscoveryCallbackMapMutex;
+std::mutex g_discoveryCallbackMapMutex;
 std::mutex g_publishCallbackMapMutex;
 std::mutex g_authCallbackMapMutex;
 std::mutex g_bindCallbackMapMutex;
@@ -140,7 +140,9 @@ void DmNapiInitCallback::OnRemoteDied()
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnRemoteDied uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -179,7 +181,9 @@ void DmNapiDeviceStatusCallback::OnDeviceOnline(const DmDeviceBasicInfo &deviceB
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceOnline uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -217,7 +221,9 @@ void DmNapiDeviceStatusCallback::OnDeviceReady(const DmDeviceBasicInfo &deviceBa
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceReady uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -255,7 +261,9 @@ void DmNapiDeviceStatusCallback::OnDeviceOffline(const DmDeviceBasicInfo &device
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceOffline uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -294,7 +302,9 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceChanged uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -336,7 +346,9 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceFound uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -378,7 +390,9 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDiscoveryFailed uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -444,7 +458,9 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnPublishResult uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiPublishJsCallback *callback = reinterpret_cast<DmNapiPublishJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -500,7 +516,9 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnAuthResult uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -663,8 +681,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
     if (eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS || eventType == DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL) {
         auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
         {
-            std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
-            g_DiscoveryCallbackMap.erase(bundleName);
+            std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
             g_DiscoveryCallbackMap[bundleName] = callback;
         }
         std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = callback;
@@ -676,7 +693,6 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         auto callback = std::make_shared<DmNapiPublishCallback>(env, bundleName);
         {
             std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
-            g_publishCallbackMap.erase(bundleName);
             g_publishCallbackMap[bundleName] = callback;
         }
         std::shared_ptr<DmNapiPublishCallback> publishCallback = callback;
@@ -693,7 +709,6 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         }
         {
             std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
-            g_dmUiCallbackMap.erase(bundleName);
             g_dmUiCallbackMap[bundleName] = callback;
         }
         return;
@@ -702,10 +717,11 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 
 void DeviceManagerNapi::RegisterDevStatusCallback(napi_env env, std::string &bundleName)
 {
-    LOGI("RegisterDevStatusCallback start");
+    LOGI("RegisterDevStatusCallback start for bundleName %{public}s", bundleName.c_str());
     {
         std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
         if (g_deviceStatusCallbackMap.find(bundleName) != g_deviceStatusCallbackMap.end()) {
+            LOGI("bundleName already register.");
             return;
         }
     }
@@ -718,7 +734,6 @@ void DeviceManagerNapi::RegisterDevStatusCallback(napi_env env, std::string &bun
     }
     {
         std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
-        g_deviceStatusCallbackMap.erase(bundleName);
         g_deviceStatusCallbackMap[bundleName] = callback;
     }
     return;
@@ -738,7 +753,6 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
         }
         {
             std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
-            g_deviceStatusCallbackMap.erase(bundleName);
             g_deviceStatusCallbackMap[bundleName] = callback;
         }
     }
@@ -746,6 +760,7 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
 
 void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 {
+    LOGI("ReleasePublishCallback for bundleName %{public}s", bundleName.c_str());
     std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
@@ -765,9 +780,10 @@ void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
 
 void DeviceManagerNapi::ReleaseDiscoveryCallback(std::string &bundleName)
 {
+    LOGI("ReleaseDiscoveryCallback for bundleName %{public}s", bundleName.c_str());
     std::shared_ptr<DmNapiDiscoveryCallback> DiscoveryCallback = nullptr;
     {
-        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
         auto iter = g_DiscoveryCallbackMap.find(bundleName);
         if (iter == g_DiscoveryCallbackMap.end()) {
             return;
@@ -776,7 +792,7 @@ void DeviceManagerNapi::ReleaseDiscoveryCallback(std::string &bundleName)
     }
     DiscoveryCallback->DecreaseRefCount();
     if (DiscoveryCallback->GetRefCount() == 0) {
-        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
         g_DiscoveryCallbackMap.erase(bundleName);
     }
     return;
@@ -894,7 +910,9 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnCall uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -948,7 +966,9 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+        LOGD("OnBindResult uv_queue_work_with_qos");
+    }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
@@ -1352,7 +1372,7 @@ void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bu
 {
     std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = nullptr;
     {
-        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
         auto iter = g_DiscoveryCallbackMap.find(bundleName);
         if (iter == g_DiscoveryCallbackMap.end()) {
             discoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
@@ -1798,9 +1818,9 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     }
 }
 
-void DeviceManagerNapi::LockMapMutex(std::string &bundleName)
+void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 {
-    LOGI("LockMapMutex start bundleName %{public}s", bundleName.c_str());
+    LOGI("ClearBundleCallbacks start for bundleName %{public}s", bundleName.c_str());
     {
         std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
         g_deviceManagerMap.erase(bundleName);
@@ -1814,7 +1834,7 @@ void DeviceManagerNapi::LockMapMutex(std::string &bundleName)
         g_deviceStatusCallbackMap.erase(bundleName);
     }
     {
-        std::lock_guard<std::mutex> autoLock(g_DiscoveryCallbackMapMutex);
+        std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
         g_DiscoveryCallbackMap.erase(bundleName);
     }
     {
@@ -1859,7 +1879,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
         napi_create_uint32(env, static_cast<uint32_t>(ret), &result);
         return result;
     }
-    LockMapMutex(deviceManagerWrapper->bundleName_);
+    ClearBundleCallbacks(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
     NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
     return result;

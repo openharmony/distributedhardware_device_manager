@@ -119,14 +119,15 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
 {
     LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    DmDeviceInfo devInfo;
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
             LOGE("DmDeviceStateManager::OnDeviceOnline not find deviceId");
             return;
         }
+        devInfo = stateDeviceInfos_[deviceId];
     }
-    DmDeviceInfo devInfo = stateDeviceInfos_[deviceId];
     std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
     if (pkgName.size() == 0) {
         listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), DEVICE_STATE_OFFLINE, devInfo);
