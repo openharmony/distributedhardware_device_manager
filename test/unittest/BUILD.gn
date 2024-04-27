@@ -118,13 +118,11 @@ ohos_unittest("UTTest_pin_auth_ui") {
 ohos_unittest("UTTest_ipc_cmd_parser_service") {
   module_out_path = module_out_path
 
-  include_dirs = [
-    "${devicemanager_path}/commondependency/include",
-  ]
+  include_dirs = [ "${devicemanager_path}/commondependency/include" ]
 
   sources = [
-    "UTTest_ipc_cmd_parser_service.cpp",
     "${services_path}/src/ipc/standard/ipc_cmd_parser.cpp",
+    "UTTest_ipc_cmd_parser_service.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
