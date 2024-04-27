@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <thread>
 
+#include "device_manager_impl.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -26,6 +27,7 @@
 #include "parameter.h"
 #include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
+#include "softbus_listener.cpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -343,6 +345,197 @@ HWTEST_F(SoftbusListenerTest, CloseDmRadarHelperObj_001, testing::ext::TestSize.
     std::string name;
     bool ret = softbusListener->CloseDmRadarHelperObj(name);
     EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    int result = 1;
+    EXPECT_EQ(OnSessionOpened(sessionId, result), DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, OnSessionClosed_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    OnSessionClosed(sessionId);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    std::string str = "1234513135215123";
+    OnBytesReceived(sessionId, str.c_str(), str.size());
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    int result = 1;
+    EXPECT_EQ(OnPinHolderSessionOpened(sessionId, result), ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, OnPinHolderSessionClosed_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    OnPinHolderSessionClosed(sessionId);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 0;
+    std::string str = "1234513135215123";
+    OnPinHolderBytesReceived(sessionId, str.c_str(), str.size());
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceInfoList;
+    int32_t ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkId";
+    DmDeviceInfo info;
+    int32_t ret = softbusListener->GetDeviceInfo(networkId, info);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo info;
+    int32_t ret = softbusListener->GetLocalDeviceInfo(info);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, ConvertBytesToUpperCaseHexString_001, testing::ext::TestSize.Level0)
+{
+    uint8_t arr[7] = {1, 2, 3, 4, 5, 6, 7};
+    size_t size = 7;
+    auto ret = softbusListener->ConvertBytesToUpperCaseHexString(arr, size);
+    EXPECT_EQ(ret.empty(), false);
+}
+
+HWTEST_F(SoftbusListenerTest, GetDeviceSecurityLevel_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkId";
+    int32_t securityLevel = -1;
+    int32_t ret = softbusListener->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Level0)
+{
+    auto ret = softbusListener->GetDmRadarHelperObj();
+    EXPECT_NE(ret, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, SetHostPkgName_001, testing::ext::TestSize.Level0)
+{
+    std::string hostName = "hostName";
+    softbusListener->SetHostPkgName(hostName);
+    EXPECT_EQ(softbusListener->hostName_, hostName);
+}
+
+HWTEST_F(SoftbusListenerTest, GetHostPkgName_001, testing::ext::TestSize.Level0)
+{
+    auto ret = softbusListener->GetHostPkgName();
+    EXPECT_EQ(ret.empty(), false);
+}
+
+HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId;
+    std::shared_ptr<DeviceInfo> infoPtr = nullptr;
+    softbusListener->CacheDeviceInfo(deviceId, infoPtr);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_002, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->addrNum = 0;
+    softbusListener->CacheDeviceInfo(deviceId, infoPtr);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_003, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->addrNum = 1;
+    softbusListener->CacheDeviceInfo(deviceId, infoPtr);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::string ip = "10.11.12.13.14";
+    ConnectionAddrType addrType;
+    int32_t ret = softbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
+    EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_002, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::string ip = "10.11.12.13.14";
+    ConnectionAddrType addrType;
+    std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
+    discoveredDeviceMap.insert(std::pair<std::string,
+        std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
+    int32_t ret = softbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
+    EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_003, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::string ip = "10.11.12.13.14";
+    ConnectionAddrType addrType;
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
+    deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
+    discoveredDeviceMap.insert(std::pair<std::string,
+        std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
+    int32_t ret = softbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
+    EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(SoftbusListenerTest, InitSoftbusListener_001, testing::ext::TestSize.Level0)
+{
+    SoftbusListener::GetSoftbusRefreshCb();
+    int32_t ret = softbusListener->InitSoftbusListener();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, InitSoftPublishLNN_001, testing::ext::TestSize.Level0)
+{
+    int32_t ret = softbusListener->InitSoftPublishLNN();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmSubscribeInfo dmSubInfo;
+    std::string customData = "customData";
+    int32_t ret = softbusListener->RefreshSoftbusLNN(pkgName.c_str(), dmSubInfo, customData);
+    EXPECT_EQ(ret, ERR_DM_REFRESH_LNN_FAILED);
+}
+
+HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
+{
+    uint16_t subscribeId = 1345;
+    int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
+    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
