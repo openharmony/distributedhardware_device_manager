@@ -2240,7 +2240,6 @@ void DmAuthManager::BindSocketFail()
     authResponseContext_->reply = DM_OK;
     isFinishOfLocal_ = false;
     authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
-    authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
 }
 
 void DmAuthManager::BindSocketSuccess(int32_t socket)
