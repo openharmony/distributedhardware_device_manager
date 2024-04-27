@@ -43,6 +43,48 @@ public:
     void OnDeviceOffline(std::string deviceId) {}
 };
 
+class SoftbusDiscoveryCallbackTest : public ISoftbusDiscoveryCallback {
+public:
+    SoftbusDiscoveryCallbackTest() {}
+    virtual ~SoftbusDiscoveryCallbackTest() {}
+    void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline) override
+    {
+        (void)pkgName;
+        (void)info;
+        (void)isOnline;
+    }
+    void OnDeviceFound(const std::string &pkgName, DmDeviceBasicInfo &info, const int32_t range, bool isOnline) override
+    {
+        (void)pkgName;
+        (void)info;
+        (void)range;
+        (void)isOnline;
+    }
+    void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) override
+    {
+        (void)pkgName;
+        (void)subscribeId;
+    }
+    void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason) override
+    {
+        (void)pkgName;
+        (void)subscribeId;
+        (void)failedReason;
+    }
+};
+
+class SoftbusPublishCallbackTest : public ISoftbusPublishCallback {
+public:
+    SoftbusPublishCallbackTest() {}
+    virtual ~SoftbusPublishCallbackTest() {}
+    void OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult) override
+    {
+        (void)pkgName;
+        (void)publishId;
+        (void)publishResult;
+    }
+};
+
 void SoftbusConnectorTest::SetUp()
 {
 }
@@ -57,12 +99,7 @@ void SoftbusConnectorTest::TearDownTestCase()
 }
 
 namespace {
-std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-std::shared_ptr<DmDiscoveryManager> discoveryMgr =
-    std::make_shared<DmDiscoveryManager>(softbusConnector, listener, hiChainConnector);
-std::shared_ptr<DmPublishManager> publishMgr = std::make_shared<DmPublishManager>(softbusConnector, listener);
 
 /**
  * @tc.name: SoftbusConnector_001
@@ -98,8 +135,9 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Leve
 HWTEST_F(SoftbusConnectorTest, RegisterSoftbusDiscoveryCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret1 = softbusConnector->RegisterSoftbusDiscoveryCallback(
-        pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
+        pkgName, std::make_shared<SoftbusDiscoveryCallbackTest>());
     int ret = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, DM_OK);
     EXPECT_EQ(ret, 1);
@@ -115,6 +153,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusDiscoveryCallback_001, testing::ex
 HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
     int ret1 = SoftbusConnector::discoveryCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
@@ -130,8 +169,9 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusDiscoveryCallback_001, testing::
 HWTEST_F(SoftbusConnectorTest, RegisterSoftbusPublishCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret1 = softbusConnector->RegisterSoftbusPublishCallback(
-        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+        pkgName, std::make_shared<SoftbusPublishCallbackTest>());
     int ret = SoftbusConnector::publishCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, DM_OK);
     EXPECT_EQ(ret, 1);
@@ -147,6 +187,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusPublishCallback_001, testing::ext:
 HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusPublishCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
     int ret1 = SoftbusConnector::publishCallbackMap_.count(pkgName);
     EXPECT_EQ(ret1, 0);
@@ -162,6 +203,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusPublishCallback_001, testing::ex
 HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubscribeInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
@@ -175,6 +217,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
 HWTEST_F(SoftbusConnectorTest, StartDiscovery_002, testing::ext::TestSize.Level0)
 {
     uint16_t subscribeId = 0;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(subscribeId);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
@@ -188,6 +231,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_002, testing::ext::TestSize.Level0
 HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 {
     uint16_t subscribeId = static_cast<uint16_t>(123456);
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StopDiscovery(subscribeId);
     EXPECT_NE(ret, 0);
 }
@@ -201,6 +245,7 @@ HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Level0)
 {
     DmPublishInfo dmPublishInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->PublishDiscovery(dmPublishInfo);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
@@ -214,6 +259,7 @@ HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Leve
 HWTEST_F(SoftbusConnectorTest, UnPublishDiscovery_001, testing::ext::TestSize.Level0)
 {
     int32_t publishId = 123456;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->UnPublishDiscovery(publishId);
     EXPECT_NE(ret, 0);
 }
@@ -228,6 +274,7 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
 {
     const char *networkId = "123456";
     std::string udid;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
     EXPECT_NE(ret, 0);
 }
@@ -242,6 +289,7 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
 {
     const char *networkId = "123456";
     std::string uuid;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->GetUuidByNetworkId(networkId, uuid);
     EXPECT_NE(ret, 0);
 }
@@ -254,6 +302,7 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
  */
 HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<SoftbusSession> softSession = softbusConnector->GetSoftbusSession();
     EXPECT_NE(softSession, nullptr);
 }
@@ -268,6 +317,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level
 {
     std::string deviceId = "12345678";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     bool ret = softbusConnector->HaveDeviceInMap(deviceId);
     EXPECT_EQ(ret, true);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -282,6 +332,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level
 HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "12345678";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     bool ret = softbusConnector->HaveDeviceInMap(deviceId);
     EXPECT_EQ(ret, false);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -297,6 +348,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.
     ConnectionAddrType type;
     type = CONNECTION_ADDR_MAX;
     ConnectionAddr *p = nullptr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddrByType(nullptr, type);
     EXPECT_EQ(p, ret);
 }
@@ -314,6 +366,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_002, testing::ext::TestSize.
     ConnectionAddrType type;
     type = CONNECTION_ADDR_BR;
     ConnectionAddr *p = nullptr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddrByType(&deviceInfo, type);
     EXPECT_EQ(ret, p);
 }
@@ -328,6 +381,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_001, testing::ext::TestSize.Level0
 {
     std::string deviceId;
     std::string connectAddr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_EQ(ret, nullptr);
 }
@@ -344,6 +398,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level0
     std::string connectAddr;
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = -1;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_EQ(ret, nullptr);
 }
@@ -365,6 +420,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level0
     (void)strncpy_s(deviceInfo->addr[0].info.ip.ip, IP_STR_MAX_LEN, ethIp, strlen(ethIp));
     deviceInfo->addr[0].info.ip.port = 0;
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -387,6 +443,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level0
     (void)strncpy_s(deviceInfo->addr[0].info.ip.ip, IP_STR_MAX_LEN, wlanIp, strlen(wlanIp));
     deviceInfo->addr[0].info.ip.port = 0;
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -408,6 +465,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level0
     deviceInfo->addr[0].type = CONNECTION_ADDR_BR;
     (void)strncpy_s(deviceInfo->addr[0].info.br.brMac, IP_STR_MAX_LEN, brMac, strlen(brMac));
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -429,6 +487,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0
     deviceInfo->addr[0].type = CONNECTION_ADDR_BLE;
     (void)strncpy_s(deviceInfo->addr[0].info.ble.bleMac, IP_STR_MAX_LEN, bleMac, strlen(bleMac));
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
@@ -453,6 +512,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::Te
         .deviceName = "11111",
         .deviceTypeId = 1
     };
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dm);
     bool ret = false;
     if (strcmp(dm.deviceId, dm_1.deviceId) == 0) {
@@ -470,6 +530,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::Te
 HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo *device = nullptr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusDeviceFound(device);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -493,8 +554,8 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.
         .devName = "com.ohos.helloworld"
     };
     std::string pkgName = "com.ohos.helloworld";
-    softbusConnector->RegisterSoftbusDiscoveryCallback(pkgName,
-        std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    softbusConnector->RegisterSoftbusDiscoveryCallback(pkgName, std::make_shared<SoftbusDiscoveryCallbackTest>());
     softbusConnector->OnSoftbusDeviceFound(&device);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
@@ -515,15 +576,16 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_001, testing::ext::TestS
     int32_t subscribeId = 123456;
     RefreshResult result = (RefreshResult)1;
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->RegisterSoftbusDiscoveryCallback(
-        pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
+        pkgName, std::make_shared<SoftbusDiscoveryCallbackTest>());
     softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
 }
 
@@ -538,15 +600,16 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDiscoveryResult_002, testing::ext::TestS
     int32_t subscribeId = 123456;
     RefreshResult result = (RefreshResult)0;
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->RegisterSoftbusDiscoveryCallback(
-        pkgName, std::shared_ptr<ISoftbusDiscoveryCallback>(discoveryMgr));
+        pkgName, std::make_shared<SoftbusDiscoveryCallbackTest>());
     softbusConnector->OnSoftbusDiscoveryResult(subscribeId, result);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     softbusConnector->UnRegisterSoftbusDiscoveryCallback(pkgName);
 }
 
@@ -561,15 +624,16 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_001, testing::ext::TestSiz
     int32_t publishId = 123456;
     PublishResult failReason = (PublishResult)1;
     std::string pkgName = "com.ohos.helloworld";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->RegisterSoftbusPublishCallback(
-        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+        pkgName, std::make_shared<SoftbusPublishCallbackTest>());
     softbusConnector->OnSoftbusPublishResult(publishId, failReason);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
 }
 
@@ -584,15 +648,16 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_002, testing::ext::TestSiz
     int32_t publishId = 123456;
     std::string pkgName = "com.ohos.helloworld";
     PublishResult failReason = (PublishResult)0;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->RegisterSoftbusPublishCallback(
-        pkgName, std::shared_ptr<ISoftbusPublishCallback>(publishMgr));
+        pkgName, std::make_shared<SoftbusPublishCallbackTest>());
     softbusConnector->OnSoftbusPublishResult(publishId, failReason);
     bool ret = false;
     if (listener->ipcServerListener_.req_ != nullptr) {
         listener->ipcServerListener_.req_ = nullptr;
         ret = true;
     }
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     softbusConnector->UnRegisterSoftbusPublishCallback(pkgName);
 }
 
@@ -604,6 +669,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusPublishResult_002, testing::ext::TestSiz
 HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->JoinLnn(deviceId);
     EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
 }
@@ -621,6 +687,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::Te
         .devName = "11111"
     };
     DmDeviceBasicInfo dmDeviceBasicInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dmDeviceBasicInfo);
     EXPECT_EQ(dmDeviceBasicInfo.deviceTypeId, deviceInfo.devType);
 }
@@ -633,6 +700,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::Te
 HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceDiscovery_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo *device = nullptr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusDeviceDiscovery(device);
     EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
 }
@@ -649,6 +717,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceDiscovery_002, testing::ext::TestS
         .devType = (DeviceType)1,
         .devName = "11111"
     };
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusDeviceDiscovery(&device);
     EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
 }
@@ -661,6 +730,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusDeviceDiscovery_002, testing::ext::TestS
 HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSize.Level0)
 {
     std::string udidHash;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string str = softbusConnector->GetDeviceUdidByUdidHash(udidHash);
     EXPECT_EQ(str.empty(), true);
 }
@@ -672,6 +742,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSi
  */
 HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     int32_t ret = softbusConnector->RegisterSoftbusStateCallback(callback);
     EXPECT_EQ(ret, DM_OK);
@@ -683,6 +754,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::T
  */
 HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int32_t ret = softbusConnector->UnRegisterSoftbusStateCallback();
     EXPECT_EQ(ret, DM_OK);
 }
@@ -699,6 +771,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSiz
     ConnectionAddr *addr = nullptr;
     char *networkId = nullptr;
     int32_t result = 0;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
     EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
 }
@@ -709,8 +782,20 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSiz
  */
 HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int32_t ret = softbusConnector->GetLocalDeviceTypeId();
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceNetworkId_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    auto ret = softbusConnector->GetLocalDeviceNetworkId();
+    EXPECT_EQ(ret.empty(), true);
 }
 
 /**
@@ -721,8 +806,22 @@ HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSiz
 {
     std::string deviceId;
     std::shared_ptr<DeviceInfo> deviceInfo = nullptr;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int32_t ret = softbusConnector->AddMemberToDiscoverMap(deviceId, deviceInfo);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: AddMemberToDiscoverMap_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_002, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    int32_t ret = softbusConnector->AddMemberToDiscoverMap(deviceId, deviceInfo);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -732,6 +831,9 @@ HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSiz
 HWTEST_F(SoftbusConnectorTest, SetPkgName_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
+    std::vector<std::string> pkgNameVec;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    softbusConnector->SetPkgNameVec(pkgNameVec);
     softbusConnector->SetPkgName(pkgName);
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), false);
 }
@@ -743,6 +845,7 @@ HWTEST_F(SoftbusConnectorTest, SetPkgName_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "123456789";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
     EXPECT_EQ(ret.empty(), false);
 }
@@ -754,6 +857,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSi
 HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "123456789";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->EraseUdidFromMap(udid);
     EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), false);
 }
@@ -764,6 +868,7 @@ HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Leve
  */
 HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string ret = softbusConnector->GetLocalDeviceName();
     EXPECT_EQ(ret.empty(), true);
 }
@@ -775,6 +880,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Le
 HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
     EXPECT_EQ(ret.empty(), true);
 }
@@ -786,6 +892,7 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
 HWTEST_F(SoftbusConnectorTest, SetPkgNameVec_001, testing::ext::TestSize.Level0)
 {
     std::vector<std::string> pkgNameVec;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->SetPkgNameVec(pkgNameVec);
     EXPECT_EQ(pkgNameVec.empty(), true);
 }
@@ -796,6 +903,7 @@ HWTEST_F(SoftbusConnectorTest, SetPkgNameVec_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(SoftbusConnectorTest, GetPkgName_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     auto ret = softbusConnector->GetPkgName();
     EXPECT_EQ(ret.empty(), true);
 }
@@ -806,6 +914,7 @@ HWTEST_F(SoftbusConnectorTest, GetPkgName_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(SoftbusConnectorTest, ClearPkgName_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ClearPkgName();
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
 }
@@ -817,6 +926,7 @@ HWTEST_F(SoftbusConnectorTest, ClearPkgName_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
     softbusConnector->HandleDeviceOnline(deviceId);
@@ -830,6 +940,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Le
 HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
     softbusConnector->HandleDeviceOffline(deviceId);
@@ -843,6 +954,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
 HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
 {
     std::string targetDeviceId = "targetDeviceId";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->CheckIsOnline(targetDeviceId);
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
 }
@@ -854,6 +966,7 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId);
     EXPECT_EQ(ret.deviceId == deviceId, false);
 }
@@ -869,6 +982,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext:
         .deviceName = "name",
     };
     DmDeviceInfo dmDeviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
 }
