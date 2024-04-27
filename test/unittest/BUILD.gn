@@ -51,6 +51,7 @@ group("unittest") {
     ":UTTest_ipc_client_proxy",
     ":UTTest_ipc_client_server_proxy",
     ":UTTest_ipc_client_stub",
+    ":UTTest_ipc_cmd_parser_service",
     ":UTTest_ipc_cmd_register",
     ":UTTest_ipc_get_device_info_rsp",
     ":UTTest_ipc_server_client_proxy",
@@ -112,6 +113,38 @@ ohos_unittest("UTTest_pin_auth_ui") {
 }
 
 ## UnitTest UTTest_pin_auth_ui }}}
+
+## UnitTest UTTest_ipc_cmd_parser_service {{{
+ohos_unittest("UTTest_ipc_cmd_parser_service") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+  ]
+
+  sources = [
+    "UTTest_ipc_cmd_parser_service.cpp",
+    "${services_path}/src/ipc/standard/ipc_cmd_parser.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Werror",
+    "-g3",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+## UnitTest UTTest_ipc_cmd_parser_service }}}
 
 ## UnitTest UTTest_ipc_cmd_register {{{
 ohos_unittest("UTTest_ipc_cmd_register") {
