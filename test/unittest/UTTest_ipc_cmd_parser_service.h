@@ -32,7 +32,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcCmdParserSeviceTest : public testing::Test {
+class IpcCmdParserServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();

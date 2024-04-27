@@ -43,19 +43,19 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void IpcCmdParserSeviceTest::SetUp()
+void IpcCmdParserServiceTest::SetUp()
 {
 }
 
-void IpcCmdParserSeviceTest::TearDown()
+void IpcCmdParserServiceTest::TearDown()
 {
 }
 
-void IpcCmdParserSeviceTest::SetUpTestCase()
+void IpcCmdParserServiceTest::SetUpTestCase()
 {
 }
 
-void IpcCmdParserSeviceTest::TearDownTestCase()
+void IpcCmdParserServiceTest::TearDownTestCase()
 {
 }
 
@@ -137,277 +137,277 @@ bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
     return bRet;
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_001, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_001, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_001, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_001, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_002, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_002, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_002, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_002, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FOUND;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_003, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FOUND;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_004, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_004, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FOUND;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_003, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_005, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_005, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_006, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_006, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_004, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_004, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DISCOVER_FINISH;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_007, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_007, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DISCOVER_FINISH;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_008, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_008, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DISCOVER_FINISH;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_005, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_005, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_PUBLISH_FINISH;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_009, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_009, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_PUBLISH_FINISH;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_010, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_010, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_PUBLISH_FINISH;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_006, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_006, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_AUTH_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_011, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_011, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_AUTH_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_012, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_012, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_AUTH_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_007, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_007, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FA_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_013, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_013, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FA_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_014, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_014, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FA_NOTIFY;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_008, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_008, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_016, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_016, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_009, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_009, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_TARGET_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_017, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_017, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_TARGET_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_018, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_018, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_TARGET_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_010, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_010, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_019, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_019, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_020, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_020, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_011, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_011, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_021, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_021, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_022, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_022, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_012, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_012, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_024, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_024, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_013, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_013, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_026, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_026, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_014, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_014, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_028, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_028, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, SetIpcRequestFunc_015, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_015, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
     ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_DEVICE;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -426,7 +426,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_002, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_002, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_DEVICE;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -443,7 +443,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_002, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_003, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = GET_NETWORKTYPE_BY_NETWORK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -460,7 +460,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_003, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_004, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_004, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_UI_STATE_CALLBACK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -475,7 +475,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_004, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_005, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_005, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNREGISTER_UI_STATE_CALLBACK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -490,7 +490,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_005, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_006, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_006, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = IMPORT_AUTH_CODE;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -507,7 +507,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_006, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_007, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_007, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = EXPORT_AUTH_CODE;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -522,7 +522,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_007, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_008, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_008, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_DISCOVERY_CALLBACK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -540,7 +540,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_008, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_009, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_009, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNREGISTER_DISCOVERY_CALLBACK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -557,7 +557,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_009, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_010, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_010, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = START_DISCOVERING;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -575,7 +575,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_010, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_011, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_011, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = STOP_DISCOVERING;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -592,7 +592,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_011, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_012, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_012, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = START_ADVERTISING;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -609,7 +609,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_012, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_013, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_013, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = STOP_ADVERTISING;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -626,7 +626,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_013, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_014, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_014, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_TARGET;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -645,7 +645,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_014, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_015, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_015, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -664,7 +664,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_015, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_016, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_016, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_PIN_HOLDER_CALLBACK;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -679,7 +679,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_016, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_017, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_017, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = CREATE_PIN_HOLDER;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -699,7 +699,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_017, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_018, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_018, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = DESTROY_PIN_HOLDER;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -719,7 +719,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_018, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_019, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_019, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = DP_ACL_ADD;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -734,7 +734,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_019, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_020, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_020, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = GET_SECURITY_LEVEL;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -751,7 +751,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_020, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_021, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_021, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = IS_SAME_ACCOUNT;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -766,7 +766,7 @@ HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_021, testing::ext::TestSize.Level0
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserSeviceTest, OnIpcCmdFunc_022, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_022, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = CHECK_API_PERMISSION;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
