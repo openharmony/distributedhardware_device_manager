@@ -25,6 +25,7 @@ ohos_benchmarktest("DeviceManagerTest") {
     "${access_token_path}/token_setproc/include",
     "${access_token_path}/accesstoken/include",
     "${common_path}/include",
+    "${softbus_path}/interfaces/kits/common",
   ]
 
   cflags = []
