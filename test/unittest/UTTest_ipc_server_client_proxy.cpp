@@ -235,6 +235,26 @@ HWTEST_F(IpcServerClientProxyTest, SendCmd_005, testing::ext::TestSize.Level0)
     // 4. check ret is not ERR_DM_FAILED
     ASSERT_NE(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(IpcServerClientProxyTest, SendCmd_006, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = 1;
+    sptr<IRemoteObject> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    auto instance = new IpcServerClientProxy(remoteObject);
+    int ret = instance->SendCmd(cmdCode, nullptr, nullptr);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
+
+HWTEST_F(IpcServerClientProxyTest, SendCmd_007, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = 1;
+    sptr<IRemoteObject> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    auto instance = new IpcServerClientProxy(remoteObject);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
