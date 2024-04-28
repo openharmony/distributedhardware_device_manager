@@ -2168,6 +2168,9 @@ void DmAuthManager::ProRespNegotiate(const int32_t &sessionId)
     }
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
+        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
+            jsonObject[TAG_IMPORT_AUTH_CODE] = importAuthCode_;
+        }
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
