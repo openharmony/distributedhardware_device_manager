@@ -176,6 +176,7 @@ typedef struct DmAuthResponseContext {
     std::string remoteAccountId;
     int32_t remoteUserId;
     std::string targetDeviceName;
+    std::string importAuthCode;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -494,6 +495,7 @@ private:
     void SrcAuthDeviceFinish();
     void SrcSyncDeleteAclDone();
     void SinkSyncDeleteAclDone();
+    int32_t CheckTrustState();
 
 public:
     void RequestCredential();
