@@ -710,13 +710,13 @@ HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmPinHolderTest, NotityPinHolderEvent_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_101, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     std::string packName = "com.ohos.dmtest";
     std::string event = "event";
-    int32_t ret = pinHolder->NotityPinHolderEvent(packName, event);
+    int32_t ret = pinHolder->NotifyPinHolderEvent(packName, event);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace

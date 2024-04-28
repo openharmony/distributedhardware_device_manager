@@ -45,7 +45,7 @@ public:
         DmPinType pinType, const std::string &payload);
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
-    int32_t NotityPinHolderEvent(const std::string &pkgName, const std::string &event);
+    int32_t NotifyPinHolderEvent(const std::string &pkgName, const std::string &event);
 public:
     void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
     void OnSessionClosed(int32_t sessionId);

@@ -501,23 +501,23 @@ int32_t PinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
     return DM_OK;
 }
 
-int32_t PinHolder::NotityPinHolderEvent(const std::string &pkgName, const std::string &event)
+int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::string &event)
 {
-    LOGI("NotityPinHolderEvent.");
+    LOGI("NotifyPinHolderEvent.");
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("NotityPinHolderEvent listener or session is nullptr.");
+        LOGE("NotifyPinHolderEvent listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
     if (registerPkgName_.empty() || pkgName != registerPkgName_ || event.empty()) {
-        LOGE("NotityPinHolderEvent pkgName: %{public}s is not register callback.", pkgName.c_str());
+        LOGE("NotifyPinHolderEvent pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     if (sessionId_ == SESSION_ID_INVALID) {
-        LOGE("NotityPinHolderEvent session invalid.");
+        LOGE("NotifyPinHolderEvent session invalid.");
         return ERR_DM_FAILED;
     }
     if (!isRemoteSupported_) {
-        LOGE("NotityPinHolderEvent failed, remote not support.");
+        LOGE("NotifyPinHolderEvent failed, remote not support.");
         return ERR_DM_BIND_PEER_UNSUPPORTED;
     }
     nlohmann::json jsonObject = nlohmann::json::parse(event, nullptr, false);
@@ -534,7 +534,7 @@ int32_t PinHolder::NotityPinHolderEvent(const std::string &pkgName, const std::s
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
     jsonObj[TAG_PIN_TYPE] = pinType;
     std::string message = jsonObj.dump();
-    LOGI("NotityPinHolderEvent, message type is: %{public}d, pin type is: %{public}d.",
+    LOGI("NotifyPinHolderEvent, message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_PIN_HOLDER_CHANGE, pinType);
     int32_t ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
