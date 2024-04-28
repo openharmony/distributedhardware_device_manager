@@ -719,6 +719,91 @@ HWTEST_F(DmPinHolderTest, NotityPinHolderEvent_101, testing::ext::TestSize.Level
     int32_t ret = pinHolder->NotityPinHolderEvent(packName, event);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(DmPinHolderTest, OpenSessionServer_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    PeerTargetId targetId = {
+        .deviceId = "deviceId",
+        .brMac = "brMac",
+        .bleMac = "bleMac",
+        .wifiIp = "wifiIp",
+    };
+    int32_t ret = pinHolderSession->OpenSessionServer(targetId);
+    EXPECT_NE(ret, -1);
+}
+
+HWTEST_F(DmPinHolderTest, CloseSessionServer_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    int32_t sessionId = 1;
+    int32_t ret = pinHolderSession->CloseSessionServer(sessionId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmPinHolderTest, OnSessionOpened_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    pinHolderSession->RegisterSessionCallback(pinHolder);
+    int sessionId = 1;
+    int result = 1;
+    int ret = pinHolderSession->OnSessionOpened(sessionId, result);
+    int closeSessionId = 2;
+    pinHolderSession->OnSessionClosed(closeSessionId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmPinHolderTest, SendData_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    int32_t sessionId = 6;
+    std::string message = "123456";
+    int32_t ret = pinHolderSession->SendData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, SendData_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    int32_t sessionId = 6;
+    std::string message = R"(
+    {
+        "MSG_TYPE" : "789"
+    }
+    )";
+    int32_t ret = pinHolderSession->SendData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    int32_t sessionId = 6;
+    std::string message = R"(
+    {
+        "MSG_TYPE" : 100
+    }
+    )";
+    int32_t ret = pinHolderSession->SendData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    PeerTargetId targetId = {
+        .deviceId = "deviceIdTest",
+        .brMac = "brMacTest",
+        .bleMac = "bleMacTest",
+        .wifiIp = "wifiIpTest",
+        .wifiPort = 369,
+    };
+    ConnectionAddr addr;
+    int32_t ret = pinHolderSession->GetAddrByTargetId(targetId, addr);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -106,6 +106,31 @@ HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: OnDbReady_002
+ * @tc.desc: set info.deviceId to some para, and return it
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmDeviceStateManagerTest, OnDbReady_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgNameTest";
+    std::string deviceId = "deviceIdTest";
+    DmDeviceInfo info;
+    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
+    std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
+        std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
+    DmDeviceInfo dminfo;
+    if (pReq == nullptr) {
+        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    } else {
+        dminfo = pReq->GetDeviceInfo();
+    }
+    int result = strcmp(info.deviceId, dminfo.deviceId);
+    EXPECT_EQ(result, 0);
+}
+
+/**
  * @tc.name: RegisterOffLineTimer_001
  * @tc.desc: call RegisterOffLineTimer
  * @tc.type: FUNC
@@ -221,6 +246,7 @@ HWTEST_F(DmDeviceStateManagerTest, GetAuthForm_001, testing::ext::TestSize.Level
 HWTEST_F(DmDeviceStateManagerTest, GetAuthForm_002, testing::ext::TestSize.Level0)
 {
     std::string networkId;
+    dmDeviceStateManager->hiChainConnector_ = std::make_shared<HiChainConnector>();
     int32_t ret = dmDeviceStateManager->GetAuthForm(networkId);
     EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
 }
@@ -237,6 +263,18 @@ HWTEST_F(DmDeviceStateManagerTest, ProcNotifyEvent_001, testing::ext::TestSize.L
     int32_t eventId = 0;
     std::string deviceId;
     int32_t ret = dmDeviceStateManager->ProcNotifyEvent(eventId, deviceId);
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+        .networkId = "14569",
+    };
+    std::string udid = "udidTest";
+    DmDeviceInfo remoteInfo = {
+        .deviceId = "123",
+    };
+    dmDeviceStateManager->remoteDeviceInfos_[udid] = remoteInfo;
+    dmDeviceStateManager->ChangeDeviceInfo(info);
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace

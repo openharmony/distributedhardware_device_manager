@@ -375,7 +375,7 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::
 void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
 {
     std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-    for (auto iter: remoteDeviceInfos_) {
+    for (auto iter : remoteDeviceInfos_) {
         if (iter.second.deviceId == info.deviceId) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
