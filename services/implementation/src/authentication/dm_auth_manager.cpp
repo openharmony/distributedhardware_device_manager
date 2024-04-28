@@ -2169,7 +2169,7 @@ void DmAuthManager::ProRespNegotiate(const int32_t &sessionId)
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            jsonObject[TAG_IMPORT_AUTH_CODE] = importAuthCode_;
+            jsonObject[TAG_IMPORT_AUTH_CODE] = Crypto::Sha256(importAuthCode_);
         }
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
@@ -2367,7 +2367,7 @@ int32_t DmAuthManager::CheckTrustState()
 {
     if (authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
         !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
-        if (authResponseContext_->importAuthCode == importAuthCode_) {
+        if (authResponseContext_->importAuthCode == Crypto::Sha256(importAuthCode_)) {
             SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
         } else {
             SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
