@@ -694,7 +694,7 @@ void DmAuthManager::AbilityNegotiate()
         }
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            authResponseContext_->importAuthCode = importAuthCode_;
+            authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
         }
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;

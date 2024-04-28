@@ -214,7 +214,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
     json[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
     json[TAG_TARGET_DEVICE_NAME] = authResponseContext_->targetDeviceName;
-    json[TAG_IMPORT_AUTH_CODE] = Crypto::Sha256(authResponseContext_->importAuthCode);
+    json[TAG_IMPORT_AUTH_CODE] = authResponseContext_->importAuthCode;
     for (uint32_t item = 0; item < authResponseContext_->bindType.size(); item++) {
         auto itemStr = std::to_string(item);
         json[itemStr] = authResponseContext_->bindType[item];
