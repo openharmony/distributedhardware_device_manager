@@ -56,6 +56,7 @@ const int32_t USLEEP_TIME_MS = 500000; // 500ms
 const int32_t SYNC_DELETE_TIMEOUT = 60;
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
+const int32_t ALREADY_BIND = 1;
 
 constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -692,6 +693,9 @@ void DmAuthManager::AbilityNegotiate()
             CompatiblePutAcl();
         }
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
+        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
+            authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
+        }
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     }
@@ -763,33 +767,8 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     } else {
         authResponseContext_->isOnline = false;
     }
-    if (authResponseContext_->isIdenticalAccount) {
-        if (IsIdenticalAccount()) {
-            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
-            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-            authRequestContext_->reason = DM_OK;
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            return;
-        }
-    }
-    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        if (hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
-                                                   authRequestContext_->localDeviceId)) {
-            if (!DeviceProfileConnector::GetInstance().CheckSrcDeviceIdInAcl(authResponseContext_->hostPkgName,
-                authResponseContext_->localDeviceId)) {
-                CompatiblePutAcl();
-            }
-            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            return;
-        }
-    }
-    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
-        (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
-        authResponseContext_->isAuthCodeReady == false)) {
-        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-        authRequestContext_->reason = ERR_DM_BIND_PEER_UNSUPPORTED;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+    if (CheckTrustState() != DM_OK) {
+        LOGI("CheckTrustState end.");
         return;
     }
 
@@ -2189,6 +2168,9 @@ void DmAuthManager::ProRespNegotiate(const int32_t &sessionId)
     }
     if (IsIdenticalAccount()) {
         jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
+        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
+            jsonObject[TAG_IMPORT_AUTH_CODE] = Crypto::Sha256(importAuthCode_);
+        }
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
@@ -2378,6 +2360,49 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
             });
     }
     LOGI("DmAuthManager::HandleSessionHeartbeat complete");
+}
+
+int32_t DmAuthManager::CheckTrustState()
+{
+    if (authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
+        if (authResponseContext_->importAuthCode == Crypto::Sha256(importAuthCode_)) {
+            SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
+        } else {
+            SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
+        }
+        return ALREADY_BIND;
+    }
+    if (authResponseContext_->isIdenticalAccount) {
+        if (IsIdenticalAccount()) {
+            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+            authRequestContext_->reason = DM_OK;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            return ALREADY_BIND;
+        }
+    }
+    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
+        if (hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
+                                                   authRequestContext_->localDeviceId)) {
+            if (!DeviceProfileConnector::GetInstance().CheckSrcDeviceIdInAcl(authResponseContext_->hostPkgName,
+                authResponseContext_->localDeviceId)) {
+                CompatiblePutAcl();
+            }
+            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            return ALREADY_BIND;
+        }
+    }
+    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
+        (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        authResponseContext_->isAuthCodeReady == false)) {
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestContext_->reason = ERR_DM_BIND_PEER_UNSUPPORTED;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return ERR_DM_BIND_PEER_UNSUPPORTED;
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
