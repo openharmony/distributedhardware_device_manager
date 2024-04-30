@@ -189,5 +189,22 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
     return false;
 }
+
+bool PermissionManager::CheckSA(void)
+{
+    LOGI("Enter CheckSA::CheckPermission");
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        return false;
+    }
+    LOGI("CheckSA::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
+    }
+    LOGE("TokenCaller is not SA.");
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -129,6 +129,7 @@ public:
 
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
+    int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
 
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);

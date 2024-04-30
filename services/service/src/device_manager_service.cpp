@@ -1384,5 +1384,26 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &udid)
     }
     return dmServiceImpl_->IsSameAccount(udid);
 }
+
+int32_t DeviceManagerService::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (udid.empty() || bundleName.empty()) {
+        LOGE("DeviceManagerService::CheckRelatedDevice error: udid: %{public}s bundleName: %{public}s",
+            GetAnonyString(udid).c_str(), bundleName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService CheckRelatedDevice start for udid: %{public}s bundleName: %{public}s",
+        GetAnonyString(udid).c_str(), bundleName.c_str());
+
+    if (!IsDMServiceImplReady()) {
+        LOGE("CheckRelatedDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->CheckRelatedDevice(udid, bundleName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

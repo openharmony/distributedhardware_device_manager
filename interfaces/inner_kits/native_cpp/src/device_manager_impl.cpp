@@ -29,6 +29,7 @@
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
+#include "ipc_check_related_device_req.h"
 #include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_destroy_pin_holder_req.h"
@@ -2164,6 +2165,30 @@ int32_t DeviceManagerImpl::CheckApiPermission(int32_t permissionLevel)
     }
     LOGI("The caller declare the DM permission!");
     return DM_OK;
+}
+
+bool DeviceManagerImpl::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
+{
+    if (udid.empty() || bundleName.empty()) {
+        LOGE("DeviceManagerImpl::CheckRelatedDevice error: udid %{public}s bundleName %{public}s",
+            GetAnonyString(udid).c_str(), bundleName.c_str());
+        return false;
+    }
+    std::shared_ptr<IpcCheckRelatedDeviceReq> req = std::make_shared<IpcCheckRelatedDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetUdid(udid);
+    req->SetBundleName(bundleName);
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_RELATED_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("CheckRelatedDevice Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("CheckRelatedDevice Failed with ret: %{public}d", ret);
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

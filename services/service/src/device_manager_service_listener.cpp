@@ -31,6 +31,7 @@
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_server_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -108,6 +109,15 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
         pReq->SetDeviceInfo(info);
         pReq->SetDeviceBasicInfo(deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        std::set<std::string> set = IpcServerStub::GetInstance().GetSaPkgname();
+        for (auto item : set) {
+            LOGI("Notify SA pkgname %s", item.c_str());
+            pReq->SetPkgName(item);
+            pReq->SetDeviceState(state);
+            pReq->SetDeviceInfo(info);
+            pReq->SetDeviceBasicInfo(deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        }
     }
 }
 
