@@ -545,7 +545,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_001, testing::ext::TestSi
 HWTEST_F(DeviceProfileConnectorTest, CheckRelatedDevice_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "123";
-    std::string bundleName = "bundleName"
+    std::string bundleName = "bundleName";
     bool ret = DeviceProfileConnector::GetInstance().CheckRelatedDevice(udid, bundleName);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -554,7 +554,7 @@ HWTEST_F(DeviceProfileConnectorTest, IsTrustDevice_001, testing::ext::TestSize.L
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     std::string udid = "123";
-    std::string bundleName = "bundleName"
+    std::string bundleName = "bundleName";
     bool ret = DeviceProfileConnector::GetInstance().IsTrustDevice(profiles, udid, bundleName);
     EXPECT_EQ(ret, false);
 }

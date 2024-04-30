@@ -26,6 +26,7 @@
 #if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
+#include "ipc_notify_device_state_req.h"
 #endif
 
 namespace OHOS {

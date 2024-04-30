@@ -1689,7 +1689,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_002, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_003, testing::ext::TestSize.Level0)
 {
     std::string udid;
     std::string bundleName;
