@@ -62,8 +62,9 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 
-void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcReq> pReq, const std::string &pkgName,
-    const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo)
+void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq,
+    const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &deviceInfo,
+    const DmDeviceBasicInfo &deviceBasicInfo)
 {
     LOGI("DeviceManagerServiceListener::SetDeviceInfo");
     pReq->SetPkgName(pkgName);
