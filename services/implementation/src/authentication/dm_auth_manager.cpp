@@ -63,7 +63,7 @@ constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* DM_VERSION = "4.1.5.1";
-constexpr const char* DM_NEW_VERSION = "5.0.0.1";
+constexpr const char* DM_NEW_VERSION = "5.0.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<HiChainConnector> hiChainConnector,

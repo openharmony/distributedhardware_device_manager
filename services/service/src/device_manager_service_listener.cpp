@@ -62,6 +62,16 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 
+void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcReq> pReq, const std::string &pkgName,
+    const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo)
+{
+    LOGI("DeviceManagerServiceListener::SetDeviceInfo");
+    pReq->SetPkgName(pkgName);
+    pReq->SetDeviceState(state);
+    pReq->SetDeviceInfo(deviceInfo);
+    pReq->SetDeviceBasicInfo(deviceBasicInfo);
+}
+
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
@@ -88,10 +98,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
                     alreadyOnlineSet_.insert(notifyKey);
                 }
             }
-            pReq->SetPkgName(it);
-            pReq->SetDeviceState(state);
-            pReq->SetDeviceInfo(info);
-            pReq->SetDeviceBasicInfo(deviceBasicInfo);
+            SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
@@ -104,20 +111,16 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
                 alreadyOnlineSet_.erase(notifyKey);
             }
         }
-        pReq->SetPkgName(pkgName);
-        pReq->SetDeviceState(state);
-        pReq->SetDeviceInfo(info);
-        pReq->SetDeviceBasicInfo(deviceBasicInfo);
+        SetDeviceInfo(pReq, pkgName, state, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::set<std::string> set = IpcServerStub::GetInstance().GetSaPkgname();
-        for (auto item : set) {
+        for (const auto &item : set) {
             LOGI("Notify SA pkgname %s", item.c_str());
-            pReq->SetPkgName(item);
-            pReq->SetDeviceState(state);
-            pReq->SetDeviceInfo(info);
-            pReq->SetDeviceBasicInfo(deviceBasicInfo);
+            SetDeviceInfo(pReq, item, state, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
+    #endif
     }
 }
 

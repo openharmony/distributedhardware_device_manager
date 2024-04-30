@@ -1094,6 +1094,23 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }
+
+HWTEST_F(DeviceManagerImplTest, CheckRelatedDevice001, testing::ext::TestSize.Level0)
+{
+    std::string udid;
+    std::string bundleName = "pkgName"
+    bool ret = DeviceManager::GetInstance().CheckRelatedDevice(udid, bundleName);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceManagerImplTest, CheckRelatedDevice002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "123";
+    std::string bundleName = "pkgName"
+    bool ret = DeviceManager::GetInstance().CheckRelatedDevice(udid, bundleName);
+    EXPECT_NE(ret, true);
+}
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
