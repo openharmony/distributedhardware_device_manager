@@ -1356,7 +1356,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1372,7 +1372,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
         std::to_string(static_cast<int32_t>(DmExchangeFreq::DM_LOW));
     std::map<std::string, std::string> filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1451,7 +1451,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
