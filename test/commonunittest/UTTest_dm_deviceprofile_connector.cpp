@@ -547,7 +547,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckRelatedDevice_001, testing::ext::TestS
     std::string udid = "123";
     std::string bundleName = "bundleName";
     int32_t ret = DeviceProfileConnector::GetInstance().CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, IsTrustDevice_001, testing::ext::TestSize.Level0)
