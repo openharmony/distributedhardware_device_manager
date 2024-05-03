@@ -129,7 +129,7 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         return DmAuthForm::IDENTICAL_ACCOUNT;
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-        if (profiles.GetBindLevel() == DEVICE) {
+        if (profiles.GetBindLevel() == DEVICE || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
             LOGI("The found device is peer-to-peer device bind-level.");
             return DmAuthForm::PEER_TO_PEER;
         }
@@ -147,7 +147,7 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         }
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-        if (profiles.GetBindLevel() == DEVICE) {
+        if (profiles.GetBindLevel() == DEVICE || || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
             LOGI("The found device is across-account device bind-level.");
             return DmAuthForm::ACROSS_ACCOUNT;
         }

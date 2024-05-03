@@ -173,7 +173,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
     if (PermissionManager::GetInstance().CheckSA()) {
-        LOGI("RegisterDeviceManagerListener pkgname %s is SA", pkgName.c_str());
+        LOGI("RegisterDeviceManagerListener pkgname %{public}s is SA", pkgName.c_str());
         saSet_.insert(pkgName);
     }
     LOGI("RegisterDeviceManagerListener: Register listener complete.");

@@ -40,6 +40,7 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
+constexpr const char* ALL_PKGNAME = "";
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -123,21 +124,16 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::vector<DmDeviceInfo> onlineDeviceList;
-    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
-    if (ret != DM_OK) {
+    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
-        return ret;
-    }
-    std::string bundleName = "";
-    if (pkgName == "ohos.distributeddata.service") {
-        bundleName = "ohos.samples.distributeddatagobang";
+        return ERR_DM_FAILED;
     }
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
         std::map<std::string, DmAuthForm> udidMap;
-        if (bundleName == "") {
+        if (PermissionManager::GetInstance().CheckSA()) {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
+        } else {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
-        } else if (bundleName == "ohos.samples.distributeddatagobang") {
-            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(bundleName);
         }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
@@ -166,14 +162,18 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::vector<DmDeviceBasicInfo> onlineDeviceList;
-    int32_t ret = softbusListener_->GetAvailableDeviceList(onlineDeviceList);
-    if (ret != DM_OK) {
-        LOGE("GetAvailableDeviceList failed");
-        return ret;
+    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
+        LOGE("GetTrustedDeviceList failed");
+        return ERR_DM_FAILED;
     }
 
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        std::map<std::string, DmAuthForm> udidMap;
+        if (PermissionManager::GetInstance().CheckSA()) {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
+        } else {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
