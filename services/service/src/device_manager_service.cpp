@@ -128,9 +128,17 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("GetTrustedDeviceList failed");
         return ret;
     }
-
+    std::bundleName = "";
+    if (pkgName == "ohos.distributeddata.service") {
+        bundleName = "ohos.samples.distributeddatagobang";
+    }
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        std::map<std::string, DmAuthForm> udidMap;
+        if (bundleName == "") {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        } else if (bundleName == "ohos.samples.distributeddatagobang") {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(bundleName);
+        }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
