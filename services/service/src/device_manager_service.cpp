@@ -128,7 +128,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("GetTrustedDeviceList failed");
         return ret;
     }
-    std::bundleName = "";
+    std::string bundleName = "";
     if (pkgName == "ohos.distributeddata.service") {
         bundleName = "ohos.samples.distributeddatagobang";
     }
