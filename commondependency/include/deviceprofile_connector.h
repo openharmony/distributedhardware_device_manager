@@ -154,6 +154,7 @@ private:
         std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, uint32_t index);
     bool IsTrustDevice(DistributedDeviceProfile::AccessControlProfile profile, const std::string &udid,
         const std::string &bundleName);
+    int32_t ProcessAuthForm(DmAuthForm form, AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

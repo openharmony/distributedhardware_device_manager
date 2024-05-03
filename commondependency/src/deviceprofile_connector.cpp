@@ -122,6 +122,29 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     return DM_OK;
 }
 
+int32_t DeviceProfileConnector::ProcessAuthForm(DmAuthForm form, AccessControlProfile profiles,
+    DmDiscoveryInfo discoveryInfo)
+{
+    LOGI("DeviceProfileConnector::ProcessAuthForm %{public}d", form);
+    if (profiles.GetBindLevel() == DEVICE || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
+        LOGI("The found device is device bind-level.");
+        return form;
+    }
+    if (profiles.GetBindLevel() == APP) {
+        if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
+            discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
+            LOGI("The found device is app bind-level.");
+            return form;
+        }
+        if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
+            discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
+            LOGI("The found device is app bind-level.");
+            return form;
+        }
+    }
+    return DmAuthForm::INVALID_TYPE;
+}
+
 int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo)
 {
     if (profiles.GetBindType() == DM_IDENTICAL_ACCOUNT) {
@@ -129,40 +152,10 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         return DmAuthForm::IDENTICAL_ACCOUNT;
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-        if (profiles.GetBindLevel() == DEVICE || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
-            LOGI("The found device is peer-to-peer device bind-level.");
-            return DmAuthForm::PEER_TO_PEER;
-        }
-        if (profiles.GetBindLevel() == APP) {
-            if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
-                discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
-                LOGI("The found device is peer-to-peer app bind-level.");
-                return DmAuthForm::PEER_TO_PEER;
-            }
-            if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
-                discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
-                LOGI("The found device is peer-to-peer app bind-level.");
-                return DmAuthForm::PEER_TO_PEER;
-            }
-        }
+        return ProcessAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-        if (profiles.GetBindLevel() == DEVICE || || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
-            LOGI("The found device is across-account device bind-level.");
-            return DmAuthForm::ACROSS_ACCOUNT;
-        }
-        if (profiles.GetBindLevel() == APP) {
-            if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
-                discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
-                LOGI("The found device is across-account app bind-level.");
-                return DmAuthForm::ACROSS_ACCOUNT;
-            }
-            if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
-                discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
-                LOGI("The found device is across-account app bind-level.");
-                return DmAuthForm::ACROSS_ACCOUNT;
-            }
-        }
+        return ProcessAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
     }
     return DmAuthForm::INVALID_TYPE;
 }

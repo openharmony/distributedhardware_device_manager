@@ -162,8 +162,8 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::vector<DmDeviceBasicInfo> onlineDeviceList;
-    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
-        LOGE("GetTrustedDeviceList failed");
+    if (softbusListener_->GetAvailableDeviceList(onlineDeviceList) != DM_OK) {
+        LOGE("GetAvailableDeviceList failed");
         return ERR_DM_FAILED;
     }
 
