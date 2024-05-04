@@ -27,7 +27,6 @@
 #include "ohos_init.h"
 #include "samgr_lite.h"
 #include "securec.h"
-
 namespace {
 const int32_t WAIT_FOR_SERVER = 2;
 const int32_t STACK_SIZE = 0x1000;

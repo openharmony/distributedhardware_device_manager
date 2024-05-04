@@ -63,6 +63,7 @@ constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* DM_VERSION = "4.1.5.1";
+constexpr const char* DM_NEW_VERSION = "5.0.1";
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<HiChainConnector> hiChainConnector,
@@ -77,7 +78,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     authenticationMap_[AUTH_TYPE_CRE] = nullptr;
-    dmVersion_ = DM_VERSION;
+    dmVersion_ = DM_NEW_VERSION;
 }
 
 DmAuthManager::~DmAuthManager()
@@ -150,7 +151,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->localDeviceId = localUdid;
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->ip = deviceId;
-    authRequestContext_->dmVersion = DM_VERSION;
+    authRequestContext_->dmVersion = DM_NEW_VERSION;
     authRequestContext_->localAccountId = MultipleUserConnector::GetOhosAccountId();
     MultipleUserConnector::SetSwitchOldAccountId(authRequestContext_->localAccountId);
     authRequestContext_->localUserId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -668,7 +669,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->bindType = authRequestContext_->bindType;
     authResponseContext_->isOnline = authRequestContext_->isOnline;
     authResponseContext_->authed = authRequestContext_->authed;
-    authResponseContext_->dmVersion = authRequestContext_->dmVersion;
+    authResponseContext_->dmVersion = "";
     authResponseContext_->localAccountId = authRequestContext_->localAccountId;
     authResponseContext_->localUserId = authRequestContext_->localUserId;
     authResponseContext_->isIdenticalAccount = false;
@@ -722,11 +723,18 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
         return;
     }
     LOGI("DmAuthManager::RespNegotiate sessionid %{public}d", sessionId);
-    dmVersion_ = authResponseContext_->dmVersion;
     remoteDeviceId_ = authResponseContext_->localDeviceId;
     authResponseContext_->networkId = softbusConnector_->GetLocalDeviceNetworkId();
     authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
-    if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
+    if (authResponseContext_->dmVersion == "") {
+        authResponseContext_->dmVersion = dmVersion_;
+    } else if (authResponseContext_->dmVersion == DM_VERSION) {
+        authResponseContext_->dmVersion = "";
+        authResponseContext_->bindLevel = INVALIED_TYPE;
+    }
+    LOGI("RespNegotiate dmversion %{public}s, level %{public}d",
+        authResponseContext_->dmVersion.c_str(), authResponseContext_->bindLevel);
+    if (authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel != INVALIED_TYPE) {
         ProRespNegotiateExt(sessionId);
     } else {
         ProRespNegotiate(sessionId);
@@ -744,13 +752,14 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     LOGI("DmAuthManager::SendAuthRequest session id");
-    dmVersion_ = authResponseContext_->dmVersion;
     remoteDeviceId_ = authResponseContext_->localDeviceId;
     timer_->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
     if (authResponseContext_->cryptoSupport) {
         isCryptoSupport_ = true;
     }
-    if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
+    LOGI("SendAuthRequest dmversion %{public}s, level %{public}d",
+        authResponseContext_->dmVersion.c_str(), authResponseContext_->bindLevel);
+    if (authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel != INVALIED_TYPE) {
         ProcessAuthRequestExt(sessionId);
     } else {
         ProcessAuthRequest(sessionId);
@@ -925,7 +934,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
         LOGE("ReportAuthConfirmBox failed");
     }
-    if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
+    if (authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel != INVALIED_TYPE) {
         return ConfirmProcessExt(action);
     } else {
         return ConfirmProcess(action);
@@ -1102,7 +1111,7 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
-        authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel == INVALIED_TYPE &&
+        authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel == INVALIED_TYPE &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
     }
@@ -1301,7 +1310,7 @@ void DmAuthManager::ShowStartAuthDialog()
             LOGE("failed to get auth code");
             return;
         }
-        if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
+        if (authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel != INVALIED_TYPE) {
             AuthDevice(pinCode);
         } else {
             AddMember(pinCode);
@@ -1319,7 +1328,7 @@ int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
         return ERR_DM_FAILED;
     }
     timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
-    if (authResponseContext_->dmVersion != "" && authResponseContext_->bindLevel != INVALIED_TYPE) {
+    if (authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel != INVALIED_TYPE) {
         return AuthDevice(pinCode);
     } else {
         return AddMember(pinCode);

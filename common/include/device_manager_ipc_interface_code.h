@@ -92,6 +92,7 @@ enum DMIpcCmdInterfaceCode {
     GET_SECURITY_LEVEL,
     IS_SAME_ACCOUNT,
     CHECK_API_PERMISSION,
+    CHECK_RELATED_DEVICE,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

@@ -210,6 +210,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_ISONLINE] = authResponseContext_->isOnline;
     json[TAG_AUTHED] = authResponseContext_->authed;
     json[TAG_DMVERSION] = authResponseContext_->dmVersion;
+    json[TAG_BIND_LEVEL] = authResponseContext_->bindLevel;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
     json[TAG_BIND_TYPE_SIZE] = authResponseContext_->bindType.size();
@@ -482,7 +483,7 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
     if (IsString(json, TAG_DMVERSION)) {
         authResponseContext_->dmVersion = json[TAG_DMVERSION].get<std::string>();
     } else {
-        authResponseContext_->dmVersion = "";
+        authResponseContext_->dmVersion = "3.2";
     }
     if (IsBool(json, TAG_HAVECREDENTIAL)) {
         authResponseContext_->haveCredential = json[TAG_HAVECREDENTIAL].get<bool>();

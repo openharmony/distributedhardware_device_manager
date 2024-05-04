@@ -40,6 +40,7 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
+constexpr const char* ALL_PKGNAME = "";
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -123,14 +124,17 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::vector<DmDeviceInfo> onlineDeviceList;
-    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
-    if (ret != DM_OK) {
+    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
-        return ret;
+        return ERR_DM_FAILED;
     }
-
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        std::map<std::string, DmAuthForm> udidMap;
+        if (PermissionManager::GetInstance().CheckSA()) {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
+        } else {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
@@ -158,14 +162,18 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::vector<DmDeviceBasicInfo> onlineDeviceList;
-    int32_t ret = softbusListener_->GetAvailableDeviceList(onlineDeviceList);
-    if (ret != DM_OK) {
+    if (softbusListener_->GetAvailableDeviceList(onlineDeviceList) != DM_OK) {
         LOGE("GetAvailableDeviceList failed");
-        return ret;
+        return ERR_DM_FAILED;
     }
 
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        std::map<std::string, DmAuthForm> udidMap;
+        if (PermissionManager::GetInstance().CheckSA()) {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
+        } else {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
@@ -1383,6 +1391,27 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &udid)
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->IsSameAccount(udid);
+}
+
+int32_t DeviceManagerService::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (udid.empty() || bundleName.empty()) {
+        LOGE("DeviceManagerService::CheckRelatedDevice error: udid: %{public}s bundleName: %{public}s",
+            GetAnonyString(udid).c_str(), bundleName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("DeviceManagerService CheckRelatedDevice start for udid: %{public}s bundleName: %{public}s",
+        GetAnonyString(udid).c_str(), bundleName.c_str());
+
+    if (!IsDMServiceImplReady()) {
+        LOGE("CheckRelatedDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->CheckRelatedDevice(udid, bundleName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

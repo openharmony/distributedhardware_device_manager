@@ -601,6 +601,7 @@ public:
     virtual int32_t DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType) = 0;
 
     virtual bool IsSameAccount(const std::string &udid) = 0;
+    virtual bool CheckRelatedDevice(const std::string &udid, const std::string &bundleName) = 0;
 
     /**
      * @brief Get Security Level by NetworkId.

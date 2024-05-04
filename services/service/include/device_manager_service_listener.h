@@ -18,7 +18,7 @@
 
 #include <map>
 #include <string>
-#include<unordered_set>
+#include <unordered_set>
 #include <mutex>
 
 #include "dm_device_info.h"
@@ -26,6 +26,7 @@
 #if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
+#include "ipc_notify_device_state_req.h"
 #endif
 
 namespace OHOS {
@@ -79,6 +80,8 @@ public:
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
+    void SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const std::string &pkgName,
+        const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

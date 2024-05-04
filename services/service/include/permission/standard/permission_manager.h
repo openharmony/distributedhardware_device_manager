@@ -33,6 +33,7 @@ public:
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);
+    bool CheckSA(void);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

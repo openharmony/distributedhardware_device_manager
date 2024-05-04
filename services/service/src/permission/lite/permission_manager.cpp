@@ -53,5 +53,10 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     (void)processName;
     return true;
 }
+
+bool PermissionManager::CheckSA(void)
+{
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,6 +31,7 @@
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_server_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -61,6 +62,17 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 
+void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq,
+    const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &deviceInfo,
+    const DmDeviceBasicInfo &deviceBasicInfo)
+{
+    LOGI("DeviceManagerServiceListener::SetDeviceInfo");
+    pReq->SetPkgName(pkgName);
+    pReq->SetDeviceState(state);
+    pReq->SetDeviceInfo(deviceInfo);
+    pReq->SetDeviceBasicInfo(deviceBasicInfo);
+}
+
 void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
@@ -87,10 +99,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
                     alreadyOnlineSet_.insert(notifyKey);
                 }
             }
-            pReq->SetPkgName(it);
-            pReq->SetDeviceState(state);
-            pReq->SetDeviceInfo(info);
-            pReq->SetDeviceBasicInfo(deviceBasicInfo);
+            SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
@@ -103,11 +112,16 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
                 alreadyOnlineSet_.erase(notifyKey);
             }
         }
-        pReq->SetPkgName(pkgName);
-        pReq->SetDeviceState(state);
-        pReq->SetDeviceInfo(info);
-        pReq->SetDeviceBasicInfo(deviceBasicInfo);
+        SetDeviceInfo(pReq, pkgName, state, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::set<std::string> set = IpcServerStub::GetInstance().GetSaPkgname();
+        for (const auto &item : set) {
+            LOGI("Notify SA pkgname %s", item.c_str());
+            SetDeviceInfo(pReq, item, state, info, deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        }
+    #endif
     }
 }
 
