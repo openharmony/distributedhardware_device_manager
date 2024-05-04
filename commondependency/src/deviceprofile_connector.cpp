@@ -122,10 +122,10 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::ProcessAuthForm(DmAuthForm form, AccessControlProfile profiles,
+int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProfile profiles,
     DmDiscoveryInfo discoveryInfo)
 {
-    LOGI("DeviceProfileConnector::ProcessAuthForm %{public}d", form);
+    LOGI("DeviceProfileConnector::CheckAuthForm %{public}d", form);
     if (profiles.GetBindLevel() == DEVICE || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
         LOGI("The found device is device bind-level.");
         return form;
@@ -152,10 +152,10 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         return DmAuthForm::IDENTICAL_ACCOUNT;
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-        return ProcessAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
+        return CheckAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-        return ProcessAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
+        return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
     }
     return DmAuthForm::INVALID_TYPE;
 }
