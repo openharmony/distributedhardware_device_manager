@@ -37,6 +37,7 @@ void OnDataReceivedFuzzTest(const uint8_t* data, size_t size)
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
     std::string message(reinterpret_cast<const char*>(data), size);
     authManager->OnDataReceived(sessionId, message);
+    authManager->OnSessionClosed(sessionId);
 }
 }
 }
