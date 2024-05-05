@@ -31,12 +31,8 @@ void OnSoftbusDeviceOnlineFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    NodeBasicInfo info = {
-        .networkId = "123456",
-        .deviceName = "123456",
-    };
-    info.deviceTypeId = *(reinterpret_cast<const uint16_t *>(data));
-    softbusListener->OnSoftbusDeviceOnline(&info);
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOnline(info);
 }
 }
 }
