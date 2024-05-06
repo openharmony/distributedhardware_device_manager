@@ -91,15 +91,16 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
         }
         for (const auto &it : PkgNameVec) {
             std::string notifyKey =  it + "_" + info.deviceId;
+            DmDeviceState notifyState = state;
             {
                 std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
                 if (state == DEVICE_STATE_ONLINE && alreadyOnlineSet_.find(notifyKey) != alreadyOnlineSet_.end()) {
-                    continue;
+                    notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
                 } else if (state == DEVICE_STATE_ONLINE) {
                     alreadyOnlineSet_.insert(notifyKey);
                 }
             }
-            SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
+            SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
