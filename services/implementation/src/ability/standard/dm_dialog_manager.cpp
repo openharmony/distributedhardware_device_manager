@@ -57,10 +57,14 @@ DmDialogManager DmDialogManager::dialogMgr_;
 sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
     new (std::nothrow) DialogAbilityConnection());
 
-DmDialogManager::DmDialogManager() {}
+DmDialogManager::DmDialogManager()
+{
+    LOGI("DmDialogManager constructor");
+}
+
 DmDialogManager::~DmDialogManager()
 {
-    dialogConnectionCallback_ = nullptr;
+    LOGI("DmDialogManager destructor");
 }
 
 DmDialogManager &DmDialogManager::GetInstance()
