@@ -125,7 +125,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     dmSubInfo.medium = DmExchangeMedium::DM_AUTO;
-    dmSubInfo.freq = DmExchangeFreq::DM_MID;
+    dmSubInfo.freq = DmExchangeFreq::DM_LOW;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {

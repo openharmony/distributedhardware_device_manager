@@ -263,10 +263,13 @@ void SoftbusListener::OnParameterChgCallback(const char *key, const char *value,
         dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
         dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
         dmPublishInfo.medium = ExchangeMedium::AUTO;
-        dmPublishInfo.freq = ExchangeFreq::HIGH;
+        dmPublishInfo.freq = ExchangeFreq::LOW;
         dmPublishInfo.capability = DM_CAPABILITY_OSD;
         dmPublishInfo.ranging = false;
         int32_t ret = ::PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
+        LOGI("OnParameterChgCallback begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+            "%{public}s, ranging: %{public}d, freq: %{public}d.", dmPublishInfo.publishId, dmPublishInfo.mode,
+            dmPublishInfo.medium, dmPublishInfo.capability, dmPublishInfo.ranging, dmPublishInfo.freq);
         if (ret == DM_OK) {
             g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
         }
@@ -394,10 +397,12 @@ int32_t SoftbusListener::InitSoftPublishLNN()
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
     publishInfo.medium = ExchangeMedium::AUTO;
-    publishInfo.freq = ExchangeFreq::HIGH;
+    publishInfo.freq = ExchangeFreq::LOW;
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = false;
-
+    LOGI("InitSoftPublishLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
+        publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret == DM_OK) {
@@ -448,7 +453,8 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
         const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(customData.c_str()));
     subscribeInfo.dataLen = customData.size();
     LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-        "%{public}s.", subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium, subscribeInfo.capability);
+        "%{public}s, freq: %{public}d.", subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium,
+        subscribeInfo.capability, subscribeInfo.freq);
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
     struct RadarInfo info = {
         .funcName = "RefreshSoftbusLNN",
@@ -514,8 +520,8 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     publishInfo.ranging = dmPubInfo.ranging;
 
     LOGI("PublishSoftbusLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-        "%{public}s, ranging: %{public}d.", publishInfo.publishId, publishInfo.mode, publishInfo.medium,
-        publishInfo.capability, publishInfo.ranging);
+        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
+        publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 
     int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {

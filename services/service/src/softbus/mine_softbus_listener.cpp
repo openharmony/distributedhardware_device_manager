@@ -599,7 +599,7 @@ int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
     publishInfo.medium = ExchangeMedium::AUTO;
-    publishInfo.freq = ExchangeFreq::HIGH;
+    publishInfo.freq = ExchangeFreq::LOW;
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.capabilityData = nullptr;
     publishInfo.dataLen = 0;
