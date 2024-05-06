@@ -99,6 +99,10 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
         dmPubInfo->mode =
             static_cast<DmDiscoverMode>(std::atoi((advertiseParam.find(PARAM_KEY_DISC_MODE)->second).c_str()));
     }
+    if (advertiseParam.find(PARAM_KEY_DISC_FREQ) != advertiseParam.end()) {
+        dmPubInfo->freq =
+            static_cast<DmExchangeFreq>(std::atoi((advertiseParam.find(PARAM_KEY_DISC_FREQ)->second).c_str()));
+    }
 }
 
 int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t publishId)
