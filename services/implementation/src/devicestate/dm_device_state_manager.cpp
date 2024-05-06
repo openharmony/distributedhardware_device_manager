@@ -101,6 +101,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
 {
     LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
+    devInfo.authForm = GetAuthForm(devInfo.networkId);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         stateDeviceInfos_[deviceId] = devInfo;
