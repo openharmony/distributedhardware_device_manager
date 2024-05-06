@@ -86,7 +86,7 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     }
     dmPubInfo->publishId = -1;
     dmPubInfo->mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
-    dmPubInfo->freq = DmExchangeFreq::DM_HIGH;
+    dmPubInfo->freq = DmExchangeFreq::DM_LOW;
     dmPubInfo->ranging = true;
 
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
