@@ -381,7 +381,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
-    LOGI("DmAuthManager::OnSessionOpened sessionId = %{public}d", sessionId);
+    LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
 }
 
 void DmAuthManager::ProcessSourceMsg()
