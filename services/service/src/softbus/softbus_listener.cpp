@@ -509,7 +509,7 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     const std::string &customData)
 {
     LOGI("PublishSoftbusLNN begin, publishId: %{public}d.", dmPubInfo.publishId);
-    PublishInfo publishInfo; 
+    PublishInfo publishInfo;
     publishInfo.publishId = dmPubInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
     publishInfo.medium = (capability == DM_CAPABILITY_APPROACH) ? ExchangeMedium::BLE : ExchangeMedium::AUTO;
