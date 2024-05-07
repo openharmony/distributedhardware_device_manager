@@ -20,6 +20,7 @@
 
 #include "device_manager.h"
 #include "device_manager_callback.h"
+#include "device_manager_impl.h"
 #include "accesstoken_kit.h"
 #include "authenticate_device_fuzzer.h"
 #include "nativetoken_kit.h"
@@ -197,13 +198,16 @@ void AddPermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     AddPermission();
     std::string str(reinterpret_cast<const char*>(data), size);
+
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ =
+        std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
 
     DeviceManager::GetInstance().InitDeviceManager(str, g_initcallback);
     DeviceManager::GetInstance().RegisterDevStateCallback(str, str, g_stateCallback);
@@ -217,6 +221,20 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().StopDeviceDiscovery(g_tokenId, str);
     DeviceManager::GetInstance().PublishDeviceDiscovery(str, g_publishInfo, g_publishCallback);
     DeviceManager::GetInstance().UnPublishDeviceDiscovery(str, g_publishInfo.publishId);
+    DeviceManager::GetInstance().UnInitDeviceManager(str);
+}
+
+void AuthenticateDeviceSecondFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    AddPermission();
+    std::string str(reinterpret_cast<const char*>(data), size);
+
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ =
+        std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
+
     DeviceManager::GetInstance().GetTrustedDeviceList(str, str, g_deviceList);
     DeviceManager::GetInstance().GetTrustedDeviceList(str, str, g_isRefresh, g_deviceList);
     DeviceManager::GetInstance().GetAvailableDeviceList(str, g_deviceBasic);
@@ -224,12 +242,23 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().GetLocalDeviceInfo(str, g_getDeviceInfo);
     DeviceManager::GetInstance().GetUdidByNetworkId(str, str, g_returnStr);
     DeviceManager::GetInstance().GetUuidByNetworkId(str, str, g_returnStr);
-    DeviceManager::GetInstance().GetDeviceSecurityLevel(str, str, g_securityLevel);
     DeviceManager::GetInstance().DpAclAdd(g_accessControlId, str, g_bindType);
     DeviceManager::GetInstance().CreatePinHolder(str, g_targetId, g_pinType, str);
     DeviceManager::GetInstance().DestroyPinHolder(str, g_targetId, g_pinType, str);
     DeviceManager::GetInstance().CheckAccessToTarget(g_tokenId, str);
     DeviceManager::GetInstance().IsSameAccount(str);
+}
+
+void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    AddPermission();
+    std::string str(reinterpret_cast<const char*>(data), size);
+
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ =
+        std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
 
     DeviceManager::GetInstance().SetUserOperation(str, g_action, str);
     DeviceManager::GetInstance().RequestCredential(str, g_returnStr);
@@ -245,7 +274,6 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
-    DeviceManager::GetInstance().UnInitDeviceManager(str);
 }
 }
 }
@@ -254,6 +282,8 @@ void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::AuthenticateDeviceFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceFirstFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceSecondFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceThirdFuzzTest(data, size);
     return 0;
 }
