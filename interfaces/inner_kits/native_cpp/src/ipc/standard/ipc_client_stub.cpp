@@ -34,7 +34,7 @@ int32_t IpcClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         LOGI("ReadInterfaceToken fail!");
         return ERR_DM_IPC_READ_FAILED;
     }
-    if (IpcCmdRegister::GetInstance().OnIpcCmd((int32_t)code, data, reply) == DM_OK) {
+    if (IpcCmdRegister::GetInstance().OnIpcCmd(static_cast<int32_t>(code), data, reply) == DM_OK) {
         return DM_OK;
     }
     LOGW("unsupported code: %{public}u", code);

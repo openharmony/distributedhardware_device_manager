@@ -30,44 +30,44 @@ public:
      * @tc.desc: Dm App Image Info Save Data
      * @tc.type: FUNC
      */
-    explicit DmAppImageInfo(uint8_t *appIcon_, int32_t appIconLen_, uint8_t *appThumbnail_, int32_t appThumbnailLen_)
+    explicit DmAppImageInfo(uint8_t *appIcon, int32_t appIconLen, uint8_t *appThumbnail, int32_t appThumbnailLen)
     {
-        SaveData(appIcon_, appIconLen_, appThumbnail_, appThumbnailLen_);
+        SaveData(appIcon, appIconLen, appThumbnail, appThumbnailLen);
     }
     /**
      * @tc.name: DmAppImageInfo::Reset
      * @tc.desc: Dm App Image Info Reset
      * @tc.type: FUNC
      */
-    void Reset(uint8_t *appIcon_, int32_t appIconLen_, uint8_t *appThumbnail_, int32_t appThumbnailLen_)
+    void Reset(uint8_t *appIcon, int32_t appIconLen, uint8_t *appThumbnail, int32_t appThumbnailLen)
     {
-        SaveData(appIcon_, appIconLen_, appThumbnail_, appThumbnailLen_);
+        SaveData(appIcon, appIconLen, appThumbnail, appThumbnailLen);
     }
     /**
      * @tc.name: DmAppImageInfo::ResetIcon
      * @tc.desc: Dm App Image Info ResetIcon
      * @tc.type: FUNC
      */
-    void ResetIcon(uint8_t *appIcon_, int32_t appIconLen_)
+    void ResetIcon(uint8_t *appIcon, int32_t appIconLen)
     {
-        SaveIconData(appIcon_, appIconLen_);
+        SaveIconData(appIcon, appIconLen);
     }
     /**
      * @tc.name: DmAppImageInfo::InitThumbnail
      * @tc.desc: Dm App Image Info Init Thumbnail
      * @tc.type: FUNC
      */
-    void InitThumbnail(int32_t appThumbnailLen_)
+    void InitThumbnail(int32_t appThumbnailLen)
     {
-        if (appThumbnailLen_ <= 0 || appThumbnailLen_ > THUMB_MAX_LEN) {
-            appThumbnailLen = 0;
-            appThumbnail = nullptr;
+        if (appThumbnailLen <= 0 || appThumbnailLen > THUMB_MAX_LEN) {
+            appThumbnailLen_ = 0;
+            appThumbnail_ = nullptr;
             return;
         }
 
-        appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
-        if (appThumbnail != nullptr) {
-            appThumbnailLen = appThumbnailLen_;
+        appThumbnail_ = new (std::nothrow) uint8_t[appThumbnailLen] { 0 };
+        if (appThumbnail_ != nullptr) {
+            appThumbnailLen_ = appThumbnailLen;
         }
     }
     /**
@@ -81,15 +81,15 @@ public:
             return -1;
         }
 
-        if ((copyIndex + copyLen) > appThumbnailLen) {
+        if ((copyIndex + copyLen) > appThumbnailLen_) {
             return -1;
         }
 
-        if (appThumbnail == nullptr) {
+        if (appThumbnail_ == nullptr) {
             return -1;
         }
 
-        if (memcpy_s(appThumbnail + copyIndex, appThumbnailLen - copyIndex, srcBuffer,
+        if (memcpy_s(appThumbnail_ + copyIndex, appThumbnailLen_ - copyIndex, srcBuffer,
                      static_cast<uint32_t>(copyLen)) != 0) {
             return -1;
         }
@@ -103,13 +103,13 @@ public:
      */
     ~DmAppImageInfo()
     {
-        if (appIcon != nullptr) {
-            delete[] appIcon;
-            appIcon = nullptr;
+        if (appIcon_ != nullptr) {
+            delete[] appIcon_;
+            appIcon_ = nullptr;
         }
-        if (appThumbnail != nullptr) {
-            delete[] appThumbnail;
-            appThumbnail = nullptr;
+        if (appThumbnail_ != nullptr) {
+            delete[] appThumbnail_;
+            appThumbnail_ = nullptr;
         }
     }
     /**
@@ -141,12 +141,12 @@ public:
      */
     int32_t GetAppIconLen() const
     {
-        return appIconLen;
+        return appIconLen_;
     }
 
     const uint8_t *GetAppIcon() const
     {
-        return appIcon;
+        return appIcon_;
     }
     /**
      * @tc.name: DmAppImageInfo::GetAppThumbnailLen
@@ -155,7 +155,7 @@ public:
      */
     int32_t GetAppThumbnailLen() const
     {
-        return appThumbnailLen;
+        return appThumbnailLen_;
     }
     /**
      * @tc.name: DmAppImageInfo::GetAppThumbnail
@@ -164,51 +164,51 @@ public:
      */
     const uint8_t *GetAppThumbnail() const
     {
-        return appThumbnail;
+        return appThumbnail_;
     }
 
 private:
-    void SaveData(const uint8_t *appIcon_, int32_t appIconLen_, const uint8_t *appThumbnail_, int32_t appThumbnailLen_)
+    void SaveData(const uint8_t *appIcon, int32_t appIconLen, const uint8_t *appThumbnail, int32_t appThumbnailLen)
     {
-        SaveIconData(appIcon_, appIconLen_);
-        SaveThumbnailData(appThumbnail_, appThumbnailLen_);
+        SaveIconData(appIcon, appIconLen);
+        SaveThumbnailData(appThumbnail, appThumbnailLen);
     }
 
-    void SaveIconData(const uint8_t *appIcon_, int32_t appIconLen_)
+    void SaveIconData(const uint8_t *appIcon, int32_t appIconLen)
     {
-        if (appIconLen_ > 0 && appIconLen_ < ICON_MAX_LEN && appIcon_ != nullptr) {
-            if (appIconLen < appIconLen_) {
-                if (appIcon != nullptr && appIconLen > 0) {
-                    delete[] appIcon;
-                    appIcon = nullptr;
-                    appIconLen = 0;
+        if (appIconLen > 0 && appIconLen < ICON_MAX_LEN && appIcon != nullptr) {
+            if (appIconLen_ < appIconLen) {
+                if (appIcon_ != nullptr && appIconLen_ > 0) {
+                    delete[] appIcon_;
+                    appIcon_ = nullptr;
+                    appIconLen_ = 0;
                 }
-                appIcon = new (std::nothrow) uint8_t[appIconLen_] { 0 };
+                appIcon_ = new (std::nothrow) uint8_t[appIconLen] { 0 };
             }
-            if (appIcon != nullptr) {
-                appIconLen = appIconLen_;
-                if (memcpy_s(appIcon, static_cast<uint32_t>(appIconLen), appIcon_, appIconLen_) != 0) {
+            if (appIcon_ != nullptr) {
+                appIconLen_ = appIconLen;
+                if (memcpy_s(appIcon_, static_cast<uint32_t>(appIconLen_), appIcon, appIconLen) != 0) {
                     return;
                 }
             }
         }
     }
 
-    void SaveThumbnailData(const uint8_t *appThumbnail_, int32_t appThumbnailLen_)
+    void SaveThumbnailData(const uint8_t *appThumbnail, int32_t appThumbnailLen)
     {
-        if (appThumbnailLen_ > 0 && appThumbnailLen_ < THUMB_MAX_LEN && appThumbnail_ != nullptr) {
-            if (appThumbnailLen < appThumbnailLen_) {
-                if (appThumbnail != nullptr && appThumbnailLen > 0) {
-                    delete[] appThumbnail;
-                    appThumbnail = nullptr;
-                    appThumbnailLen = 0;
+        if (appThumbnailLen > 0 && appThumbnailLen < THUMB_MAX_LEN && appThumbnail != nullptr) {
+            if (appThumbnailLen_ < appThumbnailLen) {
+                if (appThumbnail_ != nullptr && appThumbnailLen_ > 0) {
+                    delete[] appThumbnail_;
+                    appThumbnail_ = nullptr;
+                    appThumbnailLen_ = 0;
                 }
-                appThumbnail = new (std::nothrow) uint8_t[appThumbnailLen_] { 0 };
+                appThumbnail_ = new (std::nothrow) uint8_t[appThumbnailLen] { 0 };
             }
-            if (appThumbnail != nullptr) {
-                appThumbnailLen = appThumbnailLen_;
-                if (memcpy_s(appThumbnail, static_cast<uint32_t>(appThumbnailLen), appThumbnail_,
-                             appThumbnailLen_) != 0) {
+            if (appThumbnail_ != nullptr) {
+                appThumbnailLen_ = appThumbnailLen;
+                if (memcpy_s(appThumbnail_, static_cast<uint32_t>(appThumbnailLen_), appThumbnail,
+                             appThumbnailLen) != 0) {
                     return;
                 }
             }
@@ -216,10 +216,10 @@ private:
     }
 
 private:
-    int32_t appIconLen { 0 };
-    uint8_t *appIcon { nullptr };
-    int32_t appThumbnailLen { 0 };
-    uint8_t *appThumbnail { nullptr };
+    int32_t appIconLen_ { 0 };
+    uint8_t *appIcon_ { nullptr };
+    int32_t appThumbnailLen_ { 0 };
+    uint8_t *appThumbnail_ { nullptr };
     const int32_t ICON_MAX_LEN = 32 * 1024;
     const int32_t THUMB_MAX_LEN = 153 * 1024;
 };

@@ -83,7 +83,7 @@ void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
     }
     devInfo.range = parcel.ReadInt32();
     devInfo.networkType = parcel.ReadInt32();
-    devInfo.authForm = (DmAuthForm)parcel.ReadInt32();
+    devInfo.authForm = static_cast<DmAuthForm>(parcel.ReadInt32());
     devInfo.extraData = parcel.ReadString();
 }
 
@@ -228,7 +228,8 @@ ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, MessageParcel &reply, std::share
         DmDeviceBasicInfo *pDmDeviceBasicinfo = nullptr;
         for (int32_t i = 0; i < deviceNum; ++i) {
             pDmDeviceBasicinfo = nullptr;
-            pDmDeviceBasicinfo = (DmDeviceBasicInfo *)reply.ReadRawData(sizeof(DmDeviceBasicInfo));
+            pDmDeviceBasicinfo =
+                static_cast<DmDeviceBasicInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceBasicInfo))));
             if (pDmDeviceBasicinfo == nullptr) {
                 LOGE("GetAvailableDeviceList read node info failed!");
                 pRsp->SetErrCode(ERR_DM_IPC_WRITE_FAILED);

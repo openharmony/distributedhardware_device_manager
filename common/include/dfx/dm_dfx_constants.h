@@ -51,18 +51,6 @@ typedef struct DumperInfo {
     DmDeviceType deviceTypeId;
     std::string deviceTypeInfo;
 } DumperInfo;
-
-static DumperInfo dumperDeviceType[] = {
-    {DEVICE_TYPE_UNKNOWN, "DEVICE_TYPE_UNKNOWN"},
-    {DEVICE_TYPE_WIFI_CAMERA, "DEVICE_TYPE_WIFI_CAMERA"},
-    {DEVICE_TYPE_AUDIO, "DEVICE_TYPE_AUDIO"},
-    {DEVICE_TYPE_PC, "DEVICE_TYPE_PC"},
-    {DEVICE_TYPE_PHONE, "DEVICE_TYPE_PHONE"},
-    {DEVICE_TYPE_PAD, "DEVICE_TYPE_PAD"},
-    {DEVICE_TYPE_WATCH, "DEVICE_TYPE_WATCH"},
-    {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
-    {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
-};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DFX_CONSTANTS_H
