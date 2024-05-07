@@ -41,8 +41,9 @@ void DmDistributedHardwareLoadTest::TearDownTestCase()
 HWTEST_F(DmDistributedHardwareLoadTest, LoadDistributedHardwareFwk_001, testing::ext::TestSize.Level0)
 {
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
-    uint32_t ret = DmDistributedHardwareLoad::GetInstance().distributedHardwareLoadCount_;
-    EXPECT_NE(ret, DM_OK);
+    DmDistributedHardwareLoad::GetInstance().InitDistributedHardwareLoadCount();
+    uint32_t ret = DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount();
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmDistributedHardwareLoadTest, InitDistributedHardwareLoadCount_001, testing::ext::TestSize.Level0)
