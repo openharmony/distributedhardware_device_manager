@@ -23,7 +23,7 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "是否信任此设备？"
+      "value": "%s是否信任此设备？"
     },
     {
       "name": "dm_allow_temp",

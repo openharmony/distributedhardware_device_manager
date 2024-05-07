@@ -32,7 +32,7 @@ struct InputCustomDialog {
   @State password: string = '';
   @State passwordCircle: string[] = ['', '', '', '', '', ''];
   @State isTimes: number = 3;
-  @State errorTips: Resource = $r('app.plural.dm_incorrect_code', this.isTimes);
+  @State errorTips: Resource = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
   @State errorTipsVisible: Visibility = Visibility.None;
   @State heightNum: number = 600;
   @State targetDeviceName: string = '';
@@ -77,7 +77,7 @@ struct InputCustomDialog {
         }
         if (msg === MSG_PIN_CODE_ERROR) {
           this.isTimes--;
-          this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes);
+          this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
           this.password = '';
           this.errorTipsVisible = Visibility.Visible;
           this.passwordCircle = ['', '', '', '', '', ''];

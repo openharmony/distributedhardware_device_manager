@@ -16,6 +16,7 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
 import deviceInfo from '@ohos.deviceInfo';
 import Constant from '../common/constant';
+import common from '@ohos.app.ability.common';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -29,7 +30,7 @@ const DEVICE_TYPE_PC: number = 0x0C;
 
 @CustomDialog
 struct ConfirmCustomDialog {
-  @State peerAppOperation: string|Resource = $r('app.string.dm_connect_device');
+  @State peerAppOperation: string = '';
   @State peerCustomDescription: string = '';
   @State peerDeviceName: string = '';
   @State peerDeviceType: number = 0;
@@ -37,15 +38,19 @@ struct ConfirmCustomDialog {
   @State times: number = 0;
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
+  @State titleFirst: string = '';
   controller?: CustomDialogController;
   isPC: boolean = false;
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
+    let context = getContext() as common.UIAbilityContext;
     if (AppStorage.get('deviceName') != null) {
       this.peerDeviceName = AppStorage.get('deviceName') as string
       console.log('peerDeviceName is ' + this.peerDeviceName)
     }
+    this.titleFirst =
+      context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
 
     if (AppStorage.get('deviceType') != null) {
       this.peerDeviceType = AppStorage.get('deviceType') as number
@@ -55,6 +60,7 @@ struct ConfirmCustomDialog {
     if (AppStorage.get('appOperationStr') != null) {
       this.peerAppOperation = AppStorage.get('appOperationStr') as string
       console.log('peerAppOperation is ' + this.peerAppOperation)
+      this.titleFirst = this.peerDeviceName + ' ' + this.peerAppOperation;
     }
 
     if (AppStorage.get('customDescriptionStr') != null) {
@@ -186,11 +192,7 @@ struct ConfirmCustomDialog {
             .margin({ bottom: 16, top: 24 })
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
-            Text() {
-              Span(this.peerDeviceName + ' ')
-              Span(this.peerAppOperation)
-              Span($r('app.string.dm_is_trust_device'))
-            }
+            Text($r('app.string.dm_is_trust_device', this.titleFirst))
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
@@ -262,7 +264,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                 }
               })
-            Button($r('app.plural.dm_not_allow', this.secondsNum))
+            Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
               .margin({ left: 16, right: 16 })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .onClick(() => {

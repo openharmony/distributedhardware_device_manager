@@ -23,15 +23,15 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "Do you trust this device?"
+      "value": "%sDo you trust this device?"
     },
     {
       "name": "dm_allow_temp",
-      "value": "TEMPORARY TRUST"
+      "value": "Trust this time"
     },
     {
       "name": "dm_allow_always",
-      "value": "ALWAYS TRUST"
+      "value": "Always trust"
     },
     {
       "name": "dm_connect_device",
@@ -43,7 +43,7 @@
     },
     {
       "name": "dm_enter_connect_code",
-      "value": "Enter the connection code displayed on the peer device"
+      "value": "Enter the connection code shown on the other device."
     },
     {
       "name": "dm_cancel",
@@ -51,7 +51,7 @@
     },
     {
       "name": "dm_authenticating",
-      "value": "Authenticating...Please wait."
+      "value": "Authenticating..."
     },
     {
       "name": "dm_connect_code",
