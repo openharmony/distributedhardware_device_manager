@@ -23,23 +23,19 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "Trust this device?"
+      "value": "Do you trust this device?"
     },
     {
       "name": "dm_allow_temp",
-      "value": "Allow temp"
+      "value": "TEMPORARY TRUST"
     },
     {
       "name": "dm_allow_always",
-      "value": "Allow always"
+      "value": "ALWAYS TRUST"
     },
     {
       "name": "dm_connect_device",
-      "value": "would like to link with your device."
-    },
-    {
-      "name": "dm_not_allow",
-      "value": "Don't trust(%d s)"
+      "value": "%s wants to connect to this device."
     },
     {
       "name": "dm_connect",
@@ -51,7 +47,7 @@
     },
     {
       "name": "dm_cancel",
-      "value": "Cancel"
+      "value": "CANCEL"
     },
     {
       "name": "dm_incorrect_code",

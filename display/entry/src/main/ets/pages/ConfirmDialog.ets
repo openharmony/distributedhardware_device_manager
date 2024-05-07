@@ -262,7 +262,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                 }
               })
-            Button($r('app.string.dm_not_allow', this.secondsNum))
+            Button($r('app.plural.dm_not_allow', this.secondsNum))
               .margin({ left: 16, right: 16 })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .onClick(() => {
