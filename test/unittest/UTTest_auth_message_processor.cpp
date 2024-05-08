@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,38 @@ namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
 constexpr const char* TAG_HOST = "HOST";
+
+class CryptoAdapterTest : public ICryptoAdapter {
+public:
+    CryptoAdapterTest() {}
+    virtual ~CryptoAdapterTest() {}
+    std::string GetName() override
+    {
+        return "";
+    }
+    std::string GetVersion() override
+    {
+        return "";
+    }
+    int32_t MbedTlsEncrypt(const uint8_t *plainText, int32_t plainTextLen, uint8_t *cipherText, int32_t cipherTextLen,
+        int32_t *outLen) override
+    {
+        (void)plainText;
+        (void)plainTextLen;
+        (void)cipherText;
+        (void)cipherTextLen;
+        return DM_OK;
+    }
+    int32_t MbedTlsDecrypt(const uint8_t *cipherText, int32_t cipherTextLen, uint8_t *plainText, int32_t plainTextLen,
+        int32_t *outLen) override
+    {
+        (void)cipherText;
+        (void)cipherTextLen;
+        (void)plainText;
+        (void)plainTextLen;
+        return DM_OK;
+    }
+};
 
 void AuthMessageProcessorTest::SetUp()
 {
@@ -301,6 +333,216 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseAuthResponseMessage(jsona);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_002
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = "12";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_003
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = 0;
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_004
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_005
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_005, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = 1513;
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_006
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_006, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = "1513";
+    jsona[TAG_REQUEST_ID] = 1513;
+    jsona[TAG_GROUP_ID] = "4521201";
+    jsona[TAG_GROUP_NAME] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "1513152";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_007
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_007, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = "1513";
+    jsona[TAG_REQUEST_ID] = "1513";
+    jsona[TAG_GROUP_ID] = 4521201;
+    jsona[TAG_GROUP_NAME] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "1513152";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_008
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_008, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = "1513";
+    jsona[TAG_REQUEST_ID] = "1513";
+    jsona[TAG_GROUP_ID] = "4521201";
+    jsona[TAG_GROUP_NAME] = 4521201;
+    jsona[TAG_AUTH_TOKEN] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "1513152";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_009
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_009, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = "1513";
+    jsona[TAG_REQUEST_ID] = "1513";
+    jsona[TAG_GROUP_ID] = "4521201";
+    jsona[TAG_GROUP_NAME] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = 4521201;
+    jsona[TAG_AUTH_TOKEN] = "1513152";
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseAuthResponseMessage_0010
+ * @tc.desc: Compare JSON before and after assi gnment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_0010, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsona;
+    jsona[TAG_REPLY] = 0;
+    jsona[TAG_DEVICE_ID] = "4153125";
+    jsona[TAG_TOKEN] = "1513";
+    jsona[TAG_REQUEST_ID] = "1513";
+    jsona[TAG_GROUP_ID] = "4521201";
+    jsona[TAG_GROUP_NAME] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = "4521201";
+    jsona[TAG_AUTH_TOKEN] = 1513152;
+    authMessageProcessor->ParseAuthResponseMessage(jsona);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, DM_OK);
 }
 
 /**
@@ -604,6 +846,57 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::
     ASSERT_NE(authMessageProcessor->authResponseContext_->isIdenticalAccount, jsonObj[TAG_IDENTICAL_ACCOUNT]);
 }
 
+/**
+ * @tc.name: AuthMessageProcessor::ParseRespNegotiateMessage_003
+ * @tc.desc: return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = true;
+    jsonObj[TAG_REPLY] = 1231;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "1212";
+    jsonObj[TAG_IS_AUTH_CODE_READY] = true;
+    jsonObj[TAG_ACCOUNT_GROUPID] = "1212";
+    jsonObj[TAG_NET_ID] = "1212";
+    jsonObj[TAG_TOKENID] = "1212";
+    jsonObj[TAG_TARGET_DEVICE_NAME] = "1212";
+    authMessageProcessor->ParseRespNegotiateMessage(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->isIdenticalAccount, true);
+}
+
+/**
+ * @tc.name: AuthMessageProcessor::ParseRespNegotiateMessage_004
+ * @tc.desc: return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_004, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = 112;
+    jsonObj[TAG_REPLY] = "1231";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = 1212;
+    jsonObj[TAG_IS_AUTH_CODE_READY] = 1212;
+    jsonObj[TAG_ACCOUNT_GROUPID] = 1212;
+    jsonObj[TAG_NET_ID] = 1212;
+    jsonObj[TAG_TOKENID] = 1212;
+    jsonObj[TAG_TARGET_DEVICE_NAME] = 1212;
+    authMessageProcessor->ParseRespNegotiateMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->isIdenticalAccount, jsonObj[TAG_IDENTICAL_ACCOUNT]);
+}
 /**
  * @tc.name: AuthMessageProcessor::SetRequestContext_001
  * @tc.desc: Compare authResponseContext before and after assignment
@@ -1013,6 +1306,306 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_009, testing::ext::TestSize.Leve
     jsonObj[TAG_HAVECREDENTIAL] = true;
     jsonObj[TAG_BIND_TYPE_SIZE] = 5;
     authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
+}
+
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authRequestContext_->groupVisibility = 0;
+    authMessageProcessor->authRequestContext_->authType = 5;
+    int32_t param = 1;
+    authMessageProcessor->authRequestContext_->bindType.push_back(param);
+    nlohmann::json jsonObj;
+    authMessageProcessor->GetJsonObj(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_IS_SHOW_DIALOG], false);
+}
+
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authRequestContext_->groupVisibility = 0;
+    authMessageProcessor->authRequestContext_->authType = 1;
+    int32_t param = 1;
+    authMessageProcessor->authRequestContext_->bindType.push_back(param);
+    nlohmann::json jsonObj;
+    authMessageProcessor->GetJsonObj(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_IS_SHOW_DIALOG], true);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreateSyncDeleteMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authResponseContext_->localDeviceId = "13213521";
+    authMessageProcessor->authResponseContext_->hostPkgName = "ohos_test";
+    nlohmann::json jsonObj;
+    authMessageProcessor->CreateSyncDeleteMessageExt(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_REPLY], DM_OK);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authResponseContext_->publicKey = "13213521";
+    nlohmann::json jsonObj;
+    authMessageProcessor->CreatePublicKeyMessageExt(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_PUBLICKEY], authMessageProcessor->authResponseContext_->publicKey);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authResponseContext_->reply = 123;
+    authMessageProcessor->authResponseContext_->token = "13213521";
+    authMessageProcessor->authResponseContext_->confirmOperation = 456;
+    authMessageProcessor->authResponseContext_->requestId = 521;
+    nlohmann::json jsonObj;
+    authMessageProcessor->CreateResponseAuthMessageExt(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_REPLY], authMessageProcessor->authResponseContext_->reply);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = nullptr;
+    nlohmann::json jsonObj;
+    authMessageProcessor->CreateRespNegotiateMessage(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT], false);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    authMessageProcessor->CreateRespNegotiateMessage(jsonObj);
+    ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT], true);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseSyncDeleteMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "12121213";
+    jsonObj[TAG_HOST_PKGNAME] = "hostPkgname";
+    jsonObj[TAG_REPLY] = 1212;
+    authMessageProcessor->ParseSyncDeleteMessageExt(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, 1212);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseSyncDeleteMessageExt_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = 2121;
+    jsonObj[TAG_HOST_PKGNAME] = 1231;
+    jsonObj[TAG_REPLY] = "1212";
+    authMessageProcessor->ParseSyncDeleteMessageExt(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->reply, 1212);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_PUBLICKEY] = 2121;
+    authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), true);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_PUBLICKEY] = "2121";
+    authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), false);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_REPLY] = 2121;
+    jsonObj[TAG_TOKEN] = "1231";
+    jsonObj[TAG_CONFIRM_OPERATION] = 1212;
+    jsonObj[TAG_REQUEST_ID] = 1212;
+    authMessageProcessor->ParseAuthResponseMessageExt(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, 2121);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_REPLY] = "2121";
+    jsonObj[TAG_TOKEN] = 1231;
+    jsonObj[TAG_CONFIRM_OPERATION] = "1212";
+    jsonObj[TAG_REQUEST_ID] = "1212";
+    authMessageProcessor->ParseAuthResponseMessageExt(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->reply, 2121);
+}
+
+HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_AUTH_TYPE] = 21;
+    jsonObj[TAG_TOKEN] = "1231";
+    jsonObj[TAG_DEVICE_ID] = "1212";
+    jsonObj[TAG_TARGET] = "1212";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "2121";
+    jsonObj[TAG_APP_OPERATION] = "1231";
+    jsonObj[TAG_CUSTOM_DESCRIPTION] = "1212";
+    jsonObj[TAG_REQUESTER] = "1212";
+    jsonObj[TAG_LOCAL_DEVICE_TYPE] = "2121";
+    jsonObj[TAG_INDEX] = 1212;
+    authMessageProcessor->GetAuthReqMessage(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->authType, 21);
+}
+
+HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_AUTH_TYPE] = "21";
+    jsonObj[TAG_TOKEN] = 1231;
+    jsonObj[TAG_DEVICE_ID] = 1212;
+    jsonObj[TAG_TARGET] = 1212;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = 2121;
+    jsonObj[TAG_APP_OPERATION] = 1231;
+    jsonObj[TAG_CUSTOM_DESCRIPTION] = 1212;
+    jsonObj[TAG_REQUESTER] = 1212;
+    jsonObj[TAG_LOCAL_DEVICE_TYPE] = 2121;
+    jsonObj[TAG_INDEX] = "1212";
+    authMessageProcessor->GetAuthReqMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_LOCAL_ACCOUNTID] = "21";
+    jsonObj[TAG_LOCAL_USERID] = 1231;
+    jsonObj[TAG_BIND_LEVEL] = 1212;
+    jsonObj[TAG_ISONLINE] = true;
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = true;
+    jsonObj[TAG_AUTHED] = true;
+    jsonObj[TAG_TOKENID] = 1212;
+    jsonObj[TAG_DMVERSION] = "1212";
+    jsonObj[TAG_HAVECREDENTIAL] = true;
+    jsonObj[TAG_BIND_TYPE_SIZE] = 5;
+    authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    jsonObj[TAG_LOCAL_ACCOUNTID] = 21;
+    jsonObj[TAG_LOCAL_USERID] = "1231";
+    jsonObj[TAG_BIND_LEVEL] = "1212";
+    jsonObj[TAG_ISONLINE] = "1212";
+    jsonObj[TAG_IDENTICAL_ACCOUNT] = "1212";
+    jsonObj[TAG_AUTHED] = "1212";
+    jsonObj[TAG_TOKENID] = "1212";
+    jsonObj[TAG_DMVERSION] = 1212;
+    jsonObj[TAG_HAVECREDENTIAL] = "1212";
+    jsonObj[TAG_BIND_TYPE_SIZE] = "1212";
+    authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
+    ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
+}
+
+HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t msgType = 1;
+    uint8_t param = 0;
+    uint32_t dataLen = 0;
+    std::string str = "1324213";
+    std::string ret = authMessageProcessor->CreateDeviceAuthMessage(msgType, &param, dataLen);
+    ASSERT_EQ(ret.empty(), false);
 }
 } // namespace
 } // namespace DistributedHardware
