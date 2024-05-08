@@ -1,0 +1,30 @@
+{
+  "plural":[
+    {
+      "name": "dm_not_allow",
+      "value": [
+        {
+          "quantity": "one",
+          "value": "DISTRUST (%d SECOND)"
+        },
+        {
+          "quantity": "other",
+          "value": "DISTRUST (%d SECONDS)"
+        }
+      ]
+    },
+    {
+      "name": "dm_incorrect_code",
+      "value": [
+        {
+          "quantity": "one",
+          "value": "Incorrect connection code, you can try another %d time."
+        },
+        {
+          "quantity": "other",
+          "value": "Incorrect connection code, you can try another %d times."
+        }
+      ]
+    }
+  ]
+}

@@ -23,23 +23,19 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "Trust this device?"
+      "value": "%sDo you trust this device?"
     },
     {
       "name": "dm_allow_temp",
-      "value": "Allow temp"
+      "value": "Trust this time"
     },
     {
       "name": "dm_allow_always",
-      "value": "Allow always"
+      "value": "Always trust"
     },
     {
       "name": "dm_connect_device",
-      "value": "would like to link with your device."
-    },
-    {
-      "name": "dm_not_allow",
-      "value": "Don't trust(%d s)"
+      "value": "%s wants to connect to this device."
     },
     {
       "name": "dm_connect",
@@ -47,19 +43,15 @@
     },
     {
       "name": "dm_enter_connect_code",
-      "value": "Enter the connection code displayed on the peer device"
+      "value": "Enter the connection code shown on the other device."
     },
     {
       "name": "dm_cancel",
-      "value": "Cancel"
-    },
-    {
-      "name": "dm_incorrect_code",
-      "value": "Incorrect connection code, you can try another %d times."
+      "value": "CANCEL"
     },
     {
       "name": "dm_authenticating",
-      "value": "Authenticating...Please wait."
+      "value": "Authenticating..."
     },
     {
       "name": "dm_connect_code",

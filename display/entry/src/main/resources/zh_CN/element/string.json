@@ -23,7 +23,7 @@
     },
     {
       "name": "dm_is_trust_device",
-      "value": "是否信任此设备？"
+      "value": "%s是否信任此设备？"
     },
     {
       "name": "dm_allow_temp",
@@ -35,11 +35,7 @@
     },
     {
       "name": "dm_connect_device",
-      "value": "想要连接本机。"
-    },
-    {
-      "name": "dm_not_allow",
-      "value": "不信任( %d 秒)"
+      "value": "%s 想要连接本机。"
     },
     {
       "name": "dm_connect",
@@ -52,10 +48,6 @@
     {
       "name": "dm_cancel",
       "value": "取消"
-    },
-    {
-      "name": "dm_incorrect_code",
-      "value": "连接码错误，还可以尝试 %d 次"
     },
     {
       "name": "dm_authenticating",
