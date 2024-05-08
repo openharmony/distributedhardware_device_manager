@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,7 +70,6 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string token(reinterpret_cast<const char*>(data), size);
     uint16_t subscribeId = 12;
-    int32_t publishId = 111;
     int32_t failedReason = 231;
     uint32_t status = 3;
     uint32_t reason = 14;
@@ -88,8 +87,20 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, subscribeId);
-    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, failedReason);
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
+}
+
+void DeviceManagerNotifyOnPublishResultFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+
+    std::string pkgName(reinterpret_cast<const char*>(data), size);
+    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t publishResult = *(reinterpret_cast<const int32_t*>(data));
+
+    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
 }
 }
 }
@@ -100,6 +111,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     OHOS::DistributedHardware::DeviceManagerNotifyUnRegisterFuzzTest(data, size);
     OHOS::DistributedHardware::DeviceManagerNotifyDeviceStatusFuzzTest(data, size);
+    OHOS::DistributedHardware::DeviceManagerNotifyOnPublishResultFuzzTest(data, size);
 
     return 0;
 }
