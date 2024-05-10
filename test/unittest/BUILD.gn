@@ -31,7 +31,8 @@ group("unittest") {
     ":UTTest_discovery_manager",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_anonymous",
-    ":UTTest_dm_auth_manager",
+    ":UTTest_dm_auth_manager_first",
+    ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_device_state_manager",
@@ -851,14 +852,13 @@ ohos_unittest("ipc_client_manager_test") {
 
 ## UnitTest ipc_client_manager_test }}}
 
-## UnitTest UTTest_dm_auth_manager {{{
-ohos_unittest("UTTest_dm_auth_manager") {
+## UnitTest UTTest_dm_auth_manager_first {{{
+ohos_unittest("UTTest_dm_auth_manager_first") {
   module_out_path = module_out_path
 
   include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources =
-      [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager.cpp" ]
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -869,7 +869,26 @@ ohos_unittest("UTTest_dm_auth_manager") {
   ]
 }
 
-## UTTest_dm_auth_manager }}}
+## UTTest_dm_auth_manager_first }}}
+
+## UnitTest UTTest_dm_auth_manager_second {{{
+ohos_unittest("UTTest_dm_auth_manager_second") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+}
+
+## UTTest_dm_auth_manager_second }}}
 
 ###############################
 ## UnitTest UTTest_dm_radar_helper_test {{{
