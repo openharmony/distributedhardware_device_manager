@@ -32,7 +32,8 @@ void OnSoftbusDeviceInfoChangedFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
 
-    NodeBasicInfoType type = NodeBasicInfoType::TYPE_DEVICE_NAME;
+    int infoType = 1234;
+    NodeBasicInfoType type = static_cast<NodeBasicInfoType>(infoType);
     NodeBasicInfo info;
     if (memcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
         return;
