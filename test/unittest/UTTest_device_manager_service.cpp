@@ -147,6 +147,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
 }
@@ -161,6 +162,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSi
 {
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
 }
@@ -1591,6 +1593,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
@@ -1607,6 +1610,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
     discoverParam[PARAM_KEY_DISC_FREQ] =
         std::to_string(static_cast<int32_t>(DmExchangeFreq::DM_LOW));
     std::map<std::string, std::string> filterOptions;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_EQ(ret, ERR_DM_START_DISCOVERING_FAILED);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
@@ -1633,6 +1637,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.L
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
     EXPECT_NE(ret, DM_OK);
 }
