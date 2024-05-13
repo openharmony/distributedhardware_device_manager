@@ -641,7 +641,9 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
     }
     if (sessionId < 0) {
         LOGE("OpenAuthSession failed, stop the authentication");
-        authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+        if (authResponseContext_ == nullptr) {
+            authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+        }
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
         authRequestContext_->reason = ERR_DM_AUTH_OPEN_SESSION_FAILED;
         if (authRequestState_ != nullptr) {
