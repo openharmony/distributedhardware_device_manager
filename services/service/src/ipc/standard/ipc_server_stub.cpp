@@ -24,6 +24,8 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iservice_registry.h"
+#include "mem_mgr_client.h"
+#include "mem_mgr_proxy.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "permission_manager.h"
@@ -56,6 +58,10 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
     LOGI("called:AddAbilityListener end!");
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    LOGI("IpcServerStub::OnStart end");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -97,6 +103,10 @@ void IpcServerStub::OnStop()
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    LOGI("IpcServerStub::OnStop end.");
 }
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

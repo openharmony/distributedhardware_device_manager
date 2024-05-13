@@ -40,6 +40,7 @@
                 "init",
                 "ipc",
                 "json",
+                "memmgr",
                 "napi",
                 "node",
                 "openssl",
