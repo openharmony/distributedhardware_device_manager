@@ -90,9 +90,9 @@ public:
     void DeleteTimeOutGroup(std::string name);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
-    void OnDeviceOnline(std::string deviceId);
+    void OnDeviceOnline(std::string deviceId, int32_t authForm);
     void OnDeviceOffline(std::string deviceId);
-    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
+    std::string GetUdidByNetWorkId(std::string &networkId); 
 
 private:
     void StartEventThread();

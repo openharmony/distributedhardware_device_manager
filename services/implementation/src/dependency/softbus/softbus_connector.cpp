@@ -689,10 +689,10 @@ void SoftbusConnector::ClearPkgName()
     pkgNameVec_.clear();
 }
 
-void SoftbusConnector::HandleDeviceOnline(std::string deviceId)
+void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
     LOGI("SoftbusConnector::HandleDeviceOnline");
-    deviceStateManagerCallback_->OnDeviceOnline(deviceId);
+    deviceStateManagerCallback_->OnDeviceOnline(deviceId, authForm);
     return;
 }
 

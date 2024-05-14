@@ -566,6 +566,7 @@ private:
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
+    int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

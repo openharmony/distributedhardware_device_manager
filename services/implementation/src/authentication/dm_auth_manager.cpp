@@ -2306,7 +2306,6 @@ int32_t DmAuthManager::DeleteGroup(const std::string &pkgName, const std::string
 
 void DmAuthManager::PutAccessControlList()
 {
-    LOGI("PutAccessControlList start.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
@@ -2317,9 +2316,11 @@ void DmAuthManager::PutAccessControlList()
     aclInfo.bindType = DM_ACROSS_ACCOUNT;
     if (authResponseContext_->isIdenticalAccount) {
         aclInfo.bindType = DM_IDENTICAL_ACCOUNT;
+        authForm_ = DmAuthForm::IDENTICAL_ACCOUNT;
     } else if (authResponseContext_->localAccountId == "ohosAnonymousUid" ||
         authResponseContext_->remoteAccountId == "ohosAnonymousUid") {
         aclInfo.bindType = DM_POINT_TO_POINT;
+        authForm_ = DmAuthForm::PEER_TO_PEER;
     }
     aclInfo.bindLevel = authResponseContext_->bindLevel;
     aclInfo.trustDeviceId = remoteDeviceId_;

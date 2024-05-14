@@ -141,7 +141,7 @@ public:
     int32_t GetLocalDeviceTypeId();
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
     std::string GetNetworkIdByDeviceId(const std::string &deviceId);
-    void HandleDeviceOnline(std::string deviceId);
+    void HandleDeviceOnline(std::string deviceId, int32_t authForm);
     void HandleDeviceOffline(std::string deviceId);
     void SetPkgName(std::string pkgName);
     bool CheckIsOnline(const std::string &targetDeviceId);

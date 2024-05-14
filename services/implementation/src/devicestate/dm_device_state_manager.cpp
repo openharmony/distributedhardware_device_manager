@@ -97,11 +97,11 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
     }
 }
 
-void DmDeviceStateManager::OnDeviceOnline(std::string deviceId)
+void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm)
 {
     LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
-    devInfo.authForm = GetAuthForm(devInfo.networkId);
+    devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         stateDeviceInfos_[deviceId] = devInfo;
@@ -380,17 +380,47 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
         if (iter.second.deviceId == info.deviceId) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo copy deviceName failed");
+                    LOGE("ChangeDeviceInfo remoteDeviceInfos copy deviceName failed");
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                 sizeof(info.networkId)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo copy networkId failed");
+                    LOGE("ChangeDeviceInfo remoteDeviceInfos copy networkId failed");
             }
             iter.second.deviceTypeId = info.deviceTypeId;
-            LOGI("ChangeDeviceInfo complete");
+            LOGI("Change remoteDeviceInfos complete");
             break;
         }
     }
+    for (auto iter : stateDeviceInfos_) {
+        if (iter.second.deviceId == info.deviceId) {
+            if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
+                sizeof(info.deviceName)) != DM_OK) {
+                    LOGE("ChangeDeviceInfo stateDeviceInfos copy deviceName failed");
+            }
+            if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
+                sizeof(info.networkId)) != DM_OK) {
+                    LOGE("ChangeDeviceInfo stateDeviceInfos copy networkId failed");
+            }
+            iter.second.deviceTypeId = info.deviceTypeId;
+            LOGI("Change stateDeviceInfos complete");
+            break;
+        }
+    }
+}
+
+std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string &networkId)
+{
+    LOGI("DmDeviceStateManager::GetUdidByNetWorkId networkId %{public}s", GetAnonyString(networkId).c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        for (auto &iter : stateDeviceInfos_) {
+            if (networkId == iter.second.networkId) {
+                return iter.first;
+            }
+        }
+    }
+    LOGI("Not find udid by networkid in stateDeviceInfos.");
+    return "";
 }
 } // namespace DistributedHardware
 } // namespace OHOS
