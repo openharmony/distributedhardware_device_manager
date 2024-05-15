@@ -59,6 +59,7 @@ group("unittest") {
     ":UTTest_ipc_server_client_proxy",
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
+    ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
     ":UTTest_multiple_user_connector",
     ":UTTest_permission_manager",
@@ -316,6 +317,25 @@ ohos_unittest("UTTest_hichain_connector") {
 }
 
 ## UnitTest UTTest_hichain_connector }}}
+
+## UnitTest UTTest_mine_hichain_connector {{{
+ohos_unittest("UTTest_mine_hichain_connector") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_mine_hichain_connector.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+  ]
+}
+
+## UnitTest UTTest_mine_hichain_connector }}}
 
 ## UnitTest UTTest_mine_softbus_listener {{{
 ohos_unittest("UTTest_mine_softbus_listener") {
