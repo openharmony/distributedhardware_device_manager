@@ -30,7 +30,7 @@ class SoftbusStateCallbackTest : public ISoftbusStateCallback {
 public:
     SoftbusStateCallbackTest() {}
     virtual ~SoftbusStateCallbackTest() {}
-    void OnDeviceOnline(std::string deviceId) {}
+    void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
 };
 

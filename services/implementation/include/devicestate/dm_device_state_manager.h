@@ -92,7 +92,7 @@ public:
     int32_t RegisterSoftbusStateCallback();
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
     void OnDeviceOffline(std::string deviceId);
-    std::string GetUdidByNetWorkId(std::string &networkId); 
+    std::string GetUdidByNetWorkId(std::string networkId);
 
 private:
     void StartEventThread();

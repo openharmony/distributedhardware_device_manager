@@ -39,7 +39,7 @@ class SoftbusStateCallbackTest : public ISoftbusStateCallback {
 public:
     SoftbusStateCallbackTest() {}
     virtual ~SoftbusStateCallbackTest() {}
-    void OnDeviceOnline(std::string deviceId) {}
+    void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
 };
 
@@ -929,7 +929,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Le
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
-    softbusConnector->HandleDeviceOnline(deviceId);
+    softbusConnector->HandleDeviceOnline(deviceId, DmAuthForm::ACROSS_ACCOUNT);
     EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
 }
 

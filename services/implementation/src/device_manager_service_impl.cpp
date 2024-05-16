@@ -249,7 +249,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
         LOGE("HandleOffline not get udid in deviceStateMgr.");
         return;
     }
-    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(udid);
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
         return;
@@ -287,7 +287,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
         LOGE("HandleDeviceOffline get udid failed.");
         return;
     }
-    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(udid);
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
         return;

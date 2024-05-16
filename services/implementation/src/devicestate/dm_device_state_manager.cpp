@@ -76,7 +76,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
     }
 }
 
-void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
+void DmDeviceStateManager:: DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
     LOGI("DeleteOfflineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
@@ -408,7 +408,7 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
     }
 }
 
-std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string &networkId)
+std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string networkId)
 {
     LOGI("DmDeviceStateManager::GetUdidByNetWorkId networkId %{public}s", GetAnonyString(networkId).c_str());
     {

@@ -1115,7 +1115,7 @@ void DmAuthManager::AuthenticateFinish()
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel == INVALIED_TYPE &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
-        softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
     DeleteAuthCode();
     if (authResponseState_ != nullptr) {
@@ -1861,7 +1861,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
                 softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
             }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
             authRequestContext_->reason = DM_OK;
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
@@ -1874,7 +1874,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
                 softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
             }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
             return;
         }
@@ -1904,7 +1904,7 @@ void DmAuthManager::SinkAuthDeviceFinish()
         if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
             softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
         }
-        softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
 }
 

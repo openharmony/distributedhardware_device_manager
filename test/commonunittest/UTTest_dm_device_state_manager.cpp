@@ -191,7 +191,7 @@ HWTEST_F(DmDeviceStateManagerTest, DeleteOfflineDeviceInfo_001, testing::ext::Te
 HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
-    dmDeviceStateManager->OnDeviceOnline(deviceId);
+    dmDeviceStateManager->OnDeviceOnline(deviceId, DmAuthForm::ACROSS_ACCOUNT);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
