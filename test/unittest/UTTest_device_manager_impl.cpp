@@ -795,31 +795,24 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceInfo_101, testing::ext::TestSize.L
  * @tc.desc: 1. set packName not null
  *              set subscribeInfo null
  *              set callback not null
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize.Level0)
 {
-    // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     std::string extra = "";
-    // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
-    // set callback not null
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    // 2. InitDeviceManager return DM_OK
-    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
-    // 3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
-    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 4. check ret is DM_OK
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
     ASSERT_EQ(ret, DM_OK);
-    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -827,31 +820,24 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_101, testing::ext::TestSize
  * @tc.desc: 1. set packName not null
  *              set subscribeInfo null
  *              set callback not null
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize.Level0)
 {
-    // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
     std::string extra = "{\"findDeviceMode\":1}";
-    // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
-    // set callback not null
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    // 2. InitDeviceManager return DM_OK
-    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
-    // 3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
-    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 4. check ret is DM_OK
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
     ASSERT_EQ(ret, DM_OK);
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -860,9 +846,8 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_102, testing::ext::TestSize
  *              set subscribeId 0
  *              set filterOptions null
  *              set callback not null
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::StartDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -873,12 +858,12 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_103, testing::ext::TestSize
     uint16_t subscribeId = 0;
     std::string filterOptions;
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
-    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
     ASSERT_EQ(ret, DM_OK);
-    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -910,31 +895,23 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_104, testing::ext::TestSize
  * @tc.desc: 1. set packName not null
  *              set subscribeInfo null
  *              set callback not null
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::StopDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.Level0)
 {
-    // 1. set packName not null
     std::string packName = "com.ohos.test";
     std::string extra = "";
-    // set subscribeInfo null
     DmSubscribeInfo subscribeInfo;
-    // set callback not null
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    // 2. InitDeviceManager return DM_OK
-    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
-    ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeInfo, extra, callback);
-    // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
-    ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
-    // 4. check ret is DM_OK
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeInfo.subscribeId);
     ASSERT_EQ(ret, DM_OK);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -969,56 +946,44 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_102, testing::ext::TestSize.
  * @tc.desc: 1. set packName not null
  *              set publishInfo null
  *              set callback not null
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
 HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery_101, testing::ext::TestSize.Level0)
 {
-    // 1. set packName not null
     std::string packName = "com.ohos.helloworld";
-    // set publishInfo null
     DmPublishInfo publishInfo;
-    // set callback not null
     std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
-    // 2. InitDeviceManager return DM_OK
-    std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
-    // 3. call DeviceManagerImpl::PublishDeviceDiscovery with parameter
-    ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
-    // 4. check ret is DM_OK
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
     ASSERT_EQ(ret, DM_OK);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
  * @tc.name: UnPublishDeviceDiscovery_101
  * @tc.desc: 1. set packName not null
  *              set publishId is 0
- *           2. InitDeviceManager return DM_OK
- *           3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
- *           4. check ret is DM_OK
+ *           2. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
+ *           3. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
 HWTEST_F(DeviceManagerImplTest, UnPublishDeviceDiscovery_101, testing::ext::TestSize.Level0)
 {
-    // 1. set packName not null
     std::string packName = "com.ohos.test";
-    // set subscribeInfo is 0
     int32_t publishId = 0;
-    // 2. InitDeviceManager return DM_OK
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    // 3. call DeviceManagerImpl::UnPublishDeviceDiscovery with parameter
-    ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
-    // 4. check ret is DM_OK
+    auto ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = std::make_shared<MockIpcClientProxy>();
+    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(packName, publishId);
     ASSERT_EQ(ret, DM_OK);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
