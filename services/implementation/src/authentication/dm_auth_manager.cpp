@@ -1115,7 +1115,7 @@ void DmAuthManager::AuthenticateFinish()
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel == INVALIED_TYPE &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
-        softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
     DeleteAuthCode();
     if (authResponseState_ != nullptr) {
@@ -1861,7 +1861,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
                 softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
             }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
             authRequestContext_->reason = DM_OK;
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
@@ -1874,7 +1874,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
                 softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
             }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
             return;
         }
@@ -1904,7 +1904,7 @@ void DmAuthManager::SinkAuthDeviceFinish()
         if (authResponseContext_->bindLevel == APP && !authResponseContext_->isIdenticalAccount) {
             softbusConnector_->SetPkgName(authResponseContext_->hostPkgName);
         }
-        softbusConnector_->HandleDeviceOnline(remoteDeviceId_);
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
 }
 
@@ -2306,7 +2306,6 @@ int32_t DmAuthManager::DeleteGroup(const std::string &pkgName, const std::string
 
 void DmAuthManager::PutAccessControlList()
 {
-    LOGI("PutAccessControlList start.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
@@ -2317,9 +2316,11 @@ void DmAuthManager::PutAccessControlList()
     aclInfo.bindType = DM_ACROSS_ACCOUNT;
     if (authResponseContext_->isIdenticalAccount) {
         aclInfo.bindType = DM_IDENTICAL_ACCOUNT;
+        authForm_ = DmAuthForm::IDENTICAL_ACCOUNT;
     } else if (authResponseContext_->localAccountId == "ohosAnonymousUid" ||
         authResponseContext_->remoteAccountId == "ohosAnonymousUid") {
         aclInfo.bindType = DM_POINT_TO_POINT;
+        authForm_ = DmAuthForm::PEER_TO_PEER;
     }
     aclInfo.bindLevel = authResponseContext_->bindLevel;
     aclInfo.trustDeviceId = remoteDeviceId_;

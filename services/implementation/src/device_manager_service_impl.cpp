@@ -243,9 +243,15 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
 void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
     LOGI("DeviceManagerServiceImpl::HandleOffline");
-    std::string trustDeviceId = "";
-    if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
-        LOGE("HandleDeviceOffline get udid failed.");
+    std::string trustDeviceId = deviceStateMgr_->GetUdidByNetWorkId(std::string(devInfo.networkId));
+    LOGI("deviceStateMgr Udid: %{public}s", GetAnonyString(trustDeviceId).c_str());
+    if (trustDeviceId == "") {
+        LOGE("HandleOffline not get udid in deviceStateMgr.");
+        return;
+    }
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
         return;
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
@@ -279,6 +285,11 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     std::string trustDeviceId = "";
     if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
         LOGE("HandleDeviceOffline get udid failed.");
+        return;
+    }
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
         return;
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
@@ -315,15 +326,16 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         LOGE("deviceStateMgr_ is nullpter!");
         return;
     }
-    std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
-    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
-        LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
-    }
     if (devState == DEVICE_STATE_ONLINE) {
         HandleOnline(devState, devInfo);
     } else if (devState == DEVICE_STATE_OFFLINE) {
         HandleOffline(devState, devInfo);
     } else {
+        std::string udiddHash = GetUdidHashByNetworkId(devInfo.networkId);
+        if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udiddHash.c_str(), udiddHash.length()) != 0) {
+            LOGE("get deviceId: %{public}s failed", GetAnonyString(udiddHash).c_str());
+            return;
+        }
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     }
 }
@@ -649,7 +661,7 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
     MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
     if (softbusConnector_->CheckIsOnline(udid)) {
         LOGI("DeviceManagerServiceImpl DpAclAdd identical account and online");
-        deviceStateMgr_->OnDeviceOnline(udid);
+        deviceStateMgr_->OnDeviceOnline(udid, DmAuthForm::IDENTICAL_ACCOUNT);
     }
     LOGI("DeviceManagerServiceImpl::DpAclAdd completed");
     return DM_OK;
