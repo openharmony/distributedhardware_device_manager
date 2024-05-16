@@ -26,6 +26,19 @@ namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = -20000;
+namespace {
+static DumperInfo g_dumperDeviceType[] = {
+    {DEVICE_TYPE_UNKNOWN, "DEVICE_TYPE_UNKNOWN"},
+    {DEVICE_TYPE_WIFI_CAMERA, "DEVICE_TYPE_WIFI_CAMERA"},
+    {DEVICE_TYPE_AUDIO, "DEVICE_TYPE_AUDIO"},
+    {DEVICE_TYPE_PC, "DEVICE_TYPE_PC"},
+    {DEVICE_TYPE_PHONE, "DEVICE_TYPE_PHONE"},
+    {DEVICE_TYPE_PAD, "DEVICE_TYPE_PAD"},
+    {DEVICE_TYPE_WATCH, "DEVICE_TYPE_WATCH"},
+    {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
+    {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
+};
+} // namespace
 int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDumpHelper start.");
@@ -96,9 +109,9 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
 std::string HiDumpHelper::GetDeviceType(int32_t deviceTypeId)
 {
     std::string dmDeviceTypeIdString = "";
-    for (uint32_t i = 0; i < (sizeof(dumperDeviceType) / sizeof(dumperDeviceType[0])); i++) {
-        if (deviceTypeId == dumperDeviceType[i].deviceTypeId) {
-            dmDeviceTypeIdString = dumperDeviceType[i].deviceTypeInfo;
+    for (uint32_t i = 0; i < (sizeof(g_dumperDeviceType) / sizeof(g_dumperDeviceType[0])); i++) {
+        if (deviceTypeId == g_dumperDeviceType[i].deviceTypeId) {
+            dmDeviceTypeIdString = g_dumperDeviceType[i].deviceTypeInfo;
             break;
         }
     }
