@@ -101,6 +101,9 @@ private:
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
     DmAuthForm GetAuthForm(const std::string &networkId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t DeleteGroupByDP(const std::string &deviceId);
+#endif
 
 private:
     std::mutex timerMapMutex_;
