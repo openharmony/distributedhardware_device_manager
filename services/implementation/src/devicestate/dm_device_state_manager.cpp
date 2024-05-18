@@ -263,6 +263,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             LOGI("remove hichain group with deviceId: %{public}s", GetAnonyString(iter->first).c_str());
             hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            DeleteGroupByDP(iter->first);
             uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
             if (res == 0) {
                 hiChainAuthConnector_->DeleteCredential(iter->first,
@@ -422,5 +423,44 @@ std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string networkId)
     LOGI("Not find udid by networkid in stateDeviceInfos.");
     return "";
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &deviceId)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    LOGI("DeleteGroupByDP, AccessControlProfile size is %{public}zu", profiles.size());
+    std::vector<std::string> delPkgNameVec;
+    for (auto &item : profiles) {
+        std::string trustDeviceId = item.GetTrustDeviceId();
+        if (trustDeviceId != deviceId) {
+            continue;
+        }
+        if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE && !item.GetAccesser().GetAccesserBundleName().empty()) {
+            delPkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
+        }
+    }
+    if (delPkgNameVec.size() == 0) {
+        LOGI("delPkgNameVec is empty");
+        return DM_OK;
+    }
+    if (hiChainConnector_ == nullptr) {
+        LOGE("hiChainConnector_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    std::vector<GroupInfo> groupListExt;
+    hiChainConnector_->GetRelatedGroupsExt(deviceId, groupListExt);
+    for (auto &iter : groupListExt) {
+        for (auto &pkgName : delPkgNameVec) {
+            if (iter.groupName.find(pkgName) != std::string::npos) {
+                int32_t ret = hiChainConnector_->DeleteGroupExt(iter.groupId);
+                LOGI("DeleteGroupByDP delete groupId %{public}s ,result %{public}d.",
+                    GetAnonyString(iter.groupId).c_str(), ret);
+            }
+        }
+    }
+    return DM_OK;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
