@@ -377,7 +377,7 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
 {
     std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
     for (auto iter : remoteDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
+        if (std::string(iter.second.deviceId) == std::string(info.deviceId)) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
                     LOGE("ChangeDeviceInfo remoteDeviceInfos copy deviceName failed");
@@ -392,7 +392,7 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
         }
     }
     for (auto iter : stateDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
+        if (std::string(iter.second.deviceId) == std::string(info.deviceId)) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
                     LOGE("ChangeDeviceInfo stateDeviceInfos copy deviceName failed");
