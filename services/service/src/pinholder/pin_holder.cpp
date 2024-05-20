@@ -521,14 +521,15 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
         return ERR_DM_BIND_PEER_UNSUPPORTED;
     }
     nlohmann::json jsonObject = nlohmann::json::parse(event, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    if (jsonObject.is_discarded() || !IsInt32(jsonObject, TAG_PIN_TYPE)) {
         LOGE("ProcessChangeMsg DecodeRequest jsonStr error.");
         return ERR_DM_FAILED;
     }
-    if (!IsInt32(jsonObject, TAG_PIN_TYPE)) {
-        LOGE("ProcessChangeMsg err json string.");
-        return ERR_DM_FAILED;
-    }
+    timer_->DeleteAll();
+    timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
+        [this] (std::string name) {
+            PinHolder::CloseSession(name);
+        });
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
@@ -572,6 +573,11 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
         jsonContent[TAG_PIN_TYPE] = pinType;
         std::string content = jsonContent.dump();
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::PIN_TYPE_CHANGE, DM_OK, content);
+        timer_->DeleteAll();
+        timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
+            [this] (std::string name) {
+                PinHolder::CloseSession(name);
+            });
     }
 
     std::string msg = jsonObj.dump();
