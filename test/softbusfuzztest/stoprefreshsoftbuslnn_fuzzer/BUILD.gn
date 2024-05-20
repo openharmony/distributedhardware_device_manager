@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StopRefreshSoftnusLNNFuzzTest") {
+ohos_fuzztest("StopRefreshSoftbusLnnFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
       "${devicemanager_path}/test/softbusfuzztest/stoprefreshsoftbuslnn_fuzzer"
@@ -53,7 +53,7 @@ ohos_fuzztest("StopRefreshSoftnusLNNFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"StopRefreshSoftnusLNNFuzzTest\"",
+    "DH_LOG_TAG=\"StopRefreshSoftbusLnnFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
   ]
 }
@@ -62,6 +62,6 @@ ohos_fuzztest("StopRefreshSoftnusLNNFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":StopRefreshSoftnusLNNFuzzTest" ]
+  deps = [ ":StopRefreshSoftbusLnnFuzzTest" ]
 }
 ###############################################################################

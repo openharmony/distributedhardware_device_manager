@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("PublishSoftnusLNNFuzzTest") {
+ohos_fuzztest("PublishSoftbusLnnFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
       "${devicemanager_path}/test/softbusfuzztest/publishsoftbuslnn_fuzzer"
@@ -53,7 +53,7 @@ ohos_fuzztest("PublishSoftnusLNNFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"PublishSoftnusLNNFuzzTest\"",
+    "DH_LOG_TAG=\"PublishSoftbusLnnFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
   ]
 }
@@ -62,6 +62,6 @@ ohos_fuzztest("PublishSoftnusLNNFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":PublishSoftnusLNNFuzzTest" ]
+  deps = [ ":PublishSoftbusLnnFuzzTest" ]
 }
 ###############################################################################
