@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_UTTEST_HICHAIN_AUTH_CONNECTOR_H
-#define OHOS_UTTEST_HICHAIN_AUTH_CONNECTOR_H
+#ifndef OHOS_UTTEST_MINE_HICHAIN_CONNECTOR_H
+#define OHOS_UTTEST_MINE_HICHAIN_CONNECTOR_H
 
 #include <memory>
 #include <gtest/gtest.h>
 
-#include "hichain_auth_connector.h"
+#include "mine_hichain_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class HiChainAuthConnectorTest : public testing::Test {
+class MiniHiChainAuthConnectorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    std::shared_ptr<HiChainAuthConnector> hiChain_ = std::make_shared<HiChainAuthConnector>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_UTTEST_HICHAIN_AUTH_CONNECTOR_H
+#endif // OHOS_UTTEST_MINE_HICHAIN_CONNECTOR_H
