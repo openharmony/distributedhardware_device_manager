@@ -1,0 +1,32 @@
+{
+    "string":[
+        {
+            "name":"dm_enter_connect_code",
+            "value":"請輸入對端裝置中顯示的連線碼"
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"連線碼"
+        },
+        {
+            "name":"dm_cancel",
+            "value":"取消"
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"正在認證，請稍侯…"
+        },
+        {
+            "name":"dm_connect",
+            "value":"連線 %s"
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"臨時信任"
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"始終信任"
+        }
+    ]
+}

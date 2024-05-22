@@ -1,0 +1,32 @@
+{
+    "string":[
+        {
+            "name":"dm_enter_connect_code",
+            "value":"قارشى ئۈسكۈنىدە كۆرۈنگەن ئۇلاش كودىنى كىرگۈزۈڭ."
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"ئۇلاش كودى"
+        },
+        {
+            "name":"dm_cancel",
+            "value":"بىكار قىلىش"
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"دەلىللەۋاتىدۇ، سەل كۈتۈڭ..."
+        },
+        {
+            "name":"dm_connect",
+            "value":"\u200f%s ئۇلاش"
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"بۇ قېتىم رۇخسەت"
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"ئىزچىل رۇخسەت"
+        }
+    ]
+}

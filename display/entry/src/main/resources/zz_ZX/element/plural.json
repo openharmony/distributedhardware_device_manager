@@ -1,0 +1,62 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"[TS_922746]_Incorrect connection code. %d attempt remaining."
+                },
+                {
+                    "quantity":"other",
+                    "value":"[TS_922743]_Incorrect connection code. %d attempts remaining."
+                },
+                {
+                    "quantity":"zero",
+                    "value":"[TS_922738]_Incorrect connection code. %d attempts remaining."
+                },
+                {
+                    "quantity":"few",
+                    "value":"[TS_922740]_Incorrect connection code. %d attempts remaining."
+                },
+                {
+                    "quantity":"many",
+                    "value":"[TS_922747]_Incorrect connection code. %d attempts remaining."
+                },
+                {
+                    "quantity":"two",
+                    "value":"[TS_922736]_Incorrect connection code. %d attempts remaining."
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"[TS_922739]_Don't trust (%d)"
+                },
+                {
+                    "quantity":"one",
+                    "value":"[TS_922744]_Don't trust (%d)"
+                },
+                {
+                    "quantity":"zero",
+                    "value":"[TS_922745]_Don't trust (%d)"
+                },
+                {
+                    "quantity":"few",
+                    "value":"[TS_922741]_Don't trust (%d)"
+                },
+                {
+                    "quantity":"many",
+                    "value":"[TS_922742]_Don't trust (%d)"
+                },
+                {
+                    "quantity":"two",
+                    "value":"[TS_922737]_Don't trust (%d)"
+                }
+            ]
+        }
+    ]
+}
