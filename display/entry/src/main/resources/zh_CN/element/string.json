@@ -1,73 +1,72 @@
-
 {
-  "string": [
-    {
-      "name": "entry_desc",
-      "value": "entry_desc"
-    },
-    {
-      "name": "ServiceExtAbility_desc",
-      "value": "ServiceExtAbility_desc"
-    },
-    {
-      "name": "ServiceExtAbility_label",
-      "value": "ServiceExtAbility_label"
-    },
-    {
-      "name": "MainAbility_desc",
-      "value": "manager device manager dialog"
-    },
-    {
-      "name": "MainAbility_label",
-      "value": "device manager ui"
-    },
-    {
-      "name": "dm_is_trust_device",
-      "value": "%s是否信任此设备？"
-    },
-    {
-      "name": "dm_allow_temp",
-      "value": "临时信任"
-    },
-    {
-      "name": "dm_allow_always",
-      "value": "始终信任"
-    },
-    {
-      "name": "dm_connect_device",
-      "value": "%s 想要连接本机。"
-    },
-    {
-      "name": "dm_connect",
-      "value": "连接 %s"
-    },
-    {
-      "name": "dm_enter_connect_code",
-      "value": "请输入对端设备上显示的连接码"
-    },
-    {
-      "name": "dm_cancel",
-      "value": "取消"
-    },
-    {
-      "name": "dm_authenticating",
-      "value": "正在认证中，请稍候……"
-    },
-    {
-      "name": "dm_connect_code",
-      "value": "连接码"
-    },
-    {
-      "name": "dm_bt_not_open",
-      "value": "蓝牙未打开"
-    },
-    {
-      "name": "dm_open_bt",
-      "value": "请打开蓝牙"
-    },
-    {
-      "name": "dm_close",
-      "value": "关闭"
-    }
-  ]
+    "string":[
+        {
+            "name":"entry_desc",
+            "value":"entry_desc"
+        },
+        {
+            "name":"ServiceExtAbility_desc",
+            "value":"ServiceExtAbility_desc"
+        },
+        {
+            "name":"ServiceExtAbility_label",
+            "value":"ServiceExtAbility_label"
+        },
+        {
+            "name":"MainAbility_desc",
+            "value":"manager device manager dialog"
+        },
+        {
+            "name":"MainAbility_label",
+            "value":"device manager ui"
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s是否信任此设备？"
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"临时信任"
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"始终信任"
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s 想要连接本机。"
+        },
+        {
+            "name":"dm_connect",
+            "value":"连接 %s"
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"请输入对端设备上显示的连接码"
+        },
+        {
+            "name":"dm_cancel",
+            "value":"取消"
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"正在认证中，请稍侯…"
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"连接码"
+        },
+        {
+            "name":"dm_bt_not_open",
+            "value":"蓝牙未打开"
+        },
+        {
+            "name":"dm_open_bt",
+            "value":"请打开蓝牙"
+        },
+        {
+            "name":"dm_close",
+            "value":"关闭"
+        }
+    ]
 }

@@ -1,0 +1,32 @@
+{
+    "string":[
+        {
+            "name":"dm_enter_connect_code",
+            "value":"ཕ་རོལ་སྣེའི་སྒྲིག་ཆས་ཐོག་ཏུ་མངོན་པའི་སྦྲེལ་མཐུད་ཨང་རྟགས་ནང་འཇུག་གནང་རོགས།"
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"འབྲེལ་མཐུད་ཨང་རྟགས།"
+        },
+        {
+            "name":"dm_cancel",
+            "value":"འདོར་བ།"
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"བདེན་དཔང་ར་སྤྲོད་བྱེད་བཞིན་ཡོད། ཏོག་ཙམ་སྒུག་རོགས།"
+        },
+        {
+            "name":"dm_connect",
+            "value":"%sདང་འབྲེལ་མཐུད་བྱེད།"
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"སྐབས་ཐོག་ཡིད་ཆེས།"
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"རྟག་ཏུ་ཡིད་ཆེས།"
+        }
+    ]
+}
