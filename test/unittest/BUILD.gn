@@ -961,16 +961,21 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
   include_dirs = [
     "${devicemanager_path}/commondependency/include",
     "${devicemanager_path}/test/commonunittest",
-    "${os_account_path }/interfaces/innerkits/ohosaccount/native/include",
-    "${os_account_path }/interfaces/innerkits/osaccount/native/include",
+    "${deviceprofile_path}/device_info_manager/interfaces/innerkits/core/include",
+    "${os_account_path}/interfaces/innerkits/ohosaccount/native/include",
+    "${os_account_path}/interfaces/innerkits/osaccount/native/include",
   ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector.cpp",
+    "${devicemanager_path}/test/unittest/mock/mock_distributed_device_profile_client.cpp",
+  ]
+
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
     "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
+    #"device_info_manager:distributed_device_profile_sdk",
   ]
 }
 
