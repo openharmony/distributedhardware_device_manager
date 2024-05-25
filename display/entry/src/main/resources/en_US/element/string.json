@@ -67,6 +67,18 @@
       {
           "name":"dm_close",
           "value":"Close"
+      },
+      {
+          "name":"dm_confirm_title_cast",
+          "value":"The user wants to mirror the %s to the local computer, Do you trust this device?"
+      },
+      {
+          "name":"dm_confirm_title_hap",
+          "value":"%s on your %s wants to access your phone. Do you trust this app?"
+      },
+      {
+          "name":"dm_confirm_intention",
+          "value":"Used for data synchronization and collaborative operations between devices."
       }
   ]
 }

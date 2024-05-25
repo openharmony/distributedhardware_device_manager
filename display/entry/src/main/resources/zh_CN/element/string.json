@@ -67,6 +67,18 @@
         {
             "name":"dm_close",
             "value":"关闭"
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s想要投屏至本机。是否信任此设备？"
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%s的“%s”请求访问本机。是否信任此应用？"
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"用于进行数据同步及设备间协同操作"
         }
     ]
 }
