@@ -128,6 +128,7 @@ constexpr const char* DM_UNBIND_SESSION_NAME = "ohos.distributedhardware.devicem
 constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
 constexpr const char* DM_CAPABILITY_APPROACH = "approach";
 constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
+constexpr const char* DM_CAPABILITY_VIRTUAL_LINK = "virtualLink";
 constexpr const char* DM_CAPABILITY_SHARE = "share";
 constexpr const char* DM_CAPABILITY_WEAR = "wear";
 constexpr const char* DM_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
