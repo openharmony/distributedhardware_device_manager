@@ -27,6 +27,7 @@
                 "ability_runtime",
                 "access_token",
                 "bounds_checking_function",
+                "bluetooth",
                 "bundle_framework",
                 "cJSON",
                 "c_utils",
@@ -47,7 +48,8 @@
                 "os_account",
                 "safwk",
                 "samgr",
-                "resource_management"
+                "resource_management",
+                "wifi"
             ],
             "third_party": []
         },

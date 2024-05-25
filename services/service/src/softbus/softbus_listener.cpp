@@ -33,19 +33,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-enum PulishStatus {
-    STATUS_UNKNOWN = 0,
-    ALLOW_BE_DISCOVERY = 1,
-    NOT_ALLOW_BE_DISCOVERY = 2,
-};
-const int32_t DISCOVER_STATUS_LEN = 20;
+
 const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t LOAD_RADAR_TIMEOUT = 180;
-constexpr const char* DISCOVER_STATUS_KEY = "persist.distributed_hardware.device_manager.discover_status";
-constexpr const char* DISCOVER_STATUS_ON = "1";
-constexpr const char* DISCOVER_STATUS_OFF = "0";
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
@@ -56,7 +48,6 @@ constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
 constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
 
-static PulishStatus g_publishStatus = PulishStatus::STATUS_UNKNOWN;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
@@ -253,36 +244,6 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
     }
 }
 
-void SoftbusListener::OnParameterChgCallback(const char *key, const char *value, void *context)
-{
-    (void)key;
-    (void)context;
-    if (strcmp(value, DISCOVER_STATUS_ON) == 0 && g_publishStatus != PulishStatus::ALLOW_BE_DISCOVERY) {
-        PublishInfo dmPublishInfo;
-        (void)memset_s(&dmPublishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
-        dmPublishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-        dmPublishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
-        dmPublishInfo.medium = ExchangeMedium::AUTO;
-        dmPublishInfo.freq = ExchangeFreq::LOW;
-        dmPublishInfo.capability = DM_CAPABILITY_OSD;
-        dmPublishInfo.ranging = false;
-        int32_t ret = ::PublishLNN(DM_PKG_NAME, &dmPublishInfo, &softbusPublishCallback_);
-        LOGI("OnParameterChgCallback begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-            "%{public}s, ranging: %{public}d, freq: %{public}d.", dmPublishInfo.publishId, dmPublishInfo.mode,
-            dmPublishInfo.medium, dmPublishInfo.capability, dmPublishInfo.ranging, dmPublishInfo.freq);
-        if (ret == DM_OK) {
-            g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
-        }
-        LOGI("[SOFTBUS]PublishLNN return ret: %{public}d.", ret);
-    } else if (strcmp(value, DISCOVER_STATUS_OFF) == 0 && g_publishStatus != PulishStatus::NOT_ALLOW_BE_DISCOVERY) {
-        int32_t ret = ::StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-        if (ret == DM_OK) {
-            g_publishStatus = PulishStatus::NOT_ALLOW_BE_DISCOVERY;
-        }
-        LOGI("[SOFTBUS]StopPublishLNN return ret: %{public}d.", ret);
-    }
-}
-
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
     if (device == nullptr) {
@@ -391,8 +352,8 @@ int32_t SoftbusListener::InitSoftbusListener()
 
 int32_t SoftbusListener::InitSoftPublishLNN()
 {
-    int32_t ret;
-
+    int32_t ret = DM_OK;
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
@@ -403,35 +364,11 @@ int32_t SoftbusListener::InitSoftPublishLNN()
     LOGI("InitSoftPublishLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
         "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
         publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+
     ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret == DM_OK) {
-        g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
+        LOGI("[SOFTBUS]PublishLNN successed, ret: %{public}d", ret);
     }
-#else
-    char discoverStatus[DISCOVER_STATUS_LEN + 1] = {0};
-    GetParameter(DISCOVER_STATUS_KEY, "not exist", discoverStatus, DISCOVER_STATUS_LEN);
-    if (strcmp(discoverStatus, "not exist") == 0) {
-        SetParameter(DISCOVER_STATUS_KEY, DISCOVER_STATUS_ON);
-        ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
-        if (ret == DM_OK) {
-            g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
-        }
-        LOGI("[SOFTBUS]service publish result, ret: %{public}d.", ret);
-    } else if (strcmp(discoverStatus, DISCOVER_STATUS_ON) == 0) {
-        ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
-        if (ret == DM_OK) {
-            g_publishStatus = PulishStatus::ALLOW_BE_DISCOVERY;
-        }
-        LOGI("[SOFTBUS]service publish result, ret: %{public}d.", ret);
-    } else if (strcmp(discoverStatus, DISCOVER_STATUS_OFF) == 0) {
-        ret = StopPublishLNN(DM_PKG_NAME, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-        if (ret == DM_OK) {
-            g_publishStatus = PulishStatus::NOT_ALLOW_BE_DISCOVERY;
-        }
-        LOGI("[SOFTBUS]service unpublish. ret: %{public}d.", ret);
-    }
-    ret = WatchParameter(DISCOVER_STATUS_KEY, &OnParameterChgCallback, nullptr);
 #endif
     return ret;
 }

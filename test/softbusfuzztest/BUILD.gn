@@ -16,7 +16,6 @@ group("fuzztest") {
 
   deps = [
     "onbytesreceived_fuzzer:fuzztest",
-    "onparameterchgcallback_fuzzer:fuzztest",
     "onsessionopened_fuzzer:fuzztest",
     "onsoftbusdevicefound_fuzzer:fuzztest",
     "onsoftbusdeviceinfochanged_fuzzer:fuzztest",

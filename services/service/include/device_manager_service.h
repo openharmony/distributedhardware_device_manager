@@ -31,6 +31,9 @@
 #include "idevice_manager_service_impl.h"
 #include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_publish_common_event.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -199,6 +202,9 @@ private:
     bool IsDMServiceAdapterLoad();
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    void SubscribePublishCommonEvent();
+#endif
 
 private:
     bool isImplsoLoaded_ = false;
@@ -213,6 +219,9 @@ private:
     std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

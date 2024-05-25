@@ -75,17 +75,13 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_002, testing::ext::
 }
 
 /**
- * @tc.name: OnParameterChgCallback_001
+ * @tc.name: OnSoftbusDeviceOnline_001
  * @tc.desc: return true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusListenerTest, OnParameterChgCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.Level0)
 {
-    const char *key = "222";
-    const char *value = "0";
-    void *context = nullptr;
-    softbusListener->OnParameterChgCallback(key, value, context);
     NodeBasicInfo info = {
             .networkId = "123456",
             .deviceName = "123456",
@@ -513,12 +509,6 @@ HWTEST_F(SoftbusListenerTest, InitSoftbusListener_001, testing::ext::TestSize.Le
 {
     SoftbusListener::GetSoftbusRefreshCb();
     int32_t ret = softbusListener->InitSoftbusListener();
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(SoftbusListenerTest, InitSoftPublishLNN_001, testing::ext::TestSize.Level0)
-{
-    int32_t ret = softbusListener->InitSoftPublishLNN();
     EXPECT_EQ(ret, DM_OK);
 }
 
