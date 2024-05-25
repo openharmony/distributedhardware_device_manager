@@ -836,6 +836,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
         dmDevice.extraData = jsonObj.dump();
         return;
     }
+    jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
         std::string wifiIp((addrInfo->info).ip.ip);
         jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;

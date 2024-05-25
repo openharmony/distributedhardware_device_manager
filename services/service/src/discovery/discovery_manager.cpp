@@ -78,6 +78,13 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
             pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
         }
     }
+    if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
+        std::string capability = discoverParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
+        if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, capability.c_str()) != EOK) {
+            LOGI("EnableDiscoveryListener failed, capability copy err.");
+            return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
+        }
+    }
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
