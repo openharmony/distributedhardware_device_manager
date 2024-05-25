@@ -53,12 +53,12 @@ constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_
 
 bool PermissionManager::CheckPermission(void)
 {
-    LOGI("Enter PermissionManager::CheckPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
+        LOGE("CheckPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("CheckPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -73,12 +73,12 @@ bool PermissionManager::CheckPermission(void)
 
 bool PermissionManager::CheckNewPermission(void)
 {
-    LOGI("Enter PermissionManager::CheckNewPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
+        LOGE("CheckNewPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("CheckNewPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -93,13 +93,12 @@ bool PermissionManager::CheckNewPermission(void)
 
 bool PermissionManager::CheckMonitorPermission(void)
 {
-    LOGI("Enter PermissionManager::CheckMonitorPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("GetCallingTokenID error.");
+        LOGE("CheckMonitorPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("CheckMonitorPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -115,12 +114,12 @@ bool PermissionManager::CheckMonitorPermission(void)
 
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)
 {
-    LOGI("Enter PermissionManager::GetCallerProcessName");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
+        LOGE("GetCallerProcessName GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
-    LOGI("PermissionManager::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("GetCallerProcessName::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;
@@ -192,9 +191,9 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
 
 bool PermissionManager::CheckSA(void)
 {
-    LOGI("Enter CheckSA::CheckPermission");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
+        LOGE("CheckSA GetCallingTokenID error.");
         return false;
     }
     LOGI("CheckSA::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
