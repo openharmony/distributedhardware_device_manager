@@ -74,7 +74,7 @@
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%s的“%s”请求访问本机。是否信任此应用？"
+            "value":"%2$s的“%1$s”请求访问本机。是否信任此应用？"
         },
         {
             "name":"dm_confirm_intention",
