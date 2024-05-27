@@ -49,7 +49,6 @@ public:
     static void OnSoftbusDeviceOnline(NodeBasicInfo *info);
     static void OnSoftbusDeviceOffline(NodeBasicInfo *info);
     static void OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info);
-    static void OnParameterChgCallback(const char *key, const char *value, void *context);
     static void OnSoftbusPublishResult(int publishId, PublishResult result);
     static void DeviceOnLine(DmDeviceInfo deviceInfo);
     static void DeviceOffLine(DmDeviceInfo deviceInfo);
