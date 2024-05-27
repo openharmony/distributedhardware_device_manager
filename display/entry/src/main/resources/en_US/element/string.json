@@ -74,7 +74,7 @@
       },
       {
           "name":"dm_confirm_title_hap",
-          "value":"%s on your %s wants to access your phone. Do you trust this app?"
+          "value":"%1$s on your %2$s wants to access your phone. Do you trust this app?"
       },
       {
           "name":"dm_confirm_intention",
