@@ -15,6 +15,7 @@
 
 #include "dm_auth_manager.h"
 
+#include <mutex>
 #include <string>
 #include <unistd.h>
 
@@ -64,6 +65,7 @@ constexpr const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
 constexpr const char* CANCEL_DISPLAY_KEY = "cancelPinCodeDisplay";
 constexpr const char* DM_VERSION = "4.1.5.1";
 constexpr const char* DM_NEW_VERSION = "5.0.1";
+std::mutex g_authFinishLock;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<HiChainConnector> hiChainConnector,
@@ -1105,6 +1107,7 @@ void DmAuthManager::SrcAuthenticateFinish()
 
 void DmAuthManager::AuthenticateFinish()
 {
+    std::lock_guard<std::mutex> autoLock(g_authFinishLock);
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to AuthenticateFinish because authResponseContext_ or authUiStateMgr is nullptr");
         return;
