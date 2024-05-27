@@ -19,6 +19,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DeviceManagerServiceImplTest::SetUp()
 {
+    deviceManagerServiceImpl_->Initialize(listener_);
 }
 
 void DeviceManagerServiceImplTest::TearDown()
@@ -34,10 +35,6 @@ void DeviceManagerServiceImplTest::TearDownTestCase()
 }
 
 namespace {
-std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
 
 /**
  * @tc.name: Initialize_001
@@ -46,24 +43,40 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
  */
 HWTEST_F(DeviceManagerServiceImplTest, Initialize_001, testing::ext::TestSize.Level0)
 {
-    auto ideviceManagerServiceListener = std::shared_ptr<IDeviceManagerServiceListener>();
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->commonEventManager_ = std::make_shared<DmCommonEventManager>();
-    int ret = deviceManagerServiceImpl->Initialize(ideviceManagerServiceListener);
+    deviceManagerServiceImpl_->commonEventManager_ = std::make_shared<DmCommonEventManager>();
+    int ret = deviceManagerServiceImpl_->Initialize(listener_);
     EXPECT_EQ(ret, DM_OK);
 }
 
 /**
- * @tc.name: Initialize_001
+ * @tc.name: Initialize_002
  * @tc.desc: return DM_OK
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, Initialize_002, testing::ext::TestSize.Level0)
 {
-    auto ideviceManagerServiceListener = std::shared_ptr<IDeviceManagerServiceListener>();
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->commonEventManager_ = nullptr;
-    int ret = deviceManagerServiceImpl->Initialize(ideviceManagerServiceListener);
+    deviceManagerServiceImpl_->commonEventManager_ = nullptr;
+    int ret = deviceManagerServiceImpl_->Initialize(listener_);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: Initialize_003
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, Initialize_003, testing::ext::TestSize.Level0)
+{
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    deviceManagerServiceImpl_->hiChainConnector_ = nullptr;
+    deviceManagerServiceImpl_->mineHiChainConnector_ = nullptr;
+    deviceManagerServiceImpl_->discoveryMgr_ = nullptr;
+    deviceManagerServiceImpl_->publishMgr_ = nullptr;
+    deviceManagerServiceImpl_->hiChainAuthConnector_ = nullptr;
+    deviceManagerServiceImpl_->deviceStateMgr_ = nullptr;
+    deviceManagerServiceImpl_->authMgr_ = nullptr;
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int ret = deviceManagerServiceImpl_->Initialize(listener_);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -76,8 +89,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_001, testing::ext::T
 {
     std::string event = R"({"extra": {"deviceId": "123"})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -90,8 +102,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_002, testing::ext::T
 {
     std::string event = R"({"content": {"deviceid": "123"}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -104,8 +115,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_003, testing::ext::T
 {
     std::string event = R"({"extra": {"deviceaId": "123"}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -118,8 +128,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_004, testing::ext::T
 {
     std::string event = R"({"extra": {"deviceId": 123}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -132,8 +141,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_005, testing::ext::T
 {
     std::string event = R"({"Extra": {"deviceId": "123"}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -146,8 +154,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_006, testing::ext::T
 {
     std::string event = R"({"extra":"123"}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -160,8 +167,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_007, testing::ext::T
 {
     std::string event = R"({"extra": {"deviceId": "123"}})";
     nlohmann::json jsonObject;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->PraseNotifyEventJson(event, jsonObject);
+    int ret = deviceManagerServiceImpl_->PraseNotifyEventJson(event, jsonObject);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -175,8 +181,7 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_001, testing::ext::TestSize.L
     std::string pkgName = "com.ohos.test";
     int32_t eventId = DM_NOTIFY_EVENT_START;
     std::string event = R"({"extra": {"deviceId": "123"}})";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->NotifyEvent(pkgName, eventId, event);
+    int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -190,8 +195,7 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_002, testing::ext::TestSize.L
     std::string pkgName = "com.ohos.test";
     int32_t eventId = DM_NOTIFY_EVENT_BUTT;
     std::string event = R"({"extra": {"deviceId": "123"}})";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->NotifyEvent(pkgName, eventId, event);
+    int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -205,8 +209,7 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_003, testing::ext::TestSize.L
     std::string pkgName = "com.ohos.test";
     int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
     std::string event = R"({"extra": {"deviceId": "123"})";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int ret = deviceManagerServiceImpl->NotifyEvent(pkgName, eventId, event);
+    int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -219,8 +222,7 @@ HWTEST_F(DeviceManagerServiceImplTest, RequestCredential_001, testing::ext::Test
 {
     const std::string reqJsonStr = "";
     std::string returnJsonStr = "returntest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->RequestCredential(reqJsonStr, returnJsonStr);
+    int32_t ret = deviceManagerServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -233,9 +235,8 @@ HWTEST_F(DeviceManagerServiceImplTest, RequestCredential_002, testing::ext::Test
 {
     const std::string reqJsonStr = "test";
     std::string returnJsonStr = "returntest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->credentialMgr_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->RequestCredential(reqJsonStr, returnJsonStr);
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -248,8 +249,7 @@ HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_001, testing::ext::TestS
 {
     const std::string pkgName = "";
     const std::string credentialInfo = "";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->ImportCredential(pkgName, credentialInfo);
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -262,10 +262,63 @@ HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_002, testing::ext::TestS
 {
     const std::string pkgName = "pkgNametest";
     const std::string credentialInfo = "credentialInfotest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->credentialMgr_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->ImportCredential(pkgName, credentialInfo);
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: ImportCredential_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_003, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName;
+    const std::string credentialInfo = "credentialInfotest";
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ImportCredential_004
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_004, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    const std::string credentialInfo;
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ImportCredential_005
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_005, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    std::string reqJsonStr;
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ImportCredential_006
+ * @tc.desc: return ERR_DM_HICHAIN_CREDENTIAL_IMPORT_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_006, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    std::string reqJsonStr = "reqJsonStr";
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_HICHAIN_CREDENTIAL_IMPORT_FAILED);
 }
 
 /**
@@ -277,8 +330,7 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_001, testing::ext::TestS
 {
     const std::string pkgName = "";
     const std::string deleteInfo = "";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->DeleteCredential(pkgName, deleteInfo);
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -291,10 +343,63 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_002, testing::ext::TestS
 {
     const std::string pkgName = "pkgNametest";
     const std::string deleteInfo = "deleteInfotest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->credentialMgr_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->DeleteCredential(pkgName, deleteInfo);
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: DeleteCredential_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName;
+    const std::string deleteInfo = "deleteInfotest";
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: DeleteCredential_004
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    const std::string deleteInfo;
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: DeleteCredential_005
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_005, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    std::string reqJsonStr;
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: DeleteCredential_006
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_006, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    std::string reqJsonStr = "reqJsonStr";
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -305,8 +410,7 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_002, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceImplTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level0)
 {
     const std::string pkgName = "";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->RegisterCredentialCallback(pkgName);
+    int32_t ret = deviceManagerServiceImpl_->RegisterCredentialCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -318,9 +422,8 @@ HWTEST_F(DeviceManagerServiceImplTest, RegisterCredentialCallback_001, testing::
 HWTEST_F(DeviceManagerServiceImplTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level0)
 {
     const std::string pkgName = "pkgNametest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->credentialMgr_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->RegisterCredentialCallback(pkgName);
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->RegisterCredentialCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -332,8 +435,7 @@ HWTEST_F(DeviceManagerServiceImplTest, RegisterCredentialCallback_002, testing::
 HWTEST_F(DeviceManagerServiceImplTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level0)
 {
     const std::string pkgName = "";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->UnRegisterCredentialCallback(pkgName);
+    int32_t ret = deviceManagerServiceImpl_->UnRegisterCredentialCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -345,9 +447,58 @@ HWTEST_F(DeviceManagerServiceImplTest, UnRegisterCredentialCallback_001, testing
 HWTEST_F(DeviceManagerServiceImplTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level0)
 {
     const std::string pkgName = "pkgNametest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->credentialMgr_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->UnRegisterCredentialCallback(pkgName);
+    deviceManagerServiceImpl_->credentialMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->UnRegisterCredentialCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: RegisterUiStateCallback_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "";
+    int32_t ret = deviceManagerServiceImpl_->RegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: RegisterUiStateCallback_002
+ * @tc.desc: return ERR_DM_POINT_NULL
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    deviceManagerServiceImpl_->authMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->RegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: UnRegisterUiStateCallback_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "";
+    int32_t ret = deviceManagerServiceImpl_->UnRegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnRegisterUiStateCallback_002
+ * @tc.desc: return ERR_DM_POINT_NULL
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "pkgNametest";
+    deviceManagerServiceImpl_->authMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -360,9 +511,8 @@ HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_001, testing::ext::TestS
 {
     std::string pkgName = "";
     int32_t action = 1;
-    const std::string params = "";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->SetUserOperation(pkgName, action, params);
+    const std::string params = "params";
+    int32_t ret = deviceManagerServiceImpl_->SetUserOperation(pkgName, action, params);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -376,11 +526,124 @@ HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_002, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     int32_t action = 1;
     const std::string params = "paramsTest";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    int32_t ret = deviceManagerServiceImpl->SetUserOperation(pkgName, action, params);
+    int32_t ret = deviceManagerServiceImpl_->SetUserOperation(pkgName, action, params);
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: SetUserOperation_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t action = 1;
+    const std::string params;
+    int32_t ret = deviceManagerServiceImpl_->SetUserOperation(pkgName, action, params);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetUserOperation_004
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t action = 1;
+    const std::string params;
+    int32_t ret = deviceManagerServiceImpl_->SetUserOperation(pkgName, action, params);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetUserOperation_005
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, SetUserOperation_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t action = 1;
+    const std::string params;
+    deviceManagerServiceImpl_->authMgr_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->SetUserOperation(pkgName, action, params);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: HandleOffline_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleOnline_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleDeviceStatusChange_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->deviceStateMgr_ = nullptr;
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    EXPECT_EQ(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleDeviceStatusChange_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_STATE_ONLINE;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleDeviceStatusChange_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_003, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_STATE_OFFLINE;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleDeviceStatusChange_004
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_004, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_CHANGED;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 
 /**
@@ -393,10 +656,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_001, testing::ext::T
     const std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 0;
     std::string filterOptions;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->discoveryMgr_ =
-        std::make_shared<DmDiscoveryManager>(softbusConnector, listener, hiChainConnector_);
-    int32_t ret = deviceManagerServiceImpl->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
@@ -410,9 +670,226 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_002, testing::ext::T
     const std::string pkgName;
     uint16_t subscribeId = 0;
     std::string filterOptions;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
+    int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_003
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_003, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName = "com.ohos.test";
+    DmSubscribeInfo subscribeInfo;
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_004
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    const std::string pkgName;
+    DmSubscribeInfo subscribeInfo;
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StopDeviceDiscovery_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 1;
+    int32_t ret = deviceManagerServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StopDeviceDiscovery_002
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 1;
+    int32_t ret = deviceManagerServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DmPublishInfo publishInfo;
+    int32_t ret = deviceManagerServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: PublishDeviceDiscovery_002
+ * @tc.desc: return ERR_DM_PUBLISH_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    DmPublishInfo publishInfo;
+    int32_t ret = deviceManagerServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t publishId = 1;
+    int32_t ret = deviceManagerServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnPublishDeviceDiscovery_002
+ * @tc.desc: return ERR_DM_PUBLISH_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t publishId = 1;
+    int32_t ret = deviceManagerServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+}
+
+/**
+ * @tc.name: AuthenticateDevice_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, AuthenticateDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t authType = 1;
+    std::string deviceId = "deviceId";
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: AuthenticateDevice_002
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t authType = 1;
+    std::string deviceId;
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: AuthenticateDevice_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, AuthenticateDevice_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t authType = 1;
+    std::string deviceId;
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: AuthenticateDevice_004
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t authType = 1;
+    std::string deviceId = "deviceId";
+    std::string extra;
+    int32_t ret = deviceManagerServiceImpl_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnAuthenticateDevice_001
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId = "networkId";
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnAuthenticateDevice_002
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string networkId;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnAuthenticateDevice_003
+ * @tc.desc: return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: UnAuthenticateDevice_004
+ * @tc.desc: return ERR_DM_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string networkId = "networkId";
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -426,8 +903,7 @@ HWTEST_F(DeviceManagerServiceImplTest, BindDevice_001, testing::ext::TestSize.Le
     int32_t authType = 0;
     std::string udidHash;
     std::string bindParam;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->BindDevice(pkgName, authType, udidHash, bindParam);
+    int32_t ret = deviceManagerServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -442,8 +918,7 @@ HWTEST_F(DeviceManagerServiceImplTest, BindDevice_002, testing::ext::TestSize.Le
     int32_t authType = 0;
     std::string udidHash = "udidHash";
     std::string bindParam;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->BindDevice(pkgName, authType, udidHash, bindParam);
+    int32_t ret = deviceManagerServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -458,10 +933,7 @@ HWTEST_F(DeviceManagerServiceImplTest, BindDevice_003, testing::ext::TestSize.Le
     int32_t authType = 0;
     std::string udidHash = "udidHash";
     std::string bindParam;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    int32_t ret = deviceManagerServiceImpl->BindDevice(pkgName, authType, udidHash, bindParam);
+    int32_t ret = deviceManagerServiceImpl_->BindDevice(pkgName, authType, udidHash, bindParam);
     EXPECT_NE(ret, DM_OK);
 }
 
@@ -474,8 +946,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_001, testing::ext::TestSize.
 {
     std::string pkgName = "com.ohos.test";
     std::string udidHash;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -488,8 +959,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_002, testing::ext::TestSize.
 {
     std::string pkgName;
     std::string udidHash = "udidHash";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    int32_t ret = deviceManagerServiceImpl->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -502,10 +972,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_003, testing::ext::TestSize.
 {
     std::string pkgName = "com.ohos.test";
     std::string udidHash = "udidHash";
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->authMgr_ =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    int32_t ret = deviceManagerServiceImpl->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
     EXPECT_NE(ret, DM_OK);
 }
 
@@ -518,9 +985,8 @@ HWTEST_F(DeviceManagerServiceImplTest, GetUdidHashByNetWorkId_001, testing::ext:
 {
     char *networkId = nullptr;
     std::string deviceId;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->softbusConnector_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->GetUdidHashByNetWorkId(networkId, deviceId);
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->GetUdidHashByNetWorkId(networkId, deviceId);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -533,10 +999,8 @@ HWTEST_F(DeviceManagerServiceImplTest, GetUdidHashByNetWorkId_002, testing::ext:
 {
     char *networkId = nullptr;
     std::string deviceId;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->softbusConnector_ = softbusConnector;
-    deviceManagerServiceImpl->hiChainConnector_ = nullptr;
-    int32_t ret = deviceManagerServiceImpl->GetUdidHashByNetWorkId(networkId, deviceId);
+    deviceManagerServiceImpl_->hiChainConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->GetUdidHashByNetWorkId(networkId, deviceId);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -549,11 +1013,297 @@ HWTEST_F(DeviceManagerServiceImplTest, GetUdidHashByNetWorkId_003, testing::ext:
 {
     const char *networkId = "networkId";
     std::string deviceId;
-    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
-    deviceManagerServiceImpl->softbusConnector_ = softbusConnector;
-    deviceManagerServiceImpl->hiChainConnector_ = hiChainConnector_;
-    int32_t ret = deviceManagerServiceImpl->GetUdidHashByNetWorkId(networkId, deviceId);
+    int32_t ret = deviceManagerServiceImpl_->GetUdidHashByNetWorkId(networkId, deviceId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: Release_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, Release_001, testing::ext::TestSize.Level0)
+{
+    deviceManagerServiceImpl_->Release();
+    EXPECT_EQ(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+}
+
+/**
+ * @tc.name: OnSessionOpened_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
+{
+    int sessionId = 1;
+    int result = 1;
+    std::string data = "15631023";
+    int ret = deviceManagerServiceImpl_->OnSessionOpened(sessionId, result);
+    deviceManagerServiceImpl_->OnBytesReceived(sessionId, data.c_str(), data.size());
+    deviceManagerServiceImpl_->OnSessionClosed(sessionId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: MineRequestCredential_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, MineRequestCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->MineRequestCredential(pkgName, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: CheckCredential_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, CheckCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    const std::string reqJsonStr;
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: CheckCredential_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, CheckCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    const std::string reqJsonStr = "reqJsonStr";
+    std::string returnJsonStr;
+    int32_t ret = deviceManagerServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetGroupType_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, GetGroupType_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceList;
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->GetGroupType(deviceList);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: GetGroupType_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, GetGroupType_002, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceList;
+    deviceManagerServiceImpl_->hiChainConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->GetGroupType(deviceList);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: GetGroupType_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, GetGroupType_003, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "123456789101112131415",
+        .deviceName = "deviceName",
+        .deviceTypeId = 1
+    };
+    std::vector<DmDeviceInfo> deviceList;
+    deviceList.push_back(deviceInfo);
+    int32_t ret = deviceManagerServiceImpl_->GetGroupType(deviceList);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ImportAuthCode_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string authCode = "authCode";
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ImportAuthCode_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportAuthCode_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string authCode;
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ImportAuthCode_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ImportAuthCode_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string authCode = "authCode";
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ExportAuthCode_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, ExportAuthCode_001, testing::ext::TestSize.Level0)
+{
+    std::string authCode = "authCode";
+    int32_t ret = deviceManagerServiceImpl_->ExportAuthCode(authCode);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: BindTarget_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, BindTarget_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    PeerTargetId targetId;
+    std::map<std::string, std::string> bindParam;
+    int32_t ret = deviceManagerServiceImpl_->BindTarget(pkgName, targetId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: PutIdenticalAccountToAcl_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, PutIdenticalAccountToAcl_001, testing::ext::TestSize.Level0)
+{
+    std::string requestDeviceId;
+    std::string trustDeviceId;
+    deviceManagerServiceImpl_->PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
+    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+}
+
+/**
+ * @tc.name: DpAclAdd_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, DpAclAdd_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "2342154";
+    int32_t ret = deviceManagerServiceImpl_->DpAclAdd(udid);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: IsSameAccount_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, IsSameAccount_001, testing::ext::TestSize.Level0)
+{
+    std::string udid;
+    int32_t ret = deviceManagerServiceImpl_->IsSameAccount(udid);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: IsSameAccount_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, IsSameAccount_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "2342154";
+    int32_t ret = deviceManagerServiceImpl_->IsSameAccount(udid);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: CheckRelatedDevice_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string udid;
+    std::string bundleName = "bundleName";
+    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: CheckRelatedDevice_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "2342154";
+    std::string bundleName;
+    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: CheckRelatedDevice_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_003, testing::ext::TestSize.Level0)
+{
+    std::string udid = "2342154";
+    std::string bundleName = "bundleName";
+    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetAppTrustDeviceIdList_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, GetAppTrustDeviceIdList_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgname = "pkgname";
+    auto ret = deviceManagerServiceImpl_->GetAppTrustDeviceIdList(pkgname);
+    EXPECT_EQ(ret.empty(), true);
+}
+
+/**
+ * @tc.name: OnUnbindSessionCloseed_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, OnUnbindSessionCloseed_001, testing::ext::TestSize.Level0)
+{
+    int32_t socket = 1;
+    deviceManagerServiceImpl_->OnUnbindSessionCloseed(socket);
+    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+}
+
+/**
+ * @tc.name: OnUnbindBytesReceived_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, OnUnbindBytesReceived_001, testing::ext::TestSize.Level0)
+{
+    int32_t socket = 1;
+    std::string data = "15135135";
+    deviceManagerServiceImpl_->OnUnbindBytesReceived(socket, data.c_str(), data.size());
+    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+}
+
+/**
+ * @tc.name: LoadHardwareFwkService_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level0)
+{
+    deviceManagerServiceImpl_->LoadHardwareFwkService();
+    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -111,7 +111,7 @@ HWTEST_F(SoftbusAdapterTest, OnQosEvent_001, testing::ext::TestSize.Level0)
     };
     uint32_t qosCount = 1;
     SoftbusAdapter::GetInstance().OnQosEvent(socket, eventId, qosInfo, qosCount);
-    EXPECT_EQ(SoftbusAdapter::GetInstance().iSocketListener_.OnFile, nullptr);
+    EXPECT_EQ(SoftbusAdapter::GetInstance().iSocketListener_.OnError, nullptr);
 }
 
 HWTEST_F(SoftbusAdapterTest, DmOnSoftbusSessionBind_001, testing::ext::TestSize.Level0)
@@ -124,7 +124,7 @@ HWTEST_F(SoftbusAdapterTest, DmOnSoftbusSessionBind_001, testing::ext::TestSize.
         .networkId = const_cast<char*>(str.c_str()),
     };
     SoftbusAdapter::GetInstance().iSocketListener_.OnBind(socket, info);
-    EXPECT_EQ(SoftbusAdapter::GetInstance().iSocketListener_.OnFile, nullptr);
+    EXPECT_EQ(SoftbusAdapter::GetInstance().iSocketListener_.OnError, nullptr);
 }
 
 HWTEST_F(SoftbusAdapterTest, DmOnSoftbusSessionClosed_001, testing::ext::TestSize.Level0)
