@@ -2189,7 +2189,6 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
         return false;
     }
     return true;
-
 }
 
 } // namespace DistributedHardware
