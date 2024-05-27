@@ -194,7 +194,7 @@ public:
     int32_t DpAclAdd(const std::string &udid);
 
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
-    int32_t IsSameAccount(const std::string &udid);
+    int32_t IsSameAccount(const std::string &networkId);
     int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
 
 private:

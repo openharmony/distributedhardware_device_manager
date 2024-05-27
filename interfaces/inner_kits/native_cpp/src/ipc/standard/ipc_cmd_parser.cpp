@@ -1532,7 +1532,7 @@ ON_IPC_CMD(SERVER_DESTROY_PIN_HOLDER_RESULT, MessageParcel &data, MessageParcel 
 ON_IPC_SET_REQUEST(DP_ACL_ADD, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcAclProfileReq> pReq = std::static_pointer_cast<IpcAclProfileReq>(pBaseReq);
-    std::string udid = pReq->GetUdid();
+    std::string udid = pReq->GetStr();
     if (!data.WriteString(udid)) {
         LOGE("write udid failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1587,9 +1587,9 @@ ON_IPC_CMD(SERVER_ON_PIN_HOLDER_EVENT, MessageParcel &data, MessageParcel &reply
 ON_IPC_SET_REQUEST(IS_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcAclProfileReq> pReq = std::static_pointer_cast<IpcAclProfileReq>(pBaseReq);
-    std::string udid = pReq->GetUdid();
-    if (!data.WriteString(udid)) {
-        LOGE("write udid failed");
+    std::string netWorkId = pReq->GetStr();
+    if (!data.WriteString(netWorkId)) {
+        LOGE("write netWorkId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

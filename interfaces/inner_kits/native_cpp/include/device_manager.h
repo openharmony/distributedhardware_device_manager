@@ -599,8 +599,6 @@ public:
                                      std::string &returnJsonStr) = 0;
 
     virtual int32_t DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType) = 0;
-
-    virtual bool IsSameAccount(const std::string &udid) = 0;
     virtual bool CheckRelatedDevice(const std::string &udid, const std::string &bundleName) = 0;
 
     /**
@@ -612,6 +610,7 @@ public:
      */
     virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                            int32_t &securityLevel) = 0;
+    virtual bool IsSameAccount(const std::string &netWorkId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
