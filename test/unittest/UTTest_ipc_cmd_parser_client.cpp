@@ -527,7 +527,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_013, testing::ext::TestSize.L
     MessageParcel data;
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::string udid = "XXX";
-    req->SetUdid(udid);
+    req->SetStr(udid);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
