@@ -380,8 +380,8 @@ public:
     virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                            int32_t &securityLevel) override;
 
-    virtual bool IsSameAccount(const std::string &udid) override;
     virtual bool CheckRelatedDevice(const std::string &udid, const std::string &bundleName) override;
+    virtual bool IsSameAccount(const std::string &netWorkId) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

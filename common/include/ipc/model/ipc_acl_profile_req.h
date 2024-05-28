@@ -30,9 +30,9 @@ public:
      * @tc.desc: Ipc get first string parameter
      * @tc.type: FUNC
      */
-    const std::string &GetUdid() const
+    const std::string &GetStr() const
     {
-        return udid_;
+        return str_;
     }
 
     /**
@@ -40,13 +40,13 @@ public:
      * @tc.desc: Ipc set first string parameter
      * @tc.type: FUNC
      */
-    void SetUdid(const std::string &udid)
+    void SetStr(const std::string &str)
     {
-        udid_ = udid;
+        str_ = str;
     }
 
 private:
-    std::string udid_;
+    std::string str_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
