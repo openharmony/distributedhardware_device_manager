@@ -40,6 +40,7 @@ struct InputCustomDialog {
   @State btnColor: ResourceColor = Color.Transparent;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   controller?: CustomDialogController;
+  private scroller: Scroller = new Scroller();
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
@@ -47,6 +48,11 @@ struct InputCustomDialog {
     } else {
       this.heightNum = 800;
     }
+  }
+
+  aboutToDisappear() {
+    let inputMethodController = inputMethod.getController();
+    inputMethodController.hideTextInput();
   }
 
   aboutToAppear() {
@@ -154,151 +160,154 @@ struct InputCustomDialog {
     GridRow({
       columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
       gutter: { x: 4 },
-      breakpoints: { value: ['520vp', '840vp'] }
+      breakpoints: { value: ['600vp', '840vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
-        Column() {
+        Scroll(this.scroller) {
           Column() {
-            Text($r('app.string.dm_connect', this.targetDeviceName))
-              .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .margin({ top: 12, bottom: 3 })
-              .width('100%')
-              .textAlign(TextAlign.Start)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .minFontSize(12)
-              .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+            Column() {
+              Text($r('app.string.dm_connect', this.targetDeviceName))
+                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                .margin({ top: 12, bottom: 3 })
+                .width('100%')
+                .textAlign(TextAlign.Start)
+                .maxLines(2)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .minFontSize(12)
+                .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
 
-            Text($r('app.string.dm_enter_connect_code'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight(FontWeight.Regular)
-              .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-              .margin({ bottom: 8 })
-              .width('100%')
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .minFontSize(12)
-              .maxFontSize($r('sys.float.ohos_id_text_size_body2'))
-              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
-          }
-          .margin({ left: 24, right: 24 })
-          .height(72)
-          .justifyContent(FlexAlign.Center)
-
-          Stack() {
-            List() {
-              ListItem() {
-                Flex({ justifyContent: FlexAlign.Center }) {
-                  ForEach(this.passwordCircle, (item:string) => {
-                    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-                      Text(item)
-                        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                        .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                        .fontWeight(FontWeight.Medium)
-                        .height(26)
-                    }.width('10%')
-                    .height('100%')
-                    .visibility(item === '' ? Visibility.None : Visibility.Visible)
-                  })
-                  ForEach(this.passwordCircle, (item: string) => {
-                    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-                      Column()
-                        .width(12)
-                        .height(12)
-                        .border({ width: 2, color: $r('sys.color.ohos_id_color_primary'), radius: 12})
-                    }.width('10%')
-                    .height('100%')
-                    .visibility(item === '' ? Visibility.Visible : Visibility.None)
-                  })
-                }
-              }
+              Text($r('app.string.dm_enter_connect_code'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .fontWeight(FontWeight.Regular)
+                .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+                .margin({ bottom: 8 })
+                .width('100%')
+                .maxLines(2)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .minFontSize(12)
+                .maxFontSize($r('sys.float.ohos_id_text_size_body2'))
+                .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
             }
-            TextInput({ placeholder: '', text: this.password})
-              .defaultFocus(true)
-              .type(8)
-              .height(60)
-              .opacity(0)
-              .fontColor(('rgba(0,0,0,0)'))
-              .backgroundColor(('rgba(0,0,0,0)'))
-              .caretColor(('rgba(0,0,0,0)'))
-              .maxLength(6)
-              .margin({ bottom: 8 })
-              .width('100%')
-              .onChange((value: string) => {
-                this.password = value;
-                if (value.length > 6) {
-                  return;
-                }
-                let length = value.length;
-                for (let i = 0; i < 6; i++) {
-                  if (i < length) {
-                    this.passwordCircle[i] = value[i];
-                  } else {
-                    this.passwordCircle[i] = '';
+            .margin({ left: 24, right: 24 })
+            .height(72)
+            .justifyContent(FlexAlign.Center)
+
+            Stack() {
+              List() {
+                ListItem() {
+                  Flex({ justifyContent: FlexAlign.Center }) {
+                    ForEach(this.passwordCircle, (item:string) => {
+                      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                        Text(item)
+                          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                          .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                          .fontWeight(FontWeight.Medium)
+                          .height(26)
+                      }.width('10%')
+                      .height('100%')
+                      .visibility(item === '' ? Visibility.None : Visibility.Visible)
+                    })
+                    ForEach(this.passwordCircle, (item: string) => {
+                      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                        Column()
+                          .width(12)
+                          .height(12)
+                          .border({ width: 2, color: $r('sys.color.ohos_id_color_primary'), radius: 12})
+                      }.width('10%')
+                      .height('100%')
+                      .visibility(item === '' ? Visibility.Visible : Visibility.None)
+                    })
                   }
                 }
-                let gThis = this;
-                setTimeout(()=> {
-                  gThis.passwordOnChange(value);
-                }, 50)
-                console.log(TAG + 'this.password: ' + this.password);
-              })
-          }.height(48)
-          .margin({ top: 12, bottom: 16})
+              }
+              TextInput({ placeholder: '', text: this.password})
+                .defaultFocus(true)
+                .type(8)
+                .height(60)
+                .opacity(0)
+                .fontColor(('rgba(0,0,0,0)'))
+                .backgroundColor(('rgba(0,0,0,0)'))
+                .caretColor(('rgba(0,0,0,0)'))
+                .maxLength(6)
+                .margin({ bottom: 8 })
+                .width('100%')
+                .onChange((value: string) => {
+                  this.password = value;
+                  if (value.length > 6) {
+                    return;
+                  }
+                  let length = value.length;
+                  for (let i = 0; i < 6; i++) {
+                    if (i < length) {
+                      this.passwordCircle[i] = value[i];
+                    } else {
+                      this.passwordCircle[i] = '';
+                    }
+                  }
+                  let gThis = this;
+                  setTimeout(()=> {
+                    gThis.passwordOnChange(value);
+                  }, 50)
+                  console.log(TAG + 'this.password: ' + this.password);
+                })
+            }.height(48)
+            .margin({ top: 12, bottom: 16})
 
-          Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-            Text(this.errorTips)
-                .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.ohos_id_color_warning'))
-          }.visibility(this.errorTipsVisible)
-          .margin({ bottom: 16,
-                    left: $r('sys.float.ohos_id_corner_radius_dialog'),
-                    right: $r('sys.float.ohos_id_corner_radius_dialog') })
+            Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+              Text(this.errorTips)
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.ohos_id_color_warning'))
+            }.visibility(this.errorTipsVisible)
+            .margin({ bottom: 16,
+                      left: $r('sys.float.ohos_id_corner_radius_dialog'),
+                      right: $r('sys.float.ohos_id_corner_radius_dialog') })
 
-          Flex({ justifyContent: FlexAlign.Center }) {
-            Button($r('app.string.dm_cancel'))
-              .height(40)
-              .fontSize($r('sys.float.ohos_id_text_size_button1'))
-              .onClick(() => {
-                let inputMethodController = inputMethod.getController();
-                inputMethodController.hideTextInput();
-                if (this.controller) {
-                  this.controller.close();
-                }
-                this.cancel();
-              })
-              .width('100%')
-              .backgroundColor(this.btnColor)
-              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = $r('sys.color.ohos_id_color_hover');
-                } else {
-                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-                }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-                },
-                normal: {
-                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-                }
-              })
-          }.margin({
-            left: this.isPC ? 72 : 16,
-            right: this.isPC ? 72 : 16,
-            bottom: this.isPC ? 24 : 16 })
-        }.constraintSize({ maxHeight: `${this.heightNum}`})
+            Flex({ justifyContent: FlexAlign.Center }) {
+              Button($r('app.string.dm_cancel'))
+                .height(40)
+                .fontSize($r('sys.float.ohos_id_text_size_button1'))
+                .onClick(() => {
+                  if (this.controller) {
+                    this.controller.close();
+                  }
+                  this.cancel();
+                })
+                .width('100%')
+                .backgroundColor(this.btnColor)
+                .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                  if (isHover) {
+                    this.btnColor = $r('sys.color.ohos_id_color_hover');
+                  } else {
+                    this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                  }
+                })
+                .stateStyles({
+                  pressed: {
+                    .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                  },
+                  normal: {
+                    .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                  }
+                })
+            }.margin({
+              left: this.isPC ? 72 : 16,
+              right: this.isPC ? 72 : 16,
+              bottom: this.isPC ? 24 : 16 })
+          }
+        }
+        .scrollable(ScrollDirection.Vertical)
+        .scrollBar(BarState.On)
+        .constraintSize({ maxHeight: `${this.heightNum}`})
         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
-    }
+    }.margin({top: 8, bottom: 20})
   }
 }
 
@@ -309,7 +318,7 @@ struct dialogPlusPage {
     builder: InputCustomDialog(),
     autoCancel: false,
     alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
-    offset: { dx: 0, dy: -20 },
+    offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
