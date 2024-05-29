@@ -53,10 +53,16 @@ struct InputCustomDialog {
   aboutToDisappear() {
     let inputMethodController = inputMethod.getController();
     inputMethodController.hideTextInput();
+    let ims = inputMethod.getSetting();
+    ims.off('imeShow');
   }
 
   aboutToAppear() {
     this.isPC = Constant.isPC();
+    let ims = inputMethod.getSetting();
+    ims.on('imeShow', (info: Array<inputMethod.InputWindowInfo>) => {
+      this.scroller.scrollTo({yOffset: 72, xOffset: 0});
+    });
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
       console.log('targetDeviceName is ' + this.targetDeviceName);
