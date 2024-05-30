@@ -182,7 +182,7 @@ struct ConfirmCustomDialog {
     GridRow({
       columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
       gutter: { x: 4 },
-      breakpoints: { value: ['520vp', '840vp'] }
+      breakpoints: { value: ['600vp', '840vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
         Column() {
