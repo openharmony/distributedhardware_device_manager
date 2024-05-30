@@ -79,6 +79,14 @@
         {
             "name":"dm_confirm_intention",
             "value":"用于进行数据同步及设备间协同操作"
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"设备连接需开启蓝牙，请开启后重试。"
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"知道了"
         }
     ]
 }
