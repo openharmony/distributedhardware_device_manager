@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,9 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+
+    std::shared_ptr<IDeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<DeviceManagerServiceImpl> deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

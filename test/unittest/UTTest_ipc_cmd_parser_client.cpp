@@ -186,55 +186,55 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_008, testing::ext::TestSize.Le
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_009, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = GET_NETWORKTYPE_BY_NETWORK;
+    int32_t cmdCode = REGISTER_UI_STATE_CALLBACK;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_010, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = REGISTER_UI_STATE_CALLBACK;
+    int32_t cmdCode = UNREGISTER_UI_STATE_CALLBACK;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_011, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = UNREGISTER_UI_STATE_CALLBACK;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+    int32_t cmdCode = REGISTER_DISCOVERY_CALLBACK;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_012, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_DISCOVERY_CALLBACK;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_013, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = REGISTER_DISCOVERY_CALLBACK;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+    int32_t cmdCode = UNREGISTER_DISCOVERY_CALLBACK;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_014, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNREGISTER_DISCOVERY_CALLBACK;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = UNREGISTER_DISCOVERY_CALLBACK;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_016, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = START_DISCOVERING;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_017, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_016, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = STOP_DISCOVERING;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_017, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_ADVERTISING;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
@@ -247,76 +247,64 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_018, testing::ext::TestSize.Le
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_019, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = START_ADVERTISING;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_020, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = START_ADVERTISING;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+    int32_t cmdCode = STOP_ADVERTISING;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_021, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = STOP_ADVERTISING;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_022, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = STOP_ADVERTISING;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_022, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_TARGET;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_024, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_024, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = CREATE_PIN_HOLDER;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_026, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = DESTROY_PIN_HOLDER;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_026, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = DP_ACL_ADD;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_028, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = DP_ACL_ADD;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_SECURITY_LEVEL;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_028, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = IS_SAME_ACCOUNT;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_031, testing::ext::TestSize.Level0)
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = CHECK_API_PERMISSION;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);

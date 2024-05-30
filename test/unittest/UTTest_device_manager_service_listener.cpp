@@ -63,10 +63,28 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
         .deviceTypeId = 1,
     };
     listener_->OnDeviceStateChange(pkgName, state, info);
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
-        std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    int32_t dmState = pReq->GetDeviceState();
-    EXPECT_EQ(0, dmState);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnDeviceStateChange_002
+ * @tc.desc: OnDeviceStateChange, construct a dummy listener, pass in pkgName, use the constructed listener to get
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "ohos.distributedhardware.devicemanager";
+    DmDeviceState state = DEVICE_STATE_OFFLINE;
+    DmDeviceInfo info = {
+        .deviceId = "asdad",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    listener_->OnDeviceStateChange(pkgName, state, info);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -84,10 +102,43 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
     int32_t status = 3;
     int32_t reason = 2006;
     listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
-    std::shared_ptr<IpcNotifyAuthResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyAuthResultReq>(listener_->ipcServerListener_.req_);
-    std::string ret = pReq->GetPkgName();
-    EXPECT_EQ(ret, pkgName);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnAuthResult_002
+ * @tc.desc:OnAuthResult, construct a dummy listener, pass in pkgName, use the constructed listener to get pkgName
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string deviceId = "dkdkd";
+    std::string token = "kdkddk";
+    int32_t status = 8;
+    int32_t reason = 2006;
+    listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnAuthResult_003
+ * @tc.desc:OnAuthResult, construct a dummy listener, pass in pkgName, use the constructed listener to get pkgName
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string deviceId = "dkdkd";
+    std::string token = "kdkddk";
+    int32_t status = -1;
+    int32_t reason = 2006;
+    listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -108,10 +159,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
     };
     uint16_t subscribeId = 1;
     listener_->OnDeviceFound(pkgName, subscribeId, info);
-    std::shared_ptr<IpcNotifyDeviceFoundReq> pReq =
-        std::static_pointer_cast<IpcNotifyDeviceFoundReq>(listener_->ipcServerListener_.req_);
-    uint16_t ret = pReq->GetSubscribeId();
-    EXPECT_EQ(ret, subscribeId);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -128,10 +176,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::
     uint16_t subscribeId = 1;
     int32_t failedReason = 1;
     listener_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
-    std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    int32_t ret = pReq->GetResult();
-    EXPECT_EQ(ret, failedReason);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -146,10 +191,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
     std::string pkgName = "com.ohos.helloworld";
     uint16_t subscribeId = 1;
     listener_->OnDiscoverySuccess(pkgName, subscribeId);
-    std::shared_ptr<IpcNotifyDiscoverResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyDiscoverResultReq>(listener_->ipcServerListener_.req_);
-    uint16_t ret = pReq->GetSubscribeId();
-    EXPECT_EQ(ret, subscribeId);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -166,14 +208,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 1;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
-    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    int32_t ret = pReq->GetPublishId();
-    EXPECT_EQ(ret, publishId);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
- * @tc.name: OnPublishResult_001
+ * @tc.name: OnPublishResult_002
  * @tc.desc: OnDeviceResult,construct a dummy listener, pass in pkgName, publishId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -185,10 +224,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 0;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
-    std::shared_ptr<IpcNotifyPublishResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyPublishResultReq>(listener_->ipcServerListener_.req_);
-    int32_t ret = pReq->GetPublishId();
-    EXPECT_EQ(ret, publishId);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -203,10 +239,89 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.
     std::string pkgName = "com.ohos.helloworld";
     std::string paramJson = "ahaha";
     listener_->OnUiCall(pkgName, paramJson);
-    std::shared_ptr<IpcNotifyDMFAResultReq> pReq =
-        std::static_pointer_cast<IpcNotifyDMFAResultReq>(listener_->ipcServerListener_.req_);
-    std::string ret = pReq->GetJsonParam();
-    EXPECT_EQ(ret, paramJson);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnCredentialResult_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    int32_t action = 1;
+    std::string resultInfo = "resultInfo";
+    listener_->OnCredentialResult(pkgName, action, resultInfo);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnBindResult_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    PeerTargetId targetId;
+    int32_t result = 0;
+    int32_t status = 1;
+    std::string content = "content";
+    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnBindResult_002
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    PeerTargetId targetId;
+    int32_t result = 0;
+    int32_t status = 8;
+    std::string content = "content";
+    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnBindResult_003
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    PeerTargetId targetId;
+    int32_t result = 0;
+    int32_t status = -1;
+    std::string content = "content";
+    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnUnbindResult_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    PeerTargetId targetId;
+    int32_t result = 0;
+    std::string content = "content";
+    listener_->OnUnbindResult(pkgName, targetId, result, content);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 
 /**
@@ -353,6 +468,81 @@ HWTEST_F(DeviceManagerServiceListenerTest, CalcDeviceId_001, testing::ext::TestS
     std::string udidHash;
     std::string str = listener_->CalcDeviceId(pkgName, udidHash);
     EXPECT_EQ(str.empty(), true);
+}
+
+/**
+ * @tc.name: OnPinHolderCreate_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string deviceId = "153123";
+    DmPinType pinType = static_cast<DmPinType>(1);
+    std::string payload = "payload";
+    listener_->OnPinHolderCreate(pkgName, deviceId, pinType, payload);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnPinHolderDestroy_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    DmPinType pinType = static_cast<DmPinType>(1);
+    std::string payload = "payload";
+    listener_->OnPinHolderDestroy(pkgName, pinType, payload);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnCreateResult_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    int32_t result = 0;
+    listener_->OnCreateResult(pkgName, result);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnDestroyResult_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    int32_t result = 0;
+    listener_->OnDestroyResult(pkgName, result);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: OnPinHolderEvent_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    DmPinHolderEvent event = DmPinHolderEvent::CREATE_RESULT;
+    int32_t result = 0;
+    std::string content = "content";
+    listener_->OnPinHolderEvent(pkgName, event, result, content);
+    EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware

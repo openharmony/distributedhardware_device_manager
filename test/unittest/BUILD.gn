@@ -791,11 +791,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
 ohos_unittest("UTTest_device_manager_service_listener") {
   module_out_path = module_out_path
 
-  sources = [
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${services_path}/src/device_manager_service_listener.cpp",
-    "UTTest_device_manager_service_listener.cpp",
-  ]
+  sources = [ "UTTest_device_manager_service_listener.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1011,15 +1007,6 @@ ohos_unittest("UTTest_dm_discovery_manager") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
-    "${services_path}/src/device_manager_service.cpp",
-    "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/softbus/softbus_listener.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/discovery/dm_discovery_filter.cpp",
-    "${servicesimpl_path}/src/discovery/dm_discovery_manager.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
