@@ -19,7 +19,7 @@ const TAG = '[DeviceManagerUI:PinCode]==>';
 
 export default class InputUIExtAbility extends UIExtensionAbility {
     onSessionCreate(want: Want, session: UIExtensionContentSession) {
-        console.log(TAG, `UIExtAbility onSessionCreate, want: ${JSON.stringify(want)}`)
+        console.log(TAG, `UIExtAbility onSessionCreate`)
         if (want.parameters && want.parameters.pinCode) {
             AppStorage.setOrCreate('pinCode', want.parameters.pinCode);
         }

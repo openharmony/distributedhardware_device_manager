@@ -19,7 +19,7 @@ const TAG: string = '[DeviceManagerUI:Confirm]==>'
 
 export default class ConfirmUIExtAbility extends UIExtensionAbility {
     onSessionCreate(want: Want, session: UIExtensionContentSession) {
-        console.log(TAG, `UIExtAbility onSessionCreate, want: ${JSON.stringify(want)}`)
+        console.log(TAG, `UIExtAbility onSessionCreate`)
         if (want.parameters == undefined) {
             return;
         }
