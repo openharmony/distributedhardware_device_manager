@@ -95,6 +95,7 @@ typedef enum DmDeviceType {
      * Indicates 2in1
     */
     DEVICE_TYPE_2IN1 = 0xA2F,
+    THIRD_TV = 0x2E,
 } DmDeviceType;
 
 /**
