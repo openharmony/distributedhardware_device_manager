@@ -526,7 +526,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         DmDeviceInfo deviceInfo;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
-        deviceInfoList.push_back(*deviceInfo);
+        deviceInfoList.push_back(deviceInfo);
     }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
     if (radarDeviceCount != deviceCount && deviceCount > 0
@@ -555,7 +555,7 @@ int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         DmDeviceBasicInfo deviceBasicInfo;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceBasicInfo);
-        deviceBasicInfoList.push_back(*deviceBasicInfo);
+        deviceBasicInfoList.push_back(deviceBasicInfo);
     }
     FreeNodeInfo(nodeInfo);
     LOGI("GetAvailableDevices success, deviceCount: %{public}d.", deviceCount);
