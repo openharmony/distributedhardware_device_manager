@@ -522,16 +522,10 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
-    DmDeviceInfo *info = static_cast<DmDeviceInfo *>(malloc(sizeof(DmDeviceInfo) * (deviceCount)));
-    if (info == nullptr) {
-        FreeNodeInfo(nodeInfo);
-        return ERR_DM_MALLOC_FAILED;
-    }
-    DmDeviceInfo **pInfoList = &info;
     for (int32_t i = 0; i < deviceCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
-        DmDeviceInfo *deviceInfo = *pInfoList + i;
-        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceInfo);
+        DmDeviceInfo deviceInfo;
+        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
         deviceInfoList.push_back(*deviceInfo);
     }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
@@ -544,7 +538,6 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         }
     }
     FreeNodeInfo(nodeInfo);
-    free(info);
     LOGI("GetTrustDevices success, deviceCount: %{public}d.", deviceCount);
     return ret;
 }
@@ -558,20 +551,13 @@ int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return ERR_DM_FAILED;
     }
-    DmDeviceBasicInfo *info = static_cast<DmDeviceBasicInfo *>(malloc(sizeof(DmDeviceBasicInfo) * (deviceCount)));
-    if (info == nullptr) {
-        FreeNodeInfo(nodeInfo);
-        return ERR_DM_MALLOC_FAILED;
-    }
-    DmDeviceBasicInfo **pInfoList = &info;
     for (int32_t i = 0; i < deviceCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
-        DmDeviceBasicInfo *deviceBasicInfo = *pInfoList + i;
-        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, *deviceBasicInfo);
+        DmDeviceBasicInfo deviceBasicInfo;
+        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceBasicInfo);
         deviceBasicInfoList.push_back(*deviceBasicInfo);
     }
     FreeNodeInfo(nodeInfo);
-    free(info);
     LOGI("GetAvailableDevices success, deviceCount: %{public}d.", deviceCount);
     return ret;
 }
@@ -704,16 +690,10 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    std::string extraData = devInfo.extraData;
     nlohmann::json extraJson;
-    if (!extraData.empty()) {
-        extraJson = nlohmann::json::parse(extraData, nullptr, false);
-    }
-    if (!extraJson.is_discarded()) {
-        extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-        extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
-        devInfo.extraData = to_string(extraJson);
-    }
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+    devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
 
