@@ -46,8 +46,8 @@ public:
 
 private:
     std::vector<std::string> eventNameVec_;
-    int32_t wifiState_;
-    int32_t bluetoothState_;
+    int32_t wifiState_ { -1 };
+    int32_t bluetoothState_ { -1 };
     PublishEventCallback callback_;
 };
 
