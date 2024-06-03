@@ -1,0 +1,30 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى."
+                },
+                {
+                    "quantity":"other",
+                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى."
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"ئىشەنمەيمەن (%d)"
+                },
+                {
+                    "quantity":"one",
+                    "value":"ئىشەنمەيمەن (%d)"
+                }
+            ]
+        }
+    ]
+}

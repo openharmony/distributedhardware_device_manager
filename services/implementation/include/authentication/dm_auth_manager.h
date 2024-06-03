@@ -127,6 +127,7 @@ typedef struct DmAuthRequestContext {
     std::string remoteAccountId;
     int32_t remoteUserId;
     std::string ip;
+    std::string hostPkgLabel;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -177,6 +178,7 @@ typedef struct DmAuthResponseContext {
     int32_t remoteUserId;
     std::string targetDeviceName;
     std::string importAuthCode;
+    std::string hostPkgLabel;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -535,6 +537,7 @@ private:
         const std::string &extra);
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
+    std::string GetBundleLable(const std::string &bundleName);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

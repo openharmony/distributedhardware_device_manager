@@ -17,6 +17,8 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 import deviceInfo from '@ohos.deviceInfo';
 import Constant from '../common/constant';
 import common from '@ohos.app.ability.common';
+import display from '@ohos.display';
+import mediaQuery from '@ohos.mediaquery';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -27,6 +29,9 @@ const ACTION_ALLOW_AUTH_ALWAYS: number = 6;
 const MSG_CANCEL_CONFIRM_SHOW: number = 5;
 const DEVICE_TYPE_2IN1: number = 0xA2F;
 const DEVICE_TYPE_PC: number = 0x0C;
+const CAST_PKG_NAME: string = 'CastEngineService';
+const DIALOG_MAX_HEIGHT_RATE = 0.9;
+const OTHER_HEIGHT_EXPECT_TITLE = 260;
 
 @CustomDialog
 struct ConfirmCustomDialog {
@@ -39,33 +44,56 @@ struct ConfirmCustomDialog {
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   @State titleFirst: string = '';
+  @State scrollHeight: number = 0;
   controller?: CustomDialogController;
   isPC: boolean = false;
+  listener: mediaQuery.MediaQueryListener = mediaQuery.matchMediaSync('(orientation: landscape)');
+
+  getScrollHeight() {
+    let defaultDisplay = display.getDefaultDisplaySync();
+    let height = defaultDisplay.height;
+    let densityPixels = defaultDisplay.densityPixels;
+    if (densityPixels === 0) {
+      console.error(TAG + 'onPortrait densityPixels is zero.')
+      return;
+    }
+    this.scrollHeight = height / densityPixels * DIALOG_MAX_HEIGHT_RATE - OTHER_HEIGHT_EXPECT_TITLE;
+  }
+
+  onPortrait(mediaQueryResult: mediaQuery.MediaQueryResult) {
+    this.getScrollHeight();
+  }
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
+    this.getScrollHeight();
     let context = getContext() as common.UIAbilityContext;
+
     if (AppStorage.get('deviceName') != null) {
-      this.peerDeviceName = AppStorage.get('deviceName') as string
-      console.log('peerDeviceName is ' + this.peerDeviceName)
+      this.peerDeviceName = AppStorage.get('deviceName') as string;
+      console.log('peerDeviceName is ' + this.peerDeviceName);
     }
-    this.titleFirst =
-      context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
+    let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
+    if (hostPkgLabel === CAST_PKG_NAME) {
+      this.titleFirst =
+        context.resourceManager.getStringSync($r('app.string.dm_confirm_title_cast').id, this.peerDeviceName);
+    } else if (hostPkgLabel != null) {
+      this.titleFirst = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
+        this.peerDeviceName);
+      this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
+    } else {
+      this.titleFirst =
+        context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
+    }
 
     if (AppStorage.get('deviceType') != null) {
-      this.peerDeviceType = AppStorage.get('deviceType') as number
-      console.log('peerDeviceType is ' + this.peerDeviceType)
-    }
-
-    if (AppStorage.get('appOperationStr') != null) {
-      this.peerAppOperation = AppStorage.get('appOperationStr') as string
-      console.log('peerAppOperation is ' + this.peerAppOperation)
-      this.titleFirst = this.peerDeviceName + ' ' + this.peerAppOperation;
+      this.peerDeviceType = AppStorage.get('deviceType') as number;
+      console.log('peerDeviceType is ' + this.peerDeviceType);
     }
 
     if (AppStorage.get('customDescriptionStr') != null) {
-      this.peerCustomDescription = AppStorage.get('customDescriptionStr') as string
-      console.log('peerCustomDescription is ' + this.peerCustomDescription)
+      this.peerCustomDescription = AppStorage.get('customDescriptionStr') as string;
+      console.log('peerCustomDescription is ' + this.peerCustomDescription);
     }
     this.times = setInterval(() => {
       console.info('devicemanagerui confirm dialog run seconds:' + this.secondsNum);
@@ -80,6 +108,9 @@ struct ConfirmCustomDialog {
     }, 1000)
     console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
     this.isPC = Constant.isPC();
+    this.listener.on('change', (mediaQueryResult: mediaQuery.MediaQueryResult) => {
+      this.onPortrait(mediaQueryResult);
+    })
   }
 
   onAllowOnce() {
@@ -192,14 +223,15 @@ struct ConfirmCustomDialog {
             .margin({ bottom: 16, top: 24 })
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
-            Text($r('app.string.dm_is_trust_device', this.titleFirst))
+            Scroll() {
+              Text(this.titleFirst)
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
               .fontSize($r('sys.float.ohos_id_text_size_body1'))
-              .maxLines(2)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .width('100%')
+            }.constraintSize({ maxHeight: this.scrollHeight })
             Text(this.peerCustomDescription)
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
@@ -209,7 +241,7 @@ struct ConfirmCustomDialog {
               .maxLines(3)
               .constraintSize({ maxHeight: 45 })
               .width('100%')
-              .margin({ top: 2 })
+              .margin({ top: 8 })
               .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
           }.margin({
             top: this.isAvailableType ? 0 : 24,
@@ -299,7 +331,7 @@ struct ConfirmCustomDialog {
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
-    }
+    }.constraintSize({ maxHeight: '90%' })
   }
 }
 

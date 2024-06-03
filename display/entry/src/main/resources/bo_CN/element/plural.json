@@ -1,0 +1,22 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"སྦྲེལ་མཐུད་ཨང་རྟགས་ནོར་འདུག ཁྱེད་ཀྱིས་ད་དུང་ཚོད་ལྟ་ཐེངས་ %d བྱ་ཆོག"
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"ཡིད་ཆེས་མེད། (སྐར་ཆ་ %d)"
+                }
+            ]
+        }
+    ]
+}

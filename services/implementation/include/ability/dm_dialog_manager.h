@@ -72,6 +72,11 @@ public:
     {
         return targetDeviceName_;
     }
+
+    static std::string GetHostPkgLabel()
+    {
+        return hostPkgLabel_;
+    }
 private:
     DmDialogManager();
     ~DmDialogManager();
@@ -92,6 +97,7 @@ private:
     static std::string appOperationStr_;
     static std::string customDescriptionStr_;
     static std::string pinCode_;
+    static std::string hostPkgLabel_;
     static int32_t deviceType_;
     static std::atomic<bool> isDialogDestroy_;
     static std::condition_variable dialogCondition_;

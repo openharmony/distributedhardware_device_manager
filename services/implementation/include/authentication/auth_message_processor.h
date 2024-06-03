@@ -69,6 +69,7 @@ constexpr const char* TAG_CONFIRM_OPERATION = "confirmOperation";
 constexpr const char* TAG_DATA = "data";
 constexpr const char* TAG_DATA_LEN = "dataLen";
 constexpr const char* TAG_IMPORT_AUTH_CODE = "IMPORT_AUTH_CODE";
+constexpr const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
 
 class DmAuthManager;
 struct DmAuthRequestContext;

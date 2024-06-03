@@ -18,6 +18,10 @@
 #include <string>
 #include <unistd.h>
 
+#include "bundle_mgr_interface.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+
 #include "auth_message_processor.h"
 #include "dm_ability_manager.h"
 #include "dm_anonymous.h"
@@ -145,6 +149,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     authRequestContext_->hostPkgName = pkgName;
+    authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
     authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
@@ -666,6 +671,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->deviceId = authRequestContext_->deviceId;
     authResponseContext_->accountGroupIdHash = GetAccountGroupIdHash();
     authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
+    authResponseContext_->hostPkgLabel = authRequestContext_->hostPkgLabel;
     authResponseContext_->tokenId = authRequestContext_->tokenId;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
     authResponseContext_->bindType = authRequestContext_->bindType;
@@ -1258,6 +1264,7 @@ void DmAuthManager::ShowConfigDialog()
     jsonObj[TAG_APP_OPERATION] = authResponseContext_->appOperation;
     jsonObj[TAG_LOCAL_DEVICE_TYPE] = authResponseContext_->deviceTypeId;
     jsonObj[TAG_REQUESTER] = authResponseContext_->deviceName;
+    jsonObj[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
     const std::string params = jsonObj.dump();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -2415,6 +2422,42 @@ int32_t DmAuthManager::CheckTrustState()
         return ERR_DM_BIND_PEER_UNSUPPORTED;
     }
     return DM_OK;
+}
+
+std::string DmAuthManager::GetBundleLable(const std::string &bundleName)
+{
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("Get ability manager failed");
+        return bundleName;
+    }
+
+    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        LOGE("object is NULL.");
+        return bundleName;
+    }
+
+    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
+    if (bms == nullptr) {
+        LOGE("bundle manager service is NULL.");
+        return bundleName;
+    }
+
+    auto bundleResourceProxy = bms->GetBundleResourceProxy();
+    if (bundleResourceProxy == nullptr) {
+        LOGE("GetBundleResourceProxy fail");
+        return bundleName;
+    }
+    AppExecFwk::BundleResourceInfo resourceInfo;
+    auto result = bundleResourceProxy->GetBundleResourceInfo(bundleName,
+        static_cast<uint32_t>(OHOS::AppExecFwk::ResourceFlag::GET_RESOURCE_INFO_ALL), resourceInfo);
+    if (result != ERR_OK) {
+        LOGE("GetBundleResourceInfo failed");
+        return bundleName;
+    }
+    LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
+    return resourceInfo.label;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
