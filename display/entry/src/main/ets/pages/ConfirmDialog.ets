@@ -43,7 +43,7 @@ struct ConfirmCustomDialog {
   @State times: number = 0;
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
-  @State titleFirst: string = '';
+  @State title: string = '';
   @State scrollHeight: number = 0;
   controller?: CustomDialogController;
   isPC: boolean = false;
@@ -75,15 +75,18 @@ struct ConfirmCustomDialog {
     }
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
     if (hostPkgLabel === CAST_PKG_NAME) {
-      this.titleFirst =
+      this.title =
         context.resourceManager.getStringSync($r('app.string.dm_confirm_title_cast').id, this.peerDeviceName);
     } else if (hostPkgLabel != null) {
-      this.titleFirst = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
+      this.title = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
         this.peerDeviceName);
       this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
     } else {
-      this.titleFirst =
+      let titleFirst: string =
         context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
+      this.title =
+        context.resourceManager.getStringSync($r('app.string.dm_is_trust_device').id, titleFirst);
+      this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
     }
 
     if (AppStorage.get('deviceType') != null) {
@@ -91,10 +94,6 @@ struct ConfirmCustomDialog {
       console.log('peerDeviceType is ' + this.peerDeviceType);
     }
 
-    if (AppStorage.get('customDescriptionStr') != null) {
-      this.peerCustomDescription = AppStorage.get('customDescriptionStr') as string;
-      console.log('peerCustomDescription is ' + this.peerCustomDescription);
-    }
     this.times = setInterval(() => {
       console.info('devicemanagerui confirm dialog run seconds:' + this.secondsNum);
       this.secondsNum--;
@@ -224,7 +223,7 @@ struct ConfirmCustomDialog {
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
             Scroll() {
-              Text(this.titleFirst)
+              Text(this.title)
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
