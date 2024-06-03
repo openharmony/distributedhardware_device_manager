@@ -229,7 +229,6 @@ struct ConfirmCustomDialog {
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Medium)
               .fontSize($r('sys.float.ohos_id_text_size_body1'))
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
               .width('100%')
             }.constraintSize({ maxHeight: this.scrollHeight })
             Text(this.peerCustomDescription)
