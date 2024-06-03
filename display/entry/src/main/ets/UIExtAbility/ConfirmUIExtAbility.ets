@@ -35,6 +35,9 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         if (want.parameters.deviceType) {
             AppStorage.setOrCreate('deviceType', want.parameters.deviceType);
         }
+        if (want.parameters.hostPkgLabel) {
+            AppStorage.setOrCreate('hostPkgLabel', want.parameters.hostPkgLabel);
+        }
 
         let param: Record<string, UIExtensionContentSession> = {
             'session': session

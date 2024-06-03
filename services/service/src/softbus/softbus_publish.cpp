@@ -39,10 +39,10 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState)
         softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = softbusPublish.PublishSoftbusLNN();
         if (ret == DM_OK) {
-            LOGI("publish successed, ret : %{publisc}d.", ret);
+            LOGI("publish successed, ret : %{public}d.", ret);
             return;
         }
-        LOGE("publish failed, ret : %{publisc}d.", ret);
+        LOGE("publish failed, ret : %{public}d.", ret);
         return;
     }
     softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
