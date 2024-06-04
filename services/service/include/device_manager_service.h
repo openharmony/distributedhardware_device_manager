@@ -32,7 +32,9 @@
 #include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 
 namespace OHOS {
@@ -203,7 +205,9 @@ private:
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 
 private:
@@ -220,7 +224,9 @@ private:
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 };
 } // namespace DistributedHardware

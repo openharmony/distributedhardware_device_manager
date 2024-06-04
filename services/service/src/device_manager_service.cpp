@@ -28,9 +28,11 @@
 #include "permission_manager.h"
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "common_event_support.h"
 #include "softbus_publish.h"
 using namespace OHOS::EventFwk;
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -68,13 +70,16 @@ int32_t DeviceManagerService::InitSoftbusListener()
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
     LOGI("SoftbusListener init success.");
     return DM_OK;
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::SubscribePublishCommonEvent()
 {
     LOGI("DeviceManagerServiceImpl::SubscribeCommonEvent");
@@ -84,13 +89,19 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     PublishEventCallback callback = std::bind(&OHOS::DistributedHardware::PublishCommonEventCallback,
         std::placeholders::_1, std::placeholders::_2);
     std::vector<std::string> PublishCommonEventVec;
+#ifdef SUPPORT_BLUETOOTH
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE);
+#endif // SUPPORT_BLUETOOTH
+
+#ifdef SUPPORT_WIFI
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE);
+#endif // SUPPORT_WIFI
     if (publshCommonEventManager_->SubscribePublishCommonEvent(PublishCommonEventVec, callback)) {
         LOGI("subscribe ble and wifi common event success");
     }
     return;
 }
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 
 void DeviceManagerService::UninitSoftbusListener()

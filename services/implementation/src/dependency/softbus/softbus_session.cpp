@@ -63,6 +63,7 @@ static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t q
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
+    (void)memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener));
     iSocketListener_.OnShutdown = OnShutdown;
     iSocketListener_.OnBytes = OnBytes;
     iSocketListener_.OnQos = OnQos;
