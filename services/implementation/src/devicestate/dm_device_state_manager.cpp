@@ -475,9 +475,9 @@ std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DmDeviceStat
         {
             if (stateDeviceInfos_.find(item.first) != stateDeviceInfos_.end()) {
                 osType = stateDeviceInfos_[item.first].extraData;
-                LOGI("yangwei find stateDeviceInfos_ ostype %{public}s", osType.c_str());
+                LOGI("Find stateDeviceInfos_ ostype %{public}s", osType.c_str());
             } else {
-                LOGI("yangwei not find stateDeviceInfos_ ostype %{public}s", osType.c_str());
+                LOGI("Not find stateDeviceInfos_ ostype %{public}s", osType.c_str());
             }
         }
         trustDeviceOsTypeMap[item.first] = std::pair<DmAuthForm, std::string>(item.second, osType);

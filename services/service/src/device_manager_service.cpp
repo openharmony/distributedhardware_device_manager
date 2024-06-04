@@ -174,7 +174,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
                 }
                 item.authForm = udidMap[udid].first;
                 item.extraData = udidMap[udid].second;
-                LOGI("yangwei GetTrustedDeviceList item.extraData %{public}s", item.extraData.c_str());
                 deviceList.push_back(item);
             }
         }

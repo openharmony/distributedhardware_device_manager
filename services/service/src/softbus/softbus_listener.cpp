@@ -694,7 +694,6 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
     devInfo.extraData = to_string(extraJson);
-    LOGI("yangwei SoftbusListener::ConvertNodeBasicInfoToDmDevice devInfo.extraData %{public}s", devInfo.extraData.c_str());
     return DM_OK;
 }
 
