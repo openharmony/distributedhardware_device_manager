@@ -39,12 +39,12 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     return profiles;
 }
 
-std::map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
+std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("DeviceProfileConnector::GetAppTrustDeviceList, AccessControlProfile size is %{public}zu", profiles.size());
-    std::map<std::string, DmAuthForm> deviceIdMap;
+    std::unordered_map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {

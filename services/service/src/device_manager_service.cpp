@@ -157,7 +157,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return ERR_DM_FAILED;
     }
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap;
+        std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> udidMap;
         if (PermissionManager::GetInstance().CheckSA()) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
@@ -172,7 +172,9 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
                 if (memcpy_s(item.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash.c_str(), deviceIdHash.length()) != 0) {
                     LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceIdHash).c_str());
                 }
-                item.authForm = udidMap[udid];
+                item.authForm = udidMap[udid].first;
+                item.extraData = udidMap[udid].second;
+                LOGI("yangwei GetTrustedDeviceList item.extraData %{public}s", item.extraData.c_str());
                 deviceList.push_back(item);
             }
         }
@@ -196,7 +198,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
     }
 
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::map<std::string, DmAuthForm> udidMap;
+        std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> udidMap;
         if (PermissionManager::GetInstance().CheckSA()) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
@@ -204,7 +206,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
-            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid); 
             if (udidMap.find(udid) != udidMap.end()) {
                 std::string deviceIdHash = "";
                 dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);

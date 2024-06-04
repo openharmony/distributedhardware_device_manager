@@ -687,12 +687,15 @@ int32_t DeviceManagerServiceImpl::CheckRelatedDevice(const std::string &udid, co
     return DeviceProfileConnector::GetInstance().CheckRelatedDevice(udid, bundleName);
 }
 
-std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
+std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
+        std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = reinterpret_cast<char *>(localDeviceId);
-    return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
+    std::unordered_map<std::string, DmAuthForm> trustDeviceMap =
+        DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
+    return deviceStateMgr_->GetDeviceOsType(trustDeviceMap);
 }
 
 void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)

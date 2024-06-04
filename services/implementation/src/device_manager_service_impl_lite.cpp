@@ -408,10 +408,10 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     return DM_OK;
 }
 
-std::map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
+std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
 {
     (void)pkgname;
-    std::map<std::string, DmAuthForm> tmp;
+    std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> tmp;
     return tmp;
 }
 
