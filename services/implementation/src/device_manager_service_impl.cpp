@@ -688,7 +688,7 @@ int32_t DeviceManagerServiceImpl::CheckRelatedDevice(const std::string &udid, co
 }
 
 std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
-        std::string pkgname)
+    std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);

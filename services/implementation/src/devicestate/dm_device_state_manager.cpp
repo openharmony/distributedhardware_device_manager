@@ -465,7 +465,7 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &deviceId)
 }
 #endif
 std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DmDeviceStateManager::GetDeviceOsType(
-        std::unordered_map<std::string, DmAuthForm> devMap)
+    std::unordered_map<std::string, DmAuthForm> devMap)
 {
     LOGI("DmDeviceStateManager::GetDeviceOsType");
     std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> trustDeviceOsTypeMap;

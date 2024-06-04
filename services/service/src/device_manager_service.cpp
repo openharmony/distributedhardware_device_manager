@@ -205,7 +205,7 @@ int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
         }
         for (auto item : onlineDeviceList) {
             std::string udid = "";
-            SoftbusListener::GetUdidByNetworkId(item.networkId, udid); 
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
                 std::string deviceIdHash = "";
                 dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
