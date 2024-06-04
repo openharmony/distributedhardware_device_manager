@@ -90,7 +90,7 @@ public:
     virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
     virtual int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee) = 0;
     virtual int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId) = 0;
-    virtual std::map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
+    virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
         const std::string &deviceId) = 0;
     virtual DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId) = 0;
     virtual std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
@@ -122,7 +122,8 @@ public:
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
     int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
-    std::map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName, const std::string &deviceId);
+    std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
+        const std::string &deviceId);
     DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId);
     std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
         std::string trustUdid);
