@@ -57,18 +57,6 @@
             "value":"连接码"
         },
         {
-            "name":"dm_bt_not_open",
-            "value":"蓝牙未打开"
-        },
-        {
-            "name":"dm_open_bt",
-            "value":"请打开蓝牙"
-        },
-        {
-            "name":"dm_close",
-            "value":"关闭"
-        },
-        {
             "name":"dm_confirm_title_cast",
             "value":"%s想要投屏至本机。是否信任此设备？"
         },

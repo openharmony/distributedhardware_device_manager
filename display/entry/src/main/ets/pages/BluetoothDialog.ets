@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,104 +13,115 @@
  * limitations under the License.
  */
 import deviceManager from '@ohos.distributedHardware.deviceManager';
-import Context from '@ohos.app.ability.common';
-import Want from '@ohos.app.ability.Want';
-import window from '@ohos.window';
+import { BusinessError } from '@ohos.base';
+import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
+import deviceInfo from '@ohos.deviceInfo';
+import Constant from '../common/constant';
 
-let dmClass: deviceManager.DeviceManager | null;
-let TAG = '[DeviceManagerUI:BluetoothDialog]==>'
+let TAG = '[DeviceManagerUI:BluetoothDialog]==>';
 
-const MSG_CANCEL_PIN_CODE_SHOW: number = 2
+@CustomDialog
+struct BluetoothCustomDialog {
+  @State btnColor: ResourceColor = Color.Transparent;
+  @State isPC: boolean = false;
+  controller?: CustomDialogController
+
+  aboutToAppear() {
+    console.log(TAG + 'aboutToAppear execute BluetoothCustomDialog');
+    this.isPC = Constant.isPC();
+  }
+
+  build() {
+    GridRow({
+      columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+      gutter: { x: 4 },
+      breakpoints: { value: ['600vp', '840vp'] }
+    }) {
+      GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
+        Column() {
+          Flex({ justifyContent: FlexAlign.Center }) {
+            Text($r('app.string.dm_bluetooth_dialog_content'))
+              .fontSize($r('sys.float.ohos_id_text_size_body1'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary'))
+              .fontWeight(FontWeight.Regular)
+              .margin({
+                left: 24,
+                right: 24
+              })
+              .flexBasis('auto')
+              .width('auto')
+          }
+          .margin({
+            bottom: this.isPC ? 16 : 8,
+            top: this.isPC ? 32 : 24
+          })
+
+          Flex({ justifyContent: FlexAlign.Center }) {
+            Button($r('app.string.dm_bluetooth_dialog_close'))
+              .fontSize($r('sys.float.ohos_id_text_size_button1'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .height(40)
+              .width('100%')
+              .backgroundColor(this.btnColor)
+              .onClick(() => {
+                if (this.controller) {
+                  this.controller.close();
+                }
+                let session = AppStorage.get<UIExtensionContentSession>('bluetoothSession');
+                if (session) {
+                  session.terminateSelf();
+                }
+              })
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+          }.margin({
+            left: this.isPC ? 72 : 16,
+            right: this.isPC ? 72 : 16,
+            bottom: this.isPC ? 24 : 16 })
+        }
+        .constraintSize({ maxHeight: `${300}` })
+        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+      }
+    }
+  }
+}
+
 @Entry
 @Component
 struct dialogPlusPage {
-  @State isShow: boolean = true
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: BluetoothCustomDialog(),
+    autoCancel: false,
+    alignment: DialogAlignment.Center,
+    offset: { dx: 0, dy: -20 },
+    customStyle: true,
+    maskColor: $r('sys.color.ohos_id_color_mask_thin')
+  });
 
   aboutToAppear() {
-    this.initStatue()
-    console.log('aboutToAppear execute');
+    console.log(TAG + 'aboutToAppear execute')
   }
 
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear executed')
-    if (dmClass != null) {
-      try {
-        dmClass.off('uiStateChange')
-        dmClass.release()
-      } catch (error) {
-        console.log('dmClass release failed')
-      }
-      dmClass = null
-    }
-  }
-
-  initStatue() {
-    let globalWindowNum: number = AppStorage.get('bluetoothDialogWindowNum') as number
-    console.log('initStatue' + 'bluetoothDialogWindowNum:' + globalWindowNum)
-    if (dmClass) {
-      console.log('deviceManager exist')
-      return
-    }
-    deviceManager.createDeviceManager('com.ohos.devicemanagerui.bluetoothDialog',
-      (err: Error, dm: deviceManager.DeviceManager) => {
-      if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + JSON.stringify(dm))
-        return
-      }
-      dmClass = dm
-      dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data))
-        let tmpStr: Record<string, number> = JSON.parse(data.param)
-        let msg: number = tmpStr.uiStateMsg as number
-        if (msg === MSG_CANCEL_PIN_CODE_SHOW) {
-          this.destruction()
-        }
-      })
-    });
-  }
-
-  setUserOperation(operation: number) {
-    console.log('setUserOperation: ' + operation)
-    if (dmClass == null) {
-      console.log('setUserOperation: ' + 'dmClass null')
-      return;
-    }
-    try {
-      dmClass.setUserOperation(operation, 'extra')
-    } catch (error) {
-      console.log('dmClass setUserOperation failed')
-    }
-  }
-
-  destruction() {
-    let temporaryWindow: window.Window = AppStorage.get('bluetoothDialogWin') as window.Window
-    temporaryWindow.destroy()
-    let context: Context.UIAbilityContext = AppStorage.get('bluetoothDialogContext') as Context.UIAbilityContext
-    context.terminateSelf()
   }
 
   build() {
-    Row() {
-      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-        Column() {
-          Text($r('app.string.dm_bt_not_open'))
-            .fontSize(35)
-            .fontWeight(FontWeight.Bold)
-          Text($r('app.string.dm_open_bt'))
-            .fontSize(30)
-            .fontWeight(FontWeight.Medium)
-          Row() {}.height('2%')
-          Button($r('app.string.dm_close'))
-            .fontSize(25)
-            .fontColor(0xffffff)
-            .border({ width: 1.5, color: (0xe7e7e7), radius: 50 })
-            .fontWeight(FontWeight.Normal)
-            .onClick(() => {
-              this.destruction()
-            })
-        }.width('100%')
-      }.width('100%')
-      .height('100%')
-    }.width('100%')
+    Column(this.dialogController.open())
   }
 }

@@ -57,18 +57,6 @@
             "value":"Connection code"
         },
         {
-            "name":"dm_bt_not_open",
-            "value":"Bluetooth is not turned on"
-        },
-        {
-            "name":"dm_open_bt",
-            "value":"Please turn on Bluetooth"
-        },
-        {
-            "name":"dm_close",
-            "value":"Close"
-        },
-        {
             "name":"dm_confirm_title_cast",
             "value":"%s would like to mirror their screen on your device. Trust this device?"
         },
