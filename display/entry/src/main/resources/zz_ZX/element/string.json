@@ -9,24 +9,12 @@
             "value":"[TS_917651]_%s Trust this device?"
         },
         {
-            "name":"dm_close",
-            "value":"[TS_917649]_Close"
-        },
-        {
             "name":"ServiceExtAbility_desc",
             "value":"[TS_917650]_ServiceExtAbility_desc"
         },
         {
-            "name":"dm_open_bt",
-            "value":"[TS_917666]_Please turn on Bluetooth"
-        },
-        {
             "name":"dm_connect_code",
             "value":"[TS_917664]_Connection code"
-        },
-        {
-            "name":"dm_bt_not_open",
-            "value":"[TS_917652]_Bluetooth is not turned on"
         },
         {
             "name":"dm_cancel",
