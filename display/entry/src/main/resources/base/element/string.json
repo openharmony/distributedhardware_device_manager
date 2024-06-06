@@ -70,7 +70,7 @@
         },
         {
             "name":"dm_bluetooth_dialog_content",
-            "value":"Bluetooth must be enabled to connect to the device. Please enable it and try again."
+            "value":"Bluetooth needs to be enabled to connect to another device. Please enable it and try again."
         },
         {
             "name":"dm_bluetooth_dialog_close",
