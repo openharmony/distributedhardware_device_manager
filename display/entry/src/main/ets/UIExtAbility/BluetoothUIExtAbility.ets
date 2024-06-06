@@ -15,39 +15,20 @@
 import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility'
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import Want from '@ohos.app.ability.Want';
-const TAG: string = '[DeviceManagerUI:Confirm]==>'
+const TAG = '[DeviceManagerUI:BluetoothDialog]==>';
 
-export default class ConfirmUIExtAbility extends UIExtensionAbility {
+export default class BluetoothUIExtAbility extends UIExtensionAbility {
     onSessionCreate(want: Want, session: UIExtensionContentSession) {
         console.log(TAG, `UIExtAbility onSessionCreate`)
-        if (want.parameters == undefined) {
-            return;
-        }
-        if (want.parameters.deviceName) {
-            AppStorage.setOrCreate('deviceName', want.parameters.deviceName);
-        }
-        if (want.parameters.appOperationStr) {
-            AppStorage.setOrCreate('appOperationStr', want.parameters.appOperationStr);
-        }
-        if (want.parameters.customDescriptionStr) {
-            AppStorage.setOrCreate('customDescriptionStr', want.parameters.customDescriptionStr);
-        }
-        if (want.parameters.deviceType) {
-            AppStorage.setOrCreate('deviceType', want.parameters.deviceType);
-        }
-        if (want.parameters.hostPkgLabel) {
-            AppStorage.setOrCreate('hostPkgLabel', want.parameters.hostPkgLabel);
-        }
-
         let param: Record<string, UIExtensionContentSession> = {
             'session': session
         }
         let storage: LocalStorage = new LocalStorage(param);
-        session.loadContent('pages/ConfirmDialog', storage);
+        session.loadContent('pages/BluetoothDialog', storage);
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
-        AppStorage.setOrCreate('ConfirmSession', session);
+        AppStorage.setOrCreate('bluetoothSession', session);
     }
 
     onSessionDestroy(session: UIExtensionContentSession) {

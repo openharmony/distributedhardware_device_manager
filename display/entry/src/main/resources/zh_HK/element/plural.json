@@ -1,0 +1,22 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"連接碼錯誤，還可以嘗試 %d 次"
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"不信任（%d 秒）"
+                }
+            ]
+        }
+    ]
+}

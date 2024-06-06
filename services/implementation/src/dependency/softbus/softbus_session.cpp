@@ -72,6 +72,7 @@ SoftbusSession::SoftbusSession()
     iSocketListener_.OnBind = nullptr;
     iSocketListener_.OnStream = nullptr;
     iSocketListener_.OnError = nullptr;
+    iSocketListener_.OnNegotiate = nullptr;
 }
 
 SoftbusSession::~SoftbusSession()

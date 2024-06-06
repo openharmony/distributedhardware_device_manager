@@ -50,6 +50,7 @@ std::string DmDialogManager::appOperationStr_ = "";
 std::string DmDialogManager::customDescriptionStr_ = "";
 std::string DmDialogManager::targetDeviceName_ = "";
 std::string DmDialogManager::pinCode_ = "";
+std::string DmDialogManager::hostPkgLabel_ = "";
 std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
 std::condition_variable DmDialogManager::dialogCondition_;
 int32_t DmDialogManager::deviceType_ = -1;
@@ -77,6 +78,7 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
     std::string deviceName = "";
     std::string appOperationStr = "";
     std::string customDescriptionStr = "";
+    std::string hostPkgLabel = "";
     int32_t deviceType = -1;
     nlohmann::json jsonObject = nlohmann::json::parse(param, nullptr, false);
     if (!jsonObject.is_discarded()) {
@@ -92,6 +94,9 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
         if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
             deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].get<std::int32_t>();
         }
+        if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
+            hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].get<std::string>();
+        }
     }
 
     bundleName_ = dmUiBundleName;
@@ -100,6 +105,7 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
     appOperationStr_ = appOperationStr;
     customDescriptionStr_ = customDescriptionStr;
     deviceType_ = deviceType;
+    hostPkgLabel_ = hostPkgLabel;
     ConnectExtension();
 }
 
@@ -188,6 +194,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     param["customDescriptionStr"] = DmDialogManager::GetCustomDescriptionStr();
     param["deviceType"] = DmDialogManager::GetDeviceType();
     param[TAG_TARGET_DEVICE_NAME] = DmDialogManager::GetTargetDeviceName();
+    param[TAG_HOST_PKGLABEL] = DmDialogManager::GetHostPkgLabel();
     std::string paramStr = param.dump();
     data.WriteString16(Str8ToStr16(paramStr));
     LOGI("show dm dialog is begin");

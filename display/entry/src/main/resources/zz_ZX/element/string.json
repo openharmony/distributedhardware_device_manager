@@ -9,24 +9,12 @@
             "value":"[TS_917651]_%s Trust this device?"
         },
         {
-            "name":"dm_close",
-            "value":"[TS_917649]_Close"
-        },
-        {
             "name":"ServiceExtAbility_desc",
             "value":"[TS_917650]_ServiceExtAbility_desc"
         },
         {
-            "name":"dm_open_bt",
-            "value":"[TS_917666]_Please turn on Bluetooth"
-        },
-        {
             "name":"dm_connect_code",
             "value":"[TS_917664]_Connection code"
-        },
-        {
-            "name":"dm_bt_not_open",
-            "value":"[TS_917652]_Bluetooth is not turned on"
         },
         {
             "name":"dm_cancel",
@@ -67,6 +55,26 @@
         {
             "name":"dm_allow_always",
             "value":"[TS_917657]_Always trust"
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"[TS_931359]_%s would like to mirror their screen on your device. Trust this device?"
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"[TS_931358]_%1$s on %2$s would like to access this device. Trust this app?"
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"[TS_933058]_OK"
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"[TS_933059]_Bluetooth must be enabled to connect to the device. Please enable it and try again."
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"[TS_931360]_This is required for cross-device data syncing and collaboration."
         }
     ]
 }

@@ -27,6 +27,26 @@
         {
             "name":"dm_allow_always",
             "value":"始終信任"
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s想要螢幕投影至本機。是否信任此裝置？"
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s是否信任此裝置？"
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%2$s 的「%1$s」要求存取本機。是否信任此應用程式？"
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s 想要連線本機。"
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"用於進行資料同步及裝置間共同作業"
         }
     ]
 }

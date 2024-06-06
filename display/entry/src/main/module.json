@@ -61,12 +61,12 @@
       },
       {
         "name": "com.ohos.devicemanagerui.BluetoothDialogAbility",
-        "srcEntrance": "./ets/ServiceExtAbility/BluetoothDialogAbility.ts",
+        "srcEntrance": "./ets/UIExtAbility/BluetoothUIExtAbility.ets",
         "description": "$string:ServiceExtAbility_desc",
         "icon": "$media:icon",
         "label": "$string:ServiceExtAbility_label",
-        "visible": true,
-        "type": "service"
+        "exported": true,
+        "type": "sysDialog/common"
       }
     ],
     "requestPermissions": [

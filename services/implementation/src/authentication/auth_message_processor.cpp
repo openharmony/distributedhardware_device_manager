@@ -188,6 +188,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
+    json[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -497,6 +498,9 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
                 authResponseContext_->bindType.push_back(json[itemStr].get<int32_t>());
             }
         }
+    }
+    if (IsString(json, TAG_HOST_PKGLABEL)) {
+        authResponseContext_->hostPkgLabel = json[TAG_HOST_PKGLABEL].get<std::string>();
     }
 }
 

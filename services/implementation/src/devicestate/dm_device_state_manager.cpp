@@ -104,7 +104,9 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
     devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-        stateDeviceInfos_[deviceId] = devInfo;
+        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
+            stateDeviceInfos_[deviceId] = devInfo;
+        }
     }
     std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
     if (pkgName.size() == 0) {
@@ -462,5 +464,25 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &deviceId)
     return DM_OK;
 }
 #endif
+std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DmDeviceStateManager::GetDeviceOsType(
+    std::unordered_map<std::string, DmAuthForm> devMap)
+{
+    LOGI("DmDeviceStateManager::GetDeviceOsType");
+    std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> trustDeviceOsTypeMap;
+    for (const auto &item : devMap) {
+        std::string osType = "";
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        {
+            if (stateDeviceInfos_.find(item.first) != stateDeviceInfos_.end()) {
+                osType = stateDeviceInfos_[item.first].extraData;
+                LOGI("Find stateDeviceInfos_ ostype %{public}s", osType.c_str());
+            } else {
+                LOGI("Not find stateDeviceInfos_ ostype %{public}s", osType.c_str());
+            }
+        }
+        trustDeviceOsTypeMap[item.first] = std::pair<DmAuthForm, std::string>(item.second, osType);
+    }
+    return trustDeviceOsTypeMap;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

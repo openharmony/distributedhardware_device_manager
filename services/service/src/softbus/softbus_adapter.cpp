@@ -75,6 +75,7 @@ SoftbusAdapter::SoftbusAdapter()
     iSocketListener_.OnQos = DmOnQosEvent;
     iSocketListener_.OnFile = nullptr;
     iSocketListener_.OnError = nullptr;
+    iSocketListener_.OnNegotiate = nullptr;
 }
 
 SoftbusAdapter::~SoftbusAdapter()
