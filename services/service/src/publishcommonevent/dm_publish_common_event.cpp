@@ -17,13 +17,15 @@
 
 #include <pthread.h>
 #include <thread>
-
+#ifdef SUPPORT_BLUETOOTH
 #include "bluetooth_def.h"
+#endif // SUPPORT_BLUETOOTH
 #include "common_event_support.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
-
+#endif // SUPPORT_WIFI
 #include "dm_constants.h"
 #include "dm_log.h"
 
@@ -134,19 +136,25 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string receiveEvent = data.GetWant().GetAction();
     int32_t eventState = data.GetCode();
     LOGI("On Received receiveEvent: %{public}s, eventState: %{public}d", receiveEvent.c_str(), eventState);
+#ifdef SUPPORT_BLUETOOTH
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
         eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
         bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
-        eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
-        wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED);
     } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
         eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF)) {
         bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF);
+    }
+#endif // SUPPORT_BLUETOOTH
+
+#ifdef SUPPORT_WIFI
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
+        eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
+        wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED);
     } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
         eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED)) {
         wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED);
     }
+#endif // SUPPORT_WIFI
 
     std::thread dealThread(callback_, bluetoothState_, wifiState_);
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);

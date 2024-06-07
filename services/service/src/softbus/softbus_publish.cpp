@@ -17,11 +17,15 @@
 
 #include <mutex>
 
+#ifdef SUPPORT_BLUETOOTH
 #include "bluetooth_def.h"
+#endif // SUPPORT_BLUETOOTH
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "system_ability_definition.h"
+#ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
+#endif // SUPPORT_WIFI
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,18 +38,33 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState)
 {
     LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState:  %{public}d,", bluetoothState, wifiState);
     SoftbusPublish softbusPublish;
-    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON) ||
-        wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
+#ifdef SUPPORT_BLUETOOTH
+    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
         softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = softbusPublish.PublishSoftbusLNN();
         if (ret == DM_OK) {
-            LOGI("publish successed, ret : %{public}d.", ret);
+            LOGI("bluetooth publish successed, ret : %{public}d.", ret);
             return;
         }
-        LOGE("publish failed, ret : %{public}d.", ret);
+        LOGE("bluetooth publish failed, ret : %{public}d.", ret);
         return;
     }
     softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_BLUETOOTH
+
+#ifdef SUPPORT_WIFI
+    if (wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
+        softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        int32_t ret = softbusPublish.PublishSoftbusLNN();
+        if (ret == DM_OK) {
+            LOGI("wifi publish successed, ret : %{public}d.", ret);
+            return;
+        }
+        LOGE("wifi publish failed, ret : %{public}d.", ret);
+        return;
+    }
+    softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_WIFI
 }
 
 SoftbusPublish::SoftbusPublish()

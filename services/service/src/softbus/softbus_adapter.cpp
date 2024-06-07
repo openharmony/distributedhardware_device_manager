@@ -66,6 +66,7 @@ static void DmOnQosEvent(int32_t socket, QoSEvent eventId, const QosTV *qos, uin
 SoftbusAdapter::SoftbusAdapter()
 {
     LOGI("SoftbusAdapter");
+    (void)memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener));
     iSocketListener_.OnBind = DmOnSoftbusSessionBind;
     iSocketListener_.OnShutdown = DmOnSoftbusSessionClosed;
     iSocketListener_.OnBytes = DmOnBytesReceived;
