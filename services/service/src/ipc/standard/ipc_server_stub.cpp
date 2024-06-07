@@ -57,11 +57,8 @@ void IpcServerStub::OnStart()
     LOGI("called:AddAbilityListener begin!");
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     LOGI("called:AddAbilityListener end!");
-    int pid = getpid();
-    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    LOGI("IpcServerStub::OnStart end");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -69,6 +66,9 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
+    } else if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        int pid = getpid();
+        Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     }
 }
 
@@ -105,7 +105,6 @@ void IpcServerStub::OnStop()
     registerToService_ = false;
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     LOGI("IpcServerStub::OnStop end.");
 }
 
