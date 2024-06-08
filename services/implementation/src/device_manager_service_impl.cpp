@@ -80,35 +80,8 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
     }
-
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    if (userId > 0) {
-        LOGI("get current account user id success");
-        MultipleUserConnector::SetSwitchOldUserId(userId);
-        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
-    }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    SubscribeCommonEvent();
-#endif
     LOGI("Init success, singleton initialized");
     return DM_OK;
-}
-
-void DeviceManagerServiceImpl::SubscribeCommonEvent()
-{
-    LOGI("DeviceManagerServiceImpl::SubscribeCommonEvent");
-    if (commonEventManager_ == nullptr) {
-        commonEventManager_ = std::make_shared<DmCommonEventManager>();
-    }
-    CommomEventCallback callback = std::bind(&DmAuthManager::CommonEventCallback, *authMgr_.get(),
-        std::placeholders::_1);
-    std::vector<std::string> commonEvevtVec;
-    commonEvevtVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
-    commonEvevtVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
-    if (commonEventManager_->SubscribeServiceEvent(commonEvevtVec, callback)) {
-        LOGI("subscribe service user switch common event success");
-    }
-    return;
 }
 
 void DeviceManagerServiceImpl::Release()
@@ -716,6 +689,27 @@ void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t socket, const void 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
     DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+}
+
+void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
+{
+    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
+        commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        authMgr_->CommonEventCallback(userId, commonEventType);
+        LOGI("DeviceManagerServiceImpl::account event: %{public}s, userId: %{public}s",
+            commonEventType.c_str(), GetAnonyInt32(userId).c_str());
+        return;
+    }
+    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+        int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+        std::string currentAccountId = MultipleUserConnector::GetOhosAccountId();
+        MultipleUserConnector::SetSwitchOldUserId(currentUserId);
+        MultipleUserConnector::SetSwitchOldAccountId(currentAccountId);
+        LOGI("DeviceManagerServiceImpl::account login accountId: %{public}s, userId: %{public}s",
+            GetAnonyString(currentAccountId).c_str(), GetAnonyInt32(currentUserId).c_str());
+        return;
+    }
+    LOGI("DeviceManagerServiceImpl::AccountCommonEventCallback error.");
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

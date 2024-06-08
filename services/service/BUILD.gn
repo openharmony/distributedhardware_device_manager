@@ -163,6 +163,7 @@ if (defined(ohos_lite)) {
       "src/permission/standard/permission_manager.cpp",
       "src/pinholder/pin_holder.cpp",
       "src/pinholder/pin_holder_session.cpp",
+      "src/publishcommonevent/dm_account_common_event.cpp",
       "src/softbus/mine_softbus_listener.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
@@ -175,7 +176,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004110",
     ]
 
-    deps = [ "${utils_path}:devicemanagerutils" ]
+    deps = [
+      "${devicemanager_path}/commondependency:devicemanagerdependency",
+      "${utils_path}:devicemanagerutils",
+    ]
 
     external_deps = [
       "ability_base:want",
@@ -194,6 +198,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "memmgr:memmgrclient",
       "openssl:libcrypto_shared",
+      "os_account:libaccountkits",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]

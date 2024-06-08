@@ -24,6 +24,7 @@
 #include "system_ability_definition.h"
 
 #include "auth_message_processor.h"
+#include "common_event_support.h"
 #include "dm_ability_manager.h"
 #include "dm_anonymous.h"
 #include "dm_config_manager.h"
@@ -2029,13 +2030,20 @@ void DmAuthManager::CompatiblePutAcl()
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
 }
 
-void DmAuthManager::CommonEventCallback(int32_t userId)
+void DmAuthManager::CommonEventCallback(int32_t userId, std::string commonEventType)
 {
     LOGI("DmAuthManager::CommonEventCallback");
-    if (MultipleUserConnector::GetSwitchOldUserId() == userId) {
+    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
         AccountIdLogoutEventCallback(userId);
-    } else {
-        UserSwitchEventCallback(userId);
+    } else if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        std::string accountId = MultipleUserConnector::GetOhosAccountId();
+        LOGI("user_switched event accountId: %{public}s, userId: %{public}s",
+            GetAnonyString(accountId).c_str(), GetAnonyInt32(userId).c_str());
+        if (userId > 0) {
+            MultipleUserConnector::SetSwitchOldUserId(userId);
+            MultipleUserConnector::SetSwitchOldAccountId(accountId);
+        }
     }
 }
 

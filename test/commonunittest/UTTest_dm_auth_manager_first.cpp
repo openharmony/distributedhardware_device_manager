@@ -902,7 +902,7 @@ HWTEST_F(DmAuthManagerTest, CommonEventCallback001, testing::ext::TestSize.Level
 {
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
     int32_t userId = 0;
-    authManager_->CommonEventCallback(userId);
+    authManager_->CommonEventCallback(userId, "");
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 

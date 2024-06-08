@@ -58,6 +58,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+    AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     LOGI("called:AddAbilityListener end!");
 }
 
@@ -69,6 +70,8 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     } else if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         int pid = getpid();
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        DeviceManagerService::GetInstance().InitAccountInfo();
     }
 }
 

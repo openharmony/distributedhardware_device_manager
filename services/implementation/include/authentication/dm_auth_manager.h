@@ -513,7 +513,7 @@ public:
     int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
     void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-    void CommonEventCallback(int32_t userId);
+    void CommonEventCallback(int32_t userId, std::string commonEventType);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
     void BindSocketSuccess(int32_t socket);
