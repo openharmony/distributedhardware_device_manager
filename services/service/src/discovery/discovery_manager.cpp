@@ -129,23 +129,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmSubscribeInfo dmSubInfo;
-    dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
-    dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
-    dmSubInfo.medium = DmExchangeMedium::DM_AUTO;
-    dmSubInfo.freq = DmExchangeFreq::DM_LOW;
-    dmSubInfo.isSameAccount = false;
-    dmSubInfo.isWakeRemote = false;
-    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
-        dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
-    }
-    if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
-        int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
-        dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
-    }
-    if (discoverParam.find(PARAM_KEY_DISC_FREQ) != discoverParam.end()) {
-        int32_t freq = std::atoi((discoverParam.find(PARAM_KEY_DISC_FREQ)->second).c_str());
-        dmSubInfo.freq = static_cast<DmExchangeFreq>(freq);
-    }
+    ConfigDiscParam(discoverParam, &dmSubInfo);
     if (HandleDiscoveryQueue(pkgName, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
     }
@@ -172,6 +156,37 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
+}
+
+void DiscoveryManager::ConfigDiscParam(const std::map<std::string, std::string> &discoverParam,
+    DmSubscribeInfo *dmSubInfo)
+{
+    LOGI("DiscoveryManager::ConfigDiscParam");
+    if (dmSubInfo == nullptr) {
+        LOGE("ConfigDiscParam failed, dmSubInfo is nullptr.");
+        return;
+    }
+    dmSubInfo->subscribeId = DM_INVALID_FLAG_ID;
+    dmSubInfo->mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
+    dmSubInfo->medium = DmExchangeMedium::DM_AUTO;
+    dmSubInfo->freq = DmExchangeFreq::DM_LOW;
+    dmSubInfo->isSameAccount = false;
+    dmSubInfo->isWakeRemote = false;
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        dmSubInfo->subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+    }
+    if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
+        int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
+        dmSubInfo->medium = static_cast<DmExchangeMedium>(medium);
+    }
+    if (discoverParam.find(PARAM_KEY_DISC_FREQ) != discoverParam.end()) {
+        int32_t freq = std::atoi((discoverParam.find(PARAM_KEY_DISC_FREQ)->second).c_str());
+        dmSubInfo->freq = static_cast<DmExchangeFreq>(freq);
+    }
+    if (discoverParam.find(PARAM_KEY_DISC_MODE) != discoverParam.end()) {
+        dmSubInfo->mode =
+            static_cast<DmDiscoverMode>(std::atoi((discoverParam.find(PARAM_KEY_DISC_MODE)->second).c_str()));
+    }
 }
 
 int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,

@@ -83,6 +83,7 @@ private:
     int32_t HandleDiscoveryQueue(const std::string &pkgName, uint16_t subscribeId,
         const std::map<std::string, std::string> &filterOps);
     int32_t GetDeviceAclParam(const std::string &pkgName, std::string deviceId, bool &isOnline, int32_t &authForm);
+    void ConfigDiscParam(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo *dmSubInfo);
 
 private:
     std::mutex locks_;
