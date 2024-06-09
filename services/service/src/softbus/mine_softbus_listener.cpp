@@ -221,7 +221,7 @@ void MineSoftbusListener::OnRePublish(void)
     int32_t retryTimes = 0;
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-    publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
+    publishInfo.mode = DiscoverMode::DISCOVER_MODE_PASSIVE;
     publishInfo.medium = ExchangeMedium::COAP;
     publishInfo.freq = ExchangeFreq::LOW;
     publishInfo.capability = DM_CAPABILITY_OSD;
