@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != 0 || ids.empty()) {
+        LOGE("GetCurrentAccountUserID error ret: %{public}d", ret);
         return -1;
     }
     return ids[0];
@@ -62,6 +63,7 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfo(accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
+        LOGE("GetOhosAccountId error ret: %{public}d", ret);
         return "";
     }
     return accountInfo.uid_;

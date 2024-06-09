@@ -457,6 +457,12 @@ int32_t DeviceManagerServiceImpl::CheckRelatedDevice(const std::string &udid, co
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
+{
+    (void)userId;
+    (void)commonEventType;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

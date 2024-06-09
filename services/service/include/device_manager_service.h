@@ -32,6 +32,7 @@
 #include "i_dm_service_impl_ext.h"
 #include "single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_account_common_event.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
@@ -198,13 +199,15 @@ public:
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
     int32_t IsSameAccount(const std::string &networkId);
     int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
-
+    int32_t InitAccountInfo();
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    void SubscribeAccountCommonEvent();
+    void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
@@ -224,6 +227,7 @@ private:
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI

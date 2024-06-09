@@ -130,13 +130,13 @@ public:
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
     int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
+    void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
 
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
-    void SubscribeCommonEvent();
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
 private:
     std::shared_ptr<DmAuthManager> authMgr_;

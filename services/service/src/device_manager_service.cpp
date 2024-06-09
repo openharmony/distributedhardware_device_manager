@@ -28,15 +28,15 @@
 #include "permission_manager.h"
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "common_event_support.h"
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "softbus_publish.h"
-using namespace OHOS::EventFwk;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
+using namespace OHOS::EventFwk;
 #else
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
 #endif
@@ -124,7 +124,6 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (pinHolder_ == nullptr) {
         pinHolder_ = std::make_shared<PinHolder>(listener_);
     }
-
     LOGI("DeviceManagerServiceListener init success.");
     return DM_OK;
 }
@@ -1455,5 +1454,44 @@ int32_t DeviceManagerService::CheckRelatedDevice(const std::string &udid, const 
     }
     return dmServiceImpl_->CheckRelatedDevice(udid, bundleName);
 }
+
+int32_t DeviceManagerService::InitAccountInfo()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    SubscribeAccountCommonEvent();
+    LOGI("InitAccountInfo success.");
+#endif
+    return DM_OK;
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::SubscribeAccountCommonEvent()
+{
+    LOGI("DeviceManagerServiceImpl::SubscribeAccountCommonEvent");
+    if (accountCommonEventManager_ == nullptr) {
+        accountCommonEventManager_ = std::make_shared<DmAccountCommonEventManager>();
+    }
+    AccountEventCallback callback = std::bind(&DeviceManagerService::AccountCommonEventCallback,
+        this, std::placeholders::_1, std::placeholders::_2);
+    std::vector<std::string> AccountCommonEventVec;
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
+    if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
+        LOGI("subscribe account common event success");
+    }
+    return;
+}
+
+void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
+{
+    if (!IsDMServiceImplReady()) {
+        LOGE("AccountCommonEventCallback failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
+}
+#endif
+
 } // namespace DistributedHardware
 } // namespace OHOS
