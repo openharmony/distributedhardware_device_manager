@@ -48,6 +48,9 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     if (advertiseParam.find(PARAM_KEY_DISC_CAPABILITY) != advertiseParam.end()) {
         capability = advertiseParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
     }
+    if (capability == DM_CAPABILITY_APPROACH) {
+        dmPubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
+    }
     std::string customData = "";
     if (advertiseParam.find(PARAM_KEY_CUSTOM_DATA) != advertiseParam.end()) {
         customData = advertiseParam.find(PARAM_KEY_CUSTOM_DATA)->second;

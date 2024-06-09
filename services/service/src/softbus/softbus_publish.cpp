@@ -86,7 +86,7 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
 {
     LOGI("SoftbusPublish::PublishSoftbusLNN begin.");
     PublishInfo publishInfo;
-    publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID; 
+    publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_PASSIVE;
     publishInfo.medium = ExchangeMedium::AUTO;
     publishInfo.freq = ExchangeFreq::LOW;
