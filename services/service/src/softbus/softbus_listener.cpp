@@ -356,7 +356,7 @@ int32_t SoftbusListener::InitSoftPublishLNN()
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
-    publishInfo.mode = DiscoverMode::DISCOVER_MODE_ACTIVE;
+    publishInfo.mode = DiscoverMode::DISCOVER_MODE_PASSIVE;
     publishInfo.medium = ExchangeMedium::AUTO;
     publishInfo.freq = ExchangeFreq::LOW;
     publishInfo.capability = DM_CAPABILITY_OSD;

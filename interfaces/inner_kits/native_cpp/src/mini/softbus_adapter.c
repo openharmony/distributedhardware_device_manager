@@ -900,7 +900,7 @@ int StartSoftbusPublish(const char *pkgName, OnAdvertisingResult cb)
     }
     PublishInfo publishInfo;
     publishInfo.publishId = DEVICEMANAGER_SA_ID;
-    publishInfo.mode = DISCOVER_MODE_ACTIVE;
+    publishInfo.mode = DISCOVER_MODE_PASSIVE;
     publishInfo.medium = AUTO;
     publishInfo.freq = HIGH;
     publishInfo.capability = DM_CAPABILITY_OSD;
