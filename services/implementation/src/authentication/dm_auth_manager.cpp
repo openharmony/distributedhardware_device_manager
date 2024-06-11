@@ -2222,6 +2222,13 @@ std::string DmAuthManager::GenerateBindResultContent()
 {
     nlohmann::json jsonObj;
     jsonObj[DM_BIND_RESULT_NETWORK_ID] = authResponseContext_->networkId;
+    if (remoteDeviceId_.empty()) {
+        jsonObj[TAG_DEVICE_ID] = "";
+    } else {
+        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        Crypto::GetUdidHash(remoteDeviceId_, reinterpret_cast<uint8_t *>(deviceIdHash));
+        jsonObj[TAG_DEVICE_ID] = deviceIdHash;
+    }
     std::string content = jsonObj.dump();
     return content;
 }
