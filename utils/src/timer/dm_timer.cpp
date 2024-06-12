@@ -81,7 +81,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     LOGI("DmTimer DeleteTimer name %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     for (auto iter : timerVec_) {
-        if (iter->timerName_ == timerName) {
+        if (iter != nullptr && iter->timerName_ == timerName) {
             iter->state_ = false;
         }
     }
