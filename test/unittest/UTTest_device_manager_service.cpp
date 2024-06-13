@@ -1146,21 +1146,15 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_005, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
     std::string filterOptions;
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener, listener);
     int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_006, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName;
     uint16_t subscribeId = 1;
-    std::string filterOptions;
-    std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener, listener);
+    std::string filterOptions = "filterOptions";
     int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
     EXPECT_NE(ret, ERR_DM_FAILED);
 }
