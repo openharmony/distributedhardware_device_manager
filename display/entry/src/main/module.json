@@ -75,6 +75,9 @@
       },
       {
         "name": "ohos.permission.ACCESS_SERVICE_DM"
+      },
+      {
+        "name": "ohos.permission.PRIVACY_WINDOW"
       }
     ]
   }

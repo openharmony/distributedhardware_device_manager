@@ -177,8 +177,8 @@ struct InputCustomDialog {
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('sys.color.ohos_id_color_text_primary'))
                 .margin({ top: 12, bottom: 3 })
-                .width('100%')
-                .textAlign(TextAlign.Start)
+                .width('auto')
+                .textAlign(TextAlign.Center)
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .minFontSize(12)
@@ -190,15 +190,16 @@ struct InputCustomDialog {
                 .fontWeight(FontWeight.Regular)
                 .fontColor($r('sys.color.ohos_id_color_text_secondary'))
                 .margin({ bottom: 8 })
-                .width('100%')
+                .width('auto')
                 .maxLines(2)
+                .textAlign(TextAlign.Center)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .minFontSize(12)
                 .maxFontSize($r('sys.float.ohos_id_text_size_body2'))
                 .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
             }
             .margin({ left: 24, right: 24 })
-            .height(72)
+            .constraintSize({ minHeight: 72 })
             .justifyContent(FlexAlign.Center)
 
             Stack() {
@@ -323,7 +324,7 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
-    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
+    alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
