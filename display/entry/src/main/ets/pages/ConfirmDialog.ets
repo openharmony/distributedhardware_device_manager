@@ -160,25 +160,25 @@ struct ConfirmCustomDialog {
       return $r('app.media.ic_device_soundx')
     } else if (peerdeviceType == deviceManager.DeviceType.PHONE) {
       this.isAvailableType = true
-      return $r('sys.symbol.phone_fill_1')
+      return $r('app.media.ic_public_devices_phone')
     } else if (peerdeviceType == deviceManager.DeviceType.TABLET) {
       this.isAvailableType = true
-      return $r('sys.symbol.pad_fill')
+      return $r('app.media.ic_device_pad')
     } else if (peerdeviceType == deviceManager.DeviceType.WEARABLE) {
       this.isAvailableType = true
-      return $r('sys.symbol.earphone_case_16896')
+      return $r('app.media.ic_device_watch')
     } else if (peerdeviceType == deviceManager.DeviceType.CAR) {
       this.isAvailableType = true
-      return $r('sys.symbol.car_fill')
+      return $r('app.media.ic_public_car')
     } else if (peerdeviceType == deviceManager.DeviceType.TV) {
       this.isAvailableType = true
       return $r('app.media.ic_device_smartscreen')
     } else if (peerdeviceType == DEVICE_TYPE_PC) {
       this.isAvailableType = true
-      return $r('sys.symbol.matebook_fill')
+      return $r('app.media.ic_device_matebook')
     } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
       this.isAvailableType = true
-      return $r('sys.symbol.matebook_fill')
+      return $r('app.media.ic_device_matebook')
     } else {
       this.isAvailableType = false
       return $r('app.media.icon')
@@ -193,17 +193,11 @@ struct ConfirmCustomDialog {
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
         Column() {
-          Shape() {
-            Circle({ width: 32, height: 32 })
-              .fill($r('sys.color.ohos_id_color_activated'))
-            Column() {
-              SymbolGlyph(this.getImages(this.peerDeviceType))
-                .fontSize(20)
-                .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-                .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
-            }.offset({ x: 6, y: 6 })
-          }.margin({ bottom: 16, top: 24 })
-          .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
+          Image(this.getImages(this.peerDeviceType))
+            .width(24)
+            .height(24)
+            .margin({ bottom: 16, top: 24 })
+            .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
             Text(this.title)
               .textAlign(TextAlign.Center)
