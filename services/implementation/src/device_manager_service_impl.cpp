@@ -632,7 +632,7 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
     LOGI("DeviceManagerServiceImpl DpAclAdd start.");
     MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
     MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
-    if (softbusConnector_->CheckIsOnline(udid)) {
+    if (deviceStateMgr_->CheckIsOnline(udid)) {
         LOGI("DeviceManagerServiceImpl DpAclAdd identical account and online");
         deviceStateMgr_->OnDeviceOnline(udid, DmAuthForm::IDENTICAL_ACCOUNT);
     }

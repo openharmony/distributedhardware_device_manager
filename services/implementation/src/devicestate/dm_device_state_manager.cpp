@@ -484,5 +484,17 @@ std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DmDeviceStat
     }
     return trustDeviceOsTypeMap;
 }
+
+bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
+{
+    LOGI("DmDeviceStateManager::CheckIsOnline start.");
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
