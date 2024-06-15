@@ -34,33 +34,45 @@ static IPublishCb softbusPublishCallback_ = {
     .OnPublishResult = SoftbusPublish::OnSoftbusPublishResult,
 };
 
-void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState)
+void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
 {
-    LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState:  %{public}d,", bluetoothState, wifiState);
+    LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d",
+        bluetoothState, wifiState, screenState);
     SoftbusPublish softbusPublish;
-#ifdef SUPPORT_BLUETOOTH
-    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
-        softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-        int32_t ret = softbusPublish.PublishSoftbusLNN();
-        if (ret == DM_OK) {
-            LOGI("bluetooth publish successed, ret : %{public}d.", ret);
+    if (screenState == DM_SCREEN_OFF) {
+        int32_t ret = softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        if (ret != DM_OK) {
+            LOGE("stop publish failed, ret : %{public}d.", ret);
             return;
         }
-        LOGE("bluetooth publish failed, ret : %{public}d.", ret);
+        LOGI("stop publish successed, ret : %{public}d.", ret);
+        return;
+    }
+#ifdef SUPPORT_BLUETOOTH
+    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON) &&
+        screenState == DM_SCREEN_ON) {
+        softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        int32_t ret = softbusPublish.PublishSoftbusLNN();
+        if (ret != DM_OK) {
+            LOGE("bluetooth publish failed, ret : %{public}d.", ret);
+            return;
+        }
+        LOGI("bluetooth publish successed, ret : %{public}d.", ret);
         return;
     }
     softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_BLUETOOTH
 
 #ifdef SUPPORT_WIFI
-    if (wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
+    if (wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED) &&
+        screenState == DM_SCREEN_ON) {
         softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = softbusPublish.PublishSoftbusLNN();
-        if (ret == DM_OK) {
-            LOGI("wifi publish successed, ret : %{public}d.", ret);
+        if (ret != DM_OK) {
+            LOGE("wifi publish failed, ret : %{public}d.", ret);
             return;
         }
-        LOGE("wifi publish failed, ret : %{public}d.", ret);
+        LOGI("wifi publish successed, ret : %{public}d.", ret);
         return;
     }
     softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);

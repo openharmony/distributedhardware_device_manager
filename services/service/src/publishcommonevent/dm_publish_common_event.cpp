@@ -26,7 +26,6 @@
 #ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
 #endif // SUPPORT_WIFI
-#include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -56,7 +55,7 @@ bool DmPublishCommonEventManager::SubscribePublishCommonEvent(const std::vector<
     }
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
-        LOGE("failed to subscribe ble and wifi commom eventName size: %{public}zu", eventNameVec.size());
+        LOGE("failed to subscribe ble/wifi/screen commom eventName size: %{public}zu", eventNameVec.size());
         return false;
     }
 
@@ -91,7 +90,7 @@ bool DmPublishCommonEventManager::SubscribePublishCommonEvent(const std::vector<
     }
     eventNameVec_ = eventNameVec;
     eventValidFlag_ = true;
-    LOGI("success to subscribe ble and wifi commom event name size: %{public}zu", eventNameVec.size());
+    LOGI("success to subscribe ble/wifi/screen commom event name size: %{public}zu", eventNameVec.size());
     return true;
 }
 
@@ -99,17 +98,17 @@ bool DmPublishCommonEventManager::UnsubscribePublishCommonEvent()
 {
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
-        LOGE("failed to unsubscribe ble and wifi commom event name size: %{public}zu because event is invalid.",
+        LOGE("failed to unsubscribe ble/wifi/screen commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());
         return false;
     }
     if (subscriber_ != nullptr) {
         LOGI("start to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
         if (!CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
-            LOGE("failed to unsubscribe commom event name size: %{public}zu", eventNameVec_.size());
+            LOGE("failed to unsubscribe ble/wifi/screen commom event name size: %{public}zu", eventNameVec_.size());
             return false;
         }
-        LOGI("success to unsubscribe ble and wifi commom event name size: %{public}zu", eventNameVec_.size());
+        LOGI("success to unsubscribe ble/wifi/screen commom event name size: %{public}zu", eventNameVec_.size());
         subscriber_ = nullptr;
     }
     if (statusChangeListener_ != nullptr) {
@@ -126,7 +125,7 @@ bool DmPublishCommonEventManager::UnsubscribePublishCommonEvent()
         statusChangeListener_ = nullptr;
     }
 
-    LOGI("success to unsubscribe ble and wifi commom event name size: %{public}zu", eventNameVec_.size());
+    LOGI("success to unsubscribe ble/wifi/screen commom event name size: %{public}zu", eventNameVec_.size());
     eventValidFlag_ = false;
     return true;
 }
@@ -136,6 +135,12 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string receiveEvent = data.GetWant().GetAction();
     int32_t eventState = data.GetCode();
     LOGI("On Received receiveEvent: %{public}s, eventState: %{public}d", receiveEvent.c_str(), eventState);
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        screenState_ = DM_SCREEN_ON;
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        screenState_ = DM_SCREEN_OFF;
+    }
+
 #ifdef SUPPORT_BLUETOOTH
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
         eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
@@ -143,6 +148,9 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
         eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF)) {
         bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF);
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE) {
+        LOGI("bluetooth eventState: %{public}d", eventState);
+        return;
     }
 #endif // SUPPORT_BLUETOOTH
 
@@ -153,10 +161,13 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
         eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED)) {
         wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED);
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE) {
+        LOGI("wifi eventState: %{public}d", eventState);
+        return;
     }
 #endif // SUPPORT_WIFI
 
-    std::thread dealThread(callback_, bluetoothState_, wifiState_);
+    std::thread dealThread(callback_, bluetoothState_, wifiState_, screenState_);
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");
@@ -172,13 +183,13 @@ void DmPublishCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystem
         return;
     }
     if (changeSubscriber_ == nullptr) {
-        LOGE("failed to subscribe ble and wifi commom event because changeSubscriber_ is nullptr.");
+        LOGE("failed to subscribe ble/wifi/screen commom event because changeSubscriber_ is nullptr.");
         return;
     }
     std::vector<std::string> eventNameVec = changeSubscriber_->GetSubscriberEventNameVec();
-    LOGI("start to subscribe ble and wifi commom eventName: %{public}zu", eventNameVec.size());
+    LOGI("start to subscribe ble/wifi/screen commom eventName: %{public}zu", eventNameVec.size());
     if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
-        LOGE("failed to subscribe ble and wifi commom event: %{public}zu", eventNameVec.size());
+        LOGE("failed to subscribe ble/wifi/screen commom event: %{public}zu", eventNameVec.size());
         return;
     }
 }

@@ -223,6 +223,11 @@ constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
 constexpr const char* BIND_LEVEL = "bindLevel";
 constexpr const char* TOKENID = "tokenId";
 constexpr const char* DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
+
+// screen state
+constexpr int32_t DM_SCREEN_UNKNOWN = -1;
+constexpr int32_t DM_SCREEN_ON = 0;
+constexpr int32_t DM_SCREEN_OFF = 1;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

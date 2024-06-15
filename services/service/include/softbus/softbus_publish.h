@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState);
+void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState);
 class SoftbusPublish {
 public:
     SoftbusPublish();
