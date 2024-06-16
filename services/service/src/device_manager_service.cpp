@@ -24,9 +24,9 @@
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "parameter.h"
 #include "permission_manager.h"
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
@@ -68,8 +68,8 @@ int32_t DeviceManagerService::InitSoftbusListener()
 {
     if (softbusListener_ == nullptr) {
         softbusListener_ = std::make_shared<SoftbusListener>();
-        softbusListener_->UpdateDeviceInfoCache();
     }
+    SoftbusCache::GetInstance().UpdateDeviceInfoCache();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();

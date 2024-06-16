@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
+#include "dm_softbus_cache.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -264,6 +265,9 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());
+    if (SoftbusCache::GetInstance().GetUdidFromCache(networkId, udid) == DM_OK) {
+        return DM_OK;
+    }
     uint8_t tmpUdid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, tmpUdid, sizeof(tmpUdid));
     if (ret != DM_OK) {
@@ -277,6 +281,9 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
 int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());
+    if (SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid) == DM_OK) {
+        return DM_OK;
+    }
     uint8_t tmpUuid[UUID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, tmpUuid, sizeof(tmpUuid));
     if (ret != DM_OK) {

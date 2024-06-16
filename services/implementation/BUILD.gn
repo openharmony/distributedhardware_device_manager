@@ -50,6 +50,7 @@ if (defined(ohos_lite)) {
         "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
         "//commonlibrary/c_utils/base/include",
+        "${services_path}/softbuscache/include",
       ]
 
       sources = [
@@ -137,6 +138,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/timer",
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
+      "${services_path}/softbuscache/include",
     ]
   }
 
@@ -188,6 +190,7 @@ if (defined(ohos_lite)) {
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
+      "${services_path}:dmdevicecache",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${utils_path}:devicemanagerutils",
     ]

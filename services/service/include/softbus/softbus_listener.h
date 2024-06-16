@@ -96,12 +96,6 @@ public:
         ConnectionAddrType &addrType);
 private:
     int32_t InitSoftPublishLNN();
-    static void SaveDeviceInfo(DmDeviceInfo deviceInfo);
-    static void DeleteDeviceInfo(const DmDeviceInfo &nodeInfo);
-    static void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
-    static void GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
-    static int32_t GetUdidFromCache(const char *networkId, std::string &udid);
-    static int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
 
 private:
     static std::string hostName_;
