@@ -1057,17 +1057,21 @@ void SoftbusListener::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     {
         deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
     }
+    LOGI("SaveDeviceInfo success udid %{public}s, networkId %{public}s",
+        GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
 
 void SoftbusListener::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 {
-    LOGI("SoftbusListener::DeleteDeviceInfo");
+    LOGI("SoftbusListener::DeleteDeviceInfo networkId %{public}s",
+        GetAnonyString(std::string(nodeInfo.networkId)).c_str());
     std::string udid = "";
     GetUdidByNetworkId(nodeInfo.networkId, udid);
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             deviceInfo_.erase(udid);
+            LOGI("DeleteDeviceInfo success udid %{public}s" GetAnonyString(udid).c_str());
         }
     }
 }
@@ -1091,6 +1095,8 @@ void SoftbusListener::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
             deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
         }
     }
+    LOGI("ChangeDeviceInfo sucess udid %{public}s, networkId %{public}s.",
+        GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
 
 void SoftbusListener::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
@@ -1133,6 +1139,7 @@ int32_t SoftbusListener::GetUdidFromCache(const char *networkId, std::string &ud
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(networkId)) {
                 udid = item.first;
+                LOGI("GetUdidFromCache success udid %{public}s.", GetAnonyString(udid).c_str());
                 return DM_OK;
             }
         }
@@ -1148,6 +1155,7 @@ int32_t SoftbusListener::GetUuidFromCache(const char *networkId, std::string &uu
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(networkId)) {
                 uuid = item.second.first;
+                LOGI("GetUuidFromCache success uuid %{public}s.", GetAnonyString(uuid).c_str());
                 return DM_OK;
             }
         }
