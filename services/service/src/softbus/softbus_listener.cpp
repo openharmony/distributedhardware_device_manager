@@ -1128,26 +1128,30 @@ void SoftbusListener::UpdateDeviceInfoCache()
 int32_t SoftbusListener::GetUdidFromCache(const char *networkId, std::string &udid)
 {
     LOGI("SoftbusListener::GetUdidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
-    for (const auto &item : deviceInfo_) {
-        if (std::string(item.second.second.networkId) == std::string(networkId)) {
-            udid = item.first;
-            return DM_OK;
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.networkId) == std::string(networkId)) {
+                udid = item.first;
+                return DM_OK;
+            }
         }
     }
-    LOGI("SoftbusListener::GetUdidFromCache success udid%{public}s", GetAnonyString(udid).c_str());
     return ERR_DM_FAILED;
 }
 
 int32_t SoftbusListener::GetUuidFromCache(const char *networkId, std::string &uuid)
 {
     LOGI("SoftbusListener::GetUuidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
-    for (const auto &item : deviceInfo_) {
-        if (std::string(item.second.second.networkId) == std::string(networkId)) {
-            uuid = item.second.first;
-            return DM_OK;
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.networkId) == std::string(networkId)) {
+                uuid = item.second.first;
+                return DM_OK;
+            }
         }
     }
-    LOGI("SoftbusListener::GetUuidFromCache success uuid%{public}s", GetAnonyString(uuid).c_str());
     return ERR_DM_FAILED;
 }
 
