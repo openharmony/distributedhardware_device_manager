@@ -19,13 +19,9 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "parameter.h"
-
-using namespace OHOS::Security::AccessToken;
-
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
+IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 
 int32_t SoftbusCache::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
@@ -116,12 +112,9 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
 
 int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    LOGI("SoftbusCache::GetDeviceInfoFromCache deviceInfo size is %{public}d.", deviceInfo_.size());
+    LOGI("SoftbusCache::GetDeviceInfoFromCache.");
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        if (deviceInfo_.empty()) {
-            return ERR_DM_FAILED;
-        }
         for (const auto &item : deviceInfo_) {
             deviceInfoList.push_back(item.second.second);
         }
@@ -175,6 +168,62 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
             if (std::string(item.second.second.networkId) == std::string(networkId)) {
                 uuid = item.second.first;
                 LOGI("GetUuidFromCache success uuid %{public}s.", GetAnonyString(uuid).c_str());
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
+{
+    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+
+    if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+    }
+    devInfo.deviceTypeId = nodeInfo.deviceTypeId;
+    nlohmann::json extraJson;
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+    devInfo.extraData = to_string(extraJson);
+    return DM_OK;
+}
+
+void SoftbusCache::SaveDeviceSecurityLevel(const char *networkId, const int32_t &securityLevel)
+{
+    LOGI("SoftbusCache::SaveDeviceSecurityLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    {
+        deviceSecurityLevel_[std::string(networkId)] = securityLevel;
+    }
+}
+
+void SoftbusCache::DeleteDeviceSecurityLevel(const char *networkId)
+{
+    LOGI("SoftbusCache::DeleteDeviceSecurityLevel networkId %{public}s.",
+        GetAnonyString(std::string(networkId)).c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    {
+        if (deviceSecurityLevel_.find(networkId) != deviceSecurityLevel_.end()) {
+            deviceSecurityLevel_.erase(networkId);
+        }
+    }
+}
+
+int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel)
+{
+    LOGI("SoftbusCache::GetSecurityDeviceLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    {
+        for (const auto &item : deviceSecurityLevel_) {
+            if (item.first == std::string(networkId)) {
+                securityLevel = item.second;
                 return DM_OK;
             }
         }

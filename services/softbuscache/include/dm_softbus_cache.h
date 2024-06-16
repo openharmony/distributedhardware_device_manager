@@ -21,6 +21,8 @@
 #include <mutex>
 #include "dm_device_info.h"
 #include "single_instance.h"
+#include "softbus_bus_center.h"
+#include "softbus_common.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -31,15 +33,23 @@ public:
     void SaveDeviceInfo(DmDeviceInfo deviceInfo);
     void DeleteDeviceInfo(const DmDeviceInfo &nodeInfo);
     void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
-    void GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
+    void SaveDeviceSecurityLevel(const char *networkId, const int32_t &securityLevel);
+    void DeleteDeviceSecurityLevel(const char *networkId);
+    int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetUdidFromCache(const char *networkId, std::string &udid);
     int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
+    int32_t GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel);
+    void UpdateDeviceInfoCache();
 private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
+    int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
+
 private:
     std::mutex deviceInfosMutex_;
+    std::mutex deviceSecurityLevelMutex_;
     std::unordered_map<std::string, std::pair<std::string, DmDeviceInfo>> deviceInfo_;
+    std::unordered_map<std::string, int32_t> deviceSecurityLevel_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

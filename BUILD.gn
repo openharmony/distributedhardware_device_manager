@@ -32,6 +32,7 @@ if (defined(ohos_lite)) {
         "services/implementation:devicemanagerserviceimpl",
         "interfaces/inner_kits/native_cpp:devicemanagersdk",
         "test/smallunittest:lite_devicemanager_test",
+        "services/softbuscache:dmdevicecache",
       ]
     }
     lite_component("device_manager_fwk") {
@@ -53,6 +54,7 @@ if (defined(ohos_lite)) {
       "services/etc:ohos.para.dac",
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
+      "services/softbuscache:dmdevicecache",
     ]
   }
   group("device_manager_fwk") {

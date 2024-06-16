@@ -14,6 +14,15 @@
 import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 ohos_shared_library("dmdevicecache") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
   include_dirs = [
     "include",
     "${common_path}/include",
@@ -21,7 +30,8 @@ ohos_shared_library("dmdevicecache") {
   ]
 
   sources = [
-    "src/softbus_cache.cpp",
+    "${common_path}/src/dm_anonymous.cpp",
+    "src/dm_softbus_cache.cpp",
   ]
 
   defines = [
@@ -35,7 +45,9 @@ ohos_shared_library("dmdevicecache") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "distributedhardware"

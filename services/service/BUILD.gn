@@ -52,7 +52,7 @@ if (defined(ohos_lite)) {
         "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
         "${devicemanager_path}/radar/include",
-        "${services_path}/softbuscache/include",
+        "${softbuscache_parh}/include",
       ]
 
       sources = [
@@ -83,6 +83,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "${utils_path}:devicemanagerutils",
+        "${softbuscache_parh}:dmdevicecache",
         "//base/security/device_auth/services:deviceauth_sdk",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
@@ -130,7 +131,7 @@ if (defined(ohos_lite)) {
       "${devicemanager_path}/commondependency/include",
       "${devicemanager_path}/radar/include",
       "${innerkits_path}/native_cpp/include",
-      "${services_path}/softbuscache/include",
+      "${softbuscache_parh}/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
       "${utils_path}/include/timer",
@@ -180,7 +181,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
-      "${services_path}:dmdevicecache",
+      "${softbuscache_parh}:dmdevicecache",
       "${utils_path}:devicemanagerutils",
     ]
 

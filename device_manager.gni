@@ -18,6 +18,7 @@ common_path = "${devicemanager_path}/common"
 utils_path = "${devicemanager_path}/utils"
 services_path = "${devicemanager_path}/services/service"
 servicesimpl_path = "${devicemanager_path}/services/implementation"
+softbuscache_parh = "${devicemanager_path}/services/softbuscache"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
 ext_path = "${devicemanager_path}/ext"
 ability_runtime_innerkits_path =
