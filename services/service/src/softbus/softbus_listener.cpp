@@ -1071,7 +1071,7 @@ void SoftbusListener::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
     {
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             deviceInfo_.erase(udid);
-            LOGI("DeleteDeviceInfo success udid %{public}s" GetAnonyString(udid).c_str());
+            LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(udid).c_str());
         }
     }
 }
