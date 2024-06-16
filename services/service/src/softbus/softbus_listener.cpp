@@ -1036,7 +1036,7 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
     return ERR_DM_BIND_INPUT_PARA_INVALID;
 }
 
-void SoftbusListener::SaveDeviceInfo(DmDeviceInfo deviceInfo) 
+void SoftbusListener::SaveDeviceInfo(DmDeviceInfo deviceInfo)
 {
     LOGI("SoftbusListener::SaveDeviceInfo");
     std::string udid = "";
@@ -1123,7 +1123,6 @@ void SoftbusListener::UpdateDeviceInfoCache()
     FreeNodeInfo(nodeInfo);
     LOGI("UpdateDeviceInfoCache success, deviceCount: %{public}d.", deviceCount);
     return;
-
 }
 
 int32_t SoftbusListener::GetUdidFromCache(const char *networkId, std::string &udid)
@@ -1138,6 +1137,7 @@ int32_t SoftbusListener::GetUdidFromCache(const char *networkId, std::string &ud
     LOGI("SoftbusListener::GetUdidFromCache success udid%{public}s", GetAnonyString(udid).c_str());
     return ERR_DM_FAILED;
 }
+
 int32_t SoftbusListener::GetUuidFromCache(const char *networkId, std::string &uuid)
 {
     LOGI("SoftbusListener::GetUuidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
