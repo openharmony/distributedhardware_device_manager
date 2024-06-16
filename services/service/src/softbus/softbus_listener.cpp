@@ -24,6 +24,7 @@
 
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
+#include "dm_crypto.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -60,6 +61,8 @@ IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 std::shared_ptr<DmTimer> SoftbusListener::timer_ = std::make_shared<DmTimer>();
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
+static std::mutex deviceInfosMutex_;
+static std::unordered_map<std::string, std::pair<std::string, DmDeviceInfo>> deviceInfo_;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -149,6 +152,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    SaveDeviceInfo(dmDeviceInfo);
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -186,6 +190,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    DeleteDeviceInfo(dmDeviceInfo);
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
@@ -236,6 +241,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
+        ChangeDeviceInfo(dmDeviceInfo);
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
@@ -501,6 +507,10 @@ int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
+    if (!deviceInfo_.empty()) {
+        GetDeviceInfoFromCache(deviceInfoList);
+        return DM_OK ;
+    }
     static int32_t radarDeviceCount = 0;
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
@@ -526,6 +536,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         DmDeviceInfo deviceInfo;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
+        SaveDeviceInfo(deviceInfo);
         deviceInfoList.push_back(deviceInfo);
     }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
@@ -639,6 +650,9 @@ int32_t SoftbusListener::GetLocalDeviceType(int32_t &deviceType)
 
 int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
+    if (!deviceInfo_.empty() && GetUdidFromCache(networkId, udid) == DM_OK) {
+        return DM_OK;
+    }
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
@@ -651,6 +665,9 @@ int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &
 
 int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
+    if (!deviceInfo_.empty() && GetUuidFromCache(networkId, uuid) == DM_OK) {
+        return DM_OK;
+    }
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
@@ -1017,6 +1034,121 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
         }
     }
     return ERR_DM_BIND_INPUT_PARA_INVALID;
+}
+
+void SoftbusListener::SaveDeviceInfo(DmDeviceInfo deviceInfo) 
+{
+    LOGI("SoftbusListener::SaveDeviceInfo");
+    std::string udid = "";
+    std::string uuid = "";
+    GetUdidByNetworkId(deviceInfo.networkId, udid);
+    GetUuidByNetworkId(deviceInfo.networkId, uuid);
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(udid).c_str());
+        return;
+    }
+    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
+        std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+        LOGE("SaveDeviceInfo copy deviceId failed.");
+        return;
+    }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
+    }
+}
+
+void SoftbusListener::DeleteDeviceInfo(const NodeBasicInfo &nodeInfo)
+{
+    LOGI("SoftbusListener::DeleteDeviceInfo");
+    std::string udid = "";
+    GetUdidByNetworkId(nodeInfo.networkId, udid);
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+            deviceInfo_.erase(udid);
+        }
+    }
+}
+
+void SoftbusListener::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
+{
+    LOGI("SoftbusListener::ChangeDeviceInfo");
+    std::string udid = "";
+    GetUdidByNetworkId(deviceInfo.networkId, udid);
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+            if (memcpy_s(deviceInfo_[udid].second.deviceName, sizeof(deviceInfo_[udid].second.deviceName),
+                deviceInfo.deviceName, sizeof(deviceInfo.deviceName)) != DM_OK) {
+                LOGE("ChangeDeviceInfo deviceInfo copy deviceName failed");
+            }
+            if (memcpy_s(deviceInfo_[udid].second.networkId, sizeof(deviceInfo_[udid].second.networkId),
+                deviceInfo.networkId, sizeof(deviceInfo.networkId)) != DM_OK) {
+                LOGE("ChangeDeviceInfo deviceInfo copy networkId failed");
+            }
+            deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
+        }
+    }
+}
+
+void SoftbusListener::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
+{
+    LOGI("SoftbusListener::GetDeviceInfoFromCache");
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    {
+        for (const auto &item : deviceInfo_) {
+            deviceInfoList.push_back(item.second.second);
+        }
+    }
+}
+
+void SoftbusListener::UpdateDeviceInfoCache()
+{
+    LOGI("SoftbusListener::UpdateDeviceInfoCache");
+    int32_t deviceCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
+        return;
+    }
+    for (int32_t i = 0; i < deviceCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        DmDeviceInfo deviceInfo;
+        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
+        SaveDeviceInfo(deviceInfo);
+    }
+    FreeNodeInfo(nodeInfo);
+    LOGI("UpdateDeviceInfoCache success, deviceCount: %{public}d.", deviceCount);
+    return;
+
+}
+
+int32_t SoftbusListener::GetUdidFromCache(const char *networkId, std::string &udid)
+{
+    LOGI("SoftbusListener::GetUdidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
+    for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(networkId)) {
+            udid = item.first;
+            return DM_OK;
+        }
+    }
+    LOGI("SoftbusListener::GetUdidFromCache success udid%{public}s", GetAnonyString(udid).c_str());
+    return ERR_DM_FAILED;
+}
+int32_t SoftbusListener::GetUuidFromCache(const char *networkId, std::string &uuid)
+{
+    LOGI("SoftbusListener::GetUuidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
+    for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(networkId)) {
+            uuid = item.second.first;
+            return DM_OK;
+        }
+    }
+    LOGI("SoftbusListener::GetUuidFromCache success uuid%{public}s", GetAnonyString(uuid).c_str());
+    return ERR_DM_FAILED;
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()

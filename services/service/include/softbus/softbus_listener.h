@@ -73,7 +73,7 @@ public:
     int32_t GetLocalDeviceType(int32_t &deviceType);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
     int32_t ShiftLNNGear();
-    int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
+    static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
     int32_t GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel);
     int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
     int32_t RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo, const std::string &customData);
@@ -84,6 +84,7 @@ public:
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
+    void UpdateDeviceInfoCache();
     static IDmRadarHelper* GetDmRadarHelperObj();
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);
@@ -95,6 +96,12 @@ public:
         ConnectionAddrType &addrType);
 private:
     int32_t InitSoftPublishLNN();
+    static void SaveDeviceInfo(DmDeviceInfo deviceInfo);
+    static void DeleteDeviceInfo(const NodeBasicInfo &nodeInfo);
+    static void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
+    static void GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
+    static int32_t GetUdidFromCache(const char *networkId, std::string &udid);
+    static int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
 
 private:
     static std::string hostName_;
