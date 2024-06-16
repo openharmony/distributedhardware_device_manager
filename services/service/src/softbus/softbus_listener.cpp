@@ -1059,7 +1059,7 @@ void SoftbusListener::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     }
 }
 
-void SoftbusListener::DeleteDeviceInfo(const NodeBasicInfo &nodeInfo)
+void SoftbusListener::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusListener::DeleteDeviceInfo");
     std::string udid = "";

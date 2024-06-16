@@ -97,7 +97,7 @@ public:
 private:
     int32_t InitSoftPublishLNN();
     static void SaveDeviceInfo(DmDeviceInfo deviceInfo);
-    static void DeleteDeviceInfo(const NodeBasicInfo &nodeInfo);
+    static void DeleteDeviceInfo(const DmDeviceInfo &nodeInfo);
     static void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
     static void GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
     static int32_t GetUdidFromCache(const char *networkId, std::string &udid);
