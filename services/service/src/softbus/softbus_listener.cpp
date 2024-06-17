@@ -62,8 +62,6 @@ IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 std::shared_ptr<DmTimer> SoftbusListener::timer_ = std::make_shared<DmTimer>();
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
-static std::mutex deviceInfosMutex_;
-static std::unordered_map<std::string, std::pair<std::string, DmDeviceInfo>> deviceInfo_;
 
 static int OnSessionOpened(int sessionId, int result)
 {
