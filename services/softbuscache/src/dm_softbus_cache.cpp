@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,8 +81,8 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
             return ERR_DM_FAILED;
         }
         ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
+        SaveDeviceInfo(localDeviceInfo_);
     }
-    SaveDeviceInfo(localDeviceInfo_);
     nodeInfo = localDeviceInfo_;
     return DM_OK;
 }
@@ -114,22 +114,25 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
 void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
 {
     LOGI("SoftbusCache::SaveDeviceInfo");
-    std::string udid = "";
-    GetUdidByNetworkId(deviceInfo.networkId, udid);
-    std::string uuid = "";
-    GetUuidByNetworkId(deviceInfo.networkId, uuid);
-    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
-        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(udid).c_str());
-        return;
-    }
-    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
-        std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
-        LOGE("SaveDeviceInfo copy deviceId failed.");
-        return;
-    }
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
+        std::string udid = "";
+        GetUdidByNetworkId(deviceInfo.networkId, udid);
+        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+            return;
+        }
+        std::string uuid = "";
+        GetUuidByNetworkId(deviceInfo.networkId, uuid);
+        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+            LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(udid).c_str());
+            return;
+        }
+        if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
+            std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+            LOGE("SaveDeviceInfo copy deviceId failed.");
+            return;
+        }
         deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
         g_onlinDeviceNum++;
     }
@@ -203,6 +206,9 @@ void SoftbusCache::UpdateDeviceInfoCache()
         DmDeviceInfo deviceInfo;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
         SaveDeviceInfo(deviceInfo);
+    }
+    if (deviceCount != 0) {
+        SaveLocalDeviceInfo();
     }
     FreeNodeInfo(nodeInfo);
     LOGI("UpdateDeviceInfoCache success, deviceCount: %{public}d.", deviceCount);
