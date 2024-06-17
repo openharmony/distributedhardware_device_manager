@@ -11,46 +11,68 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-ohos_shared_library("dmdevicecache") {
-  sanitize = {
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    integer_overflow = true
-    ubsan = true
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "linux") {
+    shared_library("dmdevicecache") {
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+        "${utils_path}/include/crypto",
+      ]
+
+      sources = [
+        "${common_path}/src/dm_anonymous.cpp",
+        "src/dm_softbus_cache.cpp",
+      ]
+
+      defines = [
+        "LITE_DEVICE",
+        "DH_LOG_TAG=\"dmdevicecache\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${utils_path}:devicemanagerutils",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//third_party/bounds_checking_function:libsec_shared",
+      ]
+    }
   }
+} else {
+  ohos_shared_library("dmdevicecache") {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${utils_path}/include/crypto",
+    ]
 
-  include_dirs = [
-    "include",
-    "${common_path}/include",
-    "${utils_path}/include/crypto",
-  ]
+    sources = [
+      "${common_path}/src/dm_anonymous.cpp",
+      "src/dm_softbus_cache.cpp",
+    ]
 
-  sources = [
-    "${common_path}/src/dm_anonymous.cpp",
-    "src/dm_softbus_cache.cpp",
-  ]
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmdevicecache\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
 
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"dmdevicecache\"",
-    "LOG_DOMAIN=0xD004110",
-  ]
+    deps = [ "${utils_path}:devicemanagerutils" ]
 
-  deps = [
-    "${utils_path}:devicemanagerutils",
-  ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "dsoftbus:softbus_client",
+      "hilog:libhilog",
+    ]
 
-  external_deps = [
-    "bounds_checking_function:libsec_shared",
-    "dsoftbus:softbus_client",
-    "hilog:libhilog",
-  ]
+    subsystem_name = "distributedhardware"
 
-  subsystem_name = "distributedhardware"
-
-  part_name = "device_manager"
+    part_name = "device_manager"
+  }
 }

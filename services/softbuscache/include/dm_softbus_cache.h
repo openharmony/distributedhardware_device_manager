@@ -33,13 +33,16 @@ public:
     void SaveDeviceInfo(DmDeviceInfo deviceInfo);
     void DeleteDeviceInfo(const DmDeviceInfo &nodeInfo);
     void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
-    void SaveDeviceSecurityLevel(const char *networkId, const int32_t &securityLevel);
+    void SaveDeviceSecurityLevel(const char *networkId);
     void DeleteDeviceSecurityLevel(const char *networkId);
     int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetUdidFromCache(const char *networkId, std::string &udid);
     int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
     int32_t GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel);
     void UpdateDeviceInfoCache();
+    void SaveLocalDeviceInfo();
+    void DeleteLocalDeviceInfo();
+    int32_t GetLocalDeviceInfo(DmDeviceInfo &nodeInfo);
 private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);

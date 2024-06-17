@@ -154,13 +154,8 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
-    int32_t tempSecurityLevel = -1;
-    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
-                       reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
-        return ERR_DM_FAILED;
-    }
-    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId, tempSecurityLevel);
+    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(mDeviceInfo.networkId);
+    SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -200,6 +195,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     SoftbusCache::GetInstance().DeleteDeviceInfo(dmDeviceInfo);
     SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
+    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
@@ -586,14 +582,7 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
 
 int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
-    NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
-    return ret;
+    return SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
 }
 
 int32_t SoftbusListener::GetLocalDeviceNetworkId(std::string &networkId)
