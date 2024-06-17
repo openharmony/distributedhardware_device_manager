@@ -27,8 +27,6 @@ DmDeviceInfo localDeviceInfo_;
 int32_t onlinDeviceNum_ = 0;
 void SoftbusCache::SaveLocalDeviceInfo()
 {
-    LOGI("SoftbusCache::SaveLocalDeviceInfo networkid %{public}s.",
-        GetAnonyString(std::string(deviceInfo.networkId)).c_str());
     if (online) {
         return;
     }
@@ -39,12 +37,16 @@ void SoftbusCache::SaveLocalDeviceInfo()
         return;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
+    LOGI("SoftbusCache::SaveLocalDeviceInfo networkid %{public}s.",
+        GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
     online = true;
     bool devInMap = false;
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
-            devInMap = true;
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
+                devInMap = true;
+            }
         }
     }
     if (!devInMap) {
@@ -80,16 +82,7 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
         }
         ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     }
-    bool devInMap = false;
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    {
-        if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
-            devInMap = true;
-        }
-    }
-    if (!devInMap) {
-        SaveDeviceInfo(localDeviceInfo_);
-    }
+    SaveDeviceInfo(localDeviceInfo_);
     nodeInfo = localDeviceInfo_;
     return DM_OK;
 }
