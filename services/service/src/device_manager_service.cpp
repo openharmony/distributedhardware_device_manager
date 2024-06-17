@@ -87,7 +87,7 @@ void DeviceManagerService::SubscribePublishCommonEvent()
         publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
     }
     PublishEventCallback callback = std::bind(&OHOS::DistributedHardware::PublishCommonEventCallback,
-        std::placeholders::_1, std::placeholders::_2);
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     std::vector<std::string> PublishCommonEventVec;
 #ifdef SUPPORT_BLUETOOTH
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE);
@@ -96,8 +96,10 @@ void DeviceManagerService::SubscribePublishCommonEvent()
 #ifdef SUPPORT_WIFI
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE);
 #endif // SUPPORT_WIFI
+    PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     if (publshCommonEventManager_->SubscribePublishCommonEvent(PublishCommonEventVec, callback)) {
-        LOGI("subscribe ble and wifi common event success");
+        LOGI("subscribe ble and wifi and screen common event success");
     }
     return;
 }

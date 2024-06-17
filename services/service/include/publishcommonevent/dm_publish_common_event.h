@@ -28,12 +28,14 @@
 #include "matching_skills.h"
 #include "system_ability_status_change_stub.h"
 
+#include "dm_constants.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-using PublishEventCallback = std::function<void(int32_t, int32_t)>;
+using PublishEventCallback = std::function<void(int32_t, int32_t, int32_t)>;
 
 class DmPublishEventSubscriber : public CommonEventSubscriber {
 public:
@@ -48,6 +50,7 @@ private:
     std::vector<std::string> eventNameVec_;
     int32_t wifiState_ { -1 };
     int32_t bluetoothState_ { -1 };
+    int32_t screenState_ = DM_SCREEN_UNKNOWN;
     PublishEventCallback callback_;
 };
 
