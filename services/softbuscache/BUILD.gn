@@ -23,6 +23,7 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "include",
         "${common_path}/include",
+        "${innerkits_path}/native_cpp/include",
         "${utils_path}/include/crypto",
       ]
 
@@ -38,9 +39,9 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "${utils_path}:devicemanagerutils",
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-        "//third_party/bounds_checking_function:libsec_shared",
+        "${hilog_path}:hilog_shared",
+        "${third_path}:libsec_shared",
+        "${utils_path}:devicemanagerutils",  
       ]
     }
   }
@@ -54,7 +55,7 @@ if (defined(ohos_lite)) {
       integer_overflow = true
       ubsan = true
     }
-    
+
     include_dirs = [
       "include",
       "${common_path}/include",
