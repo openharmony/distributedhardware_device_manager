@@ -43,7 +43,7 @@ if (defined(ohos_lite)) {
         "${dsoftbussdk_path}:softbus_client",
         "${hilog_path}:hilog_shared",
         "${third_path}:libsec_shared",
-        "${utils_path}:devicemanagerutils", 
+        "${utils_path}:devicemanagerutils",
       ]
     }
   }
