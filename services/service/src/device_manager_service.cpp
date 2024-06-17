@@ -29,6 +29,7 @@
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
+#include "multiple_user_connector.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "softbus_publish.h"
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
@@ -1487,6 +1488,18 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
 
 void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
 {
+    if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED && isFirstUserSwitched_) {
+        std::string accountId = MultipleUserConnector::GetOhosAccountId();
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        LOGI("user_switched event accountId: %{public}s, userId: %{public}s", GetAnonyString(accountId).c_str(),
+            GetAnonyInt32(userId).c_str());
+        if (userId > 0) {
+            MultipleUserConnector::SetSwitchOldUserId(userId);
+            MultipleUserConnector::SetSwitchOldAccountId(accountId);
+        }
+        isFirstUserSwitched_ = false;
+        return;
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("AccountCommonEventCallback failed, instance not init or init failed.");
         return;
