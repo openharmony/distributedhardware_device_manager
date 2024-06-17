@@ -84,7 +84,6 @@ public:
     int32_t RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         const std::shared_ptr<ISoftbusDiscoveringCallback> callback);
     int32_t UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName);
-    void UpdateDeviceInfoCache();
     static IDmRadarHelper* GetDmRadarHelperObj();
     static bool IsDmRadarHelperReady();
     static bool CloseDmRadarHelperObj(std::string name);

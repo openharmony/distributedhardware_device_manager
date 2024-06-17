@@ -22,12 +22,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
-bool online = false;
+bool g_online = false;
 DmDeviceInfo localDeviceInfo_;
-int32_t onlinDeviceNum_ = 0;
+int32_t g_onlinDeviceNum = 0;
 void SoftbusCache::SaveLocalDeviceInfo()
 {
-    if (online) {
+    if (g_online) {
         return;
     }
     NodeBasicInfo nodeBasicInfo;
@@ -39,7 +39,7 @@ void SoftbusCache::SaveLocalDeviceInfo()
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     LOGI("SoftbusCache::SaveLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
-    online = true;
+    g_online = true;
     bool devInMap = false;
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
@@ -60,8 +60,8 @@ void SoftbusCache::DeleteLocalDeviceInfo()
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        if (onlinDeviceNum_ == 0) {
-            online = false;
+        if (g_onlinDeviceNum == 0) {
+            g_online = false;
         }
     }
 }
@@ -137,7 +137,7 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
         deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
-        onlinDeviceNum_++;
+        g_onlinDeviceNum++;
     }
     LOGI("SaveDeviceInfo success udid %{public}s, networkId %{public}s",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
@@ -153,7 +153,7 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
             if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
                 LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
                 deviceInfo_.erase(item.first);
-                onlinDeviceNum_--;
+                g_onlinDeviceNum--;
             }
         }
     }
