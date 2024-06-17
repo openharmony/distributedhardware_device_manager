@@ -115,9 +115,9 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
 {
     LOGI("SoftbusCache::SaveDeviceInfo");
     std::string udid = "";
+    GetUdidByNetworkId(deviceInfo.networkId, udid);
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        GetUdidByNetworkId(deviceInfo.networkId, udid);
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             return;
         }
