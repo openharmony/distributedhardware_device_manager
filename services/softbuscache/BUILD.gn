@@ -41,7 +41,9 @@ if (defined(ohos_lite)) {
       deps = [
         "${hilog_path}:hilog_shared",
         "${third_path}:libsec_shared",
-        "${utils_path}:devicemanagerutils",  
+        "${utils_path}:devicemanagerutils", 
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//third_party/json/include",
       ]
     }
   }
