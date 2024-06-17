@@ -22,6 +22,7 @@ softbuscache_parh = "${devicemanager_path}/services/softbuscache"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
 hilog_path = "//base/hiviewdfx/hilog_lite/frameworks/featured"
 third_path = "//third_party/bounds_checking_function"
+dsoftbussdk_path = "//foundation/communication/dsoftbus/sdk"
 ext_path = "${devicemanager_path}/ext"
 ability_runtime_innerkits_path =
     "//foundation/ability/ability_runtime/interfaces/inner_api"
