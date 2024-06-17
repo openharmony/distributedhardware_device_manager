@@ -82,8 +82,8 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "${utils_path}:devicemanagerutils",
         "${softbuscache_parh}:dmdevicecache",
+        "${utils_path}:devicemanagerutils",
         "//base/security/device_auth/services:deviceauth_sdk",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
