@@ -114,9 +114,9 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
 void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
 {
     LOGI("SoftbusCache::SaveDeviceInfo");
+    std::string udid = "";
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        std::string udid = "";
         GetUdidByNetworkId(deviceInfo.networkId, udid);
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             return;
