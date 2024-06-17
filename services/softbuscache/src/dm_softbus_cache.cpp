@@ -116,12 +116,6 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     LOGI("SoftbusCache::SaveDeviceInfo");
     std::string udid = "";
     GetUdidByNetworkId(deviceInfo.networkId, udid);
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    {
-        if (deviceSecurityLevel_.find(udid) != deviceSecurityLevel_.end()) {
-            return;
-        }
-    }
     std::string uuid = "";
     GetUuidByNetworkId(deviceInfo.networkId, uuid);
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};

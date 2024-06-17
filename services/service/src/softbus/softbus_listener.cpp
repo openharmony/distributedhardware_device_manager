@@ -152,7 +152,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
-    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(mDeviceInfo.networkId);
+    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
@@ -510,7 +510,7 @@ int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
+    int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
     static int32_t radarDeviceCount = 0;
     int32_t deviceCount = deviceInfoList.size();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
