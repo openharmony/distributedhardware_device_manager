@@ -181,6 +181,9 @@ int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceIn
     LOGI("SoftbusCache::GetDeviceInfoFromCache.");
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
+        if (deviceInfo_.empty()) {
+            return ERR_DM_FAILED;
+        }
         for (const auto &item : deviceInfo_) {
             deviceInfoList.push_back(item.second.second);
         }
@@ -299,6 +302,9 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
     LOGI("SoftbusCache::GetSecurityDeviceLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
     std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
     {
+        if (deviceSecurityLevel_.empty()) {
+            return ERR_DM_FAILED;
+        }
         for (const auto &item : deviceSecurityLevel_) {
             if (item.first == std::string(networkId)) {
                 securityLevel = item.second;
