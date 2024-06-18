@@ -47,14 +47,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/json/include",
-    "//third_party/jsframework/runtime/main/extend",
-    "//third_party/jsframework/runtime/main/extend/systemplugin",
-    "//third_party/node/benchmark",
-    "//third_party/libuv/include",
-    "//third_party/node/src",
-    "//third_party/json/include",
   ]
 
   cflags = [
@@ -85,8 +77,6 @@ ohos_fuzztest("IpcClientManagerFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-
-  public_deps = [ "//third_party/googletest:gmock" ]
 }
 
 ###############################################################################

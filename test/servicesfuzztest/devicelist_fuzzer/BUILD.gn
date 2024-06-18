@@ -47,12 +47,6 @@ ohos_fuzztest("DeviceListFuzzTest") {
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/jsframework/runtime/main/extend",
-    "//third_party/jsframework/runtime/main/extend/systemplugin",
-    "//third_party/node/benchmark",
-    "//third_party/node/src",
-    "//third_party/json/include",
   ]
 
   cflags = [

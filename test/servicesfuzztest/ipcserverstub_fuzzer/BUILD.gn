@@ -46,13 +46,6 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/json/include",
-    "//third_party/jsframework/runtime/main/extend",
-    "//third_party/jsframework/runtime/main/extend/systemplugin",
-    "//third_party/node/benchmark",
-    "//third_party/libuv/include",
-    "//third_party/node/src",
   ]
 
   cflags = [
@@ -82,8 +75,6 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "napi:ace_napi",
     "safwk:system_ability_fwk",
   ]
-
-  public_deps = [ "//third_party/googletest:gmock" ]
 }
 
 ###############################################################################
