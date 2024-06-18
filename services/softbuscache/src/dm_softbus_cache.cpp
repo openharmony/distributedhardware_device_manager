@@ -43,9 +43,11 @@ void SoftbusCache::SaveLocalDeviceInfo()
     bool devInMap = false;
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        for (const auto &item : deviceInfo_) {
-            if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
-                devInMap = true;
+        if (!deviceInfo_.empty()) {
+            for (const auto &item : deviceInfo_) {
+                if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
+                    devInMap = true;
+                }
             }
         }
     }
@@ -143,6 +145,9 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
         GetAnonyString(std::string(nodeInfo.networkId)).c_str());
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
+        if (deviceInfo_.empty()) {
+            return;
+        }
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
                 LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
@@ -220,6 +225,9 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
     LOGI("SoftbusCache::GetUdidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
+        if (deviceInfo_.empty()) {
+            return ERR_DM_FAILED;
+        }
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(networkId)) {
                 udid = item.first;
@@ -236,6 +244,9 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
     LOGI("SoftbusCache::GetUuidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
+        if (deviceInfo_.empty()) {
+            return ERR_DM_FAILED;
+        }
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(networkId)) {
                 uuid = item.second.first;
