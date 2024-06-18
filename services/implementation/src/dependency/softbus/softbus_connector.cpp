@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
+#include "dm_softbus_cache.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -264,27 +265,13 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());
-    uint8_t tmpUdid[UDID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, tmpUdid, sizeof(tmpUdid));
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    udid = reinterpret_cast<char *>(tmpUdid);
-    return ret;
+    return SoftbusCache::GetInstance().GetUdidFromCache(networkId, udid);
 }
 
 int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());
-    uint8_t tmpUuid[UUID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, tmpUuid, sizeof(tmpUuid));
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    uuid = reinterpret_cast<char *>(tmpUuid);
-    return ret;
+    return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

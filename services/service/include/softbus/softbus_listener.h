@@ -73,7 +73,7 @@ public:
     int32_t GetLocalDeviceType(int32_t &deviceType);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
     int32_t ShiftLNNGear();
-    int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
+    static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
     int32_t GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel);
     int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);
     int32_t RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo, const std::string &customData);

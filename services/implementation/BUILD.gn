@@ -50,6 +50,7 @@ if (defined(ohos_lite)) {
         "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
         "//commonlibrary/c_utils/base/include",
+        "${softbuscache_parh}/include",
       ]
 
       sources = [
@@ -74,6 +75,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "${devicemanager_path}/radar:devicemanagerradar",
+        "${softbuscache_parh}:dmdevicecache",
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/security/device_auth/services:deviceauth_sdk",
@@ -137,6 +139,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/timer",
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
+      "${softbuscache_parh}/include",
     ]
   }
 
@@ -189,6 +192,7 @@ if (defined(ohos_lite)) {
       "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
       "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${softbuscache_parh}:dmdevicecache",
       "${utils_path}:devicemanagerutils",
     ]
 

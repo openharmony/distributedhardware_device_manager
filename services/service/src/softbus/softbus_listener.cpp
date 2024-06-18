@@ -24,9 +24,11 @@
 
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
+#include "dm_crypto.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "softbus_adapter.cpp"
@@ -149,6 +151,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
+    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
+    SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
@@ -186,6 +191,9 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
+    SoftbusCache::GetInstance().DeleteDeviceInfo(dmDeviceInfo);
+    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
+    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
     std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
@@ -236,6 +244,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
+        SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
         std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
@@ -501,33 +510,14 @@ int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
+    int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
     static int32_t radarDeviceCount = 0;
-    int32_t deviceCount = 0;
-    NodeBasicInfo *nodeInfo = nullptr;
-    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
+    int32_t deviceCount = deviceInfoList.size();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo radarInfo = {
         .localUdid = std::string(localDeviceId),
     };
-    if (ret != DM_OK) {
-        radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL);
-        radarInfo.errCode = ERR_DM_FAILED;
-        radarInfo.discoverDevList = "";
-        if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
-            if (!GetDmRadarHelperObj()->ReportGetTrustDeviceList(radarInfo)) {
-                LOGE("ReportGetTrustDeviceList failed");
-            }
-        }
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    for (int32_t i = 0; i < deviceCount; ++i) {
-        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
-        DmDeviceInfo deviceInfo;
-        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
-        deviceInfoList.push_back(deviceInfo);
-    }
     radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
     if (radarDeviceCount != deviceCount && deviceCount > 0
         && IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
@@ -537,8 +527,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
             LOGE("ReportGetTrustDeviceList failed");
         }
     }
-    FreeNodeInfo(nodeInfo);
-    LOGI("GetTrustDevices success, deviceCount: %{public}d.", deviceCount);
+    LOGI("GetTrustedDeviceList success from cache deviceInfoList size is %{public}d.", deviceCount);
     return ret;
 }
 
@@ -591,14 +580,7 @@ int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInf
 
 int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
-    NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, deviceInfo);
-    return ret;
+    return SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
 }
 
 int32_t SoftbusListener::GetLocalDeviceNetworkId(std::string &networkId)
@@ -639,26 +621,12 @@ int32_t SoftbusListener::GetLocalDeviceType(int32_t &deviceType)
 
 int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
-    uint8_t mUdid[UDID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    udid = reinterpret_cast<char *>(mUdid);
-    return ret;
+    return SoftbusCache::GetInstance().GetUdidFromCache(networkId, udid);
 }
 
 int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
-    uint8_t mUuid[UUID_BUF_LEN] = {0};
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    uuid = reinterpret_cast<char *>(mUuid);
-    return ret;
+    return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
 int32_t SoftbusListener::ShiftLNNGear()
@@ -796,15 +764,7 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
 
 int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
 {
-    int32_t tempSecurityLevel = -1;
-    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
-                       reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
-        return ERR_DM_FAILED;
-    }
-    securityLevel = tempSecurityLevel;
-    LOGI("GetDeviceSecurityLevel success, securityLevel = %{public}d.", securityLevel);
-    return DM_OK;
+    return SoftbusCache::GetInstance().GetSecurityDeviceLevel(networkId, securityLevel);
 }
 
 void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)

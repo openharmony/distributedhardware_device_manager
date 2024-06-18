@@ -24,9 +24,9 @@
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "parameter.h"
 #include "permission_manager.h"
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "multiple_user_connector.h"
@@ -70,6 +70,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
     if (softbusListener_ == nullptr) {
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    SoftbusCache::GetInstance().UpdateDeviceInfoCache();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
@@ -180,11 +181,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
-                std::string deviceIdHash = "";
-                dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
-                if (memcpy_s(item.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash.c_str(), deviceIdHash.length()) != 0) {
-                    LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceIdHash).c_str());
-                }
                 item.authForm = udidMap[udid].first;
                 item.extraData = udidMap[udid].second;
                 deviceList.push_back(item);
@@ -373,7 +369,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
             GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    softbusListener_->GetUuidByNetworkId(netWorkId.c_str(), uuid);
+    SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
     return DM_OK;
 }
 
