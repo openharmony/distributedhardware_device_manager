@@ -21,6 +21,7 @@
 
 #include "bundle_mgr_interface.h"
 #include "iservice_registry.h"
+#include "screenlock_manager.h"
 #include "system_ability_definition.h"
 
 #include "auth_message_processor.h"
@@ -1330,6 +1331,11 @@ void DmAuthManager::ShowStartAuthDialog()
         }
         return;
     }
+    if (IsScreenLocked()) {
+        LOGE("ShowStartAuthDialog screen is locked.");
+        SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL, STATUS_DM_AUTH_DEFAULT);
+        return;
+    }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
@@ -2476,6 +2482,39 @@ std::string DmAuthManager::GetBundleLable(const std::string &bundleName)
     }
     LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
     return resourceInfo.label;
+}
+
+bool DmAuthManager::IsScreenLocked()
+{
+    bool isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
+    LOGI("IsScreenLocked isLocked: %{public}d.", isLocked);
+    return isLocked;
+}
+
+void DmAuthManager::OnScreenLocked()
+{
+    if (authRequestState_ == nullptr) {
+        LOGE("OnScreenLocked authRequestState_ is nullptr.");
+        return;
+    }
+    if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE ||
+        authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_INIT) {
+        LOGI("OnScreenLocked stop bind.");
+        SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL, STATUS_DM_AUTH_DEFAULT);
+        return;
+    }
+    if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_JOIN) {
+        LOGI("OnScreenLocked stop user input.");
+        if (authUiStateMgr_ != nullptr) {
+            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
+        }
+        SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL, STATUS_DM_AUTH_DEFAULT);
+        return;
+    }
+    if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
+        LOGI("OnScreenLocked stop confirm.");
+        SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL, STATUS_DM_AUTH_DEFAULT);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

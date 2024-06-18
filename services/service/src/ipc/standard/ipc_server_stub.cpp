@@ -59,6 +59,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
+    AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
     LOGI("called:AddAbilityListener end!");
 }
 
@@ -72,6 +73,8 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
         DeviceManagerService::GetInstance().InitAccountInfo();
+    } else if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitScreenLockEvent();
     }
 }
 

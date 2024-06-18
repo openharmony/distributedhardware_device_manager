@@ -712,6 +712,16 @@ void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::s
     LOGI("DeviceManagerServiceImpl::AccountCommonEventCallback error.");
 }
 
+void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
+{
+    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback on screen locked.");
+        authMgr_->OnScreenLocked();
+        return;
+    }
+    LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback error.");
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
