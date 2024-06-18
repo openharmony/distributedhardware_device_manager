@@ -74,7 +74,7 @@ struct PinCustomDialog {
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
         Column() {
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Start }) {
+          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
             Text($r('app.string.dm_connect_code'))
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
@@ -153,7 +153,7 @@ struct dialogPlusPage {
     builder: PinCustomDialog(),
     cancel: this.onCancel,
     autoCancel: false,
-    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
+    alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')

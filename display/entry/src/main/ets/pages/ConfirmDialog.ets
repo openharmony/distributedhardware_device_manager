@@ -30,8 +30,6 @@ const MSG_CANCEL_CONFIRM_SHOW: number = 5;
 const DEVICE_TYPE_2IN1: number = 0xA2F;
 const DEVICE_TYPE_PC: number = 0x0C;
 const CAST_PKG_NAME: string = 'CastEngineService';
-const DIALOG_MAX_HEIGHT_RATE = 0.9;
-const OTHER_HEIGHT_EXPECT_TITLE = 260;
 
 @CustomDialog
 struct ConfirmCustomDialog {
@@ -44,29 +42,11 @@ struct ConfirmCustomDialog {
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   @State title: string = '';
-  @State scrollHeight: number = 0;
   controller?: CustomDialogController;
   isPC: boolean = false;
-  listener: mediaQuery.MediaQueryListener = mediaQuery.matchMediaSync('(orientation: landscape)');
-
-  getScrollHeight() {
-    let defaultDisplay = display.getDefaultDisplaySync();
-    let height = defaultDisplay.height;
-    let densityPixels = defaultDisplay.densityPixels;
-    if (densityPixels === 0) {
-      console.error(TAG + 'onPortrait densityPixels is zero.')
-      return;
-    }
-    this.scrollHeight = height / densityPixels * DIALOG_MAX_HEIGHT_RATE - OTHER_HEIGHT_EXPECT_TITLE;
-  }
-
-  onPortrait(mediaQueryResult: mediaQuery.MediaQueryResult) {
-    this.getScrollHeight();
-  }
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
-    this.getScrollHeight();
     let context = getContext() as common.UIAbilityContext;
 
     if (AppStorage.get('deviceName') != null) {
@@ -107,9 +87,6 @@ struct ConfirmCustomDialog {
     }, 1000)
     console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
     this.isPC = Constant.isPC();
-    this.listener.on('change', (mediaQueryResult: mediaQuery.MediaQueryResult) => {
-      this.onPortrait(mediaQueryResult);
-    })
   }
 
   onAllowOnce() {
@@ -222,14 +199,17 @@ struct ConfirmCustomDialog {
             .margin({ bottom: 16, top: 24 })
             .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
           Column() {
-            Scroll() {
-              Text(this.title)
-              .textAlign(TextAlign.Start)
+            Text(this.title)
+              .textAlign(TextAlign.Center)
+              .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+              .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .fontWeight(FontWeight.Medium)
-              .fontSize($r('sys.float.ohos_id_text_size_body1'))
-              .width('100%')
-            }.constraintSize({ maxHeight: this.scrollHeight })
+              .minFontSize(12)
+              .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('auto')
+              .maxLines(2)
             Text(this.peerCustomDescription)
               .textAlign(TextAlign.Start)
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
@@ -237,8 +217,7 @@ struct ConfirmCustomDialog {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .maxLines(3)
-              .constraintSize({ maxHeight: 45 })
-              .width('100%')
+              .width('auto')
               .margin({ top: 8 })
               .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
           }.margin({
@@ -339,7 +318,7 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: ConfirmCustomDialog(),
     autoCancel: false,
-    alignment: Constant.isPhone() ? DialogAlignment.Bottom : DialogAlignment.Center,
+    alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
