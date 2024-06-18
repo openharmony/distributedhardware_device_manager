@@ -23,6 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 bool g_online = false;
+bool g_getLocalDevInfo = false;
 DmDeviceInfo localDeviceInfo_;
 int32_t g_onlinDeviceNum = 0;
 void SoftbusCache::SaveLocalDeviceInfo()
@@ -39,53 +40,37 @@ void SoftbusCache::SaveLocalDeviceInfo()
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     LOGI("SoftbusCache::SaveLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
+    SaveDeviceInfo(localDeviceInfo_);
     g_online = true;
-    bool devInMap = false;
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (!deviceInfo_.empty()) {
-            for (const auto &item : deviceInfo_) {
-                if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
-                    devInMap = true;
-                }
-            }
-        }
-    }
-    if (!devInMap) {
-        SaveDeviceInfo(localDeviceInfo_);
-    }
+    g_getLocalDevInfo = true;
 }
 
 void SoftbusCache::DeleteLocalDeviceInfo()
 {
     LOGI("SoftbusCache::DeleteLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (g_onlinDeviceNum == 0) {
-            g_online = false;
-        }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    if (g_onlinDeviceNum == 0) {
+        g_online = false;
+        g_getLocalDevInfo = false;
     }
 }
 
 int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
 {
-    bool devInfoEmpty = false;
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        devInfoEmpty = deviceInfo_.empty();
+    if (g_getLocalDevInfo) {
+        nodeInfo = localDeviceInfo_;
+        return DM_OK;
     }
-    if (devInfoEmpty) {
-        NodeBasicInfo nodeBasicInfo;
-        int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-        if (ret != DM_OK) {
-            LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-            return ERR_DM_FAILED;
-        }
-        ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
-        SaveDeviceInfo(localDeviceInfo_);
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
+        return ERR_DM_FAILED;
     }
-    nodeInfo = localDeviceInfo_;
+    ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
+    SaveDeviceInfo(localDeviceInfo_);
+    g_getLocalDevInfo = true;
     return DM_OK;
 }
 
@@ -130,11 +115,9 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
         LOGE("SaveDeviceInfo copy deviceId failed.");
         return;
     }
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
-        g_onlinDeviceNum++;
-    }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
+    g_onlinDeviceNum++;
     LOGI("SaveDeviceInfo success udid %{public}s, networkId %{public}s",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
@@ -143,17 +126,12 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusCache::DeleteDeviceInfo networkId %{public}s",
         GetAnonyString(std::string(nodeInfo.networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (deviceInfo_.empty()) {
-            return;
-        }
-        for (const auto &item : deviceInfo_) {
-            if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
-                LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
-                deviceInfo_.erase(item.first);
-                g_onlinDeviceNum--;
-            }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
+            LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
+            deviceInfo_.erase(item.first);
+            g_onlinDeviceNum--;
         }
     }
 }
@@ -163,19 +141,17 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
     LOGI("SoftbusCache::ChangeDeviceInfo");
     std::string udid = "";
     GetUdidByNetworkId(deviceInfo.networkId, udid);
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
-            if (memcpy_s(deviceInfo_[udid].second.deviceName, sizeof(deviceInfo_[udid].second.deviceName),
-                deviceInfo.deviceName, sizeof(deviceInfo.deviceName)) != DM_OK) {
-                LOGE("ChangeDeviceInfo deviceInfo copy deviceName failed");
-            }
-            if (memcpy_s(deviceInfo_[udid].second.networkId, sizeof(deviceInfo_[udid].second.networkId),
-                deviceInfo.networkId, sizeof(deviceInfo.networkId)) != DM_OK) {
-                LOGE("ChangeDeviceInfo deviceInfo copy networkId failed");
-            }
-            deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+        if (memcpy_s(deviceInfo_[udid].second.deviceName, sizeof(deviceInfo_[udid].second.deviceName),
+            deviceInfo.deviceName, sizeof(deviceInfo.deviceName)) != DM_OK) {
+            LOGE("ChangeDeviceInfo deviceInfo copy deviceName failed");
         }
+        if (memcpy_s(deviceInfo_[udid].second.networkId, sizeof(deviceInfo_[udid].second.networkId),
+            deviceInfo.networkId, sizeof(deviceInfo.networkId)) != DM_OK) {
+            LOGE("ChangeDeviceInfo deviceInfo copy networkId failed");
+        }
+        deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
     }
     LOGI("ChangeDeviceInfo sucess udid %{public}s, networkId %{public}s.",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
@@ -184,14 +160,9 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
 int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
 {
     LOGI("SoftbusCache::GetDeviceInfoFromCache.");
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (deviceInfo_.empty()) {
-            return ERR_DM_FAILED;
-        }
-        for (const auto &item : deviceInfo_) {
-            deviceInfoList.push_back(item.second.second);
-        }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    for (const auto &item : deviceInfo_) {
+        deviceInfoList.push_back(item.second.second);
     }
     return DM_OK;
 }
@@ -206,14 +177,14 @@ void SoftbusCache::UpdateDeviceInfoCache()
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
         return;
     }
+    if (deviceCount != 0) {
+        SaveLocalDeviceInfo();
+    }
     for (int32_t i = 0; i < deviceCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
         DmDeviceInfo deviceInfo;
         ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceInfo);
         SaveDeviceInfo(deviceInfo);
-    }
-    if (deviceCount != 0) {
-        SaveLocalDeviceInfo();
     }
     FreeNodeInfo(nodeInfo);
     LOGI("UpdateDeviceInfoCache success, deviceCount: %{public}d.", deviceCount);
@@ -223,17 +194,12 @@ void SoftbusCache::UpdateDeviceInfoCache()
 int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
 {
     LOGI("SoftbusCache::GetUdidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (deviceInfo_.empty()) {
-            return ERR_DM_FAILED;
-        }
-        for (const auto &item : deviceInfo_) {
-            if (std::string(item.second.second.networkId) == std::string(networkId)) {
-                udid = item.first;
-                LOGI("GetUdidFromCache success udid %{public}s.", GetAnonyString(udid).c_str());
-                return DM_OK;
-            }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(networkId)) {
+            udid = item.first;
+            LOGI("GetUdidFromCache success udid %{public}s.", GetAnonyString(udid).c_str());
+            return DM_OK;
         }
     }
     return ERR_DM_FAILED;
@@ -242,17 +208,12 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
 int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
 {
     LOGI("SoftbusCache::GetUuidFromCache networkId %{public}s", GetAnonyString(std::string(networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        if (deviceInfo_.empty()) {
-            return ERR_DM_FAILED;
-        }
-        for (const auto &item : deviceInfo_) {
-            if (std::string(item.second.second.networkId) == std::string(networkId)) {
-                uuid = item.second.first;
-                LOGI("GetUuidFromCache success uuid %{public}s.", GetAnonyString(uuid).c_str());
-                return DM_OK;
-            }
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(networkId)) {
+            uuid = item.second.first;
+            LOGI("GetUuidFromCache success uuid %{public}s.", GetAnonyString(uuid).c_str());
+            return DM_OK;
         }
     }
     return ERR_DM_FAILED;
@@ -281,46 +242,37 @@ int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeIn
 void SoftbusCache::SaveDeviceSecurityLevel(const char *networkId)
 {
     LOGI("SoftbusCache::SaveDeviceSecurityLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-        if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
-            return;
-        }
-        int32_t tempSecurityLevel = -1;
-        if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
-            reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
-            LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
-            return;
-        }
-        deviceSecurityLevel_[std::string(networkId)] = tempSecurityLevel;
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
+        return;
     }
+    int32_t tempSecurityLevel = -1;
+    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
+        reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return;
+    }
+    deviceSecurityLevel_[std::string(networkId)] = tempSecurityLevel;
 }
 
 void SoftbusCache::DeleteDeviceSecurityLevel(const char *networkId)
 {
     LOGI("SoftbusCache::DeleteDeviceSecurityLevel networkId %{public}s.",
         GetAnonyString(std::string(networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-        if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
-            deviceSecurityLevel_.erase(std::string(networkId));
-        }
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
+        deviceSecurityLevel_.erase(std::string(networkId));
     }
 }
 
 int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel)
 {
     LOGI("SoftbusCache::GetSecurityDeviceLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-        if (deviceSecurityLevel_.empty()) {
-            return ERR_DM_FAILED;
-        }
-        for (const auto &item : deviceSecurityLevel_) {
-            if (item.first == std::string(networkId)) {
-                securityLevel = item.second;
-                return DM_OK;
-            }
+    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
+    for (const auto &item : deviceSecurityLevel_) {
+        if (item.first == std::string(networkId)) {
+            securityLevel = item.second;
+            return DM_OK;
         }
     }
     return ERR_DM_FAILED;
