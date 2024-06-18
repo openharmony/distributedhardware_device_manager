@@ -43,8 +43,7 @@ void SoftbusCache::SaveLocalDeviceInfo()
     bool devInMap = false;
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     {
-        
-        for (const auto &item : deviceInfo_) { 
+        for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
                 devInMap = true;
             }
