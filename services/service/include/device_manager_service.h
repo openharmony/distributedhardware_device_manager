@@ -233,7 +233,7 @@ private:
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
-	std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
+    std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
     bool isFirstUserSwitched_ = true;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
