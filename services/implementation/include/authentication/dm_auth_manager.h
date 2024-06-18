@@ -518,6 +518,7 @@ public:
     void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
     void BindSocketSuccess(int32_t socket);
     void BindSocketFail();
+    void OnScreenLocked();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
@@ -538,6 +539,7 @@ private:
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
+    bool IsScreenLocked();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

@@ -32,6 +32,8 @@ namespace DistributedHardware {
 static constexpr int32_t INVALID_USERID = -1;
 static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 static constexpr int32_t WAIT_DIALOG_CLOSE_TIME_S = 10;
+static constexpr int32_t WINDOW_LEVEL_UPPER = 2;
+static constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
 const int32_t USLEEP_SHOW_PIN_TIME_US = 50000;  // 50ms
 const std::string CONNECT_PIN_DIALOG = "pinDialog";
 const std::string dmUiBundleName = "com.ohos.devicemanagerui";
@@ -188,6 +190,10 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     data.WriteString16(u"parameters");
     nlohmann::json param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
+    param["sysDialogZOrder"] = WINDOW_LEVEL_DEFAULT;
+    if (DmDialogManager::GetAbilityName() == inputAbilityName) {
+        param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
+    }
     param["pinCode"] = DmDialogManager::GetPinCode();
     param["deviceName"] = DmDialogManager::GetDeviceName();
     param["appOperationStr"] = DmDialogManager::GetAppOperationStr();

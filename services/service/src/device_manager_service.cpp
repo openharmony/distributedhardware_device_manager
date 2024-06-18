@@ -839,6 +839,13 @@ bool DeviceManagerService::IsDMServiceImplReady()
     return true;
 }
 
+bool DeviceManagerService::IsDMImplSoLoaded()
+{
+    LOGI("DeviceManagerService::IsDMImplSoLoaded");
+    std::lock_guard<std::mutex> lock(isImplLoadLock_);
+    return isImplsoLoaded_;
+}
+
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
@@ -1467,6 +1474,15 @@ int32_t DeviceManagerService::InitAccountInfo()
     return DM_OK;
 }
 
+int32_t DeviceManagerService::InitScreenLockEvent()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    SubscribeScreenLockEvent();
+    LOGI("InitScreenLockEvent success.");
+#endif
+    return DM_OK;
+}
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::SubscribeAccountCommonEvent()
 {
@@ -1482,6 +1498,22 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
         LOGI("subscribe account common event success");
+    }
+    return;
+}
+
+void DeviceManagerService::SubscribeScreenLockEvent()
+{
+    LOGI("DeviceManagerServiceImpl::SubscribeScreenLockEvent");
+    if (screenCommonEventManager_ == nullptr) {
+        screenCommonEventManager_ = std::make_shared<DmScreenCommonEventManager>();
+    }
+    ScreenEventCallback callback = std::bind(&DeviceManagerService::ScreenCommonEventCallback,
+        this, std::placeholders::_1);
+    std::vector<std::string> screenEventVec;
+    screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
+    if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {
+        LOGI("subscribe screen common event success");
     }
     return;
 }
@@ -1505,6 +1537,15 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
         return;
     }
     dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
+}
+
+void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType)
+{
+    if (!IsDMImplSoLoaded()) {
+        LOGE("ScreenCommonEventCallback failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->ScreenCommonEventCallback(commonEventType);
 }
 #endif
 

@@ -277,7 +277,8 @@ public:
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
     virtual int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName) = 0;
-    virtual void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
+    virtual void AccountCommonEventCallback(int32_t userId, std::string commonEventType) = 0;
+    virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

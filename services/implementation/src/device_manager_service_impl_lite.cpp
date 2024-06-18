@@ -463,6 +463,11 @@ void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::s
     (void)commonEventType;
 }
 
+void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
+{
+    (void)commonEventType;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
