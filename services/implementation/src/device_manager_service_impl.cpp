@@ -700,15 +700,6 @@ void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::s
             commonEventType.c_str(), GetAnonyInt32(userId).c_str());
         return;
     }
-    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
-        int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
-        std::string currentAccountId = MultipleUserConnector::GetOhosAccountId();
-        MultipleUserConnector::SetSwitchOldUserId(currentUserId);
-        MultipleUserConnector::SetSwitchOldAccountId(currentAccountId);
-        LOGI("DeviceManagerServiceImpl::account login accountId: %{public}s, userId: %{public}s",
-            GetAnonyString(currentAccountId).c_str(), GetAnonyInt32(currentUserId).c_str());
-        return;
-    }
     LOGI("DeviceManagerServiceImpl::AccountCommonEventCallback error.");
 }
 

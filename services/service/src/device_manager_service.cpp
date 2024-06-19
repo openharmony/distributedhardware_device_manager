@@ -1516,23 +1516,34 @@ void DeviceManagerService::SubscribeScreenLockEvent()
 
 void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
 {
-    if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED && isFirstUserSwitched_) {
+    LOGI("AccountCommonEventCallback start, commonEventType: %{public}s", commonEventType.c_str());
+    if ((commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
+        commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN)) {
         std::string accountId = MultipleUserConnector::GetOhosAccountId();
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-        LOGI("user_switched event accountId: %{public}s, userId: %{public}s", GetAnonyString(accountId).c_str(),
+        LOGI("accountId: %{public}s, userId: %{public}s", GetAnonyString(accountId).c_str(),
             GetAnonyInt32(userId).c_str());
         if (userId > 0) {
             MultipleUserConnector::SetSwitchOldUserId(userId);
             MultipleUserConnector::SetSwitchOldAccountId(accountId);
         }
-        isFirstUserSwitched_ = false;
         return;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("AccountCommonEventCallback failed, instance not init or init failed.");
-        return;
+    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        std::vector<DmDeviceInfo> onlineDeviceList;
+        if (softbusListener_ == nullptr) {
+            LOGE("softbusListener_ is nullptr.");
+            return;
+        }
+        int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
+        if (ret != DM_OK) {
+            LOGE("GetTrustedDeviceList failed, ret: %{public}d", ret);
+            return;
+        }
+        if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+            dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
+        }
     }
-    dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
 }
 
 void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType)
