@@ -39,11 +39,9 @@ namespace DistributedHardware {
 const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
-const int32_t LOAD_RADAR_TIMEOUT = 180;
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
-constexpr const char* LOAD_RADAR_TIMEOUT_TASK = "deviceManagerTimer:loadRadarSo";
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
@@ -59,7 +57,6 @@ static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOp
 static std::set<std::string> deviceIdSet;
 bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
-std::shared_ptr<DmTimer> SoftbusListener::timer_ = std::make_shared<DmTimer>();
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
 
@@ -842,13 +839,6 @@ bool SoftbusListener::IsDmRadarHelperReady()
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
         LOGI("IsDmRadarHelperReady alReady");
-        if (timer_ != nullptr) {
-            timer_->DeleteTimer(std::string(LOAD_RADAR_TIMEOUT_TASK));
-            timer_->StartTimer(std::string(LOAD_RADAR_TIMEOUT_TASK), LOAD_RADAR_TIMEOUT,
-                [=] (std::string name) {
-                    SoftbusListener::CloseDmRadarHelperObj(name);
-                });
-        }
         return true;
     }
     char path[PATH_MAX + 1] = {0x00};
@@ -872,11 +862,6 @@ bool SoftbusListener::IsDmRadarHelperReady()
     isRadarSoLoad_ = true;
     dmRadarHelper_ = func();
     LOGI("IsDmRadarHelperReady ready success");
-    if (timer_ != nullptr) {
-        timer_->DeleteTimer(std::string(LOAD_RADAR_TIMEOUT_TASK));
-        timer_->StartTimer(std::string(LOAD_RADAR_TIMEOUT_TASK), LOAD_RADAR_TIMEOUT,
-            [=](std::string name) { SoftbusListener::CloseDmRadarHelperObj(name); });
-    }
     return true;
 }
 
