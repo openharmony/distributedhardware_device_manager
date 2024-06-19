@@ -162,6 +162,9 @@ int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceIn
     LOGI("SoftbusCache::GetDeviceInfoFromCache.");
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     for (const auto &item : deviceInfo_) {
+        if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
+            continue;
+        }
         deviceInfoList.push_back(item.second.second);
     }
     return DM_OK;
