@@ -69,6 +69,7 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
         return ERR_DM_FAILED;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
+    nodeInfo = localDeviceInfo_;
     SaveDeviceInfo(localDeviceInfo_);
     g_getLocalDevInfo = true;
     return DM_OK;
