@@ -41,6 +41,7 @@ void SoftbusCache::SaveLocalDeviceInfo()
     LOGI("SoftbusCache::SaveLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
     SaveDeviceInfo(localDeviceInfo_);
+    SaveDeviceSecurityLevel(localDeviceInfo_.networkId);
     g_online = true;
     g_getLocalDevInfo = true;
 }
@@ -71,6 +72,7 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     nodeInfo = localDeviceInfo_;
     SaveDeviceInfo(localDeviceInfo_);
+    SaveDeviceSecurityLevel(localDeviceInfo_.networkId);
     g_getLocalDevInfo = true;
     return DM_OK;
 }
