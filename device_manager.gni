@@ -13,7 +13,6 @@
 
 #------------------------device manager------------------------------#
 devicemanager_path = "//foundation/distributedhardware/device_manager"
-
 common_path = "${devicemanager_path}/common"
 utils_path = "${devicemanager_path}/utils"
 services_path = "${devicemanager_path}/services/service"
@@ -24,23 +23,12 @@ hilog_path = "//base/hiviewdfx/hilog_lite/frameworks/featured"
 third_path = "//third_party/bounds_checking_function"
 dsoftbussdk_path = "//foundation/communication/dsoftbus/sdk"
 ext_path = "${devicemanager_path}/ext"
-ability_runtime_innerkits_path =
-    "//foundation/ability/ability_runtime/interfaces/inner_api"
-ability_runtime_services_path = "//foundation/ability/ability_runtime/services"
-ace_engine_lite_path = "//foundation/arkui/ace_engine_lite"
-access_token_path = "//base/security/access_token/interfaces/innerkits"
 os_account_path = "//base/account/os_account"
 samgr_lite_path = "//foundation/systemabilitymgr/samgr_lite/interfaces"
 interfaces_path = "//foundation/communication/ipc/interfaces/innerkits"
 utils_lite_path = "//commonlibrary/utils_lite"
 c_utils_path = "//commonlibrary/c_utils/base/"
-deviceprofile_path = "//foundation/deviceprofile"
 fuzz_test_output_path = "device_manager/device_manager"
-
-#--------------------------softbus----------------------------------#
-softbus_path = "//foundation/communication/dsoftbus"
-
-#---------------------------hichan----------------------------------#
 
 #----------------------compilation options--------------------------#
 dm_ldflags = [ "-lpthread" ]
