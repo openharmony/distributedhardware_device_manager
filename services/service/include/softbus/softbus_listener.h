@@ -29,7 +29,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_radar_helper.h"
-#include "dm_timer.h"
 #include "dm_subscribe_info.h"
 #include "i_softbus_discovering_callback.h"
 #include "inner_session.h"
@@ -100,7 +99,6 @@ private:
     static std::string hostName_;
     static bool isRadarSoLoad_;
     static IDmRadarHelper *dmRadarHelper_;
-    static std::shared_ptr<DmTimer> timer_;
     static void *radarHandle_;
 };
 } // namespace DistributedHardware
