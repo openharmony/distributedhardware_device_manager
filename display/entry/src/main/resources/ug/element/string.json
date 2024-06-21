@@ -47,6 +47,14 @@
         {
             "name":"dm_confirm_intention",
             "value":"بۇ ئىجازەت مەلۇمات ماسقەدەملەش ۋە ئۈسكۈنە ھەمكارلىقى ئۈچۈن ئىشلىتىلىدۇ."
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"بىلدىم"
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"ئۈسكۈنە ئۇلاش ئۈچۈن كۆكچىشنى ئېچىش كېرەك، ئېچىپ قايتا سىناڭ."
         }
     ]
 }
