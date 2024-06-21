@@ -803,21 +803,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_023, testing::ext::TestSize.Level
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_024, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_AVAILABLE_DEVICE_LIST;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_025, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = REGISTER_DEVICE_MANAGER_LISTENER;
@@ -998,66 +983,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_034, testing::ext::TestSize.Level
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_035, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = GET_LOCAL_DEVICE_INFO;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_036, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_LOCAL_DEVICE_NETWORKID;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_037, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_LOCAL_DEVICEID;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_038, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_LOCAL_DEVICE_NAME;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_039, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_LOCAL_DEVICE_TYPE;
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     MessageParcel data;
     MessageParcel reply;

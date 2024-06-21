@@ -528,92 +528,14 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
     return ret;
 }
 
-int32_t SoftbusListener::GetAvailableDeviceList(std::vector<DmDeviceBasicInfo> &deviceBasicInfoList)
-{
-    int32_t deviceCount = 0;
-    NodeBasicInfo *nodeInfo = nullptr;
-    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    for (int32_t i = 0; i < deviceCount; ++i) {
-        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
-        DmDeviceBasicInfo deviceBasicInfo;
-        ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, deviceBasicInfo);
-        deviceBasicInfoList.push_back(deviceBasicInfo);
-    }
-    FreeNodeInfo(nodeInfo);
-    LOGI("GetAvailableDevices success, deviceCount: %{public}d.", deviceCount);
-    return ret;
-}
-
 int32_t SoftbusListener::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
-    int32_t nodeInfoCount = 0;
-    NodeBasicInfo *nodeInfo = nullptr;
-    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    for (int32_t i = 0; i < nodeInfoCount; ++i) {
-        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
-        if (networkId == nodeBasicInfo->networkId) {
-            LOGI("GetDeviceInfo name : %{public}s.", GetAnonyString(nodeBasicInfo->deviceName).c_str());
-            if (memcpy_s(info.deviceName, sizeof(info.deviceName), nodeBasicInfo->deviceName,
-                std::min(sizeof(info.deviceName), sizeof(nodeBasicInfo->deviceName))) != DM_OK) {
-                LOGE("GetDeviceInfo deviceName copy deviceName data failed.");
-            }
-            info.deviceTypeId = nodeBasicInfo->deviceTypeId;
-            break;
-        }
-    }
-    FreeNodeInfo(nodeInfo);
-    LOGI("GetDeviceInfo complete, deviceName : %{public}s, deviceTypeId : %{public}d.",
-        GetAnonyString(info.deviceName).c_str(), info.deviceTypeId);
-    return ret;
+    return SoftbusCache::GetInstance().GetDevInfoByNetworkId(networkId, info);
 }
 
 int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
 {
     return SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
-}
-
-int32_t SoftbusListener::GetLocalDeviceNetworkId(std::string &networkId)
-{
-    NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    networkId = nodeBasicInfo.networkId;
-    return ret;
-}
-
-int32_t SoftbusListener::GetLocalDeviceName(std::string &deviceName)
-{
-    NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    deviceName = nodeBasicInfo.deviceName;
-    return ret;
-}
-
-int32_t SoftbusListener::GetLocalDeviceType(int32_t &deviceType)
-{
-    NodeBasicInfo nodeBasicInfo;
-    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
-    }
-    deviceType = nodeBasicInfo.deviceTypeId;
-    return ret;
 }
 
 int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &udid)

@@ -40,14 +40,8 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_get_local_device_networkId_rsp.h"
-#include "ipc_get_local_deviceId_rsp.h"
-#include "ipc_get_local_device_name_rsp.h"
-#include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
-#include "ipc_get_availabledevice_req.h"
-#include "ipc_get_availabledevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_permission_req.h"
@@ -176,6 +170,25 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
     return DM_OK;
 }
 
+void DeviceManagerImpl::ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info,
+    DmDeviceBasicInfo &deviceBasicInfo)
+{
+    (void)memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
+                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+    }
+    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
+        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
+        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+    }
+    deviceBasicInfo.deviceTypeId = info.deviceTypeId;
+}
+
 int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                 std::vector<DmDeviceInfo> &deviceList)
 {
@@ -240,28 +253,18 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
 int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     std::vector<DmDeviceBasicInfo> &deviceList)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     LOGI("GetAvailableDeviceList start, pkgName: %{public}s.", pkgName.c_str());
-
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetAvailableDeviceRsp> rsp = std::make_shared<IpcGetAvailableDeviceRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_AVAILABLE_DEVICE_LIST, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetAvailableDeviceList error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    std::vector<DmDeviceInfo> deviceListTemp;
+    std::string extra = "";
+    if (GetTrustedDeviceList(pkgName, extra, false, deviceListTemp) != DM_OK) {
+        LOGE("DeviceManagerImpl::GetTrustedDeviceList error.");
+        return ERR_DM_FAILED;
     }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGI("GetAvailableDeviceList error, failed ret: %{public}d", ret);
-        return ret;
+    for (auto &item : deviceListTemp) {
+        DmDeviceBasicInfo deviceBasicInfo;
+        ConvertDeviceInfoToDeviceBasicInfo(item, deviceBasicInfo);
+        deviceList.push_back(deviceBasicInfo);
     }
-
-    deviceList = rsp->GetDeviceVec();
     LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
@@ -1297,22 +1300,12 @@ int32_t DeviceManagerImpl::CheckNewAPIAccessPermission()
 int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, std::string &networkId)
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId start, pkgName: %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> rsp = std::make_shared<IpcGetLocalDeviceNetworkIdRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NETWORKID, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetLocalDeviceNetWorkId error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId error, failed ret: %{public}d", ret);
+    DmDeviceInfo info;
+    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
-
-    networkId = rsp->GetLocalDeviceNetworkId();
+    networkId = std::string(info.networkId);
     LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId end, pkgName : %{public}s, networkId : %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
     return DM_OK;
@@ -1321,22 +1314,12 @@ int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, s
 int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::string &deviceId)
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceId start, pkgName: %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetLocalDeviceIdRsp> rsp = std::make_shared<IpcGetLocalDeviceIdRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICEID, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetLocalDeviceId error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGI("DeviceManagerImpl::GetLocalDeviceId error, failed ret: %{public}d", ret);
+    DmDeviceInfo info;
+    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
-
-    deviceId = rsp->GetLocalDeviceId();
+    deviceId = std::string(info.deviceId);
     LOGI("DeviceManagerImpl::GetLocalDeviceId end, pkgName : %{public}s, deviceId : %{public}s", pkgName.c_str(),
         GetAnonyString(deviceId).c_str());
     return DM_OK;
@@ -1345,22 +1328,12 @@ int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::str
 int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::string &deviceName)
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceName start, pkgName: %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetLocalDeviceName error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGI("DeviceManagerImpl::GetLocalDeviceName error, failed ret: %{public}d", ret);
+    DmDeviceInfo info;
+    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
-
-    deviceName = rsp->GetLocalDeviceName();
+    deviceName = std::string(info.deviceName);
     LOGI("DeviceManagerImpl::GetLocalDeviceName end, pkgName : %{public}s, deviceName : %{public}s", pkgName.c_str(),
         GetAnonyString(deviceName).c_str());
     return DM_OK;
@@ -1369,22 +1342,12 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
 int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32_t &deviceType)
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceType start, pkgName : %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetLocalDeviceTypeRsp> rsp = std::make_shared<IpcGetLocalDeviceTypeRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_TYPE, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetLocalDeviceType error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGI("DeviceManagerImpl::GetLocalDeviceType error, failed ret: %{public}d", ret);
+    DmDeviceInfo info;
+    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+        LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ERR_DM_IPC_RESPOND_FAILED;
     }
-
-    deviceType = rsp->GetLocalDeviceType();
+    deviceType = info.deviceTypeId;
     LOGI("DeviceManagerImpl::GetLocalDeviceType end, pkgName : %{public}s, deviceType : %{public}d", pkgName.c_str(),
         deviceType);
     return DM_OK;
@@ -1393,31 +1356,9 @@ int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32
 int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::string &networkId,
     std::string &deviceName)
 {
-    if (pkgName.empty() || networkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(networkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("DeviceManagerImpl::GetDeviceName start, pkgName: %{public}s networKId : %{public}s", pkgName.c_str(),
-         GetAnonyString(networkId).c_str());
-    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
-    std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
-    req->SetPkgName(pkgName);
-    req->SetNetWorkId(networkId);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetDeviceName error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetDeviceName error, failed ret: %{public}d", ret);
-        return ret;
-    }
-
-    DmDeviceInfo info = rsp->GetDeviceInfo();
-    deviceName = info.deviceName;
+    DmDeviceInfo deviceInfo;
+    GetDeviceInfo(pkgName, networkId, deviceInfo);
+    deviceName = std::string(deviceInfo.deviceName);
     LOGI("DeviceManagerImpl::GetDeviceName end, pkgName : %{public}s, networkId : %{public}s, deviceName = %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), GetAnonyString(deviceName).c_str());
     return DM_OK;
@@ -1425,31 +1366,9 @@ int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::
 
 int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::string &networkId, int32_t &deviceType)
 {
-    if (pkgName.empty() || networkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(networkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("DeviceManagerImpl::GetDeviceType start, pkgName: %{public}s networKId : %{public}s", pkgName.c_str(),
-         GetAnonyString(networkId).c_str());
-    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
-    std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
-    req->SetPkgName(pkgName);
-    req->SetNetWorkId(networkId);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetDeviceType error, Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerImpl::GetDeviceType error, failed ret: %{public}d", ret);
-        return ret;
-    }
-
-    DmDeviceInfo info = rsp->GetDeviceInfo();
-    deviceType = info.deviceTypeId;
+    DmDeviceInfo deviceInfo;
+    GetDeviceInfo(pkgName, networkId, deviceInfo);
+    deviceType = deviceInfo.deviceTypeId;
     LOGI("DeviceManagerImpl::GetDeviceType end, pkgName : %{public}s, networkId : %{public}s, deviceType = %{public}d",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), deviceType);
     return DM_OK;

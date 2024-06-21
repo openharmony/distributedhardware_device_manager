@@ -65,7 +65,6 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = 1;
     DmAuthParam authParam;
     std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t deviceType = 0;
     int32_t level = *(reinterpret_cast<const int32_t*>(data));
     DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
@@ -75,11 +74,6 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, network);
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
     DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
-    DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(network);
-    DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, device);
-    DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
-    DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
     DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, deviceId, udid);
     DeviceManagerService::GetInstance().CheckApiPermission(level);
 }

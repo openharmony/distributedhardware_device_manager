@@ -1086,51 +1086,6 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_002, testing:
     EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetAvailableDeviceList_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetAvailableDeviceList_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
-{
-    std::string networkId;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(networkId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceId_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string deviceId;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceType_001, testing::ext::TestSize.Level0)
-{
-    int32_t deviceType = 1;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)
 {
     std::string pkgName;

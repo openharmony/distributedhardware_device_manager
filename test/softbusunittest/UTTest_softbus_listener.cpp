@@ -102,54 +102,6 @@ HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
     EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
 }
 
-/**
- * @tc.name: GetAvailableDeviceList_001
- * @tc.desc: return ERR_DM_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, GetAvailableDeviceList_001, testing::ext::TestSize.Level0)
-{
-    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t ret = softbusListener->GetAvailableDeviceList(deviceBasicInfoList);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: GetLocalDeviceNetworkId_001
- * @tc.desc: return ERR_DM_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
-{
-    std::string networkId;
-    int32_t ret = softbusListener->GetLocalDeviceNetworkId(networkId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: GetLocalDeviceName_001
- * @tc.desc: return ERR_DM_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceName;
-    int32_t ret = softbusListener->GetLocalDeviceName(deviceName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: GetLocalDeviceType_001
- * @tc.desc: return ERR_DM_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, GetLocalDeviceType_001, testing::ext::TestSize.Level0)
-{
-    int32_t deviceType = 0;
-    int32_t ret = softbusListener->GetLocalDeviceType(deviceType);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
 HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo deviceInf = {

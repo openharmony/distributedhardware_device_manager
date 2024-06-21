@@ -191,45 +191,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     return DM_OK;
 }
 
-int32_t DeviceManagerService::GetAvailableDeviceList(const std::string &pkgName,
-    std::vector<DmDeviceBasicInfo> &deviceBasicInfoList)
-{
-    LOGI("DeviceManagerService::GetAvailableDeviceList begin for pkgName = %{public}s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::vector<DmDeviceBasicInfo> onlineDeviceList;
-    if (softbusListener_->GetAvailableDeviceList(onlineDeviceList) != DM_OK) {
-        LOGE("GetAvailableDeviceList failed");
-        return ERR_DM_FAILED;
-    }
-
-    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> udidMap;
-        if (PermissionManager::GetInstance().CheckSA()) {
-            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
-        } else {
-            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
-        }
-        for (auto item : onlineDeviceList) {
-            std::string udid = "";
-            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
-            if (udidMap.find(udid) != udidMap.end()) {
-                std::string deviceIdHash = "";
-                dmServiceImpl_->GetUdidHashByNetWorkId(item.networkId, deviceIdHash);
-                if (memcpy_s(item.deviceId, DM_MAX_DEVICE_ID_LEN, deviceIdHash.c_str(),
-                    deviceIdHash.length()) != 0) {
-                    LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceIdHash).c_str());
-                }
-                deviceBasicInfoList.push_back(item);
-            }
-        }
-        LOGI("Current app available device size: %{public}zu", deviceBasicInfoList.size());
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
 {
     LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
@@ -286,55 +247,6 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(localDeviceId_).c_str());
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::GetLocalDeviceNetworkId(std::string &networkId)
-{
-    LOGI("DeviceManagerService::GetLocalDeviceNetworkId begin.");
-    int32_t ret = softbusListener_->GetLocalDeviceNetworkId(networkId);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceNetworkId failed");
-        return ret;
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::GetLocalDeviceId(const std::string &pkgName, std::string &deviceId)
-{
-    LOGI("DeviceManagerService::GetLocalDeviceId begin.");
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    char udidHash[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    int32_t ret = Crypto::GetUdidHash(localDeviceId, reinterpret_cast<uint8_t *>(udidHash));
-    if (ret != DM_OK) {
-        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(localDeviceId).c_str());
-        deviceId = "";
-        return ret;
-    }
-    deviceId = udidHash;
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::GetLocalDeviceName(std::string &deviceName)
-{
-    LOGI("DeviceManagerService::GetLocalDeviceName begin.");
-    int32_t ret = softbusListener_->GetLocalDeviceName(deviceName);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceName failed");
-        return ret;
-    }
-    return DM_OK;
-}
-
-int32_t DeviceManagerService::GetLocalDeviceType(int32_t &deviceType)
-{
-    LOGI("DeviceManagerService::GetLocalDeviceType begin.");
-    int32_t ret = softbusListener_->GetLocalDeviceType(deviceType);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceType failed");
-        return ret;
     }
     return DM_OK;
 }

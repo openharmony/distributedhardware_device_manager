@@ -777,28 +777,6 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSiz
 }
 
 /**
- * @tc.name: GetLocalDeviceTypeId_001
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    int32_t ret = softbusConnector->GetLocalDeviceTypeId();
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetLocalDeviceNetworkId_001
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    auto ret = softbusConnector->GetLocalDeviceNetworkId();
-    EXPECT_EQ(ret.empty(), true);
-}
-
-/**
  * @tc.name: AddMemberToDiscoverMap_001
  * @tc.type: FUNC
  */

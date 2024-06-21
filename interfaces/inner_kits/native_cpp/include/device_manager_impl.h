@@ -395,6 +395,7 @@ private:
     int32_t AddPublishCallback(const std::string &pkgName);
     int32_t RemovePublishCallback(const std::string &pkgName);
     int32_t CheckApiPermission(int32_t permissionLevel);
+    void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
 
 private:
 #if !defined(__LITEOS_M__)
