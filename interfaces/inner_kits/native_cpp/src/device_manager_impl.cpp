@@ -254,13 +254,13 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     std::vector<DmDeviceBasicInfo> &deviceList)
 {
     LOGI("GetAvailableDeviceList start, pkgName: %{public}s.", pkgName.c_str());
-    std::vector<DmDeviceInfo> deviceList;
+    std::vector<DmDeviceInfo> deviceListTemp;
     std::string extra = "";
-    if (GetTrustedDeviceList(pkgName, extra, false, deviceList) != DM_OK) {
+    if (GetTrustedDeviceList(pkgName, extra, false, deviceListTemp) != DM_OK) {
         LOGE("DeviceManagerImpl::GetTrustedDeviceList error.");
         return ERR_DM_FAILED;
     }
-    for (auto &item : deviceList) {
+    for (auto &item : deviceListTemp) {
         DmDeviceBasicInfo deviceBasicInfo;
         ConvertDeviceInfoToDeviceBasicInfo(item, deviceBasicInfo);
         deviceBasicList.push_back(deviceBasicInfo);
@@ -1368,7 +1368,7 @@ int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::
 {
     DmDeviceInfo deviceInfo;
     GetDeviceInfo(pkgName, networkId, deviceInfo);
-    deviceType = deviceInfo.deviceTypeId
+    deviceType = deviceInfo.deviceTypeId;
     LOGI("DeviceManagerImpl::GetDeviceType end, pkgName : %{public}s, networkId : %{public}s, deviceType = %{public}d",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), deviceType);
     return DM_OK;
