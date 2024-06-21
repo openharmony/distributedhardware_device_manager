@@ -75,11 +75,6 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, network);
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
     DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceBasicInfoList);
-    DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(network);
-    DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, device);
-    DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
-    DeviceManagerService::GetInstance().GetLocalDeviceName(pkgName);
     DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, deviceId, udid);
     DeviceManagerService::GetInstance().CheckApiPermission(level);
 }

@@ -22,15 +22,9 @@
 #include "dm_subscribe_info.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
-#include "ipc_get_availabledevice_req.h"
-#include "ipc_get_availabledevice_rsp.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_get_local_device_name_rsp.h"
-#include "ipc_get_local_device_networkId_rsp.h"
-#include "ipc_get_local_device_type_rsp.h"
-#include "ipc_get_local_deviceId_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_register_listener_req.h"
@@ -108,98 +102,6 @@ ON_IPC_READ_RESPONSE(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shar
     return SetRspErrCode(reply, pBaseRsp);
 }
 
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NETWORKID, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::string pkgName = pBaseReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NETWORKID, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> pRsp =
-        std::static_pointer_cast<IpcGetLocalDeviceNetworkIdRsp>(pBaseRsp);
-    size_t networkIdLen = 0;
-    std::string networkIdStr = (const char *)ReadString(&reply, &networkIdLen);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pRsp->SetLocalDeviceNetworkId(networkIdStr);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICEID, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::string pkgName = pBaseReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICEID, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceIdRsp> pRsp =
-        std::static_pointer_cast<IpcGetLocalDeviceIdRsp>(pBaseRsp);
-    size_t deviceIdLen = 0;
-    std::string deviceId = (const char *)ReadString(&reply, &deviceIdLen);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pRsp->SetLocalDeviceId(deviceId);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::string pkgName = pBaseReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceNameRsp> pRsp =
-        std::static_pointer_cast<IpcGetLocalDeviceNameRsp>(pBaseRsp);
-    size_t deviceNameLen = 0;
-    std::string deviceName = (const char *)ReadString(&reply, &deviceNameLen);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pRsp->SetLocalDeviceName(deviceName);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_TYPE, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::string pkgName = pBaseReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_TYPE, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceTypeRsp> pRsp =
-        std::static_pointer_cast<IpcGetLocalDeviceTypeRsp>(pBaseRsp);
-    int32_t deviceType = 0;
-    ReadInt32(&reply, &deviceType);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pRsp->SetLocalDeviceType(deviceType);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
@@ -223,43 +125,6 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBas
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
     pRsp->SetDeviceInfo(deviceInfo);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_AVAILABLE_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::string pkgName = pBaseReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetAvailableDeviceRsp> pRsp = std::static_pointer_cast<IpcGetAvailableDeviceRsp>(pBaseRsp);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    int32_t deviceNum = 0;
-    ReadInt32(&reply, &deviceNum);
-
-    if (ret == DM_OK && deviceNum > 0) {
-        uint32_t deviceTotalSize = deviceNum * (int32_t)sizeof(DmDeviceBasicInfo);
-        DmDeviceBasicInfo *pDmDeviceinfo = (DmDeviceBasicInfo *)ReadRawData(&reply, deviceTotalSize);
-        if (pDmDeviceinfo == nullptr) {
-            LOGE("failed to read trusted device node info.");
-            pRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
-            return ERR_DM_IPC_READ_FAILED;
-        }
-        std::vector<DmDeviceBasicInfo> dmDeviceInfoVec;
-        for (int32_t i = 0; i < deviceNum; i++) {
-            dmDeviceInfoVec.push_back(*pDmDeviceinfo);
-            pDmDeviceinfo = ++pDmDeviceinfo;
-        }
-        pRsp->SetDeviceVec(dmDeviceInfoVec);
-    }
     pRsp->SetErrCode(ret);
     return DM_OK;
 }

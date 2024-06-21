@@ -142,12 +142,6 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_001, testing::ext::TestSize.Le
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_002, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GET_AVAILABLE_DEVICE_LIST;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = STOP_DEVICE_DISCOVER;

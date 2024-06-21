@@ -378,35 +378,6 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(GET_AVAILABLE_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::vector<DmDeviceBasicInfo> deviceList;
-    int32_t result = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceList);
-    int32_t infoNum = (int32_t)(deviceList.size());
-    DmDeviceBasicInfo deviceBasicInfo;
-    if (!reply.WriteInt32(infoNum)) {
-        LOGE("write infoNum failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!deviceList.empty()) {
-        for (; !deviceList.empty();) {
-            deviceBasicInfo = deviceList.back();
-            deviceList.pop_back();
-
-            if (!reply.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
-                LOGE("write subscribeInfo failed");
-                return ERR_DM_IPC_WRITE_FAILED;
-            }
-        }
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -565,63 +536,6 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_INFO, MessageParcel &data, MessageParcel &reply)
     if (!EncodeDmDeviceInfo(localDeviceInfo, reply)) {
         LOGE("write dm device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_LOCAL_DEVICE_NETWORKID, MessageParcel &data, MessageParcel &reply)
-{
-    std::string networkId = "";
-    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(networkId);
-    if (!reply.WriteString(networkId)) {
-        LOGE("write LocalDeviceNetworkId failed");
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_LOCAL_DEVICEID, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string deviceId = "";
-    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
-    if (!reply.WriteString(deviceId)) {
-        LOGE("write GetLocalDeviceId failed");
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
-{
-    std::string deviceName = "";
-    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceName(deviceName);
-    if (!reply.WriteString(deviceName)) {
-        LOGE("write GetLocalDeviceName failed");
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_LOCAL_DEVICE_TYPE, MessageParcel &data, MessageParcel &reply)
-{
-    int32_t deviceType = 0;
-    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
-    if (!reply.WriteInt32(deviceType)) {
-        LOGE("write GetLocalDeviceName failed");
     }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

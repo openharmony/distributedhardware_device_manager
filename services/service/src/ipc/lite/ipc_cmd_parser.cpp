@@ -130,44 +130,6 @@ ON_IPC_SERVER_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &req, IpcIo &reply)
     WriteInt32(&reply, errCode);
 }
 
-ON_IPC_SERVER_CMD(GET_LOCAL_DEVICE_NETWORKID, IpcIo &req, IpcIo &reply)
-{
-    LOGI("enter GetLocalDeviceNetworkId.");
-    (void)req;
-    std::string networkId;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceNetworkId(networkId);
-    WriteString(&reply, networkId.c_str());
-    WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(GET_LOCAL_DEVICEID, IpcIo &req, IpcIo &reply)
-{
-    LOGI("enter GetLocalDeviceId.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    std::string deviceId;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceId(pkgName, deviceId);
-    WriteString(&reply, deviceId.c_str());
-    WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(GET_LOCAL_DEVICE_NAME, IpcIo &req, IpcIo &reply)
-{
-    LOGI("enter GetLocalDeviceName.");
-    std::string deviceName;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceName(deviceName);
-    WriteString(&reply, deviceName.c_str());
-    WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(GET_LOCAL_DEVICE_TYPE, IpcIo &req, IpcIo &reply)
-{
-    LOGI("enter GetLocalDeviceType.");
-    int32_t deviceType = 0;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceType(deviceType);
-    WriteInt32(&reply, deviceType);
-    WriteInt32(&reply, ret);
-}
-
 ON_IPC_SERVER_CMD(GET_DEVICE_INFO, IpcIo &req, IpcIo &reply)
 {
     LOGI("enter GetDeviceInfo.");
@@ -177,19 +139,6 @@ ON_IPC_SERVER_CMD(GET_DEVICE_INFO, IpcIo &req, IpcIo &reply)
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EncodeDmDeviceInfo(deviceInfo, reply);
     WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(GET_AVAILABLE_DEVICE_LIST, IpcIo &req, IpcIo &reply)
-{
-    LOGI("enter get available device list.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    std::vector<DmDeviceBasicInfo> deviceList;
-    int32_t ret = DeviceManagerService::GetInstance().GetAvailableDeviceList(pkgName, deviceList);
-    WriteInt32(&reply, ret);
-    WriteInt32(&reply, deviceList.size());
-    if (ret == DM_OK && deviceList.size() > 0) {
-        WriteRawData(&reply, deviceList.data(), sizeof(DmDeviceBasicInfo) * deviceList.size());
-    }
 }
 
 ON_IPC_SERVER_CMD(GET_TRUST_DEVICE_LIST, IpcIo &req, IpcIo &reply)

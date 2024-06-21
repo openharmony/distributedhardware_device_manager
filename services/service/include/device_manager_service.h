@@ -65,20 +65,9 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
 
-    int32_t GetAvailableDeviceList(const std::string &pkgName,
-                                 std::vector<DmDeviceBasicInfo> &deviceBasicInfoList);
-
     int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh);
 
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
-
-    int32_t GetLocalDeviceNetworkId(std::string &networkId);
-
-    int32_t GetLocalDeviceId(const std::string &pkgName, std::string &deviceId);
-
-    int32_t GetLocalDeviceType(int32_t &deviceType);
-
-    int32_t GetLocalDeviceName(std::string &deviceName);
 
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
 

@@ -35,16 +35,9 @@
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
-#include "ipc_get_local_device_networkId_rsp.h"
-#include "ipc_get_local_deviceId_rsp.h"
-#include "ipc_get_local_device_name_rsp.h"
-#include "ipc_get_local_device_type_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_get_local_device_networkId_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
-#include "ipc_get_availabledevice_req.h"
-#include "ipc_get_availabledevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_register_listener_req.h"
@@ -204,45 +197,6 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(GET_AVAILABLE_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkg failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_AVAILABLE_DEVICE_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetAvailableDeviceRsp> pRsp = std::static_pointer_cast<IpcGetAvailableDeviceRsp>(pBaseRsp);
-    if (pRsp == nullptr) {
-        LOGE("GetAvailableDeviceList pRsp is null");
-        return ERR_DM_FAILED;
-    }
-    int32_t deviceNum = reply.ReadInt32();
-    if (deviceNum > 0 && deviceNum <= INT32_MAX) {
-        std::vector<DmDeviceBasicInfo> deviceBasicInfoVec;
-        DmDeviceBasicInfo *pDmDeviceBasicinfo = nullptr;
-        for (int32_t i = 0; i < deviceNum; ++i) {
-            pDmDeviceBasicinfo = nullptr;
-            pDmDeviceBasicinfo =
-                static_cast<DmDeviceBasicInfo *>(const_cast<void *>(reply.ReadRawData(sizeof(DmDeviceBasicInfo))));
-            if (pDmDeviceBasicinfo == nullptr) {
-                LOGE("GetAvailableDeviceList read node info failed!");
-                pRsp->SetErrCode(ERR_DM_IPC_WRITE_FAILED);
-                return ERR_DM_IPC_WRITE_FAILED;
-            }
-            deviceBasicInfoVec.emplace_back(*pDmDeviceBasicinfo);
-        }
-        pRsp->SetDeviceVec(deviceBasicInfoVec);
-    }
-    pRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
 ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
@@ -279,83 +233,6 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
     DmDeviceInfo localDeviceInfo;
     DecodeDmDeviceInfo(reply, localDeviceInfo);
     pRsp->SetLocalDeviceInfo(localDeviceInfo);
-    pRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NETWORKID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NETWORKID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceNetworkIdRsp> pRsp =
-        std::static_pointer_cast<IpcGetLocalDeviceNetworkIdRsp>(pBaseRsp);
-    std::string networkId = reply.ReadString();
-    pRsp->SetLocalDeviceNetworkId(networkId);
-    pRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICEID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICEID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceIdRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceIdRsp>(pBaseRsp);
-    std::string deviceId = reply.ReadString();
-    pRsp->SetLocalDeviceId(deviceId);
-    pRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceNameRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNameRsp>(pBaseRsp);
-    std::string deviceName = reply.ReadString();
-    pRsp->SetLocalDeviceName(deviceName);
-    pRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_TYPE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_TYPE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetLocalDeviceTypeRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceTypeRsp>(pBaseRsp);
-    int32_t deviceType = reply.ReadInt32();
-    pRsp->SetLocalDeviceType(deviceType);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1143,7 +1020,7 @@ ON_IPC_READ_RESPONSE(EXPORT_AUTH_CODE, MessageParcel &reply, std::shared_ptr<Ipc
 {
     std::shared_ptr<IpcExportAuthCodeRsp> pRsp = std::static_pointer_cast<IpcExportAuthCodeRsp>(pBaseRsp);
     if (pRsp == nullptr) {
-        LOGE("GetAvailableDeviceList pRsp is null");
+        LOGE("IpcExportAuthCodeRsp pRsp is null");
         return ERR_DM_FAILED;
     }
     std::string authCode = reply.ReadString();
