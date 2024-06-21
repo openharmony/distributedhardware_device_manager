@@ -47,6 +47,14 @@
         {
             "name":"dm_confirm_intention",
             "value":"用以進行數據同步及裝置之間的協同操作"
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"知道了"
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"裝置連接需要啟用藍牙。請先啟用，然後重試。"
         }
     ]
 }
