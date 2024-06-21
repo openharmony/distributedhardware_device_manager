@@ -263,7 +263,7 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     for (auto &item : deviceListTemp) {
         DmDeviceBasicInfo deviceBasicInfo;
         ConvertDeviceInfoToDeviceBasicInfo(item, deviceBasicInfo);
-        deviceBasicList.push_back(deviceBasicInfo);
+        deviceList.push_back(deviceBasicInfo);
     }
     LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
