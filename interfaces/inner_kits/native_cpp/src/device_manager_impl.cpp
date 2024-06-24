@@ -687,13 +687,6 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    int32_t ret = CheckAPIAccessPermission();
-    if (ret != DM_OK) {
-        LOGE("The caller: %{public}s does not have permission to call RegisterDeviceManagerFaCallback.",
-            pkgName.c_str());
-        return ret;
-    }
-
     LOGI("dRegisterDeviceManagerFaCallback start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     RegisterUiStateCallback(pkgName);
@@ -706,13 +699,6 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    int32_t ret = CheckAPIAccessPermission();
-    if (ret != DM_OK) {
-        LOGE("The caller: %{public}s does not have permission to call UnRegisterDeviceManagerFaCallback.",
-            pkgName.c_str());
-        return ret;
     }
 
     LOGI("UnRegisterDeviceManagerFaCallback start, pkgName: %{public}s", pkgName.c_str());
