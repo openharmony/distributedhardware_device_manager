@@ -216,8 +216,12 @@ if (defined(ohos_lite)) {
       "os_account:libaccountkits",
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
-      "screenlock_mgr:screenlock_client",
     ]
+
+    if (support_screenlock) {
+      defines += [ "SUPPORT_SCREENLOCK" ]
+      external_deps += [ "screenlock_mgr:screenlock_client" ]
+    }
 
     public_external_deps = [ "json:nlohmann_json_static" ]
 

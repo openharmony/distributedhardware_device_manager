@@ -55,4 +55,11 @@ declare_args() {
   } else {
     support_wifi = false
   }
+
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.theme_screenlock_mgr)) {
+    support_screenlock = true
+  } else {
+    support_screenlock = false
+  }
 }

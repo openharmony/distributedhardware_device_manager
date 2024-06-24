@@ -21,7 +21,9 @@
 
 #include "bundle_mgr_interface.h"
 #include "iservice_registry.h"
+#if defined(SUPPORT_SCREENLOCK)
 #include "screenlock_manager.h"
+#endif
 #include "system_ability_definition.h"
 
 #include "auth_message_processor.h"
@@ -2486,7 +2488,10 @@ std::string DmAuthManager::GetBundleLable(const std::string &bundleName)
 
 bool DmAuthManager::IsScreenLocked()
 {
-    bool isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
+    bool isLocked = false;
+#if defined(SUPPORT_SCREENLOCK)
+    isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
+#endif
     LOGI("IsScreenLocked isLocked: %{public}d.", isLocked);
     return isLocked;
 }
