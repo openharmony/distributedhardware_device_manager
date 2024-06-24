@@ -295,7 +295,34 @@ int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDevi
             return DM_OK;
         }
     }
+    if (GetDevInfoFromBus(networkId, nodeInfo) != DM_OK) {
+        LOGE("GetDevInfoFromBus failed.");
+        return ERR_DM_FAILED;
+    }
+    SaveDeviceInfo(nodeInfo);
     return ERR_DM_FAILED;
+}
+
+int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceInfo &devInfo)
+{
+    int32_t nodeInfoCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    for (int32_t i = 0; i < nodeInfoCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        if (networkId == std::string(nodeBasicInfo->networkId)) {
+            ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, devInfo);
+            break;
+        }
+    }
+    FreeNodeInfo(nodeInfo);
+    LOGI("GetDeviceInfo complete, deviceName : %{public}s, deviceTypeId : %{public}d.",
+        GetAnonyString(devInfo.deviceName).c_str(), devInfo.deviceTypeId);
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

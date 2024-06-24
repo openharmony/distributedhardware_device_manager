@@ -48,6 +48,7 @@ private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
     int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
+    int32_t GetDevInfoFromBus(const std::string &networkId, DmDeviceInfo &devInfo);
 
 private:
     std::mutex deviceInfosMutex_;
