@@ -287,12 +287,14 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
 int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusCache::GetDevInfoByNetworkId networkId %{public}s.", GetAnonyString(networkId).c_str());
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    for (const auto &item : deviceInfo_) {
-        if (std::string(item.second.second.networkId) == networkId) {
-            nodeInfo = item.second.second;
-            LOGI("GetDevInfoByNetworkId success udid %{public}s.", GetAnonyString(item.first).c_str());
-            return DM_OK;
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.networkId) == networkId) {
+                nodeInfo = item.second.second;
+                LOGI("GetDevInfoByNetworkId success udid %{public}s.", GetAnonyString(item.first).c_str());
+                return DM_OK;
+            }
         }
     }
     if (GetDevInfoFromBus(networkId, nodeInfo) != DM_OK) {
