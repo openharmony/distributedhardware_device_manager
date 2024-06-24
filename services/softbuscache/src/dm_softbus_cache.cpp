@@ -287,15 +287,44 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
 int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusCache::GetDevInfoByNetworkId networkId %{public}s.", GetAnonyString(networkId).c_str());
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    for (const auto &item : deviceInfo_) {
-        if (std::string(item.second.second.networkId) == networkId) {
-            nodeInfo = item.second.second;
-            LOGI("GetDevInfoByNetworkId success udid %{public}s.", GetAnonyString(item.first).c_str());
-            return DM_OK;
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.networkId) == networkId) {
+                nodeInfo = item.second.second;
+                LOGI("GetDevInfoByNetworkId success udid %{public}s.", GetAnonyString(item.first).c_str());
+                return DM_OK;
+            }
         }
     }
+    if (GetDevInfoFromBus(networkId, nodeInfo) != DM_OK) {
+        LOGE("GetDevInfoFromBus failed.");
+        return ERR_DM_FAILED;
+    }
+    SaveDeviceInfo(nodeInfo);
     return ERR_DM_FAILED;
+}
+
+int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceInfo &devInfo)
+{
+    int32_t nodeInfoCount = 0;
+    NodeBasicInfo *nodeInfo = nullptr;
+    int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    for (int32_t i = 0; i < nodeInfoCount; ++i) {
+        NodeBasicInfo *nodeBasicInfo = nodeInfo + i;
+        if (networkId == std::string(nodeBasicInfo->networkId)) {
+            ConvertNodeBasicInfoToDmDevice(*nodeBasicInfo, devInfo);
+            break;
+        }
+    }
+    FreeNodeInfo(nodeInfo);
+    LOGI("GetDeviceInfo complete, deviceName : %{public}s, deviceTypeId : %{public}d.",
+        GetAnonyString(devInfo.deviceName).c_str(), devInfo.deviceTypeId);
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
