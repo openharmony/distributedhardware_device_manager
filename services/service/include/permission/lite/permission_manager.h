@@ -32,7 +32,7 @@ public:
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);
-    bool CheckSA(void);
+    bool CheckSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetSystemSA();
 };
 } // namespace DistributedHardware

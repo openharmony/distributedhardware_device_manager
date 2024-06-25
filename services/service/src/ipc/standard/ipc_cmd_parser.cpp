@@ -102,7 +102,7 @@ void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
     caller.tokenId = parcel.ReadUint64();
 }
 
-void DecodeDmAccessCallee(MessageParcel &parcel, const DmAccessCallee &callee)
+void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
 {
     callee.networkId = parcel.ReadString();
     callee.peerId = parcel.ReadString();

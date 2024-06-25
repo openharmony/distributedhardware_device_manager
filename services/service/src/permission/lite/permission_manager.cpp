@@ -54,11 +54,6 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     return true;
 }
 
-bool PermissionManager::CheckSA(void)
-{
-    return true;
-}
-
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
     (void)pkgName;

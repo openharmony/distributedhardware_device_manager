@@ -352,7 +352,6 @@ typedef struct DmAccessCallee {
     std::string networkId;
     std::string peerId;
 } DmAccessCallee;
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

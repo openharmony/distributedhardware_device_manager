@@ -212,7 +212,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         saveInfo = iter->second;
     }
     if (listener_ != nullptr) {
-        ProcessDeviceStateChange(DEVICE_INFO_READY, devInfo);
+        ProcessDeviceStateChange(DEVICE_INFO_READY, saveInfo);
         softbusConnector_->ClearPkgName();
     }
 }
