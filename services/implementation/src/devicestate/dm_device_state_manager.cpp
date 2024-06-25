@@ -198,8 +198,8 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         saveInfo = iter->second;
     }
     if (listener_ != nullptr) {
-        ProcessDeviceStateChange(DEVICE_INFO_READY, saveInfo);
-        softbusConnector_->ClearPkgName();
+        DmDeviceState state = DEVICE_INFO_READY;
+        listener_->OnDeviceStateChange(pkgName, state, saveInfo);
     }
 }
 
