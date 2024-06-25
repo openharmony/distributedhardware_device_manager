@@ -36,14 +36,10 @@ static constexpr int32_t WINDOW_LEVEL_UPPER = 2;
 static constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
 const int32_t USLEEP_SHOW_PIN_TIME_US = 50000;  // 50ms
 const std::string CONNECT_PIN_DIALOG = "pinDialog";
-const std::string dmUiBundleName = "com.ohos.devicemanagerui";
-const std::string comfirmAbilityName = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
-const std::string pinAbilityName = "com.ohos.devicemanagerui.PincodeUIExtAbility";
-const std::string inputAbilityName = "com.ohos.devicemanagerui.InputUIExtAbility";
-const std::string peerDeviceName = "deviceName";
-const std::string appOperation = "appOperation";
-const std::string customDescription = "customDescription";
-const std::string peerdeviceType = "deviceType";
+const std::string DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
+const std::string CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
+const std::string PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtAbility";
+const std::string INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
 
 std::string DmDialogManager::bundleName_ = "";
 std::string DmDialogManager::abilityName_ = "";
@@ -101,8 +97,8 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
         }
     }
 
-    bundleName_ = dmUiBundleName;
-    abilityName_ = comfirmAbilityName;
+    bundleName_ = DM_UI_BUNDLE_NAME;
+    abilityName_ = CONFIRM_ABILITY_NAME;
     deviceName_ = deviceName;
     appOperationStr_ = appOperationStr;
     customDescriptionStr_ = customDescriptionStr;
@@ -113,8 +109,8 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
 
 void DmDialogManager::ShowPinDialog(const std::string param)
 {
-    bundleName_ = dmUiBundleName;
-    abilityName_ = pinAbilityName;
+    bundleName_ = DM_UI_BUNDLE_NAME;
+    abilityName_ = PIN_ABILITY_NAME;
     pinCode_ = param;
     std::thread pinDilog(ConnectExtension);
     int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
@@ -127,8 +123,8 @@ void DmDialogManager::ShowPinDialog(const std::string param)
 void DmDialogManager::ShowInputDialog(const std::string param)
 {
     targetDeviceName_ = param;
-    bundleName_ = dmUiBundleName;
-    abilityName_ = inputAbilityName;
+    bundleName_ = DM_UI_BUNDLE_NAME;
+    abilityName_ = INPUT_ABILITY_NAME;
     ConnectExtension();
 }
 
@@ -191,7 +187,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     nlohmann::json param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
     param["sysDialogZOrder"] = WINDOW_LEVEL_DEFAULT;
-    if (DmDialogManager::GetAbilityName() == inputAbilityName) {
+    if (DmDialogManager::GetAbilityName() == INPUT_ABILITY_NAME) {
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
     param["pinCode"] = DmDialogManager::GetPinCode();
