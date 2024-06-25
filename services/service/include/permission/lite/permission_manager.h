@@ -17,6 +17,7 @@
 #define OHOS_DM_PERMISSION_LITE_PERMISSION_MANAGER_H
 
 #include <string>
+#include <unordered_set>
 #include "single_instance.h"
 
 namespace OHOS {
@@ -31,7 +32,8 @@ public:
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);
-    bool CheckSA(void);
+    bool CheckSystemSA(const std::string &pkgName);
+    std::unordered_set<std::string> GetSystemSA();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

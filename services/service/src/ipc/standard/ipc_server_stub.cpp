@@ -187,10 +187,6 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     }
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
-    if (PermissionManager::GetInstance().CheckSA()) {
-        LOGI("RegisterDeviceManagerListener pkgname %{public}s is SA", pkgName.c_str());
-        saSet_.insert(pkgName);
-    }
     LOGI("RegisterDeviceManagerListener: Register listener complete.");
     return DM_OK;
 }
@@ -219,7 +215,6 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
     listener->AsObject()->RemoveDeathRecipient(appRecipient);
     appRecipient_.erase(pkgName);
     dmListener_.erase(pkgName);
-    saSet_.erase(pkgName);
     return DM_OK;
 }
 
@@ -303,11 +298,6 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
     LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-}
-
-std::set<std::string> IpcServerStub::GetSaPkgname()
-{
-    return saSet_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

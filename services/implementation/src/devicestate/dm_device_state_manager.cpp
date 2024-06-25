@@ -108,14 +108,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
             stateDeviceInfos_[deviceId] = devInfo;
         }
     }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    if (pkgName.size() == 0) {
-        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), DEVICE_STATE_ONLINE, devInfo);
-    } else {
-        for (auto item : pkgName) {
-            listener_->OnDeviceStateChange(item, DEVICE_STATE_ONLINE, devInfo);
-        }
-    }
+    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo);
     softbusConnector_->ClearPkgName();
 }
 
@@ -131,14 +124,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
         }
         devInfo = stateDeviceInfos_[deviceId];
     }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    if (pkgName.size() == 0) {
-        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), DEVICE_STATE_OFFLINE, devInfo);
-    } else {
-        for (auto item : pkgName) {
-            listener_->OnDeviceStateChange(item, DEVICE_STATE_OFFLINE, devInfo);
-        }
-    }
+    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo);
     softbusConnector_->ClearPkgName();
 }
 
@@ -149,9 +135,11 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     switch (devState) {
         case DEVICE_STATE_ONLINE:
             RegisterOffLineTimer(devInfo);
-            SaveOnlineDeviceInfo(devInfo);
             devInfo.authForm = GetAuthForm(devInfo.networkId);
+            SaveOnlineDeviceInfo(devInfo);
             DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+            ProcessDeviceStateChange(devState, devInfo);
+            softbusConnector_->ClearPkgName();
             break;
         case DEVICE_STATE_OFFLINE:
             StartOffLineTimer(devInfo);
@@ -161,28 +149,33 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
                 softbusConnector_->GetUdidByNetworkId(devInfo.networkId, udid);
                 softbusConnector_->EraseUdidFromMap(udid);
             }
+            ProcessDeviceStateChange(devState, devInfo);
+            softbusConnector_->ClearPkgName();
             break;
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
+            ProcessDeviceStateChange(devState, devInfo);
+            softbusConnector_->ClearPkgName();
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
             break;
     }
-    if (listener_ == nullptr) {
-        LOGE("HandleDeviceStatusChange failed, device manager client listener is null.");
+}
+
+void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo)
+{
+    if (softbusConnector_ == nullptr || listener_ == nullptr) {
+        LOGE("ProcessDeviceStateChange failed, callback_ptr is null.");
         return;
     }
-    if (softbusConnector_ != nullptr) {
-        std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-        if (pkgName.size() == 0) {
-            listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
-        } else {
-            for (auto item : pkgName) {
-                listener_->OnDeviceStateChange(item, devState, devInfo);
-            }
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    if (pkgName.size() == 0) {
+        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnDeviceStateChange(item, devState, devInfo);
         }
-        softbusConnector_->ClearPkgName();
     }
 }
 
