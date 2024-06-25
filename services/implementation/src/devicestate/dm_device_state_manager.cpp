@@ -139,6 +139,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             SaveOnlineDeviceInfo(devInfo);
             DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             ProcessDeviceStateChange(devState, devInfo);
+            softbusConnector_->ClearPkgName();
             break;
         case DEVICE_STATE_OFFLINE:
             StartOffLineTimer(devInfo);
@@ -159,21 +160,6 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
             break;
-    }
-    if (listener_ == nullptr) {
-        LOGE("HandleDeviceStatusChange failed, device manager client listener is null.");
-        return;
-    }
-    if (softbusConnector_ != nullptr) {
-        std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-        if (pkgName.size() == 0) {
-            listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
-        } else {
-            for (auto item : pkgName) {
-                listener_->OnDeviceStateChange(item, devState, devInfo);
-            }
-        }
-        softbusConnector_->ClearPkgName();
     }
 }
 

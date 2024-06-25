@@ -22,7 +22,6 @@
 #include "dm_subscribe_info.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
-#include "ipc_check_access_control.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_local_device_info_rsp.h"
