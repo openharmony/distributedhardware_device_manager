@@ -88,6 +88,8 @@ enum DMIpcCmdInterfaceCode {
     IS_SAME_ACCOUNT,
     CHECK_API_PERMISSION,
     CHECK_RELATED_DEVICE,
+    CHECK_ACCESS_CONTROL,
+    CHECK_SAME_ACCOUNT,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

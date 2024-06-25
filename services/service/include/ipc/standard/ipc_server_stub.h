@@ -148,7 +148,6 @@ public:
      * @tc.type: FUNC
      */
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-    std::set<std::string> GetSaPkgname();
 
 private:
     IpcServerStub();
@@ -161,7 +160,6 @@ private:
     mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
     std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
-    std::set<std::string> saSet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

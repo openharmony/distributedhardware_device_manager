@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include <string>
-
+#include <unordered_set>
 #include "single_instance.h"
 
 namespace OHOS {
@@ -34,6 +34,7 @@ public:
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);
     bool CheckSA(void);
+    std::unordered_set<std::string> GetSystemSA();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

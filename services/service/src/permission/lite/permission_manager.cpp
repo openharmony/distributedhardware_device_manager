@@ -58,5 +58,16 @@ bool PermissionManager::CheckSA(void)
 {
     return true;
 }
+
+bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+{
+    (void)pkgName;
+    return true;
+}
+
+std::unordered_set<std::string> PermissionManager::GetSystemSA()
+{
+    return std::unordered_set<std::string>{};
+}
 } // namespace DistributedHardware
 } // namespace OHOS
