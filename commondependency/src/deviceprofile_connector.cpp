@@ -191,7 +191,7 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
             break;
         case DM_POINT_TO_POINT:
             if (profiles.GetBindLevel() == DEVICE) {
-               priority =  DEVICE_PEER_TO_PEER_TYPE;
+                priority =  DEVICE_PEER_TO_PEER_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
                 profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
                 priority =  APP_PEER_TO_PEER_TYPE;
@@ -214,7 +214,7 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
         default:
             LOGE("unknown bind type %{public}d.", bindType);
             break;
-    } 
+    }
     return priority;
 }
 
