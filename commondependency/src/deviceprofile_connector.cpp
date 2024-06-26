@@ -177,21 +177,17 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
             priority = DEVICE_PEER_TO_PEER_TYPE;
         } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == DEVICE) {
             priority = DEVICE_ACROSS_ACCOUNT_TYPE;
-        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
-            (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
-            priority = APP_PEER_TO_PEER_TYPE;
-        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+        } else if ((item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP) &&
+            ((item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
+            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
             (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
-            item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
+            item.GetAccesser().GetAccesserDeviceId() == trustDeviceId))) {
             priority = APP_PEER_TO_PEER_TYPE;
-        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
-            (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
-            priority = APP_ACROSS_ACCOUNT_TYPE;
-        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+        } else if ((item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP) &&
+            ((item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
+            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
             (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
-            item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
+            item.GetAccesser().GetAccesserDeviceId() == trustDeviceId))) {
             priority = APP_ACROSS_ACCOUNT_TYPE;
         }
         if (priority > highestPriority) {
