@@ -157,8 +157,8 @@ private:
         const std::string &bundleName);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
         DmDiscoveryInfo discoveryInfo);
-    int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, std::string trustDev,
-        std::string reqDev);
+    int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
+        const std::string &reqDev);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

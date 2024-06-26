@@ -179,7 +179,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 }
 
 int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles,
-    std::string trustDev, std::string reqDev)
+    const std::string &trustDev, const std::string &reqDev)
 {
     LOGI("DeviceProfileConnector::GetAuthForm bindType %{public}d, bindLevel %{public}d",
         profiles.GetBindType(), profiles.GetBindLevel());
@@ -191,7 +191,7 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
             break;
         case DM_POINT_TO_POINT:
             if (profiles.GetBindLevel() == DEVICE) {
-                priority =  DEVICE_PEER_TO_PEER_TYPE;
+                priority = DEVICE_PEER_TO_PEER_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
                 profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
                 priority =  APP_PEER_TO_PEER_TYPE;
@@ -206,8 +206,8 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
                 profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
                 priority =  APP_ACROSS_ACCOUNT_TYPE;
-            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
-                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
+            } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
+                profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
                 priority =  APP_ACROSS_ACCOUNT_TYPE;
             }
             break;
