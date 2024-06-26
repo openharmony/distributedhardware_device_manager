@@ -170,7 +170,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
         if (trustDeviceId != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
             continue;
         }
-        uint32_t priority = GetAuthForm(item);
+        uint32_t priority = GetAuthForm(item, trustDeviceId, requestDeviceId);
         if (priority > highestPriority) {
             highestPriority = priority;
         }
@@ -178,40 +178,44 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
     return highestPriority;
 }
 
-int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles)
+int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles,
+    std::string trustDev, std::string reqDev);
 {
     LOGI("DeviceProfileConnector::GetAuthForm bindType %{public}d, bindLevel %{public}d",
         profiles.GetBindType(), profiles.GetBindLevel());
-    if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-        return IDENTICAL_ACCOUNT_TYPE;
-    }
-    if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == DEVICE) {
-        return DEVICE_PEER_TO_PEER_TYPE;
-    }
-    if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == DEVICE) {
-        return DEVICE_ACROSS_ACCOUNT_TYPE;
-    }
-    if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
-        (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-        item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
-        return APP_PEER_TO_PEER_TYPE
-    }
-    if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
-        (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
-        item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
-        return APP_PEER_TO_PEER_TYPE
-    }
-    if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
-        (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-        item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
-        return APP_ACROSS_ACCOUNT_TYPE
-    }
-    if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
-        (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
-        item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
-        return APP_ACROSS_ACCOUNT_TYPE
-    }
-    return INVALIED_TYPE;
+    uint32_t priority = INVALIED_TYPE;
+    uint32_t bindType = profiles.GetBindType();
+    switch (bindType) {
+        case DM_IDENTICAL_ACCOUNT:
+            priority = IDENTICAL_ACCOUNT_TYPE;
+            break;
+        case DM_POINT_TO_POINT:
+            if (profiles.GetBindLevel() == DEVICE) {
+               priority =  DEVICE_PEER_TO_PEER_TYPE;
+            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
+                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
+                priority =  APP_PEER_TO_PEER_TYPE;
+            } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
+                profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
+                priority =  APP_PEER_TO_PEER_TYPE;
+            }
+            break;
+        case DM_ACROSS_ACCOUNT:
+            if (profiles.GetBindLevel() == DEVICE) {
+                priority =  DEVICE_ACROSS_ACCOUNT_TYPE;
+            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
+                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
+                priority =  APP_ACROSS_ACCOUNT_TYPE;
+            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
+                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
+                priority =  APP_ACROSS_ACCOUNT_TYPE;
+            }
+            break;
+        default:
+            LOGE("unknown bind type %{public}d.", bindType);
+            break;
+    } 
+    return priority;
 }
 
 std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
