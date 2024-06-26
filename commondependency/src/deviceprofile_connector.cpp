@@ -173,14 +173,26 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
         uint32_t priority = INVALIED_TYPE;
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             priority = IDENTICAL_ACCOUNT_TYPE;
-        } else if (item.GetBindLevel() == DEVICE) {
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == DEVICE) {
             priority = DEVICE_PEER_TO_PEER_TYPE;
-        } else if (item.GetBindLevel() == APP && (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == DEVICE) {
+            priority = DEVICE_ACROSS_ACCOUNT_TYPE;
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+            (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
             item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
             priority = APP_PEER_TO_PEER_TYPE;
-        } else if (item.GetBindLevel() == APP && (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
+        } else if (item.GetBindType() == DM_POINT_TO_POINT && item.GetBindLevel() == APP &&
+            (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
             item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
             priority = APP_PEER_TO_PEER_TYPE;
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
+            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId)) {
+            priority = APP_ACROSS_ACCOUNT_TYPE;
+        } else if (item.GetBindType() == DM_ACROSS_ACCOUNT && item.GetBindLevel() == APP &&
+            (item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId &&
+            item.GetAccesser().GetAccesserDeviceId() == trustDeviceId)) {
+            priority = APP_ACROSS_ACCOUNT_TYPE;
         }
         if (priority > highestPriority) {
             highestPriority = priority;

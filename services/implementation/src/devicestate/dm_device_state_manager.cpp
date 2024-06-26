@@ -135,7 +135,6 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     switch (devState) {
         case DEVICE_STATE_ONLINE:
             RegisterOffLineTimer(devInfo);
-            devInfo.authForm = GetAuthForm(devInfo.networkId);
             SaveOnlineDeviceInfo(devInfo);
             DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             ProcessDeviceStateChange(devState, devInfo);

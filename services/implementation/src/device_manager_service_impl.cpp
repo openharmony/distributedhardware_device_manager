@@ -271,17 +271,15 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     LOGI("The online device bind type is %{public}d.", bindType);
     if (bindType == INVALIED_TYPE) {
-        LOGI("The online device is identical account.");
         PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
     } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
-        LOGI("The online device is identical account self-networking.");
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
-        LOGI("The online device is device-level bind type.");
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        devInfo.authForm = DmAuthForm::PEER_TO_PEER;
+    } else if (bindType == DEVICE_ACROSS_ACCOUNT_TYPE) {
+        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     } else if (bindType == APP_PEER_TO_PEER_TYPE) {
-        LOGI("The online device is app-level bind type.");
         std::vector<std::string> pkgNameVec =
             DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(requestDeviceId, trustDeviceId);
         if (pkgNameVec.size() == 0) {
@@ -289,8 +287,19 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
             return;
         }
         softbusConnector_->SetPkgNameVec(pkgNameVec);
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        devInfo.authForm = DmAuthForm::PEER_TO_PEER;
+    } else if (bindType == APP_ACROSS_ACCOUNT_TYPE) {
+        std::vector<std::string> pkgNameVec =
+            DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(requestDeviceId, trustDeviceId);
+        if (pkgNameVec.size() == 0) {
+            LOGI("The online device not need report pkgname");
+            return;
+        }
+        softbusConnector_->SetPkgNameVec(pkgNameVec);
+        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     }
+    LOGI("DeviceManagerServiceImpl::HandleOnline success devInfo auform %{public}d.", devInfo.authForm);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
 }
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
