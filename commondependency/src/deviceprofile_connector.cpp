@@ -179,7 +179,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 }
 
 int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles,
-    std::string trustDev, std::string reqDev);
+    std::string trustDev, std::string reqDev)
 {
     LOGI("DeviceProfileConnector::GetAuthForm bindType %{public}d, bindLevel %{public}d",
         profiles.GetBindType(), profiles.GetBindLevel());
