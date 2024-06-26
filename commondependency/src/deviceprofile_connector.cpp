@@ -194,21 +194,21 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
                 priority = DEVICE_PEER_TO_PEER_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
                 profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
-                priority =  APP_PEER_TO_PEER_TYPE;
+                priority = APP_PEER_TO_PEER_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
                 profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
-                priority =  APP_PEER_TO_PEER_TYPE;
+                priority = APP_PEER_TO_PEER_TYPE;
             }
             break;
         case DM_ACROSS_ACCOUNT:
             if (profiles.GetBindLevel() == DEVICE) {
-                priority =  DEVICE_ACROSS_ACCOUNT_TYPE;
+                priority = DEVICE_ACROSS_ACCOUNT_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
                 profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
-                priority =  APP_ACROSS_ACCOUNT_TYPE;
+                priority = APP_ACROSS_ACCOUNT_TYPE;
             } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
                 profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
-                priority =  APP_ACROSS_ACCOUNT_TYPE;
+                priority = APP_ACROSS_ACCOUNT_TYPE;
             }
             break;
         default:
