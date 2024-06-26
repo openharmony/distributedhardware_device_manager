@@ -147,71 +147,79 @@ HWTEST_F(DiscoveryManagerTest, StartDiscovering4MineLibary_001, testing::ext::Te
 HWTEST_F(DiscoveryManagerTest, StartDiscoveringNoMetaType_001, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest01";
     std::map<std::string, std::string> param;
     param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_SHARE)));
-    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscoveringNoMetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscoveringNoMetaType_002, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest02";
     std::map<std::string, std::string> param;
     param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_WEAR)));
-    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscoveringNoMetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscoveringNoMetaType_003, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest03";
     std::map<std::string, std::string> param;
     param.insert(std::pair<std::string, std::string>("META_TYPE", std::to_string(MetaNodeType::PROXY_CASTPLUS)));
-    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscoveringNoMetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscoveringNoMetaType_004, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest04";
     std::map<std::string, std::string> param;
-    int32_t ret = manager->StartDiscoveringNoMetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscoveringNoMetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering4MetaType_001, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest01";
     std::map<std::string, std::string> param;
     param.emplace("META_TYPE", "4");
-    int32_t ret = manager->StartDiscovering4MetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscovering4MetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering4MetaType_002, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest02";
     std::map<std::string, std::string> param;
     param.emplace("META_TYPE", "7");
-    int32_t ret = manager->StartDiscovering4MetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscovering4MetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering4MetaType_003, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest03";
     std::map<std::string, std::string> param;
     param.emplace("META_TYPE", "5");
-    int32_t ret = manager->StartDiscovering4MetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscovering4MetaType(pkgName, dmSubInfo, param);
     EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering4MetaType_004, testing::ext::TestSize.Level0)
 {
     DmSubscribeInfo dmSubInfo;
+    std::string pkgName = "pkgNameTest04";
     std::map<std::string, std::string> param;
     param.emplace("META_TYPE", "1234");
-    int32_t ret = manager->StartDiscovering4MetaType(dmSubInfo, param);
+    int32_t ret = manager->StartDiscovering4MetaType(pkgName, dmSubInfo, param);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
@@ -227,7 +235,7 @@ HWTEST_F(DiscoveryManagerTest, StopDiscovering_002, testing::ext::TestSize.Level
 {
     std::string pkgName = "pkgName";
     uint16_t subscribeId = 0;
-    manager->discoveryQueue_.push(pkgName);
+    manager->pkgNameSet_.insert(pkgName);
     DiscoveryContext context;
     manager->discoveryContextMap_.emplace(pkgName, context);
     int32_t ret = manager->StopDiscovering(pkgName, subscribeId);
@@ -286,7 +294,7 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.L
     std::string pkgName = "pkgName";
     int32_t subscribeId = 1;
     int32_t result = 1;
-    manager->discoveryQueue_.push(pkgName);
+    manager->pkgNameSet_.insert(pkgName);
     DiscoveryContext context;
     manager->discoveryContextMap_.emplace(pkgName, context);
     manager->listener_ = std::make_shared<DeviceManagerServiceListener>();
@@ -297,7 +305,8 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.L
 HWTEST_F(DiscoveryManagerTest, StartDiscoveryTimer_001, testing::ext::TestSize.Level0)
 {
     manager->timer_ = nullptr;
-    manager->StartDiscoveryTimer();
+    std::string pkgName = "timeTest";
+    manager->StartDiscoveryTimer(pkgName);
     EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
 }
 
@@ -313,30 +322,31 @@ HWTEST_F(DiscoveryManagerTest, HandleDiscoveryQueue_001, testing::ext::TestSize.
 
 HWTEST_F(DiscoveryManagerTest, HandleDiscoveryTimeout_001, testing::ext::TestSize.Level0)
 {
-    std::string name = "name";
-    std::queue<std::string> emptyQueue;
-    manager->discoveryQueue_ = emptyQueue;
+    std::string name = "nameTest01";
+    std::set<std::string> emptySet;
+    manager->pkgNameSet_ = emptySet;
     manager->HandleDiscoveryTimeout(name);
-    EXPECT_EQ(manager->discoveryQueue_.empty(), true);
+    EXPECT_EQ(manager->pkgNameSet_.empty(), true);
 }
 
 HWTEST_F(DiscoveryManagerTest, HandleDiscoveryTimeout_002, testing::ext::TestSize.Level0)
 {
-    std::string name = "name";
-    manager->discoveryQueue_.push(name);
+    std::string name = "nameTest02";
+    manager->pkgNameSet_.insert(name);
     manager->discoveryContextMap_.clear();
     manager->HandleDiscoveryTimeout(name);
-    EXPECT_EQ(manager->discoveryQueue_.empty(), false);
+    EXPECT_EQ(manager->pkgNameSet_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, HandleDiscoveryTimeout_003, testing::ext::TestSize.Level0)
 {
-    std::string name = "name";
-    manager->discoveryQueue_.push(name);
+    manager->pkgNameSet_.clear();
+    std::string name = "nameTest03";
+    manager->pkgNameSet_.insert(name);
     DiscoveryContext context;
     manager->discoveryContextMap_.emplace(name, context);
     manager->HandleDiscoveryTimeout(name);
-    EXPECT_EQ(manager->discoveryQueue_.empty(), false);
+    EXPECT_NE(manager->pkgNameSet_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)

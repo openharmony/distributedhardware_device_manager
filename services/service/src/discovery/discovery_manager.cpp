@@ -18,16 +18,19 @@
 #include <dlfcn.h>
 #include <securec.h>
 
+#include "softbus_common.h"
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "parameter.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t DISCOVERY_TIMEOUT = 120;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
-constexpr const char* DISCOVERY_TIMEOUT_TASK = "deviceManagerTimer:discovery";
 const std::string TYPE_MINE = "findDeviceMode";
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 static std::mutex comDependencyLoadLock;
 constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.z.so";
@@ -65,7 +68,10 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     dmSubInfo.freq = DmExchangeFreq::DM_LOW;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
-    strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_APPROACH);
+    if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_APPROACH) != EOK) {
+        LOGE("capability copy err.");
+        return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
+    }
 
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
@@ -85,6 +91,12 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
             return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
         }
     }
+    LOGI("EnableDiscoveryListener capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
+    }
+
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
@@ -115,6 +127,12 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
             pkgName2SubIdMap_.erase(pkgName);
         }
     }
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgName);
+        }
+    }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
     return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
@@ -141,7 +159,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     }
 
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
-    StartDiscoveryTimer();
+    StartDiscoveryTimer(pkgName);
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
@@ -149,8 +167,8 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         return StartDiscovering4MineLibary(pkgName, dmSubInfo, it->second);
     }
 
-    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(dmSubInfo, discoverParam) :
-            StartDiscovering4MetaType(dmSubInfo, discoverParam);
+    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(pkgName, dmSubInfo, discoverParam) :
+            StartDiscovering4MetaType(pkgName, dmSubInfo, discoverParam);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
         return ERR_DM_START_DISCOVERING_FAILED;
@@ -192,7 +210,16 @@ void DiscoveryManager::ConfigDiscParam(const std::map<std::string, std::string> 
 int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::string &searchJson)
 {
-    LOGI("StartDiscovering for mine meta node process.");
+    if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD) != EOK) {
+        LOGE("capability copy err.");
+        return ERR_DM_START_DISCOVERING_FAILED;
+    }
+    LOGI("StartDiscovering for mine meta node process, pkgName = %{public}s, capability = %{public}s",
+        pkgName.c_str(), std::string(dmSubInfo.capability).c_str());
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
+    }
     int32_t ret = mineSoftbusListener_->RefreshSoftbusLNN(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
@@ -201,13 +228,21 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
     return ret;
 }
 
-int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
+int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    LOGI("StartDiscovering for standard meta node process.");
     (void)param;
-    strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD);
+    if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD) != EOK) {
+        LOGE("capability copy err.");
+        return ERR_DM_START_DISCOVERING_FAILED;
+    }
+    LOGI("StartDiscovering for standard meta node process, pkgName = %{public}s, capability = %{public}s",
+        pkgName.c_str(), std::string(dmSubInfo.capability).c_str());
 
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
+    }
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("StartDiscoveringNoMetaType failed, softbus refresh lnn ret: %{public}d.", ret);
@@ -215,24 +250,33 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(DmSubscribeInfo &dmSubInfo,
     return ret;
 }
 
-int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
+int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    LOGI("StartDiscovering for meta node process, input metaType = %{public}s",
-         (param.find(PARAM_KEY_META_TYPE)->second).c_str());
+    LOGI("StartDiscovering for meta node process, input metaType = %{public}s, pkgName = %{public}s",
+         (param.find(PARAM_KEY_META_TYPE)->second).c_str(), pkgName.c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
             LOGI("StartDiscovering4MetaType for share meta node process.");
-            strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_SHARE);
+            if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_SHARE) != EOK) {
+                LOGE("capability copy error.");
+                return ERR_DM_FAILED;
+            }
             break;
         case MetaNodeType::PROXY_WEAR:
             LOGI("StartDiscovering4MetaType for wear meta node process.");
-            strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_WEAR);
+            if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_WEAR) != EOK) {
+                LOGE("capability copy error.");
+                return ERR_DM_FAILED;
+            }
             break;
         case MetaNodeType::PROXY_CASTPLUS:
             LOGI("StartDiscovering4MetaType for cast_plus meta node process.");
-            strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_CASTPLUS);
+            if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_CASTPLUS) != EOK) {
+                LOGE("capability copy error.");
+                return ERR_DM_FAILED;
+            }
             break;
         default:
             LOGE("StartDiscovering4MetaType failed, unsupport meta type : %{public}d.", metaType);
@@ -242,6 +286,11 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(DmSubscribeInfo &dmSubInfo,
     std::string customData = "";
     if (param.find(PARAM_KEY_CUSTOM_DATA) != param.end()) {
         customData = param.find(PARAM_KEY_CUSTOM_DATA)->second;
+    }
+    LOGI("StartDiscovering4MetaType capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        capabilityMap_[pkgName] =std::string(dmSubInfo.capability);
     }
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, customData);
@@ -260,12 +309,19 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
     }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (!discoveryQueue_.empty()) {
-            discoveryQueue_.pop();
+        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
+            pkgNameSet_.erase(pkgName);
         }
-        if (!discoveryContextMap_.empty()) {
+
+        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            timer_->DeleteTimer(pkgName);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgName);
         }
     }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
@@ -288,6 +344,16 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
     if (isOnline && GetDeviceAclParam(pkgName, deviceIdHash, filterPara.isOnline, filterPara.authForm) != DM_OK) {
         LOGE("The found device get online param failed.");
     }
+    nlohmann::json jsonObject = nlohmann::json::parse(info.extraData, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("OnDeviceFound jsonStr error");
+        return;
+    }
+    if (!IsInt32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
+        LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
+        return;
+    }
+    int32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<int32_t>();
     uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
@@ -297,14 +363,33 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            listener_->OnDeviceFound(pkgName, subscribeId, info);
-            return;
+            if (capabilityMap_.find(pkgName) != capabilityMap_.end() &&
+                CompareCapability(capabilityType, capabilityMap_[pkgName])) {
+                LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+                listener_->OnDeviceFound(pkgName, subscribeId, info);
+                return;
+            }
         }
         discoveryContext = iter->second;
     }
     if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end() &&
+            CompareCapability(capabilityType, capabilityMap_[pkgName])) {
+            LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+            listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
+        }
     }
+}
+
+bool DiscoveryManager::CompareCapability(int32_t capabilityType, const std::string &capabilityStr)
+{
+    for (uint32_t i = 0; i < sizeof(g_capabilityMap) / sizeof(g_capabilityMap[0]); i++) {
+        if (strcmp(capabilityStr.c_str(), g_capabilityMap[i].capability) == 0) {
+            LOGD("capabilityType: %{public}d, capabilityStr: %{public}s", capabilityType, capabilityStr.c_str());
+            return ((capabilityType >> static_cast<int32_t>(g_capabilityMap[i].bitmap)) & 1);
+        }
+    }
+    return false;
 }
 
 void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
@@ -322,24 +407,30 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (!discoveryQueue_.empty()) {
-            discoveryQueue_.pop();
+        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
+            pkgNameSet_.erase(pkgName);
         }
-        if (!discoveryContextMap_.empty()) {
+        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            timer_->DeleteTimer(pkgName);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgName);
         }
     }
     listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
 
-void DiscoveryManager::StartDiscoveryTimer()
+void DiscoveryManager::StartDiscoveryTimer(const std::string &pkgName)
 {
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
-    timer_->StartTimer(std::string(DISCOVERY_TIMEOUT_TASK), DISCOVERY_TIMEOUT,
+    timer_->StartTimer(pkgName, DISCOVERY_TIMEOUT,
         [this] (std::string name) {
             DiscoveryManager::HandleDiscoveryTimeout(name);
         });
@@ -356,47 +447,30 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
     if ((dmFilter.TransformToFilter(filterData) != DM_OK) && (dmFilter.TransformFilterOption(filterData) != DM_OK)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    uint16_t frontSubscribeId = 0;
-    std::string frontPkgName = "";
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (discoveryQueue_.empty()) {
-            discoveryQueue_.push(pkgName);
+        if (pkgNameSet_.find(pkgName) == pkgNameSet_.end()) {
+            pkgNameSet_.emplace(pkgName);
             DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
             discoveryContextMap_.emplace(pkgName, context);
             return DM_OK;
-        }
-        frontPkgName = discoveryQueue_.front();
-        frontSubscribeId = discoveryContextMap_[frontPkgName].subscribeId;
-        if (pkgName == frontPkgName) {
+        } else {
             LOGE("DiscoveryManager::HandleDiscoveryQueue repeated, pkgName : %{public}s.", pkgName.c_str());
             return ERR_DM_DISCOVERY_REPEATED;
         }
     }
-    StopDiscovering(frontPkgName, frontSubscribeId);
-    {
-        std::lock_guard<std::mutex> autoLock(locks_);
-        discoveryQueue_.push(pkgName);
-        DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
-        discoveryContextMap_.emplace(pkgName, context);
-    }
-    return DM_OK;
 }
 
-void DiscoveryManager::HandleDiscoveryTimeout(std::string name)
+void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
 {
-    (void)name;
     LOGI("DiscoveryManager::HandleDiscoveryTimeout");
     uint16_t subscribeId = 0;
-    std::string pkgName = "";
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (discoveryQueue_.empty()) {
-            LOGE("HandleDiscoveryTimeout: discovery queue is empty.");
+        if (pkgNameSet_.find(pkgName) == pkgNameSet_.end()) {
+            LOGE("HandleDiscoveryTimeout: pkgName: %{public}s is not exist.", pkgName.c_str());
             return;
         }
-
-        pkgName = discoveryQueue_.front();
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
             LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %{public}s.",
