@@ -42,7 +42,7 @@ std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ 
 std::map<std::string, std::map<std::string, std::string>> DeviceManagerServiceListener::udidHashMap_ = {};
 std::mutex DeviceManagerServiceListener::alreadyOnlineSetLock_;
 std::unordered_set<std::string> DeviceManagerServiceListener::alreadyOnlineSet_ = {};
-const int32_t ALREADY_ONLINE_NUMS = 3;
+const int32_t ALREADY_ONLINE_NUMS = 4;
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
