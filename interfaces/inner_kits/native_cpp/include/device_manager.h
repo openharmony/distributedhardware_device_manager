@@ -611,8 +611,6 @@ public:
     virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                            int32_t &securityLevel) = 0;
     virtual bool IsSameAccount(const std::string &netWorkId) = 0;
-    virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
-    virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

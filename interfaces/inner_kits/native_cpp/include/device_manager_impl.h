@@ -382,8 +382,6 @@ public:
 
     virtual bool CheckRelatedDevice(const std::string &udid, const std::string &bundleName) override;
     virtual bool IsSameAccount(const std::string &netWorkId) override;
-    virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
-    virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

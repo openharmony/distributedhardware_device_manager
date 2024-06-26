@@ -694,7 +694,7 @@ bool DeviceProfileConnector::IsTrustDevice(AccessControlProfile profile, const s
             return true;
         }
         if (profile.GetBindType() == DM_POINT_TO_POINT || profile.GetBindType() == DM_ACROSS_ACCOUNT) {
-            if (profile.GetBindLevel() == DEVICE || profile.GetBindLevel() == SERVICE) {  // 设备级
+            if (profile.GetBindLevel() == DEVICE) {  // 设备级
                 LOGI("The udid %{public}s is device bind.", GetAnonyString(udid).c_str());
                 return true;
             }

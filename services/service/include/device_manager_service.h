@@ -191,9 +191,6 @@ public:
     int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
     int32_t InitAccountInfo();
     int32_t InitScreenLockEvent();
-    bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
-    bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
-
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

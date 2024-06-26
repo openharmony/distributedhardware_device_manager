@@ -172,7 +172,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     }
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
         std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> udidMap;
-        if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        if (PermissionManager::GetInstance().CheckSA()) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
@@ -1371,36 +1371,6 @@ int32_t DeviceManagerService::CheckRelatedDevice(const std::string &udid, const 
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->CheckRelatedDevice(udid, bundleName);
-}
-
-bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", caller.pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckAccessControl failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    std::string udid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), udid);
-    return dmServiceImpl_->CheckRelatedDevice(udid, caller.pkgName);
-}
-
-bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", caller.pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckIsSameAccount failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    std::string udid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), udid);
-    return dmServiceImpl_->IsSameAccount(udid);
 }
 
 int32_t DeviceManagerService::InitAccountInfo()

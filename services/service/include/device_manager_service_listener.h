@@ -82,10 +82,6 @@ private:
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
     void SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const std::string &pkgName,
         const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessDeviceStateChange(const DmDeviceState &state, const DmDeviceInfo &info,
-        const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
-        const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

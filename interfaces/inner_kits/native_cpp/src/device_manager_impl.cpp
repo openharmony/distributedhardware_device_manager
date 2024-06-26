@@ -29,7 +29,6 @@
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
-#include "ipc_check_access_control.h"
 #include "ipc_check_related_device_req.h"
 #include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
@@ -2111,44 +2110,5 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
     return true;
 }
 
-bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("DeviceManagerImpl::CheckAccessControl");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_ACCESS_CONTROL, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("CheckAccessControl Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("CheckAccessControl Failed with ret: %{public}d", ret);
-        return false;
-    }
-    return true;
-}
-
-bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("DeviceManagerImpl::CheckIsSameAccount");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_SAME_ACCOUNT, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("CheckIsSameAccount Failed with ret: %{public}d", ret);
-        return false;
-    }
-    return true;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

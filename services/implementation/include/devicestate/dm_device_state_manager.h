@@ -107,7 +107,6 @@ private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t DeleteGroupByDP(const std::string &deviceId);
 #endif
-    void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo);
 
 private:
     std::mutex timerMapMutex_;

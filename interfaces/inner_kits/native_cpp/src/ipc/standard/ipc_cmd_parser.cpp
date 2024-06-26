@@ -23,7 +23,6 @@
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
-#include "ipc_check_access_control.h"
 #include "ipc_check_related_device_req.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
@@ -116,24 +115,6 @@ void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
     targetId.bleMac = parcel.ReadString();
     targetId.wifiIp = parcel.ReadString();
     targetId.wifiPort = parcel.ReadUint16();
-}
-
-bool EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(caller.accountId));
-    bRet = (bRet && parcel.WriteString(caller.pkgName));
-    bRet = (bRet && parcel.WriteInt32(caller.userId));
-    bRet = (bRet && parcel.WriteUint64(caller.tokenId));
-    return bRet;
-}
-
-bool EncodeDmAccessCallee(const DmAccessCallee &callee, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(callee.networkId));
-    bRet = (bRet && parcel.WriteString(callee.peerId));
-    return bRet;
 }
 
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
@@ -1542,58 +1523,6 @@ ON_IPC_SET_REQUEST(CHECK_RELATED_DEVICE, std::shared_ptr<IpcReq> pBaseReq, Messa
 }
 
 ON_IPC_READ_RESPONSE(CHECK_RELATED_DEVICE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(CHECK_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
-    DmAccessCaller caller = pReq->GetAccessCaller();
-    DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!EncodeDmAccessCaller(caller, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!EncodeDmAccessCallee(callee, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(CHECK_ACCESS_CONTROL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(CHECK_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
-    DmAccessCaller caller = pReq->GetAccessCaller();
-    DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!EncodeDmAccessCaller(caller, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!EncodeDmAccessCallee(callee, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(CHECK_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");

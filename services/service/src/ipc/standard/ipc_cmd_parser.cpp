@@ -94,20 +94,6 @@ void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
     targetId.wifiPort = parcel.ReadUint16();
 }
 
-void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
-{
-    caller.accountId = parcel.ReadString();
-    caller.pkgName = parcel.ReadString();
-    caller.userId = parcel.ReadInt32();
-    caller.tokenId = parcel.ReadUint64();
-}
-
-void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
-{
-    callee.networkId = parcel.ReadString();
-    callee.peerId = parcel.ReadString();
-}
-
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
@@ -1395,34 +1381,6 @@ ON_IPC_CMD(CHECK_RELATED_DEVICE, MessageParcel &data, MessageParcel &reply)
     std::string udid = data.ReadString();
     std::string bundleName = data.ReadString();
     int32_t result = DeviceManagerService::GetInstance().CheckRelatedDevice(udid, bundleName);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed.");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(CHECK_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
-{
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    DecodeDmAccessCaller(data, caller);
-    DecodeDmAccessCallee(data, callee);
-    int32_t result = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed.");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(CHECK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
-{
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    DecodeDmAccessCaller(data, caller);
-    DecodeDmAccessCallee(data, callee);
-    int32_t result = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed.");
         return ERR_DM_IPC_WRITE_FAILED;

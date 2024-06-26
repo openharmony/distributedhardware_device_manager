@@ -49,12 +49,6 @@ constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NA
 constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "CollaborationFwk",
 };
-
-#define SYSTEM_SA_WHITE_LIST_NUM (2)
-constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
-    "Samgr_Networking",
-    "ohos.distributeddata.service",
-};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -195,27 +189,21 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     return false;
 }
 
-bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+bool PermissionManager::CheckSA(void)
 {
-    LOGI("PermissionManager::CheckSystemSA");
-    for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
-        std::string tmp(systemSaWhiteList[index]);
-        if (pkgName == tmp) {
-            return true;
-        }
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("CheckSA GetCallingTokenID error.");
+        return false;
     }
-    return false;
-}
+    LOGI("CheckSA::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
 
-std::unordered_set<std::string> PermissionManager::GetSystemSA()
-{
-    std::unordered_set<std::string> systemSA;
-    for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
-        std::string tmp(systemSaWhiteList[index]);
-        systemSA.insert(tmp);
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
     }
     LOGE("TokenCaller is not SA.");
-    return systemSA;
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

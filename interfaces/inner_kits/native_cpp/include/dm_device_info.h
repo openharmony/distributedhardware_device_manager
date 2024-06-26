@@ -340,18 +340,6 @@ const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
 const std::string DEVICE_TYPE_PC_STRING = "PC";
 const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 const std::string DEVICE_TYPE_2IN1_STRING = "2IN1";
-
-typedef struct DmAccessCaller {
-    std::string accountId;
-    std::string pkgName;
-    int32_t userId;
-    uint64_t tokenId;
-} DmAccessCaller;
-
-typedef struct DmAccessCallee {
-    std::string networkId;
-    std::string peerId;
-} DmAccessCallee;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
