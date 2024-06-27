@@ -31,10 +31,8 @@ namespace OHOS {
 namespace DistributedHardware {
 static constexpr int32_t INVALID_USERID = -1;
 static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
-static constexpr int32_t WAIT_DIALOG_CLOSE_TIME_S = 10;
 static constexpr int32_t WINDOW_LEVEL_UPPER = 2;
 static constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
-const int32_t USLEEP_SHOW_PIN_TIME_US = 50000;  // 50ms
 const std::string CONNECT_PIN_DIALOG = "pinDialog";
 const std::string DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
 const std::string CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
@@ -132,7 +130,7 @@ void DmDialogManager::ShowInputDialog(const std::string param)
 void DmDialogManager::ConnectExtension()
 {
     LOGI("DmDialogManager::ConnectExtension start.");
-    if (isConnectSystemUI_.load()) {
+    if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr) {
         AppExecFwk::ElementName element;
         dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
         LOGI("DmDialogManager::ConnectExtension dialog has been show.");
