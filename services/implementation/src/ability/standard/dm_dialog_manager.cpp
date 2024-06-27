@@ -49,12 +49,13 @@ std::string DmDialogManager::customDescriptionStr_ = "";
 std::string DmDialogManager::targetDeviceName_ = "";
 std::string DmDialogManager::pinCode_ = "";
 std::string DmDialogManager::hostPkgLabel_ = "";
-std::atomic<bool> DmDialogManager::isDialogDestroy_(true);
-std::condition_variable DmDialogManager::dialogCondition_;
 int32_t DmDialogManager::deviceType_ = -1;
 DmDialogManager DmDialogManager::dialogMgr_;
 sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
     new (std::nothrow) DialogAbilityConnection());
+
+std::atomic<bool> DmDialogManager::isConnectSystemUI_(false);
+sptr<IRemoteObject> g_remoteObject = nullptr;
 
 DmDialogManager::DmDialogManager()
 {
@@ -131,16 +132,11 @@ void DmDialogManager::ShowInputDialog(const std::string param)
 void DmDialogManager::ConnectExtension()
 {
     LOGI("DmDialogManager::ConnectExtension start.");
-    std::mutex mutex;
-    std::unique_lock<std::mutex> lock(mutex);
-    if (!isDialogDestroy_.load()) {
-        auto status = dialogCondition_.wait_for(lock, std::chrono::seconds(WAIT_DIALOG_CLOSE_TIME_S),
-            [] () { return isDialogDestroy_.load(); });
-        if (!status) {
-            LOGE("wait dm dialog close failed.");
-            return;
-        }
-        usleep(USLEEP_SHOW_PIN_TIME_US);  // 50ms
+    if (isConnectSystemUI_.load()) {
+        AppExecFwk::ElementName element;
+        dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
+        LOGI("DmDialogManager::ConnectExtension dialog has been show.");
+        return;
     }
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
@@ -175,6 +171,9 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         LOGE("remoteObject is nullptr");
         return;
     }
+    if (g_remoteObject == nullptr) {
+        g_remoteObject = remoteObject;
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -206,7 +205,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         LOGE("show dm dialog is failed: %{public}d", ret);
         return;
     }
-    isDialogDestroy_.store(false);
+    isConnectSystemUI_.store(true);
     LOGI("show dm dialog is success");
 }
 
@@ -215,8 +214,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityDisconnectDone(
 {
     LOGI("OnAbilityDisconnectDone");
     std::lock_guard<std::mutex> lock(mutex_);
-    isDialogDestroy_.store(true);
-    dialogCondition_.notify_all();
+    isConnectSystemUI_.store(false);
 }
 }
 }
