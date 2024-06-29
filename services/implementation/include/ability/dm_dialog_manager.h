@@ -99,8 +99,7 @@ private:
     static std::string pinCode_;
     static std::string hostPkgLabel_;
     static int32_t deviceType_;
-    static std::atomic<bool> isDialogDestroy_;
-    static std::condition_variable dialogCondition_;
+    static std::atomic<bool> isConnectSystemUI_;
     static sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_;
     static DmDialogManager dialogMgr_;
 };
