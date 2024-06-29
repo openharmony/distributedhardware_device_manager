@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 
 constexpr const char* TIMER_RUNNING = "TimerRunning";
-constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
 constexpr int32_t DM_OK = 0;
 
 Timer::Timer(std::string name, int32_t time, TimerCallback callback)

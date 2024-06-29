@@ -61,7 +61,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             "BIZ_STATE", info.bizState,
             "TO_CALL_PKG", info.toCallPkg,
             "COMM_SERV", info.commServ,
-            "ERROR_CODE", std::abs(info.errCode));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportDiscoverRegCallback error, res:%{public}d", res);
@@ -101,7 +101,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
+            "ERROR_CODE", info.errCode);
     }
 
     if (res != DM_OK) {
@@ -151,7 +151,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
-            "ERROR_CODE", std::abs(info.errCode));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportDiscoverUserRes error, res:%{public}d", res);
@@ -221,7 +221,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             "COMM_SERV", info.commServ,
             "LOCAL_SESS_NAME", info.localSessName,
             "PEER_SESS_NAME", info.peerSessName,
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthOpenSession error, res:%{public}d", res);
@@ -313,7 +313,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::USER))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthConfirmBox error, res:%{public}d", res);
@@ -350,7 +350,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             "BIZ_STATE", info.bizState,
             "TO_CALL_PKG", info.toCallPkg,
             "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::HICHAIN))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthCreateGroup error, res:%{public}d", res);
@@ -385,7 +385,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             "STAGE_RES", stageRes,
             "HOST_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_CREATE_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
+            "ERROR_CODE", ERR_DM_CREATE_GROUP_FAILED);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthCreateGroupCb error, res:%{public}d", res);
@@ -436,7 +436,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_INPUT_BOX_END),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::USER))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthInputPinBox error, res:%{public}d", res);
@@ -475,7 +475,7 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
             "TO_CALL_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::HICHAIN))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthAddGroup error, res:%{public}d", res);
@@ -511,7 +511,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             "STAGE_RES", stageRes,
             "HOST_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "ERROR_CODE", std::abs(GetErrorCode(ERR_DM_ADD_GROUP_FAILED, static_cast<int32_t>(Module::HICHAIN))));
+            "ERROR_CODE", ERR_DM_ADD_GROUP_FAILED);
     }
     if (res != DM_OK) {
         LOGE("ReportAuthAddGroupCb error, res:%{public}d", res);
@@ -576,8 +576,8 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "FUNC", info.funcName,
         "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DELET_TRUST_RELATION),
         "BIZ_STAGE", static_cast<int32_t>(DeleteTrust::DELETE_TRUST),
-        "STAGE_RES", info.stageRes,
-        "BIZ_STATE", info.bizState,
+        "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+        "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
         "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
         "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
@@ -618,7 +618,7 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
             "DISCOVERY_DEVICE_LIST", info.discoverDevList,
-            "ERROR_CODE", std::abs(GetErrorCode(info.errCode, static_cast<int32_t>(Module::SOFTBUS))));
+            "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
         LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
@@ -679,11 +679,6 @@ std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
         return "";
     }
     return GetAnonyUdid(std::string(udidHash));
-}
-
-int32_t DmRadarHelper::GetErrorCode(int32_t errCode, int32_t module)
-{
-    return ErrCodeOffset(SUBSYS_DISTRIBUTEDHARDWARE_DM, module) + errCode;
 }
 
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)

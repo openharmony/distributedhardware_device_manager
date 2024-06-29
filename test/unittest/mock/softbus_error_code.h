@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_UTTEST_DM_PUBLISH_MANAGER_H
-#define OHOS_UTTEST_DM_PUBLISH_MANAGER_H
+#ifndef OHOS_DM_SOFTBUS_ERROR_CODE_H
+#define OHOS_DM_SOFTBUS_ERROR_CODE_H
 
-#include <gtest/gtest.h>
-#include <refbase.h>
-#include <queue>
-
-#include "softbus_connector.h"
-#include "device_manager_service_listener.h"
-#include "dm_publish_manager.h"
-#include "ipc_notify_publish_result_req.h"
-#include "softbus_error_code.h"
+#include <memory>
+#include <iostream>
+#include "ipc_req.h"
+#include "ipc_rsp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmPublishManagerTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-};
+constexpr int32_t SOFTBUS_IPC_ERR = -426442720;
+constexpr int32_t SOFTBUS_INVALID_PARAM = -426442749;
+constexpr int32_t SOFTBUS_WIFI_DIRECT_INIT_FAILED = -426442706;
+constexpr int32_t SOFTBUS_ERR = -426442707;
+constexpr int32_t SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL = -425799673;
+constexpr int32_t SOFTBUS_TRANS_SESSION_SERVER_NOINIT = -426115031;
+constexpr int32_t SOFTBUS_TRANS_UDP_GET_CHANNEL_FAILED = -426115035;
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_UTTEST_DM_PUBLISH_MANAGER_H
+#endif // OHOS_DM_SOFTBUS_ERROR_CODE_H

@@ -87,7 +87,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: SendData_002
- * @tc.desc: set sessionId = 0, go to the SendBytes'smaster and return ERR_DM_FAILED
+ * @tc.desc: set sessionId = 0, go to the SendBytes'smaster and return SOFTBUS_TRANS_SESSION_SERVER_NOINIT
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -101,7 +101,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
     int32_t sessionId = 0;
     softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr));
     int ret = softbusSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_TRANS_SESSION_SERVER_NOINIT);
 }
 
 /**
@@ -183,7 +183,7 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
     int32_t sessionId = 3;
     std::string peerDevId;
     int ret = softbusSession->GetPeerDeviceId(sessionId, peerDevId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_TRANS_SESSION_SERVER_NOINIT);
 }
 
 /**

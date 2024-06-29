@@ -43,14 +43,13 @@ constexpr const char* TAG_REPLY = "REPLY";
 constexpr const char* TAG_REMOTE_DEVICE_ID = "REMOTE_DEVICE_ID";
 
 constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_FAILED = -20000;
-constexpr int32_t ERR_DM_AUTH_OPEN_SESSION_FAILED = -20020;
+constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* TAG_DM_VERSION = "DM_VERSION";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
-constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
-constexpr int32_t ERR_DM_BIND_PEER_UNSUPPORTED = -20059;
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
+constexpr int32_t ERR_DM_BIND_PEER_UNSUPPORTED = 96929802;
 PinHolder::PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener): listener_(listener)
 {
     if (session_ == nullptr) {
@@ -117,10 +116,10 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     if (sessionId_ < 0) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId_);
         sessionId_ = SESSION_ID_INVALID;
-        listener_->OnCreateResult(registerPkgName_, ERR_DM_AUTH_OPEN_SESSION_FAILED);
+        listener_->OnCreateResult(registerPkgName_, sessionId_);
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT,
-            ERR_DM_AUTH_OPEN_SESSION_FAILED, "");
-        return ERR_DM_AUTH_OPEN_SESSION_FAILED;
+            sessionId_, "");
+        return sessionId_;
     }
     pinType_ = pinType;
     payload_ = payload;
@@ -146,9 +145,9 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     }
     if (sessionId_ == SESSION_ID_INVALID) {
         LOGI("DestroyPinHolder session already destroy.");
-        listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
-        return ERR_DM_FAILED;
+        listener_->OnDestroyResult(registerPkgName_, ret);
+        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ret, "");
+        return ret;
     }
     if (sourceState_ != SOURCE_CREATE) {
         LOGE("DestroyPinHolder failed, state is %{public}d.", sourceState_);
@@ -197,9 +196,9 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
     int32_t ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
-        listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
-        return ERR_DM_FAILED;
+        listener_->OnCreateResult(registerPkgName_, ret);
+        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ret, "");
+        return ret;
     }
     return ret;
 }
@@ -461,8 +460,8 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
     LOGE("[SOFTBUS]onSesssionOpened failed. sessionId: %{public}d.", sessionId);
     sessionId_ = SESSION_ID_INVALID;
     if (listener_ != nullptr) {
-        listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
+        listener_->OnCreateResult(registerPkgName_, result);
+        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, result, "");
     }
     return;
 }

@@ -193,7 +193,7 @@ ohos_unittest("UTTest_ipc_cmd_register") {
 ## UnitTest UTTest_dm_pin_holder {{{
 ohos_unittest("UTTest_dm_pin_holder") {
   module_out_path = module_out_path
-
+  include_dirs = [ "mock" ]
   sources = [
     "${services_path}/src/pinholder/pin_holder.cpp",
     "${services_path}/src/pinholder/pin_holder_session.cpp",
@@ -357,6 +357,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
   include_dirs = [
     "${devicemanager_path}/test/softbusunittest",
     "${services_path}/include",
+    "${devicemanager_path}/unittest/mock",
   ]
 
   sources = [ "${devicemanager_path}/test/softbusunittest/UTTest_mine_softbus_listener.cpp" ]
@@ -385,7 +386,10 @@ ohos_unittest("UTTest_mine_softbus_listener") {
 ohos_unittest("UTTest_softbus_adapter") {
   module_out_path = module_out_path
 
-  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
+  include_dirs = [
+    "${devicemanager_path}/test/softbusunittest",
+    "${devicemanager_path}/unittest/mock",
+  ]
 
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_adapter.cpp",

@@ -163,7 +163,7 @@ HWTEST_F(DmAnonymousTest, IsNumberString_003, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmAnonymousTest, GetErrorString_001, testing::ext::TestSize.Level0)
 {
-    int failedReason = -20000;
+    int failedReason = 96929744;
     std::string errorMessage = "dm process execution failed.";
     std::string ret = GetErrorString(failedReason);
     EXPECT_EQ(ret, errorMessage);

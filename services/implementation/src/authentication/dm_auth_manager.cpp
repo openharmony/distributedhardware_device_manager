@@ -260,9 +260,10 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         }
     }
     std::string deviceUdid = "";
-    if (SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), deviceUdid) != DM_OK) {
+    int32_t ret = SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), deviceUdid);
+    if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
-        return ERR_DM_FAILED;
+        return ret;
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -270,9 +271,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         .funcName = "UnAuthenticateDevice",
         .toCallPkg = HICHAINNAME,
         .hostName = pkgName,
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
         .peerNetId = networkId,
         .localUdid = localDeviceId,
         .peerUdid = deviceUdid,
@@ -1046,7 +1044,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %{public}d", ret);
         isAddingMember_ = false;
-        return ERR_DM_FAILED;
+        return ERR_DM_ADD_GROUP_FAILED;
     }
     return DM_OK;
 }

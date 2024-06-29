@@ -768,7 +768,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
             if (ret != DM_OK) {
                 result.append("HiDumpHelper GetTrustedDeviceList failed");
                 LOGE("HiDumpHelper GetTrustedDeviceList failed");
-                return ERR_DM_FAILED;
+                return ret;
             }
 
             for (unsigned int j = 0; j < deviceList.size(); j++) {

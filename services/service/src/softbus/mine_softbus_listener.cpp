@@ -606,7 +606,7 @@ int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
     int retValue = PublishLNN(DM_PKG_NAME, &publishInfo, &publishLNNCallback_);
     if (retValue != SOFTBUS_OK) {
         LOGE("failed to call softbus publishLNN function with ret: %{public}d.", retValue);
-        return ERR_DM_SOFTBUS_PUBLISH_SERVICE;
+        return retValue;
     }
     std::chrono::seconds timeout = std::chrono::seconds(MAX_SOFTBUS_DELAY_TIME);
     std::unique_lock<std::mutex> locker(g_publishLnnLock);

@@ -442,11 +442,11 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
     profile.SetAuthenticationType(aclInfo.authenticationType);
     profile.SetAccessee(accessee);
     profile.SetAccesser(accesser);
-    if (DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile) != DM_OK) {
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
+    if (ret != DM_OK) {
         LOGE("PutAccessControlProfile failed.");
-        return ERR_DM_FAILED;
     }
-    return DM_OK;
+    return ret;
 }
 
 int32_t DeviceProfileConnector::DeleteAccessControlList(int32_t userId, std::string &accountId)

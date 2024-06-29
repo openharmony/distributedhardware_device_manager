@@ -35,6 +35,7 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
