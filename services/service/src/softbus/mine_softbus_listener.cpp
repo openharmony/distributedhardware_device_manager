@@ -500,7 +500,7 @@ void MineSoftbusListener::SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInf
     subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
     subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
-    subscribeInfo.capability = DM_CAPABILITY_OSD;
+    subscribeInfo.capability = dmSubscribeInfo.capability;
     subscribeInfo.capabilityData = nullptr;
     subscribeInfo.dataLen = 0;
 }

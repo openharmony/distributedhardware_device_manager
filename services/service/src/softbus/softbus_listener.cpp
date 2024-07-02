@@ -273,8 +273,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         }
     }
     LOGI("OnSoftbusDeviceFound: devId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
-        "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
-        dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
+        "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(),
+        GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     CacheDiscoveredDevice(device);
