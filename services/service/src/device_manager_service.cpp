@@ -88,8 +88,9 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     if (publshCommonEventManager_ == nullptr) {
         publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
     }
-    PublishEventCallback callback = std::bind(&OHOS::DistributedHardware::PublishCommonEventCallback,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    PublishEventCallback callback = [&](const auto &arg1, const auto &arg2, const auto &arg3) {
+        OHOS::DistributedHardware::PublishCommonEventCallback(arg1, arg2, arg3);
+    };
     std::vector<std::string> PublishCommonEventVec;
 #ifdef SUPPORT_BLUETOOTH
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE);
@@ -1428,8 +1429,9 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     if (accountCommonEventManager_ == nullptr) {
         accountCommonEventManager_ = std::make_shared<DmAccountCommonEventManager>();
     }
-    AccountEventCallback callback = std::bind(&DeviceManagerService::AccountCommonEventCallback,
-        this, std::placeholders::_1, std::placeholders::_2);
+    AccountEventCallback callback = [&](const auto &arg1, const auto &arg2) {
+        this->AccountCommonEventCallback(arg1, arg2);
+    };
     std::vector<std::string> AccountCommonEventVec;
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
@@ -1446,8 +1448,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     if (screenCommonEventManager_ == nullptr) {
         screenCommonEventManager_ = std::make_shared<DmScreenCommonEventManager>();
     }
-    ScreenEventCallback callback = std::bind(&DeviceManagerService::ScreenCommonEventCallback,
-        this, std::placeholders::_1);
+    ScreenEventCallback callback = [&](const auto &arg1) { this->ScreenCommonEventCallback(arg1); };
     std::vector<std::string> screenEventVec;
     screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {

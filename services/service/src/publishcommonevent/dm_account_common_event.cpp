@@ -144,7 +144,7 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         LOGE("userId is less zero");
         return;
     }
-    std::thread dealThread(callback_, userId, receiveEvent);
+    std::thread dealThread([&]() { callback_(userId, receiveEvent); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");
