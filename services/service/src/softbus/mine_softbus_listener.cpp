@@ -133,7 +133,7 @@ MineSoftbusListener::MineSoftbusListener()
     {
         std::lock_guard<std::mutex> autoLock(g_matchWaitDeviceLock);
         g_matchDealFlag = true;
-        std::thread(MatchSearchDealTask).detach();
+        std::thread([]() { MatchSearchDealTask(); }).detach();
     }
 #endif
     LOGI("MineSoftbusListener constructor");
