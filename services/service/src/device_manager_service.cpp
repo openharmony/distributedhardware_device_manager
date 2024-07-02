@@ -1484,6 +1484,9 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
             return;
         }
         if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+            if (IsDMServiceAdapterLoad()) {
+                dmServiceImplExt_->AccountIdLogout(userId, MultipleUserConnector::GetSwitchOldAccountId());
+            }
             dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
         }
     }

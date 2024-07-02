@@ -72,6 +72,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t ReplyUiAction(const std::string &pkgName, int32_t action, const std::string &result) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::AccountIdLogout
+     * @tc.desc: AccountIdLogout
+     * @tc.type: FUNC
+     */
+    virtual int32_t AccountIdLogout(int32_t userId, const std::string &oldAccountId) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
