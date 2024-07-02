@@ -302,7 +302,7 @@ int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDevi
         return ERR_DM_FAILED;
     }
     SaveDeviceInfo(nodeInfo);
-    return ERR_DM_FAILED;
+    return DM_OK;
 }
 
 int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceInfo &devInfo)
