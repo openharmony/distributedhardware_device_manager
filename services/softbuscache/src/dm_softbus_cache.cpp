@@ -83,7 +83,7 @@ void SoftbusCache::UpDataLocalDevInfo()
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     ChangeDeviceInfo(localDeviceInfo_);
