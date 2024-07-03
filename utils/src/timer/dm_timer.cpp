@@ -64,7 +64,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
 
 int32_t DmTimer::DeleteTimer(std::string timerName)
 {
-    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName);
+    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     if (!timerVec_.empty() && timerVec_.find(timerName) == timerVec_.end()) {
         LOGI("DmTimer DeleteTimer is not exist.");
