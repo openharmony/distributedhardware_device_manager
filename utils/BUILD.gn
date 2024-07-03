@@ -36,6 +36,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${innerkits_path}/native_cpp/include",
         "${interfaces_path}/c/ipc/include",
+        "//base/notification/eventhandler/interfaces/inner_api",
         "//third_party/json/include",
         "//third_party/bounds_checking_function/include",
       ]
@@ -62,6 +63,7 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
+        "//base/notification/eventhandler/frameworks/eventhandler::libeventhandler",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//third_party/bounds_checking_function:libsec_shared",
         "//third_party/openssl:libcrypto_shared",

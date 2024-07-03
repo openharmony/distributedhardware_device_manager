@@ -23,7 +23,7 @@ namespace DistributedHardware {
 CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
 {
-    LOGI("CommonEventHandler destructor");
+    LOGI("CommonEventHandler constructor");
 }
 
 bool CommonEventHandler::PostTask(const Callback &callback, const std::string &name, int64_t delayTime)
@@ -38,7 +38,7 @@ void CommonEventHandler::RemoveTask(const std::string &name)
 
 DmTimer::DmTimer()
 {
-    LOGI("DmTimer construct");
+    LOGI("DmTimer constructor");
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     eventHandler_ = std::make_shared<CommonEventHandler>(runner);
 }
