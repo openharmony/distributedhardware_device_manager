@@ -19,6 +19,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t MIN_TIME_OUT = 0;
+const int32_t MAX_TIME_OUT = 300;
+const int32_t MILLISECOND_TO_SECOND = 1000;
 
 CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
@@ -51,6 +54,10 @@ DmTimer::~DmTimer()
 
 int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
+    if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
+        LOGI("DmTimer StartTimer input value invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     timerVec_.insert(name);
@@ -64,6 +71,10 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
 
 int32_t DmTimer::DeleteTimer(std::string timerName)
 {
+    if (timerName.empty()) {
+        LOGE("DmTimer DeleteTimer timer is null");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     if (!timerVec_.empty() && timerVec_.find(timerName) == timerVec_.end()) {
@@ -83,6 +94,10 @@ int32_t DmTimer::DeleteAll()
     std::lock_guard<std::mutex> locker(timerMutex_);
     if (eventHandler_ ==  nullptr) {
         return ERR_DM_FAILED;
+    }
+    if (timerVec_.empty()) {
+        LOGI("DmTimer is empty");
+        return DM_OK;
     }
     for (auto name : timerVec_) {
         eventHandler_->RemoveTask(name);

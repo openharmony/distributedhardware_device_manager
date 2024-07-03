@@ -43,7 +43,6 @@ constexpr const char* SYNC_DELETE_TIMEOUT_TASK = "deviceManagerTimer:syncDelete_
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
 
 using TimerCallback = std::function<void (std::string name)>;
-const int32_t MILLISECOND_TO_SECOND = 1000;
 
 class CommonEventHandler : public AppExecFwk::EventHandler {
     public:
