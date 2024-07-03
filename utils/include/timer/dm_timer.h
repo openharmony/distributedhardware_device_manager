@@ -42,15 +42,8 @@ constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_
 constexpr const char* SYNC_DELETE_TIMEOUT_TASK = "deviceManagerTimer:syncDelete_";
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
 
-
-constexpr int32_t DELAY_TICK_MILLSECONDS = 1000;
-typedef std::chrono::steady_clock::time_point timerPoint;
-typedef std::chrono::steady_clock steadyClock;
-typedef std::chrono::duration<int64_t, std::ratio<1, 1000>> timerDuration;
 using TimerCallback = std::function<void (std::string name)>;
 const int32_t MILLISECOND_TO_SECOND = 1000;
-const int32_t MIN_TIME_OUT = 0;
-const int32_t MAX_TIME_OUT = 300;
 
 class CommonEventHandler : public AppExecFwk::EventHandler {
     public:
