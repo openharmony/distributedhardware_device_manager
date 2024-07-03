@@ -122,7 +122,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "openssl:libcrypto_shared",
-      "safwk::system_ability_fwk",
       "samgr:samgr_proxy",
     ]
 
