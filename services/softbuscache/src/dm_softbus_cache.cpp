@@ -25,9 +25,9 @@ IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 bool g_online = false;
 bool g_getLocalDevInfo = false;
 DmDeviceInfo localDeviceInfo_;
-int32_t g_onlinDeviceNum = 0;
 void SoftbusCache::SaveLocalDeviceInfo()
 {
+    LOGI("SoftbusCache::SaveLocalDeviceInfo");
     if (g_online) {
         return;
     }
@@ -50,17 +50,16 @@ void SoftbusCache::DeleteLocalDeviceInfo()
 {
     LOGI("SoftbusCache::DeleteLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    if (g_onlinDeviceNum == 0) {
-        g_online = false;
-        g_getLocalDevInfo = false;
-    }
+    g_online = false;
+    g_getLocalDevInfo = false;
 }
 
 int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
 {
+    LOGI("SoftbusCache::GetLocalDeviceInfo");
     if (g_getLocalDevInfo) {
         nodeInfo = localDeviceInfo_;
+        LOGI("SoftbusCache::GetLocalDeviceInfo from dm cache.");
         return DM_OK;
     }
     NodeBasicInfo nodeBasicInfo;
@@ -75,6 +74,19 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
     SaveDeviceSecurityLevel(localDeviceInfo_.networkId);
     g_getLocalDevInfo = true;
     return DM_OK;
+}
+
+void SoftbusCache::UpDataLocalDevInfo()
+{
+    LOGI("SoftbusCache::UpDataLocalDevInfo");
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
+        return;
+    }
+    ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
+    ChangeDeviceInfo(localDeviceInfo_);
 }
 
 int32_t SoftbusCache::GetUdidByNetworkId(const char *networkId, std::string &udid)
@@ -120,7 +132,6 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     }
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
     deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
-    g_onlinDeviceNum++;
     LOGI("SaveDeviceInfo success udid %{public}s, networkId %{public}s",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
@@ -134,7 +145,6 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
         if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
             LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
             deviceInfo_.erase(item.first);
-            g_onlinDeviceNum--;
         }
     }
 }
@@ -208,6 +218,10 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
             return DM_OK;
         }
     }
+    if (GetUdidByNetworkId(networkId, udid) == DM_OK) {
+        LOGI("Get udid from softbus success.");
+        return DM_OK;
+    }
     return ERR_DM_FAILED;
 }
 
@@ -221,6 +235,10 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
             LOGI("GetUuidFromCache success uuid %{public}s.", GetAnonyString(uuid).c_str());
             return DM_OK;
         }
+    }
+    if (GetUuidByNetworkId(networkId, uuid) == DM_OK) {
+        LOGI("Get uuid from softbus success.");
+        return DM_OK;
     }
     return ERR_DM_FAILED;
 }
@@ -281,7 +299,25 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
             return DM_OK;
         }
     }
+    if (GetDevLevelFromBus(networkId, securityLevel) == DM_OK) {
+        LOGI("Get dev level from softbus success.");
+        return DM_OK;
+    }
     return ERR_DM_FAILED;
+}
+
+int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securityLevel)
+{
+    LOGI("SoftbusCache::GetDevLevelFromBus");
+    int32_t tempSecurityLevel = -1;
+    if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
+        reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return ERR_DM_FAILED;
+    }
+    securityLevel = tempSecurityLevel;
+    deviceSecurityLevel_[std::string(networkId)] = tempSecurityLevel;
+    return DM_OK;
 }
 
 int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo)
