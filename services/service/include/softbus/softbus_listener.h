@@ -52,6 +52,7 @@ public:
     static void DeviceOnLine(DmDeviceInfo deviceInfo);
     static void DeviceOffLine(DmDeviceInfo deviceInfo);
     static void DeviceNameChange(DmDeviceInfo deviceInfo);
+    static void OnLocalDevInfoChange();
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();
