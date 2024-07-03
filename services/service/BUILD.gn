@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
         "${utils_path}/include/appInfo/lite",
         "${utils_path}/include/crypto",
         "${utils_path}/include/fwkload/lite",
-        "${utils_path}/include/timer",
+        "${utils_path}/include/timer/lite",
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/ipc",
         "${innerkits_path}/native_cpp/include/ipc/lite",

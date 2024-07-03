@@ -15,58 +15,56 @@
 
 #include "dm_log.h"
 #include "dm_timer.h"
-
-#include <pthread.h>
-#include <thread>
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t MIN_TIME_OUT = 0;
+const int32_t MAX_TIME_OUT = 300;
+const int32_t MILLISECOND_TO_SECOND = 1000;
 
-constexpr const char* TIMER_RUNNING = "TimerRunning";
-constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
-constexpr int32_t DM_OK = 0;
+CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
+    : AppExecFwk::EventHandler(runner)
+{
+    LOGI("CommonEventHandler constructor");
+}
 
-Timer::Timer(std::string name, int32_t time, TimerCallback callback)
-    : timerName_(name), expire_(steadyClock::now()), state_(true), timeOut_(time), callback_(callback) {};
+bool CommonEventHandler::PostTask(const Callback &callback, const std::string &name, int64_t delayTime)
+{
+    return AppExecFwk::EventHandler::PostTask(callback, name, delayTime);
+}
+
+void CommonEventHandler::RemoveTask(const std::string &name)
+{
+    AppExecFwk::EventHandler::RemoveTask(name);
+}
 
 DmTimer::DmTimer()
 {
+    LOGI("DmTimer constructor");
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    eventHandler_ = std::make_shared<CommonEventHandler>(runner);
 }
 
 DmTimer::~DmTimer()
 {
     LOGI("DmTimer destructor");
     DeleteAll();
-    if (timerState_) {
-        std::unique_lock<std::mutex> locker(timerStateMutex_);
-        stopTimerCondition_.wait(locker, [this] { return static_cast<bool>(!timerState_); });
-    }
 }
 
 int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
-    LOGI("DmTimer StartTimer %{public}s", name.c_str());
     if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
         LOGI("DmTimer StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
+    std::lock_guard<std::mutex> locker(timerMutex_);
+    timerVec_.insert(name);
 
-    std::shared_ptr<Timer> timer = std::make_shared<Timer>(name, timeOut, callback);
-    {
-        std::lock_guard<std::mutex> locker(timerMutex_);
-        timerQueue_.push(timer);
-        timerVec_.emplace_back(timer);
-    }
-
-    if (timerState_) {
-        LOGI("DmTimer is running");
-        return DM_OK;
-    }
-
-    TimerRunning();
-    {
-        std::unique_lock<std::mutex> locker(timerStateMutex_);
-        runTimerCondition_.wait(locker, [this] { return static_cast<bool>(timerState_); });
+    auto taskFunc = [callback, name] () { callback(name); };
+    if (eventHandler_ != nullptr) {
+        eventHandler_->PostTask(taskFunc, name, timeOut * MILLISECOND_TO_SECOND);
     }
     return DM_OK;
 }
@@ -77,13 +75,15 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         LOGE("DmTimer DeleteTimer timer is null");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
-    LOGI("DmTimer DeleteTimer name %{public}s", timerName.c_str());
+    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    for (auto iter : timerVec_) {
-        if (iter != nullptr && iter->timerName_ == timerName) {
-            iter->state_ = false;
-        }
+    if (!timerVec_.empty() && timerVec_.find(timerName) == timerVec_.end()) {
+        LOGI("DmTimer DeleteTimer is not exist.");
+        return ERR_DM_FAILED;
+    }
+    timerVec_.erase(timerName);
+    if (eventHandler_ != nullptr) {
+        eventHandler_->RemoveTask(timerName);
     }
     return DM_OK;
 }
@@ -92,67 +92,18 @@ int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
-    for (auto iter : timerVec_) {
-        LOGI("DmTimer DeleteAll timer.name = %{public}s ", iter->timerName_.c_str());
-        iter->state_ = false;
+    if (eventHandler_ ==  nullptr) {
+        return ERR_DM_FAILED;
     }
+    if (timerVec_.empty()) {
+        LOGI("DmTimer is empty");
+        return DM_OK;
+    }
+    for (auto name : timerVec_) {
+        eventHandler_->RemoveTask(name);
+    }
+    timerVec_.clear();
     return DM_OK;
-}
-
-int32_t DmTimer::TimerRunning()
-{
-    int32_t ret = pthread_setname_np(pthread_self(), TIMER_RUNNING);
-    if (ret != DM_OK) {
-        LOGE("TimerRunning setname failed.");
-    }
-    std::thread([this] () {
-        {
-            timerState_ = true;
-            std::unique_lock<std::mutex> locker(timerStateMutex_);
-            runTimerCondition_.notify_one();
-        }
-        while (!timerQueue_.empty() && timerState_) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TICK_MILLSECONDS));
-            timerMutex_.lock();
-            while (!timerQueue_.empty() && (std::chrono::duration_cast<timerDuration>(steadyClock::now() -
-                timerQueue_.top()->expire_).count() / MILLISECOND_TO_SECOND >= timerQueue_.top()->timeOut_ ||
-                !timerQueue_.top()->state_)) {
-                std::string name = timerQueue_.top()->timerName_;
-                LOGI("DmTimer TimerRunning timer.name = %{public}s", name.c_str());
-                TimerCallback callBack = nullptr;
-                if (timerQueue_.top()->state_) {
-                    callBack = timerQueue_.top()->callback_;
-                }
-                timerQueue_.pop();
-                DeleteVector(name);
-                timerMutex_.unlock();
-                if (callBack != nullptr) {
-                    callBack(name);
-                }
-                timerMutex_.lock();
-                if (timerQueue_.empty()) {
-                    break;
-                }
-            }
-            timerMutex_.unlock();
-        }
-        {
-            timerState_ = false;
-            std::unique_lock<std::mutex> locker(timerStateMutex_);
-            stopTimerCondition_.notify_one();
-        }
-    }).detach();
-    return DM_OK;
-}
-
-void DmTimer::DeleteVector(std::string name)
-{
-    for (auto iter = timerVec_.begin(); iter != timerVec_.end(); ++iter) {
-        if ((*iter)->timerName_ == name) {
-            timerVec_.erase(iter);
-            break;
-        }
-    }
 }
 }
 }
