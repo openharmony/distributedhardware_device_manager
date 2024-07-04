@@ -35,6 +35,7 @@
                 "device_auth",
                 "device_info_manager",
                 "dsoftbus",
+                "eventhandler",
                 "hisysevent",
                 "hitrace",
                 "hilog",

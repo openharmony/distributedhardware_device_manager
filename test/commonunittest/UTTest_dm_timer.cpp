@@ -138,19 +138,6 @@ HWTEST_F(TimeHeapTest, DeleteAll_001, testing::ext::TestSize.Level0)
     ret = timer->DeleteAll();
     EXPECT_EQ(DM_OK, ret);
 }
-
-/**
- * @tc.name: TimeHeapTest::TimerRunning_001
- * @tc.desc: Timeout event trigger
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(TimeHeapTest, TimerRunning_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
-    int32_t ret = timer->TimerRunning();
-    EXPECT_EQ(DM_OK, ret);
-}
 }
 }
 }

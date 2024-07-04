@@ -51,6 +51,7 @@ constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
+static std::mutex g_onlinDeviceNumLock;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -59,6 +60,7 @@ bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
+int32_t g_onlinDeviceNum = 0;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -151,7 +153,11 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
     SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
-    std::thread deviceOnLine(DeviceOnLine, dmDeviceInfo);
+    {
+        std::lock_guard<std::mutex> lock(g_onlinDeviceNumLock);
+        g_onlinDeviceNum++;
+    }
+    std::thread deviceOnLine([&]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("deviceOnLine setname failed.");
@@ -190,9 +196,15 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     SoftbusCache::GetInstance().DeleteDeviceInfo(dmDeviceInfo);
     SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
-    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
+    {
+        std::lock_guard<std::mutex> lock(g_onlinDeviceNumLock);
+        g_onlinDeviceNum--;
+        if (g_onlinDeviceNum == 0) {
+            SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
+        }
+    }
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
-    std::thread deviceOffLine(DeviceOffLine, dmDeviceInfo);
+    std::thread deviceOffLine([&]() { DeviceOffLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
         LOGE("deviceOffLine setname failed.");
@@ -242,12 +254,18 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
-        std::thread deviceInfoChange(DeviceNameChange, dmDeviceInfo);
+        std::thread deviceInfoChange([&]() { DeviceNameChange(dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
         }
         deviceInfoChange.detach();
     }
+}
+
+void SoftbusListener::OnLocalDevInfoChange()
+{
+    LOGI("SoftbusListener::OnLocalDevInfoChange");
+    SoftbusCache::GetInstance().UpDataLocalDevInfo();
 }
 
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
@@ -273,8 +291,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         }
     }
     LOGI("OnSoftbusDeviceFound: devId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
-        "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(), GetAnonyString(dmDevInfo.deviceName).c_str(),
-        dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
+        "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(),
+        GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     CacheDiscoveredDevice(device);

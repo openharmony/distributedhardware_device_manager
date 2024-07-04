@@ -274,7 +274,7 @@ void DmDeviceStateManager::StartEventThread()
 {
     LOGI("StartEventThread begin");
     eventTask_.threadRunning_ = true;
-    eventTask_.queueThread_ = std::thread(&DmDeviceStateManager::ThreadLoop, this);
+    eventTask_.queueThread_ = std::thread([this]() { this->ThreadLoop(); });
     LOGI("StartEventThread complete");
 }
 

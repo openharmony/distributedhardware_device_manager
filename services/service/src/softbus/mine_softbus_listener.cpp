@@ -133,7 +133,7 @@ MineSoftbusListener::MineSoftbusListener()
     {
         std::lock_guard<std::mutex> autoLock(g_matchWaitDeviceLock);
         g_matchDealFlag = true;
-        std::thread(MatchSearchDealTask).detach();
+        std::thread([]() { MatchSearchDealTask(); }).detach();
     }
 #endif
     LOGI("MineSoftbusListener constructor");
@@ -500,7 +500,7 @@ void MineSoftbusListener::SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInf
     subscribeInfo.freq = (ExchangeFreq)dmSubscribeInfo.freq;
     subscribeInfo.isSameAccount = dmSubscribeInfo.isSameAccount;
     subscribeInfo.isWakeRemote = dmSubscribeInfo.isWakeRemote;
-    subscribeInfo.capability = DM_CAPABILITY_OSD;
+    subscribeInfo.capability = dmSubscribeInfo.capability;
     subscribeInfo.capabilityData = nullptr;
     subscribeInfo.dataLen = 0;
 }

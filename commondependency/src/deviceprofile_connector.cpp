@@ -170,7 +170,7 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
         if (trustDeviceId != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
             continue;
         }
-        uint32_t priority = GetAuthForm(item, trustDeviceId, requestDeviceId);
+        uint32_t priority = static_cast<uint32_t>(GetAuthForm(item, trustDeviceId, requestDeviceId));
         if (priority > highestPriority) {
             highestPriority = priority;
         }

@@ -383,7 +383,7 @@ try {
 
 ```
 
-详细接口说明请参考[**API文档**](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-distributedDeviceManager.md)
+详细接口说明请参考[**API文档**](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-distributedservice-kit/js-apis-distributedDeviceManager.md)
 
 ## 系统弹框ServiceExtensionAbility
 
