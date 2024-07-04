@@ -369,6 +369,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
                 listener_->OnDeviceFound(pkgName, subscribeId, info);
                 return;
             }
+            return;
         }
         discoveryContext = iter->second;
     }
