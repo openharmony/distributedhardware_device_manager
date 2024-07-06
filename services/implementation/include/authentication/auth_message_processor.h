@@ -51,6 +51,7 @@ constexpr const char* QR_CODE_KEY = "qrCode";
 constexpr const char* TAG_AUTH_TOKEN = "authToken";
 constexpr const char* NFC_CODE_KEY = "nfcCode";
 constexpr const char* OLD_VERSION_ACCOUNT = "oldVersionAccount";
+constexpr const char* TAG_AUTH_FINISH = "isFinish";
 
 constexpr const char* TAG_HAVE_CREDENTIAL = "haveCredential";
 constexpr const char* TAG_PUBLICKEY = "publicKey";

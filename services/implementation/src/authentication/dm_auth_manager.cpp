@@ -531,7 +531,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
-    CompatiblePutAcl();
+
     int32_t pinCode = -1;
     if (authResponseContext_->isShowDialog) {
         pinCode = GeneratePincode();
@@ -561,7 +561,6 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %{public}d", authTimes_);
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
-        CompatiblePutAcl();
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
             HandleMemberJoinImportAuthCode(requestId, status);
             return;
@@ -1068,6 +1067,7 @@ int32_t DmAuthManager::JoinNetwork()
     LOGI("DmAuthManager JoinNetwork start");
     timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+    authResponseContext_->isFinish = true;
     authRequestContext_->reason = DM_OK;
     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     return DM_OK;
@@ -1123,11 +1123,15 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
+    if (authResponseContext_->isFinish) {
+        CompatiblePutAcl();
+    }
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         authResponseContext_->dmVersion == DM_NEW_VERSION && authResponseContext_->bindLevel == INVALIED_TYPE &&
-        softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
+        softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
+
     DeleteAuthCode();
     if (authResponseState_ != nullptr) {
         SinkAuthenticateFinish();
