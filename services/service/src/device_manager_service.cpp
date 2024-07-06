@@ -167,7 +167,8 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     }
     bool isOnlyShowNetworkId = false;
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %s does not have permission to call GetTrustedDeviceList.", pkgName.c_str());
+        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.",
+            GetAnonyString(pkgName).c_str());
         isOnlyShowNetworkId = true;
     }
     std::vector<DmDeviceInfo> onlineDeviceList;
@@ -248,7 +249,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     LOGI("DeviceManagerService::GetLocalDeviceInfo begin.");
     bool isOnlyShowNetworkId = false;
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call GetTrustedDeviceList.");
+        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
         isOnlyShowNetworkId = true;
     }
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
@@ -719,7 +720,7 @@ int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName
     }
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call RegisterUiStateCallback.",
-            pkgName.c_str());
+            GetAnonyString(pkgName).c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
@@ -733,7 +734,7 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 {
     if (pkgName.empty()) {
         LOGE("DeviceManagerService::UnRegisterUiStateCallback error: Invalid parameter, pkgName: %{public}s",
-            pkgName.c_str());
+            GetAnonyString(pkgName).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!PermissionManager::GetInstance().CheckPermission()) {
