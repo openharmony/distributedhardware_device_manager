@@ -355,7 +355,7 @@ public:
      * @tc.desc: Get Pin Code of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t GetPinCode();
+    int32_t GetPinCode(int32_t &code);
 
     /**
      * @tc.name: DmAuthManager::GenerateGroupName

@@ -1239,14 +1239,16 @@ int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> a
     return DM_OK;
 }
 
-int32_t DmAuthManager::GetPinCode()
+int32_t DmAuthManager::GetPinCode(int32_t &code)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("failed to GetPinCode because authResponseContext_ is nullptr");
-        return ERR_DM_AUTH_NOT_START;
+        code = ERR_DM_AUTH_NOT_START;
+        return ERR_DM_FAILED;
     }
     LOGI("ShowConfigDialog start add member pin code.");
-    return authResponseContext_->code;
+    code = authResponseContext_->code;
+    return DM_OK;
 }
 
 void DmAuthManager::ShowConfigDialog()
