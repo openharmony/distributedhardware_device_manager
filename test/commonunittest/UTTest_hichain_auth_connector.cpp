@@ -62,11 +62,13 @@ public:
         (void)sessionKey;
         (void)sessionKeyLen;
     }
-    int32_t GetPinCode() override
+    int32_t GetPinCode(int32_t &code) override
     {
         if (pinCode == 0) {
+            code = 0;
             return DM_OK;
         }
+        code = ERR_DM_AUTH_NOT_START;
         return ERR_DM_AUTH_NOT_START;
     }
     void GetRemoteDeviceId(std::string &deviceId) override

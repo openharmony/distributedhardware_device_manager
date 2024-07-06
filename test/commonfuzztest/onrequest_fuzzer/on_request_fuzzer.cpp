@@ -45,8 +45,9 @@ public:
         (void)deviceId;
         return "";
     }
-    int32_t GetPinCode() override
+    int32_t GetPinCode(int32_t &code) override
     {
+        (void)code;
         return DM_OK;
     }
 };

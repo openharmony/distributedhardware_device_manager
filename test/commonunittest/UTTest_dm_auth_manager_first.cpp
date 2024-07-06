@@ -260,8 +260,9 @@ HWTEST_F(DmAuthManagerTest, SetAuthResponseState_002, testing::ext::TestSize.Lev
 HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_->code = 123456;
-    int32_t ret = authManager_->GetPinCode();
-    ASSERT_EQ(ret, 123456);
+    int32_t code = 0;
+    authManager_->GetPinCode(code);
+    ASSERT_EQ(code, 123456);
 }
 
 HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
@@ -270,8 +271,9 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
     authManager_->ShowConfigDialog();
     authManager_->ShowAuthInfoDialog();
     authManager_->ShowStartAuthDialog();
-    int32_t ret = authManager_->GetPinCode();
-    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+    int32_t code = 0;
+    authManager_->GetPinCode(code);
+    ASSERT_EQ(code, ERR_DM_AUTH_NOT_START);
 }
 
 HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
-
+const int32_t MAX_BINDTYPE_SIZE = 1000;
 constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
@@ -401,7 +401,6 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
         GetAuthReqMessage(json);
         authResponseContext_->appThumbnail = "";
     }
-
     if (idx < sliceNum && IsString(json, TAG_APP_THUMBNAIL)) {
         std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL].get<std::string>();
         authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
@@ -414,6 +413,10 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(nlohmann::json &json)
     }
     if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
         int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
+        if (bindTypeSize > MAX_BINDTYPE_SIZE) {
+            LOGE("ParseAuthRequestMessage bindTypeSize is over size.");
+            return ERR_DM_FAILED;
+        }
         authResponseContext_->bindType.clear();
         for (int32_t item = 0; item < bindTypeSize; item++) {
             std::string itemStr = std::to_string(item);
@@ -491,6 +494,10 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
     }
     if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
         int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
+        if (bindTypeSize > MAX_BINDTYPE_SIZE) {
+            LOGE("ParsePkgNegotiateMessage bindTypeSize is over size.");
+            return;
+        }
         authResponseContext_->bindType.clear();
         for (int32_t item = 0; item < bindTypeSize; item++) {
             std::string itemStr = std::to_string(item);
