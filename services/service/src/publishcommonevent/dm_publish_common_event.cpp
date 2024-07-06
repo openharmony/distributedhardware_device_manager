@@ -167,7 +167,7 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     }
 #endif // SUPPORT_WIFI
 
-    std::thread dealThread([&]() { callback_(bluetoothState_, wifiState_, screenState_); });
+    std::thread dealThread([=]() { callback_(bluetoothState_, wifiState_, screenState_); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");
