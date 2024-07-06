@@ -748,7 +748,7 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
             item.GetTrustDeviceId() != srcUdid)) {
             continue;
         }
-        if (SingleUserProcess(item, caller, calee)) {
+        if (SingleUserProcess(item, caller, callee)) {
             return DM_OK;
         }
     }
@@ -759,7 +759,7 @@ bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::A
     const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
     LOGI("DeviceProfileConnector::SingleUserProcess bindType %{public}d, bindLevel %{public}d",
-        profile.GetBindType(), GetBindType.GetBindLevel());
+        profile.GetBindType(), profile.GetBindLevel());
     uint32_t bindType = profile.GetBindType();
     bool ret = false;
     switch (bindType) {

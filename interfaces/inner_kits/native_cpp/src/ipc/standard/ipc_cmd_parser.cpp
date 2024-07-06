@@ -126,7 +126,7 @@ bool EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel)
     bRet = (bRet && parcel.WriteString(caller.networkId));
     bRet = (bRet && parcel.WriteInt32(caller.userId));
     bRet = (bRet && parcel.WriteUint64(caller.tokenId));
-    bRet = (bRet && parcel.WriteUint64(caller.extra));
+    bRet = (bRet && parcel.WriteString(caller.extra));
     return bRet;
 }
 
@@ -136,7 +136,7 @@ bool EncodeDmAccessCallee(const DmAccessCallee &callee, MessageParcel &parcel)
     bRet = (bRet && parcel.WriteString(callee.accountId));
     bRet = (bRet && parcel.WriteString(callee.networkId));
     bRet = (bRet && parcel.WriteString(callee.peerId));
-    bRet = (bRet && parcel.WriteString(callee.userId));
+    bRet = (bRet && parcel.WriteInt32(callee.userId));
     bRet = (bRet && parcel.WriteString(callee.extra));
     return bRet;
 }
