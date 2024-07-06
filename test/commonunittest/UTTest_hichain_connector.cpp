@@ -63,7 +63,8 @@ public:
     }
     int32_t GetPinCode(int32_t &code)
     {
-        code = 123456;
+        int32_t pinCode = 123456;
+        code = pinCode;
         return DM_OK;
     }
 };
