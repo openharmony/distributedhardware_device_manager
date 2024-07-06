@@ -1400,7 +1400,7 @@ bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, cons
     if (!IsDMServiceImplReady()) {
         LOGE("CheckIsSameAccount failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
-    }
+    } 
     std::string srcUdid = "";
     SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
     std::string sinkUdid = "";

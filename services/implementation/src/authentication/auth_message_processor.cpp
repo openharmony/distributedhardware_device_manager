@@ -24,7 +24,6 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
-const int32_t MAX_BINDTYPE_SIZE = 1000;
 constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
@@ -492,9 +491,6 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
     if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
         int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
         authResponseContext_->bindType.clear();
-        if (bindTypeSize > MAX_BINDTYPE_SIZE) {
-            return;
-        }
         for (int32_t item = 0; item < bindTypeSize; item++) {
             std::string itemStr = std::to_string(item);
             if (IsInt32(json, itemStr)) {
