@@ -734,12 +734,12 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 {
     if (pkgName.empty()) {
         LOGE("DeviceManagerService::UnRegisterUiStateCallback error: Invalid parameter, pkgName: %{public}s",
-            GetAnonyString(pkgName).c_str());
+            pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnRegisterUiStateCallback.",
-            pkgName.c_str());
+            GetAnonyString(pkgName).c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
