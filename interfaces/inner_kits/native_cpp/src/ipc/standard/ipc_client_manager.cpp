@@ -108,12 +108,12 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("UnInit in, pkgName %{public}s", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
         return ERR_DM_INIT_FAILED;
     }
 
-    std::lock_guard<std::mutex> autoLock(lock_);
     if (dmListener_.count(pkgName) > 0) {
         std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
         std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -159,15 +159,18 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 int32_t IpcClientManager::OnDmServiceDied()
 {
     LOGI("IpcClientManager::OnDmServiceDied begin");
-    if (dmInterface_ == nullptr) {
-        LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
-        return ERR_DM_POINT_NULL;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (dmInterface_ == nullptr) {
+            LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
+            return ERR_DM_POINT_NULL;
+        }
+        if (dmRecipient_ != nullptr) {
+            dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
+            dmRecipient_ = nullptr;
+        }
+        dmInterface_ = nullptr;
     }
-    if (dmRecipient_ != nullptr) {
-        dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
-        dmRecipient_ = nullptr;
-    }
-    dmInterface_ = nullptr;
     LOGI("IpcClientManager::OnDmServiceDied complete");
     return DM_OK;
 }
