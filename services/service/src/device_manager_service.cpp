@@ -88,7 +88,7 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     if (publshCommonEventManager_ == nullptr) {
         publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
     }
-    PublishEventCallback callback = [&](const auto &arg1, const auto &arg2, const auto &arg3) {
+    PublishEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
         OHOS::DistributedHardware::PublishCommonEventCallback(arg1, arg2, arg3);
     };
     std::vector<std::string> PublishCommonEventVec;
@@ -1429,7 +1429,7 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     if (accountCommonEventManager_ == nullptr) {
         accountCommonEventManager_ = std::make_shared<DmAccountCommonEventManager>();
     }
-    AccountEventCallback callback = [&](const auto &arg1, const auto &arg2) {
+    AccountEventCallback callback = [=](const auto &arg1, const auto &arg2) {
         this->AccountCommonEventCallback(arg1, arg2);
     };
     std::vector<std::string> AccountCommonEventVec;
@@ -1448,7 +1448,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     if (screenCommonEventManager_ == nullptr) {
         screenCommonEventManager_ = std::make_shared<DmScreenCommonEventManager>();
     }
-    ScreenEventCallback callback = [&](const auto &arg1) { this->ScreenCommonEventCallback(arg1); };
+    ScreenEventCallback callback = [=](const auto &arg1) { this->ScreenCommonEventCallback(arg1); };
     std::vector<std::string> screenEventVec;
     screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {

@@ -157,7 +157,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         std::lock_guard<std::mutex> lock(g_onlinDeviceNumLock);
         g_onlinDeviceNum++;
     }
-    std::thread deviceOnLine([&]() { DeviceOnLine(dmDeviceInfo); });
+    std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("deviceOnLine setname failed.");
@@ -204,7 +204,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
         }
     }
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
-    std::thread deviceOffLine([&]() { DeviceOffLine(dmDeviceInfo); });
+    std::thread deviceOffLine([=]() { DeviceOffLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
         LOGE("deviceOffLine setname failed.");
@@ -254,7 +254,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
-        std::thread deviceInfoChange([&]() { DeviceNameChange(dmDeviceInfo); });
+        std::thread deviceInfoChange([=]() { DeviceNameChange(dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
         }
