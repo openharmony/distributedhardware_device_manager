@@ -146,6 +146,10 @@ public:
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
     int32_t IsSameAccount(const std::string &udid);
     int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
+    int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
@@ -159,6 +163,8 @@ private:
         DmDiscoveryInfo discoveryInfo);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
+    bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const DmAccessCallee &callee);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

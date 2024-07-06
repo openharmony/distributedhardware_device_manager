@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
-
+const int32_t MAX_BINDTYPE_SIZE = 1000;
 constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
@@ -77,6 +77,10 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 {
     LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
     std::vector<std::string> jsonStrVec;
+    if (authRequestContext_ == nullptr || authResponseContext_ == nullptr) {
+        LOGE("AuthMessageProcessor::CreateAuthRequestMessage authRequestContext_ is nullptr.");
+        return jsonStrVec;
+    }
     int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
     int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
     nlohmann::json jsonObj;
@@ -492,6 +496,9 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
     if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
         int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].get<int32_t>();
         authResponseContext_->bindType.clear();
+        if (bindTypeSize > MAX_BINDTYPE_SIZE) {
+            return;
+        }
         for (int32_t item = 0; item < bindTypeSize; item++) {
             std::string itemStr = std::to_string(item);
             if (IsInt32(json, itemStr)) {

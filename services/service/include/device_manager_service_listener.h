@@ -86,6 +86,7 @@ private:
         const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
         const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
+    std::string ComposeOnlinekey(const std::string &pkgName, const std::string &devId);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

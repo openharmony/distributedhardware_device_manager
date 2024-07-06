@@ -65,6 +65,19 @@ public:
     void RegisterPinHolderCallback(const std::string &pkgName, std::shared_ptr<PinHolderCallback> callback);
 
 public:
+    static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
+    static void DeviceInfoOffline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
+    static void DeviceInfoChanged(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
+    static void DeviceInfoReady(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
+    static void DeviceBasicInfoOnline(const DmDeviceBasicInfo &deviceBasicInfo,
+        std::shared_ptr<DeviceStatusCallback> tempCbk);
+    static void DeviceBasicInfoOffline(const DmDeviceBasicInfo &deviceBasicInfo,
+        std::shared_ptr<DeviceStatusCallback> tempCbk);
+    static void DeviceBasicInfoChanged(const DmDeviceBasicInfo &deviceBasicInfo,
+        std::shared_ptr<DeviceStatusCallback> tempCbk);
+    static void DeviceBasicInfoReady(const DmDeviceBasicInfo &deviceBasicInfo,
+        std::shared_ptr<DeviceStatusCallback> tempCbk);
+public:
     void OnRemoteDied();
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo);
@@ -91,7 +104,6 @@ public:
     void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
                           const std::string &content);
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
-
 private:
 #if !defined(__LITEOS_M__)
     std::mutex lock_;

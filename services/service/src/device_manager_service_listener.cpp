@@ -74,6 +74,11 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetDeviceBasicInfo(deviceBasicInfo);
 }
 
+std::string DeviceManagerServiceListener::ComposeOnlinekey(const std::string &pkgName, const std::string &devId)
+{
+    return pkgName + "_" + devId;
+}
+
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -82,24 +87,37 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
     if (state == DEVICE_STATE_OFFLINE) {
-        {
-            std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
-            alreadyOnlineSet_.clear();
+        for (const auto &it : PkgNameVec) {
+            std::string notifyKey = ComposeOnlinekey(it, std::string(info.deviceId));
+            {
+                std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
+                alreadyOnlineSet_.erase(notifyKey);
+            }
+            SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     }
-    for (const auto &it : PkgNameVec) {
-        std::string notifyKey =  it + "_" + info.deviceId;
-        DmDeviceState notifyState = state;
-        {
-            std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
-            if (state == DEVICE_STATE_ONLINE && alreadyOnlineSet_.find(notifyKey) != alreadyOnlineSet_.end()) {
-                notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
-            } else if (state == DEVICE_STATE_ONLINE) {
-                alreadyOnlineSet_.insert(notifyKey);
+    if (state == DEVICE_STATE_ONLINE) {
+        for (const auto &it : PkgNameVec) {
+            std::string notifyKey = ComposeOnlinekey(it, std::string(info.deviceId));
+            DmDeviceState notifyState = state;
+            {
+                std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
+                if (alreadyOnlineSet_.find(notifyKey) != alreadyOnlineSet_.end()) {
+                    notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
+                } else {
+                    alreadyOnlineSet_.insert(notifyKey);
+                }
             }
+            SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
-        SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
-        ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
+    if (state == DEVICE_INFO_READY) {
+        for (const auto &it : PkgNameVec) {
+            SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+        }
     }
 }
 

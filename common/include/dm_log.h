@@ -35,7 +35,6 @@ namespace DistributedHardware {
 
 #define LOGE(fmt, ...) HILOG_ERROR(LOG_CORE, \
     "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_LOG_H
