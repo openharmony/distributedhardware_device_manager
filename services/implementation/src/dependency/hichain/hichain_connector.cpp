@@ -442,7 +442,7 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_FAILED_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
-            hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_FAILED);
+            hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_ADD_GROUP_FAILED);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
@@ -828,7 +828,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
         usleep(DELAY_TIME_MS);
         if (++nTickTimes > SERVICE_INIT_TRY_MAX_NUM) {
             LOGE("failed to create group because timeout!");
-            return ERR_DM_FAILED;
+            return ERR_DM_CREATE_GROUP_FAILED;
         }
     }
     return DM_OK;
@@ -927,7 +927,7 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
     int32_t ret = deviceGroupManager_->addMultiMembersToGroup(osAccountUserId, DM_PKG_NAME, addParams.c_str());
     if (ret != DM_OK) {
         LOGE("[HICHAIN]fail to add member to hichain group with ret:%{public}d.", ret);
-        return ret;
+        return ERR_DM_ADD_GROUP_FAILED;
     }
     return DM_OK;
 }

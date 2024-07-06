@@ -134,11 +134,11 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
         peerDevId = peerDeviceId;
         LOGI("[SOFTBUS]GetPeerDeviceId success for session: %{public}d, peerDeviceId: %{public}s.", sessionId,
             GetAnonyString(peerDevId).c_str());
-        return ERR_DM_FAILED;
+        return DM_OK;
     }
     LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d, ret: %{public}d.", sessionId, ret);
     peerDevId = "";
-    return DM_OK;
+    return ret;
 }
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
@@ -157,18 +157,20 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SendData Start encryption.");
     }
-    if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
+    int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
+    if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed.");
-        return ERR_DM_FAILED;
+        return ret;
     }
     return DM_OK;
 }
 
 int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &message)
 {
-    if (SendBytes(sessionId, message.c_str(), strlen(message.c_str())) != DM_OK) {
+    int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
+    if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendHeartbeatData failed.");
-        return ERR_DM_FAILED;
+        return ret;
     }
     return DM_OK;
 }
@@ -236,7 +238,7 @@ int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
     int32_t socket = Socket(info);
     if (socket <= 0) {
         LOGE("[SOFTBUS]create socket failed, socket: %{public}d", socket);
-        return ERR_DM_FAILED;
+        return socket;
     }
 
     int32_t ret = Bind(socket, g_qosInfo, g_qosTVParamIndex, &iSocketListener_);
@@ -245,7 +247,7 @@ int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
             GetAnonyString(netWorkId).c_str(), socket);
         sessionCallback_->BindSocketFail();
         Shutdown(socket);
-        return ERR_DM_FAILED;
+        return ret;
     }
     LOGI("OpenUnbindSession success. socket: %{public}d.", socket);
     sessionCallback_->BindSocketSuccess(socket);

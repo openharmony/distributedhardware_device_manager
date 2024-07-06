@@ -94,13 +94,13 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgname, c
     int32_t socket = Socket(info);
     if (socket <= 0) {
         LOGE("[SOFTBUS]create socket failed, socket: %{public}d", socket);
-        return ERR_DM_FAILED;
+        return socket;
     }
     int32_t ret = Listen(socket, g_qosInfo, g_qosTVParamIndex, &iSocketListener_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]Socket Listen failed, ret: %{public}d, socket: %{public}d.", ret, socket);
         Shutdown(socket);
-        return ERR_DM_FAILED;
+        return ret;
     }
     LOGI("SoftbusAdapter::CreateSoftbusSessionServer success.");
     return DM_OK;
@@ -109,9 +109,10 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgname, c
 int32_t SoftbusAdapter::RemoveSoftbusSessionServer(const std::string &pkgname, const std::string &sessionName)
 {
     LOGI("SoftbusAdapter::RemoveSoftbusSessionServer");
-    if (RemoveSessionServer(pkgname.c_str(), sessionName.c_str()) != DM_OK) {
+    int32_t ret = RemoveSessionServer(pkgname.c_str(), sessionName.c_str());
+    if (ret != DM_OK) {
         LOGE("RemoveSoftbusSessionServer failed.");
-        return ERR_DM_FAILED;
+        return ret;
     }
     LOGI("SoftbusAdapter::RemoveSoftbusSessionServer success.");
     return DM_OK;

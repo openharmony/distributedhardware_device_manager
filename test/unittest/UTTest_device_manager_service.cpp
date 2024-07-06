@@ -154,7 +154,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestS
 
 /**
  * @tc.name: StopDeviceDiscovery_001
- * @tc.desc: Stop device discovery and return ERR_DM_STOP_REFRESH_LNN_FAILED
+ * @tc.desc: Stop device discovery and return SOFTBUS_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -164,7 +164,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSi
     uint16_t subscribeId = 1;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 /**
@@ -218,7 +218,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::Tes
 /**
  * @tc.name: PublishDeviceDiscovery_003
  * @tc.desc: Call PublishDeviceDiscovery twice with pkgName not null and flag bit not false and return
- * ERR_DM_START_ADVERTISING_FAILED
+ * SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -229,12 +229,12 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::Tes
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "1com.ohos.test1";
     ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
 }
 
 /**
  * @tc.name: UnPublishDeviceDiscovery_001
- * @tc.desc: UnPublish device discovery and return ERR_DM_STOP_PUBLISH_LNN_FAILED
+ * @tc.desc: UnPublish device discovery and return SOFTBUS_ERR
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -243,7 +243,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::T
     std::string pkgName = "com.ohos.test";
     int32_t publishId = 1;
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 /**
@@ -1544,7 +1544,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1561,7 +1561,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1641,7 +1641,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
@@ -1842,7 +1842,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     std::string invalidNetworkId = "12345";
     int32_t securityLevel = -1;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level0)

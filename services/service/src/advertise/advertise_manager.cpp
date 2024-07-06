@@ -59,7 +59,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     int32_t ret = softbusListener_->PublishSoftbusLNN(dmPubInfo, capability, customData);
     if (ret != DM_OK) {
         LOGE("StartAdvertising failed, softbus publish lnn ret: %{public}d", ret);
-        return ERR_DM_START_ADVERTISING_FAILED;
+        return ret;
     }
 
     if (advertiseParam.find(PARAM_KEY_AUTO_STOP_ADVERTISE) != advertiseParam.end()) {
