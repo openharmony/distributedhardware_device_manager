@@ -91,6 +91,7 @@ public:
     void ParseAuthResponseMessageExt(nlohmann::json &json);
     
 private:
+    std::string CreateRequestAuthMessage(nlohmann::json &json);
     void CreateNegotiateMessage(nlohmann::json &json);
     void CreateRespNegotiateMessage(nlohmann::json &json);
     void CreateSyncGroupMessage(nlohmann::json &json);
