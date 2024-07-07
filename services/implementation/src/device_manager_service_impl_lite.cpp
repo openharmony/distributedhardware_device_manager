@@ -468,6 +468,26 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     (void)commonEventType;
 }
 
+int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

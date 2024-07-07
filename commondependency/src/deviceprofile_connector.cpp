@@ -737,6 +737,78 @@ bool DeviceProfileConnector::IsTrustDevice(AccessControlProfile profile, const s
     return false;
 }
 
+int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    LOGI("DeviceProfileConnector::CheckAccessControl pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    for (auto &item : profiles) {
+        if (item.GetStatus() != ACTIVE || (item.GetTrustDeviceId() != sinkUdid &&
+            item.GetTrustDeviceId() != srcUdid)) {
+            continue;
+        }
+        if (SingleUserProcess(item, caller, callee)) {
+            return DM_OK;
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
+bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
+    const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("DeviceProfileConnector::SingleUserProcess bindType %{public}d, bindLevel %{public}d",
+        profile.GetBindType(), profile.GetBindLevel());
+    uint32_t bindType = profile.GetBindType();
+    bool ret = false;
+    switch (bindType) {
+        case DM_IDENTICAL_ACCOUNT:
+            ret = true;
+            break;
+        case DM_POINT_TO_POINT:
+            if (profile.GetBindLevel() == DEVICE || profile.GetBindLevel() == SERVICE) {
+                ret = true;
+            } else if (profile.GetBindLevel() == APP &&
+                profile.GetAccesser().GetAccesserBundleName() == caller.pkgName) {
+                ret = true;
+            }
+            break;
+        case DM_ACROSS_ACCOUNT:
+            if (profile.GetBindLevel() == DEVICE || profile.GetBindLevel() == SERVICE) {
+                ret = true;
+            } else if (profile.GetBindLevel() == APP &&
+                profile.GetAccesser().GetAccesserBundleName() == caller.pkgName) {
+                ret = true;
+            }
+            break;
+        default:
+            LOGE("unknown bind type %{public}d.", bindType);
+            break;
+    }
+    return ret;
+}
+
+int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    LOGI("DeviceProfileConnector::CheckAccessControl pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    for (auto &item : profiles) {
+        if (item.GetStatus() != ACTIVE || (item.GetTrustDeviceId() != sinkUdid &&
+            item.GetTrustDeviceId() != srcUdid)) {
+            continue;
+        }
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            LOGI("The udid %{public}s is identical bind.", GetAnonyString(item.GetTrustDeviceId()).c_str());
+            return DM_OK;
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

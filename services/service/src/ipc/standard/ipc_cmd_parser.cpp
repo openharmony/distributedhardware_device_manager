@@ -98,14 +98,19 @@ void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
 {
     caller.accountId = parcel.ReadString();
     caller.pkgName = parcel.ReadString();
+    caller.networkId = parcel.ReadString();
     caller.userId = parcel.ReadInt32();
     caller.tokenId = parcel.ReadUint64();
+    caller.extra = parcel.ReadString();
 }
 
 void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
 {
+    callee.accountId = parcel.ReadString();
     callee.networkId = parcel.ReadString();
     callee.peerId = parcel.ReadString();
+    callee.userId = parcel.ReadInt32();
+    callee.extra = parcel.ReadString();
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)

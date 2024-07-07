@@ -344,13 +344,18 @@ const std::string DEVICE_TYPE_2IN1_STRING = "2IN1";
 typedef struct DmAccessCaller {
     std::string accountId;
     std::string pkgName;
+    std::string networkId;
     int32_t userId;
     uint64_t tokenId;
+    std::string extra;
 } DmAccessCaller;
 
 typedef struct DmAccessCallee {
+    std::string accountId;
     std::string networkId;
     std::string peerId;
+    int32_t userId;
+    std::string extra;
 } DmAccessCallee;
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1423,9 +1423,11 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
         LOGE("CheckAccessControl failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), udid);
-    return dmServiceImpl_->CheckRelatedDevice(udid, caller.pkgName);
+    std::string srcUdid = "";
+    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
+    std::string sinkUdid = "";
+    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
+    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
 }
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
@@ -1438,9 +1440,11 @@ bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, cons
         LOGE("CheckIsSameAccount failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string udid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), udid);
-    return dmServiceImpl_->IsSameAccount(udid);
+    std::string srcUdid = "";
+    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
+    std::string sinkUdid = "";
+    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
+    return dmServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
 int32_t DeviceManagerService::InitAccountInfo()
