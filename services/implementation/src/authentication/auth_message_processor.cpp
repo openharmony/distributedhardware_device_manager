@@ -260,6 +260,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(nlohmann::json &json)
 void AuthMessageProcessor::CreateResponseFinishMessage(nlohmann::json &json)
 {
     json[TAG_REPLY] = authResponseContext_->reply;
+    json[TAG_AUTH_FINISH] = authResponseContext_->isFinish;
 }
 
 int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
@@ -350,6 +351,9 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
 {
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
+    }
+    if (IsBool(json, TAG_AUTH_FINISH)) {
+        authResponseContext_->isFinish = json[TAG_AUTH_FINISH].get<bool>();
     }
 }
 

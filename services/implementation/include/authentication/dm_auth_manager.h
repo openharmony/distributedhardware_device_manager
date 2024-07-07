@@ -179,6 +179,7 @@ typedef struct DmAuthResponseContext {
     std::string targetDeviceName;
     std::string importAuthCode;
     std::string hostPkgLabel;
+    bool isFinish = false;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
