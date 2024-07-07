@@ -280,7 +280,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device state callback is nullptr.");
         return;
     }
-    std::thread deviceOnline(DeviceInfoOnline, deviceInfo, tempCbk);
+    std::thread deviceOnline([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
         LOGE("DeviceInfoOnline set name failed.");
     }
@@ -308,7 +308,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device status callback is nullptr.");
         return;
     }
-    std::thread deviceOnline(DeviceBasicInfoOnline, deviceBasicInfo, tempCbk);
+    std::thread deviceOnline([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
         LOGE("DeviceInfoOnline set name failed.");
     }
@@ -336,7 +336,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOffline error, registered device state callback is nullptr.");
         return;
     }
-    std::thread deviceOffline(DeviceInfoOffline, deviceInfo, tempCbk);
+    std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
         LOGE("DeviceInfoOffline set name failed.");
     }
@@ -364,7 +364,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOffline error, registered device status callback is nullptr.");
         return;
     }
-    std::thread deviceOffline(DeviceBasicInfoOffline, deviceBasicInfo, tempCbk);
+    std::thread deviceOffline([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
         LOGE("DeviceInfoOffline set name failed.");
     }
@@ -392,7 +392,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-    std::thread deviceChanged(DeviceInfoChanged, deviceInfo, tempCbk);
+    std::thread deviceChanged([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
         LOGE("deviceChanged set name failed.");
     }
@@ -420,7 +420,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-    std::thread deviceChanged(DeviceBasicInfoChanged, deviceBasicInfo, tempCbk);
+    std::thread deviceChanged([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
         LOGE("deviceChanged set name failed.");
     }
@@ -448,7 +448,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-    std::thread deviceReady(DeviceInfoReady, deviceInfo, tempCbk);
+    std::thread deviceReady([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
         LOGE("deviceReady set name failed.");
     }
@@ -476,7 +476,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device status callback is nullptr.");
         return;
     }
-    std::thread deviceReady(DeviceBasicInfoReady, deviceBasicInfo, tempCbk);
+    std::thread deviceReady([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
         LOGE("deviceReady set name failed.");
     }
