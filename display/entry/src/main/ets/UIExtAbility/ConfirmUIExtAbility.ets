@@ -15,6 +15,7 @@
 import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility'
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import Want from '@ohos.app.ability.Want';
+import deviceInfo from '@ohos.deviceInfo';
 const TAG: string = '[DeviceManagerUI:Confirm]==>'
 
 export default class ConfirmUIExtAbility extends UIExtensionAbility {
@@ -43,7 +44,11 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
             'session': session
         }
         let storage: LocalStorage = new LocalStorage(param);
-        session.loadContent('pages/ConfirmDialog', storage);
+        if (deviceInfo.deviceType === 'wearable') {
+            session.loadContent('pages/ConfirmDialogWearable', storage);
+        } else {
+            session.loadContent('pages/ConfirmDialog', storage);
+        }
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);

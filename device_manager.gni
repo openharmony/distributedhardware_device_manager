@@ -34,6 +34,7 @@ fuzz_test_output_path = "device_manager/device_manager"
 dm_ldflags = [ "-lpthread" ]
 declare_args() {
   device_manager_no_interaction_auth = false
+  dhdm_feature_product = "default"
 
   if (!defined(global_parts_info) ||
       defined(global_parts_info.account_os_account)) {

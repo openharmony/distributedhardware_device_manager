@@ -3,6 +3,9 @@
     "pages/ConfirmDialog",
     "pages/PinDialog",
     "pages/InputPinDialog",
-    "pages/BluetoothDialog"
+    "pages/BluetoothDialog",
+    "pages/ConfirmDialogWearable",
+    "pages/PinDialogWearable",
+    "pages/InputPinDialogWearable"
   ]
 }

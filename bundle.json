@@ -10,6 +10,9 @@
     },
     "dirs": {},
     "scripts": {},
+    "features": [
+      "dhdm_feature_product"
+    ],
     "component": {
         "name": "device_manager",
         "subsystem": "distributedhardware",
