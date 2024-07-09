@@ -32,7 +32,7 @@ struct Index {
   @State isTimes: number = 3;
   @State passwordCircle: string[] = ['', '', '', '', '', ''];
   @State errorTips: Resource = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
-  @State @Watch("onChangeInput") input: string = '';
+  @State @Watch('onChangeInput') input: string = '';
   private keyboards: string[][] = [
     ['1', '2', '3'],
     ['4', '5', '6'],
