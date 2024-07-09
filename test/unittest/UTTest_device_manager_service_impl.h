@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "device_manager_service_impl.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {

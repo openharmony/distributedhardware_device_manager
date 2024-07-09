@@ -179,14 +179,14 @@ HWTEST_F(SoftbusListenerTest, PublishSoftbusLNN_001, testing::ext::TestSize.Leve
     std::string capability;
     std::string customData;
     int32_t ret = softbusListener->PublishSoftbusLNN(dmPubInfo, capability, customData);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
 {
     int32_t publishId = 1;
     int32_t ret = softbusListener->StopPublishSoftbusLNN(publishId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, RegisterSoftbusLnnOpsCbk_001, testing::ext::TestSize.Level0)
@@ -217,7 +217,7 @@ HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_001, testing::ext::TestSize.Lev
     char *networkId = nullptr;
     std::string udid;
     int32_t ret = softbusListener->GetUdidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
@@ -225,7 +225,7 @@ HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Lev
     char *networkId = nullptr;
     std::string udid;
     int32_t ret = softbusListener->GetUuidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
@@ -241,7 +241,7 @@ HWTEST_F(SoftbusListenerTest, GetNetworkTypeByNetworkId_001, testing::ext::TestS
     char *networkId;
     int32_t networkType = -1;
     int32_t ret = softbusListener->GetNetworkTypeByNetworkId(networkId, networkType);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level0)

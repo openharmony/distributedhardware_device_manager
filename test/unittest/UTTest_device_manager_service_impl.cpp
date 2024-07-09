@@ -648,7 +648,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_004, testing::ex
 
 /**
  * @tc.name: StartDeviceDiscovery_001
- * @tc.desc: return SOFTBUS_IPC_ERR
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_001, testing::ext::TestSize.Level0)
@@ -657,7 +657,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_001, testing::ext::T
     uint16_t subscribeId = 0;
     std::string filterOptions;
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
@@ -676,7 +676,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_002, testing::ext::T
 
 /**
  * @tc.name: StartDeviceDiscovery_003
- * @tc.desc: return SOFTBUS_INVALID_PARAM
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_003, testing::ext::TestSize.Level0)
@@ -685,7 +685,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_003, testing::ext::T
     DmSubscribeInfo subscribeInfo;
     std::string extra;
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
@@ -717,7 +717,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_001, testing::ext::Te
 
 /**
  * @tc.name: StopDeviceDiscovery_002
- * @tc.desc: return SOFTBUS_IPC_ERR
+ * @tc.desc: return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_002, testing::ext::TestSize.Level0)
@@ -725,7 +725,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_002, testing::ext::Te
     std::string pkgName = "com.ohos.test";
     uint16_t subscribeId = 1;
     int32_t ret = deviceManagerServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
 }
 
 /**
@@ -743,7 +743,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_001, testing::ext:
 
 /**
  * @tc.name: PublishDeviceDiscovery_002
- * @tc.desc: return SOFTBUS_INVALID_PARAM
+ * @tc.desc: return ERR_DM_PUBLISH_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
@@ -751,7 +751,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_002, testing::ext:
     std::string pkgName = "com.ohos.test";
     DmPublishInfo publishInfo;
     int32_t ret = deviceManagerServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
 
 /**
@@ -769,7 +769,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_001, testing::ex
 
 /**
  * @tc.name: UnPublishDeviceDiscovery_002
- * @tc.desc: return SOFTBUS_IPC_ERR
+ * @tc.desc: return ERR_DM_PUBLISH_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
@@ -777,7 +777,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_002, testing::ex
     std::string pkgName = "com.ohos.test";
     int32_t publishId = 1;
     int32_t ret = deviceManagerServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
 
 /**

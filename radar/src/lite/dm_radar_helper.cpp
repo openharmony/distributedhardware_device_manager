@@ -157,6 +157,11 @@ std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
     return GetAnonyUdid(std::string(udidHash));
 }
 
+int32_t DmRadarHelper::GetErrorCode(int32_t errCode, int32_t module)
+{
+    return ErrCodeOffset(SUBSYS_DISTRIBUTEDHARDWARE_DM, module) + errCode;
+}
+
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)
 {
     if (udid.empty() || udid.length() < INVALID_UDID_LENGTH) {

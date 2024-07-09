@@ -27,7 +27,6 @@
 #include "parameter.h"
 #include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -755,7 +754,7 @@ HWTEST_F(MineSoftbusListenerTest, PublishDeviceDiscovery_001, testing::ext::Test
 {
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->PublishDeviceDiscovery();
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_SOFTBUS_PUBLISH_SERVICE);
 }
 
 HWTEST_F(MineSoftbusListenerTest, MatchSearchDealTask_001, testing::ext::TestSize.Level0)

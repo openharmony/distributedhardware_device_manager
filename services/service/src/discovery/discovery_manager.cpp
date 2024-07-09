@@ -100,7 +100,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
     }
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     return DM_OK;
@@ -171,7 +171,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
             StartDiscovering4MetaType(pkgName, dmSubInfo, discoverParam);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
-        return ret;
+        return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
 }
@@ -223,7 +223,7 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
     int32_t ret = mineSoftbusListener_->RefreshSoftbusLNN(pkgName, searchJson, dmSubInfo);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
-        return ret;
+        return ERR_DM_START_DISCOVERING_FAILED;
     }
     return ret;
 }

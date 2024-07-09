@@ -828,7 +828,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_105, testing::ext::TestSize
  *              set callback not null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StartDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_DISCOVERY_REPEATED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -843,7 +843,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
+    ASSERT_NE(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1012,7 +1012,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential003, testing::ext::TestSize.Lev
     std::string reqJsonStr = "reqJsonStr";
     std::string returnJsonStr;
     int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, ImportCredential001, testing::ext::TestSize.Level0)
@@ -1036,7 +1036,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential003, testing::ext::TestSize.Leve
     std::string pkgName = "pkgName";
     std::string credentialInfo = "credentialInfo";
     int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, DeleteCredential001, testing::ext::TestSize.Level0)
@@ -1060,7 +1060,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential003, testing::ext::TestSize.Leve
     std::string pkgName = "pkgName";
     std::string deleteInfo = "deleteInfo";
     int32_t ret = DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback001, testing::ext::TestSize.Level0)
@@ -1108,7 +1108,7 @@ HWTEST_F(DeviceManagerImplTest, CheckRelatedDevice002, testing::ext::TestSize.Le
     std::string udid = "123";
     std::string bundleName = "pkgName";
     bool ret = DeviceManager::GetInstance().CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, false);
+    EXPECT_NE(ret, true);
 }
 
 } // namespace

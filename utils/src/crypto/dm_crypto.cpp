@@ -26,9 +26,9 @@ constexpr int WIDTH = 4;
 constexpr unsigned char MASK = 0x0F;
 constexpr int DEC_MAX_NUM = 10;
 constexpr int HEX_MAX_BIT_NUM = 4;
-constexpr uint32_t ERR_DM_FAILED = 96929744;
+constexpr uint32_t ERR_DM_FAILED = -20000;
 constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
+constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 

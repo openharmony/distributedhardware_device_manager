@@ -33,7 +33,6 @@
 #include "softbus_session_callback.h"
 #include "dm_auth_manager.h"
 #include "auth_response_state.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {

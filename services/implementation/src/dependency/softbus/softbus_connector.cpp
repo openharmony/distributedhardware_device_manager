@@ -139,7 +139,7 @@ int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
     int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]PublishLNN failed, ret %{public}d.", ret);
-        return ret;
+        return ERR_DM_PUBLISH_FAILED;
     }
     return ret;
 }
@@ -150,7 +150,7 @@ int32_t SoftbusConnector::UnPublishDiscovery(int32_t publishId)
     int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopPublishLNN failed with ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_PUBLISH_FAILED;
     }
     return ret;
 }
@@ -184,7 +184,7 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_DISCOVERY_FAILED;
     }
     return ret;
 }
@@ -218,7 +218,7 @@ int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_DISCOVERY_FAILED;
     }
     return ret;
 }
@@ -241,7 +241,7 @@ int32_t SoftbusConnector::StopDiscovery(uint16_t subscribeId)
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_DISCOVERY_FAILED;
     }
     return ret;
 }
