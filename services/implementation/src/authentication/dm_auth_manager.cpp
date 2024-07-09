@@ -248,10 +248,10 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         return ERR_DM_FAILED;
     }
     if (authRequestState_!= nullptr || authResponseContext_ != nullptr) {
-        if (isAuthenticateDevice_ && authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
+        if (isAuthenticateDevice_) {
             LOGI("Stop previous AuthenticateDevice.");
             authRequestContext_->reason = STOP_BIND;
-            authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE_DONE;
+            authResponseContext_->state = authRequestState_->GetStateType();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return DM_OK;
         } else {
@@ -294,10 +294,10 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
         return ERR_DM_FAILED;
     }
     if (authRequestState_!= nullptr || authResponseContext_ != nullptr) {
-        if (isAuthenticateDevice_ && authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_NEGOTIATE_DONE) {
+        if (isAuthenticateDevice_) {
             LOGI("Stop previous AuthenticateDevice.");
             authRequestContext_->reason = STOP_BIND;
-            authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE_DONE;
+            authResponseContext_->state = authRequestState_->GetStateType();
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return DM_OK;
         } else {
