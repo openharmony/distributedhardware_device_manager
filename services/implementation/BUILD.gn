@@ -218,7 +218,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    if (support_screenlock) {
+    if (support_screenlock && device_manager_feature_product == "default") {
       defines += [ "SUPPORT_SCREENLOCK" ]
       external_deps += [ "screenlock_mgr:screenlock_client" ]
     }

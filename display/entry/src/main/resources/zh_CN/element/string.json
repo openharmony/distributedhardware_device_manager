@@ -75,6 +75,10 @@
         {
             "name":"dm_bluetooth_dialog_close",
             "value":"知道了"
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"输入对端连接码"
         }
     ]
 }

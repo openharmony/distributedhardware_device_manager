@@ -15,6 +15,7 @@
 import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility'
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import Want from '@ohos.app.ability.Want';
+import deviceInfo from '@ohos.deviceInfo';
 const TAG = '[DeviceManagerUI:PinCode]==>';
 
 export default class InputUIExtAbility extends UIExtensionAbility {
@@ -28,7 +29,11 @@ export default class InputUIExtAbility extends UIExtensionAbility {
             'session': session
         }
         let storage: LocalStorage = new LocalStorage(param);
-        session.loadContent('pages/PinDialog', storage);
+        if (deviceInfo.deviceType === 'wearable') {
+            session.loadContent('pages/PinDialogWearable', storage);
+        } else {
+            session.loadContent('pages/PinDialog', storage);
+        }
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
