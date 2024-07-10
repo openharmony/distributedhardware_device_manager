@@ -217,76 +217,89 @@ struct Index {
     this.destruction();
   }
 
+  @Builder
+  Symbol() {
+    Shape() {
+      Circle()
+        .width(52)
+        .height(52)
+        .fill($r('sys.color.ohos_id_color_activated'))
+      Column() {
+        SymbolGlyph(this.getImages(this.peerDeviceType))
+          .fontSize('36vp')
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+          .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
+          .offset({ x: 8, y: 8 })
+      }
+    }
+    .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
+    .margin({ bottom: 12, top: 6 })
+  }
+
+  @Builder
+  Title() {
+    Column() {
+      Text(this.title)
+        .textAlign(TextAlign.Center)
+        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+        .fontWeight(FontWeight.Regular)
+        .fontColor('#FFFFFF')
+        .width('auto')
+      Text(this.peerCustomDescription)
+        .textAlign(TextAlign.Center)
+        .fontColor('#99FFFFFF')
+        .fontWeight(FontWeight.Regular)
+        .fontSize($r('sys.float.ohos_id_text_size_body3'))
+        .width('auto')
+        .margin({ top: 2 })
+        .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
+    }.margin({
+      top: this.isAvailableType ? 0 : 6,
+      bottom: 12, left: 26, right: 26 })
+  }
+
+  @Builder
+  Buttons() {
+    Column() {
+      Button($r('app.string.dm_allow_always'))
+        .margin({ bottom: 12 })
+        .onClick(() => {
+          this.onAllowAlways();
+        })
+        .fontColor('#FFFFFF')
+        .fontSize($r('sys.float.ohos_id_text_size_button2'))
+        .height(40)
+        .width('100%')
+        .backgroundColor('#1F71FF')
+      Button($r('app.string.dm_allow_temp'))
+        .margin({ bottom: 12 })
+        .onClick(() => {
+          this.onAllowOnce();
+        })
+        .fontColor('#5EA1FF')
+        .fontSize($r('sys.float.ohos_id_text_size_button2'))
+        .height(40)
+        .width('100%')
+        .backgroundColor('#405ea1ff')
+      Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+        .onClick(() => {
+          this.onCancel();
+        })
+        .fontColor('#5EA1FF')
+        .fontSize($r('sys.float.ohos_id_text_size_button2'))
+        .height(40)
+        .width('100%')
+        .backgroundColor('#405ea1ff')
+    }
+    .margin({ left: 50, right: 50, bottom: 36})
+  }
+
   build() {
     Scroll() {
       Column() {
-        Shape() {
-          Circle()
-            .width(52)
-            .height(52)
-            .fill($r('sys.color.ohos_id_color_activated'))
-          Column() {
-            SymbolGlyph(this.getImages(this.peerDeviceType))
-              .fontSize('36vp')
-              .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-              .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
-              .offset({ x: 8, y: 8 })
-          }
-        }
-        .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
-        .margin({ bottom: 12, top: 6 })
-
-        Column() {
-          Text(this.title)
-            .textAlign(TextAlign.Center)
-            .fontSize($r('sys.float.ohos_id_text_size_body2'))
-            .fontWeight(FontWeight.Regular)
-            .fontColor('#FFFFFF')
-            .width('auto')
-          Text(this.peerCustomDescription)
-            .textAlign(TextAlign.Center)
-            .fontColor('#99FFFFFF')
-            .fontWeight(FontWeight.Regular)
-            .fontSize($r('sys.float.ohos_id_text_size_body3'))
-            .width('auto')
-            .margin({ top: 2 })
-            .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
-        }.margin({
-          top: this.isAvailableType ? 0 : 6,
-          bottom: 12, left: 26, right: 26 })
-        
-        Column() {
-          Button($r('app.string.dm_allow_always'))
-            .margin({ bottom: 12 })
-            .onClick(() => {
-              this.onAllowAlways();
-            })
-            .fontColor('#FFFFFF')
-            .fontSize($r('sys.float.ohos_id_text_size_button2'))
-            .height(40)
-            .width('100%')
-            .backgroundColor('#1F71FF')
-          Button($r('app.string.dm_allow_temp'))
-            .margin({ bottom: 12 })
-            .onClick(() => {
-              this.onAllowOnce();
-            })
-            .fontColor('#5EA1FF')
-            .fontSize($r('sys.float.ohos_id_text_size_button2'))
-            .height(40)
-            .width('100%')
-            .backgroundColor('#405ea1ff')
-          Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
-            .onClick(() => {
-              this.onCancel();
-            })
-            .fontColor('#5EA1FF')
-            .fontSize($r('sys.float.ohos_id_text_size_button2'))
-            .height(40)
-            .width('100%')
-            .backgroundColor('#405ea1ff')
-        }
-        .margin({ left: 50, right: 50, bottom: 36})
+        this.Symbol();
+        this.Title();
+        this.Buttons();
       }
     }
     .backgroundColor(Color.Black)
