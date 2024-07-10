@@ -20,7 +20,6 @@
 #include "nlohmann/json.hpp"
 #include "softbus_adapter.h"
 #include "softbus_connector.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,7 +42,7 @@ HWTEST_F(SoftbusAdapterTest, CreateSoftbusSessionServer_001, testing::ext::TestS
     std::string pkgName;
     std::string sessionName;
     int32_t ret = SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(pkgName, sessionName);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusAdapterTest, RemoveSoftbusSessionServer_001, testing::ext::TestSize.Level0)
@@ -51,7 +50,7 @@ HWTEST_F(SoftbusAdapterTest, RemoveSoftbusSessionServer_001, testing::ext::TestS
     std::string pkgName;
     std::string sessionName;
     int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(pkgName, sessionName);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusAdapterTest, OnSoftbusSessionOpened_001, testing::ext::TestSize.Level0)

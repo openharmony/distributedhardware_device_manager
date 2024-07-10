@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
 constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_FAILED = 96929744;
+constexpr int32_t ERR_DM_FAILED = -20000;
 namespace {
 static DumperInfo g_dumperDeviceType[] = {
     {DEVICE_TYPE_UNKNOWN, "DEVICE_TYPE_UNKNOWN"},

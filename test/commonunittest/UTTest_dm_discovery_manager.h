@@ -25,7 +25,6 @@
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "softbus_connector.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {

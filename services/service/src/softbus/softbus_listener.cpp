@@ -435,7 +435,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]RefreshLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_REFRESH_LNN_FAILED;
     }
     return DM_OK;
 }
@@ -461,7 +461,7 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     }
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopRefreshLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_STOP_REFRESH_LNN_FAILED;
     }
     return DM_OK;
 }
@@ -487,7 +487,7 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]PublishLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_PUBLISH_FAILED;
     }
     return DM_OK;
 }
@@ -498,7 +498,7 @@ int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
     int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
     return DM_OK;
 }

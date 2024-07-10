@@ -25,7 +25,6 @@
 #include "device_manager.h"
 #include "single_instance.h"
 #include "device_manager_impl.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -26,7 +26,7 @@ const std::string FILTER_OP_KEY = "filter_op";
 const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
 const int32_t DM_OK = 0;
-const int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
+const int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
 enum DmDiscoveryDeviceFilter {
     DM_INVALID_DEVICE = 0,
     DM_VALID_DEVICE = 1,

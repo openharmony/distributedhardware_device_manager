@@ -24,7 +24,6 @@
 #include "device_manager_service_listener.h"
 #include "dm_publish_manager.h"
 #include "ipc_notify_publish_result_req.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {

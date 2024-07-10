@@ -66,7 +66,7 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_FAILED;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     nodeInfo = localDeviceInfo_;
@@ -95,7 +95,7 @@ int32_t SoftbusCache::GetUdidByNetworkId(const char *networkId, std::string &udi
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_FAILED;
     }
     udid = reinterpret_cast<char *>(mUdid);
     return ret;
@@ -107,7 +107,7 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_FAILED;
     }
     uuid = reinterpret_cast<char *>(mUuid);
     return ret;
@@ -333,10 +333,9 @@ int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDevi
             }
         }
     }
-    int32_t ret = GetDevInfoFromBus(networkId, nodeInfo);
-    if (ret != DM_OK) {
+    if (GetDevInfoFromBus(networkId, nodeInfo) != DM_OK) {
         LOGE("GetDevInfoFromBus failed.");
-        return ret;
+        return ERR_DM_FAILED;
     }
     SaveDeviceInfo(nodeInfo);
     return DM_OK;
@@ -349,7 +348,7 @@ int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceIn
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ret;
+        return ERR_DM_FAILED;
     }
     for (int32_t i = 0; i < nodeInfoCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;

@@ -30,7 +30,6 @@
 #include "dm_subscribe_info.h"
 #include "inner_session.h"
 #include "session.h"
-#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
