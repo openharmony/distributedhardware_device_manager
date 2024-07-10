@@ -34,10 +34,13 @@ static IPublishCb softbusPublishCallback_ = {
     .OnPublishResult = SoftbusPublish::OnSoftbusPublishResult,
 };
 
+std::mutex g_publishMutex;
+
 void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
 {
     LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d",
         bluetoothState, wifiState, screenState);
+    std::lock_guard<std::mutex> saLock(g_publishMutex);
     SoftbusPublish softbusPublish;
     if (screenState == DM_SCREEN_OFF) {
         int32_t ret = softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);

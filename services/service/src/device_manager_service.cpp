@@ -30,9 +30,17 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "multiple_user_connector.h"
-#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
+#include "power_mgr_client.h"
+#if defined(SUPPORT_BLUETOOTH)
 #include "softbus_publish.h"
-#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+#include "bluetooth_def.h"
+#include "bluetooth_host.h"
+#endif // SUPPORT_BLUETOOTH
+#if defined(SUPPORT_WIFI)
+#include "softbus_publish.h"
+#include "wifi_device.h"
+#include "wifi_msg.h"
+#endif // SUPPORT_WIFI
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -74,6 +82,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
+    QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
     LOGI("SoftbusListener init success.");
@@ -105,6 +114,44 @@ void DeviceManagerService::SubscribePublishCommonEvent()
         LOGI("subscribe ble and wifi and screen common event success");
     }
     return;
+}
+#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+#endif
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
+void DeviceManagerService::QueryDependsSwitchState()
+{
+    LOGI("DeviceManagerService::QueryDependsSwitchState start.");
+    std::shared_ptr<DmPublishEventSubscriber> publisSubScriber = publshCommonEventManager_->GetSubscriber();
+    if (publisSubScriber == nullptr) {
+        LOGE("publisSubScriber is nullptr.");
+        return;
+    }
+#ifdef SUPPORT_BLUETOOTH
+    if (Bluetooth::BluetoothHost::GetDefaultHost().IsBleEnabled()) {
+        publisSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON));
+    } else {
+        publisSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
+    }
+#endif // SUPPORT_BLUETOOTH
+
+#ifdef SUPPORT_WIFI
+    bool isWifiActive = false;
+    Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
+    if (isWifiActive) {
+        publisSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
+    } else {
+        publisSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
+    }
+#endif // SUPPORT_WIFI
+    if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
+        publisSubScriber->SetScreenState(DM_SCREEN_ON);
+    } else {
+        publisSubScriber->SetScreenState(DM_SCREEN_OFF);
+    }
+    OHOS::DistributedHardware::PublishCommonEventCallback(publisSubScriber->GetBluetoothState(),
+        publisSubScriber->GetWifiState(), publisSubScriber->GetScreenState());
 }
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif

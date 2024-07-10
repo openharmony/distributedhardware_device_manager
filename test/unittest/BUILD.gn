@@ -1086,6 +1086,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "hitrace:hitrace_meter",
+    "power_manager:powermgr_client",
   ]
 }
 

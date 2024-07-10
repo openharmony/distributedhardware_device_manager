@@ -45,6 +45,12 @@ public:
     ~DmPublishEventSubscriber() override = default;
     std::vector<std::string> GetSubscriberEventNameVec() const;
     void OnReceiveEvent(const CommonEventData &data) override;
+    void SetWifiState(const int32_t wifiState);
+    int32_t GetWifiState();
+    void SetBluetoothState(const int32_t bluetoothState);
+    int32_t GetBluetoothState();
+    void SetScreenState(const int32_t screenState);
+    int32_t GetScreenState();
 
 private:
     std::vector<std::string> eventNameVec_;
@@ -52,6 +58,9 @@ private:
     int32_t bluetoothState_ { -1 };
     int32_t screenState_ = DM_SCREEN_UNKNOWN;
     PublishEventCallback callback_;
+    std::mutex wifiStateMutex_;
+    std::mutex bluetoothStateMutex_;
+    std::mutex screenStateMutex_;
 };
 
 class DmPublishCommonEventManager {
@@ -61,11 +70,14 @@ public:
     bool SubscribePublishCommonEvent(const std::vector<std::string> &eventNameVec,
         const PublishEventCallback &callback);
     bool UnsubscribePublishCommonEvent();
+    void SetSubscriber(std::shared_ptr<DmPublishEventSubscriber> subscriber);
+    std::shared_ptr<DmPublishEventSubscriber> GetSubscriber();
 
 private:
     std::vector<std::string> eventNameVec_;
     bool eventValidFlag_ = false;
     std::mutex evenSubscriberMutex_;
+    std::mutex subscriberMutex_;
     std::shared_ptr<DmPublishEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     int32_t counter_ = 0;

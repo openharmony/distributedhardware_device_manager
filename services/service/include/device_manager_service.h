@@ -207,6 +207,7 @@ private:
     void ScreenCommonEventCallback(std::string commonEventType);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
+    void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
 

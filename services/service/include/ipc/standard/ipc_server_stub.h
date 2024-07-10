@@ -20,8 +20,8 @@
 #include <memory>
 #include <mutex>
 #include <tuple>
+#include <unordered_set>
 #include <vector>
-#include <set>
 
 #include "ipc_remote_broker.h"
 #include "ipc_req.h"
@@ -160,6 +160,8 @@ private:
     mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
     std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
+    std::mutex dependsSASetLock_;
+    std::unordered_set<int32_t> dependsSASet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
