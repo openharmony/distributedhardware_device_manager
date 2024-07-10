@@ -192,11 +192,20 @@ struct Index {
   }
 
   @Builder
+  processKey(key: string) {
+    if (key === 'x') {
+      this.SymbolDelete();
+    } else {
+      this.keyBuilder(key);
+    }
+  }
+
+  @Builder
   keyboardMocker() {
     Grid() {
       ForEach(this.keyboards, (keysArr: string[]) => {
         ForEach(keysArr, (key: string) => {
-          key === 'x' ? this.SymbolDelete() : this.keyBuilder(key);
+          this.processKey();
         })
       })
     }
