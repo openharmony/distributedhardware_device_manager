@@ -205,7 +205,7 @@ struct Index {
     Grid() {
       ForEach(this.keyboards, (keysArr: string[]) => {
         ForEach(keysArr, (key: string) => {
-          this.processKey();
+          this.processKey(key);
         })
       })
     }
