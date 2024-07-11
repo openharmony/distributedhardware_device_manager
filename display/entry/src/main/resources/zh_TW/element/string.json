@@ -30,7 +30,7 @@
         },
         {
             "name":"dm_confirm_title_cast",
-            "value":"%s想要螢幕投影至本機。是否信任此裝置？"
+            "value":"%s 想要螢幕投影至本機。是否信任此裝置？"
         },
         {
             "name":"dm_is_trust_device",

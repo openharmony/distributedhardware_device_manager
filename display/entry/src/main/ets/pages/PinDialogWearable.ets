@@ -35,6 +35,7 @@ struct PinDialog {
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
     console.log(TAG + 'this.pinCodeArr' + this.pinCodeArr);
+    this.initStatue();
   }
 
   aboutToDisappear() {
@@ -176,8 +177,8 @@ struct PinDialog {
             .fontColor('#FFFFFF')
             .backgroundColor(Color.Transparent)
             .onClick(() => {
-              this.destruction();
               this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+              this.destruction();
             })
             .offset({ y: -5 })
         }

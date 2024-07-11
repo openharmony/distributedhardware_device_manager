@@ -75,10 +75,6 @@
         {
             "name":"dm_bluetooth_dialog_close",
             "value":"OK"
-        },
-        {
-            "name":"dm_enter_peer_connect_code",
-            "value":"Enter the peer connection code"
         }
     ]
 }
