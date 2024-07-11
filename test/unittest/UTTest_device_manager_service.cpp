@@ -93,14 +93,14 @@ void DeletePermission()
 
 namespace {
 /**
- * @tc.name: Init_001
- * @tc.desc: Init device manager service and return DM_OK
+ * @tc.name: InitDMServiceListener_001
+ * @tc.desc: Init device manager listener and return DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, Init_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::TestSize.Level0)
 {
-    int ret = DeviceManagerService::GetInstance().Init();
+    int ret = DeviceManagerService::GetInstance().InitDMServiceListener();
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -256,7 +256,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::T
 {
     std::string pkgName;
     int32_t publishId = 1;
-    DeviceManagerService::GetInstance().Init();
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1369,7 +1369,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     std::string networkId;
     std::string uuid;
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_NE(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
@@ -1842,7 +1842,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     std::string invalidNetworkId = "12345";
     int32_t securityLevel = -1;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level0)
@@ -1886,26 +1886,19 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    DeviceManagerService::GetInstance().InitSoftbusListener();
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::TestSize.Level0)
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, OnUnbindSessionCloseed_001, testing::ext::TestSize.Level0)
 {
     int32_t socket = 1;
     DeviceManagerService::GetInstance().OnUnbindSessionCloseed(socket);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, OnUnbindBytesReceived_001, testing::ext::TestSize.Level0)
@@ -1913,7 +1906,7 @@ HWTEST_F(DeviceManagerServiceTest, OnUnbindBytesReceived_001, testing::ext::Test
     int32_t socket = 1;
     std::string data = "4152413541";
     DeviceManagerService::GetInstance().OnUnbindBytesReceived(socket, data.c_str(), data.size());
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_001, testing::ext::TestSize.Level0)

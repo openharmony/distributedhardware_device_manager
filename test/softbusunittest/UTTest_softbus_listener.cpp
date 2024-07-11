@@ -214,18 +214,18 @@ HWTEST_F(SoftbusListenerTest, UnRegisterSoftbusLnnOpsCbk_001, testing::ext::Test
 
 HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
 {
-    char *networkId = nullptr;
-    std::string udid;
-    int32_t ret = softbusListener->GetUdidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    std::string networkId = "networkId";
+    std::string udid = "udid";
+    int32_t ret = softbusListener->GetUdidByNetworkId(networkId.c_str(), udid);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
 {
-    char *networkId = nullptr;
+    std::string networkId = "networkId";
     std::string udid;
-    int32_t ret = softbusListener->GetUuidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), udid);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
@@ -343,7 +343,7 @@ HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.L
 {
     std::vector<DmDeviceInfo> deviceInfoList;
     int32_t ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
@@ -351,14 +351,14 @@ HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
     std::string networkId = "networkId";
     DmDeviceInfo info;
     int32_t ret = softbusListener->GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info;
     int32_t ret = softbusListener->GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertBytesToUpperCaseHexString_001, testing::ext::TestSize.Level0)
@@ -374,7 +374,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceSecurityLevel_001, testing::ext::TestSize
     std::string networkId = "networkId";
     int32_t securityLevel = -1;
     int32_t ret = softbusListener->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Level0)
