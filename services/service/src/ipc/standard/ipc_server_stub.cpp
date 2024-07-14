@@ -55,20 +55,49 @@ void IpcServerStub::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
 
     LOGI("called:AddAbilityListener begin!");
-    AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
+
+    {
+        std::lock_guard<std::mutex> lock(dependsSASetLock_);
+        dependsSASet_.emplace(SOFTBUS_SERVER_SA_ID);
+        dependsSASet_.emplace(POWER_MANAGER_SERVICE_ID);  // power
+#ifdef SUPPORT_BLUETOOTH
+        dependsSASet_.emplace(BLUETOOTH_HOST_SYS_ABILITY_ID); // ble
+#endif // SUPPORT_BLUETOOTH
+
+#ifdef SUPPORT_WIFI
+        dependsSASet_.emplace(WIFI_DEVICE_SYS_ABILITY_ID); // wifi
+#endif // SUPPORT_WIFI
+    }
+
+    AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
+    AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
+#ifdef SUPPORT_BLUETOOTH
+    AddSystemAbilityListener(BLUETOOTH_HOST_SYS_ABILITY_ID);  // ble
+#endif // SUPPORT_BLUETOOTH
+#ifdef SUPPORT_WIFI
+    AddSystemAbilityListener(WIFI_DEVICE_SYS_ABILITY_ID);  // wifi
+#endif // SUPPORT_WIFI
     LOGI("called:AddAbilityListener end!");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
-        DeviceManagerService::GetInstance().InitSoftbusListener();
-    } else if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+    {
+        std::lock_guard<std::mutex> lock(dependsSASetLock_);
+        if (dependsSASet_.find(systemAbilityId) != dependsSASet_.end()) {
+            dependsSASet_.erase(systemAbilityId);
+            if (dependsSASet_.empty()) {
+                DeviceManagerService::GetInstance().InitSoftbusListener();
+            }
+        }
+    }
+
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         int pid = getpid();
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {

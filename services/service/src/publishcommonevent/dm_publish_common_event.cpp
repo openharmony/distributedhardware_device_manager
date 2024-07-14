@@ -90,6 +90,7 @@ bool DmPublishCommonEventManager::SubscribePublishCommonEvent(const std::vector<
     }
     eventNameVec_ = eventNameVec;
     eventValidFlag_ = true;
+    SetSubscriber(subscriber_);
     LOGI("success to subscribe ble/wifi/screen commom event name size: %{public}zu", eventNameVec.size());
     return true;
 }
@@ -130,40 +131,97 @@ bool DmPublishCommonEventManager::UnsubscribePublishCommonEvent()
     return true;
 }
 
+void DmPublishCommonEventManager::SetSubscriber(std::shared_ptr<DmPublishEventSubscriber> subscriber)
+{
+    std::lock_guard<std::mutex> lock(subscriberMutex_);
+    subscriber_ = subscriber;
+}
+
+std::shared_ptr<DmPublishEventSubscriber> DmPublishCommonEventManager::GetSubscriber()
+{
+    std::lock_guard<std::mutex> lock(subscriberMutex_);
+    return subscriber_;
+}
+
+void DmPublishEventSubscriber::SetWifiState(const int32_t wifiState)
+{
+    std::lock_guard<std::mutex> lock(wifiStateMutex_);
+    wifiState_ = wifiState;
+}
+
+int32_t DmPublishEventSubscriber::GetWifiState()
+{
+    std::lock_guard<std::mutex> lock(wifiStateMutex_);
+    return wifiState_;
+}
+
+void DmPublishEventSubscriber::SetBluetoothState(const int32_t bluetoothState)
+{
+    std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+    bluetoothState_ = bluetoothState;
+}
+
+int32_t DmPublishEventSubscriber::GetBluetoothState()
+{
+    std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+    return bluetoothState_;
+}
+
+void DmPublishEventSubscriber::SetScreenState(const int32_t screenState)
+{
+    std::lock_guard<std::mutex> lock(screenStateMutex_);
+    screenState_ = screenState;
+}
+
+int32_t DmPublishEventSubscriber::GetScreenState()
+{
+    std::lock_guard<std::mutex> lock(screenStateMutex_);
+    return screenState_;
+}
+
 void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     int32_t eventState = data.GetCode();
     LOGI("On Received receiveEvent: %{public}s, eventState: %{public}d", receiveEvent.c_str(), eventState);
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-        screenState_ = DM_SCREEN_ON;
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        screenState_ = DM_SCREEN_OFF;
+    {
+        std::lock_guard<std::mutex> lock(screenStateMutex_);
+        if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+            screenState_ = DM_SCREEN_ON;
+        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+            screenState_ = DM_SCREEN_OFF;
+        }
     }
 
 #ifdef SUPPORT_BLUETOOTH
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
-        eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
-        bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
-        eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF)) {
-        bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE) {
-        LOGI("bluetooth eventState: %{public}d", eventState);
-        return;
+    {
+        std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+        if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
+            eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
+            bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON);
+        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
+            eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF)) {
+            bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF);
+        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE) {
+            LOGI("bluetooth eventState: %{public}d", eventState);
+            return;
+        }
     }
 #endif // SUPPORT_BLUETOOTH
 
 #ifdef SUPPORT_WIFI
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
-        eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
-        wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
-        eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED)) {
-        wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE) {
-        LOGI("wifi eventState: %{public}d", eventState);
-        return;
+    {
+        std::lock_guard<std::mutex> lock(wifiStateMutex_);
+        if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
+            eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
+            wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED);
+        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
+            eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED)) {
+            wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED);
+        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE) {
+            LOGI("wifi eventState: %{public}d", eventState);
+            return;
+        }
     }
 #endif // SUPPORT_WIFI
 

@@ -50,6 +50,7 @@
                 "node",
                 "openssl",
                 "os_account",
+                "power_manager",
                 "safwk",
                 "samgr",
                 "resource_management",
