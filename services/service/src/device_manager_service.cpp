@@ -30,7 +30,9 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "multiple_user_connector.h"
+#if defined(SUPPORT_POWER_MANAGER)
 #include "power_mgr_client.h"
+#endif // SUPPORT_POWER_MANAGER
 #if defined(SUPPORT_BLUETOOTH)
 #include "softbus_publish.h"
 #include "bluetooth_def.h"
@@ -145,11 +147,16 @@ void DeviceManagerService::QueryDependsSwitchState()
         publisSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
     }
 #endif // SUPPORT_WIFI
+
+#ifdef SUPPORT_POWER_MANAGER
     if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
         publisSubScriber->SetScreenState(DM_SCREEN_ON);
     } else {
         publisSubScriber->SetScreenState(DM_SCREEN_OFF);
     }
+#else
+    publisSubScriber->SetScreenState(DM_SCREEN_ON);
+#endif // SUPPORT_POWER_MANAGER
     OHOS::DistributedHardware::PublishCommonEventCallback(publisSubScriber->GetBluetoothState(),
         publisSubScriber->GetWifiState(), publisSubScriber->GetScreenState());
 }

@@ -53,6 +53,7 @@ public:
     int32_t GetScreenState();
 
 private:
+    void SetScreenEventState(const std::string &receiveEvent);
     std::vector<std::string> eventNameVec_;
     int32_t wifiState_ { -1 };
     int32_t bluetoothState_ { -1 };
