@@ -26,8 +26,8 @@
 #if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
-#include "ipc_notify_device_state_req.h"
 #endif
+#include "ipc_notify_device_state_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -86,7 +86,7 @@ private:
         const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
         const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    std::string ComposeOnlinekey(const std::string &pkgName, const std::string &devId);
+    std::string ComposeOnlineKey(const std::string &pkgName, const std::string &devId);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

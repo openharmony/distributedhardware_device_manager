@@ -14,10 +14,10 @@
  */
 
 #include "softbus_adapter.h"
-#include "dm_log.h"
+
 #include <securec.h>
 #include <unistd.h>
-
+#include "dm_log.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 #include "device_manager_service.h"

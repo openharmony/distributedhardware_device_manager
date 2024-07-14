@@ -93,8 +93,6 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 
 DmAuthManager::~DmAuthManager()
 {
-    delete[] sessionKey_;
-    sessionKey_ = nullptr;
     LOGI("DmAuthManager destructor");
 }
 
@@ -781,9 +779,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 
 void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
 {
-    if (authResponseContext_->cryptoSupport) {
-        isCryptoSupport_ = true;
-    }
+    LOGI("ProcessAuthRequest start.");
     if (authResponseContext_->isOnline && softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
         authResponseContext_->isOnline = true;
     } else {
@@ -952,6 +948,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     } else {
         return ConfirmProcess(action);
     }
+    return DM_OK;
 }
 
 void DmAuthManager::StartRespAuthProcess()
@@ -1052,7 +1049,6 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
 
 std::string DmAuthManager::GetConnectAddr(std::string deviceId)
 {
-    LOGI("DmAuthManager::GetConnectAddr");
     std::string connectAddr;
     if (softbusConnector_->GetConnectAddr(deviceId, connectAddr) == nullptr) {
         LOGE("DmAuthManager::GetConnectAddr error");
@@ -1541,6 +1537,14 @@ int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::str
 int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
+    struct RadarInfo info = {
+        .funcName = "AuthenticateDevice",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
+    };
+    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
+        LOGE("ReportDiscoverUserRes failed");
+    }
     if (pkgName.empty()) {
         LOGE("DmAuthManager::BindTarget failed, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1691,6 +1695,21 @@ bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
         return false;
     }
     return true;
+}
+
+std::string DmAuthManager::GenerateBindResultContent()
+{
+    nlohmann::json jsonObj;
+    jsonObj[DM_BIND_RESULT_NETWORK_ID] = authResponseContext_->networkId;
+    if (remoteDeviceId_.empty()) {
+        jsonObj[TAG_DEVICE_ID] = "";
+    } else {
+        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        Crypto::GetUdidHash(remoteDeviceId_, reinterpret_cast<uint8_t *>(deviceIdHash));
+        jsonObj[TAG_DEVICE_ID] = deviceIdHash;
+    }
+    std::string content = jsonObj.dump();
+    return content;
 }
 
 void DmAuthManager::RequestCredential()
@@ -1989,8 +2008,7 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
         LOGE("DmAuthManager::onTransmit requestId %{public}" PRId64 "is error.", requestId);
         return;
     }
-    sessionKey_ = new unsigned char[sessionKeyLen];
-    memcpy_s(sessionKey_, sessionKeyLen, sessionKey, sessionKeyLen);
+    sessionKey_ = sessionKey;
     sessionKeyLen_ = sessionKeyLen;
 }
 
@@ -2158,17 +2176,14 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
     if (authResponseContext_->localAccountId == accountId && accountId != "ohosAnonymousUid") {
         authResponseContext_->isIdenticalAccount = true;
     }
-
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->localAccountId = accountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
     authResponseContext_->localUserId = userId;
-
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
     authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
-
     authResponseContext_->bindType =
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->localDeviceId, authResponseContext_->deviceId);
@@ -2176,14 +2191,12 @@ void DmAuthManager::ProRespNegotiateExt(const int32_t &sessionId)
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     authResponseContext_->haveCredential =
         hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId, authResponseContext_->localUserId);
-
     if (!IsAuthTypeSupported(authResponseContext_->authType)) {
         LOGE("DmAuthManager::AuthenticateDevice authType %{public}d not support.", authResponseContext_->authType);
         authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
     } else {
         authPtr_ = authenticationMap_[authResponseContext_->authType];
     }
-
     if (IsAuthCodeReady(authResponseContext_->hostPkgName)) {
         authResponseContext_->isAuthCodeReady = true;
     } else {
@@ -2230,21 +2243,6 @@ void DmAuthManager::ProRespNegotiate(const int32_t &sessionId)
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
     message = jsonObject.dump();
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-}
-
-std::string DmAuthManager::GenerateBindResultContent()
-{
-    nlohmann::json jsonObj;
-    jsonObj[DM_BIND_RESULT_NETWORK_ID] = authResponseContext_->networkId;
-    if (remoteDeviceId_.empty()) {
-        jsonObj[TAG_DEVICE_ID] = "";
-    } else {
-        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        Crypto::GetUdidHash(remoteDeviceId_, reinterpret_cast<uint8_t *>(deviceIdHash));
-        jsonObj[TAG_DEVICE_ID] = deviceIdHash;
-    }
-    std::string content = jsonObj.dump();
-    return content;
 }
 
 void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message)

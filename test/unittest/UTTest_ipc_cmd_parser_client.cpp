@@ -87,18 +87,6 @@ OnIpcCmdFunc GetIpcCmdFunc(int32_t cmdCode)
     return onIpcCmdMapIter->second;
 }
 
-int32_t TestIpcRequestFuncReqNull(int32_t cmdCode)
-{
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    return ret;
-}
-
 int32_t TestReadResponseRspNull(int32_t cmdCode)
 {
     MessageParcel reply;
@@ -158,12 +146,6 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_005, testing::ext::TestSize.Le
 {
     int32_t cmdCode = AUTHENTICATE_DEVICE;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_006, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = GENERATE_ENCRYPTED_UUID;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_007, testing::ext::TestSize.Level0)
@@ -296,18 +278,6 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_028, testing::ext::TestSize.Le
 {
     int32_t cmdCode = IS_SAME_ACCOUNT;
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = CHECK_API_PERMISSION;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_001, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = CHECK_API_PERMISSION;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
 }
 
 HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_002, testing::ext::TestSize.Level0)

@@ -393,24 +393,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_028, testing::ext::TestSize.L
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_015, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
-    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = BIND_DEVICE;

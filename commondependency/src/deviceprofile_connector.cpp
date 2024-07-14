@@ -19,8 +19,8 @@
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
-
 #include "distributed_device_profile_client.h"
+
 using namespace OHOS::DistributedDeviceProfile;
 
 namespace OHOS {
@@ -86,8 +86,7 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     std::vector<int32_t> bindTypes;
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) !=
-            DM_OK) {
+        if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
             LOGE("get deviceIdHash by deviceId: %{public}s failed.", GetAnonyString(deviceIdHash).c_str());
             return ERR_DM_FAILED;
         }
@@ -133,12 +132,12 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
     if (profiles.GetBindLevel() == APP) {
         if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
-            LOGI("The found device is app bind-level.");
+            LOGI("The found device is src app bind-level.");
             return form;
         }
         if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
-            LOGI("The found device is app bind-level.");
+            LOGI("The found device is sink app bind-level.");
             return form;
         }
     }
@@ -337,7 +336,6 @@ void DeviceProfileConnector::ProcessBindType(AccessControlProfile profiles, DmDi
 std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
     std::string localDeviceId, std::string targetDeviceId)
 {
-    LOGI("SyncAclByBindType start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<int32_t> sinkBindType;
@@ -696,47 +694,6 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     return ERR_DM_FAILED;
 }
 
-int32_t DeviceProfileConnector::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
-{
-    LOGI("DeviceProfileConnector::CheckRelatedDevice start, bundleName %{public}s, udid %{public}s", bundleName.c_str(),
-        GetAnonyString(udid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("CheckRelatedDevice profiles size is %{public}zu", profiles.size());
-    for (auto &item : profiles) {
-        if (IsTrustDevice(item, udid, bundleName)) {
-            LOGI("The udid %{public}s is trust.", GetAnonyString(udid).c_str());
-            return DM_OK;
-        }
-    }
-    return ERR_DM_FAILED;
-}
-
-bool DeviceProfileConnector::IsTrustDevice(AccessControlProfile profile, const std::string &udid,
-    const std::string &bundleName)
-{
-    LOGI("DeviceProfileConnector::IsTrustDevice start, bundleName %{public}s, udid %{public}s", bundleName.c_str(),
-        GetAnonyString(udid).c_str());
-    std::string trustDeviceId = profile.GetTrustDeviceId();
-    if (trustDeviceId == udid && profile.GetStatus() == ACTIVE) {
-        if (profile.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号
-            LOGI("The udid %{public}s is identical bind.", GetAnonyString(udid).c_str());
-            return true;
-        }
-        if (profile.GetBindType() == DM_POINT_TO_POINT || profile.GetBindType() == DM_ACROSS_ACCOUNT) {
-            if (profile.GetBindLevel() == DEVICE || profile.GetBindLevel() == SERVICE) {  // 设备级
-                LOGI("The udid %{public}s is device bind.", GetAnonyString(udid).c_str());
-                return true;
-            }
-            if (profile.GetBindLevel() == APP && (profile.GetAccesser().GetAccesserBundleName() == bundleName ||
-                profile.GetAccessee().GetAccesseeBundleName() == bundleName)) {  // 应用级
-                LOGI("The udid %{public}s is app bind.", GetAnonyString(udid).c_str());
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
@@ -758,7 +715,7 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
 bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
     const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    LOGI("DeviceProfileConnector::SingleUserProcess bindType %{public}d, bindLevel %{public}d",
+    LOGI("DeviceProfileConnector::SingleUserProcess bindType %{public}d, bindLevel %{public}d.",
         profile.GetBindType(), profile.GetBindLevel());
     uint32_t bindType = profile.GetBindType();
     bool ret = false;
@@ -807,7 +764,6 @@ int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller,
     }
     return ERR_DM_FAILED;
 }
-
 
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {

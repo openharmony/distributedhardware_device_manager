@@ -438,12 +438,10 @@ void SoftbusConnector::OnSoftbusDeviceFound(const DeviceInfo *device)
     DmDeviceInfo dmDeviceInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDeviceInfo);
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
-    int32_t deviceCount = 0;
-    NodeBasicInfo *nodeInfo = nullptr;
-    GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceFound",
-        .peerNetId = (nodeInfo != nullptr) ? std::string(nodeInfo->networkId) : "",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .peerNetId = "",
         .peerUdid = device->devId,
     };
     if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {
@@ -489,12 +487,10 @@ void SoftbusConnector::OnSoftbusDeviceDiscovery(const DeviceInfo *device)
     DmDeviceBasicInfo dmDeviceBasicInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDeviceBasicInfo);
     std::lock_guard<std::mutex> lock(discoveryCallbackMutex_);
-    int32_t deviceCount = 0;
-    NodeBasicInfo *nodeInfo = nullptr;
-    GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount);
     struct RadarInfo info = {
         .funcName = "OnSoftbusDeviceDiscovery",
-        .peerNetId = (nodeInfo != nullptr) ? std::string(nodeInfo->networkId) : "",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .peerNetId = "",
         .peerUdid = device->devId,
 
     };
@@ -525,6 +521,7 @@ void SoftbusConnector::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult r
         }
         struct RadarInfo info = {
             .funcName = "OnSoftbusDiscoveryResult",
+            .stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL),
             .errCode = result,
         };
         if (!DmRadarHelper::GetInstance().ReportDiscoverResCallback(info)) {

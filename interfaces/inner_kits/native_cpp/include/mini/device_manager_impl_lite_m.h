@@ -131,7 +131,6 @@ typedef struct {
 } OnAdvertisingResult;
 
 int InitDeviceManager(void);
-bool DeviceManagerIsInit(void);
 int UnInitDeviceManager(void);
 int RegisterDevStateCallback(const char *pkgName, const char *extra, DevStatusCallback callback);
 int UnRegisterDevStateCallback(const char *pkgName);
@@ -142,11 +141,6 @@ int StartDiscovering(const char *discoverParam, const char *filterOption, OnTarg
 int StopDiscovering(const char *pkgName, const int subscribeId);
 int BindTarget(const char *pkgName, const char *deviceId, const char *bindParam, OnBindResult cb);
 int UnBindTarget(const char *pkgName, const char *networkId);
-void FreeJsonStringMemory(char **jsonStr);
-int RequestCredential(char **returnJsonStr);
-int CheckCredential(const char *reqJsonStr, char **returnJsonStr);
-int ImportCredential(const char *reqJsonStr, char **returnJsonStr);
-int DeleteCredential(const char *reqJsonStr, char **returnJsonStr);
 
 #ifdef __cplusplus
 }

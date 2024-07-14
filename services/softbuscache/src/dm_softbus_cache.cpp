@@ -25,9 +25,11 @@ IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 bool g_online = false;
 bool g_getLocalDevInfo = false;
 DmDeviceInfo localDeviceInfo_;
+std::mutex localDevInfoMutex_;
 void SoftbusCache::SaveLocalDeviceInfo()
 {
     LOGI("SoftbusCache::SaveLocalDeviceInfo");
+    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     if (g_online) {
         return;
     }
@@ -50,6 +52,7 @@ void SoftbusCache::DeleteLocalDeviceInfo()
 {
     LOGI("SoftbusCache::DeleteLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
+    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     g_online = false;
     g_getLocalDevInfo = false;
 }
@@ -57,6 +60,7 @@ void SoftbusCache::DeleteLocalDeviceInfo()
 int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusCache::GetLocalDeviceInfo");
+    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     if (g_getLocalDevInfo) {
         nodeInfo = localDeviceInfo_;
         LOGI("SoftbusCache::GetLocalDeviceInfo from dm cache.");
@@ -85,6 +89,7 @@ void SoftbusCache::UpDataLocalDevInfo()
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return;
     }
+    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     ChangeDeviceInfo(localDeviceInfo_);
 }

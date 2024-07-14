@@ -145,7 +145,6 @@ public:
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
     int32_t IsSameAccount(const std::string &udid);
-    int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
     int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -157,12 +156,10 @@ private:
         std::string requestDeviceId, std::vector<int32_t> &bindTypeVec);
     void ProcessBindType(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo paramInfo,
         std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, uint32_t index);
-    bool IsTrustDevice(DistributedDeviceProfile::AccessControlProfile profile, const std::string &udid,
-        const std::string &bundleName);
-    int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
-        DmDiscoveryInfo discoveryInfo);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
+    int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
+        DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const DmAccessCallee &callee);
 };

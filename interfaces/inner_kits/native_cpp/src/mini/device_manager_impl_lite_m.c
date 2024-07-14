@@ -35,7 +35,7 @@ int InitDeviceManager(void)
 {
     DMLOGI("init device manager start.");
     if (g_deviceManagerInitFlag) {
-        DMLOGI("device manager module has been initialized.");
+        DMLOGE("device manager module has been initialized.");
         return DM_OK;
     }
     int retValue = InitSoftbusModle();
@@ -50,11 +50,6 @@ int InitDeviceManager(void)
     }
     g_deviceManagerInitFlag = true;
     return DM_OK;
-}
-
-bool DeviceManagerIsInit(void)
-{
-    return g_deviceManagerInitFlag;
 }
 
 int UnInitDeviceManager(void)
@@ -91,8 +86,7 @@ int UnRegisterDevStateCallback(const char *pkgName)
     return UnRegisterSoftbusDevStateCallback(pkgName);
 }
 
-int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen,
-    int *trustListLen)
+int GetTrustedList(const char *pkgName, DmDeviceBasicInfo *deviceList, const int deviceListLen, int *trustListLen)
 {
     DMLOGI("device manager GetTrustedList start.");
     if (!g_deviceManagerInitFlag) {
@@ -222,49 +216,4 @@ int UnBindTarget(const char *pkgName, const char *networkId)
         return ERR_DM_NO_INIT;
     }
     return SoftbusUnBindTarget(pkgName, networkId);
-}
-
-int RequestCredential(char **returnJsonStr)
-{
-    if (!g_deviceManagerInitFlag) {
-        DMLOGE("device manager module is not initialized.");
-        return ERR_DM_NO_INIT;
-    }
-    return RequestHichainCredential(returnJsonStr);
-}
-
-void FreeJsonStringMemory(char **jsonStr)
-{
-    if (!g_deviceManagerInitFlag) {
-        DMLOGE("device manager module is not initialized.");
-        return;
-    }
-    FreeHichainJsonStringMemory(jsonStr);
-}
-
-int CheckCredential(const char *reqJsonStr, char **returnJsonStr)
-{
-    if (!g_deviceManagerInitFlag) {
-        DMLOGE("device manager module is not initialized.");
-        return ERR_DM_NO_INIT;
-    }
-    return CheckHichainCredential(reqJsonStr, returnJsonStr);
-}
-
-int ImportCredential(const char *reqJsonStr, char **returnJsonStr)
-{
-    if (!g_deviceManagerInitFlag) {
-        DMLOGE("device manager module is not initialized.");
-        return ERR_DM_NO_INIT;
-    }
-    return ImportHichainCredential(reqJsonStr, returnJsonStr);
-}
-
-int DeleteCredential(const char *reqJsonStr, char **returnJsonStr)
-{
-    if (!g_deviceManagerInitFlag) {
-        DMLOGE("device manager module is not initialized.");
-        return ERR_DM_NO_INIT;
-    }
-    return DeleteHichainCredential(reqJsonStr, returnJsonStr);
 }

@@ -83,8 +83,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     GetJsonObj(jsonObj);
-    jsonStrVec.push_back(jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore));
-
+    jsonStrVec.push_back(jsonObj.dump());
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
         nlohmann::json jsonThumbnailObj;
         jsonThumbnailObj[TAG_VER] = DM_ITF_VER;
@@ -93,7 +92,6 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         jsonThumbnailObj[TAG_INDEX] = idx + 1;
         jsonThumbnailObj[TAG_DEVICE_ID] = authRequestContext_->deviceId;
         jsonThumbnailObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
-
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
         LOGI("TAG_APP_THUMBNAIL encode, idx %{public}d, sliceLen %{public}d, thumbnailSize %{public}d", idx,
@@ -206,6 +204,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
     json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
     json[TAG_IS_AUTH_CODE_READY] = authResponseContext_->isAuthCodeReady;
     json[TAG_NET_ID] = authResponseContext_->networkId;
+
     json[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
     json[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
     json[TAG_ISONLINE] = authResponseContext_->isOnline;

@@ -25,7 +25,6 @@
 #include "dm_timer.h"
 #include "softbus_listener.h"
 #include "mine_softbus_listener.h"
-#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
