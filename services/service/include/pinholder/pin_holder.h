@@ -71,7 +71,7 @@ private:
     std::string registerPkgName_ = "";
     std::string remoteDeviceId_ = "";
     std::string payload_ = "";
-    DmPinType pinType_;
+    DmPinType pinType_ = NUMBER_PIN_CODE;
     PinHolderState sinkState_;
     PinHolderState sourceState_;
     int32_t sessionId_ = -1;
