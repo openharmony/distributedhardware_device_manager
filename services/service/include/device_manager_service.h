@@ -36,7 +36,7 @@
 #include "dm_screen_common_event.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
-#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+#endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
 #endif
 
 namespace OHOS {
@@ -188,7 +188,6 @@ public:
 
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
     int32_t IsSameAccount(const std::string &networkId);
-    int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
     int32_t InitAccountInfo();
     int32_t InitScreenLockEvent();
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);

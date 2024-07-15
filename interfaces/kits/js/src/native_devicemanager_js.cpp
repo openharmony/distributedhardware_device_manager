@@ -100,16 +100,14 @@ enum DMBussinessErrorCode {
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
 
-const std::string ERR_MESSAGE_NO_PERMISSION =
-    "Permission verification failed. The application does not have the permission required to call the API.";
-const std::string ERR_MESSAGE_NOT_SYSTEM_APP =
-    "Permission verification failed. A non-system application calls a system API.";
-const std::string ERR_MESSAGE_INVALID_PARAMS = "Parameter error.";
+const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
+const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication unavailable.";
-const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery unavailable.";
-const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish unavailable.";
+const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
+const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
+const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 
 napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &msg)
 {
@@ -2652,7 +2650,7 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     napi_get_undefined(env, &result);
     return result;
 }
- 
+
 napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value thisVar, napi_value argv[])
 {
     size_t typeLen = 0;

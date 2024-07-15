@@ -28,7 +28,7 @@
 #include "mem_mgr_proxy.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
-#include "permission_manager.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);

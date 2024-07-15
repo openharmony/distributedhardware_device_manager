@@ -138,8 +138,7 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
 }
 
 int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
-                                           const std::map<std::string, std::string> &discoverParam,
-                                           const std::map<std::string, std::string> &filterOptions)
+    const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
     LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {

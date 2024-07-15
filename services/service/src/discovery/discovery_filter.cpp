@@ -16,8 +16,8 @@
 #include "discovery_filter.h"
 
 #include "dm_device_info.h"
-#include "nlohmann/json.hpp"
 #include "dm_log.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {

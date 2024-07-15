@@ -30,7 +30,6 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
-
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
@@ -198,7 +197,7 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
 
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
-    LOGI("PermissionManager::CheckSystemSA");
+    LOGI("PermissionManager::CheckSystemSA pkgName %{public}s.", pkgName.c_str());
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
         std::string tmp(systemSaWhiteList[index]);
         if (pkgName == tmp) {
@@ -215,7 +214,6 @@ std::unordered_set<std::string> PermissionManager::GetSystemSA()
         std::string tmp(systemSaWhiteList[index]);
         systemSA.insert(tmp);
     }
-    LOGE("TokenCaller is not SA.");
     return systemSA;
 }
 } // namespace DistributedHardware

@@ -42,7 +42,7 @@ std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ 
 std::map<std::string, std::map<std::string, std::string>> DeviceManagerServiceListener::udidHashMap_ = {};
 std::mutex DeviceManagerServiceListener::alreadyOnlineSetLock_;
 std::unordered_set<std::string> DeviceManagerServiceListener::alreadyOnlineSet_ = {};
-const int32_t ALREADY_ONLINE_NUMS = 4;
+const int32_t LAST_APP_ONLINE_NUMS = 4;
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -74,7 +74,7 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetDeviceBasicInfo(deviceBasicInfo);
 }
 
-std::string DeviceManagerServiceListener::ComposeOnlinekey(const std::string &pkgName, const std::string &devId)
+std::string DeviceManagerServiceListener::ComposeOnlineKey(const std::string &pkgName, const std::string &devId)
 {
     return pkgName + "_" + devId;
 }
@@ -88,7 +88,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
     std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
     if (state == DEVICE_STATE_OFFLINE) {
         for (const auto &it : PkgNameVec) {
-            std::string notifyKey = ComposeOnlinekey(it, std::string(info.deviceId));
+            std::string notifyKey = ComposeOnlineKey(it, std::string(info.deviceId));
             {
                 std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
                 alreadyOnlineSet_.erase(notifyKey);
@@ -99,7 +99,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
     }
     if (state == DEVICE_STATE_ONLINE) {
         for (const auto &it : PkgNameVec) {
-            std::string notifyKey = ComposeOnlinekey(it, std::string(info.deviceId));
+            std::string notifyKey = ComposeOnlineKey(it, std::string(info.deviceId));
             DmDeviceState notifyState = state;
             {
                 std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
@@ -144,7 +144,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const std::string &pkgN
         }
     }
     if (state == DEVICE_STATE_OFFLINE) {
-        if (alreadyOnlineSet_.size() == ALREADY_ONLINE_NUMS) {
+        if (alreadyOnlineSet_.size() == LAST_APP_ONLINE_NUMS) {
             {
                 std::lock_guard<std::mutex> autoLock(alreadyOnlineSetLock_);
                 alreadyOnlineSet_.clear();

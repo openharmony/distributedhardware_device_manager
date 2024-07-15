@@ -90,7 +90,7 @@ public:
     std::string CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen);
     void CreateResponseAuthMessageExt(nlohmann::json &json);
     void ParseAuthResponseMessageExt(nlohmann::json &json);
-    
+
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);
     void CreateNegotiateMessage(nlohmann::json &json);

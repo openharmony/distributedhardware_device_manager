@@ -252,7 +252,5 @@ int32_t AuthRequestSyncDeleteAclNone::Enter()
     stateAuthManager->SyncDeleteAclDone();
     return DM_OK;
 }
-
-
 } // namespace DistributedHardware
 } // namespace OHOS

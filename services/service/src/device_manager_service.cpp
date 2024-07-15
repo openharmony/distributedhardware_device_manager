@@ -83,7 +83,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
     QueryDependsSwitchState();
-#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+#endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
 #endif
     LOGI("SoftbusListener init success.");
     return DM_OK;
@@ -115,7 +115,7 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     }
     return;
 }
-#endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+#endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -220,9 +220,10 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         isOnlyShowNetworkId = true;
     }
     std::vector<DmDeviceInfo> onlineDeviceList;
-    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
+    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
+    if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
-        return ERR_DM_FAILED;
+        return ret;
     }
     if (isOnlyShowNetworkId && !onlineDeviceList.empty()) {
         for (auto item : onlineDeviceList) {
@@ -1439,31 +1440,10 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
     return dmServiceImpl_->IsSameAccount(udid);
 }
 
-int32_t DeviceManagerService::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
-{
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", bundleName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (udid.empty() || bundleName.empty()) {
-        LOGE("DeviceManagerService::CheckRelatedDevice error: udid: %{public}s bundleName: %{public}s",
-            GetAnonyString(udid).c_str(), bundleName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("DeviceManagerService CheckRelatedDevice start for udid: %{public}s bundleName: %{public}s",
-        GetAnonyString(udid).c_str(), bundleName.c_str());
-
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckRelatedDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->CheckRelatedDevice(udid, bundleName);
-}
-
 bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", caller.pkgName.c_str());
+        LOGE("The caller: %{public}s does not have permission to call CheckAccessControl.", caller.pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
@@ -1480,7 +1460,7 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckRelatedDevice.", caller.pkgName.c_str());
+        LOGE("The caller: %{public}s does not have permission to call CheckIsSameAccount.", caller.pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
@@ -1562,6 +1542,7 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
         }
         return;
     }
+
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
         std::vector<DmDeviceInfo> onlineDeviceList;
         if (softbusListener_ == nullptr) {

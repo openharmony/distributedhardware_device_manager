@@ -180,6 +180,8 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
+    LOGI("OnDbReady function is called with pkgName: %{public}s and uuid = %{public}s",
+         pkgName.c_str(), GetAnonyString(uuid).c_str());
     if (pkgName.empty() || uuid.empty()) {
         LOGE("On db ready pkgName is empty or uuid is empty");
         return;

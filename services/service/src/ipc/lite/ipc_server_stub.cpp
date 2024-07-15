@@ -15,7 +15,6 @@
 
 #include "ipc_server_stub.h"
 
-#include "device_manager_service.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
@@ -27,6 +26,7 @@
 #include "ohos_init.h"
 #include "samgr_lite.h"
 #include "securec.h"
+
 namespace {
 const int32_t WAIT_FOR_SERVER = 2;
 const int32_t STACK_SIZE = 0x1000;

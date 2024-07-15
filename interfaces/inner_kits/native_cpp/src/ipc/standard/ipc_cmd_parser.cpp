@@ -24,7 +24,6 @@
 #include "ipc_bind_device_req.h"
 #include "ipc_bind_target_req.h"
 #include "ipc_check_access_control.h"
-#include "ipc_check_related_device_req.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
@@ -1524,32 +1523,6 @@ ON_IPC_READ_RESPONSE(CHECK_API_PERMISSION, MessageParcel &reply, std::shared_ptr
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is nullptr");
-        return ERR_DM_FAILED;
-    }
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(CHECK_RELATED_DEVICE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcCheckRelatedDeviceReq> pReq = std::static_pointer_cast<IpcCheckRelatedDeviceReq>(pBaseReq);
-    std::string udid = pReq->GetUdid();
-    std::string bundleName = pReq->GetBundleName();
-    if (!data.WriteString(udid)) {
-        LOGE("write udid failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(bundleName)) {
-        LOGE("write bundleName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(CHECK_RELATED_DEVICE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());

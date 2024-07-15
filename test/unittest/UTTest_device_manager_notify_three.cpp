@@ -740,6 +740,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult1, testing::ext::TestSize.Le
     tempCbk = DeviceManagerNotify::GetInstance().credentialCallback_[pkgName];
     EXPECT_EQ(tempCbk, nullptr);
 }
+
 /**
  * @tc.name: OnCredentialResult2
  * @tc.type: FUNC

@@ -689,7 +689,7 @@ int32_t DmRadarHelper::GetErrorCode(int32_t errCode, int32_t module)
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)
 {
     if (udid.empty() || udid.length() < INVALID_UDID_LENGTH) {
-        return "unknown";
+        return "";
     }
     return udid.substr(0, SUBSTR_UDID_LENGTH) + "**" + udid.substr(udid.length() - SUBSTR_UDID_LENGTH);
 }

@@ -450,13 +450,6 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
-{
-    (void)udid;
-    (void)bundleName;
-    return DM_OK;
-}
-
 void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
 {
     (void)userId;
@@ -468,7 +461,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     (void)commonEventType;
 }
 
-int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;
@@ -478,7 +471,7 @@ int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &calle
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;

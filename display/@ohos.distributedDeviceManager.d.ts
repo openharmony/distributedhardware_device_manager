@@ -546,7 +546,7 @@ declare namespace distributedDeviceManager {
      * @throws { BusinessError } 401 - Parameter error. Possible causes:
      *                                                  1. Mandatory parameters are left unspecified;
      *                                                  2. Incorrect parameter type;
-     *                                                  3. Parameter verification failed; 
+     *                                                  3. Parameter verification failed;
      *                                                  4. The size of specified type is greater than 255.
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10

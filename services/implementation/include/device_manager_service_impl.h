@@ -129,12 +129,11 @@ public:
 
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
-    int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName);
     void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
     void ScreenCommonEventCallback(std::string commonEventType);
-    int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
@@ -142,6 +141,7 @@ private:
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
+
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;

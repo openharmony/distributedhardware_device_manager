@@ -380,7 +380,6 @@ public:
     virtual int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                            int32_t &securityLevel) override;
 
-    virtual bool CheckRelatedDevice(const std::string &udid, const std::string &bundleName) override;
     virtual bool IsSameAccount(const std::string &netWorkId) override;
     virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;

@@ -276,13 +276,12 @@ public:
     virtual void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
-    virtual int32_t CheckRelatedDevice(const std::string &udid, const std::string &bundleName) = 0;
     virtual void AccountCommonEventCallback(int32_t userId, std::string commonEventType) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
-    virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

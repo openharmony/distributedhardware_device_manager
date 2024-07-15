@@ -136,7 +136,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/standard",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
-      "${innerkits_path}/native_cpp/include",
     ]
   }
 

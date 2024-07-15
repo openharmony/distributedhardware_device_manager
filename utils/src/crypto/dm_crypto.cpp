@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
 constexpr int32_t HEX_TO_UINT8 = 2;
 constexpr int WIDTH = 4;
 constexpr unsigned char MASK = 0x0F;

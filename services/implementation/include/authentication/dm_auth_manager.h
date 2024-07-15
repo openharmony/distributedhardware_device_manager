@@ -50,6 +50,7 @@ typedef enum AuthState {
     AUTH_REQUEST_DELETE_INIT,
     AUTH_REQUEST_SYNCDELETE,
     AUTH_REQUEST_SYNCDELETE_DONE,
+
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
     AUTH_RESPONSE_CONFIRM,
@@ -304,7 +305,7 @@ public:
 
     /**
      * @tc.name: DmAuthManager::ProcessPincode
-     * @tc.desc: Add Member of the DeviceManager Authenticate Manager
+     * @tc.desc: Process pin code of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
     int32_t ProcessPincode(int32_t pinCode);
@@ -487,12 +488,14 @@ private:
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId, std::string &addrType);
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
+    std::string GenerateBindResultContent();
+    void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &extra);
     void CompatiblePutAcl();
     void ProRespNegotiateExt(const int32_t &sessionId);
     void ProRespNegotiate(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
-    std::string GenerateBindResultContent();
     void GetAuthRequestContext();
     void SinkAuthDeviceFinish();
     void SrcAuthDeviceFinish();
@@ -535,8 +538,6 @@ private:
     void SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId);
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     void PutAccessControlList();
-    void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-        const std::string &extra);
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
@@ -566,7 +567,7 @@ private:
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
     PeerTargetId peerTargetId_;
-    unsigned char *sessionKey_ = nullptr;
+    const uint8_t *sessionKey_ = nullptr;
     uint32_t sessionKeyLen_ = 0;
     std::string remoteDeviceId_ = "";
     std::string dmVersion_ = "";

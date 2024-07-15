@@ -1908,31 +1908,6 @@ HWTEST_F(DeviceManagerServiceTest, OnUnbindBytesReceived_001, testing::ext::Test
     DeviceManagerService::GetInstance().OnUnbindBytesReceived(socket, data.c_str(), data.size());
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
-
-HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_001, testing::ext::TestSize.Level0)
-{
-    DeletePermission();
-    std::string udid;
-    std::string bundleName;
-    int32_t ret = DeviceManagerService::GetInstance().CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_002, testing::ext::TestSize.Level0)
-{
-    std::string udid = "123";
-    std::string bundleName = "bundleName";
-    int32_t ret = DeviceManagerService::GetInstance().CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, CheckRelatedDevice_003, testing::ext::TestSize.Level0)
-{
-    std::string udid;
-    std::string bundleName;
-    int32_t ret = DeviceManagerService::GetInstance().CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

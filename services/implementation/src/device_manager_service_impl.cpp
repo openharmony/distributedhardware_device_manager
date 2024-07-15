@@ -22,12 +22,11 @@
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
-#include "dm_radar_helper.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
-#include "parameter.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
+#include "parameter.h"
 #include "common_event_support.h"
 using namespace OHOS::EventFwk;
 #endif
@@ -155,14 +154,6 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
         LOGE("DeviceManagerServiceImpl::AuthenticateDevice failed, pkgName is %{public}s, deviceId is %{public}s,"
             "extra is %{public}s", pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
-    }
-    struct RadarInfo info = {
-        .funcName = "AuthenticateDevice",
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
-    };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
-        LOGE("ReportDiscoverUserRes failed");
     }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
@@ -652,21 +643,11 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
 {
     if (udid.empty()) {
-        LOGE("DeviceManagerServiceImpl::IsSameAccount error: udid is empty.");
+        LOGE("DeviceManagerServiceImpl::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     return DeviceProfileConnector::GetInstance().IsSameAccount(udid);
-}
-
-int32_t DeviceManagerServiceImpl::CheckRelatedDevice(const std::string &udid, const std::string &bundleName)
-{
-    if (udid.empty() || bundleName.empty()) {
-        LOGE("DeviceManagerServiceImpl::CheckRelatedDevice error: udid: %{public}s bundleName: %{public}s",
-            GetAnonyString(udid).c_str(), bundleName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return DeviceProfileConnector::GetInstance().CheckRelatedDevice(udid, bundleName);
 }
 
 std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
@@ -722,16 +703,16 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback error.");
 }
 
-int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
-    const DmAccessCallee &callee, const std::string &sinkUdid)
-{
-    return DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
-}
-
 int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     return DeviceProfileConnector::GetInstance().CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
+}
+
+int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

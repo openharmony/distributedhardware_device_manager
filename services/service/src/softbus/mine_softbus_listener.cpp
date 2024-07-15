@@ -397,7 +397,7 @@ int32_t MineSoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionI
         output[(*outLen)++] = DM_HASH_DATA_LEN;
         output[(*outLen)++] = DM_DEVICE_NUMBER_LEN;
         output[(*outLen)++] = DM_DEVICE_NUMBER_LEN;
-        for (int j = 0; j < (int32_t)DM_HASH_DATA_LEN; j++) {
+        for (size_t j = 0; j < DM_HASH_DATA_LEN; j++) {
             output[(*outLen)++] = sha256Out[j];
         }
         retValue = sprintf_s(&output[*outLen], DM_DEVICE_NUMBER_LEN, "%010d", optionInfo[i].startNumber);
@@ -443,7 +443,7 @@ int32_t MineSoftbusListener::ParseVertexDeviceJsonArray(const std::vector<Vertex
             LOGE("failed to get value sha256 hash with index: %{public}zu", i);
             return ERR_DM_GET_DATA_SHA256_HASH;
         }
-        for (int j = 0; j < (int32_t)DM_HASH_DATA_LEN; j++) {
+        for (size_t j = 0; j < DM_HASH_DATA_LEN; j++) {
             output[(*outLen)++] = sha256Out[j];
         }
     }
@@ -548,7 +548,7 @@ int32_t MineSoftbusListener::DmBase64Encode(char *output, size_t outputLen, cons
         return ERR_DM_FAILED;
     }
     EVP_EncodeInit(ctx);
-    if (EVP_EncodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != 1) {
+    if (EVP_EncodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != EVP_OK) {
         LOGE("EVP_EncodeUpdate failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
@@ -577,13 +577,13 @@ int32_t MineSoftbusListener::DmBase64Decode(char *output, size_t outputLen, cons
         return ERR_DM_FAILED;
     }
     EVP_DecodeInit(ctx);
-    if (EVP_DecodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != 1) {
+    if (EVP_DecodeUpdate(ctx, (unsigned char *)output, &outLen, (const unsigned char *)input, inputLen) != EVP_OK) {
         LOGE("EVP_DecodeUpdate failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
     }
     base64OutLen += static_cast<size_t>(outLen);
-    if (EVP_DecodeFinal(ctx, (unsigned char *)(output + outLen), &outLen) != 1) {
+    if (EVP_DecodeFinal(ctx, (unsigned char *)(output + outLen), &outLen) != EVP_OK) {
         LOGE("EVP_DecodeFinal failed.");
         EVP_ENCODE_CTX_free(ctx);
         return ERR_DM_FAILED;
@@ -851,7 +851,7 @@ int32_t MineSoftbusListener::SendReturnwave(DeviceInfo &deviceInfo, const Broadc
     } else {
         outData[outLen++] = false;
     }
-    for (int i = 0; i < DM_HASH_DATA_LEN; i++) {
+    for (size_t i = 0; i < DM_HASH_DATA_LEN; i++) {
         outData[outLen++] = broadcastHead.pkgNameHash[i];
     }
     int retValue;

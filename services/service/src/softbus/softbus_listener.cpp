@@ -51,7 +51,7 @@ constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
-static std::mutex g_onlinDeviceNumLock;
+static std::mutex g_onlineDeviceNumLock;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -111,7 +111,8 @@ static INodeStateCb softbusNodeStateCb_ = {
     .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED,
     .onNodeOnline = SoftbusListener::OnSoftbusDeviceOnline,
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
-    .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged
+    .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
+    .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -154,7 +155,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     {
-        std::lock_guard<std::mutex> lock(g_onlinDeviceNumLock);
+        std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlinDeviceNum++;
     }
     std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
@@ -197,7 +198,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().DeleteDeviceInfo(dmDeviceInfo);
     SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
     {
-        std::lock_guard<std::mutex> lock(g_onlinDeviceNumLock);
+        std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlinDeviceNum--;
         if (g_onlinDeviceNum == 0) {
             SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
@@ -422,12 +423,12 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
         .toCallPkg = "dsoftbus",
         .hostName = GetHostPkgName(),
         .stageRes = (ret == DM_OK) ?
-                    static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+            static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
-                    static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+            static_cast<int32_t>(BizState::BIZ_STATE_START) : static_cast<int32_t>(BizState::BIZ_STATE_END),
         .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
         .errCode = ret,
-        };
+    };
     if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
         if (!GetDmRadarHelperObj()->ReportDiscoverRegCallback(info)) {
             LOGE("ReportDiscoverRegCallback failed");
@@ -447,11 +448,11 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopRefreshSoftbusLNN",
-        .hostName = "dsoftbus",
+        .hostName = SOFTBUSNAME,
         .stageRes = (ret == DM_OK) ?
-                    static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
+            static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .bizState = (ret == DM_OK) ?
-                    static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
+            static_cast<int32_t>(BizState::BIZ_STATE_CANCEL) : static_cast<int32_t>(BizState::BIZ_STATE_END),
         .errCode = ret,
     };
     if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
@@ -778,7 +779,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
     LOGI("SoftbusListener::IsDmRadarHelperReady start.");
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
-        LOGI("IsDmRadarHelperReady alReady");
+        LOGI("IsDmRadarHelperReady alReady.");
         return true;
     }
     char path[PATH_MAX + 1] = {0x00};
@@ -799,9 +800,9 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGE("Create object function is not exist.");
         return false;
     }
+    LOGI("IsDmRadarHelperReady ready success.");
     isRadarSoLoad_ = true;
     dmRadarHelper_ = func();
-    LOGI("IsDmRadarHelperReady ready success");
     return true;
 }
 
@@ -824,18 +825,6 @@ bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
     radarHandle_ = nullptr;
     LOGI("close libdevicemanagerradar so success.");
     return true;
-}
-
-void SoftbusListener::SetHostPkgName(const std::string hostName)
-{
-    hostName_ = hostName;
-    LOGI("SetHostPkgName::hostName_ :%s.", hostName_.c_str());
-}
-
-std::string SoftbusListener::GetHostPkgName()
-{
-    LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
-    return hostName_;
 }
 
 void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_ptr<DeviceInfo> infoPtr)
@@ -902,6 +891,18 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
         }
     }
     return ERR_DM_BIND_INPUT_PARA_INVALID;
+}
+
+void SoftbusListener::SetHostPkgName(const std::string hostName)
+{
+    hostName_ = hostName;
+    LOGI("SetHostPkgName::hostName_ :%s.", hostName_.c_str());
+}
+
+std::string SoftbusListener::GetHostPkgName()
+{
+    LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
+    return hostName_;
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()

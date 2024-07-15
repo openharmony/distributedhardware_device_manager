@@ -729,7 +729,7 @@ void DeviceManagerNapi::RegisterDevStatusCallback(napi_env env, std::string &bun
     std::string extra = "";
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, callback);
     if (ret != 0) {
-        LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName.c_str());
+        LOGE("RegisterDevStatusCallback failed ret %{public}d", ret);
         return;
     }
     {

@@ -106,31 +106,6 @@ HWTEST_F(DmDeviceStateManagerTest, OnDbReady_001, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: OnDbReady_002
- * @tc.desc: set info.deviceId to some para, and return it
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmDeviceStateManagerTest, OnDbReady_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgNameTest";
-    std::string deviceId = "deviceIdTest";
-    DmDeviceInfo info;
-    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq =
-        std::static_pointer_cast<IpcNotifyDeviceStateReq>(listener_->ipcServerListener_.req_);
-    DmDeviceInfo dminfo;
-    if (pReq == nullptr) {
-        strcpy_s(dminfo.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
-    } else {
-        dminfo = pReq->GetDeviceInfo();
-    }
-    int result = strcmp(info.deviceId, dminfo.deviceId);
-    EXPECT_EQ(result, 0);
-}
-
-/**
  * @tc.name: RegisterOffLineTimer_001
  * @tc.desc: call RegisterOffLineTimer
  * @tc.type: FUNC

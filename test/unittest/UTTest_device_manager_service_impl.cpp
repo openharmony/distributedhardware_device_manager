@@ -1227,42 +1227,6 @@ HWTEST_F(DeviceManagerServiceImplTest, IsSameAccount_002, testing::ext::TestSize
 }
 
 /**
- * @tc.name: CheckRelatedDevice_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_001, testing::ext::TestSize.Level0)
-{
-    std::string udid;
-    std::string bundleName = "bundleName";
-    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: CheckRelatedDevice_002
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_002, testing::ext::TestSize.Level0)
-{
-    std::string udid = "2342154";
-    std::string bundleName;
-    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: CheckRelatedDevice_003
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, CheckRelatedDevice_003, testing::ext::TestSize.Level0)
-{
-    std::string udid = "2342154";
-    std::string bundleName = "bundleName";
-    int32_t ret = deviceManagerServiceImpl_->CheckRelatedDevice(udid, bundleName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
  * @tc.name: GetAppTrustDeviceIdList_003
  * @tc.type: FUNC
  */

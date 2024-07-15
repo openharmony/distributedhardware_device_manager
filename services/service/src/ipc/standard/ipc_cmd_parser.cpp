@@ -1395,18 +1395,6 @@ ON_IPC_CMD(CHECK_API_PERMISSION, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(CHECK_RELATED_DEVICE, MessageParcel &data, MessageParcel &reply)
-{
-    std::string udid = data.ReadString();
-    std::string bundleName = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().CheckRelatedDevice(udid, bundleName);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed.");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(CHECK_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
 {
     DmAccessCaller caller;

@@ -146,7 +146,6 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("IpcClientManager::SendRequest in");
-
     if (dmInterface_ != nullptr) {
         LOGI("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
         return dmInterface_->SendCmd(cmdCode, req, rsp);
