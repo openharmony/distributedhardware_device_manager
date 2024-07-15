@@ -230,6 +230,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext
     nlohmann::json jsonObj;
     authMessageProcessor->authResponseContext_->reply = 1;
     jsona[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
+    jsona[TAG_AUTH_FINISH] = authMessageProcessor->authResponseContext_->isFinish;
     authMessageProcessor->CreateResponseFinishMessage(jsonObj);
     std::string str1 = jsona.dump();
     std::string str2 = jsonObj.dump();

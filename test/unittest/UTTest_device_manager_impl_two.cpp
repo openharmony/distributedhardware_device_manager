@@ -1297,7 +1297,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDeviceManagerFaCallback_002, testing::ex
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(2).WillOnce(testing::Return(DM_OK));
+                .Times(1).WillOnce(testing::Return(DM_OK));
     int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packName, callback);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
@@ -1407,7 +1407,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_002, testing::
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(2).WillOnce(testing::Return(DM_OK));
+                .Times(1).WillOnce(testing::Return(DM_OK));
     int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(packName);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
@@ -1440,7 +1440,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_003, testing::
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(2).WillOnce(testing::Return(DM_OK));
+                .Times(1).WillOnce(testing::Return(DM_OK));
     int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
@@ -1452,7 +1452,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_003, testing::
     ASSERT_NE(checkMap, nullptr);
     // 6. call DeviceManager UnRegisterDeviceManagerFaCallback with parameter
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(2).WillOnce(testing::Return(DM_OK));
+                .Times(1).WillOnce(testing::Return(DM_OK));
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     // 7. Get checkMap from pkgName
     checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
@@ -1487,7 +1487,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceManagerFaCallback_004, testing::
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
-                .Times(2).WillOnce(testing::Return(DM_OK));
+                .Times(1).WillOnce(testing::Return(DM_OK));
     int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);

@@ -47,6 +47,9 @@ HWTEST_F(DmAdapterManagerTest, GetCryptoAdapter_001, testing::ext::TestSize.Leve
 {
     std::string soName = "123";
     soName.clear();
+    if (dmAdapterManager == nullptr) {
+        dmAdapterManager = std::make_shared<DmAdapterManager>();
+    }
     std::shared_ptr<ICryptoAdapter> iCryptoAdapter = dmAdapterManager->GetCryptoAdapter(soName);
     EXPECT_EQ(nullptr, iCryptoAdapter);
 }

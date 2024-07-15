@@ -125,7 +125,9 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_004, testing::
     checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     ASSERT_NE(checkMap, nullptr);
     std::string paramJson = "test";
-    checkMap->OnCall(paramJson);
+    if (checkMap != nullptr) {
+        checkMap->OnCall(paramJson);
+    }
     ASSERT_EQ(count, 1);
 }
 
@@ -282,7 +284,9 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_003, testing
     ASSERT_NE(checkMap, nullptr);
     // 10. call checkMap OnCall
     std::string paramJson = "test";
-    checkMap->OnCall(paramJson);
+    if (checkMap != nullptr) {
+        checkMap->OnCall(paramJson);
+    }
     ASSERT_EQ(count, 1);
 }
 
@@ -371,7 +375,9 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_005, testing
     ASSERT_NE(checkMap, nullptr);
     // 10. call checkMap OnCall
     std::string paramJson = "test";
-    checkMap->OnCall(paramJson);
+    if (checkMap != nullptr) {
+        checkMap->OnCall(paramJson);
+    }
     ASSERT_EQ(count, 1);
 }
 
