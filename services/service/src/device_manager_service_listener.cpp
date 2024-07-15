@@ -113,7 +113,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     }
-    if (state == DEVICE_INFO_READY || DEVICE_INFO_CHANGED) {
+    if (state == DEVICE_INFO_READY || state == DEVICE_INFO_CHANGED) {
         for (const auto &it : PkgNameVec) {
             SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
@@ -165,7 +165,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const std::string &pkgN
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     }
-    if (state == DEVICE_INFO_READY || DEVICE_INFO_CHANGED) {
+    if (state == DEVICE_INFO_READY || state == DEVICE_INFO_CHANGED) {
         SetDeviceInfo(pReq, pkgName, state, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }

@@ -279,7 +279,7 @@ typedef struct PeerTargetId {
     /**
      * wlan ip port.
      */
-    uint16_t wifiPort;
+    uint16_t wifiPort = 0;
 
     bool operator==(const PeerTargetId &other) const
     {
