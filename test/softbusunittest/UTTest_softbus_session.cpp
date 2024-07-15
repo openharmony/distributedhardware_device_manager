@@ -54,6 +54,9 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
 HWTEST_F(SoftbusSessionTest, OpenAuthSession_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "";
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->OpenAuthSession(deviceId);
     EXPECT_EQ(ret, -1);
 }
@@ -67,6 +70,9 @@ HWTEST_F(SoftbusSessionTest, OpenAuthSession_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123456";
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->OpenAuthSession(deviceId);
     EXPECT_EQ(ret, -1);
 }
@@ -81,6 +87,9 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
 {
     std::string message = "";
     int32_t sessionId = -1;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->SendData(sessionId, message);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -99,6 +108,9 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
     jsonObj[TAG_MSG_TYPE] = msgType;
     std::string message = jsonObj.dump();
     int32_t sessionId = 0;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     softbusSession->RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(discoveryMgr));
     int ret = softbusSession->SendData(sessionId, message);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -118,6 +130,9 @@ HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level0)
     }
     )";
     int32_t sessionId = 0;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int32_t ret = softbusSession->SendData(sessionId, message);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -156,6 +171,9 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 3;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->CloseAuthSession(sessionId);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -168,6 +186,9 @@ HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0
 HWTEST_F(SoftbusSessionTest, CloseUnbindSession_001, testing::ext::TestSize.Level0)
 {
     int32_t socket = 1;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int32_t ret = softbusSession->CloseUnbindSession(socket);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -182,6 +203,9 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 3;
     std::string peerDevId;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->GetPeerDeviceId(sessionId, peerDevId);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -195,6 +219,9 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<ISoftbusSessionCallback> callback;
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->RegisterSessionCallback(callback);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -207,6 +234,9 @@ HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize
  */
 HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSize.Level0)
 {
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     int ret = softbusSession->UnRegisterSessionCallback();
     EXPECT_EQ(ret, DM_OK);
 }
@@ -219,6 +249,9 @@ HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSi
  */
 HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
 {
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
     softbusSession->RegisterSessionCallback(discoveryMgr);
     int sessionId = 1;
     int result = 0;

@@ -201,7 +201,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceNetWorkId_101, testing::ext::TestS
     std::string packName;
     std::string networkId;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceNetWorkId(packName, networkId);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**
@@ -239,7 +239,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceId_101, testing::ext::TestSize.Lev
     std::string packName;
     std::string deviceId;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceId(packName, deviceId);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**
@@ -277,7 +277,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceName_101, testing::ext::TestSize.L
     std::string packName;
     std::string deviceName;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(packName, deviceName);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**
@@ -316,7 +316,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceType_101, testing::ext::TestSize.L
     std::string packName;
     int32_t deviceType = 0;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceType(packName, deviceType);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
 }
 
 /**

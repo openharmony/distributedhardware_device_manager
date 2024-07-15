@@ -256,9 +256,10 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     LOGI("GetAvailableDeviceList start, pkgName: %{public}s.", pkgName.c_str());
     std::vector<DmDeviceInfo> deviceListTemp;
     std::string extra = "";
-    if (GetTrustedDeviceList(pkgName, extra, false, deviceListTemp) != DM_OK) {
+    int32_t ret = GetTrustedDeviceList(pkgName, extra, false, deviceListTemp);
+    if (ret != DM_OK) {
         LOGE("DeviceManagerImpl::GetTrustedDeviceList error.");
-        return ERR_DM_FAILED;
+        return ret;
     }
     for (auto &item : deviceListTemp) {
         DmDeviceBasicInfo deviceBasicInfo;
@@ -1343,7 +1344,11 @@ int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::
     std::string &deviceName)
 {
     DmDeviceInfo deviceInfo;
-    GetDeviceInfo(pkgName, networkId, deviceInfo);
+    int32_t ret = GetDeviceInfo(pkgName, networkId, deviceInfo);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceName error, failed ret: %{public}d", ret);
+        return ret;
+    }
     deviceName = std::string(deviceInfo.deviceName);
     LOGI("DeviceManagerImpl::GetDeviceName end, pkgName : %{public}s, networkId : %{public}s, deviceName = %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), GetAnonyString(deviceName).c_str());
@@ -1353,7 +1358,11 @@ int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::
 int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::string &networkId, int32_t &deviceType)
 {
     DmDeviceInfo deviceInfo;
-    GetDeviceInfo(pkgName, networkId, deviceInfo);
+    int32_t ret = GetDeviceInfo(pkgName, networkId, deviceInfo);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerImpl::GetDeviceType error, failed ret: %{public}d", ret);
+        return ret;
+    }
     deviceType = deviceInfo.deviceTypeId;
     LOGI("DeviceManagerImpl::GetDeviceType end, pkgName : %{public}s, networkId : %{public}s, deviceType = %{public}d",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), deviceType);

@@ -49,6 +49,14 @@ int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
+    if (state == nullptr) {
+        LOGE("AuthRequestState::state null");
+        return ERR_DM_FAILED;
+    }
+    if (context_ == nullptr) {
+        LOGE("AuthRequestState::Enter context_ is null");
+        return ERR_DM_FAILED;
+    }
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthRequestState(state);
     state->SetAuthContext(context_);
@@ -69,6 +77,10 @@ int32_t AuthRequestInitState::Enter()
         LOGE("AuthRequestInitState::Enter authManager_ is null");
         return ERR_DM_FAILED;
     }
+    if (context_ == nullptr) {
+        LOGE("AuthRequestInitState::Enter context_ is null");
+        return ERR_DM_FAILED;
+    }
     stateAuthManager->EstablishAuthChannel(context_->deviceId);
     return DM_OK;
 }
@@ -85,6 +97,10 @@ int32_t AuthRequestNegotiateState::Enter()
         LOGE("AuthRequestNegotiateState::Enter authManager_ is null");
         return ERR_DM_FAILED;
     }
+    if (context_ == nullptr) {
+        LOGE("AuthRequestNegotiateState::Enter context_ is null");
+        return ERR_DM_FAILED;
+    }
     stateAuthManager->StartNegotiate(context_->sessionId);
     return DM_OK;
 }
@@ -99,6 +115,10 @@ int32_t AuthRequestNegotiateDoneState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestNegotiateDoneState::Enter authManager_ is null");
+        return ERR_DM_FAILED;
+    }
+    if (context_ == nullptr) {
+        LOGE("AuthRequestNegotiateDoneState::Enter context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->SendAuthRequest(context_->sessionId);
@@ -132,6 +152,10 @@ int32_t AuthRequestJoinState::Enter()
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestJoinState::Enter authManager_  is null");
+        return ERR_DM_FAILED;
+    }
+    if (context_ == nullptr) {
+        LOGE("AuthRequestJoinState::Enter context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->AddMember(context_->deviceId);
