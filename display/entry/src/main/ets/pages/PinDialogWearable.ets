@@ -35,6 +35,7 @@ struct PinDialog {
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
     console.log(TAG + 'this.pinCodeArr' + this.pinCodeArr);
+    this.initStatue();
   }
 
   aboutToDisappear() {
@@ -127,58 +128,71 @@ struct PinDialog {
     }
   }
 
+  @Builder
+  ConnectionCode() {
+    Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+      Text($r('app.string.dm_connect_code'))
+        .fontSize($r('sys.float.ohos_id_text_size_sub_title1'))
+        .fontColor('#FFFFFF')
+        .fontWeight(FontWeight.Bold)
+        .margin({
+          left: 24,
+          right: 24
+        })
+        .offset({ y: 10})
+    }
+    .height(45)
+    .margin({ bottom: 40 })
+  }
+
+  @Builder
+  PinCode() {
+    Row() {
+      Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+        ForEach(this.pinCodeArr, (item: string) => {
+          Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+            Text(item)
+              .fontSize($r('sys.float.ohos_id_text_size_headline5'))
+              .fontColor('#FFFFFF')
+              .fontWeight(FontWeight.Medium)
+          }.width('13%')
+          .height('100%')
+        })
+      }.height(48)
+    }
+    .margin({ bottom: 34 })
+  }
+
+  @Builder
+  ButtonCancel() {
+    Flex({ justifyContent: FlexAlign.Center }) {
+      Shape() {
+        Ellipse()
+          .width('100%')
+          .height(60)
+          .fill('#1F71FF')
+        Column() {
+          Button($r('app.string.dm_cancel'))
+            .fontSize($r('sys.float.ohos_id_text_size_sub_title1'))
+            .fontColor('#FFFFFF')
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+              this.destruction();
+            })
+            .offset({ y: -5 })
+        }
+      }
+      .align(Alignment.Center)
+      .offset({ y: 10})
+    }
+  }
+
   build() {
     Column() {
-      Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-        Text($r('app.string.dm_connect_code'))
-          .fontSize($r('sys.float.ohos_id_text_size_sub_title1'))
-          .fontColor('#FFFFFF')
-          .fontWeight(FontWeight.Bold)
-          .margin({
-            left: 24,
-            right: 24
-          })
-          .offset({ y: 10})
-      }
-      .height(45)
-      .margin({ bottom: 40 })
-
-      Row() {
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-          ForEach(this.pinCodeArr, (item: string) => {
-            Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-              Text(item)
-                .fontSize($r('sys.float.ohos_id_text_size_headline5'))
-                .fontColor('#FFFFFF')
-                .fontWeight(FontWeight.Medium)
-            }.width('13%')
-            .height('100%')
-          })
-        }.height(48)
-      }
-      .margin({ bottom: 34 })
-
-      Flex({ justifyContent: FlexAlign.Center }) {
-        Shape() {
-          Ellipse()
-            .width('100%')
-            .height(60)
-            .fill('#1F71FF')
-          Column() {
-            Button($r('app.string.dm_cancel'))
-              .fontSize($r('sys.float.ohos_id_text_size_sub_title1'))
-              .fontColor('#FFFFFF')
-              .backgroundColor(Color.Transparent)
-              .onClick(() => {
-                this.destruction();
-                this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
-              })
-              .offset({ y: -5 })
-          }
-        }
-        .align(Alignment.Center)
-        .offset({ y: 10})
-      }
+      this.ConnectionCode();
+      this.PinCode();
+      this.ButtonCancel();
     }
     .backgroundColor(Color.Black)
     .width('100%')

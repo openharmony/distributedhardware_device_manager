@@ -79,15 +79,19 @@ struct Index {
           this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
           this.input = '';
           this.passwordCircle = ['', '', '', '', '', ''];
-          if (this.dialogController) {
-            this.dialogController.open();
-            setTimeout(() => {
-              this.dialogController.close();
-            }, TOAST_DURATION_TIME_MS);
-          }
+          this.showToast();
         }
       });
     });
+  }
+
+  showToast() {
+    if (this.dialogController) {
+      this.dialogController.open();
+      setTimeout(() => {
+        this.dialogController.close();
+      }, TOAST_DURATION_TIME_MS);
+    }
   }
 
   onPageHide() {
@@ -188,15 +192,20 @@ struct Index {
   }
 
   @Builder
+  processKey(key: string) {
+    if (key === 'x') {
+      this.SymbolDelete();
+    } else {
+      this.keyBuilder(key);
+    }
+  }
+
+  @Builder
   keyboardMocker() {
     Grid() {
       ForEach(this.keyboards, (keysArr: string[]) => {
         ForEach(keysArr, (key: string) => {
-          if (key === 'x') {
-            this.SymbolDelete();
-          } else {
-            this.keyBuilder(key);
-          }
+          this.processKey(key);
         })
       })
     }
@@ -219,6 +228,31 @@ struct Index {
   }
 
   @Builder
+  PinCode() {
+    Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+      ForEach(this.passwordCircle, (item:string) => {
+        Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+          Text(item)
+            .fontSize($r('sys.float.ohos_id_text_size_sub_title2'))
+            .fontColor('#FFFFFF')
+            .fontWeight(FontWeight.Medium)
+        }.width('7%')
+        .visibility(item === '' ? Visibility.None : Visibility.Visible)
+      })
+      ForEach(this.passwordCircle, (item: string) => {
+        Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+          Column()
+            .width(9)
+            .height(9)
+            .border({ width: 1, color: '#FFFFFF', radius: 9})
+            .alignItems(HorizontalAlign.Center)
+        }.width('7%')
+        .visibility(item === '' ? Visibility.Visible : Visibility.None)
+      })
+    }
+  }
+
+  @Builder
   titleBuilder() {
     Text($r('app.string.dm_enter_peer_connect_code'))
       .fontColor('#FFFFFF')
@@ -230,27 +264,7 @@ struct Index {
     Stack() {
       List() {
         ListItem() {
-          Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-            ForEach(this.passwordCircle, (item:string) => {
-              Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-                Text(item)
-                  .fontSize($r('sys.float.ohos_id_text_size_sub_title2'))
-                  .fontColor('#FFFFFF')
-                  .fontWeight(FontWeight.Medium)
-              }.width('7%')
-              .visibility(item === '' ? Visibility.None : Visibility.Visible)
-            })
-            ForEach(this.passwordCircle, (item: string) => {
-              Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-                Column()
-                  .width(9)
-                  .height(9)
-                  .border({ width: 1, color: '#FFFFFF', radius: 9})
-                  .alignItems(HorizontalAlign.Center)
-              }.width('7%')
-              .visibility(item === '' ? Visibility.Visible : Visibility.None)
-            })
-          }
+          this.PinCode();
         }
       }
     }

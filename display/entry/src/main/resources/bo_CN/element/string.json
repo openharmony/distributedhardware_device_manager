@@ -6,7 +6,7 @@
         },
         {
             "name":"dm_connect_code",
-            "value":"འབྲེལ་མཐུད་ཨང་རྟགས།"
+            "value":"སྦྲེལ་མཐུད་ཨང་རྟགས།"
         },
         {
             "name":"dm_cancel",
@@ -18,7 +18,7 @@
         },
         {
             "name":"dm_connect",
-            "value":"%sདང་འབྲེལ་མཐུད་བྱེད།"
+            "value":"%s ལ་སྦྲེལ་མཐུད་བྱེད།"
         },
         {
             "name":"dm_allow_temp",

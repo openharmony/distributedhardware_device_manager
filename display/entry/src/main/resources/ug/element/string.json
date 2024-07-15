@@ -22,11 +22,11 @@
         },
         {
             "name":"dm_allow_temp",
-            "value":"بۇ قېتىم رۇخسەت"
+            "value":"بۇ قېتىم ئىشىنىمەن"
         },
         {
             "name":"dm_allow_always",
-            "value":"ئىزچىل رۇخسەت"
+            "value":"ئىشىنىمەن"
         },
         {
             "name":"dm_confirm_title_cast",
