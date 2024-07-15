@@ -59,7 +59,7 @@ namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace{
+namespace {
 const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
 }
 
