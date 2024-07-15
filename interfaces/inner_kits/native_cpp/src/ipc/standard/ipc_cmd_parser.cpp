@@ -59,6 +59,10 @@ namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace{
+const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
+}
+
 void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
@@ -207,7 +211,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
 {
     std::shared_ptr<IpcGetTrustDeviceRsp> pRsp = std::static_pointer_cast<IpcGetTrustDeviceRsp>(pBaseRsp);
     int32_t deviceNum = reply.ReadInt32();
-    if (deviceNum > 0 && deviceNum <= INT32_MAX) {
+    if (deviceNum > 0 && deviceNum <= DM_MAX_TRUST_DEVICE_NUM) {
         std::vector<DmDeviceInfo> deviceInfoVec;
         for (int32_t i = 0; i < deviceNum; ++i) {
             DmDeviceInfo deviceInfo;

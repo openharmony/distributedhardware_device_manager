@@ -85,7 +85,7 @@ private:
         const std::map<std::string, std::string> &filterOps);
     int32_t GetDeviceAclParam(const std::string &pkgName, std::string deviceId, bool &isOnline, int32_t &authForm);
     void ConfigDiscParam(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo *dmSubInfo);
-    bool CompareCapability(int32_t capabilityType, const std::string &capabilityStr);
+    bool CompareCapability(uint32_t capabilityType, const std::string &capabilityStr);
 
 private:
     std::mutex locks_;
