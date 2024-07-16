@@ -342,8 +342,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
             GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
-    return DM_OK;
+    return SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
 }
 
 int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
@@ -359,8 +358,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
             GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
-    return DM_OK;
+    return SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
 }
 
 int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
@@ -856,7 +854,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
             if (ret != DM_OK) {
                 result.append("HiDumpHelper GetTrustedDeviceList failed");
                 LOGE("HiDumpHelper GetTrustedDeviceList failed");
-                return ERR_DM_FAILED;
+                return ret;
             }
 
             for (unsigned int j = 0; j < deviceList.size(); j++) {
@@ -976,8 +974,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
             GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-    return DM_OK;
+    return softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
 }
 
 int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const std::string &authCode)

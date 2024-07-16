@@ -1288,9 +1288,10 @@ int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, s
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId start, pkgName: %{public}s", pkgName.c_str());
     DmDeviceInfo info;
-    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+    int32_t ret = GetLocalDeviceInfo(pkgName, info);
+    if (ret != DM_OK) {
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     networkId = std::string(info.networkId);
     LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId end, pkgName : %{public}s, networkId : %{public}s",
@@ -1302,9 +1303,10 @@ int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::str
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceId start, pkgName: %{public}s", pkgName.c_str());
     DmDeviceInfo info;
-    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+    int32_t ret = GetLocalDeviceInfo(pkgName, info);
+    if (ret != DM_OK) {
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     deviceId = std::string(info.deviceId);
     LOGI("DeviceManagerImpl::GetLocalDeviceId end, pkgName : %{public}s, deviceId : %{public}s", pkgName.c_str(),
@@ -1316,9 +1318,10 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceName start, pkgName: %{public}s", pkgName.c_str());
     DmDeviceInfo info;
-    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+    int32_t ret = GetLocalDeviceInfo(pkgName, info);
+    if (ret != DM_OK) {
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     deviceName = std::string(info.deviceName);
     LOGI("DeviceManagerImpl::GetLocalDeviceName end, pkgName : %{public}s, deviceName : %{public}s", pkgName.c_str(),
@@ -1330,9 +1333,10 @@ int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32
 {
     LOGI("DeviceManagerImpl::GetLocalDeviceType start, pkgName : %{public}s", pkgName.c_str());
     DmDeviceInfo info;
-    if (GetLocalDeviceInfo(pkgName, info) != DM_OK) {
+    int32_t ret = GetLocalDeviceInfo(pkgName, info);
+    if (ret != DM_OK) {
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
-        return ERR_DM_IPC_RESPOND_FAILED;
+        return ret;
     }
     deviceType = info.deviceTypeId;
     LOGI("DeviceManagerImpl::GetLocalDeviceType end, pkgName : %{public}s, deviceType : %{public}d", pkgName.c_str(),
@@ -2119,6 +2123,15 @@ bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const D
         return false;
     }
     return true;
+}
+
+int32_t DeviceManagerImpl::GetErrCode(int32_t errCode)
+{
+    auto flag = MAP_ERROR_CODE.find(errCode);
+    if (flag == MAP_ERROR_CODE.end()) {
+        return errCode;
+    }
+    return flag->second;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

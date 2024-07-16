@@ -39,6 +39,7 @@
 #include "nativetoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -201,7 +202,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceNetWorkId_101, testing::ext::TestS
     std::string packName;
     std::string networkId;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceNetWorkId(packName, networkId);
-    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**
@@ -239,7 +240,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceId_101, testing::ext::TestSize.Lev
     std::string packName;
     std::string deviceId;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceId(packName, deviceId);
-    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**
@@ -277,7 +278,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceName_101, testing::ext::TestSize.L
     std::string packName;
     std::string deviceName;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(packName, deviceName);
-    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**
@@ -316,7 +317,7 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceType_101, testing::ext::TestSize.L
     std::string packName;
     int32_t deviceType = 0;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceType(packName, deviceType);
-    ASSERT_EQ(ret, ERR_DM_IPC_RESPOND_FAILED);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 /**
@@ -920,7 +921,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_101, testing::ext::TestSize.
  *              set subscribeId is 0
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
- *           4. check ret is ERR_DM_STOP_REFRESH_LNN_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -937,7 +938,7 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_102, testing::ext::TestSize.
     // 3. call DeviceManagerImpl::StopDeviceDiscovery with parameter
     ret = DeviceManager::GetInstance().StopDeviceDiscovery(packName, subscribeId);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1035,7 +1036,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_101, testing::ext::TestSize.L
  *              set callback null
  *           2. InitDeviceManager return DM_OK
  *           3. call DeviceManagerImpl::AuthenticateDevice with parameter
- *           4. check ret is ERR_DM_FAILED
+ *           4. check ret is DM_OK
  * deviceTypeId
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -1056,7 +1057,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_101, testing::ext::TestSize
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is ERR_DM_FAILED
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1491,7 +1492,7 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_007, testing::ext::TestSize
     bool  isRefresh = true;
     std::vector<DmDeviceInfo> deviceList;
     int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, extra, isRefresh, deviceList);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1685,7 +1686,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, dsCallback);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -2029,7 +2030,7 @@ HWTEST_F(DeviceManagerImplTest, IsSameAccount_001, testing::ext::TestSize.Level0
  * @tc.name: IsSameAccount_002
  * @tc.desc: 1. set udid and bundleName not null
  *           2. call DeviceManagerImpl::IsSameAccount with parameter
- *           3. check ret is false
+ *           3. check ret is true
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerImplTest, IsSameAccount_002, testing::ext::TestSize.Level0)

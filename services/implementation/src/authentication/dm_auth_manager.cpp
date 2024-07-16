@@ -258,9 +258,10 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         }
     }
     std::string deviceUdid = "";
-    if (SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), deviceUdid) != DM_OK) {
+    int32_t ret = SoftbusConnector::GetUdidByNetworkId(networkId.c_str(), deviceUdid);
+    if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice GetNodeKeyInfo failed");
-        return ERR_DM_FAILED;
+        return ret;
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -268,9 +269,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         .funcName = "UnAuthenticateDevice",
         .toCallPkg = HICHAINNAME,
         .hostName = pkgName,
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
         .peerNetId = networkId,
         .localUdid = localDeviceId,
         .peerUdid = deviceUdid,
@@ -642,7 +640,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
         .localUdid = localDeviceId,
         .peerUdid = deviceId,
         .channelId = sessionId,
-        .errCode = ERR_DM_AUTH_OPEN_SESSION_FAILED,
+        .errCode = sessionId,
     };
     if (!DmRadarHelper::GetInstance().ReportAuthOpenSession(info)) {
         LOGE("ReportAuthOpenSession failed");
@@ -653,7 +651,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         }
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
-        authRequestContext_->reason = ERR_DM_AUTH_OPEN_SESSION_FAILED;
+        authRequestContext_->reason = sessionId;
         if (authRequestState_ != nullptr) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         }
@@ -938,7 +936,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
             static_cast<int32_t>(StageRes::STAGE_CANCEL) : static_cast<int32_t>(StageRes::STAGE_SUCC),
         .bizState = (action_ == USER_OPERATION_TYPE_CANCEL_AUTH) ?
             static_cast<int32_t>(BizState::BIZ_STATE_END) : static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .errCode = USER_OPERATION_TYPE_CANCEL_AUTH,
+        .errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_AUTH_REJECT),
     };
     if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
         LOGE("ReportAuthConfirmBox failed");
@@ -1034,7 +1032,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
         .stageRes = (ret == 0) ?
             static_cast<int32_t>(StageRes::STAGE_IDLE) : static_cast<int32_t>(StageRes::STAGE_FAIL),
         .peerUdid = authResponseContext_ == nullptr ? "" : authResponseContext_->deviceId,
-        .errCode = ERR_DM_ADD_GROUP_FAILED,
+        .errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_ADD_GROUP_FAILED),
     };
     if (!DmRadarHelper::GetInstance().ReportAuthAddGroup(info)) {
         LOGE("ReportAuthAddGroup failed");
@@ -1042,7 +1040,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     if (ret != 0) {
         LOGE("DmAuthManager::AddMember failed, ret: %{public}d", ret);
         isAddingMember_ = false;
-        return ERR_DM_FAILED;
+        return ERR_DM_ADD_GROUP_FAILED;
     }
     return DM_OK;
 }
@@ -1394,7 +1392,6 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
         .funcName = "OnUserOperation",
         .stageRes = static_cast<int32_t>(StageRes::STAGE_CANCEL),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
-        .errCode = action,
     };
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
@@ -1404,18 +1401,21 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
             SetReasonAndFinish(ERR_DM_TIME_OUT, STATUS_DM_AUTH_DEFAULT);
+            info.errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_TIME_OUT);
             if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
                 LOGE("ReportAuthConfirmBox failed");
             }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
             SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, STATUS_DM_AUTH_DEFAULT);
+            info.errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY);
             if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
                 LOGE("ReportAuthInputPinBox failed");
             }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
             SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL_ERROR, STATUS_DM_AUTH_DEFAULT);
+            info.errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_BIND_USER_CANCEL_ERROR);
             if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
                 LOGE("ReportAuthInputPinBox failed");
             }
@@ -1768,7 +1768,7 @@ int32_t DmAuthManager::EstablishUnbindChannel(const std::string &deviceIdHash)
         LOGE("OpenAuthSession failed, stop the syncdeleteacl.");
         authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         authResponseContext_->state = AuthState::AUTH_REQUEST_SYNCDELETE;
-        authRequestContext_->reason = ERR_DM_AUTH_OPEN_SESSION_FAILED;
+        authRequestContext_->reason = sessionId;
         if (authRequestState_ != nullptr) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
         }

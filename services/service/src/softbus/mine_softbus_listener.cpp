@@ -178,7 +178,7 @@ int32_t MineSoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
     int retValue = StopRefreshLNN(DM_PKG_NAME, subscribeId);
     if (retValue != SOFTBUS_OK) {
         LOGE("failed to stop discovery device with ret: %{public}d", retValue);
-        return ERR_DM_SOFTBUS_DISCOVERY_DEVICE;
+        return retValue;
     }
     return DM_OK;
 }
@@ -606,7 +606,7 @@ int32_t MineSoftbusListener::PublishDeviceDiscovery(void)
     int retValue = PublishLNN(DM_PKG_NAME, &publishInfo, &publishLNNCallback_);
     if (retValue != SOFTBUS_OK) {
         LOGE("failed to call softbus publishLNN function with ret: %{public}d.", retValue);
-        return ERR_DM_SOFTBUS_PUBLISH_SERVICE;
+        return retValue;
     }
     std::chrono::seconds timeout = std::chrono::seconds(MAX_SOFTBUS_DELAY_TIME);
     std::unique_lock<std::mutex> locker(g_publishLnnLock);

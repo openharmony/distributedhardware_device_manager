@@ -22,6 +22,7 @@
 #include "dm_auth_manager.h"
 #include "auth_message_processor.h"
 #include "device_manager_service_listener.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -110,7 +111,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_005, testing::ext::TestSize.Lev
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSize.Level0)

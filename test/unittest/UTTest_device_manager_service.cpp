@@ -154,7 +154,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestS
 
 /**
  * @tc.name: StopDeviceDiscovery_001
- * @tc.desc: Stop device discovery and return ERR_DM_STOP_REFRESH_LNN_FAILED
+ * @tc.desc: Stop device discovery and return SOFTBUS_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -164,7 +164,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSi
     uint16_t subscribeId = 1;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 /**
@@ -218,7 +218,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::Tes
 /**
  * @tc.name: PublishDeviceDiscovery_003
  * @tc.desc: Call PublishDeviceDiscovery twice with pkgName not null and flag bit not false and return
- * ERR_DM_START_ADVERTISING_FAILED
+ * SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -229,12 +229,12 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::Tes
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "1com.ohos.test1";
     ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM);
 }
 
 /**
  * @tc.name: UnPublishDeviceDiscovery_001
- * @tc.desc: UnPublish device discovery and return ERR_DM_STOP_PUBLISH_LNN_FAILED
+ * @tc.desc: UnPublish device discovery and return SOFTBUS_ERR
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -243,7 +243,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::T
     std::string pkgName = "com.ohos.test";
     int32_t publishId = 1;
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 /**
@@ -528,7 +528,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
 /**
  * @tc.name: UnAuthenticateDevice_004
  * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId null ，The return
- * value is ERR_DM_FAILED
+ * value is SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -537,13 +537,13 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_004, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 /**
  * @tc.name: GetUdidByNetworkId_001
  * @tc.desc: Make success for GetUdidByNetworkId，The return value is
- * DM_OK
+ * SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -553,7 +553,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSiz
     std::string netWorkId = "123";
     std::string udid = "123";
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 /**
@@ -608,7 +608,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_004, testing::ext::TestSiz
 /**
  * @tc.name: GetUuidByNetworkId_001
  * @tc.desc: Make success for GetUuidByNetworkId，The return value is
- * DM_OK
+ * SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -618,7 +618,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSiz
     std::string netWorkId = "12";
     std::string uuid = "12";
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 /**
@@ -1369,7 +1369,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     std::string networkId;
     std::string uuid;
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
@@ -1456,7 +1456,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::
     std::string netWorkId = "netWorkId";
     int32_t networkType = 0;
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
@@ -1544,7 +1544,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1561,7 +1561,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
 }
 
@@ -1641,7 +1641,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
@@ -1696,7 +1696,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_003, testing::ext::TestSize.L
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> advertiseParam;
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
-    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_ERR);
 }
 
 HWTEST_F(DeviceManagerServiceTest, BindTarget_004, testing::ext::TestSize.Level0)
@@ -1842,7 +1842,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     std::string invalidNetworkId = "12345";
     int32_t securityLevel = -1;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level0)

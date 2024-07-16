@@ -31,6 +31,7 @@
 #include "ipc_notify_publish_result_req.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -196,7 +197,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusPublishCallback_001, testing::ex
 
 /**
  * @tc.name: StartDiscovery_001
- * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return SOFTBUS_INVALID_PARAM
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -205,12 +206,12 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
     DmSubscribeInfo dmSubscribeInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
-    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 /**
  * @tc.name: StartDiscovery_002
- * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get StartDiscovery to wrong branch and return SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -219,7 +220,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_002, testing::ext::TestSize.Level0
     uint16_t subscribeId = 0;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(subscribeId);
-    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 /**
@@ -238,7 +239,7 @@ HWTEST_F(SoftbusConnectorTest, StopDiscovery_001, testing::ext::TestSize.Level0)
 
 /**
  * @tc.name: PublishDiscovery_001
- * @tc.desc: get PublishDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: get PublishDiscovery to wrong branch and return SOFTBUS_INVALID_PARAM
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
@@ -247,7 +248,7 @@ HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Leve
     DmPublishInfo dmPublishInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->PublishDiscovery(dmPublishInfo);
-    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 /**

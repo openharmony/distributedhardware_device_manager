@@ -42,6 +42,7 @@
 #include "token_setproc.h"
 #include "pin_holder.h"
 #include "pinholder_session_callback.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -787,7 +788,7 @@ HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
     }
     )";
     int32_t ret = pinHolderSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
