@@ -349,7 +349,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         return;
     }
     if (!IsUint32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
-        LOGE("err json unit32_t: %{public}s", PARAM_KEY_DISC_CAPABILITY);
+        LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
         return;
     }
     uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<uint32_t>();
