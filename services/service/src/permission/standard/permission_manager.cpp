@@ -49,11 +49,12 @@ constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_
     "CollaborationFwk",
 };
 
-#define SYSTEM_SA_WHITE_LIST_NUM (3)
+#define SYSTEM_SA_WHITE_LIST_NUM (4)
 constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
     "ohos.dslm",
+    "ohos.deviceprofile",
 };
 }
 
