@@ -40,7 +40,6 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "${access_token_path}/token_setproc:libtoken_setproc",
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "../../../../distributed_hardware_fwk/utils:distributedhardwareutils",
     "//third_party/benchmark:benchmark",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
