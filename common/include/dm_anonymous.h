@@ -30,6 +30,7 @@ std::string GetAnonyInt32(const int32_t value);
 bool IsNumberString(const std::string &inputString);
 bool IsString(const nlohmann::json &jsonObj, const std::string &key);
 bool IsInt32(const nlohmann::json &jsonObj, const std::string &key);
+bool IsUint32(const nlohmann::json &jsonObj, const std::string &key);
 bool IsInt64(const nlohmann::json &jsonObj, const std::string &key);
 bool IsArray(const nlohmann::json &jsonObj, const std::string &key);
 bool IsBool(const nlohmann::json &jsonObj, const std::string &key);

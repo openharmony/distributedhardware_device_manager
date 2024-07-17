@@ -100,6 +100,16 @@ bool IsInt32(const nlohmann::json &jsonObj, const std::string &key)
     return res;
 }
 
+bool IsUint32(const nlohmann::json &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.contains(key) && jsonObj[key].is_number_unsigned() && jsonObj[key] >= 0 &&
+        jsonObj[key] <= UINT32_MAX;
+    if (!res) {
+        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
 bool IsInt64(const nlohmann::json &jsonObj, const std::string &key)
 {
     bool res = jsonObj.contains(key) && jsonObj[key].is_number_integer() && jsonObj[key] >= INT64_MIN &&

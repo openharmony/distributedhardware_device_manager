@@ -348,11 +348,11 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         LOGE("OnDeviceFound jsonStr error");
         return;
     }
-    if (!IsInt32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
+    if (!IsUint32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
         LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
         return;
     }
-    int32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<int32_t>();
+    uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<uint32_t>();
     uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
@@ -381,12 +381,12 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
     }
 }
 
-bool DiscoveryManager::CompareCapability(int32_t capabilityType, const std::string &capabilityStr)
+bool DiscoveryManager::CompareCapability(uint32_t capabilityType, const std::string &capabilityStr)
 {
     for (uint32_t i = 0; i < sizeof(g_capabilityMap) / sizeof(g_capabilityMap[0]); i++) {
         if (strcmp(capabilityStr.c_str(), g_capabilityMap[i].capability) == 0) {
             LOGD("capabilityType: %{public}d, capabilityStr: %{public}s", capabilityType, capabilityStr.c_str());
-            return ((capabilityType >> static_cast<int32_t>(g_capabilityMap[i].bitmap)) & 1);
+            return ((capabilityType >> static_cast<uint32_t>(g_capabilityMap[i].bitmap)) & 1);
         }
     }
     return false;
