@@ -598,7 +598,7 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion);
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
@@ -650,7 +650,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.range = device.range;
 
     nlohmann::json jsonObj;
-    std::string customData(device.custData);
+    std::string customData(device.custData, DISC_MAX_CUST_DATA_LEN);
     jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
 
     const ConnectionAddr *addrInfo = &(device.addr)[0];

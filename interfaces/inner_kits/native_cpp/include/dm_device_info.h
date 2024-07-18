@@ -22,8 +22,8 @@
 
 #include "dm_app_image_info.h"
 
-#define DM_MAX_DEVICE_ID_LEN (96)
-#define DM_MAX_DEVICE_NAME_LEN (128)
+#define DM_MAX_DEVICE_ID_LEN (97)
+#define DM_MAX_DEVICE_NAME_LEN (129)
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -155,11 +155,11 @@ typedef struct DmDeviceInfo {
     /**
      * Device Id of the device.
      */
-    char deviceId[DM_MAX_DEVICE_ID_LEN];
+    char deviceId[DM_MAX_DEVICE_ID_LEN] = {0};
     /**
      * Device name of the device.
      */
-    char deviceName[DM_MAX_DEVICE_NAME_LEN];
+    char deviceName[DM_MAX_DEVICE_NAME_LEN] = {0};
     /**
      * Device type of the device.
      */
@@ -167,7 +167,7 @@ typedef struct DmDeviceInfo {
     /**
      * NetworkId of the device.
      */
-    char networkId[DM_MAX_DEVICE_ID_LEN];
+    char networkId[DM_MAX_DEVICE_ID_LEN] = {0};
     /**
      * The distance of discovered device, in centimeter(cm).
      */
@@ -195,11 +195,11 @@ DmDeviceBasicInfo {
     /**
      * Device Id of the device.
      */
-    char deviceId[DM_MAX_DEVICE_ID_LEN];
+    char deviceId[DM_MAX_DEVICE_ID_LEN] = {0};
     /**
      * Device name of the device.
      */
-    char deviceName[DM_MAX_DEVICE_NAME_LEN];
+    char deviceName[DM_MAX_DEVICE_NAME_LEN] = {0};
     /**
      * Device type of the device.
      */
@@ -207,7 +207,7 @@ DmDeviceBasicInfo {
     /**
      * NetworkId of the device.
      */
-    char networkId[DM_MAX_DEVICE_ID_LEN];
+    char networkId[DM_MAX_DEVICE_ID_LEN] = {0};
 } DmDeviceBasicInfo;
 
 /**
