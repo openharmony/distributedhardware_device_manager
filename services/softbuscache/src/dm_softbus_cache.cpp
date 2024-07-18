@@ -170,6 +170,9 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
             LOGE("ChangeDeviceInfo deviceInfo copy networkId failed");
         }
         deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
+        std::string uuid = "";
+        GetUuidByNetworkId(deviceInfo.networkId, uuid);
+        deviceInfo_[udid].first = uuid;
     }
     LOGI("ChangeDeviceInfo sucess udid %{public}s, networkId %{public}s.",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
