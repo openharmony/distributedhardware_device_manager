@@ -22,6 +22,7 @@
 #include "dm_auth_manager.h"
 #include "auth_message_processor.h"
 #include "device_manager_service_listener.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -694,7 +695,7 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_002, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->bindLevel = 1;
     authManager_->isAuthDevice_ = true;
     int32_t ret = authManager_->ProcessPincode(pinCode);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_ADD_GROUP_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ProcessPincode_003, testing::ext::TestSize.Level0)

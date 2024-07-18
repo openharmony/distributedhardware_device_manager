@@ -177,8 +177,8 @@ public:
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
     std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);
+    int32_t GetErrCode(int32_t errCode);
 private:
-    int32_t GetErrorCode(int32_t errCode, int32_t module);
     std::string GetAnonyUdid(std::string udid);
     std::string GetLocalUdid();
 };

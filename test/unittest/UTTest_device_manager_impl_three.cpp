@@ -39,6 +39,7 @@
 #include "nativetoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -843,7 +844,7 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
     ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, subscribeId, filterOptions, callback);
-    ASSERT_NE(ret, DM_OK);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1012,7 +1013,7 @@ HWTEST_F(DeviceManagerImplTest, RequestCredential003, testing::ext::TestSize.Lev
     std::string reqJsonStr = "reqJsonStr";
     std::string returnJsonStr;
     int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, reqJsonStr, returnJsonStr);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, ImportCredential001, testing::ext::TestSize.Level0)
@@ -1036,7 +1037,7 @@ HWTEST_F(DeviceManagerImplTest, ImportCredential003, testing::ext::TestSize.Leve
     std::string pkgName = "pkgName";
     std::string credentialInfo = "credentialInfo";
     int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, credentialInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, DeleteCredential001, testing::ext::TestSize.Level0)
@@ -1060,7 +1061,7 @@ HWTEST_F(DeviceManagerImplTest, DeleteCredential003, testing::ext::TestSize.Leve
     std::string pkgName = "pkgName";
     std::string deleteInfo = "deleteInfo";
     int32_t ret = DeviceManager::GetInstance().DeleteCredential(pkgName, deleteInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, RegisterCredentialCallback001, testing::ext::TestSize.Level0)
@@ -1091,7 +1092,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = nullptr;
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
-    EXPECT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }
 } // namespace

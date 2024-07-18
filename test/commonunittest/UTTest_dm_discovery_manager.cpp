@@ -26,6 +26,7 @@
 #include "device_manager_service_listener.h"
 #include "softbus_bus_center.h"
 #include "device_manager_service_listener.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -121,7 +122,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_002, testing::ext::TestSiz
 /**
  * @tc.name:StartDeviceDiscovery_003
  * @tc.desc: keeping pkgame unchanged, call StartDeviceDiscovery once,
- *           extra is empty,  discoveryQueue_ is empty, and return ERR_DM_DISCOVERY_FAILED
+ *           extra is empty,  discoveryQueue_ is empty, and return SOFTBUS_INVALID_PARAM
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -134,7 +135,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_003, testing::ext::TestSiz
     std::queue<std::string> emptyQueue;
     discoveryMgr_->discoveryQueue_ = emptyQueue;
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    ASSERT_EQ(ret, SOFTBUS_INVALID_PARAM);
     discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeInfo.subscribeId);
 }
 
@@ -161,7 +162,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_004, testing::ext::TestSiz
 /**
  * @tc.name:StartDeviceDiscovery_005
  * @tc.desc: pkgame changed, call StartDeviceDiscovery once,
- *           discoveryQueue is empty and return ERR_DM_DISCOVERY_FAILED
+ *           discoveryQueue is empty and return SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -173,7 +174,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_005, testing::ext::TestSiz
     std::queue<std::string> emptyQueue;
     discoveryMgr_->discoveryQueue_ = emptyQueue;
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    ASSERT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    ASSERT_EQ(ret, SOFTBUS_IPC_ERR);
     discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
 }
 
@@ -193,7 +194,7 @@ HWTEST_F(DmDiscoveryManagerTest, StopDeviceDiscovery_001, testing::ext::TestSize
 
 /**
  * @tc.name: StopDeviceDiscovery_002
- * @tc.desc: return ERR_DM_DISCOVERY_FAILED
+ * @tc.desc: return SOFTBUS_IPC_ERR
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -202,7 +203,7 @@ HWTEST_F(DmDiscoveryManagerTest, StopDeviceDiscovery_002, testing::ext::TestSize
     std::string pkgName = "com.ohos.helloworld";
     uint16_t subscribeId = 1;
     int32_t ret = discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_DISCOVERY_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 /**

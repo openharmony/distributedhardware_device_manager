@@ -157,11 +157,6 @@ std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
     return GetAnonyUdid(std::string(udidHash));
 }
 
-int32_t DmRadarHelper::GetErrorCode(int32_t errCode, int32_t module)
-{
-    return ErrCodeOffset(SUBSYS_DISTRIBUTEDHARDWARE_DM, module) + errCode;
-}
-
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)
 {
     if (udid.empty() || udid.length() < INVALID_UDID_LENGTH) {
@@ -175,6 +170,15 @@ std::string DmRadarHelper::GetLocalUdid()
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     return std::string(localDeviceId);
+}
+
+int32_t DmRadarHelper::GetErrCode(int32_t errCode)
+{
+    auto flag = MAP_ERROR_CODE.find(errCode);
+    if (flag == MAP_ERROR_CODE.end()) {
+        return errCode;
+    }
+    return flag->second;
 }
 
 IDmRadarHelper *CreateDmRadarInstance()

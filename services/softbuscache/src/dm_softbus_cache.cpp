@@ -70,7 +70,7 @@ int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     nodeInfo = localDeviceInfo_;
@@ -100,7 +100,7 @@ int32_t SoftbusCache::GetUdidByNetworkId(const char *networkId, std::string &udi
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     udid = reinterpret_cast<char *>(mUdid);
     return ret;
@@ -112,7 +112,7 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     uuid = reinterpret_cast<char *>(mUuid);
     return ret;
@@ -223,11 +223,12 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
             return DM_OK;
         }
     }
-    if (GetUdidByNetworkId(networkId, udid) == DM_OK) {
+    int32_t ret = GetUdidByNetworkId(networkId, udid);
+    if (ret == DM_OK) {
         LOGI("Get udid from softbus success.");
         return DM_OK;
     }
-    return ERR_DM_FAILED;
+    return ret;
 }
 
 int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
@@ -241,11 +242,12 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
             return DM_OK;
         }
     }
-    if (GetUuidByNetworkId(networkId, uuid) == DM_OK) {
+    int32_t ret = GetUuidByNetworkId(networkId, uuid);
+    if (ret == DM_OK) {
         LOGI("Get uuid from softbus success.");
         return DM_OK;
     }
-    return ERR_DM_FAILED;
+    return ret;
 }
 
 int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
@@ -304,11 +306,12 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
             return DM_OK;
         }
     }
-    if (GetDevLevelFromBus(networkId, securityLevel) == DM_OK) {
+    int32_t ret = GetDevLevelFromBus(networkId, securityLevel);
+    if (ret == DM_OK) {
         LOGI("Get dev level from softbus success.");
         return DM_OK;
     }
-    return ERR_DM_FAILED;
+    return ret;
 }
 
 int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securityLevel)
@@ -338,9 +341,10 @@ int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDevi
             }
         }
     }
-    if (GetDevInfoFromBus(networkId, nodeInfo) != DM_OK) {
+    int32_t ret = GetDevInfoFromBus(networkId, nodeInfo);
+    if (ret != DM_OK) {
         LOGE("GetDevInfoFromBus failed.");
-        return ERR_DM_FAILED;
+        return ret;
     }
     SaveDeviceInfo(nodeInfo);
     return DM_OK;
@@ -353,7 +357,7 @@ int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceIn
     int32_t ret = GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &nodeInfoCount);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     for (int32_t i = 0; i < nodeInfoCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;

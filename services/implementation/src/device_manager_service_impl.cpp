@@ -550,7 +550,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         int32_t ret = softbusConnector_->GetUdidByNetworkId(it->networkId, udid);
         if (ret != DM_OK) {
             LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
-            return ERR_DM_FAILED;
+            return ret;
         }
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
         if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
@@ -571,7 +571,7 @@ int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, 
     int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId, udid);
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
     return DM_OK;

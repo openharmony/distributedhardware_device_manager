@@ -28,6 +28,7 @@
 #include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
 #include "softbus_listener.cpp"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -218,7 +219,7 @@ HWTEST_F(SoftbusListenerTest, PublishSoftbusLNN_001, testing::ext::TestSize.Leve
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->PublishSoftbusLNN(dmPubInfo, capability, customData);
-    EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
@@ -228,7 +229,7 @@ HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->StopPublishSoftbusLNN(publishId);
-    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(SoftbusListenerTest, RegisterSoftbusLnnOpsCbk_001, testing::ext::TestSize.Level0)
@@ -271,7 +272,7 @@ HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUdidByNetworkId(networkId.c_str(), udid);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
@@ -282,7 +283,7 @@ HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), udid);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
@@ -304,7 +305,7 @@ HWTEST_F(SoftbusListenerTest, GetNetworkTypeByNetworkId_001, testing::ext::TestS
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetNetworkTypeByNetworkId(networkId, networkType);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level0)
@@ -453,7 +454,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetDeviceInfo(networkId, info);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
@@ -463,7 +464,7 @@ HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetLocalDeviceInfo(info);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertBytesToUpperCaseHexString_001, testing::ext::TestSize.Level0)
@@ -485,7 +486,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceSecurityLevel_001, testing::ext::TestSize
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Level0)
@@ -614,7 +615,7 @@ HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Leve
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->RefreshSoftbusLNN(pkgName.c_str(), dmSubInfo, customData);
-    EXPECT_EQ(ret, ERR_DM_REFRESH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
@@ -624,7 +625,7 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
-    EXPECT_EQ(ret, ERR_DM_STOP_REFRESH_LNN_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 } // namespace
 } // namespace DistributedHardware

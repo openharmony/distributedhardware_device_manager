@@ -383,6 +383,8 @@ public:
     virtual bool IsSameAccount(const std::string &netWorkId) override;
     virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
+    virtual int32_t GetErrCode(int32_t errCode) override;
+
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

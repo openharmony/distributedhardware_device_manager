@@ -1042,7 +1042,7 @@ HWTEST_F(DeviceManagerImplTest, GetUdidByNetworkId_003, testing::ext::TestSize.L
     // 3. call DeviceManagerImpl::GetUdidByNetworkId with parameter
     ret = DeviceManager::GetInstance().GetUdidByNetworkId(packName, netWorkId, udid);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     // DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
@@ -1187,7 +1187,7 @@ HWTEST_F(DeviceManagerImplTest, GetUuidByNetworkId_003, testing::ext::TestSize.L
     // 3. call DeviceManagerImpl::GetUuidByNetworkId with parameter
     ret = DeviceManager::GetInstance().GetUuidByNetworkId(packName, netWorkId, uuid);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 

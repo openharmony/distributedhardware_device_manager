@@ -22,6 +22,7 @@
 #include "device_manager_service_listener.h"
 #include "softbus_bus_center.h"
 #include "device_manager_service_listener.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -110,7 +111,7 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
-    ASSERT_EQ(ret, ERR_DM_PUBLISH_FAILED);
+    ASSERT_EQ(ret, SOFTBUS_INVALID_PARAM);
     publishMgr_->UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 

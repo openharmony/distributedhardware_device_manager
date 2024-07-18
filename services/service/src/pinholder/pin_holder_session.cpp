@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
 constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_FAILED = -20000;
+constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager.pinholder";
 PinHolderSession::PinHolderSession()
@@ -53,9 +53,10 @@ int32_t PinHolderSession::OpenSessionServer(const PeerTargetId &targetId)
 {
     int32_t sessionId = -1;
     ConnectionAddr addrInfo;
-    if (GetAddrByTargetId(targetId, addrInfo) != DM_OK) {
+    int32_t ret = GetAddrByTargetId(targetId, addrInfo);
+    if (ret != DM_OK) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
-        return sessionId;
+        return ret;
     }
     sessionId = ::OpenAuthSession(DM_PIN_HOLDER_SESSION_NAME, &addrInfo, 1, nullptr);
     if (sessionId < 0) {
@@ -129,7 +130,7 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     return ret;
 }

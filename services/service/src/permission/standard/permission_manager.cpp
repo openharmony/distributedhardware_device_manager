@@ -35,7 +35,7 @@ constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SER
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_FAILED = -20000;
+constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 #define AUTH_CODE_WHITE_LIST_NUM (3)
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
