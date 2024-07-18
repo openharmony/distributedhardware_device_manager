@@ -89,11 +89,9 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     {
         std::lock_guard<std::mutex> lock(dependsSASetLock_);
-        if (dependsSASet_.find(systemAbilityId) != dependsSASet_.end()) {
-            dependsSASet_.erase(systemAbilityId);
-            if (dependsSASet_.empty()) {
-                DeviceManagerService::GetInstance().InitSoftbusListener();
-            }
+        dependsSASet_.erase(systemAbilityId);
+        if (dependsSASet_.empty()) {
+            DeviceManagerService::GetInstance().InitSoftbusListener();
         }
     }
 

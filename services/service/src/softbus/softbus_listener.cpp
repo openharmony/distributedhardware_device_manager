@@ -598,7 +598,12 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
+    char osVer[OS_VERSION_BUF_LEN + 1] = {0};
+    if (memcpy_s(osVer, OS_VERSION_BUF_LEN + 1, nodeInfo.osVersion, OS_VERSION_BUF_LEN) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy osVersion data failed.");
+        return ERR_DM_FAILED;
+    }
+    extraJson[PARAM_KEY_OS_VERSION] = std::string(osVer);
     devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
@@ -649,8 +654,13 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.deviceTypeId = device.devType;
     dmDevice.range = device.range;
 
+    char custData[DISC_MAX_CUST_DATA_LEN + 1] = {0};
+    if (memcpy_s(custData, DISC_MAX_CUST_DATA_LEN + 1, device.custData, DISC_MAX_CUST_DATA_LEN) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy custData data failed.");
+        return;
+    }
+    std::string customData(custData);
     nlohmann::json jsonObj;
-    std::string customData(device.custData, DISC_MAX_CUST_DATA_LEN);
     jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
 
     const ConnectionAddr *addrInfo = &(device.addr)[0];
