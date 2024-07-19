@@ -58,6 +58,13 @@ declare_args() {
   }
 
   if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_power_manager)) {
+    support_power_manager = true
+  } else {
+    support_power_manager = false
+  }
+
+  if (defined(global_parts_info) &&
       defined(global_parts_info.theme_screenlock_mgr)) {
     support_screenlock = true
   } else {

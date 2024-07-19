@@ -204,7 +204,6 @@ if (defined(ohos_lite)) {
       "memmgr:memmgrclient",
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
-      "power_manager:powermgr_client",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
@@ -224,6 +223,11 @@ if (defined(ohos_lite)) {
     if (support_wifi) {
       defines += [ "SUPPORT_WIFI" ]
       external_deps += [ "wifi:wifi_sdk" ]
+    }
+
+    if (support_power_manager) {
+      defines += [ "SUPPORT_POWER_MANAGER" ]
+      external_deps += [ "power_manager:powermgr_client" ]
     }
 
     public_external_deps = [ "json:nlohmann_json_static" ]

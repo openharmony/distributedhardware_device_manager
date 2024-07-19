@@ -179,19 +179,26 @@ int32_t DmPublishEventSubscriber::GetScreenState()
     return screenState_;
 }
 
+void DmPublishEventSubscriber::SetScreenEventState(const std::string &receiveEvent)
+{
+    std::lock_guard<std::mutex> lock(screenStateMutex_);
+#ifdef SUPPORT_POWER_MANAGER
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        screenState_ = DM_SCREEN_ON;
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        screenState_ = DM_SCREEN_OFF;
+    }
+#else
+    screenState_ = DM_SCREEN_ON;
+#endif // SUPPORT_POWER_MANAGER
+}
+
 void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     int32_t eventState = data.GetCode();
     LOGI("On Received receiveEvent: %{public}s, eventState: %{public}d", receiveEvent.c_str(), eventState);
-    {
-        std::lock_guard<std::mutex> lock(screenStateMutex_);
-        if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            screenState_ = DM_SCREEN_ON;
-        } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            screenState_ = DM_SCREEN_OFF;
-        }
-    }
+    SetScreenEventState(receiveEvent);
 
 #ifdef SUPPORT_BLUETOOTH
     {

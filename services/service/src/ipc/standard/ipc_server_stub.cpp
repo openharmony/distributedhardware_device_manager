@@ -63,7 +63,9 @@ void IpcServerStub::OnStart()
     {
         std::lock_guard<std::mutex> lock(dependsSASetLock_);
         dependsSASet_.emplace(SOFTBUS_SERVER_SA_ID);
+#ifdef SUPPORT_POWER_MANAGER
         dependsSASet_.emplace(POWER_MANAGER_SERVICE_ID);  // power
+#endif // SUPPORT_POWER_MANAGER
 #ifdef SUPPORT_BLUETOOTH
         dependsSASet_.emplace(BLUETOOTH_HOST_SYS_ABILITY_ID); // ble
 #endif // SUPPORT_BLUETOOTH
@@ -74,7 +76,9 @@ void IpcServerStub::OnStart()
     }
 
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
+#ifdef SUPPORT_POWER_MANAGER
     AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
+#endif // SUPPORT_POWER_MANAGER
 #ifdef SUPPORT_BLUETOOTH
     AddSystemAbilityListener(BLUETOOTH_HOST_SYS_ABILITY_ID);  // ble
 #endif // SUPPORT_BLUETOOTH
