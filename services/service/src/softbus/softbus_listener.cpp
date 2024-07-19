@@ -632,8 +632,6 @@ std::string SoftbusListener::ConvertBytesToUpperCaseHexString(const uint8_t arr[
     return result;
 }
 
-
-
 void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice)
 {
     (void)memset_s(&dmDevice, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
