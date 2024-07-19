@@ -18,8 +18,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
+namespace {
 constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+}
 
 std::string GetAnonyString(const std::string &value)
 {
@@ -172,14 +173,21 @@ bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
 }
 
-std::string ConvertC2String(const char *srcData, int32_t srcLen)
+std::string ConvertCharArray2String(const char *srcData, int32_t srcLen)
 {
-    char destData[srcLen + 1] = {0};
-    if (memcpy_s(destData, srcLen + 1, srcData, srcLen) != DM_OK) {
-        LOGE("ConvertC2String failed.");
+    if (srcData == nullptr || srcLen <= 0 || srcLen >= MAX_MESSAGE_LEN) {
+        LOGE("Invalid parameter.");
         return "";
     }
-    return std::string(destData);
+    char *dstData = new [srcLen + 1]();
+    if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != DM_OK) {
+        LOGE("ConvertC2String failed.");
+        delete[] dstData;
+        return "";
+    }
+    std::string temp(dstData);
+    delete[] dstData;
+    return temp;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
