@@ -37,6 +37,7 @@ bool IsBool(const nlohmann::json &jsonObj, const std::string &key);
 std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap);
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
+std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

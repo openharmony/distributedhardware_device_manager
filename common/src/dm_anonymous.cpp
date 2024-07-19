@@ -18,8 +18,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
+namespace {
 constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+}
 
 std::string GetAnonyString(const std::string &value)
 {
@@ -170,6 +171,23 @@ void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, st
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 {
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
+}
+
+std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
+{
+    if (srcData == nullptr || srcLen == 0 || srcLen >= MAX_MESSAGE_LEN) {
+        LOGE("Invalid parameter.");
+        return "";
+    }
+    char *dstData = new char[srcLen + 1]();
+    if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != 0) {
+        LOGE("memcpy_s failed.");
+        delete[] dstData;
+        return "";
+    }
+    std::string temp(dstData);
+    delete[] dstData;
+    return temp;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
