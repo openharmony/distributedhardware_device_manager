@@ -180,7 +180,7 @@ std::string ConvertCharArray2String(const char *srcData, int32_t srcLen)
         return "";
     }
     char *dstData = new [srcLen + 1]();
-    if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != DM_OK) {
+    if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != 0) {
         LOGE("ConvertC2String failed.");
         delete[] dstData;
         return "";
