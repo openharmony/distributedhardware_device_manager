@@ -268,7 +268,7 @@ int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeIn
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = ConvertC2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
+    extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }

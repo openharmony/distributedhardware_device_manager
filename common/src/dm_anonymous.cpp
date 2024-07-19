@@ -173,15 +173,15 @@ bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
 }
 
-std::string ConvertCharArray2String(const char *srcData, int32_t srcLen)
+std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
 {
     if (srcData == nullptr || srcLen <= 0 || srcLen >= MAX_MESSAGE_LEN) {
         LOGE("Invalid parameter.");
         return "";
     }
-    char *dstData = new [srcLen + 1]();
+    char *dstData = new char[srcLen + 1]();
     if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != 0) {
-        LOGE("ConvertC2String failed.");
+        LOGE("ConvertCharArray2String failed.");
         delete[] dstData;
         return "";
     }
