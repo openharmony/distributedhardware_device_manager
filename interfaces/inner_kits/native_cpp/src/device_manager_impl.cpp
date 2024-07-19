@@ -2133,5 +2133,25 @@ int32_t DeviceManagerImpl::GetErrCode(int32_t errCode)
     }
     return flag->second;
 }
+
+int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
+{
+    LOGI("ShiftLNNGear start. for pkgName = %{public}s", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(SHIFT_LNN_GEAR, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("ShiftLNNGear error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("ShiftLNNGear error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("DeviceManagerImpl::ShiftLNNGear completed");
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

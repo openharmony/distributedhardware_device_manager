@@ -384,6 +384,7 @@ public:
     virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual int32_t GetErrCode(int32_t errCode) override;
+    virtual int32_t ShiftLNNGear(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

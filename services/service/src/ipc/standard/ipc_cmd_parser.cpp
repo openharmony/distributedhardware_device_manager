@@ -377,7 +377,7 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
     bool isRefresh = data.ReadBool();
-    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh);
+    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh, false);
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     if (!reply.WriteInt32((int32_t)deviceList.size())) {
@@ -1418,6 +1418,18 @@ ON_IPC_CMD(CHECK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     int32_t result = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+
+ON_IPC_CMD(SHIFT_LNN_GEAR, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, true, true);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

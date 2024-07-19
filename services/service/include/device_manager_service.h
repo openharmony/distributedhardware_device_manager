@@ -65,7 +65,7 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
 
-    int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh);
+    int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh, bool isWakeUp);
 
     int32_t GetLocalDeviceInfo(DmDeviceInfo &info);
 

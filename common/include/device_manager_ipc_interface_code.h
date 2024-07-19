@@ -89,6 +89,7 @@ enum DMIpcCmdInterfaceCode {
     CHECK_API_PERMISSION,
     CHECK_ACCESS_CONTROL,
     CHECK_SAME_ACCOUNT,
+    SHIFT_LNN_GEAR,
     // Add ipc msg here
     IPC_MSG_BUTT
 };
