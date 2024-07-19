@@ -171,5 +171,15 @@ bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 {
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
 }
+
+std::string ConvertC2String(const char *srcData, int32_t srcLen)
+{
+    char destData[srcLen + 1] = {0};
+    if (memcpy_s(destData, srcLen + 1, srcData, srcLen) != DM_OK) {
+        LOGE("ConvertC2String failed.");
+        return "";
+    }
+    return std::string(destData);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

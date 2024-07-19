@@ -268,12 +268,7 @@ int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeIn
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    char osVer[OS_VERSION_BUF_LEN + 1] = {0};
-    if (memcpy_s(osVer, OS_VERSION_BUF_LEN + 1, nodeInfo.osVersion, OS_VERSION_BUF_LEN) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy osVersion data failed.");
-        return ERR_DM_FAILED;
-    }
-    extraJson[PARAM_KEY_OS_VERSION] = std::string(osVer);
+    extraJson[PARAM_KEY_OS_VERSION] = ConvertC2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
