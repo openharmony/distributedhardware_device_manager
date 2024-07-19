@@ -175,7 +175,7 @@ bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
 {
-    if (srcData == nullptr || srcLen >= MAX_MESSAGE_LEN) {
+    if (srcData == nullptr || srcLen == 0 || srcLen >= MAX_MESSAGE_LEN) {
         LOGE("Invalid parameter.");
         return "";
     }
