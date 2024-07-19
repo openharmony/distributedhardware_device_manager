@@ -175,13 +175,13 @@ bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
 {
-    if (srcData == nullptr || srcLen <= 0 || srcLen >= MAX_MESSAGE_LEN) {
+    if (srcData == nullptr || srcLen >= MAX_MESSAGE_LEN) {
         LOGE("Invalid parameter.");
         return "";
     }
     char *dstData = new char[srcLen + 1]();
     if (memcpy_s(dstData, srcLen + 1, srcData, srcLen) != 0) {
-        LOGE("ConvertCharArray2String failed.");
+        LOGE("memcpy_s failed.");
         delete[] dstData;
         return "";
     }
