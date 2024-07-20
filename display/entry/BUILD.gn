@@ -19,6 +19,7 @@ ohos_hap("DeviceManager_UI") {
     ":devicemanager_ui_js_assets",
     ":devicemanager_ui_resources",
   ]
+  publicity_file = "../publicity.xml"
   certificate_profile = "../signature/DeviceManager_UI.p7b"
   hap_name = "DeviceManager_UI"
   part_name = "prebuilt_hap"

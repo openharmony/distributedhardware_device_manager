@@ -125,16 +125,16 @@ void DeviceManagerService::SubscribePublishCommonEvent()
 void DeviceManagerService::QueryDependsSwitchState()
 {
     LOGI("DeviceManagerService::QueryDependsSwitchState start.");
-    std::shared_ptr<DmPublishEventSubscriber> publisSubScriber = publshCommonEventManager_->GetSubscriber();
-    if (publisSubScriber == nullptr) {
-        LOGE("publisSubScriber is nullptr.");
+    std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = publshCommonEventManager_->GetSubscriber();
+    if (publishSubScriber == nullptr) {
+        LOGE("publishSubScriber is nullptr.");
         return;
     }
 #ifdef SUPPORT_BLUETOOTH
     if (Bluetooth::BluetoothHost::GetDefaultHost().IsBleEnabled()) {
-        publisSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON));
+        publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON));
     } else {
-        publisSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
+        publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
     }
 #endif // SUPPORT_BLUETOOTH
 
@@ -142,23 +142,23 @@ void DeviceManagerService::QueryDependsSwitchState()
     bool isWifiActive = false;
     Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
     if (isWifiActive) {
-        publisSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
+        publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
     } else {
-        publisSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
+        publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
     }
 #endif // SUPPORT_WIFI
 
 #ifdef SUPPORT_POWER_MANAGER
     if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
-        publisSubScriber->SetScreenState(DM_SCREEN_ON);
+        publishSubScriber->SetScreenState(DM_SCREEN_ON);
     } else {
-        publisSubScriber->SetScreenState(DM_SCREEN_OFF);
+        publishSubScriber->SetScreenState(DM_SCREEN_OFF);
     }
 #else
-    publisSubScriber->SetScreenState(DM_SCREEN_ON);
+    publishSubScriber->SetScreenState(DM_SCREEN_ON);
 #endif // SUPPORT_POWER_MANAGER
-    OHOS::DistributedHardware::PublishCommonEventCallback(publisSubScriber->GetBluetoothState(),
-        publisSubScriber->GetWifiState(), publisSubScriber->GetScreenState());
+    OHOS::DistributedHardware::PublishCommonEventCallback(publishSubScriber->GetBluetoothState(),
+        publishSubScriber->GetWifiState(), publishSubScriber->GetScreenState());
 }
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
