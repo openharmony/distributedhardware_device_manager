@@ -43,7 +43,7 @@ int32_t AuthResponseState::SetAuthManager(std::shared_ptr<DmAuthManager> authMan
     return DM_OK;
 }
 
-int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state)
+int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state) __attribute__((no_sanitize("cfi")))
 {
     LOGI("AuthResponseState::TransitionTo");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
