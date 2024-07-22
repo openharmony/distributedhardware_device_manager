@@ -99,7 +99,7 @@ HWTEST_F(DMImportAuthCodeTest, PeerTargetId_001, testing::ext::TestSize.Level0)
 
     PeerTargetId other;
     ASSERT_NE(other == peerTargetId, true);
-    ASSERT_NE(other < peerTargetId, true);
+    ASSERT_EQ(other < peerTargetId, true);
 }
 } // namespace
 } // namespace DistributedHardware
