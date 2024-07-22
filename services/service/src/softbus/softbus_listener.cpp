@@ -567,12 +567,12 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
     return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
-int32_t SoftbusListener::ShiftLNNGear()
+int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
 {
     GearMode mode = {
         .cycle = HIGH_FREQ_CYCLE,
         .duration = DEFAULT_DURATION,
-        .wakeupFlag = false,
+        .wakeupFlag = isWakeUp,
     };
     int32_t ret = ::ShiftLNNGear(DM_PKG_NAME, DM_PKG_NAME, nullptr, &mode);
     if (ret != DM_OK) {

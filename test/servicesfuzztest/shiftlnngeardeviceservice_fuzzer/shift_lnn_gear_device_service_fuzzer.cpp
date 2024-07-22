@@ -29,7 +29,7 @@ void ShiftLNNGearDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     std::string callerId(reinterpret_cast<const char*>(data), size);
     bool isRefresh = true;
 
-    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh);
+    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh, false);
 }
 }
 }

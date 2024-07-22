@@ -263,16 +263,21 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     return DM_OK;
 }
 
-int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh)
+int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh,
+                                           bool isWakeUp)
 {
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call ShiftLNNGear, pkgName = %{public}s", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
     LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
-        "%{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh);
+        "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
     if (pkgName.empty() || callerId.empty()) {
         LOGE("Invalid parameter, parameter is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (isRefresh) {
-        int32_t ret = softbusListener_->ShiftLNNGear();
+        int32_t ret = softbusListener_->ShiftLNNGear(isWakeUp);
         if (ret != DM_OK) {
             LOGE("ShiftLNNGear error, failed ret: %{public}d", ret);
             return ret;

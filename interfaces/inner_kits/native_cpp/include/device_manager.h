@@ -605,6 +605,7 @@ public:
     virtual bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual int32_t GetErrCode(int32_t errCode) = 0;
+    virtual int32_t ShiftLNNGear(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

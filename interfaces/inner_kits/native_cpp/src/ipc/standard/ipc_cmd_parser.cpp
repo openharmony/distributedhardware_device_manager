@@ -1584,5 +1584,26 @@ ON_IPC_READ_RESPONSE(CHECK_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<I
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(SHIFT_LNN_GEAR, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SHIFT_LNN_GEAR, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

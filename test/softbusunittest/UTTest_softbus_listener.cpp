@@ -112,7 +112,7 @@ HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_NE(softbusListener->ShiftLNNGear(), DM_OK);
+    EXPECT_NE(softbusListener->ShiftLNNGear(false), DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
