@@ -29,6 +29,7 @@ group("fuzztest") {
     "softbusconnectorcommon_fuzzer:fuzztest",
     "softbusconnectorpublish_fuzzer:fuzztest",
     "softbusconnectorregister_fuzzer:fuzztest",
+    "softbusconnectorstate_fuzzer:fuzztest",
     "softbusconnectorstatic_fuzzer:fuzztest",
     "softbuslistenergetlocaldeviceinfo_fuzzer:fuzztest",
     "softbussession_fuzzer:fuzztest",

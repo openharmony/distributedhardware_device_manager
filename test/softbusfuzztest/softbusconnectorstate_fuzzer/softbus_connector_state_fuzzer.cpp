@@ -21,12 +21,18 @@
 #include "softbus_discovery_callback.h"
 #include "softbus_publish_callback.h"
 #include "softbus_session.h"
-#include "softbus_connector_common_fuzzer.h"
+#include "softbus_state_callback.h"
+#include "softbus_connector_state_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+class SoftbusStateCallbackFuzzTest : public ISoftbusStateCallback{
+public:
+    void OnDeviceOnline(std::string deviceId, int32_t authForm)  {}
+    void OnDeviceOffline(std::string deviceId)  {}
+};
 
-void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
+void SoftBusConnectorStateFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
@@ -35,13 +41,11 @@ void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
     std::string str(reinterpret_cast<const char*>(data), size);
     int32_t authForm = *(reinterpret_cast<const int32_t*>(data));
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackFuzzTest>();
 
-    softbusConnector->GetDeviceUdidHashByUdid(str);
-    softbusConnector->EraseUdidFromMap(str);
-    softbusConnector->GetNetworkIdByDeviceId(str);
-    softbusConnector->SetPkgName(str);
-    softbusConnector->CheckIsOnline(str);
-    softbusConnector->GetDeviceInfoByDeviceId(str);
+    softbusConnector->RegisterSoftbusStateCallback(callback);
+    softbusConnector->HandleDeviceOnline(str, authForm);
+    softbusConnector->HandleDeviceOffline(str);
 }
 }
 }
@@ -50,7 +54,7 @@ void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SoftBusConnectorCommonFuzzTest(data, size);
+    OHOS::DistributedHardware::SoftBusConnectorStateFuzzTest(data, size);
 
     return 0;
 }
