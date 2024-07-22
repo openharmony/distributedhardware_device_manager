@@ -231,7 +231,7 @@ struct ConfirmCustomDialog {
               .fontWeight(FontWeight.Regular)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .maxLines(3)
+              .maxLines(2)
               .width('auto')
               .margin({ top: 8 })
               .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
