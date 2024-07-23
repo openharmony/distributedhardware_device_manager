@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusStateCallbackFuzzTest : public ISoftbusStateCallback{
+class SoftbusStateCallbackFuzzTest : public ISoftbusStateCallback {
 public:
     virtual ~SoftbusStateCallbackFuzzTest() {}
 
