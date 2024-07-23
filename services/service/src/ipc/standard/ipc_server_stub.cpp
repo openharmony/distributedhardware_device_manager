@@ -66,25 +66,12 @@ void IpcServerStub::OnStart()
 #ifdef SUPPORT_POWER_MANAGER
         dependsSASet_.emplace(POWER_MANAGER_SERVICE_ID);  // power
 #endif // SUPPORT_POWER_MANAGER
-#ifdef SUPPORT_BLUETOOTH
-        dependsSASet_.emplace(BLUETOOTH_HOST_SYS_ABILITY_ID); // ble
-#endif // SUPPORT_BLUETOOTH
-
-#ifdef SUPPORT_WIFI
-        dependsSASet_.emplace(WIFI_DEVICE_SYS_ABILITY_ID); // wifi
-#endif // SUPPORT_WIFI
     }
 
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
 #ifdef SUPPORT_POWER_MANAGER
     AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
 #endif // SUPPORT_POWER_MANAGER
-#ifdef SUPPORT_BLUETOOTH
-    AddSystemAbilityListener(BLUETOOTH_HOST_SYS_ABILITY_ID);  // ble
-#endif // SUPPORT_BLUETOOTH
-#ifdef SUPPORT_WIFI
-    AddSystemAbilityListener(WIFI_DEVICE_SYS_ABILITY_ID);  // wifi
-#endif // SUPPORT_WIFI
     LOGI("called:AddAbilityListener end!");
 }
 
