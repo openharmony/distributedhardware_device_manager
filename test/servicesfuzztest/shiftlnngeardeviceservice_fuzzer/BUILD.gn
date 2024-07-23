@@ -59,6 +59,7 @@ ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
   deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
 
   external_deps = [
+    "ability_base:want",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
