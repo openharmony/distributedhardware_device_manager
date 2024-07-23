@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,11 @@ namespace DistributedHardware {
 
 void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 
     std::string str(reinterpret_cast<const char*>(data), size);
-    int32_t authForm = *(reinterpret_cast<const int32_t*>(data));
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 
     softbusConnector->GetDeviceUdidHashByUdid(str);
