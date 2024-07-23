@@ -27,12 +27,12 @@
 #include "device_manager_callback.h"
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerNotify {
-    DECLARE_SINGLE_INSTANCE(DeviceManagerNotify);
+    DM_DECLARE_SINGLE_INSTANCE(DeviceManagerNotify);
 
 public:
     void RegisterDeathRecipientCallback(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback);

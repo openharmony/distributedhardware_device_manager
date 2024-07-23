@@ -20,14 +20,14 @@
 #include <string>
 #include <mutex>
 #include "dm_device_info.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class SoftbusCache {
-    DECLARE_SINGLE_INSTANCE(SoftbusCache);
+    DM_DECLARE_SINGLE_INSTANCE(SoftbusCache);
 
 public:
     void SaveDeviceInfo(DmDeviceInfo deviceInfo);

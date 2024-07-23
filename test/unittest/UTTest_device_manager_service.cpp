@@ -27,7 +27,7 @@
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
 void DeviceManagerServiceTest::SetUp()
 {

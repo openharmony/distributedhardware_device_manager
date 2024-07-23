@@ -25,7 +25,7 @@
 
 #include "ipc_cmd_register.h"
 #include "iremote_broker.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 #include "ipc_types.h"
 #include "ipc_req.h"

@@ -22,11 +22,11 @@
 
 #include "session.h"
 #include "socket.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
 class SoftbusAdapter {
-    DECLARE_SINGLE_INSTANCE_BASE(SoftbusAdapter);
+    DM_DECLARE_SINGLE_INSTANCE_BASE(SoftbusAdapter);
 public:
     SoftbusAdapter();
     ~SoftbusAdapter();

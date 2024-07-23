@@ -18,7 +18,7 @@
 #include <algorithm>
 #include "access_control_profile.h"
 #include "dm_device_info.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
 constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
@@ -116,7 +116,7 @@ public:
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
-    DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
+    DM_DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
 public:
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile();
     uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);

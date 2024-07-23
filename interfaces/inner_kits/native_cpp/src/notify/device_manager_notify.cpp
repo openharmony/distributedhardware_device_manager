@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 
 constexpr uint32_t WAIT_BINDIND_TIME_OUT_SECOND = 1;
 constexpr const char* DEVICE_ONLINE = "deviceOnline";

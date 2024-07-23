@@ -29,7 +29,7 @@
 #include "dm_discovery_manager.h"
 #include "dm_publish_manager.h"
 #include "idevice_manager_service_impl.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #include "softbus_connector.h"
 #include "mine_hichain_connector.h"
 

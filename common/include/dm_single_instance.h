@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#define DECLARE_SINGLE_INSTANCE_BASE(className)       \
+#define DM_DECLARE_SINGLE_INSTANCE_BASE(className)       \
 public:                                               \
     static className &GetInstance();                  \
                                                       \
@@ -28,14 +28,14 @@ private:                                              \
     className(className &&) = delete;                 \
     className &operator=(className &&) = delete;
 
-#define DECLARE_SINGLE_INSTANCE(className)  \
-    DECLARE_SINGLE_INSTANCE_BASE(className) \
+#define DM_DECLARE_SINGLE_INSTANCE(className)  \
+    DM_DECLARE_SINGLE_INSTANCE_BASE(className) \
                                             \
 private:                                    \
     className() = default;                  \
     ~className() = default;
 
-#define IMPLEMENT_SINGLE_INSTANCE(className)    \
+#define DM_IMPLEMENT_SINGLE_INSTANCE(className)    \
     className &className::GetInstance()         \
     {                                           \
         static auto instance = new className(); \

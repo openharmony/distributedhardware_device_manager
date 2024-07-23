@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@
 #include "authentication.h"
 #include "crypto_adapter.h"
 #include "decision_adapter.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -59,7 +59,7 @@ typedef struct {
 } AuthSoLoadInfo;
 
 class DmConfigManager final {
-    DECLARE_SINGLE_INSTANCE_BASE(DmConfigManager);
+    DM_DECLARE_SINGLE_INSTANCE_BASE(DmConfigManager);
 
 public:
     ~DmConfigManager();

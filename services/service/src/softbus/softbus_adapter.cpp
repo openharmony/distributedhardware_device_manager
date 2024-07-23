@@ -31,7 +31,7 @@ static QosTV g_qosInfo[] = {
 };
 static uint32_t g_qosTVParamIndex = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
 }
-IMPLEMENT_SINGLE_INSTANCE(SoftbusAdapter);
+DM_IMPLEMENT_SINGLE_INSTANCE(SoftbusAdapter);
 static void DmOnSoftbusSessionBind(int32_t socket, PeerSocketInfo info)
 {
     SoftbusAdapter::GetInstance().OnSoftbusSessionOpened(socket, info);

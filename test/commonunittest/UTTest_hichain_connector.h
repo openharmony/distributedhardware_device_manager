@@ -25,7 +25,7 @@
 
 #include "nlohmann/json.hpp"
 #include "device_auth.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #include "hichain_connector_callback.h"
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
