@@ -34,6 +34,7 @@ namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
+constexpr int32_t DM_IPC_THREAD_NUM = 32;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
@@ -52,6 +53,7 @@ void IpcServerStub::OnStart()
         LOGE("failed to init IpcServerStub");
         return;
     }
+    IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
     state_ = ServiceRunningState::STATE_RUNNING;
 
     LOGI("called:AddAbilityListener begin!");
