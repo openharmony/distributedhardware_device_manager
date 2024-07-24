@@ -51,13 +51,13 @@ struct InputCustomDialog {
   }
 
   aboutToDisappear() {
-    let inputMethodController = inputMethod.getController();
-    inputMethodController.hideTextInput();
+    console.info(TAG + 'InputCustomDialog aboutToDisappear');
     let ims = inputMethod.getSetting();
     ims.off('imeShow');
   }
 
   aboutToAppear() {
+    console.info(TAG + 'InputCustomDialog aboutToAppear');
     this.isPC = Constant.isPC();
     let ims = inputMethod.getSetting();
     ims.on('imeShow', (info: Array<inputMethod.InputWindowInfo>) => {
@@ -143,8 +143,12 @@ struct InputCustomDialog {
   }
 
   destruction() {
+    console.info(TAG + 'destruction');
+    let inputMethodController = inputMethod.getController();
+    inputMethodController.hideTextInput();
     let session = AppStorage.get<UIExtensionContentSession>('inputSession');
     if (session) {
+      console.info(TAG + 'terminateSelf');
       session.terminateSelf();
     }
   }
