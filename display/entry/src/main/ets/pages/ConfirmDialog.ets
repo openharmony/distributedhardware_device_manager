@@ -154,35 +154,54 @@ struct ConfirmCustomDialog {
   }
 
   getImages(peerdeviceType: number): Resource {
-    console.info('peerdeviceType is ' + peerdeviceType)
-    if (peerdeviceType == deviceManager.DeviceType.SPEAKER) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_soundx')
-    } else if (peerdeviceType == deviceManager.DeviceType.PHONE) {
-      this.isAvailableType = true
-      return $r('app.media.ic_public_devices_phone')
-    } else if (peerdeviceType == deviceManager.DeviceType.TABLET) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_pad')
-    } else if (peerdeviceType == deviceManager.DeviceType.WEARABLE) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_watch')
-    } else if (peerdeviceType == deviceManager.DeviceType.CAR) {
-      this.isAvailableType = true
-      return $r('app.media.ic_public_car')
-    } else if (peerdeviceType == deviceManager.DeviceType.TV) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_smartscreen')
-    } else if (peerdeviceType == DEVICE_TYPE_PC) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_matebook')
-    } else if (peerdeviceType == DEVICE_TYPE_2IN1) {
-      this.isAvailableType = true
-      return $r('app.media.ic_device_matebook')
+    console.info('peerdeviceType is ' + peerdeviceType);
+    if (peerdeviceType === deviceManager.DeviceType.SPEAKER) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.soundai_fill');
+    } else if (peerdeviceType === deviceManager.DeviceType.PHONE) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.phone_fill_1');
+    } else if (peerdeviceType === deviceManager.DeviceType.TABLET) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.pad_fill');
+    } else if (peerdeviceType === deviceManager.DeviceType.WEARABLE) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.earphone_case_16896');
+    } else if (peerdeviceType === deviceManager.DeviceType.CAR) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.car_fill');
+    } else if (peerdeviceType === deviceManager.DeviceType.TV) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.smartscreen_fill');
+    } else if (peerdeviceType === DEVICE_TYPE_PC) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.matebook_fill');
+    } else if (peerdeviceType === DEVICE_TYPE_2IN1) {
+      this.isAvailableType = true;
+      return $r('sys.symbol.matebook_fill');
     } else {
-      this.isAvailableType = false
-      return $r('app.media.icon')
+      this.isAvailableType = false;
+      return $r('sys.symbol.unknown_device_fill');
     }
+  }
+
+  @Builder
+  Symbol() {
+    Shape() {
+      Circle()
+        .width(32)
+        .height(32)
+        .fill($r('sys.color.ohos_id_color_activated'))
+      Column() {
+        SymbolGlyph(this.getImages(this.peerDeviceType))
+          .fontSize('20vp')
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+          .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
+          .offset({ x: 6, y: 6 })
+      }
+    }
+    .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
+    .margin({ bottom: 16, top: 24 })
   }
 
   build() {
@@ -193,11 +212,7 @@ struct ConfirmCustomDialog {
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
         Column() {
-          Image(this.getImages(this.peerDeviceType))
-            .width(24)
-            .height(24)
-            .margin({ bottom: 16, top: 24 })
-            .visibility(this.isAvailableType == false ? Visibility.None : Visibility.Visible)
+          this.Symbol();
           Column() {
             Text(this.title)
               .textAlign(TextAlign.Center)
@@ -216,7 +231,7 @@ struct ConfirmCustomDialog {
               .fontWeight(FontWeight.Regular)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .maxLines(3)
+              .maxLines(2)
               .width('auto')
               .margin({ top: 8 })
               .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)

@@ -84,7 +84,7 @@ struct PinCustomDialog {
                 right: 24
               })
           }
-          .height(56)
+          .constraintSize({ minHeight: 56 })
           .margin({ bottom: this.isPC ? 16 : 8 })
 
           Row() {
@@ -107,7 +107,7 @@ struct PinCustomDialog {
             Button($r('app.string.dm_cancel'))
               .fontSize($r('sys.float.ohos_id_text_size_button1'))
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(40)
+              .constraintSize({ minHeight: 40 })
               .width('100%')
               .backgroundColor(this.btnColor)
               .onClick(() => {

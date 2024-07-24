@@ -275,7 +275,7 @@ struct InputCustomDialog {
 
             Flex({ justifyContent: FlexAlign.Center }) {
               Button($r('app.string.dm_cancel'))
-                .height(40)
+                .constraintSize({ minHeight: 40 })
                 .fontSize($r('sys.float.ohos_id_text_size_button1'))
                 .onClick(() => {
                   if (this.controller) {
