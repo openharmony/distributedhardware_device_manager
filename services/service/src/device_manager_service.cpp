@@ -29,6 +29,7 @@
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
+#include "iservice_registry.h"
 #include "multiple_user_connector.h"
 #if defined(SUPPORT_POWER_MANAGER)
 #include "power_mgr_client.h"
@@ -130,21 +131,34 @@ void DeviceManagerService::QueryDependsSwitchState()
         LOGE("publishSubScriber is nullptr.");
         return;
     }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("Get SystemAbilityManager Failed");
+        return;
+    }
 #ifdef SUPPORT_BLUETOOTH
-    if (Bluetooth::BluetoothHost::GetDefaultHost().IsBleEnabled()) {
-        publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON));
-    } else {
+    if (samgr->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
+    } else {
+        if (Bluetooth::BluetoothHost::GetDefaultHost().IsBleEnabled()) {
+            publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON));
+        } else {
+            publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
+        }
     }
 #endif // SUPPORT_BLUETOOTH
 
 #ifdef SUPPORT_WIFI
-    bool isWifiActive = false;
-    Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
-    if (isWifiActive) {
-        publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
-    } else {
+    if (samgr->CheckSystemAbility(WIFI_DEVICE_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
+    } else {
+        bool isWifiActive = false;
+        Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
+        if (isWifiActive) {
+            publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
+        } else {
+            publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
+        }
     }
 #endif // SUPPORT_WIFI
 
