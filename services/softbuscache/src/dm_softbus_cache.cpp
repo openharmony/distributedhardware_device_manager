@@ -150,6 +150,7 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
         if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
             LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
             deviceInfo_.erase(item.first);
+            break;
         }
     }
 }
