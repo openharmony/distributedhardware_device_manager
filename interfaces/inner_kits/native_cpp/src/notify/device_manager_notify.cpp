@@ -43,7 +43,7 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
-        LOGE("DeviceManagerNotify ffrtQueue has created!");
+        LOGI("DeviceManagerNotify ffrtQueue has created!");
         return;
     }
     ffrtQueue_ = std::make_shared<ffrt::queue>(DEVICE_STATE_INIT_QUEUE,
@@ -298,7 +298,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     }
-else
+#else
     std::thread deviceOnline([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
         LOGE("DeviceInfoOnline set name failed.");
