@@ -24,7 +24,7 @@
 #include "dm_device_state_manager.h"
 #include "mine_hichain_connector.h"
 #include "idevice_manager_service_impl.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #include "softbus_connector.h"
 
 namespace OHOS {

@@ -29,6 +29,7 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
+                "benchmark",
                 "bounds_checking_function",
                 "bluetooth",
                 "bundle_framework",

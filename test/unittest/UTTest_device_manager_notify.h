@@ -27,7 +27,7 @@
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
 #include "device_manager_callback.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerNotifyTest : public testing::Test {

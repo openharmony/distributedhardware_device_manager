@@ -29,7 +29,7 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
+DM_IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";

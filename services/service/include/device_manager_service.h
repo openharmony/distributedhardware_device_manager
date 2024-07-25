@@ -30,7 +30,7 @@
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
 #include "i_dm_service_impl_ext.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
 #include "dm_screen_common_event.h"
@@ -42,7 +42,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerService {
-DECLARE_SINGLE_INSTANCE_BASE(DeviceManagerService);
+DM_DECLARE_SINGLE_INSTANCE_BASE(DeviceManagerService);
 public:
     DeviceManagerService() {}
 

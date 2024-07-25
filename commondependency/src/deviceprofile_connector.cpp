@@ -25,7 +25,7 @@ using namespace OHOS::DistributedDeviceProfile;
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     LOGI("GetAccessControlProfile start.");

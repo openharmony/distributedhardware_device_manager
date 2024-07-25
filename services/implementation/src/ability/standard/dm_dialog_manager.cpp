@@ -25,7 +25,7 @@
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {

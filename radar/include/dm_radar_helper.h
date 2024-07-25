@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 #include "dm_device_info.h"
 
@@ -153,7 +153,7 @@ public:
 };
 
 class DmRadarHelper : public IDmRadarHelper {
-    DECLARE_SINGLE_INSTANCE(DmRadarHelper);
+    DM_DECLARE_SINGLE_INSTANCE(DmRadarHelper);
 public:
     bool ReportDiscoverRegCallback(struct RadarInfo &info) override;
     bool ReportDiscoverResCallback(struct RadarInfo &info) override;

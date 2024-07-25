@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
+DM_IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
 bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     return true;

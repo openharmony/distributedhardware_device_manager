@@ -21,7 +21,7 @@
 #include "dm_log.h"
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
+DM_IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 bool g_online = false;
 bool g_getLocalDevInfo = false;
 DmDeviceInfo localDeviceInfo_;

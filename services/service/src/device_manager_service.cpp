@@ -56,7 +56,7 @@ constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;

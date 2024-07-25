@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include <string>
 
 #include "ipc_skeleton.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,7 +34,7 @@ typedef struct CommonSvcId {
 } CommonSvcId;
 
 class IpcServerListenermgr {
-    DECLARE_SINGLE_INSTANCE(IpcServerListenermgr);
+    DM_DECLARE_SINGLE_INSTANCE(IpcServerListenermgr);
 
 public:
     /**

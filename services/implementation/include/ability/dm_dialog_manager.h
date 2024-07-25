@@ -22,7 +22,7 @@
 #include "ability_connect_callback_interface.h"
 #include "ability_connect_callback_stub.h"
 
-#include "single_instance.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {

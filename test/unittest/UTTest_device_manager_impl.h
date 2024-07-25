@@ -23,7 +23,7 @@
 #include <cstdint>
 #include "mock/mock_ipc_client_proxy.h"
 #include "device_manager.h"
-#include "single_instance.h"
+#include "dm_single_instance.h"
 #include "device_manager_impl.h"
 #include "softbus_error_code.h"
 
