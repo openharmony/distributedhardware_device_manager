@@ -14,6 +14,7 @@
  */
 
 #include "device_manager_notify.h"
+#include <thread>
 #include "device_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -24,6 +25,10 @@ namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 
 constexpr uint32_t WAIT_BINDIND_TIME_OUT_SECOND = 1;
+constexpr const char* DEVICE_ONLINE = "deviceOnline";
+constexpr const char* DEVICE_OFFLINE = "deviceOffline";
+constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
+constexpr const char* DEVICE_READY = "deviceReady";
 constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
 
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
@@ -37,13 +42,15 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
     dmInitCallback_[pkgName] = dmInitCallback;
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (ffrtQueue_ != nullptr) {
+        LOGE("DeviceManagerNotify ffrtQueue has created!");
+        return;
+    }
+    ffrtQueue_ = std::make_shared<ffrt::queue>(DEVICE_STATE_INIT_QUEUE,
+        ffrt::queue_attr().qos(ffrt::qos_default));
     if (ffrtQueue_ == nullptr) {
-        ffrtQueue_ = std::make_shared<ffrt::queue>(DEVICE_STATE_INIT_QUEUE,
-            ffrt::queue_attr().qos(ffrt::qos_default));
-        if (ffrtQueue_ == nullptr) {
-            LOGE("DeviceManagerNotify ffrtQueue create failed!");
-            return;
-        }
+        LOGE("DeviceManagerNotify ffrtQueue create failed!");
+        return;
     }
 #endif
 }
@@ -292,7 +299,11 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         ffrtQueue_->submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     }
 else
-    DeviceInfoOnline(deviceInfo, tempCbk);
+    std::thread deviceOnline([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
+    if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
+        LOGE("DeviceInfoOnline set name failed.");
+    }
+    deviceOnline.detach();
 #endif
 }
 
@@ -322,7 +333,11 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         ffrtQueue_->submit([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
     }
 #else
-    DeviceBasicInfoOnline(deviceBasicInfo, tempCbk);
+    std::thread deviceOnline([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
+    if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
+        LOGE("DeviceInfoOnline set name failed.");
+    }
+    deviceOnline.detach();
 #endif
 }
 
@@ -352,7 +367,11 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         ffrtQueue_->submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     }
 #else
-    DeviceInfoOffline(deviceInfo, tempCbk);
+    std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
+    if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
+        LOGE("DeviceInfoOffline set name failed.");
+    }
+    deviceOffline.detach();
 #endif
 }
 
@@ -382,7 +401,11 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         ffrtQueue_->submit([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
     }
 #else
-    DeviceBasicInfoOffline(deviceBasicInfo, tempCbk);
+    std::thread deviceOffline([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
+    if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
+        LOGE("DeviceInfoOffline set name failed.");
+    }
+    deviceOffline.detach();
 #endif
 }
 
@@ -412,7 +435,11 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         ffrtQueue_->submit([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
     }
 #else
-    DeviceInfoChanged(deviceInfo, tempCbk);
+    std::thread deviceChanged([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
+    if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
+        LOGE("deviceChanged set name failed.");
+    }
+    deviceChanged.detach();
 #endif
 }
 
@@ -442,7 +469,11 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         ffrtQueue_->submit([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
     }
 #else
-    DeviceBasicInfoChanged(deviceBasicInfo, tempCbk);
+    std::thread deviceChanged([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
+    if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
+        LOGE("deviceChanged set name failed.");
+    }
+    deviceChanged.detach();
 #endif
 }
 
@@ -472,7 +503,11 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         ffrtQueue_->submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
     }
 #else
-    DeviceInfoReady(deviceInfo, tempCbk);
+    std::thread deviceReady([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
+    if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
+        LOGE("deviceReady set name failed.");
+    }
+    deviceReady.detach();
 #endif
 }
 
@@ -502,7 +537,11 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         ffrtQueue_->submit([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
     }
 #else
-    DeviceBasicInfoReady(deviceBasicInfo, tempCbk);
+    std::thread deviceReady([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
+    if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
+        LOGE("deviceReady set name failed.");
+    }
+    deviceReady.detach();
 #endif
 }
 
