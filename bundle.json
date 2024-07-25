@@ -40,6 +40,7 @@
                 "device_info_manager",
                 "dsoftbus",
                 "eventhandler",
+                "ffrt",
                 "hisysevent",
                 "hitrace",
                 "hilog",

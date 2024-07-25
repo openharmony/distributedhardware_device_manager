@@ -176,6 +176,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
+      "ffrt:libffrt",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "hitrace:hitrace_meter",
