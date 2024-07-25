@@ -212,6 +212,7 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -538,7 +539,10 @@ ohos_unittest("UTTest_ipc_client_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+  ]
 }
 
 ## UnitTest UTTest_ipc_client_manager }}}
