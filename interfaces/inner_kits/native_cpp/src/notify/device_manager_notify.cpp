@@ -36,6 +36,7 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_[pkgName] = dmInitCallback;
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ == nullptr) {
         ffrtQueue_ = std::make_shared<ffrt::queue>(DEVICE_STATE_INIT_QUEUE,
             ffrt::queue_attr().qos(ffrt::qos_default));
@@ -44,6 +45,7 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
             return;
         }
     }
+#endif
 }
 
 void DeviceManagerNotify::UnRegisterDeathRecipientCallback(const std::string &pkgName)
@@ -285,9 +287,13 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device state callback is nullptr.");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     }
+else
+    DeviceInfoOnline(deviceInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -311,9 +317,13 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device status callback is nullptr.");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
     }
+#else
+    DeviceBasicInfoOnline(deviceBasicInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -337,9 +347,13 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOffline error, registered device state callback is nullptr.");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     }
+#else
+    DeviceInfoOffline(deviceInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -363,9 +377,13 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("OnDeviceOffline error, registered device status callback is nullptr.");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
     }
+#else
+    DeviceBasicInfoOffline(deviceBasicInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -389,9 +407,13 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
     }
+#else
+    DeviceInfoChanged(deviceInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -415,9 +437,13 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
     }
+#else
+    DeviceBasicInfoChanged(deviceBasicInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -441,9 +467,13 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
     }
+#else
+    DeviceInfoReady(deviceInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -467,9 +497,13 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device status callback is nullptr.");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (ffrtQueue_ != nullptr) {
         ffrtQueue_->submit([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
     }
+#else
+    DeviceBasicInfoReady(deviceBasicInfo, tempCbk);
+#endif
 }
 
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,

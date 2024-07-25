@@ -28,7 +28,9 @@
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
 #include "dm_single_instance.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -123,7 +125,9 @@ private:
     std::mutex bindLock_;
     std::condition_variable cv_;
     bool binding_ = false;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<ffrt::queue> ffrtQueue_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
