@@ -28,6 +28,7 @@
 #include "dm_device_info.h"
 #include "dm_subscribe_info.h"
 #include "dm_single_instance.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -122,6 +123,7 @@ private:
     std::mutex bindLock_;
     std::condition_variable cv_;
     bool binding_ = false;
+    std::shared_ptr<ffrt::queue> ffrtQueue_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
