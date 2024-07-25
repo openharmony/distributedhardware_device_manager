@@ -134,6 +134,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_client") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 
   cflags = [
@@ -164,6 +165,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 
   cflags = [
@@ -185,7 +187,10 @@ ohos_unittest("UTTest_ipc_cmd_register") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+  ]
 }
 
 ## UnitTest UTTest_ipc_cmd_register }}}
@@ -631,6 +636,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -649,6 +655,7 @@ ohos_unittest("UTTest_dm_import_auth_code") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -710,7 +717,10 @@ ohos_unittest("UTTest_device_manager_notify") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_notify }}}
