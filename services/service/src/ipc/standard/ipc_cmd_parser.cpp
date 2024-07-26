@@ -14,6 +14,8 @@
  */
 
 #include <memory>
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
@@ -44,6 +46,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const unsigned int XCOLLIE_TIMEOUT_S = 5;
 bool EncodeDmDeviceInfo(const DmDeviceInfo &devInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -399,23 +402,29 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
+    int32_t id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("RegisterDeviceManagerListener", XCOLLIE_TIMEOUT_S,
+        nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
     if (listener == nullptr) {
         LOGE("read remote object failed.");
+        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         return ERR_DM_POINT_NULL;
     }
     sptr<IpcServerClientProxy> callback(new IpcServerClientProxy(listener));
     if (callback == nullptr) {
         LOGE("create ipc server client proxy failed.");
+        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         return ERR_DM_POINT_NULL;
     }
     DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
+        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     return DM_OK;
 }
 

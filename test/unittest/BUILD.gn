@@ -166,6 +166,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "hicollie:libhicollie",
   ]
 
   cflags = [
@@ -588,6 +589,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "hicollie:libhicollie",
   ]
 }
 
