@@ -197,6 +197,7 @@ if (defined(ohos_lite)) {
       "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
       "eventhandler:libeventhandler",
+      "hicollie:libhicollie",
       "hilog:libhilog",
       "init:libbeget_proxy",
       "init:libbegetutil",
