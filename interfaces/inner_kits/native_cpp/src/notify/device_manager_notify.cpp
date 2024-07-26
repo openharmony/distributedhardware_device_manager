@@ -25,11 +25,14 @@ namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 
 constexpr uint32_t WAIT_BINDIND_TIME_OUT_SECOND = 1;
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnline";
 constexpr const char* DEVICE_OFFLINE = "deviceOffline";
 constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
+#else
 constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
+#endif
 
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
