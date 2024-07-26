@@ -28,7 +28,6 @@ namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
-    LOGI("GetAccessControlProfile start.");
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -42,8 +41,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
 std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("DeviceProfileConnector::GetAppTrustDeviceList, AccessControlProfile size is %{public}zu", profiles.size());
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile(); 
     std::unordered_map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
@@ -52,6 +50,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustD
         }
         DmDiscoveryInfo discoveryInfo = {pkgName, deviceId};
         int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
+        LOGI("The udid %{public}s in ACL authForm is %{public}d.", GetAnonyString(trustDeviceId).c_str(), bindType);
         if (bindType == DmAuthForm::INVALID_TYPE) {
             continue;
         }
@@ -72,14 +71,12 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustD
             continue;
         }
     }
-    LOGI("GetAppTrustDeviceList size is %{public}zu", deviceIdMap.size());
     return deviceIdMap;
 }
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("DeviceProfileConnector::GetDeviceAclParam, AccessControlProfile size is %{public}zu", profiles.size());
     if (profiles.size() == 0) {
         return DM_OK;
     }
@@ -124,20 +121,16 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
 int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProfile profiles,
     DmDiscoveryInfo discoveryInfo)
 {
-    LOGI("DeviceProfileConnector::CheckAuthForm %{public}d", form);
     if (profiles.GetBindLevel() == DEVICE || (profiles.GetBindLevel() == APP && discoveryInfo.pkgname == "")) {
-        LOGI("The found device is device bind-level.");
         return form;
     }
     if (profiles.GetBindLevel() == APP) {
         if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
-            LOGI("The found device is src app bind-level.");
             return form;
         }
         if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
-            LOGI("The found device is sink app bind-level.");
             return form;
         }
     }
@@ -147,7 +140,6 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
 int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo)
 {
     if (profiles.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-        LOGI("The found device is identical account device bind type.");
         return DmAuthForm::IDENTICAL_ACCOUNT;
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
@@ -682,7 +674,6 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 {
     LOGI("DeviceProfileConnector::IsSameAccount start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("IsSameAccount profiles size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
             if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号

@@ -579,7 +579,6 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
         LOGE("[SOFTBUS]ShiftLNNGear error, failed ret: %{public}d", ret);
         return ret;
     }
-    LOGI("[SOFTBUS]ShiftLNNGear success.");
     return DM_OK;
 }
 
@@ -777,7 +776,6 @@ IDmRadarHelper* SoftbusListener::GetDmRadarHelperObj()
 
 bool SoftbusListener::IsDmRadarHelperReady()
 {
-    LOGI("SoftbusListener::IsDmRadarHelperReady start.");
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
         LOGI("IsDmRadarHelperReady alReady.");
