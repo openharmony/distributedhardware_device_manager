@@ -589,6 +589,139 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
     return true;
 }
 
+void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
+    int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes)
+{
+    int32_t res = DM_OK;
+    if (stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", "CreatePinHolder",
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_START),
+            "CH_ID", channelId,
+            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
+            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "TO_CALL_PKG", SOFTBUSNAME);
+        if (res != DM_OK) {
+            LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
+            return;
+        }
+    } else {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", "CreatePinHolder",
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "CH_ID", channelId,
+            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
+            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "TO_CALL_PKG", SOFTBUSNAME,
+            "ERROR_CODE", errCode);
+        if (res != DM_OK) {
+            LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
+            return;
+        }
+    }
+    return;
+}
+
+void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
+    std::string peerUdid, int32_t errCode, int32_t stageRes)
+{
+    int32_t res = DM_OK;
+    if (stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", "DestroyPinHolder",
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
+            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "TO_CALL_PKG", SOFTBUSNAME);
+        if (res != DM_OK) {
+            LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
+            return;
+        }
+    } else {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", "DestroyPinHolder",
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
+            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "TO_CALL_PKG", SOFTBUSNAME,
+            "ERROR_CODE", errCode);
+        if (res != DM_OK) {
+            LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
+            return;
+        }
+    }
+    return;
+}
+
+void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName)
+{
+    int32_t res = DM_OK;
+    if (bizStage == static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG)) {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "FUNC", funcName,
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", bizStage,
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "TO_CALL_PKG", SOFTBUSNAME);
+        if (res != DM_OK) {
+            LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
+            return;
+        }
+    } else {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_AUTHCATION_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "FUNC", funcName,
+            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_STAGE", bizStage,
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "TO_CALL_PKG", SOFTBUSNAME);
+        if (res != DM_OK) {
+            LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
+            return;
+        }
+    }
+    return;
+}
+
 bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
 {
     int32_t res = DM_OK;

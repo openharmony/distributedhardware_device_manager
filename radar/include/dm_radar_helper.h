@@ -40,6 +40,7 @@ enum class BizScene : int32_t {
     DM_AUTHCATION = 0x2,
     DM_NETWORK = 0x3,
     DM_DELET_TRUST_RELATION = 0x4,
+    DM_PIN_HOLDER = 0x5,
 };
 
 enum class StageRes : int32_t {
@@ -80,6 +81,14 @@ enum class NetworkStage : int32_t {
 
 enum class DeleteTrust : int32_t {
     DELETE_TRUST = 0x1,
+};
+
+enum class PinHolderStage : int32_t {
+    CREATE_PIN_HOLDER = 0x1,
+    SEND_CREATE_PIN_HOLDER_MSG = 0x2,
+    RECEIVE_CREATE_PIN_HOLDER_MSG = 0x3,
+    DESTROY_PIN_HOLDER = 0x4,
+    RECEIVE_DESTROY_PIN_HOLDER_MSG = 0x5,
 };
 
 enum class GetTrustDeviceList : int32_t {
@@ -148,6 +157,11 @@ public:
     virtual bool ReportNetworkOffline(struct RadarInfo &info) = 0;
     virtual bool ReportDeleteTrustRelation(struct RadarInfo &info) = 0;
     virtual bool ReportGetTrustDeviceList(struct RadarInfo &info) = 0;
+    virtual void ReportCreatePinHolder(std::string hostName,
+        int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
+    virtual void ReportDestroyPinHolder(std::string hostName,
+        std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
+    virtual void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName) = 0;
     virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
     virtual std::string GetUdidHashByUdid(std::string udid) = 0;
 };
@@ -174,6 +188,11 @@ public:
     bool ReportNetworkOffline(struct RadarInfo &info) override;
     bool ReportDeleteTrustRelation(struct RadarInfo &info) override;
     bool ReportGetTrustDeviceList(struct RadarInfo &info) override;
+    void ReportCreatePinHolder(std::string hostName,
+        int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) override;
+    void ReportDestroyPinHolder(std::string hostName,
+        std::string peerUdid, int32_t errCode, int32_t stageRes) override;
+    void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName) override;
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
     std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);

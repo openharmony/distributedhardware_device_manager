@@ -122,6 +122,23 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
     return true;
 }
 
+void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
+    int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes)
+{
+    return;
+}
+
+void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
+    std::string peerUdid, int32_t errCode, int32_t stageRes)
+{
+    return;
+}
+
+void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName)
+{
+    return;
+}
+
 std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
 {
     std::stringstream str;

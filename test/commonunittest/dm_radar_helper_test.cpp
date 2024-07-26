@@ -224,6 +224,21 @@ HWTEST_F(DmRadarHelperTest, ReportDeleteTrustRelation_001, testing::ext::TestSiz
 }
 HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_001, testing::ext::TestSize.Level0)
 {
+    int32_t stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
+    std::string str = "test";
+    DmRadarHelper::GetInstance().ReportCreatePinHolder(str, 0, str, 0, stageRes);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(str, str, 0, stageRes);
+
+    stageRes = static_cast<int32_t>(StageRes::STAGE_FAIL);
+    DmRadarHelper::GetInstance().ReportCreatePinHolder(str, 0, str, 0, stageRes);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(str, str, 0, stageRes);
+
+    int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str);
+
+    bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_CREATE_PIN_HOLDER_MSG);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str);
+
     struct RadarInfo info = { 0 };
     info.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
     bool res = DmRadarHelper::GetInstance().ReportGetTrustDeviceList(info);

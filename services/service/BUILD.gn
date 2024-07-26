@@ -82,6 +82,7 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
+        "${devicemanager_path}/radar:devicemanagerradar",
         "${softbuscache_parh}:dmdevicecache",
         "${utils_path}:devicemanagerutils",
         "//base/security/device_auth/services:deviceauth_sdk",
@@ -182,6 +183,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
+      "${devicemanager_path}/radar:devicemanagerradar",
       "${softbuscache_parh}:dmdevicecache",
       "${utils_path}:devicemanagerutils",
     ]
