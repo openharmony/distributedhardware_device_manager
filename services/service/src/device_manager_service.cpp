@@ -298,7 +298,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
-    LOGI("DeviceManagerService::GetDeviceInfo begin.");
+    LOGI("DeviceManagerService::GetDeviceInfo begin networkId %{public}s.", GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");

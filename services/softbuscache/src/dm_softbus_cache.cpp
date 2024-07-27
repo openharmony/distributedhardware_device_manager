@@ -305,6 +305,8 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
     for (const auto &item : deviceSecurityLevel_) {
         if (item.first == std::string(networkId)) {
             securityLevel = item.second;
+            LOGI("Get dev level from cache success, networkId is %{public}s.",
+                GetAnonyString(std::string(networkId)).c_str());
             return DM_OK;
         }
     }
@@ -313,7 +315,6 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
 
 int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securityLevel)
 {
-    LOGI("SoftbusCache::GetDevLevelFromBus");
     int32_t tempSecurityLevel = -1;
     if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
         reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
@@ -322,7 +323,8 @@ int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securit
     }
     securityLevel = tempSecurityLevel;
     deviceSecurityLevel_[std::string(networkId)] = tempSecurityLevel;
-    LOGI("GetDevLevelFromBus success.");
+    LOGI("Get dev level from softbus success, networkId is %{public}s.",
+        GetAnonyString(std::string(networkId)).c_str());
     return DM_OK;
 }
 
