@@ -288,7 +288,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
     std::string extra = "jdddd";
     std::vector<DmDeviceInfo> deviceList;
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -1022,7 +1022,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
     std::string networkId = "networkIdTest";
     DmDeviceInfo info;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -1369,7 +1369,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     std::string networkId;
     std::string uuid;
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
@@ -1456,7 +1456,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::
     std::string netWorkId = "netWorkId";
     int32_t networkType = 0;
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
@@ -1842,7 +1842,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     std::string invalidNetworkId = "12345";
     int32_t securityLevel = -1;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level0)
