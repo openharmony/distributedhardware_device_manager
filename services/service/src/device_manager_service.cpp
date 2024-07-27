@@ -904,6 +904,7 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
     }
     if (eventId == DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT) {
         LOGI("NotifyEvent on pin holder event start.");
+        CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
         return pinHolder_->NotifyPinHolderEvent(pkgName, event);
     }
     return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
