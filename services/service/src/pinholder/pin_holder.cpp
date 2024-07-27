@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -113,6 +114,10 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     }
 
     sessionId_ = session_->OpenSessionServer(targetId);
+    int32_t stageRes =
+        sessionId_ > 0 ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
+    DmRadarHelper::GetInstance().ReportCreatePinHolder(registerPkgName_,
+        sessionId_, targetId.deviceId, sessionId_, stageRes);
     if (sessionId_ < 0) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId_);
         listener_->OnCreateResult(registerPkgName_, sessionId_);
@@ -163,6 +168,10 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     LOGI("DestroyPinHolder, message type is: %{public}d, pin type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER,
         pinType);
     ret = session_->SendData(sessionId_, message);
+    int32_t stageRes =
+        ret == DM_OK ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_,
+        targetId.deviceId, ret, stageRes);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
@@ -193,6 +202,8 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
     LOGI("CreateGeneratePinHolderMsg, message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
     int32_t ret = session_->SendData(sessionId_, message);
+    int32_t bizStage = static_cast<int32_t>(PinHolderStage::SEND_CREATE_PIN_HOLDER_MSG);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("CreateGeneratePinHolderMsg"));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnCreateResult(registerPkgName_, ret);
@@ -235,7 +246,8 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     std::string payload = jsonObject[TAG_PAYLOAD].get<std::string>();
     isRemoteSupported_ = jsonObject.contains(TAG_DM_VERSION);
-
+    int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_CREATE_PIN_HOLDER_MSG);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessCreateMsg"));
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER_RESP;
     if (sinkState_ != SINK_INIT) {
@@ -310,7 +322,8 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
     }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     std::string payload = jsonObject[TAG_PAYLOAD].get<std::string>();
-
+    int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessDestroyMsg"));
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
     if (sinkState_ != SINK_CREATE) {
