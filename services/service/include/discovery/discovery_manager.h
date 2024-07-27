@@ -86,6 +86,8 @@ private:
     int32_t GetDeviceAclParam(const std::string &pkgName, std::string deviceId, bool &isOnline, int32_t &authForm);
     void ConfigDiscParam(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo *dmSubInfo);
     bool CompareCapability(uint32_t capabilityType, const std::string &capabilityStr);
+    void OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
+        const DmDeviceInfo &info, const DeviceFilterPara &filterPara);
 
 private:
     std::mutex locks_;
