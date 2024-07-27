@@ -41,7 +41,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
 std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile(); 
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     std::unordered_map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();

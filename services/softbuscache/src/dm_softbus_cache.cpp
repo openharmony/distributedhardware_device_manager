@@ -57,7 +57,7 @@ void SoftbusCache::DeleteLocalDeviceInfo()
     g_getLocalDevInfo = false;
 }
 
-int32_t SoftbusCache:: GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
+int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
 {
     std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     if (g_getLocalDevInfo) {
