@@ -289,8 +289,12 @@ typedef struct PeerTargetId {
 
     bool operator<(const PeerTargetId &other) const
     {
-        return (deviceId < other.deviceId) || (brMac < other.brMac) ||
-            (bleMac < other.bleMac) || (wifiIp < other.wifiIp) || (wifiPort < other.wifiPort);
+        return (deviceId < other.deviceId) ||
+            (deviceId == other.deviceId && brMac < other.brMac) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac < other.bleMac) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp < other.wifiIp) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
+                wifiPort < other.wifiPort);
     }
 } PeerTargetId;
 
