@@ -122,7 +122,7 @@ public:
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
 
-    std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> GetAppTrustDeviceIdList(std::string pkgname);
+    std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
     void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
     void OnUnbindSessionCloseed(int32_t socket);
     void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);

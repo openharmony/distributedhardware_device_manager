@@ -269,8 +269,7 @@ public:
      */
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
 
-    virtual std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> GetAppTrustDeviceIdList(
-        std::string pkgname) = 0;
+    virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) = 0;
     virtual void OnUnbindSessionCloseed(int32_t socket) = 0;
     virtual void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen) = 0;

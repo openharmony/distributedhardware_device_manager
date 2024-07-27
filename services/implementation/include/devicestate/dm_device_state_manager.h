@@ -93,8 +93,6 @@ public:
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
     void OnDeviceOffline(std::string deviceId);
     std::string GetUdidByNetWorkId(std::string networkId);
-    std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> GetDeviceOsType(
-            std::unordered_map<std::string, DmAuthForm> devMap);
     bool CheckIsOnline(const std::string &udid);
 
 private:

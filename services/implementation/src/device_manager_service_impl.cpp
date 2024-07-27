@@ -650,15 +650,13 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DeviceProfileConnector::GetInstance().IsSameAccount(udid);
 }
 
-std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
+std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
     std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = reinterpret_cast<char *>(localDeviceId);
-    std::unordered_map<std::string, DmAuthForm> trustDeviceMap =
-        DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
-    return deviceStateMgr_->GetDeviceOsType(trustDeviceMap);
+    return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
 }
 
 void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)

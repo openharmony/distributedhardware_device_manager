@@ -215,7 +215,8 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     }
 
     deviceList = rsp->GetDeviceVec();
-    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %{public}s, device size %{public}zu",
+        pkgName.c_str(), deviceList.size());
     return DM_OK;
 }
 
@@ -246,7 +247,8 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
         return ret;
     }
     deviceList = rsp->GetDeviceVec();
-    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("DeviceManagerImpl::GetTrustedDeviceList completed, pkgName: %{public}s, device size %{public}zu",
+        pkgName.c_str(), deviceList.size());
     return DM_OK;
 }
 
@@ -266,7 +268,8 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
         ConvertDeviceInfoToDeviceBasicInfo(item, deviceBasicInfo);
         deviceList.push_back(deviceBasicInfo);
     }
-    LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("DeviceManagerImpl::GetAvailableDeviceList completed, pkgName: %{public}s, device size %{public}zu",
+        pkgName.c_str(), deviceList.size());
     return DM_OK;
 }
 

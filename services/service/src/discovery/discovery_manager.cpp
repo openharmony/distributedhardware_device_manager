@@ -486,7 +486,6 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     bool &isOnline, int32_t &authForm)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("Get deviceId = %{public}s isOnline and authForm.", GetAnonyString(deviceId).c_str());
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = static_cast<std::string>(localDeviceId);
@@ -512,10 +511,8 @@ IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
 
 bool DiscoveryManager::IsCommonDependencyReady()
 {
-    LOGI("DiscoveryManager::IsCommonDependencyReady.");
     std::lock_guard<std::mutex> lock(comDependencyLoadLock);
     if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
-        LOGI("IsCommonDependencyReady already.");
         return true;
     }
     char path[PATH_MAX + 1] = {0x00};

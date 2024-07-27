@@ -65,17 +65,15 @@ bool PermissionManager::CheckPermission(void)
         LOGE("CheckPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("CheckPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
-
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        int32_t ret = AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_PERMISSION);
-        if (ret == PermissionState::PERMISSION_GRANTED) {
-            return true;
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_PERMISSION) !=
+            PermissionState::PERMISSION_GRANTED) {
+            LOGE("DM service access is denied, please apply for corresponding permissions");
+            return false;
         }
     }
-    LOGE("DM service access is denied, please apply for corresponding permissions");
-    return false;
+    return true;
 }
 
 bool PermissionManager::CheckNewPermission(void)
@@ -85,17 +83,15 @@ bool PermissionManager::CheckNewPermission(void)
         LOGE("CheckNewPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("CheckNewPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
-
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        int32_t ret = AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_NEWPERMISSION);
-        if (ret == PermissionState::PERMISSION_GRANTED) {
-            return true;
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_NEWPERMISSION) !=
+            PermissionState::PERMISSION_GRANTED) {
+            LOGE("DM service access is denied, please apply for corresponding new permissions");
+            return false;
         }
     }
-    LOGE("DM service access is denied, please apply for corresponding new permissions");
-    return false;
+    return true;
 }
 
 bool PermissionManager::CheckMonitorPermission(void)
@@ -105,8 +101,6 @@ bool PermissionManager::CheckMonitorPermission(void)
         LOGE("CheckMonitorPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("CheckMonitorPermission::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
-
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION) !=
@@ -115,7 +109,6 @@ bool PermissionManager::CheckMonitorPermission(void)
             return false;
         }
     }
-    LOGI("CheckMonitorPermission success.");
     return true;
 }
 
@@ -198,7 +191,6 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
 
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
-    LOGI("PermissionManager::CheckSystemSA pkgName %{public}s.", pkgName.c_str());
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
         std::string tmp(systemSaWhiteList[index]);
         if (pkgName == tmp) {

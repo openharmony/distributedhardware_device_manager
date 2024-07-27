@@ -121,7 +121,7 @@ public:
         DmPinType pinType, const std::string &payload);
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
-    std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> GetAppTrustDeviceIdList(std::string pkgname);
+    std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
     void OnUnbindSessionOpened(int32_t sessionId, PeerSocketInfo info);
     void OnUnbindSessionCloseed(int32_t sessionId);
     void OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);

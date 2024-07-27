@@ -228,19 +228,18 @@ void DeviceManagerService::UnRegisterDeviceManagerListener(const std::string &pk
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    LOGI("DeviceManagerService::GetTrustedDeviceList begin for pkgName = %{public}s, extra = %{public}s",
-        pkgName.c_str(), extra.c_str());
+    LOGI("DMSrc::GetTrustedDeviceList begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     bool isOnlyShowNetworkId = false;
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.",
-            GetAnonyString(pkgName).c_str());
+        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.", pkgName.c_str());
         isOnlyShowNetworkId = true;
     }
     std::vector<DmDeviceInfo> onlineDeviceList;
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
     if (ret != DM_OK) {
         LOGE("GetTrustedDeviceList failed");
@@ -257,7 +256,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return DM_OK;
     }
     if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-        std::unordered_map<std::string, std::pair<DmAuthForm, std::string>> udidMap;
+        std::unordered_map<std::string, DmAuthForm> udidMap;
         if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
@@ -267,12 +266,10 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
-                item.authForm = udidMap[udid].first;
-                item.extraData = udidMap[udid].second;
+                item.authForm = udidMap[udid];
                 deviceList.push_back(item);
             }
         }
-        LOGI("Current app available device size: %{public}zu", deviceList.size());
     }
     return DM_OK;
 }
@@ -280,17 +277,18 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh,
                                            bool isWakeUp)
 {
+    LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
+        "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call ShiftLNNGear, pkgName = %{public}s", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
-        "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
     if (pkgName.empty() || callerId.empty()) {
         LOGE("Invalid parameter, parameter is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (isRefresh) {
+        CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
         int32_t ret = softbusListener_->ShiftLNNGear(isWakeUp);
         if (ret != DM_OK) {
             LOGE("ShiftLNNGear error, failed ret: %{public}d", ret);
@@ -302,6 +300,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
+    LOGI("DeviceManagerService::GetDeviceInfo begin networkId %{public}s.", GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
@@ -311,7 +310,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         LOGE("Invalid parameter, networkId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::GetDeviceInfo begin by networkId : %{public}s.", GetAnonyString(networkId).c_str());
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
     if (ret != DM_OK) {
         LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
@@ -327,6 +326,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
         isOnlyShowNetworkId = true;
     }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
         LOGE("GetLocalDeviceInfo failed");
@@ -362,7 +362,6 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
         LOGE("The caller: %{public}s does not have permission to call GetUdidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::GetUdidByNetworkId begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
             GetAnonyString(netWorkId).c_str());
@@ -378,7 +377,6 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
         LOGE("The caller: %{public}s does not have permission to call GetUuidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::GetUuidByNetworkId begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
             GetAnonyString(netWorkId).c_str());
@@ -409,7 +407,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
 
     std::map<std::string, std::string> filterOps;
     filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, extra));
-
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
@@ -433,7 +431,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
 
     std::map<std::string, std::string> filterOps;
     filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, filterOptions));
-
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StartDiscovering(pkgName, discParam, filterOps);
 }
 
@@ -449,6 +447,7 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
@@ -467,7 +466,7 @@ int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName,
     std::map<std::string, std::string> advertiseParam;
     advertiseParam.insert(std::pair<std::string, std::string>(PARAM_KEY_PUBLISH_ID,
         std::to_string(publishInfo.publishId)));
-
+    CHECK_NULL_RETURN(advertiseMgr_, ERR_DM_POINT_NULL);
     return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
 
@@ -481,6 +480,7 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(advertiseMgr_, ERR_DM_POINT_NULL);
     return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
 
@@ -824,7 +824,6 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 
 bool DeviceManagerService::IsDMServiceImplReady()
 {
-    LOGI("DeviceManagerService::IsDMServiceImplReady");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
@@ -875,7 +874,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
     for (unsigned int i = 0; i < dumpflag.size(); i++) {
         if (dumpflag[i] == HidumperFlag::HIDUMPER_GET_TRUSTED_LIST) {
             std::vector<DmDeviceInfo> deviceList;
-
+            CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
             int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
             if (ret != DM_OK) {
                 result.append("HiDumpHelper GetTrustedDeviceList failed");
@@ -905,6 +904,7 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
     }
     if (eventId == DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT) {
         LOGI("NotifyEvent on pin holder event start.");
+        CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
         return pinHolder_->NotifyPinHolderEvent(pkgName, event);
     }
     return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
@@ -932,6 +932,7 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerService::GetEncryptedUuidByNetworkId for pkgName = %{public}s", pkgName.c_str());
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
     if (ret != DM_OK) {
         LOGE("GetUuidByNetworkId failed, ret : %{public}d", ret);
@@ -1000,6 +1001,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
             GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
 }
 
@@ -1152,6 +1154,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         LOGI("StartDiscovering input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
 }
 
@@ -1174,6 +1177,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         LOGI("StopDiscovering input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
 }
 
@@ -1190,6 +1194,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         return ERR_DM_INPUT_PARA_INVALID;
     }
     SoftbusListener::SetHostPkgName(pkgName);
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
 }
 
@@ -1205,6 +1210,7 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->DisableDiscoveryListener(pkgName, extraParam);
 }
 
@@ -1220,6 +1226,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(advertiseMgr_, ERR_DM_POINT_NULL);
     return advertiseMgr_->StartAdvertising(pkgName, advertiseParam);
 }
 
@@ -1242,6 +1249,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
     if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
         publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
     }
+    CHECK_NULL_RETURN(advertiseMgr_, ERR_DM_POINT_NULL);
     return advertiseMgr_->StopAdvertising(pkgName, publishId);
 }
 
@@ -1328,6 +1336,7 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
     return pinHolder_->RegisterPinHolderCallback(pkgName);
 }
 
@@ -1352,6 +1361,7 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
     return pinHolder_->CreatePinHolder(pkgName, targetId, pinType, payload);
 }
 
@@ -1376,6 +1386,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
     return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
@@ -1425,6 +1436,8 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
 int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                                      int32_t &securityLevel)
 {
+    LOGI("DeviceManagerService::GetDeviceSecurityLevel begin pkgName: %{public}s, networkId: %{public}s",
+        pkgName.c_str(), GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceSecurityLevel.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1434,7 +1447,7 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
             GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::GetDeviceSecurityLevel begin for pkgName = %{public}s", pkgName.c_str());
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
     if (ret != DM_OK) {
         LOGE("GetDeviceSecurityLevel failed, ret = %{public}d", ret);
@@ -1454,8 +1467,6 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
         LOGE("DeviceManagerService::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService IsSameAccount start for networkId = %{public}s, udid = %{public}s",
-        GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
     if (!IsDMServiceImplReady()) {
         LOGE("IsSameAccount failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -1568,10 +1579,7 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
 
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
         std::vector<DmDeviceInfo> onlineDeviceList;
-        if (softbusListener_ == nullptr) {
-            LOGE("softbusListener_ is nullptr.");
-            return;
-        }
+        CHECK_NULL_VOID(softbusListener_);
         int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
         if (ret != DM_OK) {
             LOGE("GetTrustedDeviceList failed, ret: %{public}d", ret);
