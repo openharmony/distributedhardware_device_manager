@@ -1208,5 +1208,23 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
     return DM_OK;
 }
 
+void HiChainConnector::DeleteAllGroupByUdid(const std::string &udid)
+{
+    LOGI("HiChainConnector::DeleteAllGroupByUdid %{public}s.", GetAnonyString(udid).c_str());
+    std::vector<GroupInfo> groupList;
+    GetRelatedGroups(udid, groupList);
+    for (auto &iter : groupList) {
+        if (DeleteGroup(iter.groupId) != DM_OK) {
+            LOGE("Delete groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
+        }
+    }
+    std::vector<GroupInfo> groupListExt;
+    GetRelatedGroupsExt(udid, groupListExt);
+    for (auto &iter : groupListExt) {
+        if (DeleteGroupExt(iter.groupId) != DM_OK) {
+            LOGE("DeleteGroupExt groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

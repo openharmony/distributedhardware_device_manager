@@ -192,6 +192,7 @@ public:
     int32_t InitScreenLockEvent();
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    void HandleDeviceNotTrust(const std::string &msg);
 
 private:
     bool IsDMServiceImplReady();

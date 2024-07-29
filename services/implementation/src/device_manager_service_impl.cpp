@@ -713,6 +713,16 @@ int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &calle
     return DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
 }
 
+void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
+{
+    LOGI("DeviceManagerServiceImpl::HandleDeviceNotTrust udid: %{public}s.", GetAnonyString(udid).c_str());
+    if (udid.empty()) {
+        LOGE("HandleDeviceNotTrust udid is empty.");
+        return;
+    }
+    authMgr_->HandleDeviceNotTrust(udid);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

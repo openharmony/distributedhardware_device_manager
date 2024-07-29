@@ -43,6 +43,7 @@ constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
+constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -52,6 +53,10 @@ static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
 static std::mutex g_onlineDeviceNumLock;
+static std::mutex g_lockDeviceNotTrust;
+static std::mutex g_lockDeviceOnLine;
+static std::mutex g_lockDeviceOffLine;
+static std::mutex g_lockDevInfoChange;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -113,6 +118,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
+    .onNodeDeviceNotTrusted = SoftbusListener::OnDeviceNotTrusted,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -122,23 +128,26 @@ static IRefreshCallback softbusRefreshCallback_ = {
 
 void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 {
-    std::mutex lockDeviceOnLine;
-    std::lock_guard<std::mutex> lock(lockDeviceOnLine);
+    std::lock_guard<std::mutex> lock(g_lockDeviceOnLine);
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
 }
 
 void SoftbusListener::DeviceOffLine(DmDeviceInfo deviceInfo)
 {
-    std::mutex lockDeviceOffLine;
-    std::lock_guard<std::mutex> lock(lockDeviceOffLine);
+    std::lock_guard<std::mutex> lock(g_lockDeviceOffLine);
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_OFFLINE, deviceInfo);
 }
 
 void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
 {
-    std::mutex lockDeviceOffLine;
-    std::lock_guard<std::mutex> lock(lockDeviceOffLine);
+    std::lock_guard<std::mutex> lock(g_lockDevInfoChange);
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_INFO_CHANGED, deviceInfo);
+}
+
+void SoftbusListener::DeviceNotTrust(const std::string &msg)
+{
+    std::lock_guard<std::mutex> lock(g_lockDeviceNotTrust);
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
 }
 
 void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
@@ -267,6 +276,23 @@ void SoftbusListener::OnLocalDevInfoChange()
 {
     LOGI("SoftbusListener::OnLocalDevInfoChange");
     SoftbusCache::GetInstance().UpDataLocalDevInfo();
+}
+
+void SoftbusListener::OnDeviceNotTrusted(const char *msg)
+{
+    LOGI("SoftbusListener::OnDeviceNotTrusted.");
+
+    if (msg == nullptr) {
+        LOGE("OnDeviceNotTrusted msg is nullptr.");
+        return;
+    }
+    std::string softbusMsg = std::string(msg);
+    std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
+    int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
+    if (ret != DM_OK) {
+        LOGE("deviceNotTrust setname failed.");
+    }
+    deviceNotTrust.detach();
 }
 
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)

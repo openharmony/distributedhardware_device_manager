@@ -149,6 +149,7 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
+    void DeleteAccessControlList(const std::string &udid);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

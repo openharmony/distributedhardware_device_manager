@@ -481,6 +481,12 @@ int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &calle
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
+{
+    (void)udid;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
