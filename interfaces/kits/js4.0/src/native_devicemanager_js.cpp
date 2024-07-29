@@ -1097,9 +1097,8 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_callback_info info)
 {
     LOGI("GetAvailableDeviceListSync in");
-    int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
-    if (ret != 0) {
-        CreateBusinessError(env, ret);
+    if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
+        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -1118,7 +1117,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
         return result;
     }
     std::vector<DmDeviceBasicInfo> devList;
-    ret = DeviceManager::GetInstance().GetAvailableDeviceList(deviceManagerWrapper->bundleName_, devList);
+    int32_t ret = DeviceManager::GetInstance().GetAvailableDeviceList(deviceManagerWrapper->bundleName_, devList);
     if (ret != 0) {
         LOGE("GetTrustedDeviceList for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
@@ -1149,9 +1148,8 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListPromise(napi_env env,
 
 napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback_info info)
 {
-    int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
-    if (ret != 0) {
-        CreateBusinessError(env, ret);
+    if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
+        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
         return nullptr;
     }
     napi_value result = nullptr;
