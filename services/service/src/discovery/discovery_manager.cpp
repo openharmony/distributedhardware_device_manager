@@ -333,8 +333,6 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
 
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
 {
-    DiscoveryContext discoveryContext;
-    DiscoveryFilter filter;
     DeviceFilterPara filterPara;
     filterPara.isOnline = false;
     filterPara.range = info.range;
@@ -353,31 +351,50 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         return;
     }
     uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<uint32_t>();
-    uint16_t subscribeId = 0;
-    {
-        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-        subscribeId = pkgName2SubIdMap_[pkgName];
-    }
+    OnDeviceFound(pkgName, capabilityType, info, filterPara);
+}
+
+void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
+    const DmDeviceInfo &info, const DeviceFilterPara &filterPara)
+{
+    bool isIndiscoveryContextMap = false;
+    DiscoveryContext discoveryContext;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         auto iter = discoveryContextMap_.find(pkgName);
-        if (iter == discoveryContextMap_.end()) {
-            if (capabilityMap_.find(pkgName) != capabilityMap_.end() &&
-                CompareCapability(capabilityType, capabilityMap_[pkgName])) {
-                LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-                listener_->OnDeviceFound(pkgName, subscribeId, info);
+        isIndiscoveryContextMap = (iter != discoveryContextMap_.end());
+        if (isIndiscoveryContextMap) {
+            discoveryContext = iter->second;
+        }
+    }
+    if (!isIndiscoveryContextMap) {
+        {
+            std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+            if (capabilityMap_.find(pkgName) == capabilityMap_.end() ||
+                !CompareCapability(capabilityType, capabilityMap_[pkgName])) {
                 return;
             }
-            return;
         }
-        discoveryContext = iter->second;
+        uint16_t subscribeId = 0;
+        {
+            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+            subscribeId = pkgName2SubIdMap_[pkgName];
+        }
+        LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+        listener_->OnDeviceFound(pkgName, subscribeId, info);
+        return;
     }
+    DiscoveryFilter filter;
     if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        if (capabilityMap_.find(pkgName) != capabilityMap_.end() &&
-            CompareCapability(capabilityType, capabilityMap_[pkgName])) {
-            LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-            listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
+        {
+            std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+            if (capabilityMap_.find(pkgName) == capabilityMap_.end() ||
+                !CompareCapability(capabilityType, capabilityMap_[pkgName])) {
+                return;
+            }
         }
+        LOGI("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
     }
 }
 
