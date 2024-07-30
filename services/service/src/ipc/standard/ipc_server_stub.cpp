@@ -49,12 +49,8 @@ void IpcServerStub::OnStart()
         LOGI("IpcServerStub has already started.");
         return;
     }
-    if (!Init()) {
-        LOGE("failed to init IpcServerStub");
-        return;
-    }
+
     IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
-    state_ = ServiceRunningState::STATE_RUNNING;
 
     LOGI("called:AddAbilityListener begin!");
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
@@ -86,6 +82,12 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             dependsSASet_.erase(systemAbilityId);
             if (dependsSASet_.empty()) {
                 DeviceManagerService::GetInstance().InitSoftbusListener();
+                if (!Init()) {
+                    LOGE("failed to init IpcServerStub");
+                    state_ = ServiceRunningState::STATE_NOT_START;
+                    return;
+                }
+                state_ = ServiceRunningState::STATE_RUNNING;
             }
         }
     }
