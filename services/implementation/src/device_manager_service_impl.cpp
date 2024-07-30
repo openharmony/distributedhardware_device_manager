@@ -683,6 +683,7 @@ void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::s
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
         commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        CHECK_NULL_VOID(authMgr_);
         authMgr_->CommonEventCallback(userId, commonEventType);
         LOGI("DeviceManagerServiceImpl::account event: %{public}s, userId: %{public}s",
             commonEventType.c_str(), GetAnonyInt32(userId).c_str());
@@ -695,6 +696,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback on screen locked.");
+        CHECK_NULL_VOID(authMgr_);
         authMgr_->OnScreenLocked();
         return;
     }
@@ -720,6 +722,7 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
         LOGE("HandleDeviceNotTrust udid is empty.");
         return;
     }
+    CHECK_NULL_RETURN(authMgr_, ERR_DM_POINT_NULL);
     authMgr_->HandleDeviceNotTrust(udid);
 }
 
