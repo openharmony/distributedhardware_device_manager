@@ -720,7 +720,7 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
         LOGE("HandleDeviceNotTrust udid is empty.");
         return;
     }
-    CHECK_NULL_RETURN(authMgr_, ERR_DM_POINT_NULL);
+    CHECK_NULL_VOID(authMgr_);
     authMgr_->HandleDeviceNotTrust(udid);
 }
 

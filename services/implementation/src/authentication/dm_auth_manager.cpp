@@ -2534,9 +2534,8 @@ void DmAuthManager::HandleDeviceNotTrust(const std::string &udid)
         return;
     }
     DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
-    if (hiChainConnector_ != nullptr) {
-        hiChainConnector_->DeleteAllGroupByUdid(udid);
-    }
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroupByUdid(udid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
