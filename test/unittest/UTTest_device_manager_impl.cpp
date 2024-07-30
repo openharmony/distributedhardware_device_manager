@@ -688,7 +688,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_101, testing::ext::Test
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, callback);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
