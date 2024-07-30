@@ -283,8 +283,8 @@ void SoftbusListener::OnDeviceNotTrusted(const char *msg)
 {
     LOGI("SoftbusListener::OnDeviceNotTrusted.");
 
-    if (msg == nullptr) {
-        LOGE("OnDeviceNotTrusted msg is nullptr.");
+    if (msg == nullptr || strlen(msg) > MAX_SOFTBUS_MSG_LEN) {
+        LOGE("OnDeviceNotTrusted msg invalied.");
         return;
     }
     std::string softbusMsg = std::string(msg);
