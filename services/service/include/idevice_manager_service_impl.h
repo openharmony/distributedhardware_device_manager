@@ -278,9 +278,10 @@ public:
     virtual void AccountCommonEventCallback(int32_t userId, std::string commonEventType) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
     virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid);
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid);
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

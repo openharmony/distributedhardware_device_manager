@@ -79,6 +79,12 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountIdLogout(int32_t userId, const std::string &oldAccountId) = 0;
+    /**
+     * @tc.name: IDMServiceImplExt::HandleDeviceNotTrust
+     * @tc.desc: HandleDeviceNotTrust
+     * @tc.type: FUNC
+     */
+    virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

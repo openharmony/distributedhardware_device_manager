@@ -53,6 +53,8 @@ public:
     static void DeviceOffLine(DmDeviceInfo deviceInfo);
     static void DeviceNameChange(DmDeviceInfo deviceInfo);
     static void OnLocalDevInfoChange();
+    static void OnDeviceNotTrusted(const char *msg);
+    static void DeviceNotTrust(const std::string &msg);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();

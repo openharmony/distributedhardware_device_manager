@@ -135,6 +135,7 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
+    void HandleDeviceNotTrust(const std::string &udid);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

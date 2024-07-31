@@ -456,6 +456,22 @@ int32_t DeviceProfileConnector::DeleteAccessControlList(int32_t userId, std::str
     return DM_OK;
 }
 
+void DeviceProfileConnector::DeleteAccessControlList(const std::string &udid)
+{
+    LOGI("DeleteAccessControlList by udid: %{public}s.", GetAnonyString(udid).c_str());
+    if (udid.empty()) {
+        LOGE("DeleteAccessControlList udid is empty.");
+        return;
+    }
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
+    for (const auto &item : profiles) {
+        if (item.GetTrustDeviceId() == udid) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+        }
+    }
+}
+
 DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
     std::string remoteDeviceId)
 {

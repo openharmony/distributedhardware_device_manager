@@ -61,6 +61,7 @@ const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 constexpr const char* ALL_PKGNAME = "";
+constexpr const char* NETWORKID = "NETWORK_ID";
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -1604,5 +1605,34 @@ void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType
 }
 #endif
 
+void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
+{
+    LOGI("DeviceManagerService::HandleDeviceNotTrust.");
+    if (msg.empty()) {
+        LOGE("DeviceManagerService::HandleDeviceNotTrust msg is empty.");
+        return;
+    }
+    nlohmann::json msgJsonObj = nlohmann::json::parse(msg, nullptr, false);
+    if (msgJsonObj.is_discarded()) {
+        LOGE("HandleDeviceNotTrust msg prase error.");
+        return;
+    }
+    if (!IsString(msgJsonObj, NETWORKID)) {
+        LOGE("HandleDeviceNotTrust msg not contain networkId.");
+        return;
+    }
+    std::string networkId = msgJsonObj[NETWORKID].get<std::string>();
+    std::string udid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(networkId.c_str(), udid);
+    LOGI("HandleDeviceNotTrust networkId: %{public}s, udid: %{public}s.",
+        GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
+    if (IsDMImplSoLoaded()) {
+        dmServiceImpl_->HandleDeviceNotTrust(udid);
+    }
+    if (IsDMServiceImplReady()) {
+        dmServiceImplExt_->HandleDeviceNotTrust(udid);
+    }
+    return;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

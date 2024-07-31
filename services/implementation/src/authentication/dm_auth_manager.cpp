@@ -2525,5 +2525,17 @@ void DmAuthManager::OnScreenLocked()
         SetReasonAndFinish(ERR_DM_BIND_USER_CANCEL, STATUS_DM_AUTH_DEFAULT);
     }
 }
+
+void DmAuthManager::HandleDeviceNotTrust(const std::string &udid)
+{
+    LOGI("DmAuthManager::HandleDeviceNotTrust udid: %{public}s.", GetAnonyString(udid).c_str());
+    if (udid.empty()) {
+        LOGE("DmAuthManager::HandleDeviceNotTrust udid is empty.");
+        return;
+    }
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroupByUdid(udid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
