@@ -304,13 +304,13 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
     DmDeviceInfo dmDevInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDevInfo);
-    if (deviceIdSet.find(device->devId) == deviceIdSet.end()) {
-        deviceIdSet.insert(device->devId);
+    if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
+        deviceIdSet.insert(std::string(dmDevInfo.deviceId));
         struct RadarInfo info = {
             .funcName = "OnSoftbusDeviceFound",
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
             .peerNetId = "",
-            .peerUdid = device->devId,
+            .peerUdid = std::string(dmDevInfo.deviceId),
         };
         if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
             if (!GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
