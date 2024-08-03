@@ -104,9 +104,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.
 
 /**
  * @tc.name: OnSoftbusDeviceOnline_002
- * @tc.desc: return true
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_002, testing::ext::TestSize.Level0)
 {

@@ -445,7 +445,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_001, testing::ext::TestSi
 /**
  * @tc.name: GetDeviceId_002
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_002, testing::ext::TestSize.Level0)
 {
@@ -461,7 +460,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_002, testing::ext::TestSi
 /**
  * @tc.name: GetDeviceId_003
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_003, testing::ext::TestSize.Level0)
 {
