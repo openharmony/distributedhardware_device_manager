@@ -938,8 +938,6 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound7, testing::ext::TestSize.Level0)
     auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
     EXPECT_EQ(map.empty(), false);
 }
-
-
 } // namespace
 
 DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()
