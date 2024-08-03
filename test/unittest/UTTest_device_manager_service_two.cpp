@@ -51,11 +51,9 @@ void DeletePermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-
 /**
  * @tc.name: InitSoftbusListener_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_201, testing::ext::TestSize.Level0)
 {
@@ -67,7 +65,6 @@ HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_201, testing::ext::TestSi
 /**
  * @tc.name: RegisterDeviceManagerListener_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_201, testing::ext::TestSize.Level0)
 {
@@ -80,7 +77,6 @@ HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_201, testing::e
 /**
  * @tc.name: GetTrustedDeviceList_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestSize.Level0)
 {
@@ -95,7 +91,6 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestS
 /**
  * @tc.name: GetDeviceInfo_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Level0)
 {
@@ -109,7 +104,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Lev
 /**
  * @tc.name: GetLocalDeviceInfo_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_201, testing::ext::TestSize.Level0)
 {
@@ -122,7 +116,6 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_201, testing::ext::TestSiz
 /**
  * @tc.name: GetLocalDeviceInfo_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_201, testing::ext::TestSize.Level0)
 {
@@ -136,7 +129,6 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_201, testing::ext::TestSi
 /**
  * @tc.name: RegisterUiStateCallback_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::TestSize.Level0)
 {
@@ -149,7 +141,6 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::Te
 /**
  * @tc.name: UnRegisterUiStateCallback_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::TestSize.Level0)
 {
@@ -162,7 +153,6 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::
 /**
  * @tc.name: IsDMImplSoLoaded_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.Level0)
 {
@@ -174,7 +164,6 @@ HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.
 /**
  * @tc.name: GetEncryptedUuidByNetworkId_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_201, testing::ext::TestSize.Level0)
 {
@@ -189,7 +178,6 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_201, testing::ext
 /**
  * @tc.name: StopAdvertising_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_201, testing::ext::TestSize.Level0)
 {
@@ -203,7 +191,6 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_201, testing::ext::TestSize.L
 /**
  * @tc.name: StopAdvertising_202
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, StopAdvertising_202, testing::ext::TestSize.Level0)
 {
@@ -217,7 +204,6 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_202, testing::ext::TestSize.L
 /**
  * @tc.name: BindTarget_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0)
 {
@@ -233,7 +219,6 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
 /**
  * @tc.name: BindTarget_202
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, BindTarget_202, testing::ext::TestSize.Level0)
 {
@@ -249,7 +234,6 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_202, testing::ext::TestSize.Level0
 /**
  * @tc.name: UnbindTarget_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, UnbindTarget_201, testing::ext::TestSize.Level0)
 {
@@ -266,7 +250,6 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_201, testing::ext::TestSize.Leve
 /**
  * @tc.name: RegisterPinHolderCallback_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::TestSize.Level0)
 {
@@ -278,7 +261,6 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::
 /**
  * @tc.name: CreatePinHolder_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.Level0)
 {
@@ -290,7 +272,6 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
 /**
  * @tc.name: GetDeviceSecurityLevel_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::TestSize.Level0)
 {
@@ -305,7 +286,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::Tes
 /**
  * @tc.name: CheckAccessControl_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSize.Level0)
 {
@@ -318,7 +298,6 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
 /**
  * @tc.name: CheckAccessControl_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSize.Level0)
 {
@@ -332,7 +311,6 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSiz
 /**
  * @tc.name: CheckIsSameAccount_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level0)
 {
@@ -345,7 +323,6 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
 /**
  * @tc.name: CheckIsSameAccount_202
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level0)
 {
@@ -359,7 +336,6 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSiz
 /**
  * @tc.name: InitAccountInfo_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.Level0)
 {
@@ -375,7 +351,6 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
 /**
  * @tc.name: InitScreenLockEvent_001
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, InitScreenLockEvent_201, testing::ext::TestSize.Level0)
 {
@@ -386,7 +361,6 @@ HWTEST_F(DeviceManagerServiceTest, InitScreenLockEvent_201, testing::ext::TestSi
 /**
  * @tc.name: SubscribeAccountCommonEvent_201
  * @tc.type: FUNC
- * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext::TestSize.Level0)
 {
