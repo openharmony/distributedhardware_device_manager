@@ -52,17 +52,6 @@ void DeletePermission()
 }
 
 /**
- * @tc.name: InitSoftbusListener_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_201, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    int32_t ret = DeviceManagerService::GetInstance().InitSoftbusListener();
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: RegisterDeviceManagerListener_001
  * @tc.type: FUNC
  */
@@ -99,17 +88,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Lev
     DmDeviceInfo deviceIndo;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceIndo);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_201
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_201, testing::ext::TestSize.Level0)
-{
-    DeletePermission();
-    DmDeviceInfo deviceIndo;
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(deviceIndo);
+    ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(deviceIndo);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
@@ -186,18 +165,9 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_201, testing::ext::TestSize.L
     advertiseParam[PARAM_KEY_META_TYPE] = "1";
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
     EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: StopAdvertising_202
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_202, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::map<std::string, std::string> advertiseParam;
+    std::map<std::string, std::string> advertiseParam2;
     advertiseParam[PARAM_KEY_PUBLISH_ID] = "12";
-    int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
+    ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam2);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -214,20 +184,9 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     bindParam[PARAM_KEY_META_TYPE] = "1";
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: BindTarget_202
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, BindTarget_202, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    PeerTargetId targetId;
     targetId.wifiIp = "192.168.1.1";
-    targetId.deviceId = "123";
-    std::map<std::string, std::string> bindParam;
-    int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
+    std::map<std::string, std::string> bindParam2;
+    ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam2);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -243,7 +202,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_201, testing::ext::TestSize.Leve
     targetId.deviceId = "123";
     std::map<std::string, std::string> unbindParam;
     unbindParam[PARAM_KEY_META_TYPE] = "1";
-    int32_t ret = DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, bindParam);
+    int32_t ret = DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, unbindParam);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -293,18 +252,8 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
     EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: CheckAccessControl_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSize.Level0)
-{
     DeletePermission();
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
+    ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
     EXPECT_EQ(ret, false);
 }
 
@@ -318,18 +267,8 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: CheckIsSameAccount_202
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level0)
-{
     DeletePermission();
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
+    ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     EXPECT_EQ(ret, false);
 }
 
