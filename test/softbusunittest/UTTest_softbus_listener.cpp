@@ -103,7 +103,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: OnSoftbusDeviceOnline_001
+ * @tc.name: OnSoftbusDeviceOnline_002
  * @tc.desc: return true
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -116,6 +116,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_002, testing::ext::TestSize.
     }
     softbusListener->OnSoftbusDeviceOnline(info);
     softbusListener->OnSoftbusDeviceOffline(info);
+    softbusListener->OnLocalDevInfoChange();
     EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
