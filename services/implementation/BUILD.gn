@@ -212,6 +212,7 @@ if (defined(ohos_lite)) {
       "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
       "eventhandler:libeventhandler",
+      "ffrt:libffrt",
       "hilog:libhilog",
       "init:libbegetutil",
       "ipc:ipc_core",
