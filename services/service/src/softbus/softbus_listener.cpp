@@ -805,7 +805,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
 {
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
-        LOGI("IsDmRadarHelperReady alReady.");
+        LOGD("IsDmRadarHelperReady alReady.");
         return true;
     }
     char path[PATH_MAX + 1] = {0x00};

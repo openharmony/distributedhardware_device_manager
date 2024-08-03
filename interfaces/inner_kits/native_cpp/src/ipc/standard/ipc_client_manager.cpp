@@ -57,7 +57,7 @@ int32_t IpcClientManager::ClientInit()
         return ERR_DM_INIT_FAILED;
     }
 
-    if (dmRecipient_ == nullptr) {
+    if (dmRecipient_ == nullptr) { 
         dmRecipient_ = sptr<DmDeathRecipient>(new DmDeathRecipient());
     }
     if (!object->AddDeathRecipient(dmRecipient_)) {
