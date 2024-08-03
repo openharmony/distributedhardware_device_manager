@@ -172,7 +172,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     targetId.wifiIp = "192.168.1.1";
     std::map<std::string, std::string> bindParam2;
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam2);
-    EXPECT_EQ(ret, ERR_DM_LOAD_CUSTOM_META_NODE);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
