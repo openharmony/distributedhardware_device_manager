@@ -278,7 +278,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh,
                                            bool isWakeUp)
 {
-    LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
+    LOGD("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
         "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call ShiftLNNGear, pkgName = %{public}s", pkgName.c_str());

@@ -40,7 +40,7 @@ ohos_shared_library("devicemanagerdependency") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerdependency\"",
-    "LOG_DOMAIN=0xD004110",
+    "LOG_DOMAIN=0xD004112",
   ]
 
   deps = [
