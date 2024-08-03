@@ -27,7 +27,6 @@
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 namespace {
 void DeletePermission()
 {
@@ -74,7 +73,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestS
     const std::string extra;
     std::vector<DmDeviceInfo> deviceList;
     int32_t ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -89,7 +88,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Lev
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceIndo);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
     ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(deviceIndo);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -164,11 +163,11 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_201, testing::ext::TestSize.L
     std::map<std::string, std::string> advertiseParam;
     advertiseParam[PARAM_KEY_META_TYPE] = "1";
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
     std::map<std::string, std::string> advertiseParam2;
     advertiseParam[PARAM_KEY_PUBLISH_ID] = "12";
     ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam2);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -183,11 +182,11 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     std::map<std::string, std::string> bindParam;
     bindParam[PARAM_KEY_META_TYPE] = "1";
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
     targetId.wifiIp = "192.168.1.1";
     std::map<std::string, std::string> bindParam2;
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam2);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
 }
 
 /**
@@ -203,7 +202,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_201, testing::ext::TestSize.Leve
     std::map<std::string, std::string> unbindParam;
     unbindParam[PARAM_KEY_META_TYPE] = "1";
     int32_t ret = DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, unbindParam);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_START_ADVERTISING_FAILED);
 }
 
 /**
@@ -214,7 +213,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::
 {
     std::string pkgName = "CollaborationFwk";
     int32_t ret = DeviceManagerService::GetInstance().RegisterPinHolderCallback(pkgName);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -225,10 +224,10 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
 {
     std::string pkgName = "CollaborationFwk";
     PeerTargetId targetId;
-    DmPinType pinType;
+    DmPinType pinType = NUMBER_PIN_CODE;
     std::string payload;
     int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -242,7 +241,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::Tes
     int32_t securityLevel;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, networkId, securityLevel);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -255,8 +254,18 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
     EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: CheckAccessControl_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSize.Level0)
+{
+    DmAccessCaller caller;
+    DmAccessCallee callee;
     DeletePermission();
-    ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
+    bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
     EXPECT_EQ(ret, false);
 }
 
@@ -270,8 +279,18 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: CheckIsSameAccount_201
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level0)
+{
+    DmAccessCaller caller;
+    DmAccessCallee callee;
     DeletePermission();
-    ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
+    bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
     EXPECT_EQ(ret, false);
 }
 
