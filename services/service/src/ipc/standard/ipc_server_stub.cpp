@@ -57,42 +57,22 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
-
-    {
-        std::lock_guard<std::mutex> lock(dependsSASetLock_);
-        dependsSASet_.emplace(SOFTBUS_SERVER_SA_ID);
-#ifdef SUPPORT_POWER_MANAGER
-        dependsSASet_.emplace(POWER_MANAGER_SERVICE_ID);  // power
-#endif // SUPPORT_POWER_MANAGER
-    }
-
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
-#ifdef SUPPORT_POWER_MANAGER
-    AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
-#endif // SUPPORT_POWER_MANAGER
     LOGI("called:AddAbilityListener end!");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
-    {
-        std::lock_guard<std::mutex> lock(dependsSASetLock_);
-        if (dependsSASet_.find(systemAbilityId) != dependsSASet_.end()) {
-            dependsSASet_.erase(systemAbilityId);
-            if (dependsSASet_.empty()) {
-                DeviceManagerService::GetInstance().InitSoftbusListener();
-                if (!Init()) {
-                    LOGE("failed to init IpcServerStub");
-                    state_ = ServiceRunningState::STATE_NOT_START;
-                    return;
-                }
-                state_ = ServiceRunningState::STATE_RUNNING;
-            }
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        DeviceManagerService::GetInstance().InitSoftbusListener();
+        if (!Init()) {
+            LOGE("failed to init IpcServerStub");
+            state_ = ServiceRunningState::STATE_NOT_START;
+            return;
         }
-    }
-
-    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        state_ = ServiceRunningState::STATE_RUNNING;
+    } else if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         int pid = getpid();
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
