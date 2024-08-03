@@ -224,7 +224,10 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::
 HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "CollaborationFwk";
-    int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName);
+    PeerTargetId targetId;
+    DmPinType pinType;
+    std::string payload;
+    int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -279,9 +282,9 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.Level0)
 {
     int32_t userId = 100;
-    std::string commonEventType = CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    std::string commonEventType = "usual.event.USER_SWITCHED";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
-    std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
+    commonEventType = "common.event.HWID_LOGIN";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
     int32_t ret = DeviceManagerService::GetInstance().InitAccountInfo();
     EXPECT_EQ(ret, DM_OK);
@@ -305,7 +308,7 @@ HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext
 {
     DeviceManagerService::GetInstance().SubscribeAccountCommonEvent();
     DeviceManagerService::GetInstance().SubscribeScreenLockEvent();
-    std::string commonEventType = CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    std::string commonEventType = "usual.event.USER_SWITCHED";
     DeviceManagerService::GetInstance().ScreenCommonEventCallback(commonEventType);
     EXPECT_NE(DeviceManagerService::GetInstance().accountCommonEventManager_, nullptr);
 }
