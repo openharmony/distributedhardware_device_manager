@@ -128,15 +128,9 @@ void DeviceManagerService::QueryDependsSwitchState()
 {
     LOGI("DeviceManagerService::QueryDependsSwitchState start.");
     std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = publshCommonEventManager_->GetSubscriber();
-    if (publishSubScriber == nullptr) {
-        LOGE("publishSubScriber is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(publishSubScriber);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOGE("Get SystemAbilityManager Failed");
-        return;
-    }
+    CHECK_NULL_VOID(samgr);
 #ifdef SUPPORT_BLUETOOTH
     if (samgr->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
@@ -164,10 +158,14 @@ void DeviceManagerService::QueryDependsSwitchState()
 #endif // SUPPORT_WIFI
 
 #ifdef SUPPORT_POWER_MANAGER
-    if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
-        publishSubScriber->SetScreenState(DM_SCREEN_ON);
-    } else {
+    if (samgr->CheckSystemAbility(POWER_MANAGER_SERVICE_ID) == nullptr) {
         publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+    } else {
+        if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
+            publishSubScriber->SetScreenState(DM_SCREEN_ON);
+        } else {
+            publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+        }
     }
 #else
     publishSubScriber->SetScreenState(DM_SCREEN_ON);

@@ -126,7 +126,7 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     int32_t retryNum = 0;
     while (retryNum < SERVICE_INIT_TRY_MAX_NUM) {
         ret = ipcClientProxy_->Init(pkgName);
-        if (ret != ERR_DM_NOT_INIT) {
+        if (ret == DM_OK) {
             break;
         }
         usleep(SLEEP_TIME_MS);
