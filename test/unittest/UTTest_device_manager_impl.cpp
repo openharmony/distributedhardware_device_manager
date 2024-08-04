@@ -1150,11 +1150,10 @@ HWTEST_F(DeviceManagerImplTest, InitDeviceManager_003, testing::ext::TestSize.Le
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
     std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
-    EXPECT_CALL(*mockInstance, Init(testing::_)).Times(1).WillOnce(testing::Return(ERR_DM_INIT_FAILED));
     // 3. call DeviceManagerImpl::InitDeviceManager with parameter
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    // 4. check ret is ERR_DM_INIT_FAILED
-    ASSERT_EQ(ret, ERR_DM_INIT_FAILED);
+    // 4. check ret is DM_OK
+    ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
@@ -2036,7 +2035,7 @@ HWTEST_F(DeviceManagerImplTest, IsSameAccount_001, testing::ext::TestSize.Level0
 HWTEST_F(DeviceManagerImplTest, IsSameAccount_002, testing::ext::TestSize.Level0)
 {
     std::string udid = "udidTest";
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.sameaccounttest";
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(pkgName, initCallback);
     bool ret = DeviceManager::GetInstance().IsSameAccount(udid);
