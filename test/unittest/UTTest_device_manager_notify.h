@@ -111,7 +111,7 @@ public:
     void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
 };
 
-class PinHolderCallbackTest: public PinHolderCallback {
+class PinHolderCallbackTest : public PinHolderCallback {
 public:
     void OnPinHolderCreate(const std::string &deviceId, DmPinType pinType, const std::string &payload) {}
     void OnPinHolderDestroy(DmPinType pinType, const std::string &payload) {}
