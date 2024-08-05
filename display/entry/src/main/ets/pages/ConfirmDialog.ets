@@ -139,14 +139,6 @@ struct ConfirmCustomDialog {
   }
 
   destruction() {
-    if (dmClass != null) {
-      try {
-        dmClass.release();
-        dmClass = null;
-      } catch (error) {
-        console.log('dmClass release failed')
-      }
-    }
     let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
     if (session) {
       session.terminateSelf();
