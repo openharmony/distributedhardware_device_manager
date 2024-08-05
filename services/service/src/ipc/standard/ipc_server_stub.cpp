@@ -24,8 +24,10 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iservice_registry.h"
+#ifdef SUPPORT_MEMMGR
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
+#endif // SUPPORT_MEMMGR
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
@@ -54,7 +56,9 @@ void IpcServerStub::OnStart()
 
     LOGI("called:AddAbilityListener begin!");
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
+#ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
@@ -72,13 +76,25 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-    } else if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        return;
+    }
+
+#ifdef SUPPORT_MEMMGR
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         int pid = getpid();
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        return;
+    }
+#endif // SUPPORT_MEMMGR
+
+    if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
         DeviceManagerService::GetInstance().InitAccountInfo();
-    } else if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
+        return;
+    }
+
+    if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitScreenLockEvent();
+        return;
     }
 }
 
@@ -113,8 +129,10 @@ void IpcServerStub::OnStop()
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
+#ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
     LOGI("IpcServerStub::OnStop end.");
 }
 
