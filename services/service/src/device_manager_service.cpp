@@ -829,12 +829,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
-    std::string soName = std::string(LIB_IMPL_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    void *so_handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
         LOGE("load libdevicemanagerserviceimpl so failed, errMsg: %{public}s.", dlerror());
         return false;
@@ -1062,12 +1057,7 @@ void DeviceManagerService::UnloadDMServiceImplSo()
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
-    std::string soPathName = std::string(LIB_IMPL_NAME);
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
-        return;
-    }
-    void *so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("DeviceManagerService so_handle is not nullptr.");
         dlclose(so_handle);
@@ -1082,14 +1072,9 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return true;
     }
 
-    std::string soName = std::string(LIB_DM_ADAPTER_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    void *so_handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load dm service adapter so %{public}s failed.", soName.c_str());
+        LOGE("load dm service adapter so failed.");
         return false;
     }
     dlerror();
@@ -1122,12 +1107,7 @@ void DeviceManagerService::UnloadDMServiceAdapter()
     }
     dmServiceImplExt_ = nullptr;
 
-    std::string soPathName = std::string(LIB_DM_ADAPTER_NAME);
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
-        return;
-    }
-    void *so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("dm service adapter so_handle is not nullptr.");
         dlclose(so_handle);

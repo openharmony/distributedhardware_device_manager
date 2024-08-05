@@ -808,12 +808,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGI("IsDmRadarHelperReady alReady.");
         return true;
     }
-    std::string soName = std::string(LIB_RADAR_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    radarHandle_ = dlopen(soName.c_str(), RTLD_NOW);
+    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
     if (radarHandle_ == nullptr) {
         LOGE("load libdevicemanagerradar so failed.");
         return false;

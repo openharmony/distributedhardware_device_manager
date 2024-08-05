@@ -532,12 +532,7 @@ bool DiscoveryManager::IsCommonDependencyReady()
     if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
         return true;
     }
-    std::string soName = std::string(LIB_DM_COMDENPENDENCY_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    dpConnectorHandle_ = dlopen(soName.c_str(), RTLD_NOW | RTLD_NODELETE);
+    dpConnectorHandle_ = dlopen(LIB_DM_COMDENPENDENCY_NAME, RTLD_NOW | RTLD_NODELETE);
     if (dpConnectorHandle_ == nullptr) {
         LOGE("load libdevicemanagerdependency so failed, errMsg: %{public}s.", dlerror());
         return false;
