@@ -374,7 +374,7 @@ struct dialogPlusPage {
         dmClass.off('uiStateChange');
         dmClass.release();
       } catch (error) {
-        console.log('dmClass release failed');
+        console.log('dmClass release failed')
       }
       dmClass = null
     }
