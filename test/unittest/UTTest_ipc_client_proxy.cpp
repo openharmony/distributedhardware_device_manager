@@ -409,6 +409,10 @@ HWTEST_F(IpcClientProxyTest, SendRequest5, testing::ext::TestSize.Level0)
     int32_t ret = ipcClientProxy->SendRequest(0, req, rsp);
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+    ret = ipcClientProxy->SendRequest(-1, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
+    ret = ipcClientProxy->SendRequest(IPC_MSG_SEV, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -461,6 +465,9 @@ HWTEST_F(IpcClientProxyTest, OnDmServiceDied_002, testing::ext::TestSize.Level0)
     int32_t ret = ipcClientProxy->OnDmServiceDied();
     // 4. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
+    ipcClientProxy->ipcClientManager_ = nullptr;
+    ret = ipcClientProxy->OnDmServiceDied();
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 } // namespace
 } // namespace DistributedHardware
