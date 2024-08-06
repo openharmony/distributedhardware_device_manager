@@ -98,7 +98,7 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ex
 
 /**
  * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_002
- * @tc.desc: the return value is true
+ * @tc.desc: the return value is false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -107,6 +107,25 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ex
     std::string processName = "processName";
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
     ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_003
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ext::TestSize.Level0)
+{
+    std::string processName = "com.huawei.msdp.hmringgenerator";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_EQ(ret, true);
+    processName = "com.huawei.msdp.hmringdiscriminator";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_EQ(ret, true);
+    processName = "CollaborationFwk";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_EQ(ret, true);
 }
 
 /**
@@ -124,7 +143,7 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::e
 
 /**
  * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_002
- * @tc.desc: the return value is true
+ * @tc.desc: the return value is false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -134,6 +153,56 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::e
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
     ASSERT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_003
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
+{
+    std::string processName = "CollaborationFwk";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckSystemSA_001
+ * @tc.desc: the return value is false
+ * @tc.type：FUNC
+ * @tc.require: AR000GHSJK
+*/
+HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.level0)
+{
+    std::string pkgName;
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, false);
+    pkgName = "pkgName";
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckSystemSA_002
+ * @tc.desc: the return value is true
+ * @tc.type：FUNC
+ * @tc.require: AR000GHSJK
+*/
+HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.level0)
+{
+    std::string pkgName = "Samgr_Networking";
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, true);
+    pkgName = "ohos.distributeddata.service";
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, true);
+    pkgName = "ohos.dslm";
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, true);
+    pkgName = "ohos.deviceprofile";
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, true);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
