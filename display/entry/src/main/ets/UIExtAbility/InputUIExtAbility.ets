@@ -24,6 +24,9 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         if (want.parameters && want.parameters.targetDeviceName) {
             AppStorage.setOrCreate('targetDeviceName', want.parameters.targetDeviceName);
         }
+        if (want.parameters && want.parameters.model) {
+            AppStorage.setOrCreate('model', want.parameters.model);
+        }
 
         let param: Record<string, UIExtensionContentSession> = {
             'session': session

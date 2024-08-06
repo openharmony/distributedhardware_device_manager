@@ -55,6 +55,10 @@
         {
             "name":"dm_bluetooth_dialog_content",
             "value":"裝置連線需要啟用藍牙，請啟用後重試。"
+        },
+        {
+            "name":"dm_password_error",
+            "value":"密碼錯誤，連線失敗。"
         }
     ]
 }
