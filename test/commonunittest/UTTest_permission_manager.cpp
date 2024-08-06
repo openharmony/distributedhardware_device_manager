@@ -43,6 +43,20 @@ void PremissionManagerTest::SetUp()
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
+#define AUTH_CODE_WHITE_LIST_NUM (3)
+#define SYSTEM_SA_WHITE_LIST_NUM (4)
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+constexpr const static char g_authCodeWhiteList_test[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "com.huawei.msdp.hmringgenerator",
+    "com.huawei.msdp.hmringdiscriminator",
+    "CollaborationFwk",
+};
+constexpr const static char systemSaWhiteList_test[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "Samgr_Networking",
+    "ohos.distributeddata.service",
+    "ohos.dslm",
+    "ohos.deviceprofile",
+};
 
 void PremissionManagerTest::TearDown()
 {
@@ -117,13 +131,13 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ex
  */
 HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ext::TestSize.Level0)
 {
-    std::string processName = "com.huawei.msdp.hmringgenerator";
+    std::string processName = g_authCodeWhiteList_test[0]
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
     ASSERT_EQ(ret, true);
-    processName = "com.huawei.msdp.hmringdiscriminator";
+    processName = g_authCodeWhiteList_test[1];
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
     ASSERT_EQ(ret, true);
-    processName = "CollaborationFwk";
+    processName = g_authCodeWhiteList_test[2];
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
     ASSERT_EQ(ret, true);
 }
@@ -162,8 +176,14 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::e
  */
 HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
 {
-    std::string processName = "CollaborationFwk";
+    std::string processName = g_authCodeWhiteList_test[0];
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_EQ(ret, true);
+    processName = g_authCodeWhiteList_test[1];
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_EQ(ret, true);
+    processName = g_authCodeWhiteList_test[2];
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
     ASSERT_EQ(ret, true);
 }
 
@@ -191,16 +211,16 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.level0
 */
 HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.level0)
 {
-    std::string pkgName = "Samgr_Networking";
+    std::string pkgName = systemSaWhiteList_test[0];
     bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
     ASSERT_EQ(ret, true);
-    pkgName = "ohos.distributeddata.service";
+    pkgName = systemSaWhiteList_test[1];
     ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
     ASSERT_EQ(ret, true);
-    pkgName = "ohos.dslm";
+    pkgName = systemSaWhiteList_test[2];
     ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
     ASSERT_EQ(ret, true);
-    pkgName = "ohos.deviceprofile";
+    pkgName = systemSaWhiteList_test[3];
     ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
     ASSERT_EQ(ret, true);
 }

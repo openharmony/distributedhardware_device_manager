@@ -25,6 +25,7 @@ void DeviceManagerServiceImplTest::SetUp()
     }
     deviceManagerServiceImpl_->Initialize(listener_);
 }
+constexpr std::string testID = "111111";
 
 void DeviceManagerServiceImplTest::TearDown()
 {
@@ -717,7 +718,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_002, testing::ext::TestSize
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    devInfo.networkId = "111111";
+    devInfo.networkId = testID;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -748,7 +749,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_002, testing::ext::TestSize.
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    devInfo.networkId = "111111";
+    devInfo.networkId = testID;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -1588,7 +1589,7 @@ HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext:
 */
 HWTEST_F(DeviceManagerServiceImplTest, AccountCommonEventCallback_001, testing::ext::TestSize.level0)
 {
-    int32_t userId = "111111";
+    int32_t userId = testID;
     std::string commonEventType = "usual.event.USER_SWITCHED";
     deviceManagerServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
@@ -1611,7 +1612,7 @@ HWTEST_F(DeviceManagerServiceImplTest, ScreenCommonEventCallback_001, testing::e
 */
 HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::TestSize.level0)
 {
-    std::string udid = "111111";
+    std::string udid = testID;
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr)
 }
