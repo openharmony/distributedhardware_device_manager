@@ -209,5 +209,6 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.Level0
     ret = PermissionManager::GetInstance().CheckSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
 }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
