@@ -5,27 +5,27 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"[TS_922746]_Incorrect connection code. %d attempt remaining."
+                    "value":"[TS_922746]_Incorrect. %d attempt remaining."
                 },
                 {
                     "quantity":"other",
-                    "value":"[TS_922743]_Incorrect connection code. %d attempts remaining."
+                    "value":"[TS_922743]_Incorrect. %d attempts remaining."
                 },
                 {
                     "quantity":"zero",
-                    "value":"[TS_922738]_Incorrect connection code. %d attempts remaining."
+                    "value":"[TS_922738]_Incorrect. %d attempts remaining."
                 },
                 {
                     "quantity":"few",
-                    "value":"[TS_922740]_Incorrect connection code. %d attempts remaining."
+                    "value":"[TS_922740]_Incorrect. %d attempts remaining."
                 },
                 {
                     "quantity":"many",
-                    "value":"[TS_922747]_Incorrect connection code. %d attempts remaining."
+                    "value":"[TS_922747]_Incorrect. %d attempts remaining."
                 },
                 {
                     "quantity":"two",
-                    "value":"[TS_922736]_Incorrect connection code. %d attempts remaining."
+                    "value":"[TS_922736]_Incorrect. %d attempts remaining."
                 }
             ]
         },

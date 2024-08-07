@@ -4,8 +4,8 @@
   "app": {
     "bundleName": "com.ohos.devicemanagerui",
     "vendor": "example",
-    "versionCode": 1000017,
-    "versionName": "1.0.17",
+    "versionCode": 1000018,
+    "versionName": "1.0.18",
     "icon": "$media:app_icon",
     "label": "$string:app_name",
     "minAPIVersion": 10,
