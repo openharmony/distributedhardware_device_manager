@@ -78,7 +78,7 @@
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"Enter the peer connection code"
+            "value":"Enter connection code"
         },
         {
             "name":"dm_password_error",

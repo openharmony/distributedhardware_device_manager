@@ -75,6 +75,10 @@
         {
             "name":"dm_confirm_intention",
             "value":"[TS_931360]_This is required for cross-device data syncing and collaboration."
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"[TS_949559]_Enter connection code"
         }
     ]
 }
