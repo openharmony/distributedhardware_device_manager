@@ -36,6 +36,7 @@ public:
     bool CheckSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetSystemSA();
 };
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 #define AUTH_CODE_WHITE_LIST_NUM (3)
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",

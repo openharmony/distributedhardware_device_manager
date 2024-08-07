@@ -36,7 +36,6 @@ constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIB
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
-constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 }
 
 bool PermissionManager::CheckPermission(void)
