@@ -36,21 +36,21 @@ public:
     bool CheckSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetSystemSA();
 };
-constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+constexpr int32_t PAKAGE_NAME_SIZE_MAX = 256;
 #define AUTH_CODE_WHITE_LIST_NUM (3)
-constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
 };
 
 #define PIN_HOLDER_WHITE_LIST_NUM (1)
-constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "CollaborationFwk",
 };
 
 #define SYSTEM_SA_WHITE_LIST_NUM (4)
-constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
     "ohos.dslm",
