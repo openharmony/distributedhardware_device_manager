@@ -43,22 +43,6 @@ void PermissionManagerTest::SetUp()
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
-#define AUTH_CODE_WHITE_LIST_NUM (3)
-#define SYSTEM_SA_WHITE_LIST_NUM (4)
-std::array<std::string_view, AUTH_CODE_WHITE_LIST_NUM> g_authCodeWhiteList_test = {
-    "com.huawei.msdp.hmringgenerator",
-    "com.huawei.msdp.hmringdiscriminator",
-    "CollaborationFwk",
-};
-
-std::array<std::string_view, SYSTEM_SA_WHITE_LIST_NUM> systemSaWhiteList_test = {
-    "Samgr_Networking",
-    "ohos.distributeddata.service",
-    "ohos.dslm",
-    "ohos.deviceprofile",
-};
-
-
 void PermissionManagerTest::TearDown()
 {
 }
@@ -132,14 +116,14 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ex
  */
 HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ext::TestSize.Level0)
 {
-    std::string processName = g_authCodeWhiteList_test[0];
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    std::string processName1(g_authCodeWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName1);
     ASSERT_EQ(ret, true);
-    processName = g_authCodeWhiteList_test[1];
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    std::string processName2(g_authCodeWhiteList[1]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName2);
     ASSERT_EQ(ret, true);
-    processName = g_authCodeWhiteList_test[2];
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    std::string processName3(g_authCodeWhiteList[2]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName3);
     ASSERT_EQ(ret, true);
 }
 
@@ -177,14 +161,14 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::e
  */
 HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
 {
-    std::string processName = g_authCodeWhiteList_test[0];
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    std::string processName1(g_authCodeWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName1);
     ASSERT_EQ(ret, true);
-    processName = g_authCodeWhiteList_test[1];
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    std::string processName2(g_authCodeWhiteList[1]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName2);
     ASSERT_EQ(ret, true);
-    processName = g_authCodeWhiteList_test[2];
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    std::string processName3(g_authCodeWhiteList[2]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName3);
     ASSERT_EQ(ret, true);
 }
 
@@ -212,17 +196,17 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level0
 */
 HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = systemSaWhiteList_test[0];
-    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    std::string pkgName1(systemSaWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName1);
     ASSERT_EQ(ret, true);
-    pkgName = systemSaWhiteList_test[1];
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    std::string pkgName2(systemSaWhiteList[1]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName2);
     ASSERT_EQ(ret, true);
-    pkgName = systemSaWhiteList_test[2];
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    std::string pkgName3(systemSaWhiteList[2]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName3);
     ASSERT_EQ(ret, true);
-    pkgName = systemSaWhiteList_test[3];
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    std::string pkgName4(systemSaWhiteList[3]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
 }
 } // namespace DistributedHardware
