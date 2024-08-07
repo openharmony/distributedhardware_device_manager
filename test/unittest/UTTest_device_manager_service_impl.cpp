@@ -25,7 +25,7 @@ void DeviceManagerServiceImplTest::SetUp()
     }
     deviceManagerServiceImpl_->Initialize(listener_);
 }
-constexpr std::string testID = "111111";
+const std::string testID("111111");
 
 void DeviceManagerServiceImplTest::TearDown()
 {
