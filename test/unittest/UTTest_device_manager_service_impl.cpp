@@ -1589,7 +1589,7 @@ HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext:
 */
 HWTEST_F(DeviceManagerServiceImplTest, AccountCommonEventCallback_001, testing::ext::TestSize.Level0)
 {
-    int32_t userId = testID;
+    int32_t userId = 111111;
     std::string commonEventType = "usual.event.USER_SWITCHED";
     deviceManagerServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
@@ -1614,7 +1614,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::T
 {
     std::string udid = testID;
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
-    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr)
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware
