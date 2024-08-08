@@ -133,6 +133,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = jsonObj.dump();
+    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    authMessageProcessor->CreateNegotiateMessage(jsonObj);
 
     nlohmann::json jsonObject;
     jsonObject[TAG_ACCOUNT_GROUPID] = "";
@@ -274,6 +276,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext:
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     nlohmann::json jsonObj;
     jsonObj[TAG_REPLY] = 22;
+    jsonObj[TAG_AUTH_FINISH] = true;
     authMessageProcessor->ParseResponseFinishMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, jsonObj[TAG_REPLY]);
 }
@@ -607,6 +610,22 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
     jsonThumbnail[TAG_DEVICE_TYPE] = 1;
     int32_t ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
     ASSERT_EQ(ret, DM_OK);
+    jsonThumbnail[TAG_INDEX] = 1;
+    ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, DM_OK);
+    jsonThumbnail[TAG_SLICE_NUM] = 10;
+    ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, DM_OK);
+    jsonThumbnail[TAG_SLICE_NUM] = 1;
+    jsonThumbnail[TAG_IS_SHOW_DIALOG] = true;
+    ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, DM_OK);
+    jsonThumbnail[TAG_BIND_TYPE_SIZE] = 10001;
+    ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    jsonThumbnail[TAG_BIND_TYPE_SIZE] = 1;
+    ret = authMessageProcessor->ParseAuthRequestMessage(jsonThumbnail);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -808,6 +827,42 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
 }
 
 /**
+ * @tc.name: AuthMessageProcessor::ParseNegotiateMessage_006
+ * @tc.desc: Compare authResponseContext before and after assignment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    nlohmann::json jsonObj;
+    authResponseContext->localDeviceId = "22";
+    authResponseContext->authType = 1;
+    authResponseContext->reply = 33;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "LOCALDEVICEID";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_AUTH_TYPE] = authResponseContext->authType;
+    jsonObj[TAG_LOCAL_DEVICE_ID] = authResponseContext->localDeviceId;
+    jsonObj[TAG_REPLY] = authResponseContext->reply;
+    jsonObj[TAG_CRYPTO_SUPPORT] = true;
+    jsonObj[TAG_CRYPTO_NAME] = "NAMETEST";
+    jsonObj[TAG_CRYPTO_VERSION] = "1.0";
+    jsonObj[TAG_ACCOUNT_GROUPID] = "GROUPID";
+    authMessageProcessor->ParseNegotiateMessage(jsonObj);
+    jsonObj[TAG_ACCOUNT_GROUPID] = 12;
+    jsonObj[TAG_HOST] = "12";
+    jsonObj[TAG_AUTH_TYPE] = "12";
+    authMessageProcessor->SetResponseContext(authResponseContext);
+    authMessageProcessor->ParseNegotiateMessage(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
+}
+
+/**
  * @tc.name: AuthMessageProcessor::ParseRespNegotiateMessage_001
  * @tc.desc: return true
  * @tc.type: FUNC
@@ -869,6 +924,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_003, testing::ext::
     jsonObj[TAG_NET_ID] = "1212";
     jsonObj[TAG_TOKENID] = "1212";
     jsonObj[TAG_TARGET_DEVICE_NAME] = "1212";
+    jsonObj[TAG_IMPORT_AUTH_CODE] = "1212";
     authMessageProcessor->ParseRespNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_->isIdenticalAccount, true);
 }
@@ -1036,6 +1092,9 @@ HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSi
     ret = authMessageProcessor->CreateSimpleMessage(msgType);
     ASSERT_NE(ret.size(), 0);
     msgType = MSG_TYPE_RESP_NEGOTIATE;
+    ret = authMessageProcessor->CreateSimpleMessage(msgType);
+    ASSERT_NE(ret.size(), 0);
+    msgType = MSG_TYPE_UNKNOWN;
     ret = authMessageProcessor->CreateSimpleMessage(msgType);
     ASSERT_NE(ret.size(), 0);
 }
@@ -1272,6 +1331,27 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_008, testing::ext::TestSize.Leve
     }
     )";
     int32_t ret = authMessageProcessor->ParseMessage(message);
+    std::string message1 = R"(
+    {
+        "publicKey": "publicKey_test",
+        "MSG_TYPE": "503",
+    }
+    )";
+    ret = authMessageProcessor->ParseMessage(message);
+    std::string message2 = R"(
+    {
+        "publicKey": "publicKey_test",
+        "MSG_TYPE": "504",
+    }
+    )";
+    ret = authMessageProcessor->ParseMessage(message2);
+    std::string message3 = R"(
+    {
+        "publicKey": "publicKey_test",
+        "MSG_TYPE": "600",
+    }
+    )";
+    ret = authMessageProcessor->ParseMessage(message3);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -1590,6 +1670,9 @@ HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::T
     jsonObj[TAG_DMVERSION] = 1212;
     jsonObj[TAG_HAVECREDENTIAL] = "1212";
     jsonObj[TAG_BIND_TYPE_SIZE] = "1212";
+    authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
+    jsonObj[TAG_BIND_TYPE_SIZE] = 1212;
+    jsonObj[TAG_HOST_PKGLABEL] = "1212";
     authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
     ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
 }

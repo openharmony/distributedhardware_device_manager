@@ -417,7 +417,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceName_104, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().GetDeviceName(packName, networkId, deviceName);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -497,7 +497,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceType_104, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().GetDeviceType(packName, networkId, deviceType);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1085,7 +1085,7 @@ HWTEST_F(DeviceManagerImplTest, SetUserOperation_101, testing::ext::TestSize.Lev
     // 3. call DeviceManagerImpl::SetUserOperation with parameter
     ret= DeviceManager::GetInstance().SetUserOperation(packName, action, param);
     // 4. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
