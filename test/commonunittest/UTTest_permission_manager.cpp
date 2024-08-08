@@ -50,12 +50,6 @@ constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
 };
-
-#define PIN_HOLDER_WHITE_LIST_NUM (1)
-constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
-    "CollaborationFwk",
-};
-
 #define SYSTEM_SA_WHITE_LIST_NUM (4)
 constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "Samgr_Networking",
