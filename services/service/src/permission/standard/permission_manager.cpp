@@ -36,6 +36,26 @@ constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIB
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+#define AUTH_CODE_WHITE_LIST_NUM (3)
+constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+    "com.huawei.msdp.hmringgenerator",
+    "com.huawei.msdp.hmringdiscriminator",
+    "CollaborationFwk",
+};
+
+#define PIN_HOLDER_WHITE_LIST_NUM (1)
+constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+    "CollaborationFwk",
+};
+
+#define SYSTEM_SA_WHITE_LIST_NUM (4)
+constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+    "Samgr_Networking",
+    "ohos.distributeddata.service",
+    "ohos.dslm",
+    "ohos.deviceprofile",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
