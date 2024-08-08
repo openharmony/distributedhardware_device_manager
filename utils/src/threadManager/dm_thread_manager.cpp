@@ -31,7 +31,7 @@ ffrt::task_handle ThreadManager::Submit(const char* threadName, const std::funct
 
 void ThreadManager::Wait(const ffrt::task_handle& handle)
 {
-    if (ffrtQueue_ != nullptr) {
+    if (ffrtQueue_ == nullptr) {
         LOGE("ThreadManager Wait, ffrtQueue is null.");
         return;
     }
