@@ -115,11 +115,7 @@ void DmDialogManager::ShowPinDialog(const std::string param)
     abilityName_ = PIN_ABILITY_NAME;
     pinCode_ = param;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::task_handle handle = ThreadManager::GetInstance().Submit(
-        CONNECT_PIN_DIALOG.c_str(), []() { ConnectExtension(); });
-    if (handle != nullptr) {
-        ThreadManager::GetInstance().Wait(handle);
-    }
+    ThreadManager::GetInstance().Submit(CONNECT_PIN_DIALOG.c_str(), []() { ConnectExtension(); });
 #else
     std::thread pinDilog([]() { ConnectExtension(); });
     int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
