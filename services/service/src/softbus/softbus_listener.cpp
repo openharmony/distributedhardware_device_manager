@@ -61,6 +61,7 @@ static std::mutex g_lockDeviceNotTrust;
 static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
+static std::mutex g_lockDeviceIdSet;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -323,17 +324,20 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     }
     DmDeviceInfo dmDevInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDevInfo);
-    if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
-        deviceIdSet.insert(std::string(dmDevInfo.deviceId));
-        struct RadarInfo info = {
-            .funcName = "OnSoftbusDeviceFound",
-            .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-            .peerNetId = "",
-            .peerUdid = std::string(dmDevInfo.deviceId),
-        };
-        if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
-            if (!GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
-                LOGE("ReportDiscoverResCallback failed");
+    {
+        std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
+        if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
+            deviceIdSet.insert(std::string(dmDevInfo.deviceId));
+            struct RadarInfo info = {
+                .funcName = "OnSoftbusDeviceFound",
+                .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+                .peerNetId = "",
+                .peerUdid = std::string(dmDevInfo.deviceId),
+            };
+            if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
+                if (!GetDmRadarHelperObj()->ReportDiscoverResCallback(info)) {
+                    LOGE("ReportDiscoverResCallback failed");
+                }
             }
         }
     }
@@ -490,7 +494,10 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
 int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
     LOGI("StopRefreshSoftbusLNN begin, subscribeId: %{public}d.", (int32_t)subscribeId);
-    deviceIdSet.clear();
+    {
+        std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
+        deviceIdSet.clear();
+    }
     int32_t ret = ::StopRefreshLNN(DM_PKG_NAME, subscribeId);
     struct RadarInfo info = {
         .funcName = "StopRefreshSoftbusLNN",
