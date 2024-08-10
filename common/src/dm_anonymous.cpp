@@ -189,5 +189,20 @@ std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
     delete[] dstData;
     return temp;
 }
+
+int32_t StringToInt(const std::string &str, int32_t base)
+{
+    if (str.empty()) {
+        LOGE("Str is empty.");
+        return 0;
+    }
+    char *nextPtr = nullptr;
+    long result = strtol(str.c_str(), &nextPtr, base);
+    if (errno == ERANGE || *nextPtr != '\0') {
+        LOGE("parse int error");
+        return 0;
+    }
+    return static_cast<int32_t>(result);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
