@@ -38,6 +38,7 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen);
+int32_t StringToInt(const std::string &str, int32_t base);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H
