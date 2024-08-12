@@ -16,6 +16,7 @@
 #define OHOS_UTTEST_HICHAIN_CONNECTOR_H
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <refbase.h>
 #include <string>
 #include <memory>
@@ -40,6 +41,16 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+};
+
+class MockIHiChainConnectorCallback : public IHiChainConnectorCallback {
+public:
+    MockIHiChainConnectorCallback() = default;
+    virtual ~MockIHiChainConnectorCallback() = default;
+    MOCK_METHOD(void, OnGroupCreated, (int64_t requestId, const std::string &groupId), (override));
+    MOCK_METHOD(void, OnMemberJoin, (int64_t requestId, int32_t status), (override));
+    MOCK_METHOD(std::string, GetConnectAddr, (std::string deviceId), (override));
+    MOCK_METHOD(int32_t, GetPinCode, (int32_t &code), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -36,21 +36,21 @@ declare_args() {
   device_manager_no_interaction_auth = false
   device_manager_feature_product = "default"
 
-  if (!defined(global_parts_info) ||
+  if (defined(global_parts_info) &&
       defined(global_parts_info.account_os_account)) {
     os_account_part_exists = true
   } else {
     os_account_part_exists = false
   }
 
-  if (!defined(global_parts_info) ||
+  if (defined(global_parts_info) &&
       defined(global_parts_info.communication_bluetooth)) {
     support_bluetooth = true
   } else {
     support_bluetooth = false
   }
 
-  if (!defined(global_parts_info) ||
+  if (defined(global_parts_info) &&
       defined(global_parts_info.communication_wifi)) {
     support_wifi = true
   } else {
@@ -69,5 +69,12 @@ declare_args() {
     support_screenlock = true
   } else {
     support_screenlock = false
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_memmgr_override)) {
+    support_memmgr = true
+  } else {
+    support_memmgr = false
   }
 }

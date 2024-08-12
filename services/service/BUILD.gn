@@ -199,13 +199,13 @@ if (defined(ohos_lite)) {
       "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
       "eventhandler:libeventhandler",
+      "ffrt:libffrt",
       "hicollie:libhicollie",
       "hilog:libhilog",
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
-      "memmgr:memmgrclient",
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
       "safwk:system_ability_fwk",
@@ -232,6 +232,11 @@ if (defined(ohos_lite)) {
     if (support_power_manager) {
       defines += [ "SUPPORT_POWER_MANAGER" ]
       external_deps += [ "power_manager:powermgr_client" ]
+    }
+
+    if (support_memmgr) {
+      defines += [ "SUPPORT_MEMMGR" ]
+      external_deps += [ "memmgr:memmgrclient" ]
     }
 
     public_external_deps = [ "json:nlohmann_json_static" ]

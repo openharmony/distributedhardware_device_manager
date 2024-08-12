@@ -29,6 +29,9 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_thread_manager.h"
+#endif
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "softbus_adapter.cpp"
@@ -168,12 +171,16 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlinDeviceNum++;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ThreadManager::GetInstance().Submit(DEVICE_ONLINE, [=]() { DeviceOnLine(dmDeviceInfo); });
+#else
     std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("deviceOnLine setname failed.");
     }
     deviceOnLine.detach();
+#endif
     {
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -215,12 +222,16 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
         }
     }
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ThreadManager::GetInstance().Submit(DEVICE_OFFLINE, [=]() { DeviceOffLine(dmDeviceInfo); });
+#else
     std::thread deviceOffLine([=]() { DeviceOffLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
         LOGE("deviceOffLine setname failed.");
     }
     deviceOffLine.detach();
+#endif
     {
         char localDeviceId[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -265,11 +276,15 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
         dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        ThreadManager::GetInstance().Submit(DEVICE_NAME_CHANGE, [=]() { DeviceNameChange(dmDeviceInfo); });
+    #else
         std::thread deviceInfoChange([=]() { DeviceNameChange(dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
         }
         deviceInfoChange.detach();
+    #endif
     }
 }
 
@@ -288,12 +303,16 @@ void SoftbusListener::OnDeviceNotTrusted(const char *msg)
         return;
     }
     std::string softbusMsg = std::string(msg);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ThreadManager::GetInstance().Submit(DEVICE_NOT_TRUST, [=]() { DeviceNotTrust(softbusMsg); });
+#else
     std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
     int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
     if (ret != DM_OK) {
         LOGE("deviceNotTrust setname failed.");
     }
     deviceNotTrust.detach();
+#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
@@ -808,15 +827,9 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGD("IsDmRadarHelperReady alReady.");
         return true;
     }
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_RADAR_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    radarHandle_ = dlopen(path, RTLD_NOW);
+    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
     if (radarHandle_ == nullptr) {
-        LOGE("load libdevicemanagerradar so %{public}s failed.", soName.c_str());
+        LOGE("load libdevicemanagerradar so failed.");
         return false;
     }
     dlerror();

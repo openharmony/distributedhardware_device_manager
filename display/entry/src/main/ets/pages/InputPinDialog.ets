@@ -26,6 +26,8 @@ const ACTION_DONE_PINCODE_INPUT: number = 5
 const MSG_PIN_CODE_ERROR: number = 0
 const MSG_CANCEL_PIN_CODE_INPUT: number = 3
 const MSG_DOING_AUTH: number = 4
+const MODEL_PIN: string = 'pin';
+const MODEL_PASSWORD: string = 'password';
 
 @CustomDialog
 struct InputCustomDialog {
@@ -36,6 +38,7 @@ struct InputCustomDialog {
   @State errorTipsVisible: Visibility = Visibility.None;
   @State heightNum: number = 600;
   @State targetDeviceName: string = '';
+  @State model: string = MODEL_PIN;
   @State isPC: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
@@ -67,6 +70,10 @@ struct InputCustomDialog {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
       console.log('targetDeviceName is ' + this.targetDeviceName);
     }
+    if (AppStorage.get('model') != null) {
+      this.model = AppStorage.get('model') as string;
+      console.log('model is ' + this.model);
+    }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
@@ -88,8 +95,12 @@ struct InputCustomDialog {
           return;
         }
         if (msg === MSG_PIN_CODE_ERROR) {
-          this.isTimes--;
-          this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
+          if (this.model == MODEL_PASSWORD) {
+            this.errorTips = $r('app.string.dm_password_error');
+          } else {
+            this.isTimes--;
+            this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
+          }
           this.password = '';
           this.errorTipsVisible = Visibility.Visible;
           this.passwordCircle = ['', '', '', '', '', ''];

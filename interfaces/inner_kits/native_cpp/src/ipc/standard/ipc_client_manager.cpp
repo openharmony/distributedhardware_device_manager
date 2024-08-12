@@ -213,8 +213,8 @@ void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemA
 {
     LOGI("sa %{public}d is added.", systemAbilityId);
     if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
-        std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback
-        = DeviceManagerNotify::GetInstance().GetDmInitCallback();
+        std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback =
+            DeviceManagerNotify::GetInstance().GetDmInitCallback();
         if (dmInitCallback.size() == 0) {
             LOGI("dmInitCallback is empty when ReInit");
             return;

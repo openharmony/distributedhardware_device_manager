@@ -17,9 +17,11 @@
 #define OHOS_UTTEST_HICHAIN_AUTH_CONNECTOR_H
 
 #include <memory>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "hichain_auth_connector.h"
+#include "hichain_connector_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,6 +32,20 @@ public:
     void SetUp();
     void TearDown();
     std::shared_ptr<HiChainAuthConnector> hiChain_ = std::make_shared<HiChainAuthConnector>();
+};
+
+class MockIDmDeviceAuthCallback : public IDmDeviceAuthCallback {
+public:
+    MockIDmDeviceAuthCallback() = default;
+    virtual ~MockIDmDeviceAuthCallback() = default;
+
+    MOCK_METHOD(bool, AuthDeviceTransmit, (int64_t requestId, const uint8_t *data, uint32_t dataLen), (override));
+    MOCK_METHOD(void, AuthDeviceFinish, (int64_t requestId), (override));
+    MOCK_METHOD(void, AuthDeviceError, (int64_t requestId, int32_t errorCode), (override));
+    MOCK_METHOD(void, AuthDeviceSessionKey,
+                (int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen), (override));
+    MOCK_METHOD(void, GetRemoteDeviceId, (std::string &deviceId), (override));
+    MOCK_METHOD(int32_t, GetPinCode, (int32_t &code), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS
