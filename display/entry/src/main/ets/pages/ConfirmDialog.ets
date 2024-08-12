@@ -348,6 +348,7 @@ struct dialogPlusPage {
           let tmpStr: Record<string, number> = JSON.parse(data.param)
           let msg: number = tmpStr.uiStateMsg as number
           if (msg === MSG_CANCEL_CONFIRM_SHOW) {
+            console.log('cancel confirm show.')
             this.destruction()
             return
           }
