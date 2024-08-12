@@ -718,7 +718,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_002, testing::ext::TestSize
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    std::strncpy(devInfo.networkId, testID.c_str(), sizeof(devInfo.networkId) - 1);
+    std::strcpy(devInfo.networkId, testID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
@@ -750,7 +750,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_002, testing::ext::TestSize.
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    std::strncpy(devInfo.networkId, testID.c_str(), sizeof(devInfo.networkId) - 1);
+    std::strcpy(devInfo.networkId, testID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
