@@ -768,7 +768,7 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
             pkgName.c_str(), GetAnonyString(netWorkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("GetUdidByNetworkId start, pkgName: %{public}s", pkgName.c_str());
+    LOGD("GetUdidByNetworkId start, pkgName: %{public}s", pkgName.c_str());
 
     std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();

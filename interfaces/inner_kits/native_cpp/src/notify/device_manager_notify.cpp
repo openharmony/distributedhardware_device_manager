@@ -577,8 +577,8 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceFound complete with DmDeviceInfo, pkgName:%{public}s, subscribeId:%{public}d.",
-         pkgName.c_str(), (int32_t)subscribeId);
+    LOGI("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
+         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceInfo);
 }
 
@@ -611,8 +611,8 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceFound complete with DmDeviceBasicInfo, pkgName:%{public}s,"
-        "subscribeId:%{public}d.", pkgName.c_str(), (int32_t)subscribeId);
+    LOGD("Complete with DmDeviceBasicInfo, pkgName:%{public}s, subscribeId:%{public}d.",
+         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceBasicInfo);
 }
 
@@ -654,8 +654,7 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDiscoverySuccess in, pkgName:%{public}s, subscribeId:%{public}d.", pkgName.c_str(),
-        subscribeId);
+    LOGI("PkgName:%{public}s, subscribeId:%{public}d.", GetAnonyString(pkgName).c_str(), subscribeId);
     std::shared_ptr<DiscoveryCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
