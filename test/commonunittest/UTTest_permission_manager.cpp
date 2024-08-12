@@ -50,6 +50,12 @@ constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
 };
+
+#define PIN_HOLDER_WHITE_LIST_NUM (1)
+constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "CollaborationFwk",
+};
+
 #define SYSTEM_SA_WHITE_LIST_NUM (4)
 constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "Samgr_Networking",
@@ -175,14 +181,8 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::e
  */
 HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
 {
-    std::string processName1(g_authCodeWhiteList[0]);
+    std::string processName1(g_pinHolderWhiteList[0]);
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName1);
-    ASSERT_EQ(ret, true);
-    std::string processName2(g_authCodeWhiteList[1]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName2);
-    ASSERT_EQ(ret, true);
-    std::string processName3(g_authCodeWhiteList[2]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName3);
     ASSERT_EQ(ret, true);
 }
 
