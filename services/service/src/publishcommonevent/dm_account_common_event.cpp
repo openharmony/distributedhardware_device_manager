@@ -22,6 +22,9 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_thread_manager.h"
+#endif
 #include "iservice_registry.h"
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
@@ -144,12 +147,16 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         LOGE("userId is less zero");
         return;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ThreadManager::GetInstance().Submit(DEAL_THREAD, [=]() { callback_(userId, receiveEvent); });
+#else
     std::thread dealThread([=]() { callback_(userId, receiveEvent); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");
     }
     dealThread.detach();
+#endif
 }
 
 void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(

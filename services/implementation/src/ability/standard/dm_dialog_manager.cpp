@@ -26,6 +26,9 @@
 #include "nlohmann/json.hpp"
 #include "parameter.h"
 #include "dm_single_instance.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_thread_manager.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -111,12 +114,16 @@ void DmDialogManager::ShowPinDialog(const std::string param)
     bundleName_ = DM_UI_BUNDLE_NAME;
     abilityName_ = PIN_ABILITY_NAME;
     pinCode_ = param;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ThreadManager::GetInstance().Submit(CONNECT_PIN_DIALOG.c_str(), []() { ConnectExtension(); });
+#else
     std::thread pinDilog([]() { ConnectExtension(); });
     int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
     if (ret != DM_OK) {
         LOGE("pinDilog setname failed.");
     }
     pinDilog.detach();
+#endif
 }
 
 void DmDialogManager::ShowInputDialog(const std::string param)
