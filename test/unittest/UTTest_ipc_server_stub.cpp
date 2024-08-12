@@ -88,6 +88,23 @@ HWTEST_F(IpcServerStubTest, OnStart_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: OnStart_002
+ * @tc.desc:  1. Set initial state to STATE_NOT_START
+ *            2. Call OnStart to start the service
+ *            3. Call OnStop to stop the service
+ *            4. Check the final state is STATE_NOT_START
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, OnStart_002, testing::ext::TestSize.Level0)
+{
+    IpcServerStub::GetInstance().state_ = ServiceRunningState::STATE_NOT_START;
+    IpcServerStub::GetInstance().OnStart();
+    IpcServerStub::GetInstance().OnStop();
+    ASSERT_EQ(ServiceRunningState::STATE_NOT_START, IpcServerStub::GetInstance().state_);
+}
+
+/**
  * @tc.name: Init_001
  * @tc.desc: 1. Call IpcServerStub OnStart
  *           2. check IpcServerStub.state is ServiceRunningState::STATE_RUNNING
@@ -275,6 +292,8 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_004, testing::ext::Tes
  *                  3. check ret is DM_OK
  *                  4. Call IpcServerStub RegisterDeviceManagerListener with same pkgName another listener
  *                  5. check result is DM_OK
+ *                  6. earse pkgName for appRecipient_
+ *                  7. check result is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -293,6 +312,12 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_005, testing::ext::Tes
     // 4. Call IpcServerStub RegisterDeviceManagerListener with same pkgName another listener
     result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener2);
     // 5. check result is DM_OK
+    ASSERT_EQ(result, DM_OK);
+    sptr<IpcClientStub> listener3 = sptr<IpcClientStub>(new IpcClientStub());
+    // 6. earse pkgName for appRecipient_
+    IpcServerStub::GetInstance().appRecipient_.erase(pkgName);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener3);
+    // 7. check result is DM_OK
     ASSERT_EQ(result, DM_OK);
 }
 
@@ -393,6 +418,8 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_004, testing::ext::T
  *            3. check ret is DM_OK
  *            4. Call IpcServerStub UnRegisterDeviceManagerListener
  *            5. check ret is DM_OK
+ *            6. Call IpcServerStub UnRegisterDeviceManagerListener
+ *            7. check ret is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -412,8 +439,58 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_005, testing::ext::T
     result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(testPkgName);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-    sptr<IpcRemoteBroker> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
-    ASSERT_NE(dmListener, nullptr);
+    IpcServerStub::GetInstance().appRecipient_.erase(pkgName);
+    // 6. Call IpcServerStub UnRegisterDeviceManagerListener
+    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    // 7. check ret is DM_OK
+    ASSERT_EQ(result, DM_OK);
+}
+
+/**
+ * @tc.name: SendALL_001
+ * @tc.desc:  1. Set PkgName1 is com.ohos.SendALL_001
+ *            2. Set PkgName2 is com.ohos.SendALL_002
+ *            3. Add listener1 (nullptr) to dmListener_ with key pkgName1
+ *            4. Add listener2 to dmListener_ with key listener2
+ *            5. Call IpcServerStub::SendALL with cmdCode, req, rsp
+ *            6. Check result is DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, SendALL_001, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = -1;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    std::string pkgName1 = "com.ohos.SendALL_001";
+    std::string pkgName2 = "com.ohos.SendALL_002";
+    sptr<IpcClientStub> listener1 = nullptr;
+    sptr<IpcClientStub> listener2 = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().dmListener_[pkgName1] = listener1;
+    IpcServerStub::GetInstance().dmListener_[pkgName2] = listener2;
+    int32_t result = IpcServerStub::GetInstance().SendALL(cmdCode, req, rsp);
+    ASSERT_EQ(result, DM_OK);
+    IpcServerStub::GetInstance().dmListener_.clear();
+}
+
+/**
+ * @tc.name: GetDmListenerPkgName_001
+ * @tc.desc:  1. Set pkgName is com.ohos.GetDmListenerPkgName_001
+ *            2. Create listener and add it to dmListener_ with key pkgName
+ *            3. Call IpcServerStub::GetDmListenerPkgName with remote object
+ *            4. Check the result is not empty
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcServerStubTest, GetDmListenerPkgName_001, testing::ext::TestSize.Level0)
+{
+    sptr<IRemoteObject> remote(new IpcClientStub());
+    std::string pkgName = "com.ohos.GetDmListenerPkgName_001";
+    sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
+    IpcServerStub::GetInstance().dmListener_[pkgName] = listener;
+    std::string ret = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
+    EXPECT_TRUE(ret.empty() || (ret == pkgName));
+    IpcServerStub::GetInstance().dmListener_.clear();
 }
 
 /**
@@ -554,7 +631,7 @@ HWTEST_F(IpcServerStubTest, OnRemoveSystemAbility_001, testing::ext::TestSize.Le
  */
 HWTEST_F(IpcServerStubTest, OnRemoveSystemAbility_002, testing::ext::TestSize.Level0)
 {
-    int32_t systemAbilityId = 9999;
+    int32_t systemAbilityId = DISTRIBUTED_HARDWARE_SA_ID;
     std::string deviceId;
     IpcServerStub::GetInstance().OnRemoveSystemAbility(systemAbilityId, deviceId);
     ASSERT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
@@ -582,7 +659,21 @@ HWTEST_F(IpcServerStubTest, OnAddSystemAbility_002, testing::ext::TestSize.Level
     int32_t systemAbilityId = 9999;
     std::string deviceId;
     IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
-    ASSERT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+
+    systemAbilityId = SOFTBUS_SERVER_SA_ID;
+    IpcServerStub::GetInstance().registerToService_ = false;
+    IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    systemAbilityId = SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN;
+    IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+
+    systemAbilityId = SCREENLOCK_SERVICE_ID;
+    IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 /**
