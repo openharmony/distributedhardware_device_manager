@@ -282,7 +282,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceOnline with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
+    LOGI("Online with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -384,19 +384,19 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceOffline with DmDeviceBasicInfo, pkgName:%{public}s", pkgName.c_str());
+    LOGI("Offline with DmDeviceBasicInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            LOGE("OnDeviceOffline error, device status callback not register.");
+            LOGE("Error, device status callback not register.");
             return;
         }
         tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
-        LOGE("OnDeviceOffline error, registered device status callback is nullptr.");
+        LOGE("Error, registered device status callback is nullptr.");
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

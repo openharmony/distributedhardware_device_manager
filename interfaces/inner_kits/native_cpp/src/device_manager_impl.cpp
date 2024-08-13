@@ -2034,7 +2034,7 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
 
 int32_t DeviceManagerImpl::CheckApiPermission(int32_t permissionLevel)
 {
-    LOGI("permissionLevel: %{public}d", permissionLevel);
+    LOGI("PermissionLevel: %{public}d", permissionLevel);
     std::shared_ptr<IpcPermissionReq> req = std::make_shared<IpcPermissionReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPermissionLevel(permissionLevel);

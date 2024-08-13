@@ -853,7 +853,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
 bool DeviceManagerService::IsDMImplSoLoaded()
 {
-    LOGI("DeviceManagerService::IsDMImplSoLoaded");
+    LOGI("In");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     return isImplsoLoaded_;
 }

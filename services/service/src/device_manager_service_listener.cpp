@@ -67,7 +67,6 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &deviceInfo,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("In");
     pReq->SetPkgName(pkgName);
     pReq->SetDeviceState(state);
     pReq->SetDeviceInfo(deviceInfo);
