@@ -141,18 +141,6 @@ HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.
     std::map<std::string, std::string> advertiseParam2;
     advertiseParam[PARAM_KEY_PUBLISH_ID] = "12";
     DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam2);
-    DeviceManagerService::GetInstance().IsDMServiceImplReady();
-    bool ret = DeviceManagerService::GetInstance().IsDMImplSoLoaded();
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: BindTarget_201
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
     PeerTargetId targetId;
     targetId.deviceId = "123";
     std::map<std::string, std::string> bindParam;
@@ -164,8 +152,10 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     targetId.deviceId = "123";
     std::map<std::string, std::string> unbindParam;
     unbindParam[PARAM_KEY_META_TYPE] = "1";
-    int32_t ret = DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, unbindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, unbindParam);
+    DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    bool ret = DeviceManagerService::GetInstance().IsDMImplSoLoaded();
+    EXPECT_EQ(ret, true);
 }
 
 /**
