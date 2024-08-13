@@ -189,10 +189,10 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(pkgName);
     if (iter != dmListener_.end()) {
-        LOGI("RegisterDeviceManagerListener: listener already exists");
+        LOGI("Listener already exists");
         auto recipientIter = appRecipient_.find(pkgName);
         if (recipientIter == appRecipient_.end()) {
-            LOGI("RegisterDeviceManagerListener: appRecipient not exists");
+            LOGI("AppRecipient not exists");
             dmListener_.erase(pkgName);
         } else {
             auto listener = iter->second;
@@ -205,11 +205,11 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
 
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
-        LOGE("RegisterDeviceManagerListener: AddDeathRecipient Failed");
+        LOGE("AddDeathRecipient Failed");
     }
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
-    LOGI("RegisterDeviceManagerListener: Register listener complete.");
+    LOGI("Register listener complete.");
     return DM_OK;
 }
 
@@ -223,12 +223,12 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(pkgName);
     if (listenerIter == dmListener_.end()) {
-        LOGI("UnRegisterDeviceManagerListener: listener not exists");
+        LOGI("Listener not exists");
         return DM_OK;
     }
     auto recipientIter = appRecipient_.find(pkgName);
     if (recipientIter == appRecipient_.end()) {
-        LOGI("UnRegisterDeviceManagerListener: appRecipient not exists");
+        LOGI("AppRecipient not exists");
         dmListener_.erase(pkgName);
         return DM_OK;
     }
