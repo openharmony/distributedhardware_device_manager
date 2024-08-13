@@ -34,7 +34,7 @@
         },
         {
             "name":"dm_is_trust_device",
-            "value":"%s 信任此裝置？"
+            "value":"%s信任此裝置？"
         },
         {
             "name":"dm_confirm_title_hap",
