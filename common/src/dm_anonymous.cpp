@@ -15,7 +15,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_log.h"
-
+#include <sstream>
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -203,6 +203,34 @@ int32_t StringToInt(const std::string &str, int32_t base)
         return 0;
     }
     return static_cast<int32_t>(result);
+}
+
+void StringSplitToInt(const std::string &str, const char split, std::vector<int> &numVec)
+{
+    std::istringstream iss(str);
+    std::string token = "";
+    while (getline(iss, token, split)) {
+        numVec.push_back(atoi(token.c_str()));
+    }
+}
+
+bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int32_t> &sinkVecNum)
+{
+    for (uint32_t index = 0; index < std::min(srcVecNum.size(), sinkVecNum.size()); index++) {
+        if (srcVecNum[index] > sinkVecNum[index]) {
+            return true;
+        } else if (srcVecNum[index] < sinkVecNum[index]) {
+            return false;
+        } else {
+            continue;
+        }
+    }
+    if (srcVecNum.size() > sinkVecNum.size()){
+       return true; 
+    } else {
+        return false;
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

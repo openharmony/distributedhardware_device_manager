@@ -104,11 +104,11 @@ public:
     virtual std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId) = 0;
     virtual bool CheckIdenticalAccount(int32_t userId, const std::string &accountId) = 0;
     virtual int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId) = 0;
-    virtual bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
-    virtual bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId) = 0;
     virtual uint32_t DeleteTimeOutAcl(const std::string &deviceId) = 0;
     virtual int32_t GetTrustNumber(const std::string &deviceId) = 0;
-    virtual bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual bool CheckDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId) = 0;
     virtual bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId) = 0;
     virtual std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId,
@@ -136,11 +136,11 @@ public:
     std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId);
     bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
     int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId);
-    bool CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
-    bool CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
+    bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
+    bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     uint32_t DeleteTimeOutAcl(const std::string &deviceId);
     int32_t GetTrustNumber(const std::string &deviceId);
-    bool CheckDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId);
+    bool CheckDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     bool CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId, std::string remoteDeviceId);
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);

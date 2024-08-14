@@ -162,7 +162,7 @@ int32_t AuthResponseCredential::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseFinishState authManager_ is null");
+        LOGE("AuthResponseCredential authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->ResponseCredential();
@@ -178,7 +178,7 @@ int32_t AuthResponseSyncDeleteAcl::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseFinishState authManager_ is null");
+        LOGE("AuthResponseSyncDeleteAcl authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->ResponseSyncDeleteAcl();
@@ -194,7 +194,7 @@ int32_t AuthResponseSyncDeleteAclNone::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseFinishState authManager_ is null");
+        LOGE("AuthResponseSyncDeleteAclNone authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->SyncDeleteAclDone();
