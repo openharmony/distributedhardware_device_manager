@@ -525,7 +525,7 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(std::string pkgNa
 int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::string &oldAccountId,
     std::string &newAccountId)
 {
-    LOGI("UpdateAccessControlList by userId and accountId.");
+    LOGI("Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -549,7 +549,7 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
 
 bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::string &accountId)
 {
-    LOGI("DeviceProfileConnector::CheckIdenticalAccount");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     queryParams["userId"] = std::to_string(userId);
@@ -566,7 +566,7 @@ bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::st
 }
 int32_t DeviceProfileConnector::DeleteP2PAccessControlList(int32_t userId, std::string &accountId)
 {
-    LOGI("DeviceProfileConnector::DeleteP2PAccessControlList");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     queryParams["userId"] = std::to_string(userId);
@@ -590,7 +590,7 @@ int32_t DeviceProfileConnector::DeleteP2PAccessControlList(int32_t userId, std::
 
 bool DeviceProfileConnector::CheckSrcDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("DeviceProfileConnector::CheckSrcDeviceIdInAcl");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -605,7 +605,7 @@ bool DeviceProfileConnector::CheckSrcDeviceIdInAcl(const std::string &pkgName, c
 
 bool DeviceProfileConnector::CheckSinkDeviceIdInAcl(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("DeviceProfileConnector::CheckSinkDeviceIdInAcl");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -625,7 +625,7 @@ bool DeviceProfileConnector::CheckDeviceIdInAcl(const std::string &pkgName, cons
 
 uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
-    LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     uint32_t res = 0;
@@ -644,7 +644,7 @@ uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 
 int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 {
-    LOGI("DeviceProfileConnector::DeleteTimeOutAcl");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     int32_t trustNumber = 0;
@@ -659,7 +659,7 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string localDeviceId,
     std::string remoteDeviceId)
 {
-    LOGI("DeviceProfileConnector::CheckPkgnameInAcl");
+    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -688,7 +688,7 @@ bool DeviceProfileConnector::CheckPkgnameInAcl(std::string pkgName, std::string 
 
 int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 {
-    LOGI("DeviceProfileConnector::IsSameAccount start.");
+    LOGI("Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
@@ -704,7 +704,7 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("DeviceProfileConnector::CheckAccessControl pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
+    LOGI("PkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
         caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
@@ -722,7 +722,7 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
 bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
     const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    LOGI("DeviceProfileConnector::SingleUserProcess bindType %{public}d, bindLevel %{public}d.",
+    LOGI("BindType %{public}d, bindLevel %{public}d.",
         profile.GetBindType(), profile.GetBindLevel());
     uint32_t bindType = profile.GetBindType();
     bool ret = false;
@@ -756,7 +756,7 @@ bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::A
 int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("DeviceProfileConnector::CheckAccessControl pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
+    LOGI("PkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
         caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
