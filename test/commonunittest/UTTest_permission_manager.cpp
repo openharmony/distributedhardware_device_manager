@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void PremissionManagerTest::SetUp()
+void PermissionManagerTest::SetUp()
 {
     const int32_t permsNum = 2;
     const int32_t indexZero = 0;
@@ -43,16 +43,35 @@ void PremissionManagerTest::SetUp()
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
+constexpr int32_t PAKAGE_NAME_SIZE_MAX = 256;
+#define AUTH_CODE_WHITE_LIST_NUM (3)
+constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+    "com.huawei.msdp.hmringgenerator",
+    "com.huawei.msdp.hmringdiscriminator",
+    "CollaborationFwk",
+};
 
-void PremissionManagerTest::TearDown()
+#define PIN_HOLDER_WHITE_LIST_NUM (1)
+constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "CollaborationFwk",
+};
+
+#define SYSTEM_SA_WHITE_LIST_NUM (4)
+constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+    "Samgr_Networking",
+    "ohos.distributeddata.service",
+    "ohos.dslm",
+    "ohos.deviceprofile",
+};
+void PermissionManagerTest::TearDown()
 {
 }
 
-void PremissionManagerTest::SetUpTestCase()
+void PermissionManagerTest::SetUpTestCase()
 {
 }
 
-void PremissionManagerTest::TearDownTestCase()
+void PermissionManagerTest::TearDownTestCase()
 {
 }
 
@@ -64,7 +83,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, CheckPermission_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckPermission_001, testing::ext::TestSize.Level0)
 {
     bool ret = PermissionManager::GetInstance().CheckPermission();
     ASSERT_EQ(ret, true);
@@ -76,7 +95,7 @@ HWTEST_F(PremissionManagerTest, CheckPermission_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, GetCallerProcessName_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, GetCallerProcessName_001, testing::ext::TestSize.Level0)
 {
     std::string processName;
     int32_t ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
@@ -89,7 +108,7 @@ HWTEST_F(PremissionManagerTest, GetCallerProcessName_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ext::TestSize.Level0)
 {
     std::string processName;
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
@@ -98,15 +117,34 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ex
 
 /**
  * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_002
- * @tc.desc: the return value is true
+ * @tc.desc: the return value is false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ext::TestSize.Level0)
 {
     std::string processName = "processName";
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
     ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_003
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ext::TestSize.Level0)
+{
+    std::string processName1(g_authCodeWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName1);
+    ASSERT_EQ(ret, true);
+    std::string processName2(g_authCodeWhiteList[1]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName2);
+    ASSERT_EQ(ret, true);
+    std::string processName3(g_authCodeWhiteList[2]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName3);
+    ASSERT_EQ(ret, true);
 }
 
 /**
@@ -115,7 +153,7 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ex
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::ext::TestSize.Level0)
 {
     std::string processName;
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
@@ -124,15 +162,66 @@ HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::e
 
 /**
  * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_002
- * @tc.desc: the return value is true
+ * @tc.desc: the return value is false
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PremissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::ext::TestSize.Level0)
 {
     std::string processName = "processName";
     bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
     ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_003
+ * @tc.desc: the return value is true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
+{
+    std::string processName1(g_pinHolderWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName1);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckSystemSA_001
+ * @tc.desc: the return value is false
+ * @tc.type：FUNC
+ * @tc.require: AR000GHSJK
+*/
+HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, false);
+    pkgName = "pkgName";
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PinAuthUi::CheckSystemSA_002
+ * @tc.desc: the return value is true
+ * @tc.type：FUNC
+ * @tc.require: AR000GHSJK
+*/
+HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName1(systemSaWhiteList[0]);
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName1);
+    ASSERT_EQ(ret, true);
+    std::string pkgName2(systemSaWhiteList[1]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName2);
+    ASSERT_EQ(ret, true);
+    std::string pkgName3(systemSaWhiteList[2]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName3);
+    ASSERT_EQ(ret, true);
+    std::string pkgName4(systemSaWhiteList[3]);
+    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName4);
+    ASSERT_EQ(ret, true);
 }
 }
 } // namespace DistributedHardware

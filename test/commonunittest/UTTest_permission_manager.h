@@ -19,13 +19,14 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
+#include <string_view>
 
 #include "dm_constants.h"
 #include "permission_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class PremissionManagerTest : public testing::Test {
+class PermissionManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
