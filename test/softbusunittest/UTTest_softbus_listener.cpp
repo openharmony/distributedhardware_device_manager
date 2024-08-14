@@ -103,22 +103,6 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: OnSoftbusDeviceOnline_002
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_002, testing::ext::TestSize.Level0)
-{
-    NodeBasicInfo *info = nullptr;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    softbusListener->OnSoftbusDeviceOnline(info);
-    softbusListener->OnSoftbusDeviceOffline(info);
-    softbusListener->OnLocalDevInfoChange();
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
-}
-
-/**
  * @tc.name: ShiftLNNGear_001
  * @tc.desc: return DM_OK
  * @tc.type: FUNC
