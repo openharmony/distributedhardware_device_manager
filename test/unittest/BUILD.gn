@@ -68,6 +68,7 @@ group("unittest") {
     ":UTTest_softbus_adapter",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
+    ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
   ]
 }
@@ -462,6 +463,34 @@ ohos_unittest("UTTest_softbus_listener") {
 }
 
 ## UnitTest UTTest_softbus_listener }}}
+
+## UnitTest UTTest_softbus_publish {{{
+ohos_unittest("UTTest_softbus_publish") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/test/softbusunittest",
+    "${services_path}/src/softbus",
+  ]
+
+  sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_publish.cpp",
+    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_softbus_publish }}}
 
 ## UnitTest UTTest_softbus_session {{{
 ohos_unittest("UTTest_softbus_session") {
