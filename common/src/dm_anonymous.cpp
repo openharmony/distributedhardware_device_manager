@@ -225,8 +225,8 @@ bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int3
             continue;
         }
     }
-    if (srcVecNum.size() > sinkVecNum.size()){
-       return true; 
+    if (srcVecNum.size() > sinkVecNum.size()) {
+        return true;
     } else {
         return false;
     }
