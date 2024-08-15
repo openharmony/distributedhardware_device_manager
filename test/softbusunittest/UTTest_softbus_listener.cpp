@@ -297,6 +297,81 @@ HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::Tes
     EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
+HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo dmDevice;
+    DeviceInfo deviceInfo = {
+        .devId = "deviceId",
+        .devType = (DeviceType)1,
+        .devName = "11111",
+        .addrNum = 1,
+        .addr[0] = {
+            .type = ConnectionAddrType::CONNECTION_ADDR_ETH,
+            .info {
+                .ip {
+                    .ip = "172.0.0.1",
+                    .port = 0,
+                }
+            }
+        }
+    };
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->ConvertDeviceInfoToDmDevice(deviceInfo, dmDevice);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_003, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo dmDevice;
+    DeviceInfo deviceInfo = {
+        .devId = "deviceId",
+        .devType = (DeviceType)1,
+        .devName = "11111",
+        .addrNum = 1,
+        .addr[0] = {
+            .type = ConnectionAddrType::CONNECTION_ADDR_BR,
+            .info {
+                .ip {
+                    .ip = "172.0.0.1",
+                    .port = 0,
+                }
+            }
+        }
+    };
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->ConvertDeviceInfoToDmDevice(deviceInfo, dmDevice);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
+HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_004, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo dmDevice;
+    DeviceInfo deviceInfo = {
+        .devId = "deviceId",
+        .devType = (DeviceType)1,
+        .devName = "11111",
+        .addrNum = 1,
+        .addr[0] = {
+            .type = ConnectionAddrType::CONNECTION_ADDR_MAX,
+            .info {
+                .ip {
+                    .ip = "172.0.0.1",
+                    .port = 0,
+                }
+            }
+        }
+    };
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->ConvertDeviceInfoToDmDevice(deviceInfo, dmDevice);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+}
+
 HWTEST_F(SoftbusListenerTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level0)
 {
     char *networkId;
@@ -439,6 +514,18 @@ HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSi
 HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
 {
     std::vector<DmDeviceInfo> deviceInfoList;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    int32_t ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceInfoList;
+    DmDeviceInfo deviceInfo;
+    deviceInfoList.push_back(deviceInfo);
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
@@ -627,6 +714,48 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
     EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
+
+HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.Level0)
+{
+    char *msg = nullptr;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnLocalDevInfoChange();
+    EXPECT_EQ(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_001, testing::ext::TestSize.Level0)
+{
+    char *msg = nullptr;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(nullptr);
+    EXPECT_EQ(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_002, testing::ext::TestSize.Level0)
+{
+    char msg[MAX_SOFTBUS_MSG_LEN + 1] = "This is a long message";
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(msg);
+    EXPECT_NE(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_003, testing::ext::TestSize.Level0)
+{
+    char msg[MAX_SOFTBUS_MSG_LEN - 1] = "Valid message";
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(msg);
+    EXPECT_NE(msg, nullptr);
+}
+
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
