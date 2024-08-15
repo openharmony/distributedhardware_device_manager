@@ -205,12 +205,12 @@ int32_t StringToInt(const std::string &str, int32_t base)
     return static_cast<int32_t>(result);
 }
 
-void StringSplitToInt(const std::string &str, const char split, std::vector<int> &numVec)
+void VersionSplitToInt(const std::string &str, const char split, std::vector<int> &numVec)
 {
     std::istringstream iss(str);
-    std::string token = "";
-    while (getline(iss, token, split)) {
-        numVec.push_back(atoi(token.c_str()));
+    std::string item = "";
+    while (getline(iss, item, split)) {
+        numVec.push_back(atoi(item.c_str()));
     }
 }
 
@@ -227,8 +227,6 @@ bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int3
     }
     if (srcVecNum.size() > sinkVecNum.size()) {
         return true;
-    } else {
-        return false;
     }
     return false;
 }

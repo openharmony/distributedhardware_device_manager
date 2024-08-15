@@ -2628,8 +2628,8 @@ bool DmAuthManager::CompareVersion(const std::string &remoteVersion, const std::
     LOGI("remoteVersion %{public}s, oldVersion %{public}s.", remoteVersion.c_str(), oldVersion.c_str());
     std::vector<int32_t> remoteVersionVec;
     std::vector<int32_t> oldVersionVec;
-    StringSplitToInt(remoteVersion, '.', remoteVersionVec);
-    StringSplitToInt(oldVersion, '.', oldVersionVec);
+    VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
+    VersionSplitToInt(oldVersion, '.', oldVersionVec);
     return CompareVecNum(remoteVersionVec, oldVersionVec);
 }
 } // namespace DistributedHardware
