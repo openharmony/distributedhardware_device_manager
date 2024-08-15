@@ -620,59 +620,59 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteP2PAccessControlList_003, testing::ex
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSrcDeviceIdInAcl_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string deviceId;
-    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSrcDeviceIdInAcl_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
     std::string deviceId = "123456";
-    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSrcDeviceIdInAcl_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSinkDeviceIdInAcl_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string deviceId;
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSinkDeviceIdInAcl_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
     std::string deviceId = "123456";
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckSinkDeviceIdInAcl_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckDeviceIdInAcl_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, CheckDevIdInAclForDevBind_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string deviceId;
-    bool ret = DeviceProfileConnector::GetInstance().CheckDeviceIdInAcl(pkgName, deviceId);
+    bool ret = DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 
