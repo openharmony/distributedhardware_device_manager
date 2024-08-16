@@ -369,7 +369,7 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
-    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("Completed");
     return DM_OK;
 }
 

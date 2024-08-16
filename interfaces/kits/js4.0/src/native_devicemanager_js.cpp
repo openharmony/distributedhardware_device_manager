@@ -1929,7 +1929,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    LOGI("create for packageName:%{public}s", bundleName.c_str());
+    LOGI("Create for packageName:%{public}s", bundleName.c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;

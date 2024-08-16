@@ -205,7 +205,7 @@ void DeviceManagerService::UninitDMServiceListener()
     listener_ = nullptr;
     advertiseMgr_ = nullptr;
     discoveryMgr_ = nullptr;
-    LOGI("uninit.");
+    LOGI("Uninit.");
 }
 
 void DeviceManagerService::RegisterDeviceManagerListener(const std::string &pkgName)
