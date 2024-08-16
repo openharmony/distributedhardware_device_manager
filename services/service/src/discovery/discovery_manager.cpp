@@ -381,7 +381,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
             subscribeId = pkgName2SubIdMap_[pkgName];
         }
-        LOGD("PkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+        LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
         listener_->OnDeviceFound(pkgName, subscribeId, info);
         return;
     }

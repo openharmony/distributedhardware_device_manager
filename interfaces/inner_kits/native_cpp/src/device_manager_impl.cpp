@@ -2049,6 +2049,7 @@ int32_t DeviceManagerImpl::CheckApiPermission(int32_t permissionLevel)
         LOGE("Check permission failed with ret: %{public}d", ret);
         return ret;
     }
+    LOGD("The caller declare the DM permission!");
     return DM_OK;
 }
 

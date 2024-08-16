@@ -1096,6 +1096,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 
 napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_callback_info info)
 {
+    LOGI("In");
     int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
@@ -1124,6 +1125,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
         CreateBusinessError(env, ret);
         return result;
     }
+    LOGD("DeviceManager::GetAvailableDeviceListSync");
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
             DeviceBasicInfoToJsArray(env, devList, (int32_t)i, result);
