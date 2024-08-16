@@ -261,9 +261,18 @@ ohos_unittest("device_manager_impl_test") {
 
 ## UnitTest UTTest_dm_credential_manager {{{
 ohos_unittest("UTTest_dm_credential_manager") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   module_out_path = module_out_path
 
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+  include_dirs = [
+    "${devicemanager_path}/test/commonunittest",
+    "${servicesimpl_path}/src/credential",
+  ]
 
   sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp" ]
 
