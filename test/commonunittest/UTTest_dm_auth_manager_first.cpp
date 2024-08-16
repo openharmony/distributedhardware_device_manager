@@ -134,11 +134,23 @@ HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_002, testing::ext::TestSiz
     ASSERT_TRUE(authManager_->authRequestState_ != nullptr);
 }
 
+HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_003, testing::ext::TestSize.Level0)
+{
+    std::string name = "test";
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
+    authManager_->SetAuthRequestState(authRequestState);
+    authManager_->HandleAuthenticateTimeout(name);
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseFinishState>();
+    authManager_->SetAuthResponseState(authResponseState);
+    ASSERT_TRUE(authManager_->authRequestState_ != nullptr);
+}
+
 HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusSession> sessionSession = std::shared_ptr<SoftbusSession>();
     std::shared_ptr<DmAuthResponseContext> authRequestContext = std::make_shared<DmAuthResponseContext>();
     std::string deviceId1;
+    authManager_->AbilityNegotiate();
     int32_t ret = authManager_->EstablishAuthChannel(deviceId1);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -213,6 +225,9 @@ HWTEST_F(DmAuthManagerTest, AddMember_002, testing::ext::TestSize.Level0)
     int32_t pinCode = 33333;
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->AddMember(pinCode);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    authManager_->isAddingMember_ = true;
+    ret = authManager_->AddMember(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -295,8 +310,15 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
     int32_t status = 2;
     authManager_->OnMemberJoin(requestId, status);
     authManager_->OnDataReceived(sessionId, message);
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->OnDataReceived(sessionId, message);
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseFinishState>();
+    authManager_->OnDataReceived(sessionId, message);
     int32_t ret = authManager_->SetPageId(pageId);
-    ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level0)
@@ -595,6 +617,20 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_004, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
     ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthManagerTest, UnBindDevice_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "ohos_test";
+    std::string udidHash = "networkId";
+    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->isAuthenticateDevice_ = false;
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    authManager_->isAuthenticateDevice_ = true;
+    ret = authManager_->UnBindDevice(pkgName, udidHash);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, RequestCredential001, testing::ext::TestSize.Level0)
@@ -945,17 +981,17 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
     ASSERT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, ProRespNegotiateExt001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    authManager_->ProRespNegotiateExt(sessionId);
+    authManager_->ProcRespNegotiateExt(sessionId);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-HWTEST_F(DmAuthManagerTest, ProRespNegotiate001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    authManager_->ProRespNegotiate(sessionId);
+    authManager_->ProcRespNegotiate(sessionId);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
@@ -1072,6 +1108,12 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup002, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Level0)
 {
+    authManager_->PutAccessControlList();
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->authResponseContext_->isIdenticalAccount = true;
+    authManager_->PutAccessControlList();
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->PutAccessControlList();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }

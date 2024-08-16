@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,26 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef OHOS_DM_PERMISSION_MANAGER_TEST_H
-#define OHOS_DM_PERMISSION_MANAGER_TEST_H
+#ifndef OHOS_UTTEST_DM_SOFTBUS_PUBLISH_H
+#define OHOS_UTTEST_DM_SOFTBUS_PUBLISH_H
 
 #include <gtest/gtest.h>
+#include <refbase.h>
 
-#include <cstdint>
-#include <string_view>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
-#include "dm_constants.h"
-#include "permission_manager.h"
+#include "auth_response_state.h"
+#include "device_manager_service_listener.h"
+#include "dm_auth_manager.h"
+#include "dm_device_state_manager.h"
+#include "dm_discovery_manager.h"
+#include "inner_session.h"
+#include "softbus_publish.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class PermissionManagerTest : public testing::Test {
+class SoftbusPublishTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

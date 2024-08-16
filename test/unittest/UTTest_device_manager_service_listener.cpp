@@ -443,6 +443,37 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_001, testing::ext::TestSi
 }
 
 /**
+ * @tc.name: GetDeviceId_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string udidHash = "123445676788908";
+    std::string deviceId = "123";
+    listener_->udidHashMap_[pkgName][deviceId] = udidHash;
+    std::string str = listener_->GetDeviceId(udidHash, pkgName);
+    EXPECT_EQ(str, deviceId);
+}
+
+/**
+ * @tc.name: GetDeviceId_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, GetDeviceId_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string pkgName = "com.ohos.helloworld";
+    std::string udidHash = "123445676788908";
+    std::string udidHash2 = "123445676788909";
+    std::string deviceId = "123";
+    listener_->udidHashMap_[pkgName][deviceId] = udidHash;
+    std::string str = listener_->GetDeviceId(udidHash2, pkgName);
+    EXPECT_EQ(str, "");
+}
+
+/**
  * @tc.name: GetUdidHash_001
  * @tc.desc: GetUdidHash, construct a dummy listener, pass in deviceId
  * @tc.type: FUNC
@@ -543,6 +574,20 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::T
     std::string content = "content";
     listener_->OnPinHolderEvent(pkgName, event, result, content);
     EXPECT_EQ(listener_->dmListenerMap_.empty(), true);
+}
+
+/**
+ * @tc.name: ComposeOnlineKey_001
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, ComposeOnlineKey_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::string str1 = "hello";
+    std::string str2 = "world";
+    std::string str = listener_->ComposeOnlineKey(str1, str2);
+    EXPECT_EQ(str, str1 + "_" + str2);
 }
 } // namespace
 } // namespace DistributedHardware

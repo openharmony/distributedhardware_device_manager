@@ -25,6 +25,7 @@ void DeviceManagerServiceImplTest::SetUp()
     }
     deviceManagerServiceImpl_->Initialize(listener_);
 }
+const std::string testID("111111");
 
 void DeviceManagerServiceImplTest::TearDown()
 {
@@ -710,6 +711,23 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_001, testing::ext::TestSize
 }
 
 /**
+ * @tc.name: HandleOffline_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
  * @tc.name: HandleOnline_001
  * @tc.type: FUNC
  */
@@ -717,6 +735,23 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_001, testing::ext::TestSize.
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
+ * @tc.name: HandleOnline_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -1548,6 +1583,40 @@ HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext:
     }
     deviceManagerServiceImpl_->LoadHardwareFwkService();
     EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+}
+
+/**
+ * tc.name: AccountCommonEventCallback_001
+ * tc.type: FUNC
+*/
+HWTEST_F(DeviceManagerServiceImplTest, AccountCommonEventCallback_001, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 111111;
+    std::string commonEventType = "usual.event.USER_SWITCHED";
+    deviceManagerServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
+ * tc.name: ScreenCommonEventCallback_001
+ * tc.type: FUNC
+*/
+HWTEST_F(DeviceManagerServiceImplTest, ScreenCommonEventCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string commonEventType = "usual.event.SCREEN_LOCKED";
+    deviceManagerServiceImpl_->ScreenCommonEventCallback(commonEventType);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+/**
+ * tc.name: HandleDeviceNotTrust_001
+ * tc.type: FUNC
+*/
+HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = testID;
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware

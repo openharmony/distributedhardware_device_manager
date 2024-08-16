@@ -79,6 +79,10 @@
         {
             "name":"dm_enter_peer_connect_code",
             "value":"[TS_949559]_Enter connection code"
+        },
+        {
+            "name":"dm_password_error",
+            "value":"[TS_958913]_Incorrect password. Connection failed."
         }
     ]
 }
