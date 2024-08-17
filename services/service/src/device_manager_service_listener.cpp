@@ -82,7 +82,7 @@ std::string DeviceManagerServiceListener::ComposeOnlineKey(const std::string &pk
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("DeviceManagerServiceListener::ProcessDeviceStateChange");
+    LOGI("In");
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
@@ -124,7 +124,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
 void DeviceManagerServiceListener::ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("DeviceManagerServiceListener::ProcessAppStateChange");
+    LOGI("In");
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetSystemSA();

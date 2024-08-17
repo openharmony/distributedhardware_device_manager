@@ -39,7 +39,7 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 
 int32_t IpcClientManager::ClientInit()
 {
-    LOGI("InitDeviceManagerService start");
+    LOGI("Start");
     if (dmInterface_ != nullptr) {
         LOGI("DeviceManagerService Already Init");
         return DM_OK;
@@ -64,7 +64,7 @@ int32_t IpcClientManager::ClientInit()
         LOGE("InitDeviceManagerService: AddDeathRecipient Failed");
     }
     dmInterface_ = iface_cast<IpcRemoteBroker>(object);
-    LOGI("DeviceManager::InitDeviceManagerService completed");
+    LOGI("Completed");
     return DM_OK;
 }
 

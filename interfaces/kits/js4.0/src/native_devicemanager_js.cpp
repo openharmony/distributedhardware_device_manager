@@ -993,7 +993,7 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
     DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
 {
     for (unsigned int i = 0; i < deviceBasicInfoListAsyncCallbackInfo->devList.size(); i++) {
-        LOGI("DeviceManager::GetAvailableDeviceList deviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
+        LOGI("DeviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
              GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceId).c_str(),
              GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceName).c_str(),
              deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceTypeId);
@@ -1096,7 +1096,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 
 napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_callback_info info)
 {
-    LOGI("GetAvailableDeviceListSync in");
+    LOGI("In");
     int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
     if (ret != 0) {
         CreateBusinessError(env, ret);
@@ -1125,7 +1125,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
         CreateBusinessError(env, ret);
         return result;
     }
-    LOGI("DeviceManager::GetAvailableDeviceListSync");
+    LOGD("DeviceManager::GetAvailableDeviceListSync");
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
             DeviceBasicInfoToJsArray(env, devList, (int32_t)i, result);
@@ -1887,7 +1887,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
 
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
-    LOGI("CreateDeviceManager in");
+    LOGI("In");
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
@@ -1921,7 +1921,7 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
 
 napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
 {
-    LOGI("DeviceManagerNapi Constructor in");
+    LOGI("In");
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
@@ -1931,7 +1931,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    LOGI("create DeviceManagerNapi for packageName:%{public}s", bundleName.c_str());
+    LOGI("Create for packageName:%{public}s", bundleName.c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
