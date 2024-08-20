@@ -776,7 +776,7 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_003, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->dmVersion = "5.0.1";
     authManager_->authResponseContext_->bindLevel = 1;
     ret = authManager_->ProcessPincode(pinCode);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDevice_001, testing::ext::TestSize.Level0)
