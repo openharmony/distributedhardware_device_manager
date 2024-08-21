@@ -34,13 +34,13 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   deps = [
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//third_party/benchmark:benchmark",
   ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "benchmark:benchmark",
     "bounds_checking_function:libsec_shared",
     "dsoftbus:softbus_client",
     "ipc:ipc_single",
