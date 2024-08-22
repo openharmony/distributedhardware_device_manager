@@ -58,6 +58,7 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
   deps = [
     "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
     "${devicemanager_path}/services/service:devicemanagerservice",
+    "${utils_path}:devicemanagerutils",
   ]
 
   defines = [

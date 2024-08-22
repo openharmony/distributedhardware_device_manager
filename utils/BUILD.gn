@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -73,6 +73,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "include/crypto",
+      "include/kvadapter",
       "include/threadManager",
       "include/fwkload/standard",
       "include/appInfo/standard",
@@ -95,9 +96,12 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
+      "${common_path}/src/dm_anonymous.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
+      "src/kvadapter/kv_adapter.cpp",
+      "src/kvadapter/kv_adapter_manager.cpp",
       "src/threadManager/dm_thread_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
@@ -118,6 +122,7 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",
@@ -128,7 +133,10 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    public_external_deps = [ "json:nlohmann_json_static" ]
+    public_external_deps = [
+      "json:nlohmann_json_static",
+      "kv_store:distributeddata_inner",
+    ]
 
     if (support_jsapi) {
       external_deps += [ "bundle_framework:appexecfwk_core" ]

@@ -15,11 +15,13 @@
 
 #include "device_manager_service_listener.h"
 
+#include "app_manager.h"
 #include "device_manager_ipc_interface_code.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
@@ -32,14 +34,15 @@
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_server_stub.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "datetime_ex.h"
+#include "kv_adapter_manager.h"
+#endif
+#include "parameter.h"
 #include "permission_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-std::mutex DeviceManagerServiceListener::dmListenerMapLock_;
-std::mutex DeviceManagerServiceListener::udidHashMapLock_;
-std::map<std::string, std::string> DeviceManagerServiceListener::dmListenerMap_ = {};
-std::map<std::string, std::map<std::string, std::string>> DeviceManagerServiceListener::udidHashMap_ = {};
 std::mutex DeviceManagerServiceListener::alreadyOnlineSetLock_;
 std::unordered_set<std::string> DeviceManagerServiceListener::alreadyOnlineSet_ = {};
 const int32_t LAST_APP_ONLINE_NUMS = 5;
@@ -70,6 +73,25 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     LOGD("DeviceManagerServiceListener::SetDeviceInfo");
     pReq->SetPkgName(pkgName);
     pReq->SetDeviceState(state);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string appId = "";
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+        pReq->SetDeviceInfo(deviceInfo);
+        pReq->SetDeviceBasicInfo(deviceBasicInfo);
+        return;
+    }
+    DmDeviceInfo dmDeviceInfo = deviceInfo;
+    ConfuseUdidHash(pkgName, dmDeviceInfo);
+    DmDeviceBasicInfo dmDeviceBasicInfo = deviceBasicInfo;
+    (void)memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+    if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), dmDeviceInfo.deviceId,
+        std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(dmDeviceInfo.deviceId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+    }
+    pReq->SetDeviceInfo(dmDeviceInfo);
+    pReq->SetDeviceBasicInfo(dmDeviceBasicInfo);
+    return;
+#endif
     pReq->SetDeviceInfo(deviceInfo);
     pReq->SetDeviceBasicInfo(deviceBasicInfo);
 }
@@ -182,6 +204,9 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const std::string &pkgNam
     } else {
         ProcessAppStateChange(pkgName, state, info, deviceBasicInfo);
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    KVAdapterManager::GetInstance().DeleteAgedEntry();
+#endif
 }
 
 void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
@@ -189,29 +214,25 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
 {
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::make_shared<IpcNotifyDeviceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-
+    DmDeviceInfo deviceInfo = info;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ConfuseUdidHash(pkgName, deviceInfo);
+#endif
     DmDeviceBasicInfo devBasicInfo;
-    ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, devBasicInfo);
+    ConvertDeviceInfoToDeviceBasicInfo(pkgName, deviceInfo, devBasicInfo);
     pReq->SetDeviceBasicInfo(devBasicInfo);
     pReq->SetPkgName(pkgName);
     pReq->SetSubscribeId(subscribeId);
-    pReq->SetDeviceInfo(info);
+    pReq->SetDeviceInfo(deviceInfo);
     ipcServerListener_.SendRequest(SERVER_DEVICE_FOUND, pReq, pRsp);
 }
 
 void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                                  DmDeviceBasicInfo &info)
 {
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> pReq = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
-    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    std::string udIdHash = CalcDeviceId(pkgName, info.deviceId);
-    if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udIdHash.c_str(), udIdHash.length()) != DM_OK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
-    }
-    pReq->SetPkgName(pkgName);
-    pReq->SetSubscribeId(subscribeId);
-    pReq->SetDeviceBasicInfo(info);
-    ipcServerListener_.SendRequest(SERVER_DEVICE_DISCOVERY, pReq, pRsp);
+    (void)pkgName;
+    (void)subscribeId;
+    (void)info;
 }
 
 void DeviceManagerServiceListener::OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId,
@@ -259,9 +280,14 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
     if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {
         status = STATUS_DM_AUTH_DEFAULT;
     }
-
-    pReq->SetPkgName(pkgName);
     pReq->SetDeviceId(deviceId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string deviceIdTemp = "";
+    if (ConvertUdidHashToAnoy(pkgName, deviceId, deviceIdTemp) == DM_OK) {
+        pReq->SetDeviceId(deviceIdTemp);
+    }
+#endif
+    pReq->SetPkgName(pkgName);
     pReq->SetToken(token);
     pReq->SetStatus(status);
     pReq->SetReason(reason);
@@ -300,9 +326,17 @@ void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, cons
     if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {
         status = STATUS_DM_AUTH_DEFAULT;
     }
-
+    PeerTargetId returnTargetId = targetId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string deviceIdTemp = "";
+    DmKVValue kvValue;
+    if (ConvertUdidHashToAnoy(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
+        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+        returnTargetId.deviceId = deviceIdTemp;
+    }
+#endif
     pReq->SetPkgName(pkgName);
-    pReq->SetPeerTargetId(targetId);
+    pReq->SetPeerTargetId(returnTargetId);
     pReq->SetResult(result);
     pReq->SetStatus(status);
     pReq->SetContent(content);
@@ -314,82 +348,20 @@ void DeviceManagerServiceListener::OnUnbindResult(const std::string &pkgName, co
 {
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-
+    PeerTargetId returnTargetId = targetId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string deviceIdTemp = "";
+    DmKVValue kvValue;
+    if (ConvertUdidHashToAnoy(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
+        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+        returnTargetId.deviceId = deviceIdTemp;
+    }
+#endif
     pReq->SetPkgName(pkgName);
-    pReq->SetPeerTargetId(targetId);
+    pReq->SetPeerTargetId(returnTargetId);
     pReq->SetResult(result);
     pReq->SetContent(content);
     ipcServerListener_.SendRequest(UNBIND_TARGET_RESULT, pReq, pRsp);
-}
-
-void DeviceManagerServiceListener::RegisterDmListener(const std::string &pkgName, const std::string &appId)
-{
-    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
-    dmListenerMap_[pkgName] = appId;
-}
-
-void DeviceManagerServiceListener::UnRegisterDmListener(const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
-    dmListenerMap_.erase(pkgName);
-}
-
-void DeviceManagerServiceListener::DeleteDeviceIdFromMap(const std::string &deviceId, const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    std::map<std::string, std::string> &udidMap = udidHashMap_[pkgName];
-    auto iter = udidMap.find(deviceId);
-    if (iter == udidMap.end()) {
-        return;
-    }
-    udidMap.erase(deviceId);
-}
-void DeviceManagerServiceListener::SetUdidHashMap(const std::string &udidHash, const std::string &deviceId,
-    const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    udidHashMap_[pkgName][deviceId] = udidHash;
-}
-
-std::string DeviceManagerServiceListener::GetDeviceId(const std::string &udidHash, const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    std::map<std::string, std::string> &udidMap = udidHashMap_[pkgName];
-    for (auto iter = udidMap.begin(); iter != udidMap.end(); iter++) {
-        if (udidHash == iter->second) {
-            return iter->first;
-        }
-    }
-    return "";
-}
-
-std::string DeviceManagerServiceListener::GetUdidHash(const std::string &deviceId, const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> lock(udidHashMapLock_);
-    return udidHashMap_[pkgName].count(deviceId) > 0 ?  udidHashMap_[pkgName][deviceId] : "";
-}
-
-std::string DeviceManagerServiceListener::GetAppId(const std::string &pkgName)
-{
-    std::lock_guard<std::mutex> autoLock(dmListenerMapLock_);
-    return dmListenerMap_.count(pkgName) > 0 ? dmListenerMap_[pkgName] : "";
-}
-
-std::string DeviceManagerServiceListener::CalcDeviceId(const std::string &pkgName, const std::string &udidHash)
-{
-    std::string appId = GetAppId(pkgName);
-    LOGI("CalcDeviceId, appId : %{public}s, udidHash : %{public}s.", GetAnonyString(appId).c_str(),
-        GetAnonyString(udidHash).c_str());
-    if (appId.empty()) {
-        return udidHash;
-    }
-    std::string deviceId = GetDeviceId(udidHash, pkgName);
-    if (deviceId.empty()) {
-        deviceId = Crypto::Sha256(appId + udidHash);
-        SetUdidHashMap(udidHash, deviceId, pkgName);
-        return deviceId;
-    }
-    return deviceId;
 }
 
 void DeviceManagerServiceListener::OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId,
@@ -455,5 +427,54 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const std::string &pkgName, 
     pReq->SetContent(content);
     ipcServerListener_.SendRequest(SERVER_ON_PIN_HOLDER_EVENT, pReq, pRsp);
 }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DeviceManagerServiceListener::ConfuseUdidHash(const std::string &pkgName, DmDeviceInfo &deviceInfo)
+{
+    LOGI("ConfuseUdidHash pkgName %{public}s.", pkgName.c_str());
+    std::string deviceIdTemp = "";
+    if (ConvertUdidHashToAnoy(pkgName, std::string(deviceInfo.deviceId), deviceIdTemp) != DM_OK) {
+        LOGE("ConvertUdidHashToAnoy failed.");
+        return ERR_DM_FAILED;
+    }
+    std::string appId = "";
+    AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId);
+    if (appId.empty()) {
+        LOGE("GetAppIdByPkgName failed.");
+        return ERR_DM_FAILED;
+    }
+
+    DmKVValue kvValue;
+    kvValue.udidHash = std::string(deviceInfo.deviceId);
+    kvValue.appID = appId;
+    kvValue.lastModifyTime = GetSecondsSince1970ToNow();
+    (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), deviceIdTemp.c_str(),
+        std::min(sizeof(deviceInfo.deviceId), deviceIdTemp.length())) != DM_OK) {
+        LOGE("ConfuseUdidHash copy deviceId data failed.");
+        return ERR_DM_FAILED;
+    }
+    KVAdapterManager::GetInstance().Put(deviceIdTemp, kvValue);
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoy(const std::string &pkgName,
+    const std::string &udidHash, std::string &result)
+{
+    LOGI("pkgName %{public}s, udidHash %{public}s.", pkgName.c_str(), GetAnonyString(udidHash).c_str());
+    std::string appId = "";
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+        LOGE("GetAppIdByPkgName failed");
+        return ERR_DM_FAILED;
+    }
+    std::string udidTemp = udidHash + appId;
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(udidTemp, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
+        LOGE("get deviceIdHash by udidTemp: %{public}s failed.", GetAnonyString(udidTemp).c_str());
+        return ERR_DM_FAILED;
+    }
+    result = std::string(deviceIdHash);
+    return DM_OK;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
