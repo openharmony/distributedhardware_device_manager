@@ -1191,14 +1191,6 @@ config("device_manager_test_common_public_config") {
     "${devicemanager_path}/test/unittest/mock/",
   ]
 
-  if (os_account_part_exists) {
-    include_dirs += [
-      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-      "${os_account_path }/frameworks/common/database/include",
-      "${os_account_path }/frameworks/common/account_error/include",
-    ]
-  }
-
   cflags = [
     "-Wall",
     "-Werror",

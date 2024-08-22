@@ -34,7 +34,6 @@ ohos_benchmarktest("DeviceManagerFaTest") {
   deps = [
     "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "//third_party/benchmark:benchmark",
   ]
 
   external_deps = [
