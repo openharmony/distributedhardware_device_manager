@@ -1606,5 +1606,28 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
     }
     return;
 }
+
+int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t policy = -1;
+    if (policy.find(DM_POLICY_STRATEGY_FOR_BLE) != policy.end()) {
+        policy = policy.find(DM_POLICY_STRATEGY_FOR_BLE)->second).c_str());
+    }
+    uint8_t timeOut = 0;
+    if (policy.find(DM_POLICY_TIMEOUT) != policy.end()) {
+        timeOut = std::stoi((policy.find(DM_POLICY_TIMEOUT)->second).c_str());
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    return softbusListener_->SetDnPolicy(pkgName, policy, timeOut);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

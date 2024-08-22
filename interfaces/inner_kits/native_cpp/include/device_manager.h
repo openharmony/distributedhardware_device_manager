@@ -561,6 +561,14 @@ public:
         DmPinType pinType, const std::string &payload) = 0;
 
     /**
+     * @brief Set Dn Policy
+     * @param pkgName  package name.
+     * @param policy  policy and timeout.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
+
+    /**
     * @brief Request credential information.
     * @param pkgName       package name.
     * @param returnJsonStr return json string, it includes deviceId, devicePk, useId and version.
