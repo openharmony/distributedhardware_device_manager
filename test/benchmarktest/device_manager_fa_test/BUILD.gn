@@ -40,7 +40,6 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "benchmark:benchmark",
     "bounds_checking_function:libsec_shared",
     "dsoftbus:softbus_client",
     "ipc:ipc_single",
