@@ -212,7 +212,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     authRequestState_ = std::make_shared<AuthRequestInitState>();
     authRequestState_->SetAuthManager(shared_from_this());
     authRequestState_->SetAuthContext(authRequestContext_);
-    if (!DmRadarHelper::GetInstance().ReportAuthStart(deviceId, pkgName)) {
+    if (!DmRadarHelper::GetInstance().ReportAuthStart(peerTargetId_.deviceId, pkgName)) {
         LOGE("ReportAuthStart failed");
     }
     authRequestState_->Enter();
