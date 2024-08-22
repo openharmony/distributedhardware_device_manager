@@ -2560,6 +2560,10 @@ bool DmAuthManager::IsScreenLocked()
 
 void DmAuthManager::OnScreenLocked()
 {
+    if (authResponseContext_ != nullptr && AUTH_TYPE_IMPORT_AUTH_CODE == authResponseContext_->authType) {
+        LOGI("OnScreenLocked authtype is: %{public}d, no need stop bind.", authResponseContext_->authType);
+        return;
+    }
     if (authRequestState_ == nullptr) {
         LOGE("OnScreenLocked authRequestState_ is nullptr.");
         return;
