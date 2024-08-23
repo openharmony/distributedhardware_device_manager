@@ -1620,7 +1620,7 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     }
     int32_t policy = -1;
     if (policy.find(DM_POLICY_STRATEGY_FOR_BLE) != policy.end()) {
-        policy = policy.find(DM_POLICY_STRATEGY_FOR_BLE)->second).c_str());
+        policy = std::stoi((policy.find(DM_POLICY_STRATEGY_FOR_BLE)->second).c_str());
     }
     uint8_t timeOut = 0;
     if (policy.find(DM_POLICY_TIMEOUT) != policy.end()) {
