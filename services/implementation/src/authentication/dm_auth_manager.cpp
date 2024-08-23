@@ -51,6 +51,14 @@ const int32_t INPUT_TIMEOUT = 60;
 const int32_t ADD_TIMEOUT = 10;
 const int32_t WAIT_NEGOTIATE_TIMEOUT = 10;
 const int32_t WAIT_REQUEST_TIMEOUT = 10;
+const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
+const int32_t CLONE_CONFIRM_TIMEOUT = 5;
+const int32_t CLONE_NEGOTIATE_TIMEOUT = 5;
+const int32_t CLONE_INPUT_TIMEOUT = 5;
+const int32_t CLONE_ADD_TIMEOUT = 5;
+const int32_t CLONE_WAIT_NEGOTIATE_TIMEOUT = 5;
+const int32_t CLONE_WAIT_REQUEST_TIMEOUT = 5;
+const int32_t CLONE_SESSION_HEARTBEAT_TIMEOUT = 10;
 const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
 const int32_t DEVICE_ID_HALF = 2;
 const int32_t MAX_AUTH_TIMES = 3;
@@ -66,6 +74,18 @@ const int32_t SYNC_DELETE_TIMEOUT = 60;
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
+
+// clone task timeout map
+const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
+    { std::string(AUTHENTICATE_TIMEOUT_TASK), CLONE_AUTHENTICATE_TIMEOUT },
+    { std::string(NEGOTIATE_TIMEOUT_TASK), CLONE_NEGOTIATE_TIMEOUT },
+    { std::string(CONFIRM_TIMEOUT_TASK), CLONE_CONFIRM_TIMEOUT },
+    { std::string(INPUT_TIMEOUT_TASK), CLONE_INPUT_TIMEOUT },
+    { std::string(ADD_TIMEOUT_TASK), CLONE_ADD_TIMEOUT },
+    { std::string(WAIT_NEGOTIATE_TIMEOUT_TASK), CLONE_WAIT_NEGOTIATE_TIMEOUT },
+    { std::string(WAIT_REQUEST_TIMEOUT_TASK), CLONE_WAIT_REQUEST_TIMEOUT },
+    { std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), CLONE_SESSION_HEARTBEAT_TIMEOUT }
+};
 
 constexpr const char* APP_OPERATION_KEY = "appOperation";
 constexpr const char* TARGET_PKG_NAME_KEY = "targetPkgName";
@@ -200,8 +220,8 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
-    timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), AUTHENTICATE_TIMEOUT,
-        [this] (std::string name) {
+    timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
+        GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, AUTHENTICATE_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
     authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
@@ -223,6 +243,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     const std::string &deviceId, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    SetAuthType(authType);
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
@@ -349,12 +370,12 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             if (timer_ == nullptr) {
                 timer_ = std::make_shared<DmTimer>();
             }
-            timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), AUTHENTICATE_TIMEOUT,
-                [this] (std::string name) {
+            timer_->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
+                GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, AUTHENTICATE_TIMEOUT), [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
                 });
-            timer_->StartTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK), WAIT_NEGOTIATE_TIMEOUT,
-                [this] (std::string name) {
+            timer_->StartTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK),
+                GetTaskTimeout(WAIT_NEGOTIATE_TIMEOUT_TASK, WAIT_NEGOTIATE_TIMEOUT), [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
                 });
         } else {
@@ -561,20 +582,20 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %{public}d", authTimes_);
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
+        authTimes_++;
+        timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
             HandleMemberJoinImportAuthCode(requestId, status);
             return;
         }
-        authTimes_++;
-        timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
                 authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
                 authRequestContext_->reason = ERR_DM_BIND_PIN_CODE_ERROR;
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             } else {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
-                    [this] (std::string name) {
+                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
                         DmAuthManager::HandleAuthenticateTimeout(name);
                     });
                 authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
@@ -692,8 +713,8 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
-    timer_->StartTimer(std::string(NEGOTIATE_TIMEOUT_TASK), NEGOTIATE_TIMEOUT,
-        [this] (std::string name) {
+    timer_->StartTimer(std::string(NEGOTIATE_TIMEOUT_TASK),
+        GetTaskTimeout(NEGOTIATE_TIMEOUT_TASK, NEGOTIATE_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
 }
@@ -747,15 +768,15 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
         authResponseContext_->bindLevel <= APP)) {
         ProcRespNegotiateExt(sessionId);
-        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
+            GetTaskTimeout(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
         authResponseContext_->bindLevel == INVALIED_TYPE) {
         ProcRespNegotiate(sessionId);
-        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
+            GetTaskTimeout(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
     } else {
@@ -828,8 +849,8 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
     listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
     listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
-    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
-        [this] (std::string name) {
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK),
+        GetTaskTimeout(CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
 }
@@ -902,8 +923,8 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
     listener_->OnBindResult(authResponseContext_->hostPkgName, peerTargetId_, DM_OK, STATUS_DM_SHOW_AUTHORIZE_UI, "");
-    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK), CONFIRM_TIMEOUT,
-        [this] (std::string name) {
+    timer_->StartTimer(std::string(CONFIRM_TIMEOUT_TASK),
+        GetTaskTimeout(CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
 }
@@ -999,12 +1020,12 @@ void DmAuthManager::StartRespAuthProcess()
         action_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     }
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
-        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
-        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), SESSION_HEARTBEAT_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
+            GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleSessionHeartbeat(name);
             });
         listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
@@ -1048,8 +1069,8 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     jsonObject[TAG_REQUEST_ID] = authResponseContext_->requestId;
     jsonObject[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     std::string connectInfo = jsonObject.dump();
-    timer_->StartTimer(std::string(ADD_TIMEOUT_TASK), ADD_TIMEOUT,
-        [this] (std::string name) {
+    timer_->StartTimer(std::string(ADD_TIMEOUT_TASK),
+        GetTaskTimeout(ADD_TIMEOUT_TASK, ADD_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
     if (authUiStateMgr_ == nullptr) {
@@ -2039,8 +2060,8 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
-            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK), INPUT_TIMEOUT,
-                [this] (std::string name) {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
                     DmAuthManager::HandleAuthenticateTimeout(name);
                 });
             authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
@@ -2461,8 +2482,8 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
     softbusConnector_->GetSoftbusSession()->SendHeartbeatData(authResponseContext_->sessionId, message);
 
     if (authRequestState_ != nullptr) {
-        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), SESSION_HEARTBEAT_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
+            GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleSessionHeartbeat(name);
             });
     }
@@ -2635,6 +2656,23 @@ bool DmAuthManager::CompareVersion(const std::string &remoteVersion, const std::
     VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
     VersionSplitToInt(oldVersion, '.', oldVersionVec);
     return CompareVecNum(remoteVersionVec, oldVersionVec);
+}
+
+void DmAuthManager::SetAuthType(int32_t authType)
+{
+    authType_ = authType;
+}
+
+int32_t DmAuthManager::GetTaskTimeout(const char* taskName, int32_t taskTimeOut)
+{
+    LOGI("GetTaskTimeout, taskName: %{public}s, authType_: %{public}d", taskName, authType_.load());
+    if (AUTH_TYPE_IMPORT_AUTH_CODE == authType_) {
+        auto timeout = TASK_TIME_OUT_MAP.find(std::string(taskName));
+        if (timeout != TASK_TIME_OUT_MAP.end()) {
+            return timeout->second;
+        }
+    }
+    return taskTimeOut;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
