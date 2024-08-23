@@ -1450,7 +1450,7 @@ ON_IPC_CMD(SET_DN_POLICY, MessageParcel &data, MessageParcel &reply)
     std::string policyStr = data.ReadString();
     std::map<std::string, std::string> policy;
     ParseMapFromJsonString(policyStr, policy);
-    int32_t result = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
+    int32_t result = DeviceManagerService::GetInstance().SetDnPolicy(pkgName, policy);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
