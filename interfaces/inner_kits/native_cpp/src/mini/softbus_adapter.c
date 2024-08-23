@@ -20,7 +20,6 @@
 
 #include "cJSON.h"
 #include "cmsis_os2.h"
-#include "discovery_service.h"
 #include "hichain_adapter.h"
 #include "inner_session.h"
 #include "los_config.h"

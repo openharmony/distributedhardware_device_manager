@@ -287,6 +287,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
     std::string pkgName = "ohos_test";
     std::string extra = "jdddd";
     std::vector<DmDeviceInfo> deviceList;
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
