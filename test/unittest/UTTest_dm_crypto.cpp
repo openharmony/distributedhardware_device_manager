@@ -15,8 +15,8 @@
 
 #include "UTTest_dm_crypto.h"
 
-#include <iostream>
 #include <cinttypes>
+#include <iostream>
 
 #include "dm_constants.h"
 #include "dm_crypto.h"
