@@ -563,7 +563,9 @@ public:
     /**
      * @brief Set Dn Policy
      * @param pkgName  package name.
-     * @param policy  policy and timeout.
+     * @param policy contain DM_POLICY_STRATEGY_FOR_BLE and DM_POLICY_TIMEOUT key and value.
+     *               DM_POLICY_STRATEGY_FOR_BLE: Strategy BLE networking go-online policy, suppress or restore.
+     *               DM_POLICY_TIMEOUT: Indicates the duration for suppressing ble networking.
      * @return Returns 0 if success.
      */
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;

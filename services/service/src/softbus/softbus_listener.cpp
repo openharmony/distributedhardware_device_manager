@@ -756,7 +756,7 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
 int32_t SoftbusListener::SetDnPolicy(int32_t policy, int32_t timeOut)
 {
     /*
-    int32_t ret = CtrlLNNBleHb(DM_PKG_NAME, static_cast<StrategyForBle>(policy), static_cast<uint8_t>timeOut);
+    int32_t ret = CtrlLNNBleHb(DM_PKG_NAME, static_cast<StrategyForBle>(policy), timeOut);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CtrlLNNBleHb failed.");
         return ret;
