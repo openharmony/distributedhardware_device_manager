@@ -1095,6 +1095,19 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
     EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
