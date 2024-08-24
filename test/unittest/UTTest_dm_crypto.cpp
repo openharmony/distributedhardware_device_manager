@@ -51,15 +51,6 @@ HWTEST_F(DmCryptoTest, GetSecRandom_01, testing::ext::TestSize.Level0)
     uint8_t buffer[len] = {0};
     int32_t ret = Crypto::GetSecRandom(buffer, len);
     EXPECT_EQ(ret, 0);
-    char outBuf[len * 2 + 1] = {0};
-    Crypto::ConvertBytesToHexString(outBuf, len * 2 + 1, buffer, len);
-
-    // 打印生成的随机字节序列
-    std::cout << "Random Bytes:";
-    for (int i = 0; i < len * 2; ++i) {
-        std::cout << outBuf[i];
-    }
-    std::cout << std::endl;
 }
 
 /**

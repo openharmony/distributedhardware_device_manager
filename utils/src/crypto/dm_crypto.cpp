@@ -42,7 +42,7 @@ uint32_t HexifyLen(uint32_t len)
     return len * HEX_TO_UINT8 + 1;
 }
 
-void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
     uint32_t startIndex)
 {
     if (data == nullptr || outBuf == nullptr || startIndex > outBufLen) {
@@ -55,7 +55,7 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
+int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
     uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
@@ -88,7 +88,7 @@ std::string Crypto::Sha256(const std::string &text, bool isUpper)
 std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH * HEX_TO_UINT8 + 1] = "";
-    Crypto::DmGenerateStrHash(data, size, hash, HexifyLen(SHA256_DIGEST_LENGTH), SHA256_DIGEST_LENGTH);
+    DmGenerateStrHash(data, size, hash, HexifyLen(SHA256_DIGEST_LENGTH), SHA256_DIGEST_LENGTH);
     // here we translate sha256 hash to hexadecimal. each 8-bit char will be presented by two characters([0-9a-f])
     const char* hexCode = isUpper ? "0123456789ABCDEF" : "0123456789abcdef";
     for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
@@ -106,7 +106,7 @@ std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
 int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
-    Crypto::DmGenerateStrHash(udid.data(), udid.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    DmGenerateStrHash(udid.data(), udid.size(), hash, SHA256_DIGEST_LENGTH, 0);
     if (ConvertBytesToHexString(reinterpret_cast<char *>(udidHash), SHORT_DEVICE_ID_HASH_LENGTH + 1,
         reinterpret_cast<const uint8_t *>(hash), SHORT_DEVICE_ID_HASH_LENGTH / HEX_TO_UINT8) != DM_OK) {
         LOGE("ConvertBytesToHexString failed.");
@@ -158,7 +158,7 @@ int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLe
 std::string Crypto::GetGroupIdHash(const std::string &groupId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
-    Crypto::DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
     std::stringstream ss;
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
         ss << std::hex << (int)hash[i];
@@ -189,7 +189,7 @@ std::string Crypto::GetSecSalt()
     }
 
     char outHex[SALT_LENGTH * HEX_TO_UINT8 + 1] = {0};
-    if (Crypto::ConvertBytesToHexString(outHex, SALT_LENGTH * HEX_TO_UINT8 + 1, out, SALT_LENGTH) != DM_OK) {
+    if (ConvertBytesToHexString(outHex, SALT_LENGTH * HEX_TO_UINT8 + 1, out, SALT_LENGTH) != DM_OK) {
         return SALT_DEFAULT;
     }
 
