@@ -21,12 +21,19 @@ namespace OHOS {
 namespace DistributedHardware {
 class Crypto {
 public:
+    static void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+        uint32_t startIndex);
     static std::string Sha256(const std::string &text, bool isUpper = false);
     static std::string Sha256(const void *data, size_t size, bool isUpper = false);
     static int32_t ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLen,
         const char *inBuf, uint32_t inLen);
+    static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
+        uint32_t inLen);
     static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
     static std::string GetGroupIdHash(const std::string &groupId);
+    static int32_t GetSecRandom(uint8_t *out, size_t outLen);
+    static std::string GetSecSalt();
+    static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
