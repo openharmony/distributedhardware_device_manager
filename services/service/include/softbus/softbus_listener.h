@@ -91,7 +91,7 @@ public:
     static IRefreshCallback &GetSoftbusRefreshCb();
     static void SetHostPkgName(const std::string hostName);
     static std::string GetHostPkgName();
-    static int32_t SetDnPolicy(int32_t policy, uint8_t timeOut);
+    static int32_t SetDnPolicy(int32_t policy, int32_t timeOut);
 private:
     int32_t InitSoftPublishLNN();
 
