@@ -744,8 +744,9 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
     remoteVersion_ = ConvertSrcVersion(authResponseContext_->dmVersion, authResponseContext_->edition);
     NegotiateRespMsg(remoteVersion_);
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
-        authResponseContext_->bindLevel <= APP)) {
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
+        (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+        static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         ProcRespNegotiateExt(sessionId);
         timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
             [this] (std::string name) {
@@ -796,8 +797,9 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
     }
     LOGI("SendAuthRequest dmversion %{public}s, level %{public}d",
         authResponseContext_->dmVersion.c_str(), authResponseContext_->bindLevel);
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
-        authResponseContext_->bindLevel <= APP)) {
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
+        (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+        static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         ProcessAuthRequestExt(sessionId);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
         authResponseContext_->bindLevel == INVALIED_TYPE) {
@@ -973,8 +975,9 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     if (!DmRadarHelper::GetInstance().ReportAuthConfirmBox(info)) {
         LOGE("ReportAuthConfirmBox failed");
     }
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
-        authResponseContext_->bindLevel <= APP)) {
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
+        (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+        static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         return ConfirmProcessExt(action);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
         authResponseContext_->bindLevel == INVALIED_TYPE) {
@@ -1364,7 +1367,8 @@ void DmAuthManager::ShowStartAuthDialog()
             return;
         }
         if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
-            (authResponseContext_->bindLevel >= DEVICE && authResponseContext_->bindLevel <= APP)) {
+            (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+            static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
             AuthDevice(pinCode);
         } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
             authResponseContext_->bindLevel == INVALIED_TYPE) {
@@ -1390,8 +1394,9 @@ int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
         return ERR_DM_FAILED;
     }
     timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
-        authResponseContext_->bindLevel <= APP)) {
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
+        (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+        static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         return AuthDevice(pinCode);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
         authResponseContext_->bindLevel == INVALIED_TYPE) {

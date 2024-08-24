@@ -148,7 +148,9 @@ void DeviceManagerService::QueryDependsSwitchState()
         publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
     } else {
         bool isWifiActive = false;
-        Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
+        auto wifiMgr = Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+        CHECK_NULL_VOID(wifiMgr);
+        wifiMgr->IsWifiActive(isWifiActive);
         if (isWifiActive) {
             publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
         } else {
