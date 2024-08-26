@@ -92,6 +92,7 @@ enum DmAuthType : int32_t {
     AUTH_TYPE_NFC,
     AUTH_TYPE_NO_INTER_ACTION,
     AUTH_TYPE_IMPORT_AUTH_CODE,
+    AUTH_TYPE_UNKNOW,
 };
 
 typedef struct DmAuthRequestContext {
@@ -543,6 +544,8 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
+    void SetAuthType(int32_t authType);
+    int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -575,6 +578,7 @@ private:
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
+    std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
