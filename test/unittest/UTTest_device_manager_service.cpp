@@ -1112,28 +1112,28 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSiz
 }
 
 /**
- * @tc.name: RegisterDeviceManagerListener_001
+ * @tc.name: RegisterCallerAppId_001
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
-    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**
- * @tc.name: RegisterDeviceManagerListener_002
+ * @tc.name: RegisterCallerAppId_002
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().listener_ = nullptr;
-    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
-    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**
@@ -1141,11 +1141,11 @@ HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_002, testing::e
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**
@@ -1153,12 +1153,12 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_001, testing:
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterDeviceManagerListener_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().listener_ = nullptr;
-    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)

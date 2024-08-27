@@ -53,6 +53,7 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${utils_path}:devicemanagerutils",
   ]
 
   external_deps = [

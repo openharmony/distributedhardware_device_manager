@@ -16,6 +16,8 @@
 #ifndef OHOS_DM_APP_MANAGER_H
 #define OHOS_DM_APP_MANAGER_H
 
+#include <map>
+#include <mutex>
 #include <string>
 #include "dm_single_instance.h"
 
@@ -26,6 +28,12 @@ class AppManager {
 
 public:
     const std::string GetAppId();
+    void RegisterCallerAppId(const std::string &pkgName);
+    void UnRegisterCallerAppId(const std::string &pkgName);
+    int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
+private:
+    std::mutex appIdMapLock_;
+    std::map<std::string, std::string> appIdMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
