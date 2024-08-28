@@ -29,6 +29,7 @@
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "dm_device_state_manager.h"
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
@@ -551,6 +552,8 @@ private:
     void NegotiateRespMsg(const std::string &version);
     void SetAuthType(int32_t authType);
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
+    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
+    void DeleteOffLineTimer(int32_t sessionId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -585,6 +588,7 @@ private:
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
     std::atomic<int32_t> authType_;
+    std::string remoteUdidHash_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS
