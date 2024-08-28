@@ -1666,6 +1666,7 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->SetDnPolicy(policyStrategy, timeOut);
 }
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo)
 {
