@@ -52,9 +52,9 @@ public:
 
     int32_t InitSoftbusListener();
 
-    void RegisterDeviceManagerListener(const std::string &pkgName);
+    void RegisterCallerAppId(const std::string &pkgName);
 
-    void UnRegisterDeviceManagerListener(const std::string &pkgName);
+    void UnRegisterCallerAppId(const std::string &pkgName);
     
     void UninitSoftbusListener();
 
@@ -207,6 +207,9 @@ private:
     void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
+    void ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo);
+    int32_t ConvertUdidHashToAnoy(const std::string &udidHash, std::string &result);
+    int32_t GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

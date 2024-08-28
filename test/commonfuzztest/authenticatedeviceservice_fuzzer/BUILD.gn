@@ -55,7 +55,10 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
   ]
   sources = [ "authenticate_device_service_fuzzer.cpp" ]
 
-  deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
+  deps = [
+    "${devicemanager_path}/services/service:devicemanagerservice",
+    "${utils_path}:devicemanagerutils",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

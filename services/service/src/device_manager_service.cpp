@@ -29,7 +29,9 @@
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
+#include "datetime_ex.h"
 #include "iservice_registry.h"
+#include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
 #if defined(SUPPORT_POWER_MANAGER)
 #include "power_mgr_client.h"
@@ -148,7 +150,9 @@ void DeviceManagerService::QueryDependsSwitchState()
         publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
     } else {
         bool isWifiActive = false;
-        Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID)->IsWifiActive(isWifiActive);
+        auto wifiMgr = Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+        CHECK_NULL_VOID(wifiMgr);
+        wifiMgr->IsWifiActive(isWifiActive);
         if (isWifiActive) {
             publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED));
         } else {
@@ -205,23 +209,20 @@ void DeviceManagerService::UninitDMServiceListener()
     listener_ = nullptr;
     advertiseMgr_ = nullptr;
     discoveryMgr_ = nullptr;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    KVAdapterManager::GetInstance().UnInit();
+#endif
     LOGI("Uninit.");
 }
 
-void DeviceManagerService::RegisterDeviceManagerListener(const std::string &pkgName)
+void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName)
 {
-    if (listener_ == nullptr) {
-        listener_ = std::make_shared<DeviceManagerServiceListener>();
-    }
-    listener_->RegisterDmListener(pkgName, AppManager::GetInstance().GetAppId());
+    AppManager::GetInstance().RegisterCallerAppId(pkgName);
 }
 
-void DeviceManagerService::UnRegisterDeviceManagerListener(const std::string &pkgName)
+void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
 {
-    if (listener_ == nullptr) {
-        listener_ = std::make_shared<DeviceManagerServiceListener>();
-    }
-    listener_->UnRegisterDmListener(pkgName);
+    AppManager::GetInstance().UnRegisterCallerAppId(pkgName);
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -262,6 +263,9 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
         }
         for (auto item : onlineDeviceList) {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            ConvertUdidHashToAnoy(item);
+#endif
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
             if (udidMap.find(udid) != udidMap.end()) {
@@ -347,7 +351,17 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
             localDeviceId_ = udidHash;
         }
     }
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHashTemp = "";
+    if (ConvertUdidHashToAnoy(localDeviceId_, udidHashTemp) == DM_OK) {
+        (void)memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
+            LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
+            return ERR_DM_FAILED;
+        }
+        return DM_OK;
+    }
+#endif
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(localDeviceId_).c_str());
     }
@@ -498,10 +512,16 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("AuthenticateDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-
+    std::string queryDeviceId = deviceId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHash = "";
+    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+        queryDeviceId = udidHash;
+    }
+#endif
     PeerTargetId targetId;
     ConnectionAddrType addrType;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId, addrType);
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
     if (ret != DM_OK) {
         LOGE("AuthenticateDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
@@ -548,10 +568,16 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         LOGE("BindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-
+    std::string queryDeviceId = deviceId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHash = "";
+    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+        queryDeviceId = udidHash;
+    }
+#endif
     PeerTargetId targetId;
     ConnectionAddrType addrType;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(deviceId, targetId, addrType);
+    int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
     if (ret != DM_OK) {
         LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
@@ -579,7 +605,14 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->UnBindDevice(pkgName, deviceId);
+    std::string realDeviceId = deviceId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHash = "";
+    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+        realDeviceId = udidHash;
+    }
+#endif
+    return dmServiceImpl_->UnBindDevice(pkgName, realDeviceId);
 }
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
@@ -1633,5 +1666,53 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->SetDnPolicy(policyStrategy, timeOut);
 }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo)
+{
+    std::string udidHashTemp = "";
+    if (ConvertUdidHashToAnoy(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
+        (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
+            LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
+        }
+    }
+}
+
+int32_t DeviceManagerService::ConvertUdidHashToAnoy(const std::string &udidHash, std::string &result)
+{
+    LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
+    std::string appId = AppManager::GetInstance().GetAppId();
+    if (appId.empty()) {
+        LOGI("GetAppId failed");
+        return ERR_DM_FAILED;
+    }
+    std::string udidTemp = udidHash + appId;
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(udidTemp, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
+        LOGE("get deviceIdHash by udidTemp: %{public}s failed.", GetAnonyString(udidTemp).c_str());
+        return ERR_DM_FAILED;
+    }
+    result = std::string(deviceIdHash);
+    DmKVValue kvValue;
+    kvValue.udidHash = udidHash;
+    kvValue.appID = appId;
+    kvValue.lastModifyTime = GetSecondsSince1970ToNow();
+    KVAdapterManager::GetInstance().Put(result, kvValue);
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash)
+{
+    LOGI("anoyUdid %{public}s.", GetAnonyString(anoyUdid).c_str());
+    DmKVValue kvValue ;
+    if (KVAdapterManager::GetInstance().Get(anoyUdid, kvValue) != DM_OK) {
+        LOGE("Get kv value from DB failed");
+        return ERR_DM_FAILED;
+    }
+    udidHash = kvValue.udidHash;
+    LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
+    return DM_OK;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

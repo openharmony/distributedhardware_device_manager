@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_APP_MANAGER_H
-#define OHOS_DM_APP_MANAGER_H
+#ifndef OHOS_UTTEST_DM_CRYPTO_H
+#define OHOS_UTTEST_DM_CRYPTO_H
 
-#include <map>
-#include <mutex>
-#include <string>
-#include "dm_single_instance.h"
+#include <gtest/gtest.h>
 
 namespace OHOS {
 namespace DistributedHardware {
-class AppManager {
-    DM_DECLARE_SINGLE_INSTANCE(AppManager);
-
+class DmCryptoTest : public testing::Test {
 public:
-    const std::string GetAppId();
-    void RegisterCallerAppId(const std::string &pkgName);
-    void UnRegisterCallerAppId(const std::string &pkgName);
-    int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
-private:
-    std::mutex appIdMapLock_;
-    std::map<std::string, std::string> appIdMap_;
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_APP_MANAGER_H
+
+#endif // OHOS_UTTEST_DM_CRYPTO_H

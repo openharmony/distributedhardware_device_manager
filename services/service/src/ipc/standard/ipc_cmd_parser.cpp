@@ -417,7 +417,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
         OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         return ERR_DM_POINT_NULL;
     }
-    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -431,7 +431,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
 ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    DeviceManagerService::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

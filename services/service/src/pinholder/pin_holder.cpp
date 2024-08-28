@@ -123,6 +123,7 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
         listener_->OnCreateResult(registerPkgName_, sessionId_);
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT,
             sessionId_, "");
+        sessionId_ = SESSION_ID_INVALID;
         return sessionId_;
     }
     pinType_ = pinType;
@@ -302,6 +303,7 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
         listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
         session_->CloseSessionServer(sessionId_);
+        sessionId_ = SESSION_ID_INVALID;
     }
 }
 

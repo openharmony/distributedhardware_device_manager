@@ -35,6 +35,7 @@ group("unittest") {
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
+    ":UTTest_dm_crypto",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_dfx",
@@ -1118,6 +1119,21 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
 
 ## UnitTest UTTest_dm_distributed_hardware_load }}}
 
+## UnitTest UTTest_dm_crypto {{{
+ohos_unittest("UTTest_dm_crypto") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_crypto.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = []
+}
+
+## UnitTest UTTest_dm_crypto }}}
+
 ## UnitTest UTTest_dm_publish_manager {{{
 ohos_unittest("UTTest_dm_publish_manager") {
   module_out_path = module_out_path
@@ -1190,14 +1206,6 @@ config("device_manager_test_common_public_config") {
     "${servicesimpl_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock/",
   ]
-
-  if (os_account_part_exists) {
-    include_dirs += [
-      "${os_account_path }/interfaces/innerkits/osaccount/native/include",
-      "${os_account_path }/frameworks/common/database/include",
-      "${os_account_path }/frameworks/common/account_error/include",
-    ]
-  }
 
   cflags = [
     "-Wall",

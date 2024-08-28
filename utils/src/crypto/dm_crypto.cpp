@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <openssl/rand.h>
 #include "openssl/sha.h"
 
 namespace OHOS {
@@ -29,9 +30,12 @@ constexpr int DEC_MAX_NUM = 10;
 constexpr int HEX_MAX_BIT_NUM = 4;
 constexpr uint32_t ERR_DM_FAILED = 96929744;
 constexpr int32_t DM_OK = 0;
+constexpr int32_t DM_ERR = -1;
 constexpr int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
 constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
+constexpr int32_t SALT_LENGTH = 8;
+const std::string SALT_DEFAULT = "salt_defsalt_def";
 
 uint32_t HexifyLen(uint32_t len)
 {
@@ -161,5 +165,42 @@ std::string Crypto::GetGroupIdHash(const std::string &groupId)
     }
     return ss.str().substr(0, SHORT_DEVICE_ID_HASH_LENGTH);
 }
+
+int32_t Crypto::GetSecRandom(uint8_t *out, size_t outLen)
+{
+    if (out == NULL) {
+        return DM_ERR;
+    }
+
+    if (outLen == 0) {
+        return DM_ERR;
+    }
+
+    RAND_poll();
+    RAND_bytes(out, outLen);
+    return DM_OK;
+}
+
+std::string Crypto::GetSecSalt()
+{
+    uint8_t out[SALT_LENGTH] = {0};
+    if (Crypto::GetSecRandom(out, SALT_LENGTH) != DM_OK) {
+        return SALT_DEFAULT;
+    }
+
+    char outHex[SALT_LENGTH * HEX_TO_UINT8 + 1] = {0};
+    if (ConvertBytesToHexString(outHex, SALT_LENGTH * HEX_TO_UINT8 + 1, out, SALT_LENGTH) != DM_OK) {
+        return SALT_DEFAULT;
+    }
+
+    return std::string(outHex);
+}
+
+std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &salt)
+{
+    std::string rawText = text + salt;
+    return Crypto::Sha256(rawText);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

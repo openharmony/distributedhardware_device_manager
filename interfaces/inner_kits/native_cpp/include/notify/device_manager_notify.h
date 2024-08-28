@@ -123,8 +123,6 @@ private:
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>> unbindCallback_;
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
     std::mutex bindLock_;
-    std::condition_variable cv_;
-    bool binding_ = false;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<ffrt::queue> ffrtQueue_;
 #endif

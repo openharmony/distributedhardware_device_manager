@@ -549,6 +549,8 @@ private:
     std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
     std::string ConvertSinkVersion(const std::string &version);
     void NegotiateRespMsg(const std::string &version);
+    void SetAuthType(int32_t authType);
+    int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -582,6 +584,7 @@ private:
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
+    std::atomic<int32_t> authType_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
