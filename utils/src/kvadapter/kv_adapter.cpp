@@ -39,8 +39,6 @@ namespace {
     const std::string APP_ID_KEY = "appID";
     const std::string UDID_ID_KEY = "udid";
     const std::string LAST_MODIFY_TIME_KEY = "lastModifyTime";
-    constexpr uint32_t MAX_BATCH_SIZE = 128;
-    constexpr int32_t MAX_DEVICE_ITEM_SIZE = 1000;
     constexpr int32_t MAX_STRING_LEN = 4096;
     constexpr int32_t MAX_INIT_RETRY_TIMES = 20;
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
