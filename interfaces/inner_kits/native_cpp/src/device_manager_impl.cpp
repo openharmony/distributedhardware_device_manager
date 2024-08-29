@@ -196,7 +196,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s, extra: %{public}s", GetAnonyString(pkgName).c_str(), extra.c_str());
+    LOGD("Start, pkgName: %{public}s, extra: %{public}s", GetAnonyString(pkgName).c_str(), extra.c_str());
 
     std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
     std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
@@ -226,7 +226,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s, extra: %{public}s, isRefresh: %{public}d", GetAnonyString(pkgName).c_str(),
+    LOGD("Start, pkgName: %{public}s, extra: %{public}s, isRefresh: %{public}d", GetAnonyString(pkgName).c_str(),
          extra.c_str(), isRefresh);
 
     std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
