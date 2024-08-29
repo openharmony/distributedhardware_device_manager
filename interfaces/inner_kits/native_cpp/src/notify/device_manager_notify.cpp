@@ -576,7 +576,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGI("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
+    LOGD("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
          GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceInfo);
 }
