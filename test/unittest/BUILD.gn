@@ -91,6 +91,7 @@ ohos_unittest("UTTest_pin_auth") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -114,6 +115,7 @@ ohos_unittest("UTTest_pin_auth_ui") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -137,6 +139,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_client") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 
   cflags = [
@@ -168,6 +171,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
     "hicollie:libhicollie",
   ]
 
@@ -193,6 +197,7 @@ ohos_unittest("UTTest_ipc_cmd_register") {
   external_deps = [
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -216,6 +221,7 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -228,6 +234,8 @@ ohos_unittest("UTTest_ipc_get_device_info_rsp") {
   sources = [ "UTTest_ipc_get_device_info_rsp.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "googletest:gmock" ]
 }
 
 ## UnitTest UTTest_ipc_get_device_info_rsp }}}
@@ -242,7 +250,10 @@ ohos_unittest("UTTest_dm_common_event_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_dm_common_event_manager }}}
@@ -255,7 +266,10 @@ ohos_unittest("device_manager_impl_test") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest device_manager_impl_test }}}
@@ -284,6 +298,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -307,6 +322,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -326,6 +342,7 @@ ohos_unittest("UTTest_hichain_auth_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -347,6 +364,7 @@ ohos_unittest("UTTest_hichain_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -366,6 +384,7 @@ ohos_unittest("UTTest_mine_hichain_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -394,6 +413,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "openssl:libcrypto_shared",
@@ -418,6 +438,7 @@ ohos_unittest("UTTest_softbus_adapter") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -441,6 +462,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "os_account:libaccountkits",
@@ -470,6 +492,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -498,6 +521,7 @@ ohos_unittest("UTTest_softbus_publish") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -521,6 +545,7 @@ ohos_unittest("UTTest_softbus_session") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -536,7 +561,10 @@ ohos_unittest("UTTest_dm_adapter_manager") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_dm_adapter_manager }}}
@@ -555,7 +583,10 @@ ohos_unittest("UTTest_dm_anonymous") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_dm_anonymous }}}
@@ -570,7 +601,10 @@ ohos_unittest("UTTest_dm_timer") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_dm_timer }}}
@@ -586,6 +620,7 @@ ohos_unittest("UTTest_ipc_client_manager") {
   external_deps = [
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -599,7 +634,10 @@ ohos_unittest("UTTest_ipc_client_proxy") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_ipc_client_proxy }}}
@@ -612,7 +650,10 @@ ohos_unittest("UTTest_ipc_client_stub") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_ipc_client_stub }}}
@@ -632,6 +673,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hicollie:libhicollie",
   ]
 }
@@ -646,7 +688,10 @@ ohos_unittest("UTTest_ipc_server_listener") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_ipc_server_listener }}}
@@ -663,6 +708,7 @@ ohos_unittest("UTTest_ipc_server_stub") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -686,6 +732,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -705,6 +752,7 @@ ohos_unittest("UTTest_dm_import_auth_code") {
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -725,6 +773,7 @@ ohos_unittest("UTTest_multiple_user_connector") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "googletest:gmock",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -749,6 +798,7 @@ ohos_unittest("UTTest_permission_manager") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -769,6 +819,7 @@ ohos_unittest("UTTest_device_manager_notify") {
   external_deps = [
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
   ]
 }
 
@@ -782,7 +833,10 @@ ohos_unittest("UTTest_ipc_client_server_proxy") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest UTTest_ipc_client_server_proxy }}}
@@ -799,6 +853,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -818,6 +873,7 @@ ohos_unittest("UTTest_dm_dfx") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "googletest:gmock",
     "hitrace:hitrace_meter",
   ]
 }
@@ -840,6 +896,7 @@ ohos_unittest("UTTest_dm_discovery_filter") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -861,6 +918,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -880,6 +938,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -897,6 +956,7 @@ ohos_unittest("UTTest_auth_message_processor") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -914,6 +974,7 @@ ohos_unittest("UTTest_auth_response_state") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -931,6 +992,7 @@ ohos_unittest("UTTest_auth_request_state") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -944,7 +1006,10 @@ ohos_unittest("ipc_client_manager_test") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UnitTest ipc_client_manager_test }}}
@@ -963,6 +1028,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -982,6 +1048,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -1002,7 +1069,10 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "googletest:gmock",
+  ]
 }
 
 ## UTTest_dm_radar_helper_test }}}
@@ -1023,6 +1093,7 @@ ohos_unittest("UTTest_discovery_filter") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -1044,6 +1115,7 @@ ohos_unittest("UTTest_discovery_manager") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hitrace:hitrace_meter",
   ]
 }
@@ -1070,6 +1142,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
   external_deps = [
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
   ]
 }
 
@@ -1093,6 +1166,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hitrace:hitrace_meter",
   ]
 }
@@ -1113,6 +1187,7 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
     "hitrace:hitrace_meter",
   ]
 }
@@ -1129,7 +1204,7 @@ ohos_unittest("UTTest_dm_crypto") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = []
+  external_deps = [ "googletest:gmock" ]
 }
 
 ## UnitTest UTTest_dm_crypto }}}
@@ -1160,6 +1235,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
+    "googletest:gmock",
     "hitrace:hitrace_meter",
   ]
 
@@ -1247,7 +1323,6 @@ ohos_static_library("device_manager_test_common") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutils",
-    "//third_party/googletest:gmock",
   ]
 
   external_deps = [
