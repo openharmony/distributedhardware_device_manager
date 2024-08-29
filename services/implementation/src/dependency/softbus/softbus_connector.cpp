@@ -687,6 +687,14 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
     return;
 }
 
+void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
+{
+    LOGI("SoftbusConnector::DeleteOffLineTimer");
+    if (deviceStateManagerCallback_ != nullptr) {
+        deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
+    }
+}
+
 bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 {
     LOGI("Check the device is online.");

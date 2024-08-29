@@ -29,6 +29,7 @@
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "dm_device_state_manager.h"
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
@@ -543,6 +544,8 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
+    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
+    void DeleteOffLineTimer(int32_t sessionId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -575,6 +578,7 @@ private:
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
+    std::string remoteUdidHash_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -149,6 +149,7 @@ public:
     std::vector<std::string> GetPkgName();
     void ClearPkgName();
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
+    void DeleteOffLineTimer(std::string &udidHash);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
