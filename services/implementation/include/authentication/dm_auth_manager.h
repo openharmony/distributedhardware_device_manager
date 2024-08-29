@@ -29,7 +29,6 @@
 #include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
-#include "dm_device_state_manager.h"
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"

@@ -377,6 +377,10 @@ void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash
 void DmAuthManager::DeleteOffLineTimer(int32_t sessionId)
 {
     GetPeerUdidHash(sessionId, remoteUdidHash_);
+    if (remoteUdidHash_.empty()) {
+        LOGE("DeleteOffLineTimer remoteUdidHash is empty.");
+        return;
+    }
     if (softbusConnector_ != nullptr) {
         softbusConnector_->DeleteOffLineTimer(remoteUdidHash_);
     }
