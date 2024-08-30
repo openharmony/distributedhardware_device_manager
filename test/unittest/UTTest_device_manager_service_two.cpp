@@ -314,7 +314,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -327,7 +327,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -340,7 +340,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
 } // namespace DistributedHardware
