@@ -45,21 +45,11 @@ public:
     {
         return true;
     }
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) override
-    {
-        (void)socket;
-        (void)info;
-    }
     void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) override
     {
         (void)sessionId;
         (void)message;
     }
-    void BindSocketSuccess(int32_t socket) override
-    {
-        (void)socket;
-    }
-    void BindSocketFail() override {}
 };
 
 void OnBytesReceivedFuzzTest(const uint8_t* data, size_t size)

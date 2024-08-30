@@ -1982,21 +1982,6 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::T
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
-
-HWTEST_F(DeviceManagerServiceTest, OnUnbindSessionCloseed_001, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    DeviceManagerService::GetInstance().OnUnbindSessionCloseed(socket);
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
-HWTEST_F(DeviceManagerServiceTest, OnUnbindBytesReceived_001, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    std::string data = "4152413541";
-    DeviceManagerService::GetInstance().OnUnbindBytesReceived(socket, data.c_str(), data.size());
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -34,7 +34,6 @@
 #endif
 #include "parameter.h"
 #include "system_ability_definition.h"
-#include "softbus_adapter.cpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -48,6 +47,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
+constexpr const char* DEVICE_TRUSTED_CHANGE = "deviceTrustedChange";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -57,7 +57,7 @@ static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
 static std::mutex g_onlineDeviceNumLock;
-static std::mutex g_lockDeviceNotTrust;
+static std::mutex g_lockDeviceTrustedChange;
 static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
@@ -123,7 +123,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
-    .onNodeDeviceNotTrusted = SoftbusListener::OnDeviceNotTrusted,
+    .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -151,8 +151,14 @@ void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
 
 void SoftbusListener::DeviceNotTrust(const std::string &msg)
 {
-    std::lock_guard<std::mutex> lock(g_lockDeviceNotTrust);
+    std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+}
+
+void SoftbusListener::DeviceTrustedChange(const std::string &msg)
+{
+    std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
 }
 
 void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
@@ -295,24 +301,40 @@ void SoftbusListener::OnLocalDevInfoChange()
     SoftbusCache::GetInstance().UpDataLocalDevInfo();
 }
 
-void SoftbusListener::OnDeviceNotTrusted(const char *msg)
+void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
 {
-    LOGI("SoftbusListener::OnDeviceNotTrusted.");
-
-    if (msg == nullptr || strlen(msg) > MAX_SOFTBUS_MSG_LEN) {
-        LOGE("OnDeviceNotTrusted msg invalied.");
+    LOGI("OnDeviceTrustedChange.");
+    if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN) {
+        LOGE("OnDeviceTrustedChange msg invalied.");
         return;
     }
     std::string softbusMsg = std::string(msg);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_NOT_TRUST, [=]() { DeviceNotTrust(softbusMsg); });
-#else
-    std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
-    int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
-    if (ret != DM_OK) {
-        LOGE("deviceNotTrust setname failed.");
+    if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
+        ThreadManager::GetInstance().Submit(DEVICE_NOT_TRUST, [=]() { DeviceNotTrust(softbusMsg); });
+    } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
+        ThreadManager::GetInstance().Submit(DEVICE_TRUSTED_CHANGE, [=]() { DeviceTrustedChange(softbusMsg); });
+    } else {
+        LOGE("Invalied trust change type.");
     }
-    deviceNotTrust.detach();
+#else
+    if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
+        std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
+        int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
+        if (ret != DM_OK) {
+            LOGE("deviceNotTrust setname failed.");
+        
+        deviceNotTrust.detach();
+    } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
+        std::thread deviceTrustedChange([=]() { DeviceTrustedChange(softbusMsg); });
+        int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
+        if (ret != DM_OK) {
+            LOGE("deviceTrustedChange setname failed.");
+        
+        deviceTrustedChange.detach();
+    } else {
+        LOGE("Invalied trust change type.");
+    }
 #endif
 }
 
@@ -392,7 +414,6 @@ SoftbusListener::SoftbusListener()
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %{public}d.", ret);
     }
-    SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
 #endif
     InitSoftbusListener();
     ClearDiscoveredDevice();
@@ -403,7 +424,6 @@ SoftbusListener::~SoftbusListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
-    SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(DM_PKG_NAME, DM_UNBIND_SESSION_NAME);
 #endif
     LOGD("SoftbusListener destructor.");
 }
@@ -949,6 +969,14 @@ std::string SoftbusListener::GetHostPkgName()
 {
     LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
     return hostName_;
+}
+
+void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
+{
+    LOGI("SendAclChangedBroadcast");
+    // if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
+    //     LOGE("SyncTrustedRelationShip failed.");
+    // }
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()

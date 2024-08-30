@@ -24,10 +24,7 @@ public:
     virtual void OnSessionClosed(int32_t sessionId) = 0;
     virtual void OnDataReceived(int32_t sessionId, std::string message) = 0;
     virtual bool GetIsCryptoSupport() = 0;
-    virtual void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) = 0;
     virtual void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) = 0;
-    virtual void BindSocketSuccess(int32_t socket) = 0;
-    virtual void BindSocketFail() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

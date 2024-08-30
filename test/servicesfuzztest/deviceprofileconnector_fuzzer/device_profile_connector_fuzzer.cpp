@@ -53,17 +53,16 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     dmAccessee.trustBundleName = trustBundleName;
     int32_t userId = *(reinterpret_cast<const int32_t*>(data));
     std::string accountId(reinterpret_cast<const char*>(data), size);
+    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
 
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(localDeviceId, targetDeviceId);
     DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(userId, accountId);
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, requestDeviceId);
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, requestDeviceId, bindLevel);
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
     DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
-    DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);
     DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(localDeviceId);
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);

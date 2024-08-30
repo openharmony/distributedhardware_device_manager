@@ -32,7 +32,6 @@ public:
 
     void OnDeviceOnline(std::string deviceId, int32_t authForm) override {}
     void OnDeviceOffline(std::string deviceId) override {}
-    void DeleteOffLineTimer(std::string udidHash) override {}
 };
 
 void SoftBusConnectorStateFuzzTest(const uint8_t* data, size_t size)

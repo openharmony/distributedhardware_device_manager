@@ -30,7 +30,8 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t MultipleUserConnector::oldUserId_ = -1;
 std::string MultipleUserConnector::accountId_ = "";
-
+std::string MultipleUserConnector::accountName_ = "";
+std::mutex MultipleUserConnector::lock_;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
@@ -73,24 +74,62 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
 #endif
 }
 
+std::string MultipleUserConnector::GetOhosAccountName(void)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return "";
+#else
+#ifdef OS_ACCOUNT_PART_EXISTS
+    auto accountInfo = OhosAccountKits::GetInstance().QueryOhosAccountInfo();
+    if (!accountInfo.first) {
+        LOGE("QueryOhosAccountInfo failed.");
+        return "";
+    }
+    if (accountInfo.second.name_.empty()) {
+        LOGE("QueryOhosAccountInfo name empty.");
+        return "";
+    }
+    return accountInfo.second.name_;
+#else // OS_ACCOUNT_PART_EXISTS
+    return "";
+#endif // OS_ACCOUNT_PART_EXISTS
+#endif
+}
+
 void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     oldUserId_ = userId;
 }
 
 int32_t MultipleUserConnector::GetSwitchOldUserId(void)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     return oldUserId_;
 }
 
 void MultipleUserConnector::SetSwitchOldAccountId(std::string accountId)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     accountId_ = accountId;
 }
 
 std::string MultipleUserConnector::GetSwitchOldAccountId(void)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     return accountId_;
+}
+
+void MultipleUserConnector::SetSwitchOldAccountName(std::string accountName)
+{
+    std::lock_guard<std::mutex> lock(lock_);
+    accountName_ = accountName;
+}
+
+std::string MultipleUserConnector::GetSwitchOldAccountName(void)
+{
+    std::lock_guard<std::mutex> lock(lock_);
+    return accountName_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

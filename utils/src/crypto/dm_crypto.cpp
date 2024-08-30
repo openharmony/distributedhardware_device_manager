@@ -36,6 +36,7 @@ constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int32_t SALT_LENGTH = 8;
 const std::string SALT_DEFAULT = "salt_defsalt_def";
+constexpr int SHORT_ACCOUNTID_ID_HASH_LENGTH = 6;
 
 uint32_t HexifyLen(uint32_t len)
 {
@@ -202,5 +203,16 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
+int32_t Crypto::GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH] = "";
+    DmGenerateStrHash(accountId.data(), accountId.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    if (ConvertBytesToHexString(reinterpret_cast<char *>(accountIdHash), SHORT_ACCOUNTID_ID_HASH_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hash), SHORT_ACCOUNTID_ID_HASH_LENGTH / HEX_TO_UINT8) != DM_OK) {
+        LOGE("ConvertBytesToHexString failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

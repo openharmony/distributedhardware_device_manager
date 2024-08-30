@@ -12,35 +12,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_SOFTBUS_ADAPTER_H
-#define OHOS_UTTEST_DM_SOFTBUS_ADAPTER_H
 
-#include <gtest/gtest.h>
-#include <refbase.h>
-
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
-
-#include "auth_response_state.h"
-#include "device_manager_service_listener.h"
-#include "dm_auth_manager.h"
-#include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
-#include "inner_session.h"
-#include "softbus_adapter.h"
-
+#ifndef OHOS_DM_IPC_NOTIFY_DEVICETRUSTCHANGE_REQ_H
+#define OHOS_DM_IPC_NOTIFY_DEVICETRUSTCHANGE_REQ_H
+#include "ipc_req.h"
 namespace OHOS {
 namespace DistributedHardware {
-class SoftbusAdapterTest : public testing::Test {
+class IpcNotifyDevTrustChangeReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcNotifyDevTrustChangeReq);
+
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp() override;
-    void TearDown() override;
+    int32_t GetAuthForm() const
+    {
+        return authForm_;
+    }
+    void SetAuthForm(int32_t authForm)
+    {
+        authForm_ = authForm;
+    }
+    const std::string &GetDeviceId() const
+    {
+        return deviceId_;
+    }
+    void SetDeviceId(const std::string &deviceId)
+    {
+        deviceId_ = deviceId;
+    }
+
+private:
+    int32_t authForm_;
+    std::string deviceId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_DM_IPC_NOTIFY_DEVICETRUSTCHANGE_REQ_H

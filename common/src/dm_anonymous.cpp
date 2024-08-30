@@ -205,6 +205,21 @@ int32_t StringToInt(const std::string &str, int32_t base)
     return static_cast<int32_t>(result);
 }
 
+int64_t StringToInt64(const std::string &str, int32_t base)
+{
+    if (str.empty()) {
+        LOGE("Str is empty.");
+        return 0;
+    }
+    char *nextPtr = nullptr;
+    int64_t result = strtoll(str.c_str(), &nextPtr, base);
+    if (errno == ERANGE || nextPtr == nullptr || nextPtr == str.c_str() || *nextPtr != '\0') {
+        LOGE("parse int error");
+        return 0;
+    }
+    return result;
+}
+
 void VersionSplitToInt(const std::string &str, const char split, std::vector<int> &numVec)
 {
     std::istringstream iss(str);

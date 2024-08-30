@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr uint32_t DEVICE_BIUND_LEVEL = 1;
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
     LOGI("DeviceManagerServiceImpl constructor");
@@ -109,37 +110,21 @@ int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pk
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName, int32_t authType,
-    const std::string &deviceId, const std::string &extra)
+int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel)
 {
     (void)pkgName;
-    (void)authType;
-    (void)deviceId;
-    (void)extra;
+    (void)udid;
+    (void)bindLevel;
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel)
 {
     (void)pkgName;
-    (void)networkId;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
-    const std::string &bindParam)
-{
-    (void)pkgName;
-    (void)authType;
-    (void)udidHash;
-    (void)bindParam;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
-{
-    (void)pkgName;
-    (void)udidHash;
+    (void)udid;
+    (void)bindLevel;
     return DM_OK;
 }
 
@@ -416,24 +401,6 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     return tmp;
 }
 
-void DeviceManagerServiceImpl::OnUnbindSessionOpened(int32_t sessionId, PeerSocketInfo info)
-{
-    (void)sessionId;
-    (void)info;
-}
-
-void DeviceManagerServiceImpl::OnUnbindSessionCloseed(int32_t sessionId)
-{
-    (void)sessionId;
-}
-
-void DeviceManagerServiceImpl::OnUnbindBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
-{
-    (void)sessionId;
-    (void)data;
-    (void)dataLen;
-}
-
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
 }
@@ -448,12 +415,6 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
 {
     (void)udid;
     return DM_OK;
-}
-
-void DeviceManagerServiceImpl::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
-{
-    (void)userId;
-    (void)commonEventType;
 }
 
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
@@ -484,6 +445,64 @@ int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &calle
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
 {
     (void)udid;
+    return;
+}
+
+int32_t DeviceManagerServiceImpl::GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+    const std::string &udid, uint64_t &tokenId)
+{
+    (void)pkgName;
+    (void)udid;
+    (void)tokenId;
+    (void)localUdid;
+    return DEVICE_BIUND_LEVEL;
+}
+
+std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindType(int32_t userId,
+    const std::string &accountId)
+{
+    (void)userId;
+    (void)accountId;
+    return std::map<std::string, int32_t> {};
+}
+
+void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+    const std::string &remoteUdid)
+{
+    (void)remoteUserId;
+    (void)remoteAccountHash;
+    (void)remoteUdid;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid)
+{
+    (void)remoteUserId;
+    (void)remoteUdid;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int64_t tokenId)
+{
+    (void)remoteUserId;
+    (void)remoteUdid;
+    (void)tokenId;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid, int32_t userId,
+    const std::string &accountId)
+{
+    (void)udid;
+    (void)userId;
+    (void)accountId;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
+{
+    (void)preUserId;
     return;
 }
 

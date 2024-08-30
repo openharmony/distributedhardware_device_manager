@@ -136,12 +136,14 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string receiveEvent = data.GetWant().GetAction();
     LOGI("Received account event: %{public}s", receiveEvent.c_str());
     int32_t userId = data.GetCode();
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         userId = data.GetCode();
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         userId = data.GetWant().GetIntParam("userId", 0);
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
-        userId = data.GetWant().GetIntParam("userId", 0);
+    } else {
+        return;
     }
     if (userId <= 0) {
         LOGE("userId is less zero");

@@ -327,7 +327,6 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
     jsonObj[BIND_LEVEL] = bindLevel;
-    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     bindParam = jsonObj.dump();
 }
 
@@ -427,6 +426,10 @@ void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::s
     if (IsString(bindParamObj, PARAM_KEY_AUTH_TOKEN)) {
         std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
+    }
+    if (IsInt32(bindParamObj, BIND_LEVEL)) {
+        int32_t bindLevel = bindParamObj[BIND_LEVEL].get<std::int32_t>();
+        bindParamMap.insert(std::pair<std::string, std::string>(BIND_LEVEL, std::to_string(bindLevel)));
     }
 }
 

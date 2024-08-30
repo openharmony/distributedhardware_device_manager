@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 
-#include "softbus_adapter.h"
 #include "softbus_bus_center.h"
 #include "softbus_listener.h"
 #include "dm_device_info.h"

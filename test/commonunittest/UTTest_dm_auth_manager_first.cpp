@@ -64,57 +64,6 @@ namespace {
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 
-HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    std::string networkId = "222";
-    int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string networkId = "222";
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string networkId = "222";
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->isAuthenticateDevice_ = true;
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string networkId = "222";
-    authManager_->authRequestState_ = std::make_shared<AuthRequestReplyState>();
-    authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string networkId = "networkId";
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseContext_ = nullptr;
-    int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, SOFTBUS_IPC_ERR);
-}
-
 HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSize.Level0)
 {
     std::string name = "test";
@@ -251,8 +200,6 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_ = nullptr;
-    int32_t userId = 1;
-    authManager_->UserSwitchEventCallback(userId);
     authManager_->AuthenticateFinish();
     authManager_->CancelDisplay();
     int32_t ret = authManager_->JoinNetwork();
@@ -582,58 +529,6 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, UnBindDevice_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string udidHash = "udidHash";
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnBindDevice_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string udidHash = "222";
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager_->isAuthenticateDevice_ = true;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DmAuthManagerTest, UnBindDevice_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string udidHash = "222";
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnBindDevice_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string udidHash = "networkId";
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseContext_ = nullptr;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthManagerTest, UnBindDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string udidHash = "networkId";
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-    authManager_->isAuthenticateDevice_ = true;
-    ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DmAuthManagerTest, RequestCredential001, testing::ext::TestSize.Level0)
 {
     authManager_->hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
@@ -672,64 +567,9 @@ HWTEST_F(DmAuthManagerTest, ImportCredential001, testing::ext::TestSize.Level0)
     ASSERT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, EstablishUnbindChannel001, testing::ext::TestSize.Level0)
-{
-    std::string deviceIdHash = "deviceIdHash";
-    int32_t ret = authManager_->EstablishUnbindChannel(deviceIdHash);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DmAuthManagerTest, RequestSyncDeleteAcl001, testing::ext::TestSize.Level0)
-{
-    authManager_->RequestSyncDeleteAcl();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, RequestSyncDeleteAcl002, testing::ext::TestSize.Level0)
-{
-    authManager_->timer_ = nullptr;
-    authManager_->RequestSyncDeleteAcl();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, SrcSyncDeleteAclDonel001, testing::ext::TestSize.Level0)
-{
-    authManager_->isFinishOfLocal_ = true;
-    authManager_->authResponseContext_->reply = 0;
-    authManager_->SrcSyncDeleteAclDone();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, SinkSyncDeleteAclDone001, testing::ext::TestSize.Level0)
-{
-    authManager_->isFinishOfLocal_ = true;
-    authManager_->authResponseContext_->reply = 0;
-    authManager_->SinkSyncDeleteAclDone();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, SyncDeleteAclDone001, testing::ext::TestSize.Level0)
-{
-    authManager_->SyncDeleteAclDone();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, SyncDeleteAclDone002, testing::ext::TestSize.Level0)
-{
-    authManager_->authRequestState_ = nullptr;
-    authManager_->SyncDeleteAclDone();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
 HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level0)
 {
     authManager_->ResponseCredential();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, ResponseSyncDeleteAcl001, testing::ext::TestSize.Level0)
-{
-    authManager_->ResponseSyncDeleteAcl();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
@@ -938,50 +778,6 @@ HWTEST_F(DmAuthManagerTest, CompatiblePutAcl001, testing::ext::TestSize.Level0)
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-HWTEST_F(DmAuthManagerTest, CommonEventCallback001, testing::ext::TestSize.Level0)
-{
-    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
-    int32_t userId = 0;
-    authManager_->CommonEventCallback(userId, "");
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, AccountIdLogoutEventCallback001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    authManager_->AccountIdLogoutEventCallback(userId);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, UserSwitchEventCallback001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    authManager_->UserSwitchEventCallback(userId);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, UserChangeEventCallback001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    authManager_->UserChangeEventCallback(userId);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, HandleSyncDeleteTimeout001, testing::ext::TestSize.Level0)
-{
-    std::string name;
-    authManager_->HandleSyncDeleteTimeout(name);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string deviceId;
-    int32_t ret = authManager_->DeleteAcl(pkgName, deviceId);
-    ASSERT_NE(ret, DM_OK);
-}
-
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
@@ -1055,42 +851,6 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived005, testing::ext::TestSize.
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-HWTEST_F(DmAuthManagerTest, OnUnbindSessionOpened001, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 1;
-    std::string name = "nameTest";
-    std::string networkId = "159753681387291";
-    std::string pkgName = "com.ohos.test";
-    PeerSocketInfo info = {
-        .name = const_cast<char*>(name.c_str()),
-        .pkgName = const_cast<char*>(pkgName.c_str()),
-        .networkId = const_cast<char*>(networkId.c_str()),
-    };
-    authManager_->authResponseState_ = nullptr;
-    authManager_->authRequestState_ = nullptr;
-    authManager_->timer_ = nullptr;
-    authManager_->OnUnbindSessionOpened(sessionId, info);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, OnUnbindSessionOpened002, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 1;
-    std::string name = "nameTest";
-    std::string networkId = "159753681387291";
-    std::string pkgName = "com.ohos.test";
-    PeerSocketInfo info = {
-        .name = const_cast<char*>(name.c_str()),
-        .pkgName = const_cast<char*>(pkgName.c_str()),
-        .networkId = const_cast<char*>(networkId.c_str()),
-    };
-    authManager_->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
-    authManager_->authRequestState_ = std::make_shared<AuthRequestDeleteInit>();
-    authManager_->timer_ = nullptr;
-    authManager_->OnUnbindSessionOpened(sessionId, info);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
 HWTEST_F(DmAuthManagerTest, DeleteGroup001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -1117,38 +877,6 @@ HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Leve
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->PutAccessControlList();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, BindSocketFail_001, testing::ext::TestSize.Level0)
-{
-    authManager_->BindSocketFail();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, false);
-}
-
-HWTEST_F(DmAuthManagerTest, BindSocketSuccess_001, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    authManager_->authResponseState_ = nullptr;
-    authManager_->authRequestState_ = std::make_shared<AuthRequestDeleteInit>();
-    authManager_->BindSocketSuccess(socket);
-    ASSERT_EQ(authManager_->authRequestContext_->sessionId, socket);
-}
-
-HWTEST_F(DmAuthManagerTest, BindSocketSuccess_002, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    authManager_->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
-    authManager_->authRequestState_ = nullptr;
-    authManager_->BindSocketSuccess(socket);
-    ASSERT_NE(authManager_->authRequestContext_->sessionId, socket);
-}
-
-HWTEST_F(DmAuthManagerTest, SyncDeleteAcl_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::string deviceId = "deviceId";
-    authManager_->SyncDeleteAcl(pkgName, deviceId);
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
 HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_001, testing::ext::TestSize.Level0)
@@ -1231,26 +959,10 @@ HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_010, testing::ext::TestSize.Level0)
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
-HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_0011, testing::ext::TestSize.Level0)
-{
-    authManager_->authResponseContext_->msgType = 505;
-    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
-    authManager_->ProcessSourceMsg();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, false);
-}
-
 HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_0012, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_->msgType = 505;
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager_->ProcessSourceMsg();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_013, testing::ext::TestSize.Level0)
-{
-    authManager_->authResponseContext_->msgType = 1000;
-    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
     authManager_->ProcessSourceMsg();
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
@@ -1314,24 +1026,6 @@ HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_007, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->msgType = 504;
     authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
-    authManager_->ProcessSinkMsg();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_008, testing::ext::TestSize.Level0)
-{
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authResponseContext_->msgType = 505;
-    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
-    authManager_->ProcessSinkMsg();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_009, testing::ext::TestSize.Level0)
-{
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authResponseContext_->msgType = 1000;
-    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
     authManager_->ProcessSinkMsg();
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
