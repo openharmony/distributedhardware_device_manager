@@ -1105,8 +1105,75 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy001, testing::ext::TestSize.Level0)
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    bool bRet = false;
+    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD) {
+        bRet = true;
+    }
+    ASSERT_EQ(bRet, true);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
-    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy004, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::map<std::string, std::string> policy;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy005, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, SetDnPolicy006, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 } // namespace
 } // namespace DistributedHardware

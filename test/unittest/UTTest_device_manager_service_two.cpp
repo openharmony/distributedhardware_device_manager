@@ -284,6 +284,64 @@ HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext
     DeviceManagerService::GetInstance().ScreenCommonEventCallback(commonEventType);
     EXPECT_NE(DeviceManagerService::GetInstance().accountCommonEventManager_, nullptr);
 }
+
+/**
+ * @tc.name: SetDnPolicy_201
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    bool bRet = false;
+    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD) {
+        bRet = true;
+    }
+    ASSERT_EQ(bRet, true);
+}
+
+/**
+ * @tc.name: SetDnPolicy_202
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetDnPolicy_203
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetDnPolicy_204
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(bRet, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
