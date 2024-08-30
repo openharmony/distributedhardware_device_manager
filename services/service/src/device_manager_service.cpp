@@ -1663,8 +1663,11 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     }
     int32_t policyStrategy = std::stoi((policyStrategyIter->second).c_str());
     int32_t timeOut = std::stoi((timeOutIter->second).c_str());
-    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    return softbusListener_->SetDnPolicy(policyStrategy, timeOut);
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("SetDnPolicy failed, instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExt_->SetDnPolicy(policyStrategy, timeOut);
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

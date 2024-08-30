@@ -753,17 +753,6 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
     return DM_OK;
 }
 
-int32_t SoftbusListener::SetDnPolicy(int32_t policy, int32_t timeOut)
-{
-    int32_t ret = CtrlLNNBleHb(DM_PKG_NAME, static_cast<StrategyForBle>(policy), timeOut);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]CtrlLNNBleHb failed.");
-        return ret;
-    }
-    LOGI("CtrlLNNBleHb complete policy: %{public}d, timeOut: %{public}d.", policy, timeOut);
-    return DM_OK;
-}
-
 int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
 {
     return SoftbusCache::GetInstance().GetSecurityDeviceLevel(networkId, securityLevel);
