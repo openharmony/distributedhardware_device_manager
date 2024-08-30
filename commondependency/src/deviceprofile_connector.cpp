@@ -948,7 +948,7 @@ int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const
 std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId, const std::string &localUdid)
 {
-    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}" PRId64", localUdid %{public}s.",
+    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     std::string pkgName = "";

@@ -323,14 +323,14 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
         int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
         if (ret != DM_OK) {
             LOGE("deviceNotTrust setname failed.");
-        
+        }
         deviceNotTrust.detach();
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
         std::thread deviceTrustedChange([=]() { DeviceTrustedChange(softbusMsg); });
-        int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
+        int32_t ret = pthread_setname_np(deviceTrustedChange.native_handle(), DEVICE_NOT_TRUST);
         if (ret != DM_OK) {
             LOGE("deviceTrustedChange setname failed.");
-        
+        }
         deviceTrustedChange.detach();
     } else {
         LOGE("Invalied trust change type.");
