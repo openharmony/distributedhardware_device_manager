@@ -18,7 +18,6 @@
 #include <string>
 #include <unistd.h>
 
-#include "dm_constants.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
 #include "device_manager_impl.h"
@@ -373,9 +372,7 @@ void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().UnRegisterDiscoveryCallback(emptyStr);
     DeviceManagerImpl::GetInstance().StartAdvertising(emptyStr, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().StopAdvertising(emptyStr, discoverParam);
-    discoverParam[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = str;
-    discoverParam[PARAM_KEY_POLICY_TIME_OUT] = str;
-    DeviceManagerImpl::GetInstance().SetDnPolicy(str, discoverParam);
+    DeviceManagerImpl::GetInstance().SetDnPolicy(emptyStr, discoverParam);
 }
 }
 }
