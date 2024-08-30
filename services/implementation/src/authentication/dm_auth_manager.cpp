@@ -707,9 +707,9 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         }
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
-	if (authRequestContext_ == nullptr) {
-	    authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-	}
+        if (authRequestContext_ == nullptr) {
+            authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+        }
         authRequestContext_->reason = sessionId;
         if (authRequestState_ != nullptr) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
