@@ -1093,7 +1093,7 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
 {
     LOGI("PkgName %{public}s, deviceId %{public}s, authForm %{public}d", pkgName.c_str(),
         GetAnonyString(deviceId).c_str(), authForm);
-    if (pkgName.empty() || authForm < static_Cast<int32_t>(INVALID_TYPE) ||
+    if (pkgName.empty() || authForm < static_cast<int32_t>(INVALID_TYPE) ||
         authForm > static_cast<int32_t>(ACROSS_ACCOUNT)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
