@@ -139,7 +139,7 @@ private:
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
-    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int64_t tokenId);
+    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleUserRemoved(int32_t preUserId);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
 

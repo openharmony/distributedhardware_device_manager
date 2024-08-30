@@ -741,9 +741,9 @@ DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)
     DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
     if (bindType == DM_IDENTICAL_ACCOUNT) {
         authForm = IDENTICAL_ACCOUNT;
-    } else if(bindType == DM_POINT_TO_POINT) {
+    } else if (bindType == DM_POINT_TO_POINT) {
         authForm = PEER_TO_PEER;
-    } else if(bindType == DM_ACROSS_ACCOUNT) {
+    } else if (bindType == DM_ACROSS_ACCOUNT) {
         authForm = ACROSS_ACCOUNT;
     } else {
         LOGE("Invalied bindType.");
@@ -766,7 +766,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
 }
 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    int64_t tokenId)
+    int32_t tokenId)
 {
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);

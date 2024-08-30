@@ -155,30 +155,6 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::APP_UNBIND);
 }
 
-RelationShipChangeType RelationShipChangeMsg::ParseChangeType(const char *msg, const uint32_t len)
-{
-    if (msg == NULL || sizeof(msg) != len) {
-        LOGE("msg invalid");
-        return RelationShipChangeType::TYPE_MAX;
-    }
-
-    cJSON *msgObj = cJSON_Parse(msg);
-    if (msgObj == NULL) {
-        LOGE("parse msg failed");
-        return RelationShipChangeType::TYPE_MAX;
-    }
-
-    cJSON *typeJson = cJSON_GetObjectItem(msgObj, MSG_TYPE);
-    if (typeJson == NULL || !cJSON_IsNumber(typeJson) || !IsChangeTypeValid(typeJson->valueint)) {
-        LOGE("parse type failed.");
-        cJSON_Delete(msgObj);
-        return RelationShipChangeType::TYPE_MAX;
-    }
-    RelationShipChangeType type = (RelationShipChangeType)typeJson->valueint;
-    cJSON_Delete(msgObj);
-    return type;
-}
-
 void RelationShipChangeMsg::ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const
 {
     msg = new uint8_t[ACCOUNT_LOGOUT_PAYLOAD_LEN]();
@@ -271,7 +247,7 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
 {
     if (payloadJson == NULL) {
         LOGE("App unbind payloadJson is null.");
-        return false; 
+        return false;
     }
     int32_t arraySize = cJSON_GetArraySize(payloadJson);
     if (arraySize < ACCOUNT_LOGOUT_PAYLOAD_LEN || arraySize > INVALIED_PAYLOAD_SIZE) {
@@ -319,7 +295,7 @@ cJSON *RelationShipChangeMsg::ToArrayJson(cJSON *msg) const
     for (uint32_t index = 0; index < len; index++) {
         cJSON_AddItemToArray(arrayObj, cJSON_CreateNumber(payload[index]));
     }
-    if (payload) {
+    if (payload != nullptr) {
         delete[] payload;
     }
     return arrayObj;

@@ -974,9 +974,9 @@ std::string SoftbusListener::GetHostPkgName()
 void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
 {
     LOGI("SendAclChangedBroadcast");
-    // if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
-    //     LOGE("SyncTrustedRelationShip failed.");
-    // }
+    if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
+        LOGE("SyncTrustedRelationShip failed.");
+    }
 }
 
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()

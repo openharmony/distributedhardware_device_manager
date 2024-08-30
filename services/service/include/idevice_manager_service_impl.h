@@ -266,7 +266,7 @@ public:
     virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid) = 0;
     virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid) = 0;
-    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int64_t tokenId) = 0;
+    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId) = 0;
     virtual void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;

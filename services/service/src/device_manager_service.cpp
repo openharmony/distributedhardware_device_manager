@@ -1761,10 +1761,15 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
     if (bindLevel == DEVICE) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
-    } else if (bindLevel == APP) {
+        return;
+    }
+    if (bindLevel == APP) {
         SendAppUnBindBroadCast(peerUdids, userId, tokenId);
-    } else if (bindLevel == SERVICE) {
+        return;
+    }
+    if (bindLevel == SERVICE) {
         SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
+        return;
     }
 }
 
@@ -1833,7 +1838,7 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
             break;
         case RelationShipChangeType::APP_UNBIND:
             dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                relationShipMsg.tokenId);
+                static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         default:
             LOGI("Dm have not this event type.");

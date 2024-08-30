@@ -73,7 +73,7 @@ const int32_t USLEEP_TIME_MS = 500000; // 500ms
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
-const int32_t STRTOLL_BASE = 10;
+const int32_t STRTOLL_BASE_10 = 10;
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -204,7 +204,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
         }
         if (IsString(jsonObject, TAG_TOKENID)) {
-            authRequestContext_->tokenId = StringToInt64(jsonObject[TAG_TOKENID].get<std::string>(), STRTOLL_BASE);
+            authRequestContext_->tokenId = StringToInt64(jsonObject[TAG_TOKENID].get<std::string>(), STRTOLL_BASE_10);
         }
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();

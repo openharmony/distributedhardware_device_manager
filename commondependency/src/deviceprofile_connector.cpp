@@ -454,7 +454,7 @@ void DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
     const std::string &remoteUdid)
 {
     LOGI("localUdid %{public}s, userId %{public}d, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(), userId,
-       GetAnonyString(remoteUdid).c_str());
+        GetAnonyString(remoteUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     for (const auto &item : profiles) {
         if (item.GetTrustDeviceId() == remoteUdid) {
@@ -469,7 +469,7 @@ void DeviceProfileConnector::DeleteAclForUserRemoved(int32_t userId)
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     for (const auto &item : profiles) {
         if (item.GetAccesser().GetAccesserUserId() == userId || item.GetAccessee().GetAccesseeUserId() == userId) {
-           DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
 }
@@ -870,11 +870,14 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindType(in
             item.GetAccesser().GetAccesserDeviceId() == localUdid) {
             LOGI("Account logout localUdid %{public}s is src.", GetAnonyString(localUdid).c_str());
             UpdateBindType(item.GetTrustDeviceId(), item.GetBindType(), deviceIdMap);
-        } else if (item.GetAccessee().GetAccesseeUserId() == userId &&
+            continue;
+        }
+        if (item.GetAccessee().GetAccesseeUserId() == userId &&
             item.GetAccessee().GetAccesseeAccountId() == accountId &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid) {
             LOGI("Account logout localUdid %{public}s is sink.", GetAnonyString(localUdid).c_str());
             UpdateBindType(item.GetTrustDeviceId(), item.GetBindType(), deviceIdMap);
+            continue;
         }
     }
     return deviceIdMap;
@@ -942,8 +945,8 @@ int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const
     return bindType;
 }
 
-std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int64_t tokenId,
-    const std::string &localUdid)
+std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, const std::string &localUdid)
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}" PRId64", localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());

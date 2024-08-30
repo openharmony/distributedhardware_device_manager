@@ -33,8 +33,6 @@ constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
 #else
 constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
 #endif
-const int32_t MIN_AUTHFORM = -1;
-const int32_t MAX_AUTHFORM = 2;
 
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
@@ -1095,7 +1093,8 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
 {
     LOGI("PkgName %{public}s, deviceId %{public}s, authForm %{public}d", pkgName.c_str(),
         GetAnonyString(deviceId).c_str(), authForm);
-    if (pkgName.empty() || authForm < MIN_AUTHFORM || authForm > MAX_AUTHFORM) {
+    if (pkgName.empty() || authForm < static_Cast<int32_t>(INVALID_TYPE) ||
+        authForm > static_cast<int32_t>(ACROSS_ACCOUNT)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }

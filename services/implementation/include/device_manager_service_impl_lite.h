@@ -131,7 +131,7 @@ public:
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
-    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int64_t tokenId);
+    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
     void HandleUserRemoved(int32_t preUserId);
 

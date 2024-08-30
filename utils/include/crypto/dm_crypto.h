@@ -30,7 +30,7 @@ public:
     static int32_t GetSecRandom(uint8_t *out, size_t outLen);
     static std::string GetSecSalt();
     static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
-	static int32_t GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash);
+    static int32_t GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

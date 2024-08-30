@@ -132,7 +132,7 @@ public:
     int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, const std::string &localUdid);
     int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, const std::string &localUdid);
-    std::string HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int64_t tokenId,
+    std::string HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId,
         const std::string &localUdid);
 
 private:

@@ -47,15 +47,6 @@ struct RelationShipChangeMsg {
     bool IsValid() const;
     bool IsChangeTypeValid();
     bool IsChangeTypeValid(uint32_t type);
-    /**
-     * @brief parse change type from json msg
-     *
-     * @param msg json msg
-     * @param len msg length
-     * @return RelationShipChangeType parsed msg, if invalid, return TYPE_MAX
-     */
-    RelationShipChangeType ParseChangeType(const char *msg, const uint32_t len);
-
     void ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;

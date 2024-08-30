@@ -1206,6 +1206,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1307,6 +1308,7 @@ ohos_static_library("device_manager_test_common") {
     "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "cJSON:cjson",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",

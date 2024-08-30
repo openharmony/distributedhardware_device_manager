@@ -483,7 +483,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
 }
 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    int64_t tokenId)
+    int32_t tokenId)
 {
     (void)remoteUserId;
     (void)remoteUdid;
