@@ -1805,5 +1805,41 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 #endif
+
+void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
+{
+    LOGI("HandleDeviceTrustedChange start msg %{public}s.", msg.c_str());
+    if (msg.empty()) {
+        LOGE("Msg is empty.");
+        return;
+    }
+    RelationShipChangeMsg relationShipMsg =
+        ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}" PRId64","
+        "peerUdid %{public}s, accountName %{public}s.", relationShipMsg.type, relationShipMsg.userId,
+        GetAnonyString(relationShipMsg.accountId).c_str(), relationShipMsg.tokenId,
+        GetAnonyString(relationShipMsg.peerUdid).c_str(), GetAnonyString(relationShipMsg.accountName).c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("Imp instance not init or init failed.");
+        return;
+    }
+    switch (relationShipMsg.type) {
+        case RelationShipChangeType::ACCOUNT_LOGOUT:
+            dmServiceImpl_->HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId,
+                relationShipMsg.peerUdid);
+            break;
+        case RelationShipChangeType::DEVICE_UNBIND:
+            dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid);
+            break;
+        case RelationShipChangeType::APP_UNBIND:
+            dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                relationShipMsg.tokenId);
+            break;
+        default:
+            LOGI("Dm have not this event type.");
+            break;
+    }
+    return;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
