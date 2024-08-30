@@ -356,10 +356,41 @@ void DmAuthManager::SyncDeleteAcl(const std::string &pkgName, const std::string 
     authRequestState_->Enter();
 }
 
+void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
+{
+    std::string peerUdid = "";
+    int32_t ret = softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
+    if (ret != DM_OK) {
+        LOGE("DmAuthManager::GetPeerUdidHash failed.");
+        peerUdidHash = "";
+        return;
+    }
+    char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(peerUdid, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
+        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(peerUdid).c_str());
+        peerUdidHash = "";
+        return;
+    }
+    peerUdidHash = std::string(udidHashTmp);
+}
+
+void DmAuthManager::DeleteOffLineTimer(int32_t sessionId)
+{
+    GetPeerUdidHash(sessionId, remoteUdidHash_);
+    if (remoteUdidHash_.empty()) {
+        LOGE("DeleteOffLineTimer remoteUdidHash is empty.");
+        return;
+    }
+    if (softbusConnector_ != nullptr) {
+        softbusConnector_->DeleteOffLineTimer(remoteUdidHash_);
+    }
+}
+
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     LOGI("DmAuthManager::OnSessionOpened, sessionId = %{public}d and sessionSide = %{public}d result = %{public}d",
          sessionId, sessionSide, result);
+    DeleteOffLineTimer(sessionId);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
@@ -394,10 +425,8 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authMessageProcessor_->SetRequestContext(authRequestContext_);
             authRequestState_->SetAuthContext(authRequestContext_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
-            struct RadarInfo info = {
-                .funcName = "OnSessionOpened",
-                .channelId = sessionId,
-            };
+            struct RadarInfo info = { .funcName = "OnSessionOpened" };
+            info.channelId = sessionId;
             if (!DmRadarHelper::GetInstance().ReportAuthSendRequest(info)) {
                 LOGE("ReportAuthSendRequest failed");
             }

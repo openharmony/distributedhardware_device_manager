@@ -155,6 +155,9 @@ int32_t DeviceManagerServiceImpl::AuthenticateDevice(const std::string &pkgName,
             "extra is %{public}s", pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    if (deviceStateMgr_ != nullptr) {
+        deviceStateMgr_->DeleteOffLineTimer(deviceId);
+    }
     return authMgr_->AuthenticateDevice(pkgName, authType, deviceId, extra);
 }
 
@@ -176,7 +179,9 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
             "%{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str(), bindParam.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
+    if (deviceStateMgr_ != nullptr) {
+        deviceStateMgr_->DeleteOffLineTimer(udidHash);
+    }
     return authMgr_->AuthenticateDevice(pkgName, authType, udidHash, bindParam);
 }
 
