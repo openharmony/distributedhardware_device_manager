@@ -56,15 +56,9 @@ public:
 
     int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId);
 
-    int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-                               const std::string &extra);
+    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
-    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
-
-    int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
-        const std::string &bindParam);
-
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
@@ -123,25 +117,31 @@ public:
         const std::map<std::string, std::string> &bindParam);
 
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
-    void OnUnbindSessionCloseed(int32_t socket);
-    void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);
 
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
-    void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
     void ScreenCommonEventCallback(std::string commonEventType);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void HandleDeviceNotTrust(const std::string &udid);
+    int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+        const std::string &udid, uint64_t &tokenId);
+    void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
+    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId);
+    void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid);
+    void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
+    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
+    void HandleUserRemoved(int32_t preUserId);
+    DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
 
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
@@ -155,6 +155,8 @@ private:
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
+    std::shared_ptr<IDeviceManagerServiceListener> listener_;
+    std::atomic<bool> isCredentialType_ = false;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

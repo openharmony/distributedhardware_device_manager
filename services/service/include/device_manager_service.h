@@ -95,7 +95,7 @@ public:
     int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &bindParam);
 
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
@@ -180,10 +180,6 @@ public:
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
 
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
-    void OnUnbindSessionCloseed(int32_t socket);
-    void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen);
-
     int32_t DpAclAdd(const std::string &udid);
 
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
@@ -193,6 +189,7 @@ public:
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     void HandleDeviceNotTrust(const std::string &msg);
+    void HandleDeviceTrustedChange(const std::string &msg);
 
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
 
@@ -202,14 +199,24 @@ private:
     bool IsDMImplSoLoaded();
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
+    void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
+        int32_t bindLevel);
+    void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
+    void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
+    void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
+    void SendAccountLogoutBroadCast(const std::vector<std::string> &peerUdids, const std::string &accountId,
+        const std::string &accountName, int32_t userId);
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
-    void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
+    void AccountCommonEventCallback(int32_t userId, const std::string commonEventType);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
     void ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo);
     int32_t ConvertUdidHashToAnoy(const std::string &udidHash, std::string &result);
     int32_t GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash);
+    void HandleAccountLogout(int32_t userId, const std::string &accountId);
+    void HandleUserRemoved(int32_t preUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

@@ -71,6 +71,7 @@ public:
     void OnDestroyResult(const std::string &pkgName, int32_t result) override;
     void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
         const std::string &content) override;
+    void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

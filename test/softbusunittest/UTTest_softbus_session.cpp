@@ -180,21 +180,6 @@ HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0
 }
 
 /**
- * @tc.name: CloseUnbindSession_001
- * @tc.desc: set socket = 1, and return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusSessionTest, CloseUnbindSession_001, testing::ext::TestSize.Level0)
-{
-    int32_t socket = 1;
-    if (softbusSession == nullptr) {
-        softbusSession = std::make_shared<SoftbusSession>();
-    }
-    int32_t ret = softbusSession->CloseUnbindSession(socket);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: GetPeerDeviceId_001
  * @tc.desc: set sessionId = 3 and return DM_OK
  * @tc.type: FUNC

@@ -168,37 +168,5 @@ int32_t AuthResponseCredential::Enter()
     stateAuthManager->ResponseCredential();
     return DM_OK;
 }
-
-int32_t AuthResponseSyncDeleteAcl::GetStateType()
-{
-    return AuthState::AUTH_RESPONSE_SYNCDELETE;
-}
-
-int32_t AuthResponseSyncDeleteAcl::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseSyncDeleteAcl authManager_ is null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->ResponseSyncDeleteAcl();
-    return DM_OK;
-}
-
-int32_t AuthResponseSyncDeleteAclNone::GetStateType()
-{
-    return AuthState::AUTH_RESPONSE_SYNCDELETE_DONE;
-}
-
-int32_t AuthResponseSyncDeleteAclNone::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseSyncDeleteAclNone authManager_ is null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->SyncDeleteAclDone();
-    return DM_OK;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

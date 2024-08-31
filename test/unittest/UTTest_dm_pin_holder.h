@@ -179,6 +179,12 @@ public:
         (void)result;
         (void)content;
     }
+
+    void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) override
+    {
+        (void)deviceId;
+        (void)authForm;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

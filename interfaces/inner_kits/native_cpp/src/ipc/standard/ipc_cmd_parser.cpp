@@ -1635,5 +1635,15 @@ ON_IPC_READ_RESPONSE(SHIFT_LNN_GEAR, MessageParcel &reply, std::shared_ptr<IpcRs
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_CMD(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string deviceId = data.ReadString();
+    int32_t authForm = data.ReadInt32();
+    DeviceManagerNotify::GetInstance().OnDeviceTrustChange(pkgName, deviceId, authForm);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

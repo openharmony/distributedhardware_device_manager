@@ -526,7 +526,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_002, testing::ext::TestSize.L
     // set dmDeviceInfo null
     DmDeviceInfo dmDeviceInfo;
     // set extra null
-    std::string extra = "";
+    std::string extra = "{\"status\":1}";
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_FAILED
@@ -565,7 +565,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_003, testing::ext::TestSize.L
     // set dmAppImageInfo null
     DmDeviceInfo dmDeviceInfo;
     // set extra null
-    std::string extra = "";
+    std::string extra = "{\"status\":1}";
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
@@ -604,7 +604,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_004, testing::ext::TestSize.L
     // set dmAppImageInfo null
     DmDeviceInfo dmDeviceInfo;
     // set extra null
-    std::string extra = "";
+    std::string extra = "{\"status\":1}";
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_INIT_FAILED
@@ -643,7 +643,7 @@ HWTEST_F(DeviceManagerImplTest, AuthenticateDevice_005, testing::ext::TestSize.L
     // set dmAppImageInfo null
     DmDeviceInfo dmDeviceInfo;
     // set extra null
-    std::string extra = "";
+    std::string extra = "{\"status\":1}";
     // set callback null
     std::shared_ptr<AuthenticateCallback> callback = std::make_shared<AuthenticateCallbackTest>();
     // 2. MOCK IpcClientProxy SendRequest return ERR_DM_POINT_NULL
@@ -1037,14 +1037,17 @@ HWTEST_F(DeviceManagerImplTest, GetUdidByNetworkId_003, testing::ext::TestSize.L
     std::string netWorkId = "111";
     std::string udid = "222";
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
-    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     // 3. call DeviceManagerImpl::GetUdidByNetworkId with parameter
-    ret = DeviceManager::GetInstance().GetUdidByNetworkId(packName, netWorkId, udid);
+    int32_t ret = DeviceManager::GetInstance().GetUdidByNetworkId(packName, netWorkId, udid);
     // 4. check ret is DM_OK
     ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     // DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -1182,13 +1185,16 @@ HWTEST_F(DeviceManagerImplTest, GetUuidByNetworkId_003, testing::ext::TestSize.L
     std::string netWorkId = "111";
     std::string uuid = "222";
     // 2. MOCK IpcClientProxy SendRequest return DM_OK
-    std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     // 3. call DeviceManagerImpl::GetUuidByNetworkId with parameter
-    ret = DeviceManager::GetInstance().GetUuidByNetworkId(packName, netWorkId, uuid);
+    int32_t ret = DeviceManager::GetInstance().GetUuidByNetworkId(packName, netWorkId, uuid);
     // 4. check ret is DM_OK
     ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**

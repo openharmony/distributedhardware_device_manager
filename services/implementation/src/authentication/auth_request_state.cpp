@@ -204,53 +204,5 @@ int32_t AuthRequestCredentialDone::Enter()
     stateAuthManager->RequestCredentialDone();
     return DM_OK;
 }
-
-int32_t AuthRequestDeleteInit::GetStateType()
-{
-    return AuthState::AUTH_REQUEST_DELETE_INIT;
-}
-
-int32_t AuthRequestDeleteInit::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->EstablishUnbindChannel(context_->deviceId);
-    return DM_OK;
-}
-
-int32_t AuthRequestSyncDeleteAcl::GetStateType()
-{
-    return AuthState::AUTH_REQUEST_SYNCDELETE;
-}
-
-int32_t AuthRequestSyncDeleteAcl::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->RequestSyncDeleteAcl();
-    return DM_OK;
-}
-
-int32_t AuthRequestSyncDeleteAclNone::GetStateType()
-{
-    return AuthState::AUTH_REQUEST_SYNCDELETE_DONE;
-}
-
-int32_t AuthRequestSyncDeleteAclNone::Enter()
-{
-    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
-    if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
-        return ERR_DM_FAILED;
-    }
-    stateAuthManager->SyncDeleteAclDone();
-    return DM_OK;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

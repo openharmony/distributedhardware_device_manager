@@ -29,6 +29,7 @@ constexpr const char* DEVICE_ONLINE = "deviceOnline";
 constexpr const char* DEVICE_OFFLINE = "deviceOffline";
 constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
+constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
 #else
 constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
 #endif
@@ -576,7 +577,7 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGI("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
+    LOGD("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
          GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceInfo);
 }
@@ -1075,6 +1076,64 @@ void DeviceManagerNotify::DeviceBasicInfoReady(const DmDeviceBasicInfo &deviceBa
     std::shared_ptr<DeviceStatusCallback> tempCbk)
 {
     tempCbk->OnDeviceReady(deviceBasicInfo);
+}
+
+void DeviceManagerNotify::RegDevTrustChangeCallback(const std::string &pkgName,
+    std::shared_ptr<DevTrustChangeCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    devTrustChangeCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const std::string &deviceId, int32_t authForm)
+{
+    LOGI("PkgName %{public}s, deviceId %{public}s, authForm %{public}d", pkgName.c_str(),
+        GetAnonyString(deviceId).c_str(), authForm);
+    if (pkgName.empty() || authForm < static_cast<int32_t>(INVALID_TYPE) ||
+        authForm > static_cast<int32_t>(ACROSS_ACCOUNT)) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::shared_ptr<DevTrustChangeCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        auto iter = devTrustChangeCallback_.find(pkgName);
+        if (iter == devTrustChangeCallback_.end()) {
+            LOGE("PkgName %{public}s device_trust_change callback not register.", pkgName.c_str());
+            return;
+        }
+        tempCbk = iter->second;
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnDeviceReady error, registered device status callback is nullptr.");
+        return;
+    }
+    DmAuthForm dmAuthForm = static_cast<DmAuthForm>(authForm);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (ffrtQueue_ != nullptr) {
+        ffrtQueue_->submit([=]() { DeviceTrustChange(deviceId, dmAuthForm, tempCbk); });
+    }
+#else
+    std::thread deviceTrustChange([=]() { DeviceTrustChange(deviceId, dmAuthForm, tempCbk); });
+    if (pthread_setname_np(deviceTrustChange.native_handle(), DEVICE_TRUST_CHANGE) != DM_OK) {
+        LOGE("deviceTrustChange set name failed.");
+    }
+    deviceTrustChange.detach();
+#endif
+}
+
+void DeviceManagerNotify::DeviceTrustChange(const std::string &deviceId, DmAuthForm authForm,
+    std::shared_ptr<DevTrustChangeCallback> tempCbk)
+{
+    if (tempCbk == nullptr) {
+        LOGE("Callback ptr is nullptr.");
+        return;
+    }
+    tempCbk->OnDeviceTrustChange(deviceId, authForm);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

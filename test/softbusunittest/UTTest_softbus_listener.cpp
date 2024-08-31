@@ -724,38 +724,6 @@ HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.L
     softbusListener->OnLocalDevInfoChange();
     EXPECT_EQ(msg, nullptr);
 }
-
-HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_001, testing::ext::TestSize.Level0)
-{
-    char *msg = nullptr;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    softbusListener->OnDeviceNotTrusted(nullptr);
-    EXPECT_EQ(msg, nullptr);
-}
-
-HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_002, testing::ext::TestSize.Level0)
-{
-    char msg[MAX_SOFTBUS_MSG_LEN + 1] = "This is a long message";
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    softbusListener->OnDeviceNotTrusted(msg);
-    EXPECT_NE(msg, nullptr);
-}
-
-HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_003, testing::ext::TestSize.Level0)
-{
-    char msg[MAX_SOFTBUS_MSG_LEN - 1] = "Valid message";
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    softbusListener->OnDeviceNotTrusted(msg);
-    EXPECT_NE(msg, nullptr);
-}
-
-
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

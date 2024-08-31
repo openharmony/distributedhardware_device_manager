@@ -228,8 +228,6 @@ public:
     int32_t addMultiMembersExt(const std::string &credentialInfo);
 
     void DeleteAllGroup(int32_t userId);
-
-    void DeleteP2PGroup(int32_t userId);
     
     int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList);
 

@@ -108,8 +108,6 @@ private:
     void ParsePkgNegotiateMessage(const nlohmann::json &json);
     void CreatePublicKeyMessageExt(nlohmann::json &json);
     void ParsePublicKeyMessageExt(nlohmann::json &json);
-    void CreateSyncDeleteMessageExt(nlohmann::json &json);
-    void ParseSyncDeleteMessageExt(nlohmann::json &json);
     void GetJsonObj(nlohmann::json &jsonObj);
 
 private:

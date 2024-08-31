@@ -636,7 +636,7 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_103, testing::ext::TestSize.Level0)
     std::string packName = "com.ohos.test";
     int32_t bindType = 0;
     std::string deviceId = "deviceId";
-    std::string bindParam;
+    std::string bindParam = "{\"status\":1}";
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().BindDevice(packName, bindType, deviceId, bindParam, callback);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
@@ -1057,7 +1057,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_101, testing::ext::TestSize
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is ERR_DM_FAILED
-    ASSERT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 

@@ -23,7 +23,6 @@
 
 #include "device_manager_common.h"
 #include "hichain_adapter.h"
-#include "softbus_adapter.h"
 
 static const char * const FILED_PKG_NAME = "pkgName";
 static const char * const FILED_BIND_TYPE = "bindType";

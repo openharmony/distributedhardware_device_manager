@@ -30,6 +30,7 @@
 #include "ipc_def.h"
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_destroy_pin_holder_req.h"
+#include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
@@ -1455,6 +1456,40 @@ ON_IPC_CMD(SET_DN_POLICY, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::static_pointer_cast<IpcNotifyDevTrustChangeReq>(pBaseReq);
+    std::string pkgName = data.ReadString();
+    std::string deviceId = pReq->GetDeviceId();
+    int32_t authForm = pReq->GetAuthForm();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(deviceId)) {
+        LOGE("write deviceId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(authForm)) {
+        LOGE("write authForm code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

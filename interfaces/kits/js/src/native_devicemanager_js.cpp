@@ -1190,7 +1190,6 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     jsonObj[APP_OPERATION] = appOperationStr;
     jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
     jsonObj[BIND_LEVEL] = bindLevel;
-    jsonObj[TOKENID] = OHOS::IPCSkeleton::GetSelfTokenID();
     JsToJsonObject(env, object, "extraInfo", jsonObj);
     extra = jsonObj.dump();
     LOGI("appOperationLen %{public}zu, customDescriptionLen %{public}zu", appOperationStr.size(),

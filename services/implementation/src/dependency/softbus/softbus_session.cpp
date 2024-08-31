@@ -118,13 +118,6 @@ int32_t SoftbusSession::CloseAuthSession(int32_t sessionId)
     return DM_OK;
 }
 
-int32_t SoftbusSession::CloseUnbindSession(int32_t socket)
-{
-    LOGI("CloseUnbindSession.");
-    Shutdown(socket);
-    return DM_OK;
-}
-
 int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevId)
 {
     char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
@@ -215,42 +208,6 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         sessionCallback_->OnDataReceived(sessionId, message);
     }
     LOGI("completed.");
-}
-
-void SoftbusSession::OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info)
-{
-    sessionCallback_->OnUnbindSessionOpened(socket, info);
-    LOGI("SoftbusSession::OnUnbindSessionOpened success, socket: %{public}d.", socket);
-}
-
-int32_t SoftbusSession::OpenUnbindSession(const std::string &netWorkId)
-{
-    std::string localSessionName = DM_UNBIND_SESSION_NAME + netWorkId.substr(0, INTERCEPT_STRING_LENGTH);
-    SocketInfo info = {
-        .name = const_cast<char*>(localSessionName.c_str()),
-        .peerName = const_cast<char*>(DM_UNBIND_SESSION_NAME),
-        .peerNetworkId = const_cast<char*>(netWorkId.c_str()),
-        .pkgName = const_cast<char*>(DM_PKG_NAME),
-        .dataType = DATA_TYPE_BYTES
-    };
-
-    int32_t socket = Socket(info);
-    if (socket <= 0) {
-        LOGE("[SOFTBUS]create socket failed, socket: %{public}d", socket);
-        return socket;
-    }
-
-    int32_t ret = Bind(socket, g_qosInfo, g_qosTVParamIndex, &iSocketListener_);
-    if (ret < DM_OK) {
-        LOGE("[SOFTBUS]OpenUnbindSession failed, netWorkId: %{public}s, socket: %{public}d",
-            GetAnonyString(netWorkId).c_str(), socket);
-        sessionCallback_->BindSocketFail();
-        Shutdown(socket);
-        return ret;
-    }
-    LOGI("OpenUnbindSession success. socket: %{public}d.", socket);
-    sessionCallback_->BindSocketSuccess(socket);
-    return socket;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

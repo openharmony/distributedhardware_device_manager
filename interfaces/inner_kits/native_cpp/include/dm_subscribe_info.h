@@ -81,6 +81,10 @@ typedef enum DmExchangeFreq {
      * Super-high
      */
     DM_SUPER_HIGH = 3,
+    /**
+     * Extreme-high
+    */
+    DM_EXTREME_HIGH = 4,
     DM_FREQ_BUTT
 } DmExchangeFreq;
 

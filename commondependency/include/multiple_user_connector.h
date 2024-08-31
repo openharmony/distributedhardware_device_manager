@@ -17,6 +17,7 @@
 #define OHOS_DM_MULTIPLE_USER_CONNECTOR_H
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 namespace OHOS {
 namespace DistributedHardware {
@@ -63,9 +64,32 @@ public:
      * @tc.type: FUNC
      */
     static std::string GetSwitchOldAccountId(void);
+    
+    /**
+     * @tc.name: MultipleUserConnector::SetSwitchOldAccountName
+     * @tc.desc: Set Switch Old AccountName of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static void SetSwitchOldAccountName(std::string accountName);
+
+    /**
+     * @tc.name: MultipleUserConnector::GetOhosAccountName
+     * @tc.desc: Get Current AccountName of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static std::string GetOhosAccountName(void);
+
+    /**
+     * @tc.name: MultipleUserConnector::GetSwitchOldAccountName
+     * @tc.desc: Get Switc Old AccountName of the Multiple User Connector
+     * @tc.type: FUNC
+     */
+    static std::string GetSwitchOldAccountName(void);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
+    static std::string accountName_;
+    static std::mutex lock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

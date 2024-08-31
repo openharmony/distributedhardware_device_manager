@@ -687,6 +687,14 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
     return;
 }
 
+void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
+{
+    LOGI("SoftbusConnector::DeleteOffLineTimer");
+    if (deviceStateManagerCallback_ != nullptr) {
+        deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
+    }
+}
+
 bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 {
     LOGI("Check the device is online.");
@@ -694,7 +702,7 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed.");
-        return ERR_DM_FAILED;
+        return false;
     }
     for (int32_t i = 0; i < deviceCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;

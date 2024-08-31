@@ -144,6 +144,13 @@ public:
      */
     virtual void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
         const std::string &content) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::SetNotOfflinePkgname
+     * @tc.desc: Set the pkgname that not offline
+     * @tc.type: FUNC
+     */
+    virtual void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
