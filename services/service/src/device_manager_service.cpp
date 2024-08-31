@@ -1729,11 +1729,11 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsNumberString(policyStrategyIter->second)) {
-        LOGE("Invalid parameter, DM_POLICY_STRATEGY_FOR_BLE is not digit.");
+        LOGE("Invalid parameter, DM_POLICY_STRATEGY_FOR_BLE is not number.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsNumberString(timeOutIter->second)) {
-        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not digit.");
+        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not number.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     int32_t policyStrategy = std::stoi(policyStrategyIter->second);
