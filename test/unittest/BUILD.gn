@@ -66,7 +66,6 @@ group("unittest") {
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
-    ":UTTest_softbus_adapter",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
     ":UTTest_softbus_publish",
@@ -421,30 +420,6 @@ ohos_unittest("UTTest_mine_softbus_listener") {
 }
 
 ## UnitTest UTTest_mine_softbus_listener }}}
-
-## UnitTest UTTest_softbus_adapter {{{
-ohos_unittest("UTTest_softbus_adapter") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/softbusunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_adapter.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "googletest:gmock",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_softbus_adapter }}}
 
 ## UnitTest UTTest_softbus_connector {{{
 ohos_unittest("UTTest_softbus_connector") {
@@ -1231,6 +1206,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1331,6 +1307,7 @@ ohos_static_library("device_manager_test_common") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",

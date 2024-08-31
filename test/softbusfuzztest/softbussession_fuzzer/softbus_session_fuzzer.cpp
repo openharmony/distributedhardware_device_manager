@@ -47,21 +47,11 @@ public:
     {
         return true;
     }
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) override
-    {
-        (void)socket;
-        (void)info;
-    }
     void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) override
     {
         (void)sessionId;
         (void)message;
     }
-    void BindSocketSuccess(int32_t socket) override
-    {
-        (void)socket;
-    }
-    void BindSocketFail() override {}
 };
 
 void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
@@ -73,7 +63,6 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     int result = *(reinterpret_cast<const int*>(data));
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
     std::string str(reinterpret_cast<const char*>(data), size);
-    PeerSocketInfo info;
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 
     softbusSession->RegisterSessionCallback(std::make_shared<SoftbusSessionCallbackTest>());
@@ -81,9 +70,6 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     softbusSession->OpenAuthSession(str);
     softbusSession->CloseAuthSession(sessionId);
     softbusSession->OnBytesReceived(result, str.c_str(), str.size());
-    softbusSession->OnUnbindSessionOpened(sessionId, info);
-    softbusSession->OpenUnbindSession(str);
-    softbusSession->CloseUnbindSession(sessionId);
     softbusSession->GetPeerDeviceId(sessionId, str);
     softbusSession->SendData(sessionId, str);
     softbusSession->SendHeartbeatData(sessionId, str);

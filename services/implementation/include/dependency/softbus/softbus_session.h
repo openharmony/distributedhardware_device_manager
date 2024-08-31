@@ -34,7 +34,6 @@ public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
     static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
-    static void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
 
 public:
     SoftbusSession();
@@ -81,8 +80,6 @@ public:
      * @tc.type: FUNC
      */
     int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId);
-    int32_t OpenUnbindSession(const std::string &netWorkId);
-    int32_t CloseUnbindSession(int32_t socket);
     int32_t SendHeartbeatData(int32_t sessionId, std::string &message);
 
 private:

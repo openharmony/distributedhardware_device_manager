@@ -90,6 +90,7 @@ enum DMIpcCmdInterfaceCode {
     CHECK_ACCESS_CONTROL,
     CHECK_SAME_ACCOUNT,
     SHIFT_LNN_GEAR,
+    REMOTE_DEVICE_TRUST_CHANGE,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

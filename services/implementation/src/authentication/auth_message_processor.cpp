@@ -125,27 +125,16 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
             CreateResponseAuthMessageExt(jsonObj);
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
-        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             CreateResponseFinishMessage(jsonObj);
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
         case MSG_TYPE_RESP_PUBLICKEY:
             CreatePublicKeyMessageExt(jsonObj);
             break;
-        case MSG_TYPE_REQ_SYNC_DELETE:
-            CreateSyncDeleteMessageExt(jsonObj);
-            break;
         default:
             break;
     }
     return jsonObj.dump();
-}
-
-void AuthMessageProcessor::CreateSyncDeleteMessageExt(nlohmann::json &json)
-{
-    json[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
-    json[TAG_HOST_PKGNAME] = authResponseContext_->hostPkgName;
-    json[TAG_REPLY] = DM_OK;
 }
 
 void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
@@ -294,33 +283,16 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
             ParseAuthResponseMessageExt(jsonObject);
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
-        case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             ParseResponseFinishMessage(jsonObject);
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
         case MSG_TYPE_RESP_PUBLICKEY:
             ParsePublicKeyMessageExt(jsonObject);
             break;
-        case MSG_TYPE_REQ_SYNC_DELETE:
-            ParseSyncDeleteMessageExt(jsonObject);
-            break;
         default:
             break;
     }
     return DM_OK;
-}
-
-void AuthMessageProcessor::ParseSyncDeleteMessageExt(nlohmann::json &json)
-{
-    if (IsString(json, TAG_LOCAL_DEVICE_ID)) {
-        authResponseContext_->localDeviceId = json[TAG_LOCAL_DEVICE_ID].get<std::string>();
-    }
-    if (IsString(json, TAG_HOST_PKGNAME)) {
-        authResponseContext_->hostPkgName = json[TAG_HOST_PKGNAME].get<std::string>();
-    }
-    if (IsInt32(json, TAG_REPLY)) {
-        authResponseContext_->reply = json[TAG_REPLY].get<int32_t>();
-    }
 }
 
 void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)

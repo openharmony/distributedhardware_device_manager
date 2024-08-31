@@ -27,6 +27,7 @@
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
+#include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
@@ -476,5 +477,19 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoy(const std::string &p
     return DM_OK;
 }
 #endif
+
+void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm)
+{
+    LOGI("DeviceId %{public}s, authForm %{public}d.", GetAnonyString(deviceId).c_str(), authForm);
+    std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+    for (const auto &it : PkgNameVec) {
+        pReq->SetPkgName(it);
+        pReq->SetDeviceId(deviceId);
+        pReq->SetAuthForm(authForm);
+        ipcServerListener_.SendRequest(REMOTE_DEVICE_TRUST_CHANGE, pReq, pRsp);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

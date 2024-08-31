@@ -97,7 +97,6 @@ void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetTrustedDevices(deviceId);
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     hichainConnector->DeleteAllGroup(delUserid);
-    hichainConnector->DeleteP2PGroup(delUserid);
     hichainConnector->GetRelatedGroupsCommon(deviceId, pkgNameStr.data(), groupList);
     hichainConnector->UnRegisterHiChainCallback();
 }

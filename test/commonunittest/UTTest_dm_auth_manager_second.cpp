@@ -79,30 +79,6 @@ HWTEST_F(DmAuthManagerTest, OnDataReceived_003, testing::ext::TestSize.Level0)
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
-HWTEST_F(DmAuthManagerTest, OnDataReceived_004, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 0;
-    nlohmann::json jsonObject;
-    jsonObject[TAG_MSG_TYPE] = 200;
-    std::string message = jsonObject.dump();
-    authManager_->OnDataReceived(sessionId, message);
-    authManager_->authRequestState_ = std::make_shared<AuthRequestSyncDeleteAcl>();
-    authManager_->authResponseState_ = nullptr;
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, OnDataReceived_005, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 0;
-    nlohmann::json jsonObject;
-    jsonObject[TAG_MSG_TYPE] = 200;
-    std::string message = jsonObject.dump();
-    authManager_->OnDataReceived(sessionId, message);
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseState_ = std::make_shared<AuthResponseSyncDeleteAclNone>();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
 HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;

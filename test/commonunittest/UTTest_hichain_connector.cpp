@@ -1364,19 +1364,6 @@ HWTEST_F(HichainConnectorTest, DeleteAllGroup_001, testing::ext::TestSize.Level0
 }
 
 /**
- * @tc.name: DeleteP2PGroup_001
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(HichainConnectorTest, DeleteP2PGroup_001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 1;
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    hiChainConnector->DeleteP2PGroup(userId);
-    EXPECT_NE(hiChainConnector->deviceGroupManager_, nullptr);
-}
-
-/**
  * @tc.name: GetRelatedGroupsCommon_001
  * @tc.desc: return ERR_DM_FAILED
  * @tc.type: FUNC

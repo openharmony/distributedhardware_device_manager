@@ -47,9 +47,6 @@ typedef enum AuthState {
     AUTH_REQUEST_FINISH,
     AUTH_REQUEST_CREDENTIAL,
     AUTH_REQUEST_CREDENTIAL_DONE,
-    AUTH_REQUEST_DELETE_INIT,
-    AUTH_REQUEST_SYNCDELETE,
-    AUTH_REQUEST_SYNCDELETE_DONE,
 
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
@@ -58,8 +55,6 @@ typedef enum AuthState {
     AUTH_RESPONSE_SHOW,
     AUTH_RESPONSE_FINISH,
     AUTH_RESPONSE_CREDENTIAL,
-    AUTH_RESPONSE_SYNCDELETE,
-    AUTH_RESPONSE_SYNCDELETE_DONE,
 } AuthState;
 
 enum DmMsgType : int32_t {
@@ -79,8 +74,6 @@ enum DmMsgType : int32_t {
     MSG_TYPE_RESP_AUTH_EXT,
     MSG_TYPE_REQ_PUBLICKEY,
     MSG_TYPE_RESP_PUBLICKEY,
-    MSG_TYPE_REQ_SYNC_DELETE,
-    MSG_TYPE_REQ_SYNC_DELETE_DONE,
     MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE = 600,
     MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE = 700,
 };
@@ -127,7 +120,7 @@ typedef struct DmAuthRequestContext {
     int64_t tokenId;
     std::string remoteAccountId;
     int32_t remoteUserId;
-    std::string ip;
+    std::string addr;
     std::string hostPkgLabel;
 } DmAuthRequestContext;
 
@@ -210,7 +203,7 @@ public:
      * @tc.desc: UnAuthenticate Device of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
+    int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
     /**
      * @brief UnBind device.
@@ -218,7 +211,7 @@ public:
      * @param deviceId device id.
      * @return Return 0 if success.
      */
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
     /**
      * @tc.name: DmAuthManager::OnSessionOpened
@@ -417,13 +410,6 @@ public:
     int32_t OnUserOperation(int32_t action, const std::string &params);
 
     /**
-     * @tc.name: DmAuthManager::UserSwitchEventCallback
-     * @tc.desc: User Switch Event Callback of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    void UserSwitchEventCallback(int32_t userId);
-
-    /**
      * @tc.name: DmAuthManager::SetPageId
      * @tc.desc: Set PageId of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -495,13 +481,9 @@ private:
     void CompatiblePutAcl();
     void ProcRespNegotiateExt(const int32_t &sessionId);
     void ProcRespNegotiate(const int32_t &sessionId);
-    void AccountIdLogoutEventCallback(int32_t userId);
-    void UserChangeEventCallback(int32_t userId);
     void GetAuthRequestContext();
     void SinkAuthDeviceFinish();
     void SrcAuthDeviceFinish();
-    void SrcSyncDeleteAclDone();
-    void SinkSyncDeleteAclDone();
     int32_t CheckTrustState();
     void ProcIncompatible(const int32_t &sessionId);
     bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
@@ -510,37 +492,28 @@ public:
     void RequestCredential();
     void GenerateCredential(std::string &publicKey);
     void RequestCredentialDone();
-    void RequestSyncDeleteAcl();
     void ResponseCredential();
-    void ResponseSyncDeleteAcl();
     bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void AuthDeviceFinish(int64_t requestId);
     void AuthDeviceError(int64_t requestId, int32_t errorCode);
     void GetRemoteDeviceId(std::string &deviceId);
-    int32_t EstablishUnbindChannel(const std::string &deviceIdHash);
-    void SyncDeleteAclDone();
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
-    void CommonEventCallback(int32_t userId, std::string commonEventType);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
-    void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info);
-    void BindSocketSuccess(int32_t socket);
-    void BindSocketFail();
     void OnScreenLocked();
     void HandleDeviceNotTrust(const std::string &udid);
+    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
-    void HandleSyncDeleteTimeout(std::string name);
-    int32_t DeleteAcl(const std::string &pkgName, const std::string &deviceId);
+    int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
+        int32_t bindLevel);
     void ProcessAuthRequestExt(const int32_t &sessionId);
     void ProcessAuthRequest(const int32_t &sessionId);
     int32_t ConfirmProcess(const int32_t &action);
     int32_t ConfirmProcessExt(const int32_t &action);
     int32_t AddMember(int32_t pinCode);
     int32_t AuthDevice(int32_t pinCode);
-    void SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId);
-    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     void PutAccessControlList();
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();

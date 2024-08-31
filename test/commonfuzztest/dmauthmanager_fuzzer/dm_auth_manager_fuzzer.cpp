@@ -62,6 +62,7 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string str(reinterpret_cast<const char*>(data), size);
+    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
     g_authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(g_authManager);
     g_authManager->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     g_authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -94,7 +95,6 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->StartRespAuthProcess();
     g_authManager->CreateGroup();
     g_authManager->ProcessPincode(g_pinCode);
-    g_authManager->UserSwitchEventCallback(g_userId);
     g_authManager->SetPageId(g_pageId);
     g_authManager->SetReasonAndFinish(g_reason, g_state);
     g_authManager->IsIdenticalAccount();
@@ -104,8 +104,8 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->HandleAuthenticateTimeout(str);
     g_authManager->RegisterUiStateCallback(str);
     g_authManager->UnRegisterUiStateCallback(str);
-    g_authManager->UnAuthenticateDevice(str, str);
-    g_authManager->UnBindDevice(str, str);
+    g_authManager->UnAuthenticateDevice(str, str, bindLevel);
+    g_authManager->UnBindDevice(str, str, bindLevel);
 }
 }
 }

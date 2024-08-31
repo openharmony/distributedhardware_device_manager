@@ -84,34 +84,18 @@ public:
     virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::AuthenticateDevice
-     * @tc.desc: Authenticate Device of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-                                       const std::string &extra) = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::UnAuthenticateDevice
      * @tc.desc: UnAuthenticate Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::BindDevice
-     * @tc.desc: Bind Device of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-        const std::string &bindParam) = 0;
+    virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnBindDevice
      * @tc.desc: UnBindDevice Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::SetUserOperation
@@ -270,18 +254,23 @@ public:
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
 
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
-    virtual void OnUnbindSessionOpened(int32_t socket, PeerSocketInfo info) = 0;
-    virtual void OnUnbindSessionCloseed(int32_t socket) = 0;
-    virtual void OnUnbindBytesReceived(int32_t socket, const void *data, uint32_t dataLen) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
-    virtual void AccountCommonEventCallback(int32_t userId, std::string commonEventType) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
     virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId) = 0;
+    virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid) = 0;
+    virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid) = 0;
+    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
+    virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+        const std::string &udid, uint64_t &tokenId) = 0;
+    virtual void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;
+    virtual void HandleUserRemoved(int32_t preUserId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

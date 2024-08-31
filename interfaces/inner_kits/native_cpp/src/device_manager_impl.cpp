@@ -51,6 +51,7 @@
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
+#include "ipc_skeleton.h"
 #include "ipc_start_discovery_req.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
@@ -621,10 +622,18 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
     std::string strDeviceId = deviceInfo.deviceId;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
+    nlohmann::json extraJson = nlohmann::json::parse(extra, nullptr, false);
+    if (extraJson.is_discarded()) {
+        LOGE("extra bindParam %{public}s.", extra.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    extraJson[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
+#endif
     std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetExtra(extra);
+    req->SetExtra(extraJson.dump());
     req->SetAuthType(authType);
     req->SetDeviceInfo(deviceInfo);
     int32_t ret = ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp);
@@ -1370,12 +1379,20 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         LOGE("BindDevice error: Invalid para. pkgName : %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("BindDevice start, pkgName: %{public}s", pkgName.c_str());
+    nlohmann::json paramJson = nlohmann::json::parse(bindParam, nullptr, false);
+    if (paramJson.is_discarded()) {
+        LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    paramJson[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
+#endif
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, callback);
     std::shared_ptr<IpcBindDeviceReq> req = std::make_shared<IpcBindDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetBindParam(bindParam);
+    req->SetBindParam(paramJson.dump());
     req->SetBindType(bindType);
     req->SetDeviceId(deviceId);
     int32_t ret = ipcClientProxy_->SendRequest(BIND_DEVICE, req, rsp);
@@ -1744,7 +1761,10 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
         LOGE("DeviceManagerImpl::BindTarget failed: input pkgName or targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("DeviceManagerImpl::BindTarget start, pkgName: %{public}s", pkgName.c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    bindParam[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
+#endif
     std::string bindParamStr = ConvertMapToJsonString(bindParam);
     DeviceManagerNotify::GetInstance().RegisterBindCallback(pkgName, targetId, callback);
     std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
@@ -2140,6 +2160,18 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
         return ret;
     }
     LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
+    std::shared_ptr<DevTrustChangeCallback> callback)
+{
+    LOGI("PkgName %{public}s.", pkgName.c_str());
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
     return DM_OK;
 }
 } // namespace DistributedHardware

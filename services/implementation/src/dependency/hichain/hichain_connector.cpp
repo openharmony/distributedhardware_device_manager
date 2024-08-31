@@ -1131,39 +1131,6 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     }
 }
 
-void HiChainConnector::DeleteP2PGroup(int32_t userId)
-{
-    LOGI("switch user event happen and this user groups will be deleted with userId: %{public}d", userId);
-    nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    std::string queryParams = jsonObj.dump();
-    std::vector<GroupInfo> groupList;
-
-    int32_t oldUserId = MultipleUserConnector::GetSwitchOldUserId();
-    MultipleUserConnector::SetSwitchOldUserId(userId);
-    if (!GetGroupInfo(oldUserId, queryParams, groupList)) {
-        LOGE("failed to get the old user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = DeleteGroup(oldUserId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the old user id group");
-        }
-    }
-
-    if (!GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get the user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        int32_t ret = DeleteGroup(userId, iter->groupId);
-        if (ret != DM_OK) {
-            LOGE("failed to delete the user id group");
-        }
-    }
-}
-
 int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
     std::vector<GroupInfo> &groupList)
 {

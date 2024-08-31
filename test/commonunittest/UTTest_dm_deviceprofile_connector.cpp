@@ -508,50 +508,6 @@ HWTEST_F(DeviceProfileConnectorTest, PutAccessControlList_001, testing::ext::Tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    std::string accountId;
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(userId, accountId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string localDeviceId;
-    std::string remoteDeviceId;
-    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret.bindType, INVALIED_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret.bindType, INVALIED_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "123456";
-    std::string remoteDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret.bindType, INVALIED_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "deviceId";
-    std::string remoteDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret.bindType, INVALIED_TYPE);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, UpdateAccessControlList_001, testing::ext::TestSize.Level0)
 {
     int32_t userId = 0;
@@ -594,30 +550,6 @@ HWTEST_F(DeviceProfileConnectorTest, CheckIdenticalAccount_001, testing::ext::Te
     std::string accountId;
     bool ret = DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     EXPECT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteP2PAccessControlList_001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    std::string accountId;
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, accountId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteP2PAccessControlList_002, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 123456;
-    std::string accountId = "newAccountId";
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, accountId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteP2PAccessControlList_003, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 123456;
-    std::string accountId = "accountId";
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteP2PAccessControlList(userId, accountId);
-    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_001, testing::ext::TestSize.Level0)
@@ -688,42 +620,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetTrustNumber_001, testing::ext::TestSize.
     std::string deviceId;
     int32_t ret = DeviceProfileConnector::GetInstance().GetTrustNumber(deviceId);
     EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string localDeviceId;
-    std::string remoteDeviceId;
-    bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "deviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "deviceId";
-    std::string remoteDeviceId = "deviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, IsSameAccount_001, testing::ext::TestSize.Level0)

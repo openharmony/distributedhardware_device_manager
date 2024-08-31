@@ -36,7 +36,6 @@ constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNego
 constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
 constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
 constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
-constexpr const char* SYNC_DELETE_TIMEOUT_TASK = "deviceManagerTimer:syncDelete_";
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
 
 

@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "softbus_adapter.h"
-
 #include <stdio.h>
 #include <unistd.h>
 

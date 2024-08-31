@@ -109,11 +109,12 @@ void AddPermission()
 
 void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t))) {
         return;
     }
 
     std::string str(reinterpret_cast<const char*>(data), size);
+    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
     AddPermission();
     DmSubscribeInfo subscribeInfo = {
         .subscribeId = 0,
@@ -138,10 +139,8 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->StopDeviceDiscovery(str, g_subscribeId);
     deviceManagerServiceImpl->PublishDeviceDiscovery(str, publishInfo);
     deviceManagerServiceImpl->UnPublishDeviceDiscovery(str, publishInfo.publishId);
-    deviceManagerServiceImpl->AuthenticateDevice(str, g_authType, str, str);
-    deviceManagerServiceImpl->UnAuthenticateDevice(str, str);
-    deviceManagerServiceImpl->BindDevice(str, g_authType, str, str);
-    deviceManagerServiceImpl->UnBindDevice(str, str);
+    deviceManagerServiceImpl->UnAuthenticateDevice(str, str, bindLevel);
+    deviceManagerServiceImpl->UnBindDevice(str, str, bindLevel);
     deviceManagerServiceImpl->SetUserOperation(str, g_action, str);
     deviceManagerServiceImpl->RequestCredential(g_reqJsonStr, g_returnJsonStr);
     deviceManagerServiceImpl->ImportCredential(str, g_credentialInfo);
