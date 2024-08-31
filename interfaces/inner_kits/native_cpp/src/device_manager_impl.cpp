@@ -1759,7 +1759,7 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
     }
     LOGI("DeviceManagerImpl::BindTarget start, pkgName: %{public}s", pkgName.c_str());
     std::string bindParamStr = ConvertMapToJsonString(bindParam);
-
+    DeviceManagerNotify::GetInstance().RegisterBindCallback(pkgName, targetId, callback);
     std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -1775,7 +1775,6 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
         LOGE("BindTarget error: Failed with ret %{public}d", ret);
         return ret;
     }
-    DeviceManagerNotify::GetInstance().RegisterBindCallback(pkgName, targetId, callback);
 
     LOGI("DeviceManagerImpl::BindTarget completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
