@@ -702,7 +702,7 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
         LOGE("[SOFTBUS]GetAllNodeDeviceInfo failed.");
-        return ERR_DM_FAILED;
+        return false;
     }
     for (int32_t i = 0; i < deviceCount; ++i) {
         NodeBasicInfo *nodeBasicInfo = nodeInfo + i;

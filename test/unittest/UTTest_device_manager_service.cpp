@@ -612,7 +612,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_004, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

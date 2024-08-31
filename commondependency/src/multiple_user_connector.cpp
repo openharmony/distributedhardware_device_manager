@@ -40,8 +40,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return 0;
-#else
-#ifdef OS_ACCOUNT_PART_EXISTS
+#elif OS_ACCOUNT_PART_EXISTS
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != 0 || ids.empty()) {
@@ -51,7 +50,6 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
     return ids[0];
 #else // OS_ACCOUNT_PART_EXISTS
     return DEFAULT_OS_ACCOUNT_ID;
-#endif // OS_ACCOUNT_PART_EXISTS
 #endif
 }
 
@@ -59,8 +57,7 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return "";
-#else
-#ifdef OS_ACCOUNT_PART_EXISTS
+#elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfo(accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
@@ -68,9 +65,8 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
         return "";
     }
     return accountInfo.uid_;
-#else // OS_ACCOUNT_PART_EXISTS
+#else
     return "";
-#endif // OS_ACCOUNT_PART_EXISTS
 #endif
 }
 
@@ -78,8 +74,7 @@ std::string MultipleUserConnector::GetOhosAccountName(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return "";
-#else
-#ifdef OS_ACCOUNT_PART_EXISTS
+#elif OS_ACCOUNT_PART_EXISTS
     auto accountInfo = OhosAccountKits::GetInstance().QueryOhosAccountInfo();
     if (!accountInfo.first) {
         LOGE("QueryOhosAccountInfo failed.");
@@ -90,9 +85,8 @@ std::string MultipleUserConnector::GetOhosAccountName(void)
         return "";
     }
     return accountInfo.second.name_;
-#else // OS_ACCOUNT_PART_EXISTS
+#else
     return "";
-#endif // OS_ACCOUNT_PART_EXISTS
 #endif
 }
 

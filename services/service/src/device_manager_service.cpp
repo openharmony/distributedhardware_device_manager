@@ -1508,11 +1508,11 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call CheckAccessControl.", caller.pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
+        return false;
     }
     if (!IsDMServiceImplReady()) {
         LOGE("CheckAccessControl failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+        return false;
     }
     std::string srcUdid = "";
     SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
@@ -1525,11 +1525,11 @@ bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, cons
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call CheckIsSameAccount.", caller.pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
+        return false;
     }
     if (!IsDMServiceImplReady()) {
         LOGE("CheckIsSameAccount failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+        return false;
     }
     std::string srcUdid = "";
     SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
