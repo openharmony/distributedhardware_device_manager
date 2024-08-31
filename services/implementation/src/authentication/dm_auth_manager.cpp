@@ -1203,6 +1203,7 @@ void DmAuthManager::SrcAuthenticateFinish()
 
 void DmAuthManager::AuthenticateFinish()
 {
+    authType_ = AUTH_TYPE_UNKNOW;
     std::lock_guard<std::mutex> autoLock(g_authFinishLock);
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to AuthenticateFinish because authResponseContext_ or authUiStateMgr is nullptr");

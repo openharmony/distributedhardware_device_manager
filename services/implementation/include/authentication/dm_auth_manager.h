@@ -92,6 +92,7 @@ enum DmAuthType : int32_t {
     AUTH_TYPE_NFC,
     AUTH_TYPE_NO_INTER_ACTION,
     AUTH_TYPE_IMPORT_AUTH_CODE,
+    AUTH_TYPE_UNKNOW,
 };
 
 typedef struct DmAuthRequestContext {
@@ -586,7 +587,7 @@ private:
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
-    std::atomic<int32_t> authType_;
+    std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
 };
 } // namespace DistributedHardware
