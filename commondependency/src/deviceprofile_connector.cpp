@@ -497,7 +497,7 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string
         pkgName.c_str(), GetAnonyString(localDeviceId).c_str(), GetAnonyString(remoteDeviceId).c_str(), bindLevel);
     DmOfflineParam offlineParam;
     offlineParam.bindType = INVALIED_TYPE;
-    if (bindLevel > APP || bindLevel < DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) > APP || static_cast<uint32_t>(bindLevel) < DEVICE) {
         LOGE("Invalied bindlevel.");
         return offlineParam;
     }
