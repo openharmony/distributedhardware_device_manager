@@ -100,7 +100,6 @@ const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 const int32_t USLEEP_TIME_MS = 100000; // 100ms
-const uint32_t DM_MIN_PARAM = 2;
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
@@ -2166,7 +2165,8 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
 
 int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy)
 {
-    if (pkgName.empty() || policy.size() < DM_MIN_PARAM) {
+    const size_t SET_DN_POLICY_PARAM_SIZE = 2;
+    if (pkgName.empty() || policy.size() != SET_DN_POLICY_PARAM_SIZE) {
         LOGE("Para invalid: policy is less than two or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
