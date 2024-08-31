@@ -1661,12 +1661,23 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("Invalid parameter, DM_POLICY_TIMEOUT is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t policyStrategy = std::stoi((policyStrategyIter->second).c_str());
-    int32_t timeOut = std::stoi((timeOutIter->second).c_str());
+    std::string policyStrategyStr = policyStrategyIter->second;
+    if (!isdigit(policyStrategyStr[0])) {
+        LOGE("Invalid parameter, DM_POLICY_STRATEGY_FOR_BLE is not digit.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string timeOutStr = timeOutIter->second;
+    if (!isdigit(timeOutStr[0])) {
+        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not digit.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t policyStrategy = std::stoi(policyStrategyStr);
+    int32_t timeOut = std::stoi(timeOutStr);
     if (!IsDMServiceAdapterLoad()) {
         LOGE("SetDnPolicy failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
+    LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
     return dmServiceImplExt_->SetDnPolicy(policyStrategy, timeOut);
 }
 
