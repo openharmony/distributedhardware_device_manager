@@ -161,7 +161,6 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     if (timer_ != nullptr) {
         timer_->DeleteTimer(PINHOLDER_CREATE_TIMEOUT_TASK);
     }
-    isDestroy_.store(false);
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
     jsonObj[TAG_PIN_TYPE] = pinType;
@@ -466,6 +465,7 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
 
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
+    isDestroy_.store(false);
     sessionId_ = sessionId;
     if (sessionSide == SESSION_SIDE_SERVER) {
         LOGI("[SOFTBUS]onSesssionOpened success, side is sink. sessionId: %{public}d.", sessionId);

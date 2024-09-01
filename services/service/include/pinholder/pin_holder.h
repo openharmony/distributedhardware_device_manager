@@ -77,7 +77,7 @@ private:
     PinHolderState sourceState_;
     int32_t sessionId_ = -1;
     bool isRemoteSupported_ = false;
-    std::atomic<bool> isDestroy_ = false;
+    std::atomic<bool> isDestroy_;
 };
 }
 }
