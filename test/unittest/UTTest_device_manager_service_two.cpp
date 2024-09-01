@@ -342,6 +342,34 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
+
+/**
+ * @tc.name: SetDnPolicy_205
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "a100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetDnPolicy_206
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

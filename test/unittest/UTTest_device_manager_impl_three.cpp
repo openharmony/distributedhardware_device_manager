@@ -1164,32 +1164,6 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy006, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "a100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
-    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
-}
-
-HWTEST_F(DeviceManagerImplTest, SetDnPolicy007, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10aa";
-    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
-    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
-    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-    DeviceManager::GetInstance().UnInitDeviceManager(packName);
-}
-
-HWTEST_F(DeviceManagerImplTest, SetDnPolicy008, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
