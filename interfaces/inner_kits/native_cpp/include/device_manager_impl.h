@@ -388,6 +388,8 @@ public:
     virtual int32_t RegDevTrustChangeCallback(const std::string &pkgName,
         std::shared_ptr<DevTrustChangeCallback> callback) override;
 
+    virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) override;
+
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

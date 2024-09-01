@@ -44,9 +44,7 @@ namespace {
     const int32_t APP_UNBIND_PAYLOAD_LEN = 6;
     const int32_t USERID_PAYLOAD_LEN = 2;
     const int32_t ACCOUNTID_PAYLOAD_LEN = 6;
-    const int32_t TOKENID_PAYLOAD_LEN = 4;
     const int32_t BIT_PER_BYTES = 8;
-    const int32_t UINT32_BYTES = 4;
     const int32_t INVALIED_PAYLOAD_SIZE = 12;
 
     const char * const MSG_TYPE = "TYPE";

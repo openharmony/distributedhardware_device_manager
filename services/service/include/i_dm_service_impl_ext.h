@@ -85,6 +85,13 @@ public:
      * @tc.type: FUNC
      */
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::SetDnPolicy
+     * @tc.desc: SetDnPolicy
+     * @tc.type: FUNC
+     */
+    virtual int32_t SetDnPolicy(int32_t policy, int32_t timeOut) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

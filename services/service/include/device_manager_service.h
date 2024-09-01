@@ -191,6 +191,8 @@ public:
     void HandleDeviceNotTrust(const std::string &msg);
     void HandleDeviceTrustedChange(const std::string &msg);
 
+    int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

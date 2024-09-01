@@ -2162,6 +2162,34 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy)
+{
+    const size_t SET_DN_POLICY_PARAM_SIZE = 2;
+    if (pkgName.empty() || policy.size() != SET_DN_POLICY_PARAM_SIZE) {
+        LOGE("Para invalid: policy is less than two or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start");
+    std::string strategy = ConvertMapToJsonString(policy);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(strategy);
+    int32_t ret = ipcClientProxy_->SendRequest(SET_DN_POLICY, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
     std::shared_ptr<DevTrustChangeCallback> callback)
 {

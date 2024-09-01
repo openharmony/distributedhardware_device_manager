@@ -25,14 +25,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-static QosTV g_qosInfo[] = {
-    { .qos = QOS_TYPE_MIN_BW, .value = 64 * 1024 },
-    { .qos = QOS_TYPE_MAX_LATENCY, .value = 10000 },
-    { .qos = QOS_TYPE_MIN_LATENCY, .value = 2500 },
-};
-}
-
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 

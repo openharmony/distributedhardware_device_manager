@@ -66,10 +66,7 @@ const int32_t SYSTEM_CORE = 2;
 constexpr const char* ALL_PKGNAME = "";
 constexpr const char* NETWORKID = "NETWORK_ID";
 constexpr uint32_t INVALIED_BIND_LEVEL = 0;
-constexpr uint32_t DEVICE_BIND_LEVEL = 1;
 constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
-constexpr uint32_t DM_POINT_TO_POINT = 256;
-constexpr uint32_t DM_ACROSS_ACCOUNT = 1282;
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -1705,6 +1702,45 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
         dmServiceImplExt_->HandleDeviceNotTrust(udid);
     }
     return;
+}
+
+int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    auto policyStrategyIter = policy.find(PARAM_KEY_POLICY_STRATEGY_FOR_BLE);
+    if (policyStrategyIter == policy.end()) {
+        LOGE("Invalid parameter, DM_POLICY_STRATEGY_FOR_BLE is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    auto timeOutIter = policy.find(PARAM_KEY_POLICY_TIME_OUT);
+    if (timeOutIter == policy.end()) {
+        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsNumberString(policyStrategyIter->second)) {
+        LOGE("Invalid parameter, DM_POLICY_STRATEGY_FOR_BLE is not number.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsNumberString(timeOutIter->second)) {
+        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not number.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t policyStrategy = std::stoi(policyStrategyIter->second);
+    int32_t timeOut = std::stoi(timeOutIter->second);
+    LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("SetDnPolicy failed, instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExt_->SetDnPolicy(policyStrategy, timeOut);
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

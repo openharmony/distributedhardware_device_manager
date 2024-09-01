@@ -1445,6 +1445,20 @@ ON_IPC_CMD(SHIFT_LNN_GEAR, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(SET_DN_POLICY, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string policyStr = data.ReadString();
+    std::map<std::string, std::string> policy;
+    ParseMapFromJsonString(policyStr, policy);
+    int32_t result = DeviceManagerService::GetInstance().SetDnPolicy(pkgName, policy);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
