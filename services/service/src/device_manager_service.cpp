@@ -66,10 +66,7 @@ const int32_t SYSTEM_CORE = 2;
 constexpr const char* ALL_PKGNAME = "";
 constexpr const char* NETWORKID = "NETWORK_ID";
 constexpr uint32_t INVALIED_BIND_LEVEL = 0;
-constexpr uint32_t DEVICE_BIND_LEVEL = 1;
 constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
-constexpr uint32_t DM_POINT_TO_POINT = 256;
-constexpr uint32_t DM_ACROSS_ACCOUNT = 1282;
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
