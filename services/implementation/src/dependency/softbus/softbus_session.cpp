@@ -31,12 +31,10 @@ static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MAX_LATENCY, .value = 10000 },
     { .qos = QOS_TYPE_MIN_LATENCY, .value = 2500 },
 };
-static uint32_t g_qosTVParamIndex = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
 }
 
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
-constexpr int32_t INTERCEPT_STRING_LENGTH = 20;
 
 static void OnShutdown(int32_t socket, ShutdownReason reason)
 {
