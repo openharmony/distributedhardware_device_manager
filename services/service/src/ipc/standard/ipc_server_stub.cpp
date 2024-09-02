@@ -334,6 +334,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
     LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().ClearDiscoveryCache(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
