@@ -30,7 +30,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "dm_thread_manager.h"
+#include "ffrt.h"
 #endif
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -179,7 +179,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         g_onlinDeviceNum++;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_ONLINE, [=]() { DeviceOnLine(dmDeviceInfo); });
+    ffrt::submit([=]() { DeviceOnLine(dmDeviceInfo); });
 #else
     std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
@@ -230,7 +230,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_OFFLINE, [=]() { DeviceOffLine(dmDeviceInfo); });
+    ffrt::submit([=]() { DeviceOffLine(dmDeviceInfo); });
 #else
     std::thread deviceOffLine([=]() { DeviceOffLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
@@ -284,7 +284,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ThreadManager::GetInstance().Submit(DEVICE_NAME_CHANGE, [=]() { DeviceNameChange(dmDeviceInfo); });
+        ffrt::submit([=]() { DeviceNameChange(dmDeviceInfo); });
     #else
         std::thread deviceInfoChange([=]() { DeviceNameChange(dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
@@ -311,9 +311,9 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
     std::string softbusMsg = std::string(msg);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
-        ThreadManager::GetInstance().Submit(DEVICE_NOT_TRUST, [=]() { DeviceNotTrust(softbusMsg); });
+        ffrt::submit([=]() { DeviceNotTrust(softbusMsg); });
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
-        ThreadManager::GetInstance().Submit(DEVICE_TRUSTED_CHANGE, [=]() { DeviceTrustedChange(softbusMsg); });
+        ffrt::submit([=]() { DeviceTrustedChange(softbusMsg); });
     } else {
         LOGE("Invalied trust change type.");
     }

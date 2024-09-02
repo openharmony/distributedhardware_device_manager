@@ -128,9 +128,6 @@ private:
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
     std::mutex bindLock_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::shared_ptr<ffrt::queue> ffrtQueue_;
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
