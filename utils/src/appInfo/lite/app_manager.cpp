@@ -14,6 +14,7 @@
  */
 
 #include "app_manager.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -22,6 +23,23 @@ DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 const std::string AppManager::GetAppId()
 {
     return "";
+}
+
+void AppManager::RegisterCallerAppId(const std::string &pkgName)
+{
+    (void)pkgName;
+}
+
+void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
+{
+    (void)pkgName;
+}
+
+int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId)
+{
+    (void)pkgName;
+    (void)appId;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

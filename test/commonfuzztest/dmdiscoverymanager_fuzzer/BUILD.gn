@@ -46,6 +46,7 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
   deps = [
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${utils_path}:devicemanagerutils",
   ]
 
   defines = [

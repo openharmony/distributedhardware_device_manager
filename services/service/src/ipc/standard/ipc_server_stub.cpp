@@ -24,6 +24,9 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iservice_registry.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "kv_adapter_manager.h"
+#endif
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
 #include "string_ex.h"
@@ -70,6 +73,9 @@ void IpcServerStub::OnStart()
 #ifdef SUPPORT_POWER_MANAGER
     AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
 #endif // SUPPORT_POWER_MANAGER
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+#endif
     LOGI("called:AddAbilityListener end!");
 }
 
@@ -100,6 +106,12 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     } else if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitScreenLockEvent();
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        KVAdapterManager::GetInstance().ReInit();
+        return;
+    }
+#endif
 }
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -123,6 +135,7 @@ bool IpcServerStub::Init()
             return false;
         }
         registerToService_ = true;
+        KVAdapterManager::GetInstance().Init();
     }
     return true;
 }
