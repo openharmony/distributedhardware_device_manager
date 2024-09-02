@@ -192,6 +192,7 @@ public:
     void HandleDeviceTrustedChange(const std::string &msg);
 
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
+    void ClearDiscoveryCache(const std::string &pkgName);
 
 private:
     bool IsDMServiceImplReady();

@@ -593,7 +593,9 @@ int32_t SoftbusListener::RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
 int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
-    lnnOpsCbkMap.erase(pkgName);
+    if (lnnOpsCbkMap.find(pkgName) != lnnOpsCbkMap.end()) {
+        lnnOpsCbkMap.erase(pkgName);
+    }
     return DM_OK;
 }
 

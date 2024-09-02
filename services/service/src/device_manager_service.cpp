@@ -1882,5 +1882,12 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     }
     return;
 }
+
+void DeviceManagerService::ClearDiscoveryCache(const std::string &pkgName)
+{
+    LOGI("PkgName %{public}s.", pkgName.c_str());
+    CHECK_NULL_VOID(discoveryMgr_);
+    discoveryMgr_->ClearDiscoveryCache(pkgName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
