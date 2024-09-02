@@ -33,6 +33,7 @@ group("unittest") {
     ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
+    ":UTTest_dm_auth_manager_third",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
@@ -1005,6 +1006,15 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "device_info_manager:distributed_device_profile_sdk",
     "googletest:gmock",
   ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
 }
 
 ## UTTest_dm_auth_manager_first }}}
@@ -1028,6 +1038,35 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 }
 
 ## UTTest_dm_auth_manager_second }}}
+
+## UnitTest UTTest_dm_auth_manager_third {{{
+ohos_unittest("UTTest_dm_auth_manager_third") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_third.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+}
+
+## UTTest_dm_auth_manager_third }}}
 
 ###############################
 ## UnitTest UTTest_dm_radar_helper_test {{{

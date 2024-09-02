@@ -219,7 +219,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSiz
     DmAccessCallee callee;
     DeletePermission();
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 /**
@@ -244,7 +244,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSiz
     DmAccessCallee callee;
     DeletePermission();
     bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_MANAGER_FIRST_TEST_H
-#define OHOS_DM_AUTH_MANAGER_FIRST_TEST_H
+#ifndef OHOS_DM_AUTH_MANAGER_THIRD_TEST_H
+#define OHOS_DM_AUTH_MANAGER_THIRD_TEST_H
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 #include <map>
 #include <string>
+#include <gtest/gtest.h>
 
 #include "authentication.h"
 #include "softbus_session.h"
@@ -43,18 +42,7 @@ public:
     void SetUp();
     void TearDown();
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-
-    std::shared_ptr<DmAuthManager> authManager_ =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-};
-
-class AuthRequestFinishStateMock : public AuthRequestFinishState {
-public:
-    MOCK_METHOD(int32_t, GetStateType, (), (override));
+    std::shared_ptr<DmAuthManager> authManager_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

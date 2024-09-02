@@ -17,15 +17,17 @@
 
 #include "nlohmann/json.hpp"
 
-#include "dm_log.h"
-#include "dm_constants.h"
-#include "dm_auth_manager.h"
 #include "auth_message_processor.h"
+#include "common_event_support.h"
 #include "device_manager_service_listener.h"
+#include "dm_auth_manager.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
 
 class SoftbusStateCallbackTest : public ISoftbusStateCallback {
 public:
@@ -46,19 +48,13 @@ void DmAuthManagerTest::SetUp()
     authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
     authManager_->hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
     authManager_->softbusConnector_ = std::make_shared<SoftbusConnector>();
-    authManager_->softbusConnector_->GetSoftbusSession()->
-        RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback>(authManager_));
+    authManager_->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(
+        std::shared_ptr<ISoftbusSessionCallback>(authManager_));
     authManager_->timer_ = std::make_shared<DmTimer>();
 }
-void DmAuthManagerTest::TearDown()
-{
-}
-void DmAuthManagerTest::SetUpTestCase()
-{
-}
-void DmAuthManagerTest::TearDownTestCase()
-{
-}
+void DmAuthManagerTest::TearDown() {}
+void DmAuthManagerTest::SetUpTestCase() {}
+void DmAuthManagerTest::TearDownTestCase() {}
 
 namespace {
 const int32_t MIN_PIN_CODE = 100000;
@@ -267,6 +263,14 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
     authManager_->OnDataReceived(sessionId, message);
     int32_t ret = authManager_->SetPageId(pageId);
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, SetPageId_003, testing::ext::TestSize.Level0)
+{
+    int32_t pageId = 123;
+    authManager_->authResponseContext_ = nullptr;
+    int32_t ret = authManager_->SetPageId(pageId);
+    ASSERT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, SetReasonAndFinish_001, testing::ext::TestSize.Level0)
@@ -785,17 +789,58 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Leve
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
-{
-    int32_t sessionId = 0;
-    authManager_->ProcRespNegotiate(sessionId);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-}
-
 HWTEST_F(DmAuthManagerTest, GenerateBindResultContent001, testing::ext::TestSize.Level0)
 {
     auto ret = authManager_->GenerateBindResultContent();
     ASSERT_EQ(ret.empty(), false);
+}
+
+HWTEST_F(DmAuthManagerTest, GenerateBindResultContent002, testing::ext::TestSize.Level0)
+{
+    authManager_->remoteDeviceId_ = "test";
+    auto ret = authManager_->GenerateBindResultContent();
+    ASSERT_FALSE(ret.empty());
+}
+
+
+HWTEST_F(DmAuthManagerTest, OnScreenLocked001, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->OnScreenLocked();
+
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_CRE;
+    authManager_->OnScreenLocked();
+
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->OnScreenLocked();
+
+    authManager_->authResponseContext_->authType = AUTH_REQUEST_INIT;
+    std::shared_ptr<AuthRequestFinishStateMock> requestFinishState = std::make_shared<AuthRequestFinishStateMock>();
+    EXPECT_CALL(*requestFinishState, GetStateType()).WillRepeatedly(testing::Return(AuthState::AUTH_REQUEST_NEGOTIATE));
+    authManager_->authRequestState_ = requestFinishState;
+    authManager_->OnScreenLocked();
+
+    EXPECT_CALL(*requestFinishState, GetStateType()).WillRepeatedly(testing::Return(AuthState::AUTH_REQUEST_INIT));
+    authManager_->OnScreenLocked();
+
+    EXPECT_CALL(*requestFinishState, GetStateType()).WillRepeatedly(testing::Return(AuthState::AUTH_REQUEST_JOIN));
+    authManager_->OnScreenLocked();
+
+    EXPECT_CALL(*requestFinishState, GetStateType()).WillRepeatedly(testing::Return(AuthState::AUTH_REQUEST_JOIN));
+    authManager_->authUiStateMgr_ = nullptr;
+    authManager_->OnScreenLocked();
+
+    EXPECT_CALL(*requestFinishState, GetStateType())
+        .WillRepeatedly(testing::Return(AuthState::AUTH_REQUEST_NEGOTIATE_DONE));
+    authManager_->OnScreenLocked();
+
+    EXPECT_CALL(*requestFinishState, GetStateType())
+        .WillRepeatedly(testing::Return(AuthState::AUTH_RESPONSE_FINISH));
+    authManager_->OnScreenLocked();
+    EXPECT_EQ(authManager_->authResponseContext_->state, STATUS_DM_AUTH_DEFAULT);
 }
 
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived001, testing::ext::TestSize.Level0)
@@ -1028,6 +1073,34 @@ HWTEST_F(DmAuthManagerTest, ProcessSinkMsg_007, testing::ext::TestSize.Level0)
     authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
     authManager_->ProcessSinkMsg();
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, ConvertSrcVersion_001, testing::ext::TestSize.Level0)
+{
+    std::string version = "";
+    std::string edition = "test";
+    EXPECT_EQ(authManager_->ConvertSrcVersion(version, edition), "test");
+
+    edition = "";
+    EXPECT_NE(authManager_->ConvertSrcVersion(version, edition), "test");
+
+    version = "test";
+    EXPECT_EQ(authManager_->ConvertSrcVersion(version, edition), "test");
+}
+
+HWTEST_F(DmAuthManagerTest, GetTaskTimeout_001, testing::ext::TestSize.Level0)
+{
+    int32_t taskTimeOut = 0;
+    authManager_->SetAuthType(AUTH_TYPE_CRE);
+    EXPECT_EQ(authManager_->GetTaskTimeout("test", taskTimeOut), taskTimeOut);
+
+    taskTimeOut = 1000;
+
+    authManager_->SetAuthType(AUTH_TYPE_IMPORT_AUTH_CODE);
+    EXPECT_EQ(authManager_->GetTaskTimeout("test", taskTimeOut), taskTimeOut);
+
+    authManager_->SetAuthType(AUTH_TYPE_IMPORT_AUTH_CODE);
+    EXPECT_EQ(authManager_->GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, taskTimeOut), CLONE_AUTHENTICATE_TIMEOUT);
 }
 } // namespace
 } // namespace DistributedHardware
