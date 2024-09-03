@@ -1477,7 +1477,6 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     EXPECT_NE(ret, DM_OK);
-    
 }
 
 HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
