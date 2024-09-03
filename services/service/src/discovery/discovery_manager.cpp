@@ -584,5 +584,40 @@ bool DiscoveryManager::CloseCommonDependencyObj()
     return true;
 }
 #endif
+
+void DiscoveryManager::ClearDiscoveryCache(const std::string &pkgName)
+{
+    LOGI("PkgName %{public}s.", pkgName.c_str());
+    uint16_t subscribeId = 0;
+    {
+        std::lock_guard<std::mutex> autoLock(locks_);
+        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
+            LOGI("Erase pkgname %{public}s from pkgNameSet.", pkgName.c_str());
+            pkgNameSet_.erase(pkgName);
+        }
+        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
+            LOGI("Erase pkgname %{public}s from pkgNameSet.", pkgName.c_str());
+            subscribeId = discoveryContextMap_[pkgName].subscribeId;
+            discoveryContextMap_.erase(pkgName);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgName);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
+            pkgName2SubIdMap_.erase(pkgName);
+        }
+    }
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
+    softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+    CHECK_NULL_VOID(timer_);
+    timer_->DeleteTimer(pkgName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
