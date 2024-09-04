@@ -2152,7 +2152,7 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
         LOGE("ShiftLNNGear error: Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed");
+    LOGI("DeviceManagerImpl::ShiftLNNGear completed");
     return DM_OK;
 }
 
