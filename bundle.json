@@ -48,6 +48,7 @@
                 "init",
                 "ipc",
                 "json",
+                "kv_store",
                 "memmgr",
                 "napi",
                 "node",

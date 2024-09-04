@@ -46,7 +46,9 @@ ohos_fuzztest("SoftbusSessionObjectFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${utils_path}:devicemanagerutils",
   ]
 
   external_deps = [ "safwk:system_ability_fwk" ]

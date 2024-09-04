@@ -23,6 +23,9 @@
 
 #include "dm_device_info.h"
 #include "idevice_manager_service_listener.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "kv_adapter_manager.h"
+#endif
 #if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
@@ -61,14 +64,6 @@ public:
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
         std::string content) override;
 
-    void DeleteDeviceIdFromMap(const std::string &deviceId, const std::string &pkgName);
-    void RegisterDmListener(const std::string &pkgName, const std::string &appId);
-    void UnRegisterDmListener(const std::string &pkgName);
-    std::string GetAppId(const std::string &pkgName);
-    std::string CalcDeviceId(const std::string &udidHash, const std::string &appId);
-    void SetUdidHashMap(const std::string &udidHash, const std::string &deviceId, const std::string &pkgName);
-    std::string GetDeviceId(const std::string &udidHash, const std::string &pkgName);
-    std::string GetUdidHash(const std::string &deviceId, const std::string &pkgName);
     void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
         const std::string &payload) override;
     void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload) override;
@@ -87,13 +82,13 @@ private:
     void ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
         const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     std::string ComposeOnlineKey(const std::string &pkgName, const std::string &devId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t ConfuseUdidHash(const std::string &pkgName, DmDeviceInfo &deviceInfo);
+    int32_t ConvertUdidHashToAnoy(const std::string &pkgName, const std::string &udidHash, std::string &result);
+#endif
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
-    static std::mutex dmListenerMapLock_;
-    static std::map<std::string, std::string> dmListenerMap_;
-    static std::mutex udidHashMapLock_;
-    static std::map<std::string, std::map<std::string, std::string>> udidHashMap_;
     static std::mutex alreadyOnlineSetLock_;
     static std::unordered_set<std::string> alreadyOnlineSet_;
 #endif
