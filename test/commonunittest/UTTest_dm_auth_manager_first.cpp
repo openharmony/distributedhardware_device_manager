@@ -33,6 +33,7 @@ public:
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
+    void DeleteOffLineTimer(std::string udidHash) {}
 };
 
 void DmAuthManagerTest::SetUp()

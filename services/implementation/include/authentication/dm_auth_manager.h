@@ -544,6 +544,8 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
+    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
+    void DeleteOffLineTimer(int32_t sessionId);
     void SetAuthType(int32_t authType);
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
 
@@ -578,6 +580,7 @@ private:
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
+    std::string remoteUdidHash_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
 };
 } // namespace DistributedHardware
