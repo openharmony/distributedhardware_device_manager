@@ -66,6 +66,7 @@ ohos_fuzztest("PinAuthFuzzTest") {
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${utils_path}:devicemanagerutils",
   ]
 
   defines = [

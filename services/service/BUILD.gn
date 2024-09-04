@@ -40,6 +40,7 @@ if (defined(ohos_lite)) {
         "${utils_path}/include/appInfo/lite",
         "${utils_path}/include/crypto",
         "${utils_path}/include/fwkload/lite",
+        "${utils_path}/include/kvadapter",
         "${utils_path}/include/timer/lite",
         "${innerkits_path}/native_cpp/include",
         "${innerkits_path}/native_cpp/include/ipc",
@@ -135,6 +136,7 @@ if (defined(ohos_lite)) {
       "${softbuscache_parh}/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
+      "${utils_path}/include/kvadapter",
       "${utils_path}/include/timer",
     ]
   }
