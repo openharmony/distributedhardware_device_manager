@@ -1628,10 +1628,10 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
     SoftbusCache::GetInstance().GetUdidFromCache(networkId.c_str(), udid);
     LOGI("HandleDeviceNotTrust networkId: %{public}s, udid: %{public}s.",
         GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
-    if (IsDMImplSoLoaded()) {
+    if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceNotTrust(udid);
     }
-    if (IsDMServiceImplReady()) {
+    if (IsDMServiceAdapterLoad()) {
         dmServiceImplExt_->HandleDeviceNotTrust(udid);
     }
     return;
