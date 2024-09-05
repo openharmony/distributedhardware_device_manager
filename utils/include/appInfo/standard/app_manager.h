@@ -19,7 +19,9 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include "bundle_mgr_interface.h"
 #include "dm_single_instance.h"
+#include "event_handler.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,6 +34,7 @@ public:
     void UnRegisterCallerAppId(const std::string &pkgName);
     int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
 private:
+    bool GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager);
     std::mutex appIdMapLock_;
     std::map<std::string, std::string> appIdMap_;
 };
