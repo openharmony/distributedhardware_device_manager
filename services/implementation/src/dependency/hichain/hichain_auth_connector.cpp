@@ -167,6 +167,7 @@ int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    free(returnData);
     if (jsonObject.is_discarded()) {
         LOGE("Decode generate return data jsonStr error.");
         return ERR_DM_FAILED;
@@ -200,6 +201,7 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    free(returnData);
     if (jsonObject.is_discarded()) {
         LOGE("Decode query return data jsonStr error.");
         return false;
@@ -231,6 +233,7 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    free(returnData);
     if (jsonObject.is_discarded()) {
         LOGE("Decode query return data jsonStr error.");
         return ERR_DM_FAILED;
@@ -263,6 +266,7 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string 
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    free(returnData);
     if (jsonObject.is_discarded()) {
         LOGE("Decode import return data jsonStr error.");
         return ERR_DM_FAILED;
@@ -294,6 +298,7 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
+    free(returnData);
     if (jsonObject.is_discarded()) {
         LOGE("Decode import return data jsonStr error.");
         return false;

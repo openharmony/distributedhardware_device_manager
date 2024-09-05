@@ -143,6 +143,7 @@ int32_t MineHiChainConnector::DeleteCredentialAndGroup(void)
         LOGE("failed to delete hichain credential and group with ret:%{public}d.", retValue);
         return ERR_DM_FAILED;
     }
+    g_deviceGroupManager->destroyInfo(&returnInfo);
 #endif
     return DM_OK;
 }
@@ -263,9 +264,11 @@ int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &
     }
     if (CreateGroup(reqJsonStr) != DM_OK) {
         DeleteCredentialAndGroup();
+        g_deviceGroupManager->destroyInfo(&returnInfo);
         LOGE("fail to import hichain credential bacause create group unsuccessfully.");
         return ERR_DM_HICHAIN_GROUP_CREATE_FAILED;
     }
+    g_deviceGroupManager->destroyInfo(&returnInfo);
 #endif
     LOGI("import device credential info successfully.");
     return DM_OK;
