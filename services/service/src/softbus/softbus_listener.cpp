@@ -34,7 +34,6 @@
 #endif
 #include "parameter.h"
 #include "system_ability_definition.h"
-#include "softbus_adapter.cpp"
 
 namespace OHOS {
 namespace DistributedHardware {

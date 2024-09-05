@@ -279,6 +279,8 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
             return ERR_DM_FAILED;
         }
     }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo info = {
         .funcName = "UnAuthenticateDevice",
         .toCallPkg = HICHAINNAME,
