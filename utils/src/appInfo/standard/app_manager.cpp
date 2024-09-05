@@ -117,7 +117,7 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
 
 bool AppManager::GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager)
 {
-    sptr<ISystemAbilityManager> systemAbilityManager = 
+    sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
         LOGE("GetBundleManagerProxy Failed to get system ability mgr.");

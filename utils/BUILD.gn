@@ -135,9 +135,9 @@ if (defined(ohos_lite)) {
     ]
 
     public_external_deps = [
+      "bundle_framework:appexecfwk_core",
       "json:nlohmann_json_static",
       "kv_store:distributeddata_inner",
-      "bundle_framework:appexecfwk_core",
     ]
 
     if (support_jsapi) {
