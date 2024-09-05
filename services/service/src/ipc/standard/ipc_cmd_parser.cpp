@@ -1465,7 +1465,7 @@ ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq,
         return ERR_DM_FAILED;
     }
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::static_pointer_cast<IpcNotifyDevTrustChangeReq>(pBaseReq);
-    std::string pkgName = data.ReadString();
+    std::string pkgName = pReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
     int32_t authForm = pReq->GetAuthForm();
     if (!data.WriteString(pkgName)) {
