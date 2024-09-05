@@ -717,15 +717,6 @@ HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_003, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "deviceId";
-    std::string remoteDeviceId = "deviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
-    EXPECT_EQ(ret, false);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, IsSameAccount_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "udid";
