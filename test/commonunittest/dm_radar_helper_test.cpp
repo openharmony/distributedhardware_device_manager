@@ -238,10 +238,10 @@ HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_001, testing::ext::TestSize
     DmRadarHelper::GetInstance().ReportDestroyPinHolder(str, str, 0, stageRes);
 
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG);
-    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str, "");
 
     bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_CREATE_PIN_HOLDER_MSG);
-    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str);
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str, "");
     EXPECT_EQ(res, true);
 }
 HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_002, testing::ext::TestSize.Level0)
