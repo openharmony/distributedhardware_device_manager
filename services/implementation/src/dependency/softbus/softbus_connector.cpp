@@ -639,9 +639,11 @@ std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId
             LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
         }
         if (reinterpret_cast<char *>(mUdid) == deviceId) {
+            FreeNodeInfo(nodeInfo);
             return static_cast<std::string>(nodeBasicInfo->networkId);
         }
     }
+    FreeNodeInfo(nodeInfo);
     return "";
 }
 
@@ -714,10 +716,12 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
         std::string udid = reinterpret_cast<char *>(mUdid);
         if (udid == targetDeviceId) {
             LOGI("The device is online.");
+            FreeNodeInfo(nodeInfo);
             return true;
         }
     }
     LOGI("The device is not online.");
+    FreeNodeInfo(nodeInfo);
     return false;
 }
 
@@ -734,6 +738,7 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
     if (Crypto::GetUdidHash(deviceId, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
         LOGE("get deviceIdHash by deviceId: %{public}s failed.", GetAnonyString(deviceId).c_str());
+        FreeNodeInfo(nodeInfo);
         return info;
     }
     for (int32_t i = 0; i < deviceCount; ++i) {
@@ -742,6 +747,7 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
         if (GetNodeKeyInfo(DM_PKG_NAME, nodeBasicInfo->networkId, NodeDeviceInfoKey::NODE_KEY_UDID,
             mUdid, sizeof(mUdid)) != DM_OK) {
             LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
+            FreeNodeInfo(nodeInfo);
             return info;
         }
         std::string udid = reinterpret_cast<char *>(mUdid);
