@@ -29,6 +29,7 @@ group("unittest") {
     ":UTTest_device_manager_service_listener",
     ":UTTest_discovery_filter",
     ":UTTest_discovery_manager",
+    ":UTTest_dm_account_common_event",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager_first",
@@ -45,8 +46,10 @@ group("unittest") {
     ":UTTest_dm_distributed_hardware_load",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
+    ":UTTest_dm_publish_common_event",
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_radar_helper_test",
+    ":UTTest_dm_screen_common_event",
     ":UTTest_dm_timer",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
@@ -67,6 +70,7 @@ group("unittest") {
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
+    ":UTTest_relationship_sync_mgr",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
     ":UTTest_softbus_publish",
@@ -1222,6 +1226,79 @@ ohos_unittest("UTTest_dm_crypto") {
 }
 
 ## UnitTest UTTest_dm_crypto }}}
+
+## UnitTest UTTest_dm_account_common_event {{{
+ohos_unittest("UTTest_dm_account_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_account_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = []
+}
+
+## UnitTest UTTest_dm_account_common_event }}}
+
+## UnitTest UTTest_dm_publish_common_event {{{
+ohos_unittest("UTTest_dm_publish_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_publish_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "bluetooth:btframework",
+    "wifi:wifi_sdk",
+  ]
+}
+
+## UnitTest UTTest_dm_publish_common_event }}}
+
+## UnitTest UTTest_dm_screen_common_event {{{
+ohos_unittest("UTTest_dm_screen_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_screen_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "bluetooth:btframework",
+    "wifi:wifi_sdk",
+  ]
+}
+
+## UnitTest UTTest_dm_screen_common_event }}}
+
+## UnitTest UTTest_relationship_sync_mgr {{{
+ohos_unittest("UTTest_relationship_sync_mgr") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources =
+      [ "${devicemanager_path}/test/unittest/UTTest_relationship_sync_mgr.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "cJSON:cjson" ]
+}
+
+## UnitTest UTTest_relationship_sync_mgr }}}
 
 ## UnitTest UTTest_dm_publish_manager {{{
 ohos_unittest("UTTest_dm_publish_manager") {
