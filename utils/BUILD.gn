@@ -130,10 +130,12 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "openssl:libcrypto_shared",
+      "os_account:os_account_innerkits",
       "samgr:samgr_proxy",
     ]
 
     public_external_deps = [
+      "bundle_framework:appexecfwk_core",
       "json:nlohmann_json_static",
       "kv_store:distributeddata_inner",
     ]
