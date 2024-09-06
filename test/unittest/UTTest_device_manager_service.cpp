@@ -1409,6 +1409,15 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     std::string pkgName;
     int32_t eventId = 0;
     std::string event;
+    std::string msg = "";
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+    msg = "hello_openharmony";
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+    msg = "NETWORK_ID";
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+    std::string commonEventType = "helloworld";
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().ScreenCommonEventCallback(commonEventType);
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     EXPECT_NE(ret, DM_OK);
 }
@@ -1421,6 +1430,16 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level
     std::string event;
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName;
+    int32_t eventId = DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT;
+    std::string event;
+    int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level0)
@@ -1445,6 +1464,19 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     std::string uuid;
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string networkId = "network_id";
+    std::string uuid = "13345689";
+    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
+        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    }
+    int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
