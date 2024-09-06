@@ -15,15 +15,16 @@
 
 #include "app_manager.h"
 
-#include "dm_anonymous.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 #include "accesstoken_kit.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
+
+#include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 
 using namespace OHOS::Security::AccessToken;
 

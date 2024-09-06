@@ -19,9 +19,11 @@
 #include <map>
 #include <mutex>
 #include <string>
+
 #include "bundle_mgr_interface.h"
-#include "dm_single_instance.h"
 #include "event_handler.h"
+
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
