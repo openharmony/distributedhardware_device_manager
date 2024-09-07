@@ -16,22 +16,23 @@
 #ifndef OHOS_DM_AUTH_MANAGER_SECOND_TEST_H
 #define OHOS_DM_AUTH_MANAGER_SECOND_TEST_H
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <map>
 #include <string>
-#include <gtest/gtest.h>
 
-#include "authentication.h"
-#include "softbus_session.h"
-#include "device_manager_service_listener.h"
-#include "dm_adapter_manager.h"
-#include "dm_constants.h"
-#include "softbus_connector.h"
-#include "hichain_connector.h"
+#include "auth_message_processor.h"
 #include "auth_request_state.h"
 #include "auth_response_state.h"
-#include "auth_message_processor.h"
-#include "dm_timer.h"
+#include "authentication.h"
+#include "device_manager_service_listener.h"
+#include "dm_adapter_manager.h"
 #include "dm_auth_manager.h"
+#include "dm_constants.h"
+#include "dm_timer.h"
+#include "hichain_connector.h"
+#include "softbus_connector.h"
+#include "softbus_session.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,13 +43,12 @@ public:
     void SetUp();
     void TearDown();
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+    std::shared_ptr<DmAuthManager> authManager_;
+};
 
-    std::shared_ptr<DmAuthManager> authManager_ =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+class AuthResponseInitStateMock : public AuthResponseInitState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -56,6 +56,16 @@ class AuthRequestFinishStateMock : public AuthRequestFinishState {
 public:
     MOCK_METHOD(int32_t, GetStateType, (), (override));
 };
+
+class AuthRequestInitStateMock : public AuthRequestInitState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
+};
+
+class AuthResponseInitStateMock : public AuthResponseInitState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif
