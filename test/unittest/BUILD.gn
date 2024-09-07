@@ -48,6 +48,7 @@ group("unittest") {
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_timer",
+    ":UTTest_dm_service_load",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
     ":UTTest_ipc_client_manager",
@@ -584,6 +585,17 @@ ohos_unittest("UTTest_dm_timer") {
 }
 
 ## UnitTest UTTest_dm_timer }}}
+
+## UnitTest UTTest_dm_service_load {{{
+ohos_unittest("UTTest_dm_service_load") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_service_load.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_service_load }}}
 
 ## UnitTest UTTest_ipc_client_manager {{{
 ohos_unittest("UTTest_ipc_client_manager") {
