@@ -30,8 +30,6 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffline";
 constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
 constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
-#else
-constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
 #endif
 
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,

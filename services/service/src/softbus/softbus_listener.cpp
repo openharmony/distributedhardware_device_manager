@@ -42,12 +42,13 @@ const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t MAX_SOFTBUS_MSG_LEN = 2000;
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
-constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
-constexpr const char* DEVICE_TRUSTED_CHANGE = "deviceTrustedChange";
+#endif
+constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;

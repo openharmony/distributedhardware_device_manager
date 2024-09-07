@@ -36,7 +36,9 @@ namespace DistributedHardware {
 using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
 
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEAL_THREAD = "publish_common_event";
+#endif
 constexpr int32_t MAX_TRY_TIMES = 3;
 
 std::vector<std::string> DmPublishEventSubscriber::GetSubscriberEventNameVec() const
