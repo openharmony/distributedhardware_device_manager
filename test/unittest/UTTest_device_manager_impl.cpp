@@ -41,6 +41,7 @@
 #include "token_setproc.h"
 #include "softbus_error_code.h"
 
+
 namespace OHOS {
 namespace DistributedHardware {
 void DeviceManagerImplTest::SetUp()
