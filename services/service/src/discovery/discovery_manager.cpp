@@ -314,7 +314,9 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
 
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(pkgName);
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(pkgName);
+            }
         }
     }
     {
@@ -429,7 +431,9 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
         }
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(pkgName);
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(pkgName);
+            }
         }
     }
     {
