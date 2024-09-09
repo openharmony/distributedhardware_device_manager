@@ -84,8 +84,8 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
-            "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
             "PEER_NET_ID", GetAnonyUdid(info.peerNetId));
     } else {
@@ -100,6 +100,8 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "COMM_SERV", static_cast<int32_t>(CommServ::USE_SOFTBUS),
             "ERROR_CODE", info.errCode);
     }
@@ -174,8 +176,8 @@ bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::stri
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
         "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_START),
         "IS_TRUST", static_cast<int32_t>(TrustStatus::NOT_TRUST),
-        "PEER_UDID", GetUdidHashByUdid(peerUdid),
-        "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()));
+        "PEER_UDID", GetAnonyUdid(peerUdid),
+        "LOCAL_UDID", GetAnonyLocalUdid());
     if (res != DM_OK) {
         LOGE("ReportAuthStart error, res:%{public}d", res);
         return false;
@@ -196,8 +198,8 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
             "STAGE_RES", info.stageRes,
-            "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "CH_ID", info.channelId,
             "IS_TRUST", info.isTrust,
             "COMM_SERV", info.commServ,
@@ -214,8 +216,8 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
             "BIZ_STATE", info.bizState,
             "STAGE_RES", info.stageRes,
-            "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "CH_ID", info.channelId,
             "IS_TRUST", info.isTrust,
             "COMM_SERV", info.commServ,
@@ -241,6 +243,8 @@ bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
         "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
         "STAGE_RES", info.stageRes,
+        "PEER_UDID", GetAnonyUdid(info.peerUdid),
+        "LOCAL_UDID", GetAnonyLocalUdid(),
         "CH_ID", info.channelId);
     if (res != DM_OK) {
         LOGE("ReportAuthSessionOpenCb error, res:%{public}d", res);
@@ -335,7 +339,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "TO_CALL_PKG", info.toCallPkg);
     } else {
         res = HiSysEventWrite(
@@ -349,7 +353,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
             "TO_CALL_PKG", info.toCallPkg,
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "ERROR_CODE", info.errCode);
     }
     if (res != DM_OK) {
@@ -458,8 +462,8 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
             "TO_CALL_PKG", HICHAINNAME);
     } else {
         res = HiSysEventWrite(
@@ -471,8 +475,8 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(info.peerUdid),
             "TO_CALL_PKG", HICHAINNAME,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "ERROR_CODE", info.errCode);
@@ -532,8 +536,8 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
         "BIZ_STAGE", static_cast<int32_t>(NetworkStage::NETWORK_ONLINE),
         "STAGE_RES", info.stageRes,
         "BIZ_STATE", info.bizState,
-        "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
-        "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
+        "LOCAL_UDID", GetAnonyLocalUdid(),
+        "PEER_UDID", GetAnonyUdid(info.peerUdid),
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "IS_TRUST", info.isTrust);
     if (res != DM_OK) {
@@ -555,8 +559,8 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
         "BIZ_STAGE", static_cast<int32_t>(NetworkStage::NETWORK_OFFLINE),
         "STAGE_RES", info.stageRes,
         "BIZ_STATE", info.bizState,
-        "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
-        "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
+        "LOCAL_UDID", GetAnonyLocalUdid(),
+        "PEER_UDID", GetAnonyUdid(info.peerUdid),
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId));
     if (res != DM_OK) {
         LOGE("ReportNetworkOffline error, res:%{public}d", res);
@@ -578,8 +582,8 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "BIZ_STAGE", static_cast<int32_t>(DeleteTrust::DELETE_TRUST),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
         "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-        "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
-        "PEER_UDID", GetUdidHashByUdid(info.peerUdid),
+        "LOCAL_UDID", GetAnonyLocalUdid(),
+        "PEER_UDID", GetAnonyUdid(info.peerUdid),
         "PEER_NET_ID", GetAnonyUdid(info.peerNetId),
         "TO_CALL_PKG", info.toCallPkg);
     if (res != DM_OK) {
@@ -606,8 +610,8 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_START),
             "CH_ID", channelId,
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME);
         if (res != DM_OK) {
             LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
@@ -626,8 +630,8 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "CH_ID", channelId,
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME,
             "ERROR_CODE", errCode);
         if (res != DM_OK) {
@@ -653,8 +657,8 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME);
         if (res != DM_OK) {
             LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
@@ -672,8 +676,8 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetUdidHashByUdid(GetLocalUdid()),
-            "PEER_UDID", GetUdidHashByUdid(peerUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME,
             "ERROR_CODE", errCode);
         if (res != DM_OK) {
@@ -684,7 +688,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
     return;
 }
 
-void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName)
+void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid)
 {
     int32_t res = DM_OK;
     if (bizStage == static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG)) {
@@ -698,6 +702,8 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             "BIZ_STAGE", bizStage,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME);
         if (res != DM_OK) {
             LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
@@ -713,6 +719,8 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
             "BIZ_STAGE", bizStage,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "PEER_UDID", GetAnonyUdid(peerUdid),
             "TO_CALL_PKG", SOFTBUSNAME);
         if (res != DM_OK) {
             LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
@@ -736,7 +744,7 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "DISCOVERY_DEVICE_LIST", info.discoverDevList);
     } else {
         res = HiSysEventWrite(
@@ -749,7 +757,7 @@ bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetUdidHashByUdid(info.localUdid),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
             "DISCOVERY_DEVICE_LIST", info.discoverDevList,
             "ERROR_CODE", info.errCode);
     }
@@ -784,7 +792,7 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
             cJSON_Delete(deviceInfoJson);
             return "";
         }
-        std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
+        std::string udidHash = GetAnonyUdid(std::string(deviceInfoList[i].deviceId));
         cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
         std::string peerNetId = GetAnonyUdid(deviceInfoList[i].networkId);
         cJSON_AddStringToObject(object, "PEER_NET_ID", peerNetId.c_str());
@@ -822,11 +830,11 @@ std::string DmRadarHelper::GetAnonyUdid(std::string udid)
     return udid.substr(0, SUBSTR_UDID_LENGTH) + "**" + udid.substr(udid.length() - SUBSTR_UDID_LENGTH);
 }
 
-std::string DmRadarHelper::GetLocalUdid()
+std::string DmRadarHelper::GetAnonyLocalUdid()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    return std::string(localDeviceId);
+    return GetAnonyUdid(std::string(localDeviceId));
 }
 
 int32_t DmRadarHelper::GetErrCode(int32_t errCode)

@@ -74,17 +74,6 @@ int32_t g_onlinDeviceNum = 0;
 
 static int OnSessionOpened(int sessionId, int result)
 {
-    struct RadarInfo info = {
-        .funcName = "OnSessionOpened",
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
-        .channelId = sessionId,
-    };
-    if (SoftbusListener::IsDmRadarHelperReady() && SoftbusListener::GetDmRadarHelperObj() != nullptr) {
-        if (!SoftbusListener::GetDmRadarHelperObj()->ReportAuthSessionOpenCb(info)) {
-            LOGE("ReportAuthSessionOpenCb failed");
-        }
-    }
     return DeviceManagerService::GetInstance().OnSessionOpened(sessionId, result);
 }
 
@@ -189,8 +178,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     deviceOnLine.detach();
 #endif
     {
-        char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-        GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
         std::string peerUdid;
         GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
@@ -199,7 +186,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             .bizState = static_cast<int32_t>(BizState::BIZ_STATE_START),
             .isTrust = static_cast<int32_t>(TrustStatus::IS_TRUST),
             .peerNetId = info->networkId,
-            .localUdid = std::string(localDeviceId),
             .peerUdid = peerUdid,
         };
         if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
@@ -240,8 +226,6 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     deviceOffLine.detach();
 #endif
     {
-        char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-        GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
         std::string peerUdid;
         GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
@@ -249,7 +233,6 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
             .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
             .peerNetId = info->networkId,
-            .localUdid = std::string(localDeviceId),
             .peerUdid = peerUdid,
         };
         if (IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {

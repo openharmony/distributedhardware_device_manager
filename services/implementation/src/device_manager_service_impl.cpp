@@ -22,6 +22,7 @@
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -310,6 +311,18 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
 
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 {
+    std::string peerUdid = "";
+    softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
+    struct RadarInfo info = {
+        .funcName = "OnSessionOpened",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+        .peerUdid = peerUdid,
+        .channelId = sessionId,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
+        LOGE("ReportAuthSessionOpenCb failed");
+    }
     return SoftbusSession::OnSessionOpened(sessionId, result);
 }
 

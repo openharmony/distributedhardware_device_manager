@@ -21,7 +21,6 @@
 #include "pin_holder_session.h"
 #include "pinholder_session_callback.h"
 
-#include <atomic>
 #include <map>
 #include <mutex>
 
@@ -77,7 +76,6 @@ private:
     PinHolderState sourceState_;
     int32_t sessionId_ = -1;
     bool isRemoteSupported_ = false;
-    std::atomic<bool> isDestroy_;
 };
 }
 }
