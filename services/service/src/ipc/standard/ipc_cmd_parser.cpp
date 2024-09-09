@@ -1466,14 +1466,19 @@ ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq,
     }
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::static_pointer_cast<IpcNotifyDevTrustChangeReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    std::string deviceId = pReq->GetDeviceId();
+    std::string udid = pReq->GetUdid();
+    std::string uuid = pReq->GetUuid();
     int32_t authForm = pReq->GetAuthForm();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteString(deviceId)) {
-        LOGE("write deviceId failed");
+    if (!data.WriteString(udid)) {
+        LOGE("write udid failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(uuid)) {
+        LOGE("write uuid code failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteInt32(authForm)) {

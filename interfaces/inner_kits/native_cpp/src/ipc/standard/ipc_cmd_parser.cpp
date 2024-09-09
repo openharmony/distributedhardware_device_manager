@@ -1639,9 +1639,10 @@ ON_IPC_READ_RESPONSE(SHIFT_LNN_GEAR, MessageParcel &reply, std::shared_ptr<IpcRs
 ON_IPC_CMD(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    std::string deviceId = data.ReadString();
+    std::string udid = data.ReadString();
+    std::string uuid = data.ReadString();
     int32_t authForm = data.ReadInt32();
-    DeviceManagerNotify::GetInstance().OnDeviceTrustChange(pkgName, deviceId, authForm);
+    DeviceManagerNotify::GetInstance().OnDeviceTrustChange(pkgName, udid, uuid, authForm);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
