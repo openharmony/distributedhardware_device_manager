@@ -2084,12 +2084,10 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
-            if (timer_ != nullptr) {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-            }
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
             authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
         }
     }
