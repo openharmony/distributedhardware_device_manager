@@ -1849,7 +1849,6 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 
 void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
 {
-    LOGI("HandleDeviceTrustedChange start msg %{public}s.", msg.c_str());
     if (msg.empty()) {
         LOGE("Msg is empty.");
         return;

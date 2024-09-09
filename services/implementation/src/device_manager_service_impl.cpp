@@ -17,13 +17,15 @@
 
 #include <functional>
 
+#include "app_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
+#include "dm_softbus_cache.h"
 #include "multiple_user_connector.h"
-#include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "parameter.h"
@@ -310,6 +312,18 @@ std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &
 
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 {
+    std::string peerUdid = "";
+    softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
+    struct RadarInfo info = {
+        .funcName = "OnSessionOpened",
+        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
+        .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
+        .peerUdid = peerUdid,
+        .channelId = sessionId,
+    };
+    if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
+        LOGE("ReportAuthSessionOpenCb failed");
+    }
     return SoftbusSession::OnSessionOpened(sessionId, result);
 }
 
@@ -732,7 +746,9 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
     CHECK_NULL_VOID(authMgr_);
     authMgr_->DeleteGroup(DM_PKG_NAME, remoteUdid);
     CHECK_NULL_VOID(listener_);
-    listener_->OnDeviceTrustChange(remoteUdid, ConvertBindTypeToAuthForm(bindType));
+    std::string uuid = "";
+    SoftbusCache::GetInstance().GetUuidByUdid(remoteUdid, uuid);
+    listener_->OnDeviceTrustChange(remoteUdid, uuid, ConvertBindTypeToAuthForm(bindType));
 }
 
 DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)

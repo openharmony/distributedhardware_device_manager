@@ -180,9 +180,10 @@ public:
         (void)content;
     }
 
-    void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) override
+    void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override
     {
-        (void)deviceId;
+        (void)udid;
+        (void)uuid;
         (void)authForm;
     }
 };
