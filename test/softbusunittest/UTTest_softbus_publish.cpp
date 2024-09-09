@@ -37,17 +37,12 @@ void SoftbusPublishTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(SoftbusPublishTest, OnSoftbusPublishResult_001, testing::ext::TestSize.Level0)
-{
-    int publishId = 1;
-    SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
-    EXPECT_EQ(publishId, 1);
-}
-
 HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level0)
 {
     SoftbusPublish spftbusPublish;
     int32_t ret = spftbusPublish.PublishSoftbusLNN();
+    int publishId = 1;
+    SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
 } // namespace

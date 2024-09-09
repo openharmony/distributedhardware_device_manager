@@ -726,6 +726,14 @@ ohos_unittest("UTTest_device_manager_impl") {
     "ffrt:libffrt",
     "googletest:gmock",
   ]
+
+  cflags = [
+    "-Wall",
+    "-Werror",
+    "-g3",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 }
 
 ## UnitTest UTTest_device_manager_impl }}}
