@@ -307,6 +307,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_004, testing
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
+    int count = 0;
     std::shared_ptr<DeviceManagerUiCallback> dmUiCallback_ = std::make_shared<DeviceManagerFaCallbackTest>(count);
     // 2. set checkMap null
     std::shared_ptr<DeviceManagerUiCallback> checkMap = nullptr;
