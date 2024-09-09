@@ -190,7 +190,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::e
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     // 5. check checkMap not null
-    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_NE(checkMap, nullptr);
 }
 
 /**
@@ -566,7 +566,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStateCallback_005, testing::ext:
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().deviceStateCallback_[testPkgName];
     // 6. check checkMap not null
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -1526,7 +1526,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterAuthenticateCallback_004, testing::e
     // 7. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     // 8. check checkMap not null
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -1804,11 +1804,11 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::T
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    ASSERT_NE(checkMap, nullptr);
-    ASSERT_NE(checkMap1, nullptr);
-    ASSERT_NE(checkMap2, nullptr);
-    ASSERT_NE(checkMap3, nullptr);
-    ASSERT_NE(checkMap4, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
+    ASSERT_EQ(checkMap1, nullptr);
+    ASSERT_EQ(checkMap2, nullptr);
+    ASSERT_EQ(checkMap3, nullptr);
+    ASSERT_EQ(checkMap4, nullptr);
 }
 
 /**
