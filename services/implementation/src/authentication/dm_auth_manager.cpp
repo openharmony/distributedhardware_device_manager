@@ -474,11 +474,9 @@ void DmAuthManager::ProcessSourceMsg()
             break;
         case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
-                if (timer_ != nullptr) {
-                    timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
-                    isFinishOfLocal_ = false;
-                    authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
-                }
+                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                isFinishOfLocal_ = false;
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
             }
             break;
         default:
@@ -495,17 +493,13 @@ void DmAuthManager::ProcessSinkMsg()
     switch (authResponseContext_->msgType) {
         case MSG_TYPE_NEGOTIATE:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_INIT) {
-                if (timer_ != nullptr) {
-                    timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
-                }
+                timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
             }
             break;
         case MSG_TYPE_REQ_AUTH:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_NEGOTIATE) {
-                if (timer_ != nullptr) {
-                    timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
-                }
+                timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
             }
             break;
@@ -527,9 +521,7 @@ void DmAuthManager::ProcessSinkMsg()
             break;
         case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             if (authResponseState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
-                if (timer_ != nullptr) {
-                    timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
-                }
+                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
                 isFinishOfLocal_ = false;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseSyncDeleteAclNone>());
             }
