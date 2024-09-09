@@ -478,15 +478,18 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoy(const std::string &p
 }
 #endif
 
-void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm)
+void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, const std::string &uuid,
+    DmAuthForm authForm)
 {
-    LOGI("DeviceId %{public}s, authForm %{public}d.", GetAnonyString(deviceId).c_str(), authForm);
+    LOGI("udid %{public}s, uuid %{public}s, authForm %{public}d.", GetAnonyString(udid).c_str(),
+        GetAnonyString(uuid).c_str(), authForm);
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
     for (const auto &it : PkgNameVec) {
         pReq->SetPkgName(it);
-        pReq->SetDeviceId(deviceId);
+        pReq->SetUdid(udid);
+        pReq->SetUuid(uuid);
         pReq->SetAuthForm(authForm);
         ipcServerListener_.SendRequest(REMOTE_DEVICE_TRUST_CHANGE, pReq, pRsp);
     }

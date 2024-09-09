@@ -150,7 +150,7 @@ public:
      * @tc.desc: Set the pkgname that not offline
      * @tc.type: FUNC
      */
-    virtual void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) = 0;
+    virtual void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
