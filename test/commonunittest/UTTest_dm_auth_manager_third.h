@@ -44,6 +44,15 @@ public:
 
     std::shared_ptr<DmAuthManager> authManager_;
 };
+
+class SoftbusStateCallbackMock : public ISoftbusStateCallback {
+public:
+    SoftbusStateCallbackMock() {}
+    virtual ~SoftbusStateCallbackMock() {}
+    void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
+    void OnDeviceOffline(std::string deviceId) {}
+    void DeleteOffLineTimer(std::string udidHash) {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif
