@@ -19,6 +19,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <ffrt>
 #include <functional>
 #include <map>
 #include <mutex>
@@ -42,15 +43,6 @@ constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
 
 using TimerCallback = std::function<void (std::string name)>;
-
-class CommonEventHandler : public AppExecFwk::EventHandler {
-    public:
-        CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-        ~CommonEventHandler() override = default;
-
-        bool PostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
-        void RemoveTask(const std::string &name);
-};
 
 class DmTimer {
 public:
@@ -80,8 +72,8 @@ public:
 
 private:
     mutable std::mutex timerMutex_;
-    std::unordered_set<std::string> timerVec_ = {};
-    std::shared_ptr<CommonEventHandler> eventHandler_;
+    std::unordered_map<std::string, ffrt::task_handle> timerVec_ = {};
+    std::shared_ptr<ffrt::queue> queue_;
 };
 }
 }

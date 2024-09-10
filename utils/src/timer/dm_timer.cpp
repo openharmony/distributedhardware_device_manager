@@ -22,28 +22,16 @@ namespace DistributedHardware {
 const int32_t MIN_TIME_OUT = 0;
 const int32_t MAX_TIME_OUT = 300;
 const int32_t MILLISECOND_TO_SECOND = 1000;
-
-CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
-{
-    LOGI("CommonEventHandler constructor");
-}
-
-bool CommonEventHandler::PostTask(const Callback &callback, const std::string &name, int64_t delayTime)
-{
-    return AppExecFwk::EventHandler::PostTask(callback, name, delayTime);
-}
-
-void CommonEventHandler::RemoveTask(const std::string &name)
-{
-    AppExecFwk::EventHandler::RemoveTask(name);
-}
+constexpr const char* TIMER_TASK = "TimerTask";
 
 DmTimer::DmTimer()
 {
     LOGI("DmTimer constructor");
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
-    eventHandler_ = std::make_shared<CommonEventHandler>(runner);
+    if (queue_ != nullptr) {
+        LOGI("DmTimer already init.");
+        return;
+    }
+    queue_ = std::make_shared<ffrt::queue>(TIMER_TASK);
 }
 
 DmTimer::~DmTimer()
@@ -60,11 +48,13 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
     }
     LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    timerVec_.insert(name);
 
     auto taskFunc = [callback, name] () { callback(name); };
-    if (eventHandler_ != nullptr) {
-        eventHandler_->PostTask(taskFunc, name, timeOut * MILLISECOND_TO_SECOND);
+    if (queue_ != nullptr) {
+        ffrt::task_handle h = queue_->submit_h(taskFunc, ffrt::task_attr().delay(timeOut * MILLISECOND_TO_SECOND));
+        if (h != nullptr) {
+            timerVec_.insert(name, h);
+        }
     }
     return DM_OK;
 }
@@ -77,14 +67,15 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     }
     LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (!timerVec_.empty() && timerVec_.find(timerName) == timerVec_.end()) {
+    if (timerVec_.empty() || timerVec_.find(timerName) == timerVec_.end()) {
         LOGI("DmTimer DeleteTimer is not exist.");
         return ERR_DM_FAILED;
     }
-    timerVec_.erase(timerName);
-    if (eventHandler_ != nullptr) {
-        eventHandler_->RemoveTask(timerName);
+    ffrt::task_handle h = timerVec_.find(timerName);
+    if (queue_ != nullptr && h != nullptr) {
+        queue_->skip(h);
     }
+    timerVec_.erase(timerName);
     return DM_OK;
 }
 
@@ -92,7 +83,7 @@ int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (eventHandler_ ==  nullptr) {
+    if (queue_ ==  nullptr) {
         return ERR_DM_FAILED;
     }
     if (timerVec_.empty()) {
@@ -100,7 +91,10 @@ int32_t DmTimer::DeleteAll()
         return DM_OK;
     }
     for (auto name : timerVec_) {
-        eventHandler_->RemoveTask(name);
+        ffrt::task_handle h = timerVec_.find(name);
+        if (queue_ != nullptr && h != nullptr) {
+            queue_->skip(h);
+        }
     }
     timerVec_.clear();
     return DM_OK;
