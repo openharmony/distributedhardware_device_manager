@@ -624,15 +624,15 @@ void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
             authRequestContext_->reason = ERR_DM_BIND_PIN_CODE_ERROR;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        } else {
-            if (timer_ != nullptr) {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-            }
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
+            return;
         }
+        if (timer_ != nullptr) {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
+        }
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
     } else {
         authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
         if (timer_ != nullptr) {
@@ -2416,16 +2416,6 @@ std::string DmAuthManager::ConvertSinkVersion(const std::string &version)
     }
     LOGI("ConvertSinkVersion version %{public}s, sinkVersion is %{public}s.", version.c_str(), sinkVersion.c_str());
     return sinkVersion;
-}
-
-bool DmAuthManager::CompareVersion(const std::string &remoteVersion, const std::string &oldVersion)
-{
-    LOGI("remoteVersion %{public}s, oldVersion %{public}s.", remoteVersion.c_str(), oldVersion.c_str());
-    std::vector<int32_t> remoteVersionVec;
-    std::vector<int32_t> oldVersionVec;
-    VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
-    VersionSplitToInt(oldVersion, '.', oldVersionVec);
-    return CompareVecNum(remoteVersionVec, oldVersionVec);
 }
 
 void DmAuthManager::SetAuthType(int32_t authType)
