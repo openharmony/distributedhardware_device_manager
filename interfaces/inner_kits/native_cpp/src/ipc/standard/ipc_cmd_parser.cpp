@@ -32,6 +32,8 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_screen_status_req.h"
+#include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
@@ -1644,6 +1646,39 @@ ON_IPC_CMD(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &data, MessageParcel &reply
     int32_t authForm = data.ReadInt32();
     DeviceManagerNotify::GetInstance().OnDeviceTrustChange(pkgName, udid, uuid, authForm);
     reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(SERVER_DEVICE_SCREEN_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmDeviceInfo dmDeviceInfo;
+    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    DeviceManagerNotify::GetInstance().OnDeviceScreenStatus(pkgName, dmDeviceInfo);
+
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_SCREEN_STATUS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcGetDeviceScreenStatusReq> pReq = std::static_pointer_cast<IpcGetDeviceScreenStatusReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(networkId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_SCREEN_STATUS, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGetDeviceScreenStatusRsp> pRsp = std::static_pointer_cast<IpcGetDeviceScreenStatusRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetScreenStatus(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

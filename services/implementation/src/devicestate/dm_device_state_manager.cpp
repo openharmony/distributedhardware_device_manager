@@ -492,5 +492,23 @@ bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
     }
     return false;
 }
+
+void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
+{
+    if (softbusConnector_ == nullptr || listener_ == nullptr) {
+        LOGE("failed, ptr is null.");
+        return;
+    }
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    LOGI("pkgName size: %{public}d", pkgName.size());
+    if (pkgName.size() == 0) {
+        listener_->OnDeviceScreenStateChange(std::string(DM_PKG_NAME), devInfo);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnDeviceScreenStateChange(item, devInfo);
+        }
+    }
+    softbusConnector_->ClearPkgName();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

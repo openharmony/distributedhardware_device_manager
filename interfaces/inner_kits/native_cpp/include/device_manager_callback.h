@@ -140,6 +140,14 @@ public:
     }
     virtual void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) = 0;
 };
+
+class DeviceScreenStatusCallback {
+public:
+    virtual ~DeviceScreenStatusCallback()
+    {
+    }
+    virtual void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

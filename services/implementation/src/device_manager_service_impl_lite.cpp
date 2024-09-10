@@ -506,6 +506,12 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
     return;
 }
 
+void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
+{
+    (void)devInfo;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

@@ -67,6 +67,9 @@ public:
     void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, std::string content);
     void RegisterPinHolderCallback(const std::string &pkgName, std::shared_ptr<PinHolderCallback> callback);
     void RegDevTrustChangeCallback(const std::string &pkgName, std::shared_ptr<DevTrustChangeCallback> callback);
+    void RegisterDeviceScreenStatusCallback(const std::string &pkgName,
+        std::shared_ptr<DeviceScreenStatusCallback> callback);
+    void UnRegisterDeviceScreenStatusCallback(const std::string &pkgName);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -112,6 +115,7 @@ public:
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
     void OnDeviceTrustChange(const std::string &pkgName, const std::string &udid, const std::string &uuid,
         int32_t authForm);
+    void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
 private:
 #if !defined(__LITEOS_M__)
     std::mutex lock_;
@@ -128,6 +132,7 @@ private:
     std::map<std::string, std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>> unbindCallback_;
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
+    std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
     std::mutex bindLock_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<ffrt::queue> ffrtQueue_;

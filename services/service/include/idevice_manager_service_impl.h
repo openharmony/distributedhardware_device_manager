@@ -271,6 +271,7 @@ public:
         const std::string &udid, uint64_t &tokenId) = 0;
     virtual void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
+    virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

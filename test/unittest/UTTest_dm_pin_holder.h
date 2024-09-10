@@ -186,6 +186,12 @@ public:
         (void)uuid;
         (void)authForm;
     }
+
+    void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override
+    {
+        (void)pkgName;
+        (void)devInfo;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
