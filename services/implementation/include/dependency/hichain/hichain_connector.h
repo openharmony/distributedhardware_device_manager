@@ -236,6 +236,7 @@ public:
     int32_t GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
         std::vector<GroupInfo> &groupList);
     void DeleteAllGroupByUdid(const std::string &udid);
+    void DeleteP2PGroup(int32_t switchUserId);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
