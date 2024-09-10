@@ -15,11 +15,16 @@
 
 #include "app_manager.h"
 
+#include "accesstoken_kit.h"
+#include "if_system_ability_manager.h"
+#include "ipc_skeleton.h"
+#include "iservice_registry.h"
+#include "os_account_manager.h"
+#include "system_ability_definition.h"
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "accesstoken_kit.h"
-#include "ipc_skeleton.h"
 
 using namespace OHOS::Security::AccessToken;
 
@@ -32,16 +37,35 @@ const std::string AppManager::GetAppId()
     std::string appId = "";
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
     if (AccessTokenKit::GetTokenTypeFlag(tokenId) != TOKEN_HAP) {
-        LOGE("The caller is not token_hap.");
+        LOGI("The caller is not token_hap.");
         return appId;
     }
-    HapTokenInfo tokenInfo;
-    int32_t result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
-    if (result != RET_SUCCESS) {
-        LOGE("GetHapTokenInfo failed ret is %{public}d.", result);
+    sptr<AppExecFwk::IBundleMgr> bundleManager = nullptr;
+    if (!GetBundleManagerProxy(bundleManager)) {
+        LOGE("get bundleManager failed.");
         return appId;
     }
-    appId = tokenInfo.appID;
+    if (bundleManager == nullptr) {
+        LOGE("bundleManager is nullptr.");
+        return appId;
+    }
+    int userId;
+    ErrCode result = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    if (result != ERR_OK) {
+        LOGE("GetAppIdByCallingUid QueryActiveOsAccountIds failed.");
+        return appId;
+    }
+    std::string BundleName;
+    bundleManager->GetNameForUid(IPCSkeleton::GetCallingUid(), BundleName);
+    AppExecFwk::BundleInfo bundleInfo;
+    int ret = bundleManager->GetBundleInfoV9(
+        BundleName, static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO),
+        bundleInfo, userId);
+    if (ret != 0) {
+        LOGE(" GetBundleInfoV9 failed %{public}d.", ret);
+        return appId;
+    }
+    appId = bundleInfo.appId;
     return appId;
 }
 
@@ -90,6 +114,28 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
     }
     appId = appIdMap_[pkgName];
     return DM_OK;
+}
+
+bool AppManager::GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager)
+{
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        LOGE("GetBundleManagerProxy Failed to get system ability mgr.");
+        return false;
+    }
+    sptr<IRemoteObject> remoteObject =
+        systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        LOGE("GetBundleManagerProxy Failed to get bundle manager service.");
+        return false;
+    }
+    bundleManager = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    if (bundleManager == nullptr) {
+        LOGE("bundleManager is nullptr");
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

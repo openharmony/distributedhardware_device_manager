@@ -162,7 +162,6 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
             static_cast<int32_t>(StageRes::STAGE_FAIL) : static_cast<int32_t>(StageRes::STAGE_IDLE),
         .bizState = (ret != 0) ?
             static_cast<int32_t>(BizState::BIZ_STATE_END) : static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .localUdid = std::string(localDeviceId),
         .errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_CREATE_GROUP_FAILED),
     };
     if (!DmRadarHelper::GetInstance().ReportAuthCreateGroup(info)) {
@@ -1190,6 +1189,37 @@ void HiChainConnector::DeleteAllGroupByUdid(const std::string &udid)
     for (auto &iter : groupListExt) {
         if (DeleteGroupExt(iter.groupId) != DM_OK) {
             LOGE("DeleteGroupExt groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
+        }
+    }
+}
+
+void HiChainConnector::DeleteP2PGroup(int32_t switchUserId)
+{
+    LOGI("switchuserId: %{public}d", switchUserId);
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    std::string queryParams = jsonObj.dump();
+    std::vector<GroupInfo> groupList;
+
+    if (!GetGroupInfo(switchUserId, queryParams, groupList)) {
+        LOGE("failed to get the switch user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        if (DeleteGroup(switchUserId, iter->groupId) != DM_OK) {
+            LOGE("failed to delete the old user id group %{public}s", GetAnonyString(iter->groupId).c_str());
+        }
+    }
+
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    LOGI("userId: %{public}d", userId);
+    if (!GetGroupInfo(userId, queryParams, groupList)) {
+        LOGE("failed to get the user id groups");
+        return;
+    }
+    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+        if (DeleteGroup(userId, iter->groupId) != DM_OK) {
+            LOGE("failed to delete the user id group %{public}s", GetAnonyString(iter->groupId).c_str());
         }
     }
 }

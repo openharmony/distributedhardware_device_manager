@@ -30,18 +30,26 @@ public:
     {
         authForm_ = authForm;
     }
-    const std::string &GetDeviceId() const
+    const std::string &GetUdid() const
     {
-        return deviceId_;
+        return udid_;
     }
-    void SetDeviceId(const std::string &deviceId)
+    void SetUdid(const std::string &udid)
     {
-        deviceId_ = deviceId;
+        udid_ = udid;
     }
-
+    const std::string &GetUuid() const
+    {
+        return uuid_;
+    }
+    void SetUuid(const std::string &uuid)
+    {
+        uuid_ = uuid;
+    }
 private:
     int32_t authForm_;
-    std::string deviceId_;
+    std::string udid_;
+    std::string uuid_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

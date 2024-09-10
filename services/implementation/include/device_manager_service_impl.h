@@ -142,6 +142,7 @@ private:
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleUserRemoved(int32_t preUserId);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
+    void HandleUserSwitched(int32_t switchUserId);
 
 private:
     std::shared_ptr<DmAuthManager> authMgr_;

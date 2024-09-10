@@ -134,7 +134,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
     return;
 }
 
-void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName)
+void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid)
 {
     return;
 }
@@ -182,11 +182,11 @@ std::string DmRadarHelper::GetAnonyUdid(std::string udid)
     return udid.substr(0, SUBSTR_UDID_LENGTH) + "**" + udid.substr(udid.length() - SUBSTR_UDID_LENGTH);
 }
 
-std::string DmRadarHelper::GetLocalUdid()
+std::string DmRadarHelper::GetAnonyLocalUdid()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    return std::string(localDeviceId);
+    return GetAnonyUdid(std::string(localDeviceId));
 }
 
 int32_t DmRadarHelper::GetErrCode(int32_t errCode)

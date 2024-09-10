@@ -285,7 +285,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         .funcName = "UnAuthenticateDevice",
         .toCallPkg = HICHAINNAME,
         .hostName = pkgName,
-        .localUdid = localDeviceId,
         .peerUdid = udid,
     };
     if (!DmRadarHelper::GetInstance().ReportDeleteTrustRelation(info)) {
@@ -665,8 +664,6 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
 int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 {
     int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     struct RadarInfo info = {
         .funcName = "EstablishAuthChannel",
         .stageRes = (sessionId > 0) ?
@@ -677,8 +674,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
         .peerSessName = DM_SESSION_NAME,
         .isTrust = static_cast<int32_t>(TrustStatus::NOT_TRUST),
         .commServ = static_cast<int32_t>(CommServ::USE_SOFTBUS),
-        .localUdid = localDeviceId,
-        .peerUdid = deviceId,
+        .peerUdid = peerTargetId_.deviceId,
         .channelId = sessionId,
         .errCode = sessionId,
     };

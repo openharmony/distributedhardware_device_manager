@@ -1058,10 +1058,11 @@ void DeviceManagerNotify::RegDevTrustChangeCallback(const std::string &pkgName,
     devTrustChangeCallback_[pkgName] = callback;
 }
 
-void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const std::string &deviceId, int32_t authForm)
+void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const std::string &udid,
+    const std::string &uuid, int32_t authForm)
 {
-    LOGI("PkgName %{public}s, deviceId %{public}s, authForm %{public}d", pkgName.c_str(),
-        GetAnonyString(deviceId).c_str(), authForm);
+    LOGI("PkgName %{public}s, udid %{public}s, uuid %{public}s, authForm %{public}d", pkgName.c_str(),
+        GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str(), authForm);
     if (pkgName.empty() || authForm < static_cast<int32_t>(INVALID_TYPE) ||
         authForm > static_cast<int32_t>(ACROSS_ACCOUNT)) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -1093,14 +1094,14 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
 #endif
 }
 
-void DeviceManagerNotify::DeviceTrustChange(const std::string &deviceId, DmAuthForm authForm,
+void DeviceManagerNotify::DeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm,
     std::shared_ptr<DevTrustChangeCallback> tempCbk)
 {
     if (tempCbk == nullptr) {
         LOGE("Callback ptr is nullptr.");
         return;
     }
-    tempCbk->OnDeviceTrustChange(deviceId, authForm);
+    tempCbk->OnDeviceTrustChange(udid, uuid, authForm);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

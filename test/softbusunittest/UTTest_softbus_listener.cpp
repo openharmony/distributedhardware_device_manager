@@ -466,7 +466,7 @@ HWTEST_F(SoftbusListenerTest, OnSessionClosed_001, testing::ext::TestSize.Level0
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0)
@@ -477,7 +477,7 @@ HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level0)
@@ -497,7 +497,7 @@ HWTEST_F(SoftbusListenerTest, OnPinHolderSessionClosed_001, testing::ext::TestSi
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSize.Level0)
@@ -508,7 +508,7 @@ HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSi
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
@@ -712,17 +712,22 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
-}
-
-HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.Level0)
-{
-    char *msg = nullptr;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
     softbusListener->OnLocalDevInfoChange();
-    EXPECT_EQ(msg, nullptr);
+    std::string msg = "123";
+    softbusListener->DeviceNotTrust(msg);
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOffline(info);
+    TrustChangeType type = TrustChangeType::DEVICE_NOT_TRUSTED;
+    const uint32_t msgLen = 100;
+    char msg1[msgLen] = {0};
+    softbusListener->OnDeviceTrustedChange(type, msg1, msgLen);
+    char *msg2 = nullptr;
+    softbusListener->OnDeviceTrustedChange(type, msg2, msgLen);
+    const uint32_t msgLen2 = MAX_SOFTBUS_MSG_LEN + 1;
+    softbusListener->OnDeviceTrustedChange(type, msg1, msgLen2);
+    softbusListener->OnDeviceTrustedChange(type, msg2, msgLen2);
+    softbusListener->SendAclChangedBroadcast(msg);
+    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -16,9 +16,10 @@
 #ifndef OHOS_DM_AUTH_MANAGER_FIRST_TEST_H
 #define OHOS_DM_AUTH_MANAGER_FIRST_TEST_H
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <map>
 #include <string>
-#include <gtest/gtest.h>
 
 #include "authentication.h"
 #include "softbus_session.h"
@@ -49,6 +50,21 @@ public:
 
     std::shared_ptr<DmAuthManager> authManager_ =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+};
+
+class AuthRequestFinishStateMock : public AuthRequestFinishState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
+};
+
+class AuthRequestInitStateMock : public AuthRequestInitState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
+};
+
+class AuthResponseInitStateMock : public AuthResponseInitState {
+public:
+    MOCK_METHOD(int32_t, GetStateType, (), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

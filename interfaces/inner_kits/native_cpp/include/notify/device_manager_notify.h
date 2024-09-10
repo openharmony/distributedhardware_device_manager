@@ -81,7 +81,7 @@ public:
         std::shared_ptr<DeviceStatusCallback> tempCbk);
     static void DeviceBasicInfoReady(const DmDeviceBasicInfo &deviceBasicInfo,
         std::shared_ptr<DeviceStatusCallback> tempCbk);
-    static void DeviceTrustChange(const std::string &deviceId, DmAuthForm authForm,
+    static void DeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm,
         std::shared_ptr<DevTrustChangeCallback> tempCbk);
 public:
     void OnRemoteDied();
@@ -110,7 +110,8 @@ public:
     void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
                           const std::string &content);
     std::map<std::string, std::shared_ptr<DmInitCallback>> GetDmInitCallback();
-    void OnDeviceTrustChange(const std::string &pkgName, const std::string &deviceId, int32_t authForm);
+    void OnDeviceTrustChange(const std::string &pkgName, const std::string &udid, const std::string &uuid,
+        int32_t authForm);
 private:
 #if !defined(__LITEOS_M__)
     std::mutex lock_;

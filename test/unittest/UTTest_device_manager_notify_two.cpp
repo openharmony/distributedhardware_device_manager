@@ -154,10 +154,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_005, testing::
     std::string testPkgName = "com.ohos.test1";
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, dmUiCallback_);
     checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[testPkgName];
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_EQ(checkMap, nullptr);
 }
 
@@ -326,10 +322,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_004, testing
     // 7. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName];
     // 8 check checkMap null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_EQ(checkMap, nullptr);
 }
 

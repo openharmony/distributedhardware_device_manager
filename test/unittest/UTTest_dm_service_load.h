@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,43 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_MANAGER_SECOND_TEST_H
-#define OHOS_DM_AUTH_MANAGER_SECOND_TEST_H
+#ifndef OHOS_DM_SERVICE_LOAD_TEST_H
+#define OHOS_DM_SERVICE_LOAD_TEST_H
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <map>
-#include <string>
+#include <refbase.h>
 
-#include "auth_message_processor.h"
-#include "auth_request_state.h"
-#include "auth_response_state.h"
-#include "authentication.h"
-#include "device_manager_service_listener.h"
-#include "dm_adapter_manager.h"
-#include "dm_auth_manager.h"
-#include "dm_constants.h"
-#include "dm_timer.h"
-#include "hichain_connector.h"
-#include "softbus_connector.h"
-#include "softbus_session.h"
+#include "dm_service_load.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmAuthManagerTest : public testing::Test {
+class DmServiceLoadTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-
-    std::shared_ptr<DmAuthManager> authManager_;
 };
 
-class AuthResponseInitStateMock : public AuthResponseInitState {
+class DMLoadCallbackTest : public DMLoadCallback {
 public:
-    MOCK_METHOD(int32_t, GetStateType, (), (override));
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) {}
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+
+#endif // OHOS_DM_SERVICE_LOAD_TEST_H

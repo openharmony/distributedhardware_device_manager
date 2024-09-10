@@ -46,6 +46,7 @@ public:
     int32_t GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo);
     void UpDataLocalDevInfo();
     int32_t GetUdidByUdidHash(const std::string &udidHash, std::string &udid);
+    int32_t GetUuidByUdid(const std::string &udid, std::string &uuid);
 private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);

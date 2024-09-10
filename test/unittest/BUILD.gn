@@ -29,10 +29,12 @@ group("unittest") {
     ":UTTest_device_manager_service_listener",
     ":UTTest_discovery_filter",
     ":UTTest_discovery_manager",
+    ":UTTest_dm_account_common_event",
     ":UTTest_dm_adapter_manager",
     ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
+    ":UTTest_dm_auth_manager_third",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
@@ -44,8 +46,11 @@ group("unittest") {
     ":UTTest_dm_distributed_hardware_load",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
+    ":UTTest_dm_publish_common_event",
     ":UTTest_dm_publish_manager",
     ":UTTest_dm_radar_helper_test",
+    ":UTTest_dm_screen_common_event",
+    ":UTTest_dm_service_load",
     ":UTTest_dm_timer",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
@@ -66,6 +71,7 @@ group("unittest") {
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
+    ":UTTest_relationship_sync_mgr",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
     ":UTTest_softbus_publish",
@@ -584,6 +590,17 @@ ohos_unittest("UTTest_dm_timer") {
 
 ## UnitTest UTTest_dm_timer }}}
 
+## UnitTest UTTest_dm_service_load {{{
+ohos_unittest("UTTest_dm_service_load") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_service_load.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+}
+
+## UnitTest UTTest_dm_service_load }}}
+
 ## UnitTest UTTest_ipc_client_manager {{{
 ohos_unittest("UTTest_ipc_client_manager") {
   module_out_path = module_out_path
@@ -708,6 +725,14 @@ ohos_unittest("UTTest_device_manager_impl") {
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Werror",
+    "-g3",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 }
 
@@ -1005,6 +1030,15 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "device_info_manager:distributed_device_profile_sdk",
     "googletest:gmock",
   ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
 }
 
 ## UTTest_dm_auth_manager_first }}}
@@ -1020,6 +1054,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1028,6 +1063,36 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 }
 
 ## UTTest_dm_auth_manager_second }}}
+
+## UnitTest UTTest_dm_auth_manager_third {{{
+ohos_unittest("UTTest_dm_auth_manager_third") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_third.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "googletest:gmock",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+}
+
+## UTTest_dm_auth_manager_third }}}
 
 ###############################
 ## UnitTest UTTest_dm_radar_helper_test {{{
@@ -1183,6 +1248,79 @@ ohos_unittest("UTTest_dm_crypto") {
 }
 
 ## UnitTest UTTest_dm_crypto }}}
+
+## UnitTest UTTest_dm_account_common_event {{{
+ohos_unittest("UTTest_dm_account_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_account_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = []
+}
+
+## UnitTest UTTest_dm_account_common_event }}}
+
+## UnitTest UTTest_dm_publish_common_event {{{
+ohos_unittest("UTTest_dm_publish_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_publish_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "bluetooth:btframework",
+    "wifi:wifi_sdk",
+  ]
+}
+
+## UnitTest UTTest_dm_publish_common_event }}}
+
+## UnitTest UTTest_dm_screen_common_event {{{
+ohos_unittest("UTTest_dm_screen_common_event") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_screen_common_event.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "bluetooth:btframework",
+    "wifi:wifi_sdk",
+  ]
+}
+
+## UnitTest UTTest_dm_screen_common_event }}}
+
+## UnitTest UTTest_relationship_sync_mgr {{{
+ohos_unittest("UTTest_relationship_sync_mgr") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources =
+      [ "${devicemanager_path}/test/unittest/UTTest_relationship_sync_mgr.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "cJSON:cjson" ]
+}
+
+## UnitTest UTTest_relationship_sync_mgr }}}
 
 ## UnitTest UTTest_dm_publish_manager {{{
 ohos_unittest("UTTest_dm_publish_manager") {

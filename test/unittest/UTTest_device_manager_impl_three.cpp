@@ -1175,6 +1175,101 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy006, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
+
+HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_301, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    uint64_t tokenId = 123;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(tokenId, packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_302, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    uint64_t tokenId = 123;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManagerImpl::GetInstance().InitDeviceManager(packName, callback);
+    DeviceManagerImpl::GetInstance().subscribIdMap_[tokenId] = 12345;
+    DeviceManagerImpl::GetInstance().StopDeviceDiscovery(tokenId, packName);
+    DeviceManagerImpl::GetInstance().subscribIdMap_.erase(tokenId);
+    int32_t ret = DeviceManagerImpl::GetInstance().StopDeviceDiscovery(tokenId, packName);
+    ASSERT_EQ(ret, ERR_DM_STOP_DISCOVERY);
+    DeviceManagerImpl::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterUiStateCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    int32_t ret = DeviceManagerImpl::GetInstance().RegisterUiStateCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterUiStateCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    DeviceManager::GetInstance().CheckNewAPIAccessPermission();
+    int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterUiStateCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, StopAdvertising_301, testing::ext::TestSize.Level0)
+{
+    std::string packName;
+    std::map<std::string, std::string> advertiseParam;
+    int32_t ret = DeviceManager::GetInstance().StopAdvertising(packName, advertiseParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, CheckAccessToTarget_301, testing::ext::TestSize.Level0)
+{
+    uint64_t tokenId = 123;
+    std::string targetId;
+    int32_t ret = DeviceManager::GetInstance().CheckAccessToTarget(tokenId, targetId);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegDevTrustChangeCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<DevTrustChangeCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegDevTrustChangeCallback_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<DevTrustChangeCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegDevTrustChangeCallback_303, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<DevTrustChangeCallback> callback = std::make_shared<DevTrustChangeCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegDevTrustChangeCallback_304, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<DevTrustChangeCallback> callback = std::make_shared<DevTrustChangeCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetErrCode_301, testing::ext::TestSize.Level0)
+{
+    int32_t errCode = ERR_DM_TIME_OUT;
+    int32_t ret = DeviceManager::GetInstance().GetErrCode(errCode);
+    ASSERT_EQ(ret, 96929745);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

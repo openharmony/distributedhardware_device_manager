@@ -506,6 +506,13 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
     return;
 }
 
+
+void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
+{
+    (void)switchUserId;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

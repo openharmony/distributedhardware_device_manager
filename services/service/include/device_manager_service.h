@@ -192,6 +192,7 @@ public:
     void HandleDeviceTrustedChange(const std::string &msg);
 
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
+    void ClearDiscoveryCache(const std::string &pkgName);
 
 private:
     bool IsDMServiceImplReady();
@@ -217,6 +218,7 @@ private:
     int32_t GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash);
     void HandleAccountLogout(int32_t userId, const std::string &accountId);
     void HandleUserRemoved(int32_t preUserId);
+    void HandleUserSwitched(int32_t switchUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

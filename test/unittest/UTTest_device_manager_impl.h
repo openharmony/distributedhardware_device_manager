@@ -101,6 +101,14 @@ public:
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
                       int32_t reason) override {}
 };
+
+class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
+public:
+    virtual ~DevTrustChangeCallbackTest()
+    {
+    }
+    void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

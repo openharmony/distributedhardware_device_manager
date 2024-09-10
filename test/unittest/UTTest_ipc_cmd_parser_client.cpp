@@ -280,6 +280,42 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_028, testing::ext::TestSize.Le
     ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SET_DN_POLICY;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SET_DN_POLICY;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_031, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SHIFT_LNN_GEAR;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_032, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_SAME_ACCOUNT;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_033, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_ACCESS_CONTROL;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_034, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_API_PERMISSION;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
 HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_002, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = GET_NETWORKTYPE_BY_NETWORK;
@@ -505,6 +541,23 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_014, testing::ext::TestSize.L
     ASSERT_EQ(DM_OK, ret);
 }
 
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_015, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SET_DN_POLICY;
+    MessageParcel data;
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::string pkgName = "ohos.dm.test";
+    std::string policy = "DM_POLICY_STRATEGY_FOR_BLE:100";
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(policy);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
 HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
@@ -657,6 +710,25 @@ HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_008, testing::ext::TestSize.Level0
     data.WriteInt32(result);
     data.WriteInt32(pinHolderEvent);
     data.WriteString(content);
+    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_009, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = REMOTE_DEVICE_TRUST_CHANGE;
+    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    MessageParcel data;
+    MessageParcel reply;
+    std::string pkgName = "ohos.dm.test";
+    std::string deviceId = "xxx";
+    int32_t authForm = 1;
+    data.WriteString(pkgName);
+    data.WriteString(deviceId);
+    data.WriteInt32(authForm);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
     if (ptr) {
         ret = ptr(data, reply);
