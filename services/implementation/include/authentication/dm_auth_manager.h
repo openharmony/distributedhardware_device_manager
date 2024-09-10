@@ -488,6 +488,7 @@ private:
     int32_t CheckTrustState();
     void ProcIncompatible(const int32_t &sessionId);
     bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
+    void MemberJoinAuthRequest(int64_t requestId, int32_t status);
 
 public:
     void RequestCredential();
