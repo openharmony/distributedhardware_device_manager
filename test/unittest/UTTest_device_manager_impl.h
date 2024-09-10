@@ -107,7 +107,7 @@ public:
     virtual ~DevTrustChangeCallbackTest()
     {
     }
-    void OnDeviceTrustChange(const std::string &deviceId, DmAuthForm authForm) override {}
+    void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS
