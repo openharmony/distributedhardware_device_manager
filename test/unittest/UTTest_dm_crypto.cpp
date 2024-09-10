@@ -47,7 +47,7 @@ void DmCryptoTest::TearDownTestCase()
  */
 HWTEST_F(DmCryptoTest, GetSecRandom_01, testing::ext::TestSize.Level0)
 {
-    const int32_t len = 8;
+    const size_t len = 8;
     uint8_t buffer[len] = {0};
     int32_t ret = Crypto::GetSecRandom(buffer, len);
     EXPECT_EQ(ret, 0);
