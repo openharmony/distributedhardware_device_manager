@@ -1083,9 +1083,9 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
     }
     DmAuthForm dmAuthForm = static_cast<DmAuthForm>(authForm);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { DeviceTrustChange(deviceId, dmAuthForm, tempCbk); });
+    ffrt::submit([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
 #else
-    std::thread deviceTrustChange([=]() { DeviceTrustChange(deviceId, dmAuthForm, tempCbk); });
+    std::thread deviceTrustChange([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
     if (pthread_setname_np(deviceTrustChange.native_handle(), DEVICE_TRUST_CHANGE) != DM_OK) {
         LOGE("deviceTrustChange set name failed.");
     }
