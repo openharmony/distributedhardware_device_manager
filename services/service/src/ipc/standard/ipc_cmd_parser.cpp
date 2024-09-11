@@ -1497,5 +1497,50 @@ ON_IPC_READ_RESPONSE(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &reply, std::shar
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(SERVER_DEVICE_SCREEN_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodeDmDeviceInfo(deviceInfo, data)) {
+        LOGE("write dm device info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_DEVICE_SCREEN_STATE_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_SCREEN_STATUS, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string networkId = data.ReadString();
+    int32_t screenStatus = -1;
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    if (!reply.WriteInt32(result)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(screenStatus)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

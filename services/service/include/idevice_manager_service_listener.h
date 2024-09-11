@@ -151,6 +151,13 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnDeviceScreenStateChange
+     * @tc.desc: Device Screen State Change of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

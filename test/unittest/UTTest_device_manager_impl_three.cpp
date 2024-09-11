@@ -1270,6 +1270,80 @@ HWTEST_F(DeviceManagerImplTest, GetErrCode_301, testing::ext::TestSize.Level0)
     int32_t ret = DeviceManager::GetInstance().GetErrCode(errCode);
     ASSERT_EQ(ret, 96929745);
 }
+
+HWTEST_F(DeviceManagerImplTest, RegisterDeviceScreenStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::shared_ptr<DeviceScreenStatusCallbackTest> callback = std::make_shared<DeviceScreenStatusCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegisterDeviceScreenStatusCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterDeviceScreenStatusCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.screenStatustest01";
+    std::shared_ptr<DeviceScreenStatusCallbackTest> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegisterDeviceScreenStatusCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterDeviceScreenStatusCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.screenStatustest02";
+    std::shared_ptr<DeviceScreenStatusCallbackTest> callback = std::make_shared<DeviceScreenStatusCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegisterDeviceScreenStatusCallback(packName, callback);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceScreenStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.screenStatustest03";
+    int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceScreenStatusCallback(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterDeviceScreenStatusCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceScreenStatusCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.screenStatustest04";
+    std::string networkId = "networkIdTest";
+    int32_t screenStatus = -1;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceScreenStatus(packName, networkId, screenStatus);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.screenStatustest05";
+    std::string networkId = "";
+    int32_t screenStatus = -1;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceScreenStatus(packName, networkId, screenStatus);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::string networkId = "networkIdTest";
+    int32_t screenStatus = -1;
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceScreenStatus(packName, networkId, screenStatus);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

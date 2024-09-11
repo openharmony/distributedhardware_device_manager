@@ -129,6 +129,7 @@ public:
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
     void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
+    void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
