@@ -245,5 +245,15 @@ bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int3
     }
     return false;
 }
+
+bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion)
+{
+    LOGI("remoteVersion %{public}s, oldVersion %{public}s.", remoteVersion.c_str(), oldVersion.c_str());
+    std::vector<int32_t> remoteVersionVec;
+    std::vector<int32_t> oldVersionVec;
+    VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
+    VersionSplitToInt(oldVersion, '.', oldVersionVec);
+    return CompareVecNum(remoteVersionVec, oldVersionVec);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
