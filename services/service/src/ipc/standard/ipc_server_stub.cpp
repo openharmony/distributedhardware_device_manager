@@ -34,6 +34,8 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
+#include "multiple_user_connector.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
@@ -94,6 +96,9 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #endif // SUPPORT_MEMMGR
 
     if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
+        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
+        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
         DeviceManagerService::GetInstance().InitAccountInfo();
         return;
     }

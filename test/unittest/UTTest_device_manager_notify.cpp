@@ -182,7 +182,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::e
     // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
     // set dmInitCallback not null
-    int count = 0;
     std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
     // 2. set checkMap null
     std::shared_ptr<DmInitCallback> checkMap = nullptr;
@@ -191,10 +190,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::e
     // 4. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     // 5. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_NE(checkMap, nullptr);
 }
 
@@ -205,16 +200,11 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::e
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_006, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    int count = 0;
     std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
     std::shared_ptr<DmInitCallback> checkMap = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -380,10 +370,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeathRecipientCallback_004, testing:
     // 8. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
     // 9. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_NE(checkMap, nullptr);
 }
 
@@ -580,11 +566,7 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStateCallback_005, testing::ext:
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().deviceStateCallback_[testPkgName];
     // 6. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -745,11 +727,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStateCallback_004, testing::ex
     // 7. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().deviceStateCallback_[pkgName];
     // 8 check checkMap null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -957,17 +935,11 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDiscoveryCallback_005, testing::ext::T
     uint16_t subscribeId = 0;
     // 2. set checkMap null
     std::shared_ptr<DiscoveryCallback> checkMap = nullptr;
-    // 3. set testpkcName com.ohos.test1
-    std::string testPkgName = "com.ohos.test1";
     // 4. call DeviceManagerNotifyTest RegisterDiscoverCallback with parameter
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     // 6. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_NE(checkMap, nullptr);
 }
 
@@ -1156,11 +1128,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDiscoveryCallback_004, testing::ext:
     // 7. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     // 8 check checkMap null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -1381,10 +1349,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterAuthenticateCallback_005, testing::ext
     // 5. Get checkMap from DeviceManagerNotify with testpkcName
     checkMap = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     // 6. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
     ASSERT_NE(checkMap, nullptr);
 }
 
@@ -1562,11 +1526,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterAuthenticateCallback_004, testing::e
     // 7. Get checkMap from DeviceManagerNotify
     checkMap = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     // 8. check checkMap not null
-    if (checkMap == nullptr) {
-        ASSERT_NE(count, 1);
-        return;
-    }
-    ASSERT_NE(checkMap, nullptr);
+    ASSERT_EQ(checkMap, nullptr);
 }
 
 /**
@@ -1792,25 +1752,11 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_003, testing::ext::T
         DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     std::shared_ptr<PublishCallback> checkMap4 =
         DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    if (checkMap != nullptr) {
-        checkMap->OnRemoteDied();
-    }
-    DmDeviceInfo deviceInfo;
-    if (checkMap1 != nullptr) {
-        checkMap1->OnDeviceOnline(deviceInfo);
-    }
-    if (checkMap2 != nullptr) {
-        checkMap2->OnDeviceFound(subscribeId, deviceInfo);
-    }
-    if (checkMap3 != nullptr) {
-        checkMap3->OnAuthResult(deviceId, "1", 1, 1);
-    }
-    if (checkMap4 != nullptr) {
-        checkMap4->OnPublishResult(publishId, 0);
-    }
-    for (uint32_t i = 0; i < 5; i++) {
-        ASSERT_EQ(count[i], 1);
-    }
+    ASSERT_NE(checkMap, nullptr);
+    ASSERT_NE(checkMap1, nullptr);
+    ASSERT_NE(checkMap2, nullptr);
+    ASSERT_NE(checkMap3, nullptr);
+    ASSERT_NE(checkMap4, nullptr);
 }
 
 /**
@@ -1858,13 +1804,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_004, testing::ext::T
     checkMap2 = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName][subscribeId];
     checkMap3 = DeviceManagerNotify::GetInstance().authenticateCallback_[pkgName][deviceId];
     checkMap4 = DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
-    if (checkMap == nullptr && checkMap1 == nullptr && checkMap2 == nullptr && checkMap3 == nullptr &&
-        checkMap4 == nullptr) {
-        for (uint32_t i = 0; i < 5; i++) {
-            ASSERT_NE(count[i], 1);
-        }
-        return;
-    }
     ASSERT_EQ(checkMap, nullptr);
     ASSERT_EQ(checkMap1, nullptr);
     ASSERT_EQ(checkMap2, nullptr);

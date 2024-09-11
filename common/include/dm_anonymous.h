@@ -42,6 +42,7 @@ int32_t StringToInt(const std::string &str, int32_t base);
 int64_t StringToInt64(const std::string &str, int32_t base);
 void VersionSplitToInt(const std::string &str, const char split, std::vector<int32_t> &numVec);
 bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int32_t> &sinkVecNum);
+bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

@@ -220,6 +220,7 @@ private:
     int32_t GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash);
     void HandleAccountLogout(int32_t userId, const std::string &accountId);
     void HandleUserRemoved(int32_t preUserId);
+    void HandleUserSwitched(int32_t switchUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

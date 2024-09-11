@@ -109,6 +109,14 @@ public:
     }
     void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
 };
+
+class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
+public:
+    virtual ~DevTrustChangeCallbackTest()
+    {
+    }
+    void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

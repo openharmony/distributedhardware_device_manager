@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,29 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_SERVICE_H
-#define OHOS_UTTEST_DM_SERVICE_H
+
+#ifndef OHOS_DM_SERVICE_LOAD_TEST_H
+#define OHOS_DM_SERVICE_LOAD_TEST_H
 
 #include <gtest/gtest.h>
 #include <refbase.h>
 
-#include <string>
-#include <vector>
+#include "dm_service_load.h"
 
-#include "device_manager_service.h"
-#include "device_manager_service_listener.h"
-#include "device_manager_service_impl.h"
-#include "dm_single_instance.h"
-#include "common_event_support.h"
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceManagerServiceTest : public testing::Test {
+class DmServiceLoadTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
+
+class DMLoadCallbackTest : public DMLoadCallback {
+public:
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) {}
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+
+#endif // OHOS_DM_SERVICE_LOAD_TEST_H

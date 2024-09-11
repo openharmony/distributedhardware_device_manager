@@ -1339,6 +1339,121 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::T
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
+
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_101, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid;
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_102, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string udid;
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_103, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_104, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, udid, bindLevel);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_101, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string udid;
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_102, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_103, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid;
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    int32_t userId = 100;
+    std::string accountId = "60008";
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(udid, userId, accountId);
+    deviceManagerServiceImpl_->HandleUserRemoved(userId);
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetBindLevel_101, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    const std::string localUdid = "123";
+    const std::string udid = "234";
+    uint64_t tokenId = 123;
+    int32_t tokenId2 = 123;
+    int32_t remoteUserId = 100;
+    int32_t ret = deviceManagerServiceImpl_->GetBindLevel(pkgName, localUdid, udid, tokenId);
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, localUdid, tokenId2);
+    EXPECT_EQ(ret, INVALIED_TYPE);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndBindType_101, testing::ext::TestSize.Level0)
+{
+    const std::string accountId = "123";
+    const std::string localUdid = "234";
+    int32_t userId = 100;
+    std::map<std::string, int32_t> temp = deviceManagerServiceImpl_->GetDeviceIdAndBindType(userId, accountId);
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(userId, localUdid);
+    EXPECT_EQ(temp.empty(), true);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_101, testing::ext::TestSize.Level0)
+{
+    int32_t bindType = DM_INVALIED_BINDTYPE;
+    DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
+    EXPECT_EQ(authForm, DmAuthForm::INVALID_TYPE);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_102, testing::ext::TestSize.Level0)
+{
+    int32_t bindType = DM_IDENTICAL_ACCOUNT;
+    DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
+    EXPECT_EQ(authForm, DmAuthForm::IDENTICAL_ACCOUNT);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

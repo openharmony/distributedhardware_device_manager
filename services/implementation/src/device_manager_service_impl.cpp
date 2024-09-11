@@ -683,6 +683,14 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
     hiChainConnector_->DeleteAllGroup(preUserId);
 }
 
+void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
+{
+    LOGI("switchUserId: %{public}d.", switchUserId);
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(switchUserId);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteP2PGroup(switchUserId);
+}
+
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {

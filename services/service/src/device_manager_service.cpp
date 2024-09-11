@@ -1591,8 +1591,12 @@ void DeviceManagerService::SubscribeScreenLockEvent()
 
 void DeviceManagerService::AccountCommonEventCallback(int32_t userId, const std::string commonEventType)
 {
-    LOGI("CommonEventType: %{public}s", commonEventType.c_str());
+    LOGI("CommonEventType: %{public}s, userId: %{public}d", commonEventType.c_str(), userId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        if (MultipleUserConnector::GetSwitchOldUserId() > 0 &&
+            (userId != MultipleUserConnector::GetSwitchOldUserId())) {
+            HandleUserSwitched(MultipleUserConnector::GetSwitchOldUserId());
+        }
         MultipleUserConnector::SetSwitchOldUserId(userId);
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
         MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
@@ -1637,6 +1641,14 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         }
         std::string accountName = MultipleUserConnector::GetSwitchOldAccountName();
         SendAccountLogoutBroadCast(peerUdids, std::string(accountIdHash), accountName, userId);
+    }
+}
+
+void DeviceManagerService::HandleUserSwitched(int32_t switchUserId)
+{
+    LOGI("switchUserId: %{public}d.", switchUserId);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleUserSwitched(switchUserId);
     }
 }
 

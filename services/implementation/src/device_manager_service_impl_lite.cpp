@@ -512,6 +512,12 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     return;
 }
 
+void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
+{
+    (void)switchUserId;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
