@@ -25,6 +25,7 @@
 #include "device_manager_service_listener.h"
 #include "device_manager_service_impl.h"
 #include "dm_single_instance.h"
+#include "common_event_support.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceTest : public testing::Test {
