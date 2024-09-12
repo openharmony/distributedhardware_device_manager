@@ -662,6 +662,141 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, INVALIED_TYPE);
 }
 
+HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = INVALIED_TYPE;
+
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
+
+    EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = APP;
+
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
+
+    EXPECT_EQ(offlineParam.bindType, APP);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = SERVICE;
+
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
+
+    EXPECT_EQ(offlineParam.bindType, SERVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = DEVICE;
+
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
+
+    EXPECT_EQ(offlineParam.bindType, DEVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localUdid = "localDeviceId";
+    std::string udid = "remoteDeviceId";
+    uint64_t tokenId = 0;
+    int32_t bindLevel = INVALIED_TYPE;
+
+    bindLevel = DeviceProfileConnector::GetInstance()
+        .GetBindLevel(pkgName, localUdid, udid, tokenId);
+
+    EXPECT_EQ(bindLevel, DEVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndBindType_001, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 123456;
+    std::string accountId = "oldAccountId";
+    std::string localUdid = "localDeviceId";
+    std::map<std::string, int32_t> deviceIdMap;
+
+    deviceIdMap = DeviceProfileConnector::GetInstance()
+        .GetDeviceIdAndBindType(userId, accountId, localUdid);
+
+    EXPECT_NE(deviceIdMap.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "deviceId";
+    int32_t bindType = DEVICE;
+    std::map<std::string, int32_t> deviceMap;
+    deviceMap[udid] = APP;
+    DeviceProfileConnector::GetInstance().UpdateBindType(udid, bindType, deviceMap);
+    EXPECT_EQ(deviceMap[udid], DEVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "deviceId";
+    int32_t bindType = DEVICE;
+    std::map<std::string, int32_t> deviceMap;
+    DeviceProfileConnector::GetInstance().UpdateBindType(udid, bindType, deviceMap);
+    EXPECT_EQ(deviceMap[udid], DEVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_001, testing::ext::TestSize.Level0)
+{
+    int32_t remoteUserId = 0;
+    int32_t bindType = DM_INVALIED_BINDTYPE;
+    std::string remoteAccountHash = "remoteAccountHash";
+    std::string remoteUdid = "1";
+    std::string localUdid = "localDeviceId";
+
+    bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
+        remoteAccountHash, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::TestSize.Level0)
+{
+    int32_t remoteUserId = 0;
+    std::string remoteUdid = "remoteDeviceId";
+    std::string localUdid = "localDeviceId";
+    int32_t bindType = DM_INVALIED_BINDTYPE;
+
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, SERVICE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::TestSize.Level0)
+{
+    int32_t remoteUserId = 0;
+    int32_t tokenId = 0;
+    std::string remoteUdid = "remoteDeviceId";
+    std::string localUdid = "localDeviceId";
+    std::string pkgName = "";
+    std::string res = "";
+
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ(pkgName, res);
+}
+
 HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
