@@ -19,15 +19,12 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <ffrt>
 #include <functional>
 #include <map>
 #include <mutex>
-#include <queue>
-#include <vector>
-#include <unordered_set>
+#include <unordered_map>
 
-#include "event_handler.h"
+#include "ffrt"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -73,7 +70,7 @@ public:
 private:
     mutable std::mutex timerMutex_;
     std::unordered_map<std::string, ffrt::task_handle> timerVec_ = {};
-    std::shared_ptr<ffrt::queue> queue_;
+    ffrt::queue queue_;
 };
 }
 }
