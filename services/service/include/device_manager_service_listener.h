@@ -83,8 +83,9 @@ private:
         const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     std::string ComposeOnlineKey(const std::string &pkgName, const std::string &devId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t ConfuseUdidHash(const std::string &pkgName, DmDeviceInfo &deviceInfo);
-    int32_t ConvertUdidHashToAnoy(const std::string &pkgName, const std::string &udidHash, std::string &result);
+    int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo);
+    int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
+        std::string &anoyDeviceId);
 #endif
 private:
 #if !defined(__LITEOS_M__)
