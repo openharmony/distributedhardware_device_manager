@@ -2218,7 +2218,7 @@ HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_001, testing::ext::Test
 {
     std::string udid = "";
     std::string result = "";
-    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoy(udid, result);
+    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -2226,7 +2226,7 @@ HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_002, testing::ext::Test
 {
     std::string udid = "ikjwdncksd456";
     std::string result = "";
-    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoy(udid, result);
+    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
