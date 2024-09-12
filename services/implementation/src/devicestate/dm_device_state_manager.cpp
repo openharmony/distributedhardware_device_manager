@@ -500,7 +500,7 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
         return;
     }
     std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    LOGI("pkgName size: %{public}d", pkgName.size());
+    LOGI("pkgName size: %{public}zu", pkgName.size());
     if (pkgName.size() == 0) {
         listener_->OnDeviceScreenStateChange(std::string(DM_PKG_NAME), devInfo);
     } else {
