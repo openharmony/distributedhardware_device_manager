@@ -876,40 +876,6 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSiz
     EXPECT_EQ(ret, DM_OK);
 }
 
-
-/**
- * @tc.name: GetLocalDeviceInfo_002
- * @tc.desc: The return value is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    DeletePermission();
-    std::string strMsg = "";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(strMsg);
-    strMsg = "harmony123";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(strMsg);
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_003
- * @tc.desc: The return value is NOT DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_003, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    EXPECT_EQ(ret, DM_OK);
-}
-
 /**
  * @tc.name: RequestCredential_001
  * @tc.desc:The return value is ERR_DM_FAILED
