@@ -1951,7 +1951,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_005, testing::ext::TestSize.L
     std::map<std::string, std::string> advertiseParam;
     std::string key = PARAM_KEY_META_TYPE;
     std::string value = "125";
-    advertiseParam.insert(std::make_pair(key,value));
+    advertiseParam.insert(std::make_pair(key, value));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
     EXPECT_NE(ret, DM_OK);
