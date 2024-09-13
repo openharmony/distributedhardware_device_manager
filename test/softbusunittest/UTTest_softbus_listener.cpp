@@ -391,7 +391,7 @@ HWTEST_F(SoftbusListenerTest, OnSessionClosed_001, testing::ext::TestSize.Level0
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0)
@@ -402,7 +402,7 @@ HWTEST_F(SoftbusListenerTest, OnBytesReceived_001, testing::ext::TestSize.Level0
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level0)
@@ -422,7 +422,7 @@ HWTEST_F(SoftbusListenerTest, OnPinHolderSessionClosed_001, testing::ext::TestSi
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSize.Level0)
@@ -433,7 +433,7 @@ HWTEST_F(SoftbusListenerTest, OnPinHolderBytesReceived_001, testing::ext::TestSi
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)

@@ -162,7 +162,6 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
             static_cast<int32_t>(StageRes::STAGE_FAIL) : static_cast<int32_t>(StageRes::STAGE_IDLE),
         .bizState = (ret != 0) ?
             static_cast<int32_t>(BizState::BIZ_STATE_END) : static_cast<int32_t>(BizState::BIZ_STATE_START),
-        .localUdid = std::string(localDeviceId),
         .errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_CREATE_GROUP_FAILED),
     };
     if (!DmRadarHelper::GetInstance().ReportAuthCreateGroup(info)) {
