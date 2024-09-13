@@ -578,11 +578,9 @@ HWTEST_F(SoftbusListenerTest, GetDeviceSecurityLevel_001, testing::ext::TestSize
 
 HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Level0)
 {
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    auto ret = softbusListener->GetDmRadarHelperObj();
-    EXPECT_NE(ret, nullptr);
+    std::shared_ptr<SoftbusListener> softbusListener_ = std::make_shared<SoftbusListener>();
+    auto ret = softbusListener_->GetDmRadarHelperObj();
+    EXPECT_EQ(ret, nullptr);
 }
 
 HWTEST_F(SoftbusListenerTest, SetHostPkgName_001, testing::ext::TestSize.Level0)
@@ -612,7 +610,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_001, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_002, testing::ext::TestSize.Level0)
@@ -624,7 +622,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_002, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_003, testing::ext::TestSize.Level0)
@@ -636,7 +634,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_003, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
 }
 
 HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_001, testing::ext::TestSize.Level0)

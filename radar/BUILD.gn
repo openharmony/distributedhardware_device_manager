@@ -25,7 +25,6 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
         "${c_utils_path}/include",
-        "${utils_path}/include/crypto",
         "//third_party/cJSON",
       ]
 
@@ -38,7 +37,6 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
-        "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
@@ -52,7 +50,6 @@ if (defined(ohos_lite)) {
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
-      "${utils_path}/include/crypto",
     ]
 
     sources = [ "src/dm_radar_helper.cpp" ]
@@ -62,8 +59,6 @@ if (defined(ohos_lite)) {
       "DH_LOG_TAG=\"devicemanagerradar\"",
       "LOG_DOMAIN=0xD004110",
     ]
-
-    deps = [ "${utils_path}:devicemanagerutils" ]
 
     external_deps = [
       "cJSON:cjson",
