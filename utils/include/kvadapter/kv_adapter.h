@@ -24,21 +24,13 @@
 #include <unordered_set>
 #include <vector>
 
+#include "dm_kv_info.h"
 #include "distributed_kv_data_manager.h"
 #include "kvstore_death_recipient.h"
 #include "kvstore_observer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-typedef struct DmKVValue {
-    std::string udidHash;
-    std::string appID;
-    std::string udid;
-    int64_t lastModifyTime;
-    explicit DmKVValue() : udidHash(""), appID(""), udid(""), lastModifyTime(0) {}
-} DmKVValue;
-void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result);
-void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue);
 class KVAdapter : public DistributedKv::KvStoreDeathRecipient, public std::enable_shared_from_this<KVAdapter> {
 public:
     KVAdapter() = default;
@@ -46,9 +38,11 @@ public:
     int32_t Init();
     void UnInit();
     int32_t ReInit();
-    int32_t Put(const std::string& key, const std::string& value);
-    int32_t Get(const std::string& key, std::string& value);
-
+    int32_t Put(const std::string &key, const std::string &value);
+    int32_t Get(const std::string &key, std::string &value);
+    int32_t DeleteKvStore();
+    int32_t DeleteByAppId(const std::string &appId, const std::string &prefix);
+    int32_t DeleteBatch(const std::vector<std::string> &keys);
     void OnRemoteDied() override;
 
 private:
