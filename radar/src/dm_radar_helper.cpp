@@ -24,7 +24,6 @@
 
 #include "hisysevent.h"
 #include "dm_constants.h"
-#include "dm_crypto.h"
 #include "dm_log.h"
 #include "parameter.h"
 
@@ -736,7 +735,10 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
     int32_t res = DM_OK;
     std::string discoverDevList = GetDeviceInfoList(deviceInfoList);
     if (errCode == DM_OK) {
-        if (deviceInfoList.size() > 0) {
+        int32_t deviceCount = deviceInfoList.size();
+        static std::string TrustCallerName = "";
+        if (deviceCount > 0 && TrustCallerName != hostName) {
+            TrustCallerName = hostName;
             res = HiSysEventWrite(
                 OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
                 DM_DISCOVER_BEHAVIOR,
@@ -926,15 +928,6 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
     cJSON_Delete(deviceInfoJson);
     cJSON_free(deviceInfoStr);
     return devInfoStr;
-}
-
-std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
-{
-    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
-        return "";
-    }
-    return GetAnonyUdid(std::string(udidHash));
 }
 
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)

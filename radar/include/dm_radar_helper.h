@@ -178,7 +178,6 @@ public:
     virtual void ReportGetDeviceInfo(std::string hostName,
         std::string funcName, DmDeviceInfo &info, int32_t errCode) = 0;
     virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
-    virtual std::string GetUdidHashByUdid(std::string udid) = 0;
 };
 
 class DmRadarHelper : public IDmRadarHelper {
@@ -215,7 +214,6 @@ public:
     void ReportGetDeviceInfo(std::string hostName,
         std::string funcName, DmDeviceInfo &info, int32_t errCode) override;
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
-    std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
 private:

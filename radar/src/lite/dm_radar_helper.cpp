@@ -20,7 +20,6 @@
 #include <iomanip>
 #include <cJSON.h>
 #include "dm_constants.h"
-#include "dm_crypto.h"
 #include "dm_log.h"
 #include "parameter.h"
 
@@ -169,27 +168,7 @@ std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
 
 std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-    cJSON* deviceInfoJson = cJSON_CreateArray();
-    for (size_t i = 0; i < deviceInfoList.size(); i++) {
-        cJSON* object = cJSON_CreateObject();
-        std::string udidHash = GetUdidHashByUdid(std::string(deviceInfoList[i].deviceId));
-        cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
-        cJSON_AddStringToObject(object, "PEER_NET_ID", deviceInfoList[i].networkId);
-        std::string devType = ConvertHexToString(deviceInfoList[i].deviceTypeId);
-        cJSON_AddStringToObject(object, "PEER_DEV_TYPE", devType.c_str());
-        cJSON_AddStringToObject(object, "PEER_DEV_NAME", deviceInfoList[i].deviceName);
-        cJSON_AddItemToArray(deviceInfoJson, object);
-    }
-    return std::string(cJSON_PrintUnformatted(deviceInfoJson));
-}
-
-std::string DmRadarHelper::GetUdidHashByUdid(std::string udid)
-{
-    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
-        return "";
-    }
-    return GetAnonyUdid(std::string(udidHash));
+    return "";
 }
 
 std::string DmRadarHelper::GetAnonyUdid(std::string udid)

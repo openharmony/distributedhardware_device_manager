@@ -138,7 +138,6 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
       "${devicemanager_path}/radar/include",
-      "${utils_path}/include/crypto",
     ]
   }
 
@@ -157,7 +156,6 @@ if (defined(ohos_lite)) {
       "${common_path}/src/dm_anonymous.cpp",
       "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
       "${devicemanager_path}/radar/src/dm_radar_helper.cpp",
-      "${utils_path}/src/crypto/dm_crypto.cpp",
       "src/device_manager.cpp",
       "src/device_manager_impl.cpp",
       "src/ipc/ipc_client_proxy.cpp",
