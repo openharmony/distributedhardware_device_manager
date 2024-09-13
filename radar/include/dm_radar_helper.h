@@ -85,10 +85,11 @@ enum class DeleteTrust : int32_t {
 
 enum class PinHolderStage : int32_t {
     CREATE_PIN_HOLDER = 0x1,
-    SEND_CREATE_PIN_HOLDER_MSG = 0x2,
-    RECEIVE_CREATE_PIN_HOLDER_MSG = 0x3,
-    DESTROY_PIN_HOLDER = 0x4,
-    RECEIVE_DESTROY_PIN_HOLDER_MSG = 0x5,
+    SESSION_OPENED = 0x2,
+    SEND_CREATE_PIN_HOLDER_MSG = 0x3,
+    RECEIVE_CREATE_PIN_HOLDER_MSG = 0x4,
+    DESTROY_PIN_HOLDER = 0x5,
+    RECEIVE_DESTROY_PIN_HOLDER_MSG = 0x6,
 };
 
 enum class GetTrustDeviceList : int32_t {
@@ -161,7 +162,7 @@ public:
         int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
     virtual void ReportDestroyPinHolder(std::string hostName,
         std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
-    virtual void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName) = 0;
+    virtual void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid) = 0;
     virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
     virtual std::string GetUdidHashByUdid(std::string udid) = 0;
 };
@@ -192,14 +193,14 @@ public:
         int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) override;
     void ReportDestroyPinHolder(std::string hostName,
         std::string peerUdid, int32_t errCode, int32_t stageRes) override;
-    void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName) override;
+    void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid) override;
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
     std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
 private:
     std::string GetAnonyUdid(std::string udid);
-    std::string GetLocalUdid();
+    std::string GetAnonyLocalUdid();
 };
 
 extern "C" IDmRadarHelper *CreateDmRadarInstance();
