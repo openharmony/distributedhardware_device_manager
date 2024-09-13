@@ -2302,13 +2302,13 @@ int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("Error: Invalid para");
-		DmRadarHelper::GetInstance().ReportDmBehavior(
+        DmRadarHelper::GetInstance().ReportDmBehavior(
             pkgName, "RegDevTrustChangeCallback", ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("PkgName %{public}s.", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
-	DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegDevTrustChangeCallback", DM_OK);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegDevTrustChangeCallback", DM_OK);
     return DM_OK;
 }
 
