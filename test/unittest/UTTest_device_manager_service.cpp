@@ -193,7 +193,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_003, testing::ext::TestSize.Level0)
 {
     DeletePermission();
-    std::string pkgName ="StopDeviceDiscovery_003";
+    std::string pkgName = "StopDeviceDiscovery_003";
     uint16_t subscribeId = 1;
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
