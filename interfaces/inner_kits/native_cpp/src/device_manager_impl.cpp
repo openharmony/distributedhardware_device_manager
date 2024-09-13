@@ -25,6 +25,7 @@
 #include "dm_hisysevent.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
+#include "dm_radar_helper.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
@@ -118,6 +119,7 @@ DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::shared_ptr<DmInitCallback> dmInitCallback)
 {
     if (pkgName.empty() || dmInitCallback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "InitDeviceManager", ERR_DM_INPUT_PARA_INVALID);
         LOGE("DeviceManagerImpl::InitDeviceManager error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -134,10 +136,12 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
         usleep(USLEEP_TIME_MS);
         retryNum++;
         if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
+            DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "InitDeviceManager", ERR_DM_NOT_INIT);
             LOGE("InitDeviceManager error, wait for device manager service starting timeout.");
             return ERR_DM_NOT_INIT;
         }
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "InitDeviceManager", ret);
     if (ret != DM_OK) {
         LOGE("InitDeviceManager error, proxy init failed ret: %{public}d", ret);
         SysEventWrite(std::string(DM_INIT_DEVICE_MANAGER_FAILED), DM_HISYEVENT_FAULT,
@@ -156,12 +160,14 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
 int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnInitDeviceManager", ERR_DM_INPUT_PARA_INVALID);
         LOGE("UnInitDeviceManager Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
 
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnInitDeviceManager", ret);
     if (ret != DM_OK) {
         LOGE("UnInitDeviceManager error, proxy unInit failed ret: %{public}d", ret);
         return ERR_DM_FAILED;
@@ -195,6 +201,8 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
                                                 std::vector<DmDeviceInfo> &deviceList)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(
+            pkgName, "GetTrustedDeviceList", deviceList, ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -206,18 +214,21 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     req->SetExtra(extra);
     int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, ret);
         LOGE("DeviceManagerImpl::GetTrustedDeviceList error, Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, ret);
         LOGI("GetTrustedDeviceList error, failed ret: %{public}d", ret);
         return ret;
     }
 
     deviceList = rsp->GetDeviceVec();
     LOGI("Completed, device size %{public}zu", deviceList.size());
+    DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, DM_OK);
     return DM_OK;
 }
 
@@ -225,6 +236,8 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
                                                 bool isRefresh, std::vector<DmDeviceInfo> &deviceList)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(
+            pkgName, "GetTrustedDeviceList", deviceList, ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -238,17 +251,20 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     req->SetRefresh(isRefresh);
     int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, ret);
         LOGE("DeviceManagerImpl::GetTrustedDeviceList error, Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, ret);
         LOGE("GetTrustedDeviceList error, failed ret: %{public}d", ret);
         return ret;
     }
     deviceList = rsp->GetDeviceVec();
     LOGI("Completed, device size %{public}zu", deviceList.size());
+    DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceList, DM_OK);
     return DM_OK;
 }
 
@@ -259,6 +275,7 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
     std::vector<DmDeviceInfo> deviceListTemp;
     std::string extra = "";
     int32_t ret = GetTrustedDeviceList(pkgName, extra, false, deviceListTemp);
+    DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList", deviceListTemp, ret);
     if (ret != DM_OK) {
         LOGE("DeviceManagerImpl::GetTrustedDeviceList error.");
         return ret;
@@ -276,6 +293,8 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
                                          DmDeviceInfo &deviceInfo)
 {
     if (pkgName.empty() || networkId.empty()) {
+        DmRadarHelper::GetInstance().ReportGetDeviceInfo(
+            pkgName, "GetDeviceInfo", deviceInfo, ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
             GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -288,12 +307,14 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
     req->SetNetWorkId(networkId);
     int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceInfo", deviceInfo, ret);
         LOGE("DeviceManagerImpl::GetDeviceInfo error, Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceInfo", deviceInfo, ret);
         LOGE("DeviceManagerImpl::GetDeviceInfo error, failed ret: %{public}d", ret);
         return ret;
     }
@@ -301,6 +322,7 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
     deviceInfo = rsp->GetDeviceInfo();
     LOGI("Completed, networKId = %{public}s deviceName = %{public}s", GetAnonyString(req->GetNetWorkId()).c_str(),
          GetAnonyString(deviceInfo.deviceName).c_str());
+    DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceInfo", deviceInfo, DM_OK);
     return DM_OK;
 }
 
@@ -313,12 +335,14 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
     req->SetPkgName(pkgName);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_INFO, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo", info, ret);
         LOGE("DeviceManagerImpl::GetLocalDeviceInfo error, Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo", info, ret);
         LOGI("DeviceManagerImpl::GetLocalDeviceInfo error, failed ret: %{public}d", ret);
         SysEventWrite(std::string(GET_LOCAL_DEVICE_INFO_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(GET_LOCAL_DEVICE_INFO_FAILED_MSG));
@@ -330,6 +354,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
     LOGI("Completed");
     SysEventWrite(std::string(GET_LOCAL_DEVICE_INFO_SUCCESS), DM_HISYEVENT_BEHAVIOR,
         std::string(GET_LOCAL_DEVICE_INFO_SUCCESS_MSG));
+    DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo", info, DM_OK);
     return DM_OK;
 }
 
@@ -337,6 +362,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     std::shared_ptr<DeviceStateCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("RegisterDevStateCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -344,6 +370,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", ERR_DM_INIT_FAILED);
         LOGE("Get SystemAbilityManager Failed");
         return ERR_DM_INIT_FAILED;
     }
@@ -353,11 +380,13 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     }
     int32_t ret = CheckApiPermission(SYSTEM_CORE);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", ret);
         LOGE("System SA not have permission, ret: %{public}d.", ret);
         return ret;
     }
 #endif
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -366,11 +395,14 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
     std::shared_ptr<DeviceStatusCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "RegisterDevStatusCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("RegisterDevStatusCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -378,11 +410,14 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
 int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterDevStateCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("UnRegisterDevStateCallback Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDevStateCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -390,11 +425,14 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
 int32_t DeviceManagerImpl::UnRegisterDevStatusCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterDevStatusCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("UnRegisterDevStatusCallback Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDevStatusCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -553,6 +591,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
     std::shared_ptr<PublishCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "PublishDeviceDiscovery", ERR_DM_INPUT_PARA_INVALID);
         LOGE("PublishDeviceDiscovery error: pkgName %{public}s invalid para", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -566,6 +605,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
     req->SetPublishInfo(publishInfo);
     int32_t ret = ipcClientProxy_->SendRequest(PUBLISH_DEVICE_DISCOVER, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "PublishDeviceDiscovery", ret);
         LOGE("PublishDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishInfo.publishId);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -573,10 +613,11 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "PublishDeviceDiscovery", ret);
         LOGE("PublishDeviceDiscovery error: Failed with ret %{public}d", ret);
         return ret;
     }
-
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "PublishDeviceDiscovery", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -584,6 +625,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
 int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnPublishDeviceDiscovery", ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -595,17 +637,20 @@ int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, 
     req->SetPublishId(publishId);
     int32_t ret = ipcClientProxy_->SendRequest(UNPUBLISH_DEVICE_DISCOVER, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnPublishDeviceDiscovery", ret);
         LOGE("UnPublishDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnPublishDeviceDiscovery", ret);
         LOGE("UnPublishDeviceDiscovery error: Failed with ret %{public}d", ret);
         return ret;
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnPublishDeviceDiscovery", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -692,6 +737,8 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
                                                            std::shared_ptr<DeviceManagerUiCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "RegisterDeviceManagerFaCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("RegisterDeviceManagerFaCallback error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -699,6 +746,7 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
     RegisterUiStateCallback(pkgName);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDeviceManagerFaCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -706,6 +754,8 @@ int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pk
 int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterDeviceManagerFaCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -713,6 +763,7 @@ int32_t DeviceManagerImpl::UnRegisterDeviceManagerFaCallback(const std::string &
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
     UnRegisterUiStateCallback(pkgName);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDeviceManagerFaCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -844,6 +895,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
 int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -855,21 +907,26 @@ int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
 
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", ret);
         LOGI("RegisterUiStateCallback Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", ret);
         LOGE("RegisterUiStateCallback Failed with ret %{public}d", ret);
         return ret;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", DM_OK);
     return DM_OK;
 }
 
 int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterUiStateCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -880,15 +937,18 @@ int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
 
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterUiStateCallback", ret);
         LOGI("UnRegisterUiStateCallback Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterUiStateCallback", ret);
         LOGE("UnRegisterUiStateCallback Failed with ret %{public}d", ret);
         return ret;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterUiStateCallback", DM_OK);
     return DM_OK;
 }
 
@@ -1050,11 +1110,13 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
 int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ERR_DM_INPUT_PARA_INVALID);
         LOGE("NotifyEvent error: pkgName empty");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if ((eventId <= DM_NOTIFY_EVENT_START) || (eventId >= DM_NOTIFY_EVENT_BUTT)) {
         LOGE("NotifyEvent eventId invalid");
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
@@ -1066,15 +1128,18 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
 
     int32_t ret = ipcClientProxy_->SendRequest(NOTIFY_EVENT, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ret);
         LOGI("NotifyEvent Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ret);
         LOGE("NotifyEvent failed with ret %{public}d", ret);
         return ret;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1294,11 +1359,13 @@ int32_t DeviceManagerImpl::GetLocalDeviceNetWorkId(const std::string &pkgName, s
     DmDeviceInfo info;
     int32_t ret = GetLocalDeviceInfo(pkgName, info);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceNetWorkId", info, ret);
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ret;
     }
     networkId = std::string(info.networkId);
     LOGI("End, networkId : %{public}s", GetAnonyString(networkId).c_str());
+    DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceNetWorkId", info, DM_OK);
     return DM_OK;
 }
 
@@ -1308,11 +1375,13 @@ int32_t DeviceManagerImpl::GetLocalDeviceId(const std::string &pkgName, std::str
     DmDeviceInfo info;
     int32_t ret = GetLocalDeviceInfo(pkgName, info);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceId", info, ret);
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ret;
     }
     deviceId = std::string(info.deviceId);
     LOGI("End, deviceId : %{public}s", GetAnonyString(deviceId).c_str());
+    DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceId", info, DM_OK);
     return DM_OK;
 }
 
@@ -1322,11 +1391,13 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
     DmDeviceInfo info;
     int32_t ret = GetLocalDeviceInfo(pkgName, info);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceName", info, ret);
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ret;
     }
     deviceName = std::string(info.deviceName);
     LOGI("End, deviceName : %{public}s", GetAnonyString(deviceName).c_str());
+    DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceName", info, DM_OK);
     return DM_OK;
 }
 
@@ -1336,11 +1407,13 @@ int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32
     DmDeviceInfo info;
     int32_t ret = GetLocalDeviceInfo(pkgName, info);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceType", info, ret);
         LOGI("DeviceManagerImpl::GetLocalDeviceNetWorkId failed.");
         return ret;
     }
     deviceType = info.deviceTypeId;
     LOGI("End, deviceType : %{public}d", deviceType);
+    DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceType", info, DM_OK);
     return DM_OK;
 }
 
@@ -1350,12 +1423,14 @@ int32_t DeviceManagerImpl::GetDeviceName(const std::string &pkgName, const std::
     DmDeviceInfo deviceInfo;
     int32_t ret = GetDeviceInfo(pkgName, networkId, deviceInfo);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceName", deviceInfo, ret);
         LOGE("DeviceManagerImpl::GetDeviceName error, failed ret: %{public}d", ret);
         return ret;
     }
     deviceName = std::string(deviceInfo.deviceName);
     LOGI("End, pkgName : %{public}s, networkId : %{public}s, deviceName = %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), GetAnonyString(deviceName).c_str());
+    DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceName", deviceInfo, DM_OK);
     return DM_OK;
 }
 
@@ -1364,12 +1439,14 @@ int32_t DeviceManagerImpl::GetDeviceType(const std::string &pkgName, const std::
     DmDeviceInfo deviceInfo;
     int32_t ret = GetDeviceInfo(pkgName, networkId, deviceInfo);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceType", deviceInfo, ret);
         LOGE("DeviceManagerImpl::GetDeviceType error, failed ret: %{public}d", ret);
         return ret;
     }
     deviceType = deviceInfo.deviceTypeId;
     LOGI("End, pkgName : %{public}s, networkId : %{public}s, deviceType = %{public}d",
         pkgName.c_str(), GetAnonyString(networkId).c_str(), deviceType);
+    DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceType", deviceInfo, DM_OK);
     return DM_OK;
 }
 
@@ -1645,6 +1722,8 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
 int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterDiscoveryCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: input pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1652,6 +1731,8 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
 
     uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
     if (subscribeId == DM_INVALID_FLAG_ID) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "UnRegisterDiscoveryCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("DeviceManagerImpl::UnRegisterDiscoveryCallback failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1665,14 +1746,17 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
     req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Failed with ret %{public}d", ret);
         return ret;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1836,10 +1920,12 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
 {
     (void)extraParam;
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
@@ -1866,6 +1952,7 @@ uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
         }
     }
     DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "AddDiscoveryCallback", DM_OK);
     return subscribeId;
 }
 
@@ -1880,6 +1967,7 @@ uint16_t DeviceManagerImpl::RemoveDiscoveryCallback(const std::string &pkgName)
         }
     }
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RemoveDiscoveryCallback", DM_OK);
     return subscribeId;
 }
 
@@ -1895,6 +1983,7 @@ int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName)
             pkgName2PubIdMap_[pkgName] = publishId;
         }
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "AddPublishCallback", DM_OK);
     return publishId;
 }
 
@@ -1908,7 +1997,7 @@ int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
             pkgName2PubIdMap_.erase(pkgName);
         }
     }
-
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RemovePublishCallback", DM_OK);
     return publishId;
 }
 
@@ -1916,6 +2005,8 @@ int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
     std::shared_ptr<PinHolderCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "RegisterPinHolderCallback", ERR_DM_INPUT_PARA_INVALID);
         LOGE("RegisterPinHolderCallback error: Invalid para, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1926,14 +2017,17 @@ int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
 
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_PIN_HOLDER_CALLBACK, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterPinHolderCallback", ret);
         LOGI("RegisterPinHolderCallback Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterPinHolderCallback", ret);
         LOGE("RegisterPinHolderCallback Failed with ret %{public}d", ret);
         return ret;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterPinHolderCallback", DM_OK);
     return DM_OK;
 }
 
@@ -2025,6 +2119,7 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
                                                   int32_t &securityLevel)
 {
     if (pkgName.empty() || networkId.empty()) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetDeviceSecurityLevel", ERR_DM_INPUT_PARA_INVALID);
         LOGE("DeviceManagerImpl::GetDeviceSecurityLevel error: pkgName: %{public}s, networkId: %{public}s",
             pkgName.c_str(), GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2039,16 +2134,19 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
 
     int32_t ret = ipcClientProxy_->SendRequest(GET_SECURITY_LEVEL, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetDeviceSecurityLevel", ret);
         LOGE("GetDeviceSecurityLevel Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetDeviceSecurityLevel", ret);
         LOGE("GetDeviceSecurityLevel Failed with ret %{public}d", ret);
         return ret;
     }
     securityLevel = rsp->GetSecurityLevel();
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetDeviceSecurityLevel", DM_OK);
     return DM_OK;
 }
 
@@ -2152,15 +2250,18 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
     req->SetPkgName(pkgName);
     int32_t ret = ipcClientProxy_->SendRequest(SHIFT_LNN_GEAR, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", ret);
         LOGE("ShiftLNNGear error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", ret);
         LOGE("ShiftLNNGear error: Failed with ret %{public}d", ret);
         return ret;
     }
     LOGI("Completed");
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", DM_OK);
     return DM_OK;
 }
 
@@ -2168,6 +2269,7 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
 {
     const size_t SET_DN_POLICY_PARAM_SIZE = 2;
     if (pkgName.empty() || policy.size() != SET_DN_POLICY_PARAM_SIZE) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", ERR_DM_INPUT_PARA_INVALID);
         LOGE("Para invalid: policy is less than two or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -2180,15 +2282,18 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
     req->SetFirstParam(strategy);
     int32_t ret = ipcClientProxy_->SendRequest(SET_DN_POLICY, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", ret);
         LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", ret);
         LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
     LOGI("Completed");
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", DM_OK);
     return DM_OK;
 }
 
@@ -2197,10 +2302,13 @@ int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("Error: Invalid para");
+		DmRadarHelper::GetInstance().ReportDmBehavior(
+            pkgName, "RegDevTrustChangeCallback", ERR_DM_INPUT_PARA_INVALID);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("PkgName %{public}s.", pkgName.c_str());
     DeviceManagerNotify::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+	DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegDevTrustChangeCallback", DM_OK);
     return DM_OK;
 }
 

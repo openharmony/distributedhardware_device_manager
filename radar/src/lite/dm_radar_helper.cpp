@@ -117,9 +117,10 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
     return true;
 }
 
-bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
+void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
+    std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode)
 {
-    return true;
+    return;
 }
 
 void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
@@ -135,6 +136,23 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
 }
 
 void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid)
+{
+    return;
+}
+
+void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode)
+{
+    return;
+}
+
+void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
+    std::string funcName, DmDeviceInfo &info, int32_t errCode)
+{
+    return;
+}
+
+void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
+    std::string funcName, DmDeviceInfo &info, int32_t errCode)
 {
     return;
 }

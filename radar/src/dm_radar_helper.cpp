@@ -42,7 +42,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
@@ -55,7 +55,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
@@ -81,7 +81,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "PEER_UDID", GetAnonyUdid(info.peerUdid),
@@ -96,7 +96,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -124,7 +124,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -136,7 +136,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END));
@@ -148,7 +148,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -171,7 +171,7 @@ bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::stri
         "ORG_PKG", ORGPKGNAME,
         "FUNC", "AuthenticateDevice",
         "HOST_PKG", pkgName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_START),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
         "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_START),
@@ -195,7 +195,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
             "STAGE_RES", info.stageRes,
             "PEER_UDID", GetAnonyUdid(info.peerUdid),
@@ -212,7 +212,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
             "BIZ_STATE", info.bizState,
             "STAGE_RES", info.stageRes,
@@ -240,7 +240,7 @@ bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION),
         "STAGE_RES", info.stageRes,
         "PEER_UDID", GetAnonyUdid(info.peerUdid),
@@ -261,7 +261,7 @@ bool DmRadarHelper::ReportAuthSendRequest(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_SEND_REQUEST),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
         "TO_CALL_PKG", SOFTBUSNAME,
@@ -283,7 +283,7 @@ bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX),
         "STAGE_RES", info.stageRes);
     if (res != DM_OK) {
@@ -303,7 +303,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX),
             "STAGE_RES", info.stageRes);
     } else {
@@ -313,7 +313,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
@@ -336,7 +336,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
             "LOCAL_UDID", GetAnonyLocalUdid(),
@@ -348,7 +348,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
@@ -373,7 +373,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
             "HOST_PKG", HICHAINNAME);
@@ -384,7 +384,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
             "HOST_PKG", HICHAINNAME,
@@ -406,7 +406,7 @@ bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_BOX_START),
         "STAGE_RES", info.stageRes);
     if (res != DM_OK) {
@@ -426,7 +426,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_INPUT_BOX_END),
             "STAGE_RES", info.stageRes);
     } else {
@@ -436,7 +436,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_INPUT_BOX_END),
             "STAGE_RES", info.stageRes,
             "BIZ_STATE", info.bizState,
@@ -459,7 +459,7 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
             "LOCAL_UDID", GetAnonyLocalUdid(),
@@ -472,7 +472,7 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", info.stageRes,
             "LOCAL_UDID", GetAnonyLocalUdid(),
@@ -498,7 +498,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -510,7 +510,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_AUTHCATION),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
             "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP),
             "STAGE_RES", stageRes,
             "HOST_PKG", HICHAINNAME,
@@ -532,7 +532,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_NETWORK),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_NETWORK),
         "BIZ_STAGE", static_cast<int32_t>(NetworkStage::NETWORK_ONLINE),
         "STAGE_RES", info.stageRes,
         "BIZ_STATE", info.bizState,
@@ -555,7 +555,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "ORG_PKG", ORGPKGNAME,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_NETWORK),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_NETWORK),
         "BIZ_STAGE", static_cast<int32_t>(NetworkStage::NETWORK_OFFLINE),
         "STAGE_RES", info.stageRes,
         "BIZ_STATE", info.bizState,
@@ -578,7 +578,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "ORG_PKG", ORGPKGNAME,
         "HOST_PKG", info.hostName,
         "FUNC", info.funcName,
-        "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DELET_TRUST_RELATION),
+        "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_DELET_TRUST_RELATION),
         "BIZ_STAGE", static_cast<int32_t>(DeleteTrust::DELETE_TRUST),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
         "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -605,7 +605,7 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "CreatePinHolder",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_START),
@@ -625,7 +625,7 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "CreatePinHolder",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -654,7 +654,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "DestroyPinHolder",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "LOCAL_UDID", GetAnonyLocalUdid(),
@@ -672,7 +672,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "DestroyPinHolder",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -698,7 +698,7 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", bizStage,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
@@ -716,7 +716,7 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", funcName,
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_PIN_HOLDER),
+            "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", bizStage,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "LOCAL_UDID", GetAnonyLocalUdid(),
@@ -730,42 +730,162 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
     return;
 }
 
-bool DmRadarHelper::ReportGetTrustDeviceList(struct RadarInfo &info)
+void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
+    std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode)
 {
     int32_t res = DM_OK;
-    if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_SUCC)) {
-        res = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-            DM_AUTHCATION_BEHAVIOR,
-            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-            "ORG_PKG", ORGPKGNAME,
-            "FUNC", "GetTrustedDeviceList",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
-            "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
-            "STAGE_RES", info.stageRes,
-            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetAnonyLocalUdid(),
-            "DISCOVERY_DEVICE_LIST", info.discoverDevList);
+    std::string discoverDevList = GetDeviceInfoList(deviceInfoList);
+    if (errCode == DM_OK) {
+        if (deviceInfoList.size() > 0) {
+            res = HiSysEventWrite(
+                OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+                DM_DISCOVER_BEHAVIOR,
+                HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "ORG_PKG", ORGPKGNAME,
+                "HOST_PKG", hostName,
+                "FUNC", funcName,
+                "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_TRUST_DEVICE_LIST),
+                "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
+                "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+                "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "DISCOVERY_DEVICE_LIST", discoverDevList);
+        }
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-            DM_AUTHCATION_BEHAVIOR,
+            DM_DISCOVER_BEHAVIOR,
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
-            "FUNC", "GetTrustedDeviceList",
-            "BIZ_SCENE", static_cast<int32_t>(BizScene::DM_DISCOVER),
+            "HOST_PKG", hostName,
+            "FUNC", funcName,
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_TRUST_DEVICE_LIST),
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
-            "STAGE_RES", info.stageRes,
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
             "LOCAL_UDID", GetAnonyLocalUdid(),
-            "DISCOVERY_DEVICE_LIST", info.discoverDevList,
-            "ERROR_CODE", info.errCode);
+            "DISCOVERY_DEVICE_LIST", discoverDevList,
+            "ERROR_CODE", GetErrCode(errCode));
     }
-    if (res != DM_OK) {
-        LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
-        return false;
+    return;
+}
+
+void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode)
+{
+    int32_t res = DM_OK;
+    if (errCode == DM_OK) {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_DISCOVER_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", funcName,
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_BEHAVIOR),
+            "BIZ_STAGE", DEFAULT_STAGE,
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "LOCAL_UDID", GetAnonyLocalUdid());
+    } else {
+        res = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+            DM_DISCOVER_BEHAVIOR,
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "ORG_PKG", ORGPKGNAME,
+            "HOST_PKG", hostName,
+            "FUNC", funcName,
+            "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_BEHAVIOR),
+            "BIZ_STAGE", DEFAULT_STAGE,
+            "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+            "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "ERROR_CODE", GetErrCode(errCode));
     }
-    return true;
+    return;
+}
+
+void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
+    std::string funcName, DmDeviceInfo &info, int32_t errCode)
+{
+    int32_t res = DM_OK;
+    static std::string localCallerName = "";
+    if (localCallerName != hostName) {
+        localCallerName = hostName;
+        if (errCode == DM_OK) {
+            res = HiSysEventWrite(
+                OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+                DM_DISCOVER_BEHAVIOR,
+                HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "ORG_PKG", ORGPKGNAME,
+                "HOST_PKG", hostName,
+                "FUNC", funcName,
+                "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_LOCAL_DEVICE_INFO),
+                "BIZ_STAGE", DEFAULT_STAGE,
+                "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+                "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_NET_ID", GetAnonyUdid(info.networkId));
+        } else {
+            res = HiSysEventWrite(
+                OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+                DM_DISCOVER_BEHAVIOR,
+                HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "ORG_PKG", ORGPKGNAME,
+                "HOST_PKG", hostName,
+                "FUNC", funcName,
+                "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_LOCAL_DEVICE_INFO),
+                "BIZ_STAGE", DEFAULT_STAGE,
+                "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+                "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_NET_ID", GetAnonyUdid(info.networkId),
+                "ERROR_CODE", GetErrCode(errCode));
+        }
+    }
+    return;
+}
+
+void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
+    std::string funcName, DmDeviceInfo &info, int32_t errCode)
+{
+    int32_t res = DM_OK;
+    static std::string callerName = "";
+    if (callerName != hostName) {
+        callerName = hostName;
+        if (errCode == DM_OK) {
+            res = HiSysEventWrite(
+                OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+                DM_DISCOVER_BEHAVIOR,
+                HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "ORG_PKG", ORGPKGNAME,
+                "HOST_PKG", hostName,
+                "FUNC", funcName,
+                "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_DEVICE_INFO),
+                "BIZ_STAGE", DEFAULT_STAGE,
+                "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
+                "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "PEER_UDID", GetAnonyUdid(info.deviceId),
+                "PEER_NET_ID", GetAnonyUdid(info.networkId));
+        } else {
+            res = HiSysEventWrite(
+                OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+                DM_DISCOVER_BEHAVIOR,
+                HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "ORG_PKG", ORGPKGNAME,
+                "HOST_PKG", hostName,
+                "FUNC", funcName,
+                "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_DEVICE_INFO),
+                "BIZ_STAGE", DEFAULT_STAGE,
+                "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
+                "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "PEER_UDID", GetAnonyUdid(info.deviceId),
+                "PEER_NET_ID", GetAnonyUdid(info.networkId),
+                "ERROR_CODE", GetErrCode(errCode));
+        }
+    }
+    return;
 }
 
 std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
@@ -792,13 +912,8 @@ std::string DmRadarHelper::GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceIn
             cJSON_Delete(deviceInfoJson);
             return "";
         }
-        std::string udidHash = GetAnonyUdid(std::string(deviceInfoList[i].deviceId));
-        cJSON_AddStringToObject(object, "PEER_UDID", udidHash.c_str());
-        std::string peerNetId = GetAnonyUdid(deviceInfoList[i].networkId);
-        cJSON_AddStringToObject(object, "PEER_NET_ID", peerNetId.c_str());
         std::string devType = ConvertHexToString(deviceInfoList[i].deviceTypeId);
         cJSON_AddStringToObject(object, "PEER_DEV_TYPE", devType.c_str());
-        cJSON_AddStringToObject(object, "PEER_DEV_NAME", deviceInfoList[i].deviceName);
         cJSON_AddItemToArray(deviceInfoJson, object);
     }
     char *deviceInfoStr = cJSON_PrintUnformatted(deviceInfoJson);

@@ -623,22 +623,7 @@ int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
     int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
-    static size_t radarDeviceCount = 0;
     size_t deviceCount = deviceInfoList.size();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    struct RadarInfo radarInfo = {
-        .localUdid = std::string(localDeviceId),
-    };
-    radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
-    if (radarDeviceCount != deviceCount && deviceCount > 0
-        && IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
-        radarDeviceCount = deviceCount;
-        radarInfo.discoverDevList = GetDmRadarHelperObj()->GetDeviceInfoList(deviceInfoList);
-        if (!GetDmRadarHelperObj()->ReportGetTrustDeviceList(radarInfo)) {
-            LOGE("ReportGetTrustDeviceList failed");
-        }
-    }
     LOGI("Success from cache deviceInfoList size is %{public}zu.", deviceCount);
     return ret;
 }

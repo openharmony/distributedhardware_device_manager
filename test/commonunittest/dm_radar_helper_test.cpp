@@ -220,13 +220,6 @@ HWTEST_F(DmRadarHelperTest, ReportDeleteTrustRelation_001, testing::ext::TestSiz
     struct RadarInfo info = { 0 };
     info.stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE);
     bool res = DmRadarHelper::GetInstance().ReportDeleteTrustRelation(info);
-    EXPECT_EQ(res, true);
-}
-HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_001, testing::ext::TestSize.Level0)
-{
-    struct RadarInfo info = { 0 };
-    info.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
-    bool res = DmRadarHelper::GetInstance().ReportGetTrustDeviceList(info);
 
     int32_t stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
     std::string str = "test";
@@ -239,16 +232,9 @@ HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_001, testing::ext::TestSize
 
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG);
     DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str, "");
-
     bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_CREATE_PIN_HOLDER_MSG);
     DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, str, "");
-    EXPECT_EQ(res, true);
-}
-HWTEST_F(DmRadarHelperTest, ReportGetTrustDeviceList_002, testing::ext::TestSize.Level0)
-{
-    struct RadarInfo info = { 0 };
-    info.stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE);
-    bool res = DmRadarHelper::GetInstance().ReportGetTrustDeviceList(info);
+
     EXPECT_EQ(res, true);
 }
 } // namespace DistributedHardware

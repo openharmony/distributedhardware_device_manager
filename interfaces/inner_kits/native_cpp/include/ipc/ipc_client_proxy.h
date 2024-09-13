@@ -20,11 +20,11 @@
 #include <memory>
 
 #include "ipc_client.h"
-namespace OHOS::DistributedHardware { class IpcReq; }
-namespace OHOS::DistributedHardware { class IpcRsp; }
 
 namespace OHOS {
 namespace DistributedHardware {
+class IpcReq;
+class IpcRsp;
 class IpcClientProxy : public IpcClient {
     DECLARE_IPC_INTERFACE(IpcClientProxy);
 
