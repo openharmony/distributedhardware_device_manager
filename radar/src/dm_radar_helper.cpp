@@ -825,6 +825,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "LOCAL_UDID", GetAnonyLocalUdid(),
                 "LOCAL_NET_ID", GetAnonyUdid(info.networkId));
         } else {
@@ -839,6 +840,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
+                "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "LOCAL_UDID", GetAnonyLocalUdid(),
                 "LOCAL_NET_ID", GetAnonyUdid(info.networkId),
                 "ERROR_CODE", GetErrCode(errCode));
@@ -867,6 +869,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
                 "LOCAL_UDID", GetAnonyLocalUdid(),
+                "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "PEER_UDID", GetAnonyUdid(info.deviceId),
                 "PEER_NET_ID", GetAnonyUdid(info.networkId));
         } else {
@@ -882,6 +885,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
                 "LOCAL_UDID", GetAnonyLocalUdid(),
+                "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "PEER_UDID", GetAnonyUdid(info.deviceId),
                 "PEER_NET_ID", GetAnonyUdid(info.networkId),
                 "ERROR_CODE", GetErrCode(errCode));
