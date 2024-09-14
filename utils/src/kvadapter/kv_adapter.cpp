@@ -35,46 +35,10 @@ namespace {
     const std::string STORE_ID = "dm_kv_store";
     const std::string DATABASE_DIR = "/data/service/el1/public/database/distributed_device_manager_service";
     const std::string KV_REINIT_THREAD = "reinit_kv_store";
-    const std::string UDID_HASH_KEY = "udidHash";
-    const std::string APP_ID_KEY = "appID";
-    const std::string UDID_ID_KEY = "udid";
-    const std::string LAST_MODIFY_TIME_KEY = "lastModifyTime";
+    constexpr uint32_t MAX_BATCH_SIZE = 128;
     constexpr int32_t MAX_STRING_LEN = 4096;
     constexpr int32_t MAX_INIT_RETRY_TIMES = 20;
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
-}
-
-void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result)
-{
-    nlohmann::json jsonObj;
-    jsonObj[UDID_HASH_KEY] = kvValue.udidHash;
-    jsonObj[APP_ID_KEY] = kvValue.appID;
-    jsonObj[UDID_ID_KEY] = kvValue.udid;
-    jsonObj[LAST_MODIFY_TIME_KEY] = kvValue.lastModifyTime;
-    result = jsonObj.dump();
-}
-
-void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue)
-{
-    if (result.empty()) {
-        return;
-    }
-    nlohmann::json resultJson = nlohmann::json::parse(result, nullptr, false);
-    if (resultJson.is_discarded()) {
-        return;
-    }
-    if (IsString(resultJson, UDID_HASH_KEY)) {
-        kvValue.udidHash = resultJson[UDID_HASH_KEY].get<std::string>();
-    }
-    if (IsString(resultJson, APP_ID_KEY)) {
-        kvValue.appID = resultJson[APP_ID_KEY].get<std::string>();
-    }
-    if (IsString(resultJson, UDID_ID_KEY)) {
-        kvValue.udid = resultJson[UDID_ID_KEY].get<std::string>();
-    }
-    if (IsString(resultJson, LAST_MODIFY_TIME_KEY)) {
-        kvValue.lastModifyTime = resultJson[LAST_MODIFY_TIME_KEY].get<int64_t>();
-    }
 }
 
 int32_t KVAdapter::Init()
@@ -96,7 +60,13 @@ int32_t KVAdapter::Init()
             isInited_.store(true);
             return DM_OK;
         }
-        LOGD("CheckKvStore, left times: %{public}d", tryTimes);
+        LOGE("CheckKvStore, left times: %{public}d, status: %{public}d", tryTimes, status);
+        if (status == DistributedKv::Status::STORE_META_CHANGED ||
+            status == DistributedKv::Status::SECURITY_LEVEL_ERROR ||
+            status == DistributedKv::Status::CRYPT_ERROR) {
+            LOGE("init db error, remove and rebuild it");
+            DeleteKvStore();
+        }
         usleep(INIT_RETRY_SLEEP_INTERVAL);
         tryTimes--;
     }
@@ -200,6 +170,78 @@ void KVAdapter::UnregisterKvStoreDeathListener()
 {
     LOGI("UnRegister death listener");
     kvDataMgr_.UnRegisterKvStoreServiceDeathRecipient(shared_from_this());
+}
+
+int32_t KVAdapter::DeleteKvStore()
+{
+    LOGI("Delete KvStore!");
+    kvDataMgr_.CloseKvStore(appId_, storeId_);
+    kvDataMgr_.DeleteKvStore(appId_, storeId_, DATABASE_DIR);
+    return DM_OK;
+}
+
+int32_t KVAdapter::DeleteByAppId(const std::string &appId, const std::string &prefix)
+{
+    if (appId.empty()) {
+        LOGE("appId is empty");
+        return ERR_DM_FAILED;
+    }
+    std::vector<DistributedKv::Entry> localEntries;
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStoragePtr_ is null");
+            return ERR_DM_POINT_NULL;
+        }
+        if (kvStorePtr_->GetEntries(prefix + appId, localEntries) != DistributedKv::Status::SUCCESS) {
+            LOGE("Get entrys from DB failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    std::vector<std::string> delKeys;
+    for (const auto &entry : localEntries) {
+        delKeys.emplace_back(entry.key.ToString());
+        DmKVValue kvValue;
+        ConvertJsonToDmKVValue(entry.value.ToString(), kvValue);
+        delKeys.emplace_back(prefix + kvValue.anoyDeviceId);
+    }
+    return DeleteBatch(delKeys);
+}
+
+int32_t KVAdapter::DeleteBatch(const std::vector<std::string> &keys)
+{
+    if (keys.empty()) {
+        LOGE("keys size(%{public}zu) is invalid!", keys.size());
+        return ERR_DM_FAILED;
+    }
+    uint32_t keysSize = static_cast<uint32_t>(keys.size());
+    std::vector<std::vector<DistributedKv::Key>> delKeyBatches;
+    for (uint32_t i = 0; i < keysSize; i += MAX_BATCH_SIZE) {
+        uint32_t end = (i + MAX_BATCH_SIZE) > keysSize ? keysSize : (i + MAX_BATCH_SIZE);
+        auto batch = std::vector<std::string>(keys.begin() + i, keys.begin() + end);
+        std::vector<DistributedKv::Key> delKeys;
+        for (auto item : batch) {
+            DistributedKv::Key key(item);
+            delKeys.emplace_back(key);
+        }
+        delKeyBatches.emplace_back(delKeys);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStorePtr is nullptr!");
+            return ERR_DM_POINT_NULL;
+        }
+        for (auto delKeys : delKeyBatches) {
+            DistributedKv::Status status = kvStorePtr_->DeleteBatch(delKeys);
+            if (status != DistributedKv::Status::SUCCESS) {
+                LOGE("DeleteBatch failed!");
+                return ERR_DM_FAILED;
+            }
+        }
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

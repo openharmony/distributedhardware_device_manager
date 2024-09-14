@@ -101,7 +101,7 @@ HWTEST_F(TimeHeapTest, DeleteTimer_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->DeleteTimer(name);
-    EXPECT_EQ(DM_OK, ret);
+    EXPECT_EQ(ERR_DM_FAILED, ret);
 }
 
 /**

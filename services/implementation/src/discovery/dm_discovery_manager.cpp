@@ -130,7 +130,9 @@ int32_t DmDiscoveryManager::StopDeviceDiscovery(const std::string &pkgName, uint
         }
         if (!discoveryContextMap_.empty()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            }
         }
     }
     softbusConnector_->UnRegisterSoftbusDiscoveryCallback(pkgName);
@@ -244,7 +246,9 @@ void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t s
         }
         if (!discoveryContextMap_.empty()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(std::string(DISCOVERY_TIMEOUT_TASK));
+            }
         }
     }
     softbusConnector_->StopDiscovery(subscribeId);
