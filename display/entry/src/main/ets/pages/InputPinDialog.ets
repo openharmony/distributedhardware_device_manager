@@ -64,7 +64,7 @@ struct InputCustomDialog {
     this.isPC = Constant.isPC();
     let ims = inputMethod.getSetting();
     ims.on('imeShow', (info: Array<inputMethod.InputWindowInfo>) => {
-      this.scroller.scrollTo({yOffset: 72, xOffset: 0});
+      this.scroller.scrollTo({ yOffset: 72, xOffset: 0 });
     });
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
@@ -76,37 +76,37 @@ struct InputCustomDialog {
     }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
-      if (err) {
-        console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}');
-        return;
-      }
-      dmClass = dm;
-      dmClass.on('uiStateChange', (data: Record<string, string>) => {
-        console.log('uiStateChange executed, dialog closed' + JSON.stringify(data));
-        let tmpStr: Record<string, number> = JSON.parse(data.param);
-        let msg: number = tmpStr.uiStateMsg as number;
-        if (msg === MSG_DOING_AUTH) {
-          this.errorTips = $r('app.string.dm_authenticating');
-          this.errorTipsVisible = Visibility.Visible;
+        if (err) {
+          console.log('createDeviceManager err:' + JSON.stringify(err) + '  --fail:' + '${dm}');
           return;
         }
-        if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
-          this.destruction();
-          return;
-        }
-        if (msg === MSG_PIN_CODE_ERROR) {
-          if (this.model == MODEL_PASSWORD) {
-            this.errorTips = $r('app.string.dm_password_error');
-          } else {
-            this.isTimes--;
-            this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
+        dmClass = dm;
+        dmClass.on('uiStateChange', (data: Record<string, string>) => {
+          console.log('uiStateChange executed, dialog closed' + JSON.stringify(data));
+          let tmpStr: Record<string, number> = JSON.parse(data.param);
+          let msg: number = tmpStr.uiStateMsg as number;
+          if (msg === MSG_DOING_AUTH) {
+            this.errorTips = $r('app.string.dm_authenticating');
+            this.errorTipsVisible = Visibility.Visible;
+            return;
           }
-          this.password = '';
-          this.errorTipsVisible = Visibility.Visible;
-          this.passwordCircle = ['', '', '', '', '', ''];
-        }
-      })
-    });
+          if (msg === MSG_CANCEL_PIN_CODE_INPUT) {
+            this.destruction();
+            return;
+          }
+          if (msg === MSG_PIN_CODE_ERROR) {
+            if (this.model == MODEL_PASSWORD) {
+              this.errorTips = $r('app.string.dm_password_error');
+            } else {
+              this.isTimes--;
+              this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
+            }
+            this.password = '';
+            this.errorTipsVisible = Visibility.Visible;
+            this.passwordCircle = ['', '', '', '', '', ''];
+          }
+        })
+      });
     this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPortrait(mediaQueryResult);
     });
@@ -221,7 +221,7 @@ struct InputCustomDialog {
               List() {
                 ListItem() {
                   Flex({ justifyContent: FlexAlign.Center }) {
-                    ForEach(this.passwordCircle, (item:string) => {
+                    ForEach(this.passwordCircle, (item: string) => {
                       Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
                         Text(item)
                           .fontSize($r('sys.float.ohos_id_text_size_headline7'))
@@ -237,7 +237,7 @@ struct InputCustomDialog {
                         Column()
                           .width(12)
                           .height(12)
-                          .border({ width: 2, color: $r('sys.color.ohos_id_color_primary'), radius: 12})
+                          .border({ width: 2, color: $r('sys.color.ohos_id_color_primary'), radius: 12 })
                       }.width('10%')
                       .height('100%')
                       .visibility(item === '' ? Visibility.Visible : Visibility.None)
@@ -245,7 +245,8 @@ struct InputCustomDialog {
                   }
                 }
               }
-              TextInput({ placeholder: '', text: this.password})
+
+              TextInput({ placeholder: '', text: this.password })
                 .defaultFocus(true)
                 .type(8)
                 .height(60)
@@ -270,23 +271,23 @@ struct InputCustomDialog {
                     }
                   }
                   let gThis = this;
-                  setTimeout(()=> {
+                  setTimeout(() => {
                     gThis.passwordOnChange(value);
                   }, 50)
                   console.log(TAG + 'this.password: ' + this.password);
                 })
             }.height(48)
-            .margin({ top: 12, bottom: 16})
+            .margin({ top: 12, bottom: 16 })
 
             Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
               Text(this.errorTips)
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.ohos_id_color_warning'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .fontWeight(FontWeight.Medium)
+                .fontColor($r('sys.color.ohos_id_color_warning'))
             }.visibility(this.errorTipsVisible)
             .margin({ bottom: 16,
-                      left: $r('sys.float.ohos_id_corner_radius_dialog'),
-                      right: $r('sys.float.ohos_id_corner_radius_dialog') })
+              left: $r('sys.float.ohos_id_corner_radius_dialog'),
+              right: $r('sys.float.ohos_id_corner_radius_dialog') })
 
             Flex({ justifyContent: FlexAlign.Center }) {
               Button($r('app.string.dm_cancel'))
@@ -324,33 +325,38 @@ struct InputCustomDialog {
         }
         .scrollable(ScrollDirection.Vertical)
         .scrollBar(BarState.On)
-        .constraintSize({ maxHeight: `${this.heightNum}`})
+        .constraintSize({ maxHeight: `${this.heightNum}` })
         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+        .margin({
+          left: $r('sys.float.ohos_id_dialog_margin_bottom'),
+          right: $r('sys.float.ohos_id_dialog_margin_bottom')
+        })
       }
-    }.margin({top: 8, bottom: 20})
+    }.margin({ top: 8, bottom: 20 })
   }
 }
 
 @Entry
 @Component
 struct dialogPlusPage {
+  @State isPC: boolean = false;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
-    alignment: DialogAlignment.Center,
+    alignment: this.isPC ? DialogAlignment.Center : DialogAlignment.Bottom, ,
     offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear aboutToAppear')
+    console.log(TAG + 'aboutToAppear aboutToAppear');
+    this.isPC = Constant.isPC();
   }
 
   aboutToDisappear() {
-    console.log(TAG + 'aboutToDisappear aboutToDisappear')
+    console.log(TAG + 'aboutToDisappear aboutToDisappear');
     if (dmClass != null) {
       try {
         dmClass.off('uiStateChange');
@@ -358,7 +364,7 @@ struct dialogPlusPage {
       } catch (error) {
         console.log('dmClass release failed');
       }
-      dmClass = null
+      dmClass = null;
     }
   }
 
