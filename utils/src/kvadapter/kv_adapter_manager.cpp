@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string DM_KV_STORE_PREFIX = "DM_";
+const std::string DM_KV_STORE_PREFIX = "DM2_";
 constexpr int64_t DM_KV_STORE_REFRESH_TIME = 24 * 60 * 60; // one day
 constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
 }
@@ -60,23 +60,28 @@ void KVAdapterManager::ReInit()
     kvAdapter_->ReInit();
 }
 
-int32_t KVAdapterManager::Put(const std::string &key, const DmKVValue &value)
+int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVValue &value)
 {
-    std::string dmKey = AddPrefix(key);
+    std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
     auto idIter = idCacheMap_.find(dmKey);
-    if (idIter != idCacheMap_.end() && !IsTimeOut(idIter->second.second, value.lastModifyTime,
+    if (idIter != idCacheMap_.end() && !IsTimeOut(idIter->second.lastModifyTime, value.lastModifyTime,
         DM_KV_STORE_REFRESH_TIME)) {
         LOGD("Kv value is existed");
         return DM_OK;
     }
+    idCacheMap_[dmKey] = value;
+    std::string prefixKey = DM_KV_STORE_PREFIX + value.appID + DB_KEY_DELIMITER + value.udidHash;
+    idCacheMap_[prefixKey] = value;
     std::string valueStr = "";
     ConvertDmKVValueToJson(value, valueStr);
-    idCacheMap_[dmKey].first = value.udidHash;
-    idCacheMap_[dmKey].second = value.lastModifyTime;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(dmKey, valueStr) != DM_OK) {
-        LOGE("Insert value to DB failed");
+        LOGE("Insert value to DB for dmKey failed");
+        return ERR_DM_FAILED;
+    }
+    if (kvAdapter_->Put(prefixKey, valueStr) != DM_OK) {
+        LOGE("Insert value to DB for prefixKey failed");
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -84,12 +89,11 @@ int32_t KVAdapterManager::Put(const std::string &key, const DmKVValue &value)
 
 int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
 {
-    std::string dmKey = AddPrefix(key);
+    std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
     auto idIter = idCacheMap_.find(dmKey);
     if (idIter != idCacheMap_.end()) {
-        value.udidHash = idIter->second.first;
-        value.lastModifyTime = idIter->second.second;
+        value = idIter->second;
         return DM_OK;
     }
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
@@ -99,8 +103,9 @@ int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
         return ERR_DM_FAILED;
     }
     ConvertJsonToDmKVValue(valueStr, value);
-    idCacheMap_[dmKey].first = value.udidHash;
-    idCacheMap_[dmKey].second = value.lastModifyTime;
+    idCacheMap_[dmKey] = value;
+    std::string prefixKey = DM_KV_STORE_PREFIX + value.appID + DB_KEY_DELIMITER + value.udidHash;
+    idCacheMap_[prefixKey] = value;
     return DM_OK;
 }
 
@@ -109,7 +114,7 @@ int32_t KVAdapterManager::DeleteAgedEntry()
     int64_t nowTime = GetSecondsSince1970ToNow();
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
     for (auto it = idCacheMap_.begin(); it != idCacheMap_.end();) {
-        if (IsTimeOut(it->second.second, nowTime, MAX_SUPPORTED_EXIST_TIME)) {
+        if (IsTimeOut(it->second.lastModifyTime, nowTime, MAX_SUPPORTED_EXIST_TIME)) {
             it = idCacheMap_.erase(it);
         } else {
             ++it;
@@ -123,9 +128,23 @@ inline bool KVAdapterManager::IsTimeOut(int64_t sourceTime, int64_t targetTime, 
     return targetTime - sourceTime >= timeOut ? true : false;
 }
 
-inline std::string KVAdapterManager::AddPrefix(const std::string& key)
+int32_t KVAdapterManager::AppUnintall(const std::string &appId)
 {
-    return DM_KV_STORE_PREFIX + key;
+    LOGI("appId %{public}s.", GetAnonyString(appId).c_str());
+    std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+    for (auto it = idCacheMap_.begin(); it != idCacheMap_.end();) {
+        if (it->second.appID == appId) {
+            it = idCacheMap_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->DeleteByAppId(appId, DM_KV_STORE_PREFIX) != DM_OK) {
+        LOGE("DeleteByAppId failed");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

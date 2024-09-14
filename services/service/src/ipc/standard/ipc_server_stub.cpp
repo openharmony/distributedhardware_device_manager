@@ -76,6 +76,7 @@ void IpcServerStub::OnStart()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 #endif
+    DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
     LOGI("called:AddAbilityListener end!");
 }
 

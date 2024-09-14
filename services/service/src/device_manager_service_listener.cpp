@@ -81,7 +81,7 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
         return;
     }
     DmDeviceInfo dmDeviceInfo = deviceInfo;
-    ConfuseUdidHash(pkgName, dmDeviceInfo);
+    ConvertUdidHashToAnoyAndSave(pkgName, dmDeviceInfo);
     DmDeviceBasicInfo dmDeviceBasicInfo = deviceBasicInfo;
     (void)memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
     if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), dmDeviceInfo.deviceId,
@@ -216,7 +216,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const std::string &pkgName, uin
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     DmDeviceInfo deviceInfo = info;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ConfuseUdidHash(pkgName, deviceInfo);
+    ConvertUdidHashToAnoyAndSave(pkgName, deviceInfo);
 #endif
     DmDeviceBasicInfo devBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(pkgName, deviceInfo, devBasicInfo);
@@ -283,7 +283,7 @@ void DeviceManagerServiceListener::OnAuthResult(const std::string &pkgName, cons
     pReq->SetDeviceId(deviceId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
-    if (ConvertUdidHashToAnoy(pkgName, deviceId, deviceIdTemp) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(pkgName, deviceId, deviceIdTemp) == DM_OK) {
         pReq->SetDeviceId(deviceIdTemp);
     }
 #endif
@@ -330,7 +330,7 @@ void DeviceManagerServiceListener::OnBindResult(const std::string &pkgName, cons
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
-    if (ConvertUdidHashToAnoy(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
+    if (ConvertUdidHashToAnoyDeviceId(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
         KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
@@ -352,7 +352,7 @@ void DeviceManagerServiceListener::OnUnbindResult(const std::string &pkgName, co
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
-    if (ConvertUdidHashToAnoy(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
+    if (ConvertUdidHashToAnoyDeviceId(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
         KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
@@ -428,52 +428,43 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const std::string &pkgName, 
     ipcServerListener_.SendRequest(SERVER_ON_PIN_HOLDER_EVENT, pReq, pRsp);
 }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerServiceListener::ConfuseUdidHash(const std::string &pkgName, DmDeviceInfo &deviceInfo)
+int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo)
 {
-    LOGI("ConfuseUdidHash pkgName %{public}s.", pkgName.c_str());
-    std::string deviceIdTemp = "";
-    if (ConvertUdidHashToAnoy(pkgName, std::string(deviceInfo.deviceId), deviceIdTemp) != DM_OK) {
-        LOGE("ConvertUdidHashToAnoy failed.");
-        return ERR_DM_FAILED;
-    }
+    LOGI("pkgName %{public}s.", pkgName.c_str());
     std::string appId = "";
-    AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId);
-    if (appId.empty()) {
-        LOGE("GetAppIdByPkgName failed.");
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+        LOGD("GetAppIdByPkgName failed");
         return ERR_DM_FAILED;
     }
-
     DmKVValue kvValue;
-    kvValue.udidHash = std::string(deviceInfo.deviceId);
-    kvValue.appID = appId;
-    kvValue.lastModifyTime = GetSecondsSince1970ToNow();
-    (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
-    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), deviceIdTemp.c_str(),
-        std::min(sizeof(deviceInfo.deviceId), deviceIdTemp.length())) != DM_OK) {
-        LOGE("ConfuseUdidHash copy deviceId data failed.");
+    int32_t ret = Crypto::ConvertUdidHashToAnoyAndSave(appId, std::string(deviceInfo.deviceId), kvValue);
+    if (ret != DM_OK) {
         return ERR_DM_FAILED;
     }
-    KVAdapterManager::GetInstance().Put(deviceIdTemp, kvValue);
+    (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.c_str(),
+        std::min(sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.length())) != DM_OK) {
+        LOGE("copy deviceId data failed.");
+        return ERR_DM_FAILED;
+    }
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoy(const std::string &pkgName,
-    const std::string &udidHash, std::string &result)
+int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::string &pkgName,
+    const std::string &udidHash, std::string &anoyDeviceId)
 {
     LOGI("pkgName %{public}s, udidHash %{public}s.", pkgName.c_str(), GetAnonyString(udidHash).c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
-        LOGE("GetAppIdByPkgName failed");
+        LOGD("GetAppIdByPkgName failed");
         return ERR_DM_FAILED;
     }
-    std::string udidTemp = udidHash + appId;
-    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(udidTemp, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
-        LOGE("get deviceIdHash by udidTemp: %{public}s failed.", GetAnonyString(udidTemp).c_str());
-        return ERR_DM_FAILED;
+    DmKVValue kvValue;
+    int32_t ret = Crypto::ConvertUdidHashToAnoyDeviceId(appId, udidHash, kvValue);
+    if (ret == DM_OK) {
+        anoyDeviceId = kvValue.anoyDeviceId;
     }
-    result = std::string(deviceIdHash);
-    return DM_OK;
+    return ret;
 }
 #endif
 } // namespace DistributedHardware
