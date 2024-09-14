@@ -344,7 +344,7 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
-    alignment: this.isPC ? DialogAlignment.Center : DialogAlignment.Bottom, ,
+    alignment: this.isPC ? DialogAlignment.Center : DialogAlignment.Bottom,
     offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
