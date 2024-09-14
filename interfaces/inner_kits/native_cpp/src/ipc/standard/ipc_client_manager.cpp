@@ -20,6 +20,7 @@
 #include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_service_load.h"
 #include "ipc_client_server_proxy.h"
 #include "ipc_client_stub.h"
 #include "ipc_register_listener_req.h"
@@ -54,6 +55,7 @@ int32_t IpcClientManager::ClientInit()
     auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     if (object == nullptr) {
         LOGE("Get DeviceManager SystemAbility Failed");
+        DmServiceLoad::GetInstance().LoadDMService();
         return ERR_DM_INIT_FAILED;
     }
 
