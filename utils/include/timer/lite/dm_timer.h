@@ -39,7 +39,6 @@ constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_
 constexpr const char* SYNC_DELETE_TIMEOUT_TASK = "deviceManagerTimer:syncDelete_";
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
 
-
 constexpr int32_t DELAY_TICK_MILLSECONDS = 1000;
 typedef std::chrono::steady_clock::time_point timerPoint;
 typedef std::chrono::steady_clock steadyClock;
