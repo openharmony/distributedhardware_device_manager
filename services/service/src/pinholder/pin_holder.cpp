@@ -116,8 +116,8 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     sessionId_ = session_->OpenSessionServer(targetId);
     int32_t stageRes =
         sessionId_ > 0 ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
-    DmRadarHelper::GetInstance().ReportCreatePinHolder(registerPkgName_,
-        sessionId_, targetId.deviceId, sessionId_, stageRes);
+    DmRadarHelper::GetInstance().ReportCreatePinHolder(
+        registerPkgName_, sessionId_, targetId.deviceId, sessionId_, stageRes);
     if (sessionId_ < 0) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId_);
         listener_->OnCreateResult(registerPkgName_, sessionId_);
@@ -173,8 +173,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     ret = session_->SendData(sessionId_, message);
     int32_t stageRes =
         ret == DM_OK ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
-    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_,
-        targetId.deviceId, ret, stageRes);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_, targetId.deviceId, ret, stageRes);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
@@ -207,7 +206,8 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
         MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
     int32_t ret = session_->SendData(sessionId_, message);
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::SEND_CREATE_PIN_HOLDER_MSG);
-    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("CreateGeneratePinHolderMsg"));
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage,
+        std::string("CreateGeneratePinHolderMsg"), "");
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnCreateResult(registerPkgName_, ret);
@@ -251,7 +251,7 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
     std::string payload = jsonObject[TAG_PAYLOAD].get<std::string>();
     isRemoteSupported_ = jsonObject.contains(TAG_DM_VERSION);
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_CREATE_PIN_HOLDER_MSG);
-    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessCreateMsg"));
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessCreateMsg"), "");
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER_RESP;
     if (sinkState_ != SINK_INIT) {
@@ -328,7 +328,7 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     std::string payload = jsonObject[TAG_PAYLOAD].get<std::string>();
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::RECEIVE_DESTROY_PIN_HOLDER_MSG);
-    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessDestroyMsg"));
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(bizStage, std::string("ProcessDestroyMsg"), "");
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
     if (sinkState_ != SINK_CREATE) {
@@ -468,6 +468,13 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
 
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
+    char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
+    int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d.", sessionId);
+    }
+    DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(static_cast<int32_t>(PinHolderStage::SESSION_OPENED),
+        std::string("OnSessionOpened"), std::string(peerDeviceId));
     sessionId_ = sessionId;
     if (sessionSide == SESSION_SIDE_SERVER) {
         LOGI("[SOFTBUS]onSesssionOpened success, side is sink. sessionId: %{public}d.", sessionId);
