@@ -24,7 +24,7 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "ffrt"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -70,7 +70,7 @@ public:
 private:
     mutable std::mutex timerMutex_;
     std::unordered_map<std::string, ffrt::task_handle> timerVec_ = {};
-    ffrt::queue queue_;
+    std::shared_ptr<ffrt::queue> queue_;
 };
 }
 }

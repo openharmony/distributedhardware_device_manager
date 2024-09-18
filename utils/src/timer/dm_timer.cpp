@@ -27,6 +27,11 @@ constexpr const char* TIMER_TASK = "TimerTask";
 DmTimer::DmTimer()
 {
     LOGI("DmTimer constructor");
+    if (queue_ != nullptr) {
+        LOGI("Timer is already init.");
+        return;
+    }
+    queue_ = std::make_shared<ffrt::queue>(TIMER_TASK);
 }
 
 DmTimer::~DmTimer()
@@ -41,11 +46,12 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
         LOGE("DmTimer StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(queue_, ERR_DM_POINT_NULL);
     LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
 
     auto taskFunc = [callback, name] () { callback(name); };
-    ffrt::task_handle handle = queue_.submit_h(taskFunc, ffrt::task_attr().delay(timeOut * MILLISECOND_TO_SECOND));
+    ffrt::task_handle handle = queue_->submit_h(taskFunc, ffrt::task_attr().delay(timeOut * MILLISECOND_TO_SECOND));
     if (handle == nullptr) {
         LOGE("handle is nullptr.");
         return ERR_DM_FAILED;
@@ -67,8 +73,8 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         LOGI("Invalid task.");
         return ERR_DM_FAILED;
     }
-    if (item->second != nullptr) {
-        int32_t ret = queue_.cancel(item->second);
+    if (item->second != nullptr && queue_ != nullptr) {
+        int32_t ret = queue_->cancel(item->second);
         if (ret != 0) {
             LOGE("Cancel failed, errCode: %{public}d.", ret);
         }
@@ -86,8 +92,8 @@ int32_t DmTimer::DeleteAll()
         return DM_OK;
     }
     for (const auto &name : timerVec_) {
-        if (name.second != nullptr) {
-            int32_t ret = queue_.cancel(name.second);
+        if (name.second != nullptr && queue_ != nullptr) {
+            int32_t ret = queue_->cancel(name.second);
             if (ret != 0) {
                 LOGE("Cancel failed, errCode: %{public}d.", ret);
             }
