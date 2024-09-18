@@ -327,7 +327,10 @@ struct InputCustomDialog {
         .constraintSize({ maxHeight: `${this.heightNum}`})
         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+        .margin({
+          left: $r('sys.float.ohos_id_dialog_margin_bottom'),
+          right: $r('sys.float.ohos_id_dialog_margin_bottom')
+        })
       }
     }.margin({top: 8, bottom: 20})
   }
@@ -336,17 +339,18 @@ struct InputCustomDialog {
 @Entry
 @Component
 struct dialogPlusPage {
+  @State isPC: boolean = Constant.isPC();
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
-    alignment: DialogAlignment.Center,
+    alignment: this.isPC ? DialogAlignment.Center : DialogAlignment.Bottom,
     offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear aboutToAppear')
+    console.log(TAG + 'aboutToAppear : this.isPC: ' + this.isPC);
   }
 
   aboutToDisappear() {
