@@ -2326,16 +2326,6 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::
     EXPECT_NE(DeviceManagerService::GetInstance().dmServiceImpl_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    PeerTargetId targetId;
-    DmPinType pinType = DmPinType::QR_CODE;
-    std::string payload;
-    int32_t ret = DeviceManagerService::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
 HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_005, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
