@@ -993,10 +993,7 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
 int32_t DeviceManagerNapi::DumpDeviceInfo(
     DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
 {
-    if (deviceBasicInfoListAsyncCallbackInfo == nullptr) {
-        LOGE("CallGetAvailableDeviceListStatus deviceBasicInfoListAsyncCallbackInfo is null");
-        return DM_ERR_FAILED;
-    }
+    CHECK_NULL_RETURN(deviceBasicInfoListAsyncCallbackInfo, ERR_DM_POINT_NULL);
     if (deviceBasicInfoListAsyncCallbackInfo->devList.size() > DM_MAX_DEVICE_SIZE) {
         LOGE("CallGetAvailableDeviceListStatus invalid devList size");
         return DM_ERR_FAILED;

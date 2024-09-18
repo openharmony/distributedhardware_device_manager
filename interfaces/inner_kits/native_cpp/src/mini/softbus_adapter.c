@@ -743,9 +743,7 @@ static int DeleteSoftbusSemaphoreAndMutex(void)
 static int FilterDevice(const DmDeviceInfo *dmDeviceInfo)
 {
     DMLOGI("FilterDevice start.");
-    if (dmDeviceInfo == NULL) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(dmDeviceInfo, ERR_DM_POINT_NULL);
     int ret = DM_OK;
     if (g_discoveryCallbackMap.filterOption.isTrusted != NOT_FILTER &&
         dmDeviceInfo->isLocalExistCredential != g_discoveryCallbackMap.filterOption.isTrusted) {

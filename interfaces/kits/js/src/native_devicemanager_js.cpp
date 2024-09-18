@@ -1537,10 +1537,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
 void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_status &status,
     DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo)
 {
-    if (deviceInfoListAsyncCallbackInfo == nullptr) {
-        LOGE("CallGetTrustedDeviceListStatusSync deviceInfoListAsyncCallbackInfo is null");
-        return;
-    }
+    CHECK_NULL_VOID(deviceInfoListAsyncCallbackInfo);
     if (deviceInfoListAsyncCallbackInfo->devList.size() > DM_MAX_DEVICE_SIZE) {
         LOGE("CallGetTrustedDeviceListStatusSync invalid devList size");
         return;
