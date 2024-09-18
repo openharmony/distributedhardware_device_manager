@@ -102,6 +102,14 @@ public:
                       int32_t reason) override {}
 };
 
+class DeviceScreenStatusCallbackTest : public DeviceScreenStatusCallback {
+public:
+    ~DeviceScreenStatusCallbackTest()
+    {
+    }
+    void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
+};
+
 class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
 public:
     virtual ~DevTrustChangeCallbackTest()

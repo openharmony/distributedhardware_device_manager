@@ -1103,5 +1103,49 @@ void DeviceManagerNotify::DeviceTrustChange(const std::string &udid, const std::
     }
     tempCbk->OnDeviceTrustChange(udid, uuid, authForm);
 }
+
+void DeviceManagerNotify::RegisterDeviceScreenStatusCallback(const std::string &pkgName,
+    std::shared_ptr<DeviceScreenStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    deviceScreenStatusCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterDeviceScreenStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    deviceScreenStatusCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("In, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<DeviceScreenStatusCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (deviceScreenStatusCallback_.count(pkgName) == 0) {
+            LOGE("error, device screen status not register.");
+            return;
+        }
+        tempCbk = deviceScreenStatusCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered device screen status callback is nullptr.");
+        return;
+    }
+    tempCbk->OnDeviceScreenStatus(deviceInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -360,6 +360,24 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.screenStatusTest";
+    std::string networkId = "";
+    int32_t screenStatus = -1;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string networkId = "networkIdTest";
+    int32_t screenStatus = -1;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -35,12 +35,20 @@ const std::string DM_AUTHCATION_BEHAVIOR = "DM_AUTHCATION_BEHAVIOR";
 constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
 constexpr int32_t INVALID_UDID_LENGTH = 10;
 constexpr int32_t SUBSTR_UDID_LENGTH = 5;
-enum class BizScene : int32_t {
+constexpr int32_t DEFAULT_STAGE = 1;
+enum class DiscoverScene : int32_t {
     DM_DISCOVER = 0x1,
-    DM_AUTHCATION = 0x2,
-    DM_NETWORK = 0x3,
-    DM_DELET_TRUST_RELATION = 0x4,
-    DM_PIN_HOLDER = 0x5,
+    DM_GET_TRUST_DEVICE_LIST = 0x2,
+    DM_GET_LOCAL_DEVICE_INFO = 0x3,
+    DM_GET_DEVICE_INFO = 0x4,
+    DM_BEHAVIOR = 0x5,
+};
+
+enum class AuthScene : int32_t {
+    DM_AUTHCATION = 0x1,
+    DM_NETWORK = 0x2,
+    DM_DELET_TRUST_RELATION = 0x3,
+    DM_PIN_HOLDER = 0x4,
 };
 
 enum class StageRes : int32_t {
@@ -157,14 +165,19 @@ public:
     virtual bool ReportNetworkOnline(struct RadarInfo &info) = 0;
     virtual bool ReportNetworkOffline(struct RadarInfo &info) = 0;
     virtual bool ReportDeleteTrustRelation(struct RadarInfo &info) = 0;
-    virtual bool ReportGetTrustDeviceList(struct RadarInfo &info) = 0;
+    virtual void ReportGetTrustDeviceList(std::string hostName,
+        std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode) = 0;
     virtual void ReportCreatePinHolder(std::string hostName,
         int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
     virtual void ReportDestroyPinHolder(std::string hostName,
         std::string peerUdid, int32_t errCode, int32_t stageRes) = 0;
     virtual void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid) = 0;
+    virtual void ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode) = 0;
+    virtual void ReportGetLocalDevInfo(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode) = 0;
+    virtual void ReportGetDeviceInfo(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode) = 0;
     virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
-    virtual std::string GetUdidHashByUdid(std::string udid) = 0;
 };
 
 class DmRadarHelper : public IDmRadarHelper {
@@ -188,14 +201,19 @@ public:
     bool ReportNetworkOnline(struct RadarInfo &info) override;
     bool ReportNetworkOffline(struct RadarInfo &info) override;
     bool ReportDeleteTrustRelation(struct RadarInfo &info) override;
-    bool ReportGetTrustDeviceList(struct RadarInfo &info) override;
+    void ReportGetTrustDeviceList(std::string hostName,
+        std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode) override;
     void ReportCreatePinHolder(std::string hostName,
         int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes) override;
     void ReportDestroyPinHolder(std::string hostName,
         std::string peerUdid, int32_t errCode, int32_t stageRes) override;
     void ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string funcName, std::string peerUdid) override;
+    void ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode) override;
+    void ReportGetLocalDevInfo(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode) override;
+    void ReportGetDeviceInfo(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode) override;
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
-    std::string GetUdidHashByUdid(std::string udid) override;
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
 private:

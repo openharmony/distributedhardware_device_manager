@@ -375,6 +375,9 @@ void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().StartAdvertising(str, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().StopAdvertising(str, discoverParam);
     DeviceManagerImpl::GetInstance().SetDnPolicy(str, discoverParam);
+    DeviceManagerImpl::GetInstance().RegisterDeviceScreenStatusCallback(emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterDeviceScreenStatusCallback(emptyStr);
+    DeviceManagerImpl::GetInstance().GetDeviceScreenStatus(emptyStr, emptyStr, indexTwo);
 }
 }
 }

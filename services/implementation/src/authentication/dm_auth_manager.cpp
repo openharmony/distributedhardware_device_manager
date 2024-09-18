@@ -594,28 +594,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %{public}d", authTimes_);
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
-        authTimes_++;
-        timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
-        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
-            HandleMemberJoinImportAuthCode(requestId, status);
-            return;
-        }
-        if (status != DM_OK || authResponseContext_->requestId != requestId) {
-            if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
-                authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
-                authRequestContext_->reason = ERR_DM_BIND_PIN_CODE_ERROR;
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            } else {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-                authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
-            }
-        } else {
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
-            timer_->DeleteTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK));
-        }
+        MemberJoinAuthRequest(requestId, status);
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         if (status == DM_OK && authResponseContext_->requestId == requestId &&
             authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
@@ -627,6 +606,38 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         }
     } else {
         LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
+    }
+}
+
+void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
+{
+    authTimes_++;
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
+    }
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        HandleMemberJoinImportAuthCode(requestId, status);
+        return;
+    }
+    if (status != DM_OK || authResponseContext_->requestId != requestId) {
+        if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
+            authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
+            authRequestContext_->reason = ERR_DM_BIND_PIN_CODE_ERROR;
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+            return;
+        }
+        if (timer_ != nullptr) {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
+        }
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
+    } else {
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestNetworkState>());
+        if (timer_ != nullptr) {
+            timer_->DeleteTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK));
+        }
     }
 }
 
@@ -2405,16 +2416,6 @@ std::string DmAuthManager::ConvertSinkVersion(const std::string &version)
     }
     LOGI("ConvertSinkVersion version %{public}s, sinkVersion is %{public}s.", version.c_str(), sinkVersion.c_str());
     return sinkVersion;
-}
-
-bool DmAuthManager::CompareVersion(const std::string &remoteVersion, const std::string &oldVersion)
-{
-    LOGI("remoteVersion %{public}s, oldVersion %{public}s.", remoteVersion.c_str(), oldVersion.c_str());
-    std::vector<int32_t> remoteVersionVec;
-    std::vector<int32_t> oldVersionVec;
-    VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
-    VersionSplitToInt(oldVersion, '.', oldVersionVec);
-    return CompareVecNum(remoteVersionVec, oldVersionVec);
 }
 
 void DmAuthManager::SetAuthType(int32_t authType)

@@ -506,6 +506,11 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
     return;
 }
 
+void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
+{
+    (void)devInfo;
+    return;
+}
 
 void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
 {

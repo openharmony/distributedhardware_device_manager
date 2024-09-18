@@ -72,7 +72,7 @@ public:
     void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
         const std::string &content) override;
     void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override;
-
+    void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
@@ -83,9 +83,12 @@ private:
     void ProcessAppStateChange(const std::string &pkgName, const DmDeviceState &state,
         const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     std::string ComposeOnlineKey(const std::string &pkgName, const std::string &devId);
+    void SetDeviceScreenInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const std::string &pkgName,
+        const DmDeviceInfo &deviceInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t ConfuseUdidHash(const std::string &pkgName, DmDeviceInfo &deviceInfo);
-    int32_t ConvertUdidHashToAnoy(const std::string &pkgName, const std::string &udidHash, std::string &result);
+    int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo);
+    int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
+        std::string &anoyDeviceId);
 #endif
 private:
 #if !defined(__LITEOS_M__)

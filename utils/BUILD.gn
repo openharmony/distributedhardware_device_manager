@@ -99,6 +99,7 @@ if (defined(ohos_lite)) {
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
+      "src/kvadapter/dm_kv_info.cpp",
       "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
       "src/timer/dm_timer.cpp",

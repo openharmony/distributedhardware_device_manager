@@ -95,7 +95,7 @@ public:
     std::string GetUdidByNetWorkId(std::string networkId);
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(std::string udidHash);
-
+    void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
 private:
     void StartEventThread();
     void StopEventThread();

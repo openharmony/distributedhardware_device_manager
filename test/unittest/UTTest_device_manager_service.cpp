@@ -316,6 +316,41 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_003, testing::ext::T
 }
 
 /**
+ * @tc.name: UnPublishDeviceDiscovery_004
+ * @tc.desc: UnPublishDeviceDiscovery is initialized, pkgName is null, and its return ERR_DM_INPUT_PARA_INVALID
+ * @tc.type: FUNC
+ * @tc.require: I5N1K3
+ */
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test003";
+    int32_t publishId = 1;
+    int32_t userId = 23;
+    std::string accountId = "hello123";
+    int32_t preUserId = 3;
+    std::vector<std::string> peerUdids;
+    std::string accountName = "openharmony123";
+    std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId);
+    DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().SendAccountLogoutBroadCast(peerUdids, accountId, accountName, userId);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    DeletePermission();
+    int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+/**
  * @tc.name: GetTrustedDeviceList_001
  * @tc.desc:Set the intFlag of GetTrustedDeviceList to true and pkgName = null; Return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC
@@ -489,6 +524,23 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_006, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh, false);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: ShiftLNNGear_007
+ * @tc.desc:Set the callerId and pkgNamenot not to null, and isRefresh to true; Return NOT DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_007, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "ShiftLNNGear_007";
+    std::string callerId = "ShiftLNNGear_007";
+    bool isRefresh = true;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh, false);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
@@ -1101,6 +1153,21 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
 }
 
 /**
+ * @tc.name: GetDeviceInfo_004
+ * @tc.desc: The return value is DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_004, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkIdTest4";
+    DmDeviceInfo info;
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+/**
  * @tc.name: CheckApiPermission_001
  * @tc.desc: The return value is DM_OK
  * @tc.type: FUNC
@@ -1382,6 +1449,14 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_002, testing::ext::Te
     EXPECT_EQ(ret, DM_OK);
 }
 
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
 HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -1394,6 +1469,22 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_002, testing::ext::
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+
+HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    bool ret = DeviceManagerService::GetInstance().IsDMImplSoLoaded();
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(DeviceManagerServiceTest, DmHiDumper_001, testing::ext::TestSize.Level0)
@@ -1438,8 +1529,10 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level
     std::string pkgName;
     int32_t eventId = DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT;
     std::string event;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     EXPECT_NE(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
 HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level0)
@@ -1564,6 +1657,17 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::
     int32_t networkType = 0;
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string netWorkId = "netWorkId";
+    int32_t networkType = 0;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
@@ -1729,6 +1833,17 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_003, testing::ext::Te
     EXPECT_NE(ret, DM_OK);
 }
 
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
+    EXPECT_NE(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+}
+
 HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();
@@ -1752,6 +1867,16 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     std::map<std::string, std::string> extraParam;
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> extraParam;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
+    EXPECT_NE(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
 HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
@@ -1817,6 +1942,19 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_004, testing::ext::TestSize.L
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
     EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_ERR);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+}
+
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "StopAdvertising_005";
+    std::map<std::string, std::string> advertiseParam;
+    std::string key = PARAM_KEY_META_TYPE;
+    std::string value = "125";
+    advertiseParam.insert(std::make_pair(key, value));
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
+    EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1933,6 +2071,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_002, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
+
 HWTEST_F(DeviceManagerServiceTest, DpAclAdd_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();
@@ -1985,6 +2124,17 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string invalidNetworkId;
+    int32_t securityLevel = 0;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_NE(ret, DM_OK);
+}
+
 HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "";
@@ -2014,6 +2164,79 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::T
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
+
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)
+{
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    DeletePermission();
+    int ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
+    EXPECT_FALSE(ret);
+}
+
+
+HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_001, testing::ext::TestSize.Level0)
+{
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    DeletePermission();
+    int ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::map<std::string, std::string> policy;
+    int ret = DeviceManagerService::GetInstance().SetDnPolicy(pkgName, policy);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "openharmony123";
+    std::map<std::string, std::string> policy;
+    DeletePermission();
+    int ret = DeviceManagerService::GetInstance().SetDnPolicy(pkgName, policy);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "openharmony123";
+    std::map<std::string, std::string> policy;
+    std::vector<std::string> peerUdids;
+    int32_t userId = 1;
+    uint64_t tokenId = 87;
+    DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, DEVICE);
+    DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, APP);
+    DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, 2);
+    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId);
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    int ret = DeviceManagerService::GetInstance().SetDnPolicy(pkgName, policy);
+    EXPECT_NE(ret, DM_OK);
+}
+
+/**
+ * @tc.name: StartDeviceDiscovery_007
+ * @tc.desc: Call StartDeviceDiscovery twice with pkgName not null and flag bit not false and return
+ * ERR_DM_DISCOVERY_REPEATED
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_007, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test7";
+    DmSubscribeInfo subscribeInfo;
+    std::string extra = "test";
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+    EXPECT_NE(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+}
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

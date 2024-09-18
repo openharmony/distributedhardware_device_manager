@@ -608,6 +608,11 @@ public:
     virtual int32_t ShiftLNNGear(const std::string &pkgName) = 0;
     virtual int32_t RegDevTrustChangeCallback(const std::string &pkgName,
         std::shared_ptr<DevTrustChangeCallback> callback) = 0;
+    virtual int32_t RegisterDeviceScreenStatusCallback(const std::string &pkgName,
+        std::shared_ptr<DeviceScreenStatusCallback> callback) = 0;
+    virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) = 0;
+    virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
+        int32_t &screenStatus) = 0;
 
     /**
      * @brief Set Dn Policy

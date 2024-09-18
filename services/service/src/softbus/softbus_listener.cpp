@@ -49,6 +49,8 @@ constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
+constexpr const char* DEVICE_TRUSTED_CHANGE = "deviceTrustedChange";
+constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -63,6 +65,7 @@ static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
 static std::mutex g_lockDeviceIdSet;
+static std::mutex g_lockDevScreenStatusChange;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -108,12 +111,14 @@ static IPublishCb softbusPublishCallback_ = {
 };
 
 static INodeStateCb softbusNodeStateCb_ = {
-    .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED,
+    .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED |
+        EVENT_NODE_STATUS_CHANGED,
     .onNodeOnline = SoftbusListener::OnSoftbusDeviceOnline,
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
     .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
+    .onNodeStatusChanged = SoftbusListener::OnDeviceScreenStatusChanged,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -149,6 +154,40 @@ void SoftbusListener::DeviceTrustedChange(const std::string &msg)
 {
     std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+}
+
+void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
+{
+    std::lock_guard<std::mutex> lock(g_lockDevScreenStatusChange);
+    DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
+}
+
+void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status)
+{
+    LOGI("received device screen status change callback from softbus.");
+    if (status == nullptr) {
+        LOGE("[SOFTBUS]status is nullptr, type = %{public}d", static_cast<int32_t>(type));
+        return;
+    }
+    LOGI("screenStatusChanged networkId: %{public}s, screenStatus: %{public}d",
+        GetAnonyString(status->basicInfo.networkId).c_str(), static_cast<int32_t>(status->reserved[0]));
+    if (type != NodeStatusType::TYPE_SCREEN_STATUS) {
+        LOGE("type is not matching.");
+        return;
+    }
+    DmDeviceInfo dmDeviceInfo;
+    int32_t devScreenStatus = static_cast<int32_t>(status->reserved[0]);
+    ConvertScreenStatusToDmDevice(status->basicInfo, devScreenStatus, dmDeviceInfo);
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        ThreadManager::GetInstance().Submit(
+            DEVICE_SCREEN_STATUS_CHANGE, [=]() { DeviceScreenStatusChange(dmDeviceInfo); });
+    #else
+        std::thread devScreenStatusChange([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
+        if (pthread_setname_np(devScreenStatusChange.native_handle(), DEVICE_SCREEN_STATUS_CHANGE) != DM_OK) {
+            LOGE("devScreenStatusChange setname failed.");
+        }
+        devScreenStatusChange.detach();
+    #endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
@@ -586,22 +625,7 @@ int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
 {
     int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
-    static size_t radarDeviceCount = 0;
     size_t deviceCount = deviceInfoList.size();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    struct RadarInfo radarInfo = {
-        .localUdid = std::string(localDeviceId),
-    };
-    radarInfo.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
-    if (radarDeviceCount != deviceCount && deviceCount > 0
-        && IsDmRadarHelperReady() && GetDmRadarHelperObj() != nullptr) {
-        radarDeviceCount = deviceCount;
-        radarInfo.discoverDevList = GetDmRadarHelperObj()->GetDeviceInfoList(deviceInfoList);
-        if (!GetDmRadarHelperObj()->ReportGetTrustDeviceList(radarInfo)) {
-            LOGE("ReportGetTrustDeviceList failed");
-        }
-    }
     LOGI("Success from cache deviceInfoList size is %{public}zu.", deviceCount);
     return ret;
 }
@@ -638,6 +662,28 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
         LOGE("[SOFTBUS]ShiftLNNGear error, failed ret: %{public}d", ret);
         return ret;
     }
+    return DM_OK;
+}
+
+int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
+    DmDeviceInfo &devInfo)
+{
+    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+
+    if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+    }
+    devInfo.deviceTypeId = nodeInfo.deviceTypeId;
+    nlohmann::json extraJson;
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
+    extraJson[DEVICE_SCREEN_STATUS] = devScreenStatus;
+    devInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
 
@@ -968,6 +1014,20 @@ void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()
 {
     return softbusRefreshCallback_;
+}
+
+int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus)
+{
+    int32_t devScreenStatus = -1;
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SCREEN_STATUS,
+        reinterpret_cast<uint8_t *>(&devScreenStatus), LNN_COMMON_LEN);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo screenStatus failed.");
+        return ret;
+    }
+    screenStatus = devScreenStatus;
+    LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
