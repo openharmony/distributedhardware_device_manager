@@ -50,7 +50,10 @@ ohos_fuzztest("SoftbusConnectorRegisterFuzzTest") {
     "${utils_path}:devicemanagerutils",
   ]
 
-  external_deps = [ "safwk:system_ability_fwk" ]
+  external_deps = [
+    "ffrt:libffrt",
+    "safwk:system_ability_fwk",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
