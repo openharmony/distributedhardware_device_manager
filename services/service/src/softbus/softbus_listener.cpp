@@ -47,10 +47,9 @@ constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
+constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
-constexpr const char* DEVICE_TRUSTED_CHANGE = "deviceTrustedChange";
-constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -179,8 +178,7 @@ void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatu
     int32_t devScreenStatus = static_cast<int32_t>(status->reserved[0]);
     ConvertScreenStatusToDmDevice(status->basicInfo, devScreenStatus, dmDeviceInfo);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ThreadManager::GetInstance().Submit(
-            DEVICE_SCREEN_STATUS_CHANGE, [=]() { DeviceScreenStatusChange(dmDeviceInfo); });
+        ffrt::submit([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
     #else
         std::thread devScreenStatusChange([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
         if (pthread_setname_np(devScreenStatusChange.native_handle(), DEVICE_SCREEN_STATUS_CHANGE) != DM_OK) {
