@@ -411,6 +411,10 @@ int GetSoftbusTrustedDeviceList(const char *pkgName, DmDeviceBasicInfo *deviceLi
         return ERR_DM_SOFTBUS_GET_ALL_DEVICE_INFO;
     }
     int minLen = (deviceListLen > *trustListLen ? *trustListLen : deviceListLen);
+    if (minLen > DM_MAX_DEVICE_SIZE) {
+        DMLOGE("invalid device len.");
+        return ERR_DM_INPUT_INVALID_VALUE;
+    }
     for (int i = 0; i < minLen; i++) {
         NodeBasicInfoCopyToDmDevice(&deviceList[i], &nodeInfo[i]);
     }
@@ -739,6 +743,9 @@ static int DeleteSoftbusSemaphoreAndMutex(void)
 static int FilterDevice(const DmDeviceInfo *dmDeviceInfo)
 {
     DMLOGI("FilterDevice start.");
+    if (dmDeviceInfo == NULL) {
+        return ERR_DM_FAILED;
+    }
     int ret = DM_OK;
     if (g_discoveryCallbackMap.filterOption.isTrusted != NOT_FILTER &&
         dmDeviceInfo->isLocalExistCredential != g_discoveryCallbackMap.filterOption.isTrusted) {
@@ -993,15 +1000,24 @@ static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
 
 static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const NodeBasicInfo *nodeBasicInfo)
 {
-    (void)memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    errno_t retValue = strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), nodeBasicInfo->deviceName);
+    errno_t retValue = memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (retValue != EOK) {
+        LOGE("NodeBasicInfoCopyToDmDevice memset_s failed, ret: %d.", retValue);
+        return;
+    }
+
+    retValue = strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), nodeBasicInfo->deviceName);
     if (retValue != EOK) {
         DMLOGE("failed to copy device name with ret: %d.", retValue);
+        return;
     }
+
     retValue = strcpy_s(dmDeviceInfo->networkId, sizeof(dmDeviceInfo->networkId), nodeBasicInfo->networkId);
     if (retValue != EOK) {
         DMLOGE("failed to copy networkId with ret: %d.", retValue);
+        return;
     }
+    
     GetDeviceIdByNetworkId(nodeBasicInfo->networkId, dmDeviceInfo->deviceId);
     dmDeviceInfo->deviceTypeId = nodeBasicInfo->deviceTypeId;
 }
@@ -1009,14 +1025,20 @@ static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const N
 static void DeviceInfoCopyToDmDevice(DmDeviceInfo *dmDeviceInfo, const DeviceInfo *deviceInfo)
 {
     const size_t arrayStartPosition = 0;
-    (void)memset_s(dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    errno_t retValue = strcpy_s(dmDeviceInfo->deviceId, sizeof(dmDeviceInfo->deviceId), deviceInfo->devId);
+    errno_t retValue = memset_s(dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (retValue != EOK) {
+        DMLOGE("failed to memset device id with ret: %d.", retValue);
+        return;
+    }
+    retValue = strcpy_s(dmDeviceInfo->deviceId, sizeof(dmDeviceInfo->deviceId), deviceInfo->devId);
     if (retValue != EOK) {
         DMLOGE("failed to copy device id with ret: %d.", retValue);
+        return;
     }
     retValue = strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), deviceInfo->devName);
     if (retValue != EOK) {
         DMLOGE("failed to copy device name with ret: %d.", retValue);
+        return;
     }
     dmDeviceInfo->credible = deviceInfo->isOnline;
     dmDeviceInfo->deviceTypeId = deviceInfo->devType;

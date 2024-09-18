@@ -174,6 +174,10 @@ ON_IPC_READ_RESPONSE(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &reply, std
 
 ON_IPC_SET_REQUEST(UNREGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
     std::string pkgName = pBaseReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         LOGE("write papam failed");

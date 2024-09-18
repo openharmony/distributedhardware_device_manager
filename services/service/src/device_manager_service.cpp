@@ -357,7 +357,11 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(localDeviceId_, udidHashTemp) == DM_OK) {
-        (void)memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        errno_t retValue = memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        if (retValue != DM_OK) {
+            LOGE("GetLocalDeviceInfo memset_s failed, ret: %d.", retValue);
+            return ERR_DM_FAILED;
+        }
         if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
             return ERR_DM_FAILED;
@@ -923,7 +927,6 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
     dmServiceImpl_ = std::shared_ptr<IDeviceManagerServiceImpl>(func());
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImpl_ = nullptr;
         isImplsoLoaded_ = false;
         return false;
@@ -1166,7 +1169,6 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
 
     dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
     if (dmServiceImplExt_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImplExt_ = nullptr;
         isAdapterSoLoaded_ = false;
         LOGE("dm service adapter impl ext init failed.");
@@ -1760,7 +1762,11 @@ void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInf
 {
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
-        (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        errno_t retValue = memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+        if (retValue != DM_OK) {
+            LOGE("ConvertUdidHashToAnoyDeviceId memset_s failed, ret: %d.", retValue);
+            return;
+        }
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
         }

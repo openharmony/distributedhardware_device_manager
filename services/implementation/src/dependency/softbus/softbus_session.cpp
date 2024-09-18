@@ -44,6 +44,10 @@ static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t q
 {
     LOGI("[SOFTBUS]OnQos, socket: %{public}d, QoSEvent: %{public}d, qosCount: %{public}u", socket, (int32_t)eventId,
         qosCount);
+    if (qosCount > QOS_TYPE_BUTT) {
+        LOGE("OnQos invalid qosCount");
+        return;
+    }
     for (uint32_t idx = 0; idx < qosCount; idx++) {
         LOGI("QosTV: type: %{public}d, value: %{public}d", (int32_t)qos[idx].qos, qos[idx].value);
     }
@@ -52,7 +56,11 @@ static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t q
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
-    (void)memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener));
+    errno_t retValue = memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener));
+    if (retValue != DM_OK) {
+        LOGE("SoftbusSession::SoftbusSession memset_s failed, ret: %d.", retValue);
+    }
+
     iSocketListener_.OnShutdown = OnShutdown;
     iSocketListener_.OnBytes = OnBytes;
     iSocketListener_.OnQos = OnQos;

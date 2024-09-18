@@ -200,7 +200,7 @@ HWTEST_F(IpcClientStubTest, SendCmd_004, testing::ext::TestSize.Level0)
     int cmdCode = -1;
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = nullptr;
-    sptr<IpcClientStub> instance = new IpcClientStub();
+    sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, result);
 }

@@ -42,6 +42,10 @@ AuthMessageProcessor::~AuthMessageProcessor()
 
 void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
 {
+    if (authResponseContext_->bindType.size() > MAX_BINDTYPE_SIZE) {
+        LOGE("GetJsonObj invalid bindType size.");
+        return;
+    }
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
     jsonObj[TAG_INDEX] = 0;

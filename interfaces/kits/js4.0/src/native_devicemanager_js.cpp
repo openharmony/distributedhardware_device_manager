@@ -54,6 +54,7 @@ const int32_t DM_NAPI_ARGS_ONE = 1;
 const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
+const int32_t DM_MAX_DEVICE_SIZE = 100;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 
@@ -989,16 +990,32 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
     }
 }
 
-void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_status &status,
+int32_t DeviceManagerNapi::DumpDeviceInfo(
     DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
 {
+    if (deviceBasicInfoListAsyncCallbackInfo == nullptr) {
+        LOGE("CallGetAvailableDeviceListStatus deviceBasicInfoListAsyncCallbackInfo is null");
+        return DM_ERR_FAILED;
+    }
+    if (deviceBasicInfoListAsyncCallbackInfo->devList.size() > DM_MAX_DEVICE_SIZE) {
+        LOGE("CallGetAvailableDeviceListStatus invalid devList size");
+        return DM_ERR_FAILED;
+    }
     for (unsigned int i = 0; i < deviceBasicInfoListAsyncCallbackInfo->devList.size(); i++) {
         LOGI("DeviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
              GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceId).c_str(),
              GetAnonyString(deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceName).c_str(),
              deviceBasicInfoListAsyncCallbackInfo->devList[i].deviceTypeId);
     }
+    return DM_OK;
+}
 
+void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_status &status,
+    DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo)
+{
+    if (DumpDeviceInfo(deviceBasicInfoListAsyncCallbackInfo) != DM_OK) {
+        return;
+    }
     napi_value array[DM_NAPI_ARGS_TWO] = {0};
     bool isArray = false;
     NAPI_CALL_RETURN_VOID(env, napi_create_array(env, &array[1]));
@@ -1013,7 +1030,7 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
             }
             LOGI("devList is OK");
         } else {
-            LOGE("devList is null"); //CB come here
+            LOGE("devList is null"); // CB come here
         }
     } else {
         array[0] = CreateBusinessError(env, deviceBasicInfoListAsyncCallbackInfo->ret, false);

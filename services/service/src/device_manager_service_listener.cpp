@@ -50,20 +50,33 @@ const int32_t LAST_APP_ONLINE_NUMS = 8;
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
-    (void)memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
-                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+    errno_t retValue = memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (retValue != DM_OK) {
+        LOGE("ConvertDeviceInfoToDeviceBasicInfo memset_s failed, ret: %d.", retValue);
+        return;
     }
 
-    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
-        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    retValue = memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
+        std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName)));
+    if (retValue != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
+        return;
     }
-    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
-        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+
+    retValue = memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
+        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId)));
+    if (retValue != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed, ret: %d.", retValue);
+        return;
     }
+
+    retValue = memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
+        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId)));
+    if (retValue != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed, ret: %d.", retValue);
+        return;
+    }
+
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
 }
 
