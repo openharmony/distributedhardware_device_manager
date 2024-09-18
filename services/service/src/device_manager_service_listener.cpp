@@ -50,30 +50,26 @@ const int32_t LAST_APP_ONLINE_NUMS = 8;
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
-    errno_t retValue = memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    if (retValue != DM_OK) {
-        LOGE("ConvertDeviceInfoToDeviceBasicInfo memset_s failed, ret: %d.", retValue);
+    if (memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDeviceBasicInfo memset_s failed.");
         return;
     }
 
-    retValue = memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
-        std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName)));
-    if (retValue != DM_OK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
+    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
+            std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
-    retValue = memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
-        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId)));
-    if (retValue != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed, ret: %d.", retValue);
+    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
+            std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
         return;
     }
 
-    retValue = memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
-        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId)));
-    if (retValue != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed, ret: %d.", retValue);
+    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
+            std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }
 
@@ -97,10 +93,14 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     DmDeviceInfo dmDeviceInfo = deviceInfo;
     ConvertUdidHashToAnoyAndSave(pkgName, dmDeviceInfo);
     DmDeviceBasicInfo dmDeviceBasicInfo = deviceBasicInfo;
-    (void)memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+    if (memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset failed.");
+        return;
+    }
     if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), dmDeviceInfo.deviceId,
-        std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(dmDeviceInfo.deviceId))) != DM_OK) {
+            std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(dmDeviceInfo.deviceId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+        return;
     }
     pReq->SetDeviceInfo(dmDeviceInfo);
     pReq->SetDeviceBasicInfo(dmDeviceBasicInfo);
@@ -455,9 +455,12 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::st
     if (ret != DM_OK) {
         return ERR_DM_FAILED;
     }
-    (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
+    if (memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
+        LOGE("ConvertUdidHashToAnoyAndSave memset failed.");
+        return ERR_DM_FAILED;
+    }
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.c_str(),
-        std::min(sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.length())) != DM_OK) {
+            std::min(sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.length())) != DM_OK) {
         LOGE("copy deviceId data failed.");
         return ERR_DM_FAILED;
     }

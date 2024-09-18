@@ -56,9 +56,8 @@ static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t q
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
-    errno_t retValue = memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener));
-    if (retValue != DM_OK) {
-        LOGE("SoftbusSession::SoftbusSession memset_s failed, ret: %d.", retValue);
+    if (memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener)) != DM_OK) {
+        LOGE("SoftbusSession::SoftbusSession memset_s failed.");
     }
 
     iSocketListener_.OnShutdown = OnShutdown;

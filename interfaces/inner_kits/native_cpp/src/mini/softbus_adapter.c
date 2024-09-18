@@ -1000,21 +1000,18 @@ static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
 
 static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const NodeBasicInfo *nodeBasicInfo)
 {
-    errno_t retValue = memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    if (retValue != EOK) {
-        LOGE("NodeBasicInfoCopyToDmDevice memset_s failed, ret: %d.", retValue);
+    if (memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
+        LOGE("NodeBasicInfoCopyToDmDevice memset_s failed.");
         return;
     }
 
-    retValue = strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), nodeBasicInfo->deviceName);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device name with ret: %d.", retValue);
+    if (strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), nodeBasicInfo->deviceName) != EOK) {
+        DMLOGE("failed to copy device name.");
         return;
     }
 
-    retValue = strcpy_s(dmDeviceInfo->networkId, sizeof(dmDeviceInfo->networkId), nodeBasicInfo->networkId);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy networkId with ret: %d.", retValue);
+    if (strcpy_s(dmDeviceInfo->networkId, sizeof(dmDeviceInfo->networkId), nodeBasicInfo->networkId) != EOK) {
+        DMLOGE("failed to copy networkId.");
         return;
     }
     
@@ -1025,19 +1022,18 @@ static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const N
 static void DeviceInfoCopyToDmDevice(DmDeviceInfo *dmDeviceInfo, const DeviceInfo *deviceInfo)
 {
     const size_t arrayStartPosition = 0;
-    errno_t retValue = memset_s(dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (retValue != EOK) {
-        DMLOGE("failed to memset device id with ret: %d.", retValue);
+    if (memset_s(dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        DMLOGE("failed to memset device id.");
         return;
     }
-    retValue = strcpy_s(dmDeviceInfo->deviceId, sizeof(dmDeviceInfo->deviceId), deviceInfo->devId);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device id with ret: %d.", retValue);
+
+    if (strcpy_s(dmDeviceInfo->deviceId, sizeof(dmDeviceInfo->deviceId), deviceInfo->devId) != EOK) {
+        DMLOGE("failed to copy device id.");
         return;
     }
-    retValue = strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), deviceInfo->devName);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device name with ret: %d.", retValue);
+
+    if (strcpy_s(dmDeviceInfo->deviceName, sizeof(dmDeviceInfo->deviceName), deviceInfo->devName) != EOK) {
+        DMLOGE("failed to copy device name.");
         return;
     }
     dmDeviceInfo->credible = deviceInfo->isOnline;
@@ -1056,18 +1052,21 @@ static void DeviceInfoCopyToDmDevice(DmDeviceInfo *dmDeviceInfo, const DeviceInf
 
 static void DmDeviceInfoToDmBasicInfo(const DmDeviceInfo *dmDeviceInfo, DmDeviceBasicInfo *dmBasicInfo)
 {
-    (void)memset_s(dmBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    errno_t retValue = strcpy_s(dmBasicInfo->deviceId, sizeof(dmBasicInfo->deviceId), dmDeviceInfo->deviceId);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device id with ret: %d.", retValue);
+    if (memset_s(dmBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
+        DMLOGE("DmDeviceInfoToDmBasicInfo memset_s failed");
+        return;
     }
-    retValue = strcpy_s(dmBasicInfo->deviceName, sizeof(dmBasicInfo->deviceName), dmDeviceInfo->deviceName);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device name with ret: %d.", retValue);
+    if (strcpy_s(dmBasicInfo->deviceId, sizeof(dmBasicInfo->deviceId), dmDeviceInfo->deviceId) != EOK) {
+        DMLOGE("failed to copy device id.");
+        return;
     }
-    retValue = strcpy_s(dmBasicInfo->networkId, sizeof(dmBasicInfo->networkId), dmDeviceInfo->networkId);
-    if (retValue != EOK) {
-        DMLOGE("failed to copy device networkId with ret: %d.", retValue);
+    if (strcpy_s(dmBasicInfo->deviceName, sizeof(dmBasicInfo->deviceName), dmDeviceInfo->deviceName) != EOK) {
+        DMLOGE("failed to copy device name.");
+        return;
+    }
+    if (strcpy_s(dmBasicInfo->networkId, sizeof(dmBasicInfo->networkId), dmDeviceInfo->networkId) != EOK) {
+        DMLOGE("failed to copy device networkId.");
+        return;
     }
     dmBasicInfo->deviceTypeId = dmDeviceInfo->deviceTypeId;
 }

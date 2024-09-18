@@ -357,9 +357,8 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(localDeviceId_, udidHashTemp) == DM_OK) {
-        errno_t retValue = memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
-        if (retValue != DM_OK) {
-            LOGE("GetLocalDeviceInfo memset_s failed, ret: %d.", retValue);
+        if (memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
+            LOGE("GetLocalDeviceInfo memset_s failed.");
             return ERR_DM_FAILED;
         }
         if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
@@ -1762,9 +1761,8 @@ void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInf
 {
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
-        errno_t retValue = memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
-        if (retValue != DM_OK) {
-            LOGE("ConvertUdidHashToAnoyDeviceId memset_s failed, ret: %d.", retValue);
+        if (memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
+            LOGE("ConvertUdidHashToAnoyDeviceId memset_s failed.");
             return;
         }
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {

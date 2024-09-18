@@ -127,9 +127,8 @@ int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pk
 int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
 {
     PublishInfo publishInfo;
-    errno_t retValue = memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
-    if (retValue != EOK) {
-        LOGE("PublishDiscovery memset_s failed, ret: %d.", retValue);
+    if (memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo)) != EOK) {
+        LOGE("PublishDiscovery memset_s failed.");
         return ERR_DM_FAILED;
     }
     publishInfo.publishId = dmPublishInfo.publishId;
@@ -162,9 +161,8 @@ int32_t SoftbusConnector::UnPublishDiscovery(int32_t publishId)
 int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 {
     SubscribeInfo subscribeInfo;
-    errno_t retValue = memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
-    if (retValue != EOK) {
-        LOGE("StartDiscovery memset_s failed, ret: %d.", retValue);
+    if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != EOK) {
+        LOGE("StartDiscovery memset_s failed.");
         return ERR_DM_FAILED;
     }
     subscribeInfo.subscribeId = dmSubscribeInfo.subscribeId;
@@ -200,9 +198,8 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
 {
     SubscribeInfo subscribeInfo;
-    errno_t retValue = memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
-    if (retValue != EOK) {
-        LOGE("StartDiscovery memset_s failed, ret: %d.", retValue);
+    if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != EOK) {
+        LOGE("StartDiscovery memset_s failed.");
         return ERR_DM_FAILED;
     }
     subscribeInfo.subscribeId = subscribeId;
@@ -369,23 +366,20 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
 
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)
 {
-    errno_t retValue = memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice memset_s failed, ret: %d.", retValue);
+    if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
         return;
     }
 
-    retValue = memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
-        std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId)));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed, ret: %d.", retValue);
+    if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
+            std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
         return;
     }
 
-    retValue = memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
-        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName)));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
+    if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
+            std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
@@ -395,23 +389,20 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
 
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo)
 {
-    errno_t retValue = memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice memset_s failed, ret: %d.", retValue);
+    if (memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
         return;
     }
 
-    retValue = memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), deviceInfo.devId,
-        std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId)));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed, ret: %d.", retValue);
+    if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), deviceInfo.devId,
+            std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
         return;
     }
 
-    retValue = memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), deviceInfo.devName,
-        std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName)));
-    if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
+    if (memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), deviceInfo.devName,
+            std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
@@ -799,23 +790,22 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 
 void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
-    errno_t retValue = memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (retValue != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed, ret: %d.", retValue);
+    if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return;
     }
 
     retValue = memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
         std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId)));
     if (retValue != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed, ret: %d.", retValue);
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }
 
     retValue = memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
         std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName)));
     if (retValue != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
