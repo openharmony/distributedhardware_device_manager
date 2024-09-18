@@ -966,7 +966,7 @@ void DeviceManagerNapi::DmAuthParamToJsAuthParam(const napi_env &env, const DmAu
     napi_create_object(env, &extraInfo);
     SetValueInt32(env, "direction", authParam.direction, extraInfo);
     SetValueInt32(env, "authType", authParam.authType, paramResult);
-    SetValueInt32(env, "pinToken", stoi(authParam.authToken), extraInfo);
+    SetValueInt32(env, "pinToken", atoi(authParam.authToken.c_str()), extraInfo);
 
     if (authParam.direction == DM_AUTH_DIRECTION_CLIENT) {
         napi_set_named_property(env, paramResult, "extraInfo", extraInfo);
