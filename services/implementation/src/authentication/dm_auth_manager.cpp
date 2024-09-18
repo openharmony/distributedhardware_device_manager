@@ -1468,7 +1468,7 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             }
             break;
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
-            ProcessPincode(std::stoi(params));
+            ProcessPincode(std::atoi(params.c_str()));
             info.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
             if (!DmRadarHelper::GetInstance().ReportAuthInputPinBox(info)) {
                 LOGE("ReportAuthInputPinBox failed");
@@ -1625,7 +1625,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %{public}s.", GetAnonyString(targetId.wifiIp).c_str());
         if (!addrType.empty()) {
-            addr.type = static_cast<ConnectionAddrType>(std::stoi(addrType));
+            addr.type = static_cast<ConnectionAddrType>(std::atoi(addrType.c_str()));
         } else {
             addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
         }
@@ -1686,7 +1686,7 @@ int32_t DmAuthManager::ParseAuthType(const std::map<std::string, std::string> &b
         LOGE("DmAuthManager::ParseAuthType bind param %{public}s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    authType = std::stoi(authTypeStr);
+    authType = std::atoi(authTypeStr.c_str());
     return DM_OK;
 }
 
@@ -1731,7 +1731,7 @@ int32_t DmAuthManager::GetAuthCode(const std::string &pkgName, int32_t &pinCode)
         LOGE("GetAuthCode failed, pkgName not supported.");
         return ERR_DM_FAILED;
     }
-    pinCode = std::stoi(importAuthCode_);
+    pinCode = std::atoi(importAuthCode_.c_str());
     return DM_OK;
 }
 

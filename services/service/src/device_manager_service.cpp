@@ -1697,8 +1697,8 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not number.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t policyStrategy = std::stoi(policyStrategyIter->second);
-    int32_t timeOut = std::stoi(timeOutIter->second);
+    int32_t policyStrategy = std::atoi(policyStrategyIter->second.c_str());
+    int32_t timeOut = std::atoi(timeOutIter->second.c_str());
     LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
     if (!IsDMServiceAdapterLoad()) {
         LOGE("SetDnPolicy failed, instance not init or init failed.");
