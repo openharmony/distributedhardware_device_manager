@@ -795,16 +795,14 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
         return;
     }
 
-    retValue = memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
-        std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId)));
-    if (retValue != EOK) {
+    if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
+            std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }
 
-    retValue = memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
-        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName)));
-    if (retValue != EOK) {
+    if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
+            std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }

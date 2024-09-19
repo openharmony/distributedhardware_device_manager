@@ -255,22 +255,19 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
 
 int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
-    errno_t retValue = memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (retValue != DM_OK) {
+    if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed, ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
 
-    retValue = memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
-        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId)));
-    if (retValue != DM_OK) {
+    if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
+            std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed, ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
 
-    retValue = memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
-        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName)));
-    if (retValue != DM_OK) {
+    if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
+            std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed, ret: %d.", retValue);
         return ERR_DM_FAILED;
     }
