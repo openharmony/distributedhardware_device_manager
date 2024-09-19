@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const int32_t MIN_TIME_OUT = 0;
 const int32_t MAX_TIME_OUT = 300;
-const int32_t MILLISECOND_TO_SECOND = 1000;
+const int64_t DELAY_TIME = 1000000L;
 constexpr const char* TIMER_TASK = "TimerTask";
 
 DmTimer::DmTimer()
@@ -51,7 +51,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
     std::lock_guard<std::mutex> locker(timerMutex_);
 
     auto taskFunc = [callback, name] () { callback(name); };
-    ffrt::task_handle handle = queue_->submit_h(taskFunc, ffrt::task_attr().delay(timeOut * MILLISECOND_TO_SECOND));
+    ffrt::task_handle handle = queue_->submit_h(taskFunc, ffrt::task_attr().delay(timeOut * DELAY_TIME));
     if (handle == nullptr) {
         LOGE("handle is nullptr.");
         return ERR_DM_FAILED;
