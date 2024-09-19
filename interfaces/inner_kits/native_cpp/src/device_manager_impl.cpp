@@ -1576,7 +1576,13 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
     }
     LOGI("StopDiscovering start, pkgName: %{public}s", pkgName.c_str());
 
-    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
+    uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subMapLock);
+        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
+            subscribeId = pkgName2SubIdMap_[pkgName];
+        }
+    }
     if (subscribeId == DM_INVALID_FLAG_ID) {
         LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1598,7 +1604,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         LOGE("StopDiscovering error: Failed with ret %{public}d", ret);
         return ret;
     }
-
+    RemoveDiscoveryCallback(pkgName);
     LOGI("StopDiscovering completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
