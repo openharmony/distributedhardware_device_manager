@@ -306,6 +306,7 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
         session_->CloseSessionServer(sessionId_);
         sessionId_ = SESSION_ID_INVALID;
+        destroyState_ = STATE_REMOTE_WRONG;
     }
 }
 
@@ -377,6 +378,7 @@ void PinHolder::CloseSession(const std::string &name)
     }
     session_->CloseSessionServer(sessionId_);
     timer_->DeleteAll();
+    destroyState_ = STATE_TIME_OUT;
     sessionId_ = SESSION_ID_INVALID;
     sinkState_ = SINK_INIT;
     sourceState_ = SOURCE_INIT;
@@ -468,6 +470,7 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     isDestroy_.store(false);
+    destroyState_ = STATE_UNKNOW;
     char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
     int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
     if (ret != DM_OK) {
@@ -511,7 +514,13 @@ void PinHolder::OnSessionClosed(int32_t sessionId)
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+        if (destroyState_ == STATE_UNKNOW) {
+            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, sessionId, content);
+        } else if (destroyState_ == STATE_REMOTE_WRONG) {
+            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_FAILED, content);
+        } else if (destroyState_ == STATE_TIME_OUT) {
+            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+        }
         isDestroy_.store(true);
     }
     if (timer_ != nullptr) {

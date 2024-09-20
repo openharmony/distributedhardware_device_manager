@@ -36,6 +36,12 @@ typedef enum PinHolderState {
     SINK_DESTROY,
 } PinHolderState;
 
+typedef enum DestroyState {
+    STATE_UNKNOW = 0x0,
+    STATE_REMOTE_WRONG = 0x1,
+    STATE_TIME_OUT = 0x2,
+} DestroyState;
+
 class PinHolder final : public IPinholderSessionCallback,
                         public std::enable_shared_from_this<PinHolder> {
 public:
@@ -78,6 +84,7 @@ private:
     int32_t sessionId_ = -1;
     bool isRemoteSupported_ = false;
     std::atomic<bool> isDestroy_;
+    DestroyState destroyState_ = STATE_UNKNOW;
 };
 }
 }
