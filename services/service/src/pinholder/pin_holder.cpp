@@ -45,6 +45,7 @@ constexpr const char* TAG_REMOTE_DEVICE_ID = "REMOTE_DEVICE_ID";
 
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
+constexpr int32_t ERR_DM_TIME_OUT = 96929745;
 constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* TAG_DM_VERSION = "DM_VERSION";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
@@ -335,12 +336,15 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
         jsonObj[TAG_REPLY] = REPLY_SUCCESS;
         sinkState_ = SINK_INIT;
         sourceState_ = SOURCE_INIT;
-        listener_->OnPinHolderDestroy(registerPkgName_, pinType, payload);
-        nlohmann::json jsonContent;
-        jsonContent[TAG_PIN_TYPE] = pinType;
-        jsonContent[TAG_PAYLOAD] = payload;
-        std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, DM_OK, content);
+        if (!isDestroy_.load()) {
+            listener_->OnPinHolderDestroy(registerPkgName_, pinType, payload);
+            nlohmann::json jsonContent;
+            jsonContent[TAG_PIN_TYPE] = pinType;
+            jsonContent[TAG_PAYLOAD] = payload;
+            std::string content = jsonContent.dump();
+            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, DM_OK, content);
+            isDestroy_.store(true);
+        }
     }
 
     std::string msg = jsonObj.dump();
@@ -362,13 +366,14 @@ void PinHolder::CloseSession(const std::string &name)
     nlohmann::json jsonObj;
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
     std::string payload = jsonObj.dump();
-    if (listener_ != nullptr) {
+    if (listener_ != nullptr && !isDestroy_.load()) {
         listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, DM_OK, content);
+        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+        isDestroy_.store(true);
     }
     session_->CloseSessionServer(sessionId_);
     timer_->DeleteAll();
@@ -462,6 +467,7 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
 
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
+    isDestroy_.store(false);
     char peerDeviceId[DEVICE_UUID_LENGTH] = {0};
     int32_t ret = ::GetPeerDeviceId(sessionId, &peerDeviceId[0], DEVICE_UUID_LENGTH);
     if (ret != DM_OK) {
@@ -499,13 +505,14 @@ void PinHolder::OnSessionClosed(int32_t sessionId)
     nlohmann::json jsonObj;
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
     std::string payload = jsonObj.dump();
-    if (listener_ != nullptr) {
+    if (listener_ != nullptr && !isDestroy_.load()) {
         listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, DM_OK, content);
+        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+        isDestroy_.store(true);
     }
     if (timer_ != nullptr) {
         timer_->DeleteAll();
