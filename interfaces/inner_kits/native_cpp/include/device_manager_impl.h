@@ -394,6 +394,7 @@ public:
     virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) override;
     virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus) override;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

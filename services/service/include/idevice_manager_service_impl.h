@@ -89,7 +89,6 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
-
     /**
      * @tc.name: IDeviceManagerServiceImpl::UnBindDevice
      * @tc.desc: UnBindDevice Device of the device manager service impl
@@ -273,6 +272,7 @@ public:
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
     virtual void HandleUserSwitched(int32_t switchUserId) = 0;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
