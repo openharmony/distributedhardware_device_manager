@@ -267,7 +267,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     std::string requestDeviceId = static_cast<std::string>(localUdid);
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     LOGI("The online device bind type is %{public}d.", bindType);
-    if (bindType == INVALIED_TYPE) {
+    if (bindType == INVALIED_TYPE && isCredentialType_.load()) {
         PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
     } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
@@ -385,6 +385,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
         LOGE("credentialMgr_ is nullptr");
         return ERR_DM_POINT_NULL;
     }
+    isCredentialType_.store(true);
     return credentialMgr_->ImportCredential(pkgName, credentialInfo);
 }
 
@@ -399,6 +400,7 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
         LOGE("credentialMgr_ is nullptr");
         return ERR_DM_POINT_NULL;
     }
+    isCredentialType_.store(false);
     return credentialMgr_->DeleteCredential(pkgName, deleteInfo);
 }
 
@@ -439,6 +441,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
         LOGE("failed to import devices credential");
         return ERR_DM_HICHAIN_CREDENTIAL_IMPORT_FAILED;
     }
+    isCredentialType_.store(true);
     return DM_OK;
 }
 
@@ -454,6 +457,7 @@ int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, c
         LOGE("failed to delete devices credential");
         return ERR_DM_HICHAIN_CREDENTIAL_DELETE_FAILED;
     }
+    isCredentialType_.store(false);
     return DM_OK;
 }
 
