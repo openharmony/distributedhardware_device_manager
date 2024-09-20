@@ -339,18 +339,17 @@ struct InputCustomDialog {
 @Entry
 @Component
 struct dialogPlusPage {
-  @State isPC: boolean = Constant.isPC();
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
-    alignment: this.isPC ? DialogAlignment.Center : DialogAlignment.Bottom,
+    alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear : this.isPC: ' + this.isPC);
+    console.log(TAG + 'aboutToAppear aboutToAppear');
   }
 
   aboutToDisappear() {
