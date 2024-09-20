@@ -187,19 +187,19 @@ void DeviceManagerImpl::ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &i
     }
 
     if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
-        std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+            std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
     if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
-        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+            std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
         return;
     }
     
     if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
-        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+            std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }

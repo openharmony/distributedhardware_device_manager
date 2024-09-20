@@ -131,7 +131,7 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
         return;
     }
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
-        std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+            std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
         LOGE("SaveDeviceInfo copy deviceId failed.");
         return;
     }
