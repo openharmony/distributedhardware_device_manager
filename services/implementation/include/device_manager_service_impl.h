@@ -155,6 +155,7 @@ private:
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
+    std::atomic<bool> isCredentialType_ = false;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
