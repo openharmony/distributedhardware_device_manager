@@ -92,6 +92,13 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t SetDnPolicy(int32_t policy, int32_t timeOut) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::AccountUserSwitched
+     * @tc.desc: AccountUserSwitched
+     * @tc.type: FUNC
+     */
+    virtual int32_t AccountUserSwitched(int32_t userId, const std::string &oldAccountId) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
