@@ -19,10 +19,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
 const int32_t MIN_TIME_OUT = 0;
 const int32_t MAX_TIME_OUT = 300;
 const int64_t DELAY_TIME = 1000000L;
 constexpr const char* TIMER_TASK = "TimerTask";
+}
 
 DmTimer::DmTimer()
 {
@@ -87,10 +89,6 @@ int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (timerVec_.empty()) {
-        LOGI("DmTimer is empty");
-        return DM_OK;
-    }
     for (const auto &name : timerVec_) {
         if (name.second != nullptr && queue_ != nullptr) {
             int32_t ret = queue_->cancel(name.second);
