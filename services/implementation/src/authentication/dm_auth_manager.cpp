@@ -1850,11 +1850,11 @@ void DmAuthManager::SrcSyncDeleteAclDone()
         char localUdid[DEVICE_UUID_LENGTH] = {0};
         GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
         if (hiChainConnector_->IsDevicesInP2PGroup(remoteDeviceId_, localUdid) &&
-            DeviceProfileConnector::GetInstance().CheckDeviceIdInAcl(authResponseContext_->hostPkgName,
+            DeviceProfileConnector::GetInstance().CheckDeviceIdInAcl(authRequestContext_->hostPkgName,
             remoteDeviceId_)) {
-            DeleteGroup(authResponseContext_->hostPkgName, remoteDeviceId_);
+            DeleteGroup(authRequestContext_->hostPkgName, remoteDeviceId_);
         }
-        DeleteAcl(authResponseContext_->hostPkgName, remoteDeviceId_);
+        DeleteAcl(authRequestContext_->hostPkgName, remoteDeviceId_);
     }
     softbusConnector_->GetSoftbusSession()->CloseUnbindSession(authRequestContext_->sessionId);
     timer_->DeleteAll();
