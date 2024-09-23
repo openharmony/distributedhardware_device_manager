@@ -135,7 +135,7 @@ HWTEST_F(DmDiscoveryManagerTest, StartDeviceDiscovery_003, testing::ext::TestSiz
     std::queue<std::string> emptyQueue;
     discoveryMgr_->discoveryQueue_ = emptyQueue;
     int32_t ret = discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-     ASSERT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    ASSERT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
     discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeInfo.subscribeId);
 }
 

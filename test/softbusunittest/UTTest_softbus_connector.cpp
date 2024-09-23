@@ -208,7 +208,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
     EXPECT_TRUE(ret == SOFTBUS_INVALID_PARAM ||  ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
-
+}
 /**
  * @tc.name: StartDiscovery_002
  * @tc.desc: get StartDiscovery to wrong branch and return SOFTBUS_IPC_ERR
