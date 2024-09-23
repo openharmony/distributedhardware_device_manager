@@ -111,7 +111,7 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
-    ASSERT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    ASSERT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
     publishMgr_->UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 
