@@ -123,6 +123,7 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_core",
       "cJSON:cjson",
       "c_utils:utils",
+      "eventhandler:libeventhandler",
       "ffrt:libffrt",
       "hilog:libhilog",
       "ipc:ipc_core",
