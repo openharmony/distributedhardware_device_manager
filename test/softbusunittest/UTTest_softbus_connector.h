@@ -44,6 +44,7 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    bool CheckReturnResult(int ret);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
