@@ -15,7 +15,7 @@
 
 #include "UTTest_device_manager_service_impl.h"
 #include "softbus_error_code.h"
-
+#include "common_event_support.h"
 namespace OHOS {
 namespace DistributedHardware {
 void DeviceManagerServiceImplTest::SetUp()
@@ -255,6 +255,38 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_003, testing::ext::TestSize.L
     }
     int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test_004";
+    int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
+    std::string event = R"({"extra": {"deviceId": "789"}})";
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    deviceManagerServiceImpl_->deviceStateMgr_ = nullptr;
+    int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test_005";
+    int32_t eventId = DM_NOTIFY_EVENT_ONDEVICEREADY;
+    std::string event = R"({"extra": {"deviceId": "789"}})";
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    deviceManagerServiceImpl_->Initialize(listener_);
+    std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED;
+    deviceManagerServiceImpl_->ScreenCommonEventCallback(commonEventType);
+    int32_t remoteUserId = 1;
+    std::string remoteAccountHash = "45552878";
+    std::string remoteUdid = "ajdakndkwj98877";
+    deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
+    int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -1453,6 +1485,21 @@ HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_102, testing::e
     int32_t bindType = DM_IDENTICAL_ACCOUNT;
     DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
     EXPECT_EQ(authForm, DmAuthForm::IDENTICAL_ACCOUNT);
+}
+
+
+HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_103, testing::ext::TestSize.Level0)
+{
+    int32_t bindType = DM_POINT_TO_POINT;
+    DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
+    EXPECT_EQ(authForm, DmAuthForm::PEER_TO_PEER);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_104, testing::ext::TestSize.Level0)
+{
+    int32_t bindType = DM_ACROSS_ACCOUNT;
+    DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
+    EXPECT_EQ(authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
 } // namespace
 } // namespace DistributedHardware

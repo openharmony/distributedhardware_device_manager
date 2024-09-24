@@ -436,6 +436,69 @@ HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level0)
     int64_t ret = StringToInt64(str, base);
     EXPECT_EQ(ret, 0);
 }
+
+
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Level0)
+{
+    std::string jsonStr = R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" :
+        [
+            {
+                "CRYPTOSUPPORT" : "cryptosupportTest",
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "hello",
+                "pkInfoSignature" : "world",
+                "pkInfo" : "pkginfo",
+                "peerDeviceId" : "3515656546"
+            }
+        ]
+    }
+    )";
+    std::map<std::string, std::string> paramMap;
+    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_GE(paramMap.size(), 0);
+}
+
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_002, testing::ext::TestSize.Level0)
+{
+    std::string jsonStr = R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" :
+        [
+            {
+                "CRYPTOSUPPORT" : "cryptosupportTest",
+                "credentialType" : 1,
+                "credentialId" : "104",
+                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+                "serverPk" : "hello",
+                "pkInfoSignature" : "world",
+                "pkInfo" : "pkginfo",
+                "peerDeviceId" : "3515656546"
+            }
+        ]
+    )";
+    std::map<std::string, std::string> paramMap;
+    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_EQ(paramMap.size(), 0);
+}
+
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Level0)
+{
+    std::string jsonStr = "";
+    std::map<std::string, std::string> paramMap;
+    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_EQ(paramMap.size(), 0);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
