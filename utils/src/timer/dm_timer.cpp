@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,31 +19,21 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
 const int32_t MIN_TIME_OUT = 0;
 const int32_t MAX_TIME_OUT = 300;
-const int32_t MILLISECOND_TO_SECOND = 1000;
-
-CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
-{
-    LOGI("CommonEventHandler constructor");
-}
-
-bool CommonEventHandler::PostTask(const Callback &callback, const std::string &name, int64_t delayTime)
-{
-    return AppExecFwk::EventHandler::PostTask(callback, name, delayTime);
-}
-
-void CommonEventHandler::RemoveTask(const std::string &name)
-{
-    AppExecFwk::EventHandler::RemoveTask(name);
+const int64_t MICROSECOND_TO_SECOND = 1000000L;
+constexpr const char* TIMER_TASK = "TimerTask";
 }
 
 DmTimer::DmTimer()
 {
     LOGI("DmTimer constructor");
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
-    eventHandler_ = std::make_shared<CommonEventHandler>(runner);
+    if (queue_ != nullptr) {
+        LOGI("Timer is already init.");
+        return;
+    }
+    queue_ = std::make_shared<ffrt::queue>(TIMER_TASK);
 }
 
 DmTimer::~DmTimer()
@@ -55,17 +45,20 @@ DmTimer::~DmTimer()
 int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
     if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
-        LOGI("DmTimer StartTimer input value invalid");
+        LOGE("DmTimer StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(queue_, ERR_DM_POINT_NULL);
     LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    timerVec_.insert(name);
 
     auto taskFunc = [callback, name] () { callback(name); };
-    if (eventHandler_ != nullptr) {
-        eventHandler_->PostTask(taskFunc, name, timeOut * MILLISECOND_TO_SECOND);
+    ffrt::task_handle handle = queue_->submit_h(taskFunc, ffrt::task_attr().delay(timeOut * MICROSECOND_TO_SECOND));
+    if (handle == nullptr) {
+        LOGE("handle is nullptr.");
+        return ERR_DM_FAILED;
     }
+    timerVec_[name] = std::move(handle);
     return DM_OK;
 }
 
@@ -77,14 +70,18 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     }
     LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (!timerVec_.empty() && timerVec_.find(timerName) == timerVec_.end()) {
-        LOGI("DmTimer DeleteTimer is not exist.");
+    auto item = timerVec_.find(timerName);
+    if (item == timerVec_.end()) {
+        LOGI("Invalid task.");
         return ERR_DM_FAILED;
     }
-    timerVec_.erase(timerName);
-    if (eventHandler_ != nullptr) {
-        eventHandler_->RemoveTask(timerName);
+    if (item->second != nullptr && queue_ != nullptr) {
+        int32_t ret = queue_->cancel(item->second);
+        if (ret != 0) {
+            LOGE("Cancel failed, errCode: %{public}d.", ret);
+        }
     }
+    timerVec_.erase(timerName);
     return DM_OK;
 }
 
@@ -92,15 +89,13 @@ int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (eventHandler_ ==  nullptr) {
-        return ERR_DM_FAILED;
-    }
-    if (timerVec_.empty()) {
-        LOGI("DmTimer is empty");
-        return DM_OK;
-    }
-    for (auto name : timerVec_) {
-        eventHandler_->RemoveTask(name);
+    for (const auto &name : timerVec_) {
+        if (name.second != nullptr && queue_ != nullptr) {
+            int32_t ret = queue_->cancel(name.second);
+            if (ret != 0) {
+                LOGE("Cancel failed, errCode: %{public}d.", ret);
+            }
+        }
     }
     timerVec_.clear();
     return DM_OK;

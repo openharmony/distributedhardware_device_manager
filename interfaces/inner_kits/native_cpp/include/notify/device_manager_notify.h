@@ -134,9 +134,6 @@ private:
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
     std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
     std::mutex bindLock_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::shared_ptr<ffrt::queue> ffrtQueue_;
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

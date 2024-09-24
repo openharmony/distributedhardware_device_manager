@@ -30,8 +30,6 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffline";
 constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
 constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
-#else
-constexpr const char* DEVICE_STATE_INIT_QUEUE = "deviceStateInitQueue";
 #endif
 
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
@@ -43,19 +41,6 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     dmInitCallback_[pkgName] = dmInitCallback;
-
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        LOGI("FfrtQueue has created!");
-        return;
-    }
-    ffrtQueue_ = std::make_shared<ffrt::queue>(DEVICE_STATE_INIT_QUEUE,
-        ffrt::queue_attr().qos(ffrt::qos_default));
-    if (ffrtQueue_ == nullptr) {
-        LOGE("FfrtQueue create failed!");
-        return;
-    }
-#endif
 }
 
 void DeviceManagerNotify::UnRegisterDeathRecipientCallback(const std::string &pkgName)
@@ -298,9 +283,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
 #else
     std::thread deviceOnline([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
@@ -332,9 +315,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
 #else
     std::thread deviceOnline([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
@@ -366,9 +347,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
 #else
     std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
@@ -400,9 +379,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
 #else
     std::thread deviceOffline([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
@@ -434,9 +411,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
 #else
     std::thread deviceChanged([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
@@ -468,9 +443,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
 #else
     std::thread deviceChanged([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
@@ -502,9 +475,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
 #else
     std::thread deviceReady([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
@@ -536,9 +507,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
 #else
     std::thread deviceReady([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
     if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
@@ -1115,9 +1084,7 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
     }
     DmAuthForm dmAuthForm = static_cast<DmAuthForm>(authForm);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (ffrtQueue_ != nullptr) {
-        ffrtQueue_->submit([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
-    }
+    ffrt::submit([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
 #else
     std::thread deviceTrustChange([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
     if (pthread_setname_np(deviceTrustChange.native_handle(), DEVICE_TRUST_CHANGE) != DM_OK) {
