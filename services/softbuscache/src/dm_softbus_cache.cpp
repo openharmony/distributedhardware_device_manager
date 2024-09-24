@@ -131,7 +131,7 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
         return;
     }
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
-            std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+        std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
         LOGE("SaveDeviceInfo copy deviceId failed.");
         return;
     }
@@ -261,13 +261,13 @@ int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeIn
     }
 
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
-            std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
         return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
-            std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
         return ERR_DM_FAILED;
     }
