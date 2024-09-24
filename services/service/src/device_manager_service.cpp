@@ -1600,6 +1600,9 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, const std:
         MultipleUserConnector::SetSwitchOldUserId(userId);
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
         MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
+        if (IsDMServiceAdapterLoad()) {
+            dmServiceImplExt_->AccountUserSwitched(userId, MultipleUserConnector::GetOhosAccountId());
+        }
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
         MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
