@@ -45,6 +45,14 @@ HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level
     SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
+
+HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
+{
+    SoftbusPublish spftbusPublish;
+    int publishId = 2;
+    int32_t ret = spftbusPublish.StopPublishSoftbusLNN(publishId);
+    EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

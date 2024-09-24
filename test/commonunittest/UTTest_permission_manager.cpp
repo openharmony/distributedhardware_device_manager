@@ -147,6 +147,12 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ex
     ASSERT_EQ(ret, true);
 }
 
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_004, testing::ext::TestSize.Level0)
+{
+    std::string processName = "CollaborationFwk";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
+    ASSERT_TRUE(ret);
+}
 /**
  * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_001
  * @tc.desc: the return value is false
@@ -186,6 +192,12 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::e
     ASSERT_EQ(ret, true);
 }
 
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_004, testing::ext::TestSize.Level0)
+{
+    std::string processName = "CollaborationFwk";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
+    ASSERT_TRUE(ret);
+}
 /**
  * @tc.name: PinAuthUi::CheckSystemSA_001
  * @tc.desc: the return value is false
@@ -222,6 +234,20 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.Level0
     std::string pkgName4(systemSaWhiteList[3]);
     ret = PermissionManager::GetInstance().CheckSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(PermissionManagerTest, CheckSystemSA_101, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(PermissionManagerTest, CheckSystemSA_102, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "ohos.dhardware";
+    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ASSERT_TRUE(ret);
 }
 }
 } // namespace DistributedHardware
