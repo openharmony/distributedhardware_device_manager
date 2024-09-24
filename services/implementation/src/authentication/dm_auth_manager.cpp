@@ -856,6 +856,14 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
 {
     LOGI("ProcessAuthRequest start.");
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
+        if (authResponseContext_->importAuthCode != Crypto::Sha256(importAuthCode_)) {
+            SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
+            return;
+        }
+    }
+
     if (authResponseContext_->isOnline && softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
         authResponseContext_->isOnline = true;
     } else {
@@ -2262,13 +2270,8 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
 
 int32_t DmAuthManager::CheckTrustState()
 {
-    if (authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
-        !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
-        if (authResponseContext_->importAuthCode == Crypto::Sha256(importAuthCode_)) {
-            SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
-        } else {
-            SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
-        }
+    if (authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
         return ALREADY_BIND;
     }
     if (authResponseContext_->isIdenticalAccount) {
