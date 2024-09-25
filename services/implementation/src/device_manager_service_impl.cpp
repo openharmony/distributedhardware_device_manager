@@ -161,6 +161,15 @@ int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgNam
     return authMgr_->UnAuthenticateDevice(pkgName, udid, bindLevel);
 }
 
+int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerServiceImpl::StopAuthenticateDevice failed");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return authMgr_->StopAuthenticateDevice(pkgName);
+}
+
 int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
     int32_t bindLevel)
 {

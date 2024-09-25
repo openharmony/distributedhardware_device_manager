@@ -1422,6 +1422,31 @@ ON_IPC_READ_RESPONSE(SET_DN_POLICY, MessageParcel &reply, std::shared_ptr<IpcRsp
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(STOP_AUTHENTICATE_DEVICE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(STOP_AUTHENTICATE_DEVICE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
 ON_IPC_CMD(SERVER_CREATE_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();

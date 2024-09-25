@@ -22,7 +22,13 @@ class ISoftbusDiscoveryCallback {
 public:
     virtual void OnDeviceFound(const std::string &pkgName, DmDeviceInfo &info, bool isOnline) = 0;
     virtual void OnDeviceFound(const std::string &pkgName, DmDeviceBasicInfo &info,
-        const int32_t range, bool isOnline) {};
+        const int32_t range, bool isOnline)
+    {
+        (void)pkgName;
+        (void)info;
+        (void)range;
+        (void)isOnline;
+    };
     virtual void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) = 0;
     virtual void OnDiscoveryFailed(const std::string &pkgName, int32_t subscribeId, int32_t failedReason) = 0;
 };

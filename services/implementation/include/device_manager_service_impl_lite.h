@@ -136,6 +136,7 @@ public:
     void HandleUserRemoved(int32_t preUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(int32_t switchUserId);
+    int32_t StopAuthenticateDevice(const std::string &pkgName);
 
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
