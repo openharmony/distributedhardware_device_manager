@@ -21,6 +21,7 @@
 #include "pin_holder_session.h"
 #include "pinholder_session_callback.h"
 
+#include <atomic>
 #include <map>
 #include <mutex>
 
@@ -34,6 +35,12 @@ typedef enum PinHolderState {
     SINK_CREATE,
     SINK_DESTROY,
 } PinHolderState;
+
+typedef enum DestroyState {
+    STATE_UNKNOW = 0x0,
+    STATE_REMOTE_WRONG = 0x1,
+    STATE_TIME_OUT = 0x2,
+} DestroyState;
 
 class PinHolder final : public IPinholderSessionCallback,
                         public std::enable_shared_from_this<PinHolder> {
@@ -76,6 +83,8 @@ private:
     PinHolderState sourceState_;
     int32_t sessionId_ = -1;
     bool isRemoteSupported_ = false;
+    std::atomic<bool> isDestroy_ {false};
+    DestroyState destroyState_ = STATE_UNKNOW;
 };
 }
 }
