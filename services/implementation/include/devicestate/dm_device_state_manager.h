@@ -116,6 +116,7 @@ private:
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
     std::map<std::string, DmDeviceInfo> stateDeviceInfos_;
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
+    std::map<std::string, std::string> deviceIdMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;

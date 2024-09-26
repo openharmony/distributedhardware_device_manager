@@ -145,8 +145,6 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %{public}s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
-        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
