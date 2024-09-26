@@ -735,7 +735,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
     int32_t res = DM_OK;
     std::string discoverDevList = GetDeviceInfoList(deviceInfoList);
     if (errCode == DM_OK) {
-        int32_t deviceCount = deviceInfoList.size();
+        int32_t deviceCount = static_cast<int32_t>(deviceInfoList.size());
         static std::string TrustCallerName = "";
         if (deviceCount > 0 && TrustCallerName != hostName) {
             TrustCallerName = hostName;
