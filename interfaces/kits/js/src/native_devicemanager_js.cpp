@@ -1629,6 +1629,7 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status &status,
                                                        DeviceInfoListAsyncCallbackInfo *deviceInfoListAsyncCallbackInfo)
 {
+    CHECK_NULL_VOID(deviceInfoListAsyncCallbackInfo);
     if (deviceInfoListAsyncCallbackInfo->devList.size() > DM_MAX_DEVICE_SIZE) {
         LOGE("CallGetTrustedDeviceListStatus invalid devList size");
         return;

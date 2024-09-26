@@ -926,6 +926,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
     dmServiceImpl_ = std::shared_ptr<IDeviceManagerServiceImpl>(func());
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
+        dlclose(so_handle);
         dmServiceImpl_ = nullptr;
         isImplsoLoaded_ = false;
         return false;
@@ -1168,6 +1169,7 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
 
     dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
     if (dmServiceImplExt_->Initialize(listener_) != DM_OK) {
+        dlclose(so_handle);
         dmServiceImplExt_ = nullptr;
         isAdapterSoLoaded_ = false;
         LOGE("dm service adapter impl ext init failed.");
