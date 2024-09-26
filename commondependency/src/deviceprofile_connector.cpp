@@ -843,8 +843,7 @@ int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName, const s
             item.GetAccessee().GetAccesseeDeviceId() == udid) {
             tokenId = static_cast<uint32_t>(item.GetAccesser().GetAccesserTokenId());
             bindLevel = item.GetBindLevel();
-            LOGI("Src get bindLevel %{public}d, tokenid %{public}s", bindLevel,
-                 GetAnonyInt32(static_cast<int32_t>(tokenId)).c_str());
+            LOGI("Src get bindLevel %{public}d, tokenid %{public}" PRId64".", bindLevel, tokenId);
             continue;
         }
         if (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
