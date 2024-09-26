@@ -1885,10 +1885,9 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
         LOGE("Msg is empty.");
         return;
     }
-
-    std::string tokenIdStr = std::to_string(relationShipMsg.tokenId);
     RelationShipChangeMsg relationShipMsg =
         ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    std::string tokenIdStr = std::to_string(relationShipMsg.tokenId);
     LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}s,"
         "peerUdid %{public}s, accountName %{public}s.", relationShipMsg.type, relationShipMsg.userId,
         GetAnonyString(relationShipMsg.accountId).c_str(), GetAnonyString(tokenIdStr).c_str(),
