@@ -69,7 +69,7 @@ const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 5;
 const int32_t DM_AUTH_TYPE_MIN = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
-const int32_t USLEEP_TIME_MS = 500000; // 500ms
+const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
@@ -1204,7 +1204,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-    usleep(USLEEP_TIME_MS); // 500ms
+    usleep(USLEEP_TIME_US_500000); // 500ms
     listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
