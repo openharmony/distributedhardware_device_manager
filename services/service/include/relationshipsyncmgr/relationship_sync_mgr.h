@@ -50,7 +50,7 @@ struct RelationShipChangeMsg {
     void ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
-    cJSON *ToArrayJson(cJSON *msg) const;
+    cJSON *ToArrayJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
     bool FromDeviceUnbindPayLoad(const cJSON *payloadJson);

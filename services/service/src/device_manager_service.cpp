@@ -1693,7 +1693,7 @@ void DeviceManagerService::SendAccountLogoutBroadCast(const std::vector<std::str
         GetAnonyString(accountName).c_str(), userId);
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.accountId = accountId;
     msg.accountName = accountName;
@@ -1826,7 +1826,8 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel)
 {
-    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
+    LOGI("TokenId %{public}s, bindLevel %{public}d, userId %{public}d.",
+         GetAnonyInt32(static_cast<int32_t>(tokenId)).c_str(), bindLevel, userId);
     if (bindLevel == DEVICE) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
@@ -1845,7 +1846,7 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEVICE_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
@@ -1857,7 +1858,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::APP_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
@@ -1870,7 +1871,7 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SERVICE_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
@@ -1887,9 +1888,10 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     }
     RelationShipChangeMsg relationShipMsg =
         ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
-    LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}" PRId64","
+    LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}s,"
         "peerUdid %{public}s, accountName %{public}s.", relationShipMsg.type, relationShipMsg.userId,
-        GetAnonyString(relationShipMsg.accountId).c_str(), relationShipMsg.tokenId,
+        GetAnonyString(relationShipMsg.accountId).c_str(),
+        GetAnonyInt32(static_cast<int32_t>(relationShipMsg.tokenId)).c_str(),
         GetAnonyString(relationShipMsg.peerUdid).c_str(), GetAnonyString(relationShipMsg.accountName).c_str());
     if (!IsDMServiceImplReady()) {
         LOGE("Imp instance not init or init failed.");

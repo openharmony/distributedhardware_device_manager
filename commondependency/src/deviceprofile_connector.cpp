@@ -830,8 +830,8 @@ int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller,
 int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName, const std::string &localUdid,
     const std::string &udid, uint64_t &tokenId)
 {
-    LOGI("pkgName %{public}s, tokenId %{public}" PRId64", udid %{public}s.", pkgName.c_str(),
-        tokenId, GetAnonyString(udid).c_str());
+    LOGI("pkgName %{public}s, tokenId %{public}s, udid %{public}s.", pkgName.c_str(),
+        GetAnonyInt32(static_cast<int32_t>(tokenId)).c_str(), GetAnonyString(udid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     int32_t bindLevel = INVALIED_TYPE;
     for (auto &item : profiles) {
@@ -842,16 +842,18 @@ int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName, const s
             item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeDeviceId() == udid) {
             tokenId = item.GetAccesser().GetAccesserTokenId();
-            bindLevel = item.GetBindLevel();
-            LOGI("Src get bindLevel %{public}d, tokenid %{public}" PRId64".", bindLevel, tokenId);
+            bindLevel = static_cast<int32_t>(item.GetBindLevel());
+            LOGI("Src get bindLevel %{public}d, tokenid %{public}s", bindLevel,
+                 GetAnonyInt32(static_cast<int32_t>(tokenId)).c_str());
             continue;
         }
         if (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserDeviceId() == udid) {
             tokenId = item.GetAccessee().GetAccesseeTokenId();
-            bindLevel = item.GetBindLevel();
-            LOGI("Sink get bindLevel %{public}d, tokenid %{public}" PRId64".", bindLevel, tokenId);
+            bindLevel = static_cast<int32_t>(item.GetBindLevel());
+            LOGI("Sink get bindLevel %{public}d, tokenid %{public}s.", bindLevel,
+                GetAnonyInt32(static_cast<int32_t>(tokenId)).c_str());
             continue;
         }
     }

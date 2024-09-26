@@ -271,23 +271,17 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
     return true;
 }
 
-cJSON *RelationShipChangeMsg::ToArrayJson(cJSON *msg) const
+cJSON *RelationShipChangeMsg::ToArrayJson() const
 {
-    if (msg == nullptr) {
-        LOGE("Msg is nullptr.");
-        return nullptr;
-    }
     uint8_t *payload = nullptr;
     uint32_t len = 0;
     if (!this->ToBroadcastPayLoad(payload, len)) {
         LOGE("Get broadcast payload failed");
-        cJSON_Delete(msg);
         return nullptr;
     }
     cJSON *arrayObj = cJSON_CreateArray();
     if (arrayObj == nullptr) {
         LOGE("cJSON_CreateArray failed");
-        cJSON_Delete(msg);
         return nullptr;
     }
     for (uint32_t index = 0; index < len; index++) {
@@ -307,9 +301,10 @@ std::string RelationShipChangeMsg::ToJson() const
         return "";
     }
     cJSON_AddNumberToObject(msg, MSG_TYPE, (uint32_t)type);
-    cJSON *arrayObj = ToArrayJson(msg);
+    cJSON *arrayObj = ToArrayJson();
     if (arrayObj == nullptr) {
         LOGE("ArrayObj is nullptr.");
+        cJSON_Delete(msg);
         return "";
     }
     cJSON_AddItemToObject(msg, MSG_VALUE, arrayObj);
