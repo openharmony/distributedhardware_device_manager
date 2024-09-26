@@ -1826,7 +1826,8 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel)
 {
-    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
+    std::string tokenIdStr = std::to_string(tokenId);
+    LOGI("TokenId %{public}s, bindLevel %{public}d, userId %{public}d.", GetAnonyString(tokenIdStr).c_str(), bindLevel, userId);
     if (bindLevel == DEVICE) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
