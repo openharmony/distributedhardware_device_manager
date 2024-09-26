@@ -224,6 +224,10 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         if ((iter.first == std::string(udidHash)) && (timer_ != nullptr)) {
             timer_->DeleteTimer(iter.second.timerName);
             stateTimerInfoMap_.erase(iter.first);
+            auto idIter = udidhash2udidMap_.find(udidHash);
+            if (idIter != udidhash2udidMap_.end()) {
+                udidhash2udidMap_.erase(idIter->first);
+            }
             break;
         }
     }
@@ -235,6 +239,9 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
             .isStart = false,
         };
         stateTimerInfoMap_[std::string(udidHash)] = stateTimer;
+    }
+    if (udidhash2udidMap_.find(std::string(udidHash)) == udidhash2udidMap_.end()) {
+        udidhash2udidMap_[std::string(udidHash)] = deviceUdid;
     }
 }
 
@@ -269,6 +276,10 @@ void DmDeviceStateManager::DeleteOffLineTimer(std::string udidHash)
         timer_->DeleteTimer(iter->second.timerName);
         iter->second.isStart = false;
         stateTimerInfoMap_.erase(iter->first);
+        auto idIter = udidhash2udidMap_.find(udidHash);
+        if (idIter != udidhash2udidMap_.end()) {
+            udidhash2udidMap_.erase(idIter->first);
+        }
     }
     return;
 }
@@ -278,13 +289,18 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto iter = stateTimerInfoMap_.begin(); iter != stateTimerInfoMap_.end(); iter++) {
         if (((iter->second).timerName == name) && (hiChainConnector_ != nullptr)) {
-            LOGI("remove hichain group with deviceId: %{public}s", GetAnonyString(iter->first).c_str());
-            hiChainConnector_->DeleteTimeOutGroup((iter->first).c_str());
+            auto idIter = udidhash2udidMap_.find(iter->first);
+            if (idIter == udidhash2udidMap_.end()) {
+                LOGE("remove hichain group find deviceId: %{public}s failed.", GetAnonyString(iter->first).c_str());
+                break;
+            }
+            LOGI("remove hichain group with deviceId: %{public}s", GetAnonyString(idIter->second).c_str());
+            hiChainConnector_->DeleteTimeOutGroup((idIter->second).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            DeleteGroupByDP(iter->first);
-            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(iter->first);
+            DeleteGroupByDP(idIter->second);
+            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second);
             if (res == 0) {
-                hiChainAuthConnector_->DeleteCredential(iter->first,
+                hiChainAuthConnector_->DeleteCredential(idIter->second,
                                                         MultipleUserConnector::GetCurrentAccountUserID());
             }
 #endif
