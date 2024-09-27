@@ -84,6 +84,8 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    CHECK_NULL_RETURN(req, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(rsp, ERR_DM_POINT_NULL);
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
         return ERR_DM_INIT_FAILED;

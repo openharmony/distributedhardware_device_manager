@@ -494,7 +494,11 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
 {
     LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
-    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
+    if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != DM_OK) {
+        LOGE("RefreshSoftbusLNN memset_s failed.");
+        return ERR_DM_FAILED;
+    }
+
     subscribeInfo.subscribeId = dmSubInfo.subscribeId;
     subscribeInfo.mode = static_cast<DiscoverMode>(dmSubInfo.mode);
     subscribeInfo.medium = static_cast<ExchangeMedium>(dmSubInfo.medium);
@@ -666,15 +670,20 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
 int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
     DmDeviceInfo &devInfo)
 {
-    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset failed.");
+        return ERR_DM_FAILED;
+    }
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
         std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
         std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+        return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
@@ -687,15 +696,21 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
 
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
-    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        return ERR_DM_FAILED;
+    }
+    
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
-        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
-        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+        return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     nlohmann::json extraJson;
@@ -707,16 +722,23 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
 
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceBasicInfo &devInfo)
 {
-    (void)memset_s(&devInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memset_s(&devInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        return ERR_DM_FAILED;
+    }
+
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
-        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
-        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+        return ERR_DM_FAILED;
     }
+
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
     return DM_OK;
 }
@@ -734,18 +756,33 @@ std::string SoftbusListener::ConvertBytesToUpperCaseHexString(const uint8_t arr[
     return result;
 }
 
-void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice)
+int32_t SoftbusListener::FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice)
 {
-    (void)memset_s(&dmDevice, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&dmDevice, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
+        return ERR_DM_FAILED;
+    }
 
     if (memcpy_s(dmDevice.deviceId, sizeof(dmDevice.deviceId), device.devId,
         std::min(sizeof(dmDevice.deviceId), sizeof(device.devId))) != DM_OK) {
         LOGE("ConvertDeviceInfoToDmDevice: copy device id failed.");
+        return ERR_DM_FAILED;
     }
 
     if (memcpy_s(dmDevice.deviceName, sizeof(dmDevice.deviceName), device.devName,
         std::min(sizeof(dmDevice.deviceName), sizeof(device.devName))) != DM_OK) {
         LOGE("ConvertDeviceInfoToDmDevice: copy device name failed.");
+        return ERR_DM_FAILED;
+    }
+
+    return DM_OK;
+}
+
+void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice)
+{
+    if (FillDeviceInfo(device, dmDevice) != DM_OK) {
+        LOGE("FillDeviceInfo failed.");
+        return;
     }
 
     dmDevice.deviceTypeId = device.devType;

@@ -127,7 +127,10 @@ int32_t SoftbusConnector::UnRegisterSoftbusPublishCallback(const std::string &pk
 int32_t SoftbusConnector::PublishDiscovery(const DmPublishInfo &dmPublishInfo)
 {
     PublishInfo publishInfo;
-    (void)memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo));
+    if (memset_s(&publishInfo, sizeof(PublishInfo), 0, sizeof(PublishInfo)) != EOK) {
+        LOGE("PublishDiscovery memset_s failed.");
+        return ERR_DM_FAILED;
+    }
     publishInfo.publishId = dmPublishInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPublishInfo.mode);
     publishInfo.medium = ExchangeMedium::AUTO;
@@ -158,7 +161,10 @@ int32_t SoftbusConnector::UnPublishDiscovery(int32_t publishId)
 int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 {
     SubscribeInfo subscribeInfo;
-    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
+    if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != EOK) {
+        LOGE("StartDiscovery memset_s failed.");
+        return ERR_DM_FAILED;
+    }
     subscribeInfo.subscribeId = dmSubscribeInfo.subscribeId;
     subscribeInfo.mode = static_cast<DiscoverMode>(dmSubscribeInfo.mode);
     subscribeInfo.medium = static_cast<ExchangeMedium>(dmSubscribeInfo.medium);
@@ -192,7 +198,10 @@ int32_t SoftbusConnector::StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo)
 int32_t SoftbusConnector::StartDiscovery(const uint16_t subscribeId)
 {
     SubscribeInfo subscribeInfo;
-    (void)memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo));
+    if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != EOK) {
+        LOGE("StartDiscovery memset_s failed.");
+        return ERR_DM_FAILED;
+    }
     subscribeInfo.subscribeId = subscribeId;
     subscribeInfo.mode = static_cast<DiscoverMode>(DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE);
     subscribeInfo.medium = static_cast<ExchangeMedium>(DmExchangeMedium::DM_AUTO);
@@ -357,32 +366,46 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
 
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)
 {
-    (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
+        return;
+    }
+
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
-                 std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
+        std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+        return;
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
-                 std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
+        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        return;
     }
+
     dmDeviceInfo.deviceTypeId = deviceInfo.devType;
     dmDeviceInfo.range = deviceInfo.range;
 }
 
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo)
 {
-    (void)memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
+    if (memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
+        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
+        return;
+    }
+
     if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), deviceInfo.devId,
-                 std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId))) != DM_OK) {
+        std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+        return;
     }
 
     if (memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), deviceInfo.devName,
-                 std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName))) != DM_OK) {
+        std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        return;
     }
+
     dmDeviceBasicInfo.deviceTypeId = deviceInfo.devType;
 }
 
@@ -767,16 +790,23 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 
 void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
-    (void)memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        return;
+    }
+
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
-                 std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != DM_OK) {
+        std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+        return;
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
-                 std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != DM_OK) {
+        std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != EOK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        return;
     }
+
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     std::string extraData = dmDeviceInfo.extraData;
     nlohmann::json extraJson;

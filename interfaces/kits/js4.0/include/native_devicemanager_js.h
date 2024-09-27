@@ -271,7 +271,8 @@ private:
     static int32_t BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
     static void RegisterDevStatusCallback(napi_env env, std::string &bundleName);
-
+    static int32_t DumpDeviceInfo(DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
+    
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

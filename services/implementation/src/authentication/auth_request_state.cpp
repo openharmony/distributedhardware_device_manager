@@ -172,7 +172,7 @@ int32_t AuthRequestFinishState::Enter()
     return DM_OK;
 }
 
-//pkgbind
+// pkgbind
 int32_t AuthRequestCredential::GetStateType()
 {
     return AuthState::AUTH_REQUEST_CREDENTIAL;

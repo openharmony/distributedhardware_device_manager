@@ -20,6 +20,8 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+constexpr uint32_t MAX_MAP_LEN = 1000;
+constexpr uint32_t MAX_INT_LEN = 20;
 }
 
 std::string GetAnonyString(const std::string &value)
@@ -65,15 +67,15 @@ std::string GetAnonyInt32(const int32_t value)
 bool IsNumberString(const std::string &inputString)
 {
     LOGI("IsNumberString for DeviceManagerNapi");
-    if (inputString.length() == 0) {
-        LOGE("inputString is Null");
+    if (inputString.length() == 0 || inputString.length() > MAX_INT_LEN) {
+        LOGE("inputString is Null or inputString length is too long");
         return false;
     }
-    const int32_t MIN_ASCLL_NUM = 48;
-    const int32_t MAX_ASCLL_NUM = 57;
+    const int32_t MIN_ASCII_NUM = 48;
+    const int32_t MAX_ASCII_NUM = 57;
     for (size_t i = 0; i < inputString.length(); i++) {
         int num = (int)inputString[i];
-        if (num >= MIN_ASCLL_NUM && num <= MAX_ASCLL_NUM) {
+        if (num >= MIN_ASCII_NUM && num <= MAX_ASCII_NUM) {
             continue;
         } else {
             return false;
@@ -142,6 +144,10 @@ bool IsBool(const nlohmann::json &jsonObj, const std::string &key)
 std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap)
 {
     std::string jsonStr = "";
+    if (paramMap.size() > MAX_MAP_LEN) {
+        LOGE("invalid paramMap");
+        return jsonStr;
+    }
     if (!paramMap.empty()) {
         nlohmann::json jsonObj;
         for (const auto &it : paramMap) {
@@ -155,6 +161,10 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap)
 {
     if (jsonStr.empty()) {
+        return;
+    }
+    if (paramMap.size() > MAX_MAP_LEN) {
+        LOGE("invalid paramMap");
         return;
     }
     nlohmann::json paramJson = nlohmann::json::parse(jsonStr, nullptr, false);

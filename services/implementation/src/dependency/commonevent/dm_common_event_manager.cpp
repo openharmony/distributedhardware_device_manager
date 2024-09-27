@@ -66,7 +66,8 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
         subscriber_ = nullptr;
         return false;
     }
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
+    statusChangeListener_ = sptr<SystemAbilityStatusChangeListener>(
+        new SystemAbilityStatusChangeListener(subscriber_));
     if (statusChangeListener_ == nullptr) {
         LOGE("statusChangeListener_ is nullptr");
         subscriber_ = nullptr;

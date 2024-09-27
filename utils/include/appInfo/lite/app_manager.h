@@ -16,8 +16,8 @@
 #ifndef OHOS_DM_LITE_APP_MANAGER_H
 #define OHOS_DM_LITE_APP_MANAGER_H
 
-#include "dm_single_instance.h"
 #include <string>
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {

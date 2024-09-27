@@ -27,7 +27,7 @@ const std::string FILTERS_TYPE_OR = "OR";
 const std::string FILTERS_TYPE_AND = "AND";
 const int32_t DM_OK = 0;
 const int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
-enum DmDiscoveryDeviceFilter {
+enum class DmDiscoveryDeviceFilter : int32_t {
     DM_INVALID_DEVICE = 0,
     DM_VALID_DEVICE = 1,
     DM_ALL_DEVICE = 2
@@ -115,7 +115,7 @@ int32_t DeviceFilterOption::TransformToFilter(const std::string &filterOptions)
         filterOp_ = FILTERS_TYPE_OR;
         DeviceFilters deviceFilters;
         deviceFilters.type = "credible";
-        deviceFilters.value = DM_INVALID_DEVICE;
+        deviceFilters.value = static_cast<int32_t>(DmDiscoveryDeviceFilter::DM_INVALID_DEVICE);
         filters_.push_back(deviceFilters);
         return DM_OK;
     }
@@ -129,7 +129,7 @@ int32_t DeviceFilterOption::TransformFilterOption(const std::string &filterOptio
         filterOp_ = FILTERS_TYPE_OR;
         DeviceFilters deviceFilters;
         deviceFilters.type = "credible";
-        deviceFilters.value = DM_INVALID_DEVICE;
+        deviceFilters.value = static_cast<int32_t>(DmDiscoveryDeviceFilter::DM_INVALID_DEVICE);
         filters_.push_back(deviceFilters);
         return DM_OK;
     }
@@ -138,13 +138,13 @@ int32_t DeviceFilterOption::TransformFilterOption(const std::string &filterOptio
 
 bool DiscoveryFilter::FilterByDeviceState(int32_t value, bool isActive)
 {
-    if (value == DM_INVALID_DEVICE) {
+    if (value == static_cast<int32_t>(DmDiscoveryDeviceFilter::DM_INVALID_DEVICE)) {
         return !isActive;
     }
-    if (value == DM_VALID_DEVICE) {
+    if (value == static_cast<int32_t>(DmDiscoveryDeviceFilter::DM_VALID_DEVICE)) {
         return isActive;
     }
-    return (value == DM_ALL_DEVICE);
+    return (value == static_cast<int32_t>(DmDiscoveryDeviceFilter::DM_ALL_DEVICE));
 }
 
 bool DiscoveryFilter::FilterByRange(int32_t value, int32_t range)

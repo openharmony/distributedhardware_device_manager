@@ -30,7 +30,9 @@ DmNativeEvent::~DmNativeEvent()
 {
     for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
         auto listener = iter->second;
-        napi_delete_reference(env_, listener->handlerRef);
+        if (listener != nullptr) {
+            napi_delete_reference(env_, listener->handlerRef);
+        }
     }
     eventMap_.clear();
     napi_delete_reference(env_, thisVarRef_);
