@@ -683,6 +683,31 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::StopAuthenticateDevice(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("StopAuthenticateDevice error: Invalid para. pkgName %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_AUTHENTICATE_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopAuthenticateDevice error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopAuthenticateDevice error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+
+    LOGI("Completed");
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::RegisterDeviceManagerFaCallback(const std::string &pkgName,
                                                            std::shared_ptr<DeviceManagerUiCallback> callback)
 {

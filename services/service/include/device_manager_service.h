@@ -92,6 +92,8 @@ public:
 
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId);
 
+    int32_t StopAuthenticateDevice(const std::string &pkgName);
+
     int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &bindParam);
 

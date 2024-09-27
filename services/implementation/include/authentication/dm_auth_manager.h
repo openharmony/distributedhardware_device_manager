@@ -525,6 +525,7 @@ public:
     void BindSocketFail();
     void OnScreenLocked();
     void HandleDeviceNotTrust(const std::string &udid);
+    int32_t StopAuthenticateDevice(const std::string &pkgName);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,

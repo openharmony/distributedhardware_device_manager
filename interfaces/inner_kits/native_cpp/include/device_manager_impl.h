@@ -387,6 +387,7 @@ public:
     virtual int32_t ShiftLNNGear(const std::string &pkgName) override;
 
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) override;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

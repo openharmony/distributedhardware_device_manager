@@ -282,6 +282,7 @@ public:
     virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

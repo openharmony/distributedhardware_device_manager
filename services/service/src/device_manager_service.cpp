@@ -555,6 +555,29 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
     return dmServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
 }
 
+int32_t DeviceManagerService::StopAuthenticateDevice(const std::string &pkgName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call StopAuthenticateDevice.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerService::StopAuthenticateDevice error: Invalid parameter, pkgName: %{public}s",
+            pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("StopAuthenticateDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    if (dmServiceImpl_->StopAuthenticateDevice(pkgName) != DM_OK) {
+        LOGE("dmServiceImpl_ StopAuthenticateDevice failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
 int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
     const std::string &bindParam)
 {

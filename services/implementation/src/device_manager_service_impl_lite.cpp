@@ -487,6 +487,12 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
     return;
 }
 
+int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgName)
+{
+    (void)pkgName;
+    return 0;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

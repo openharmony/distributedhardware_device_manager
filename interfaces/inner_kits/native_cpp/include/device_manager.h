@@ -616,6 +616,7 @@ public:
      * @return Returns 0 if success.
      */
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
