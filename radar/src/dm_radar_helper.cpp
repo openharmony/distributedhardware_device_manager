@@ -735,7 +735,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
     int32_t res = DM_OK;
     std::string discoverDevList = GetDeviceInfoList(deviceInfoList);
     if (errCode == DM_OK) {
-        int32_t deviceCount = deviceInfoList.size();
+        int32_t deviceCount = static_cast<int32_t>(deviceInfoList.size());
         static std::string TrustCallerName = "";
         if (deviceCount > 0 && TrustCallerName != hostName) {
             TrustCallerName = hostName;
@@ -769,7 +769,10 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
             "DISCOVERY_DEVICE_LIST", discoverDevList,
             "ERROR_CODE", GetErrCode(errCode));
     }
-    return;
+    if (res != DM_OK) {
+        LOGE("ReportGetTrustDeviceList error, res:%{public}d", res);
+        return;
+    }
 }
 
 void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode)
@@ -803,7 +806,10 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             "LOCAL_UDID", GetAnonyLocalUdid(),
             "ERROR_CODE", GetErrCode(errCode));
     }
-    return;
+    if (res != DM_OK) {
+        LOGE("ReportDmBehavior error, res:%{public}d", res);
+        return;
+    }
 }
 
 void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
@@ -846,7 +852,10 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "ERROR_CODE", GetErrCode(errCode));
         }
     }
-    return;
+    if (res != DM_OK) {
+        LOGE("ReportGetLocalDevInfo error, res:%{public}d", res);
+        return;
+    }
 }
 
 void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
@@ -891,7 +900,10 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "ERROR_CODE", GetErrCode(errCode));
         }
     }
-    return;
+    if (res != DM_OK) {
+        LOGE("ReportGetDeviceInfo error, res:%{public}d", res);
+        return;
+    }
 }
 
 std::string DmRadarHelper::ConvertHexToString(uint16_t hex)
