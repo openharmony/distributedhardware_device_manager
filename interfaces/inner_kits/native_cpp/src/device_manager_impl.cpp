@@ -101,7 +101,7 @@ const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
-const int32_t USLEEP_TIME_MS = 100000; // 100ms
+const int32_t USLEEP_TIME_US_100000 = 100000; // 100ms
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
@@ -133,7 +133,7 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
         if (ret == DM_OK) {
             break;
         }
-        usleep(USLEEP_TIME_MS);
+        usleep(USLEEP_TIME_US_100000);
         retryNum++;
         if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
             DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "InitDeviceManager", ERR_DM_NOT_INIT);
@@ -386,7 +386,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
     }
     while (samgr->CheckSystemAbility(ACCESS_TOKEN_MANAGER_SERVICE_ID) == nullptr) {
         LOGD("Access_token SA not start.");
-        usleep(USLEEP_TIME_MS);
+        usleep(USLEEP_TIME_US_100000);
     }
     int32_t ret = CheckApiPermission(SYSTEM_CORE);
     if (ret != DM_OK) {
