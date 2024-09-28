@@ -650,6 +650,11 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
     return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
+int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string &networkId)
+{
+    return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
+}
+
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
 {
     GearMode mode = {

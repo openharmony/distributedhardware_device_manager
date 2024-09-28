@@ -1957,6 +1957,20 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
     return DM_OK;
 }
 
+int32_t DeviceManagerService::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
+                                                 std::string &networkId)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetNetworkIdByUdid.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("Invalid parameter, pkgName: %{public}s, udid: %{public}s", pkgName.c_str(), GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return SoftbusListener::GetNetworkIdByUdid(udid, networkId);
+}
+
 void DeviceManagerService::SubscribePackageCommonEvent()
 {
     LOGI("Start");

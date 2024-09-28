@@ -624,6 +624,7 @@ public:
      */
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
+    virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -98,6 +98,7 @@ public:
     static std::string GetHostPkgName();
     void SendAclChangedBroadcast(const std::string &msg);
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
+    static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     int32_t InitSoftPublishLNN();
