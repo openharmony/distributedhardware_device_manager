@@ -408,5 +408,20 @@ int32_t SoftbusCache::GetUuidByUdid(const std::string &udid, std::string &uuid)
     }
     return ERR_DM_FAILED;
 }
+
+int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string &networkId)
+{
+    LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+            networkId = deviceInfo_[udid].second.networkId;
+            LOGI("GetNetworkIdFromCache success networkId %{public}s, udid %{public}s.",
+                GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
+            return DM_OK;
+        }
+    }
+    return ERR_DM_FAILED;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

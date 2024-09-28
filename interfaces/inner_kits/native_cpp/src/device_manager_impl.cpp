@@ -2406,5 +2406,35 @@ int32_t DeviceManagerImpl::GetDeviceScreenStatus(const std::string &pkgName, con
     screenStatus = rsp->GetScreenStatus();
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
+                                              std::string &networkId)
+{
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("DeviceManagerImpl::GetNetworkIdByUdid error: Invalid para, pkgName: %{public}s, udid: %{public}s",
+            pkgName.c_str(), GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGD("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetUdid(udid);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKID_BY_UDID, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GetNetworkIdByUdid Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetNetworkIdByUdid Failed with ret %{public}d", ret);
+        return ret;
+    }
+    networkId = rsp->GetNetWorkId();
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
