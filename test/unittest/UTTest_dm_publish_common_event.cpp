@@ -66,6 +66,13 @@ HWTEST_F(DmPublishCommonEventManagerTest, UnsubscribePublishCommonEvent_001, tes
     ASSERT_EQ(ret, true);
 }
 
+void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
+{
+    (void)bluetoothState;
+    (void)wifiState;
+    (void)screenState;
+}
+
 HWTEST_F(DmPublishCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
 {
     AAFwk::Want want;
@@ -78,7 +85,9 @@ HWTEST_F(DmPublishCommonEventManagerTest, OnReceiveEvent_001, testing::ext::Test
     std::string strEvent = "test";
     std::vector<std::string> strEventVec;
     strEventVec.push_back(strEvent);
-    PublishEventCallback callback = nullptr;
+    PublishEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
+        PublishCommonEventCallback(arg1, arg2, arg3);
+    };
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(strEvent);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);

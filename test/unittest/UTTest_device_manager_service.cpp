@@ -1502,9 +1502,21 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     std::string event;
     std::string msg = "";
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
-    msg = "hello_openharmony";
-    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
-    msg = "NETWORK_ID";
+    msg =  R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" :
+        "CRYPTOSUPPORT" : "cryptosupportTest",
+        "credentialType" : 1,
+        "credentialId" : "104",
+        "NETWORK_ID" : "108",
+        "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+        "serverPk" : "hello",
+        "pkInfoSignature" : "world",
+        "pkInfo" : "pkginfo",
+        "peerDeviceId" : "3515656546"
+    })";
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
     std::string commonEventType = "helloworld";
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -1525,13 +1537,12 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level
 
 HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level0)
 {
-    DeletePermission();
     std::string pkgName;
     int32_t eventId = DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT;
     std::string event;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -2354,11 +2365,35 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     bool result = DeviceManagerService::GetInstance().IsDMServiceImplReady();
     EXPECT_TRUE(result);
-    msg = "0";
+    msg =  R"(
+    {
+        "type" : 0,
+        "userId" : 123,
+        "accountId" : "28776",
+        "tokenId" : 16,
+        "peerUdid" : "104",
+        "accountName" : "account_xiao"
+    })";
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg = "1";
+    msg =  R"(
+    {
+        "type" : 1,
+        "userId" : 128,
+        "accountId" : "28778",
+        "tokenId" : 17,
+        "peerUdid" : "108",
+        "accountName" : "account_li"
+    })";
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg = "2";
+    msg =  R"(
+    {
+        "type" : 2,
+        "userId" : 124,
+        "accountId" : "28779",
+        "tokenId" : 18,
+        "peerUdid" : "110",
+        "accountName" : "account_wang"
+    })";
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
