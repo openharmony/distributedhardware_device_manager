@@ -144,8 +144,6 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
     if (authRequestState_ != nullptr || authResponseState_ != nullptr) {
         LOGE("DmAuthManager::CheckAuthParamVaild %{public}s is request authentication.", pkgName.c_str());
-        listener_->OnAuthResult(pkgName, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, ERR_DM_AUTH_BUSINESS_BUSY);
-        listener_->OnBindResult(pkgName, peerTargetId_, ERR_DM_AUTH_BUSINESS_BUSY, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
@@ -302,6 +300,21 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     }
     remoteDeviceId_ = deviceUdid;
     SyncDeleteAcl(pkgName, deviceUdid);
+    return DM_OK;
+}
+
+int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_FAILED;
+    }
+    if ((authRequestState_!= nullptr || authResponseContext_ != nullptr) && isAuthenticateDevice_) {
+        LOGI("Stop previous AuthenticateDevice.");
+        authRequestContext_->reason = STOP_BIND;
+        authResponseContext_->state = authRequestState_->GetStateType();
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+    }
     return DM_OK;
 }
 
@@ -1152,11 +1165,11 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
+    usleep(USLEEP_TIME_MS); // 500ms
     listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
-    usleep(USLEEP_TIME_MS); // 500ms
     softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
