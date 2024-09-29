@@ -460,13 +460,9 @@ int32_t SoftbusListener::InitSoftbusListener()
         if (ret != DM_OK) {
             ++retryTimes;
             LOGE("[SOFTBUS]RegNodeDeviceStateCb failed with ret: %{public}d, retryTimes: %{public}u.", ret, retryTimes);
-            if (retryTimes >= SOFTBUS_MAX_RETRY_TIME) {
-                LOGE("[SOFTBUS]RegNodeDeviceStateCb timeout.");
-                break;
-            }
             usleep(SOFTBUS_CHECK_INTERVAL);
         }
-    } while (ret != DM_OK);
+    } while (ret != DM_OK && retryTimes < SOFTBUS_MAX_RETRY_TIME);
 #endif
     return InitSoftPublishLNN();
 }
