@@ -106,9 +106,30 @@ public:
         securityLevel_ = securityLevel;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::GetNetWorkId
+     * @tc.desc: Ipc Get Info By NetWork request Get NetWorkId
+     * @tc.type: FUNC
+     */
+    const std::string GetNetWorkId() const
+    {
+        return netWorkId_;
+    }
+
+    /**
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetNetWorkId
+     * @tc.desc: Ipc Get Info By NetWork request Set NetWorkId
+     * @tc.type: FUNC
+     */
+    void SetNetWorkId(const std::string &netWorkId)
+    {
+        netWorkId_ = netWorkId;
+    }
+
 private:
     std::string udid_;
     std::string uuid_;
+    std::string netWorkId_;
     int32_t networkType_;
     int32_t securityLevel_;
 };

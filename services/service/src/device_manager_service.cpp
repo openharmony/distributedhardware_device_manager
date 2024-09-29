@@ -1696,7 +1696,7 @@ void DeviceManagerService::SendAccountLogoutBroadCast(const std::vector<std::str
         GetAnonyString(accountName).c_str(), userId);
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.accountId = accountId;
     msg.accountName = accountName;
@@ -1851,7 +1851,7 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEVICE_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
@@ -1863,7 +1863,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::APP_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
@@ -1876,7 +1876,7 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SERVICE_UNBIND;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
@@ -1893,9 +1893,10 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     }
     RelationShipChangeMsg relationShipMsg =
         ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
-    LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}" PRId64","
+    std::string tokenIdStr = std::to_string(relationShipMsg.tokenId);
+    LOGI("EventType %{public}d, userId %{public}d, accountId %{public}s, tokenId %{public}s,"
         "peerUdid %{public}s, accountName %{public}s.", relationShipMsg.type, relationShipMsg.userId,
-        GetAnonyString(relationShipMsg.accountId).c_str(), relationShipMsg.tokenId,
+        GetAnonyString(relationShipMsg.accountId).c_str(), GetAnonyString(tokenIdStr).c_str(),
         GetAnonyString(relationShipMsg.peerUdid).c_str(), GetAnonyString(relationShipMsg.accountName).c_str());
     if (!IsDMServiceImplReady()) {
         LOGE("Imp instance not init or init failed.");
@@ -1954,6 +1955,20 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
         return ret;
     }
     return DM_OK;
+}
+
+int32_t DeviceManagerService::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
+                                                 std::string &networkId)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetNetworkIdByUdid.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("Invalid parameter, pkgName: %{public}s, udid: %{public}s", pkgName.c_str(), GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return SoftbusListener::GetNetworkIdByUdid(udid, networkId);
 }
 
 void DeviceManagerService::SubscribePackageCommonEvent()

@@ -623,9 +623,7 @@ int32_t SoftbusListener::RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
 int32_t SoftbusListener::UnRegisterSoftbusLnnOpsCbk(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
-    if (lnnOpsCbkMap.find(pkgName) != lnnOpsCbkMap.end()) {
-        lnnOpsCbkMap.erase(pkgName);
-    }
+    lnnOpsCbkMap.erase(pkgName);
     return DM_OK;
 }
 
@@ -655,6 +653,11 @@ int32_t SoftbusListener::GetUdidByNetworkId(const char *networkId, std::string &
 int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &uuid)
 {
     return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
+}
+
+int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string &networkId)
+{
+    return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
