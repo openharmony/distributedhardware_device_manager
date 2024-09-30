@@ -657,6 +657,11 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
 
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId)
 {
+    if (callerId.empty()) {
+        LOGE("Invalid parameter, callerId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGD("Begin for callerId = %{public}s", GetAnonyString(callerId).c_str());
     GearMode mode = {
         .cycle = HIGH_FREQ_CYCLE,
         .duration = DEFAULT_DURATION,
