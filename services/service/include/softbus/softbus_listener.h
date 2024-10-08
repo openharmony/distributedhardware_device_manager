@@ -70,7 +70,7 @@ public:
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);
     int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info);
-    int32_t ShiftLNNGear(bool isWakeUp);
+    int32_t ShiftLNNGear(bool isWakeUp, const std::string &callerId);
     static int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
     int32_t GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel);
     int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType);

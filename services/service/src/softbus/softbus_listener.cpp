@@ -603,14 +603,19 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
     return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
-int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp)
+int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId)
 {
+    if (callerId.empty()) {
+        LOGE("Invalid parameter, callerId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGD("Begin for callerId = %{public}s", GetAnonyString(callerId).c_str());
     GearMode mode = {
         .cycle = HIGH_FREQ_CYCLE,
         .duration = DEFAULT_DURATION,
         .wakeupFlag = isWakeUp,
     };
-    int32_t ret = ::ShiftLNNGear(DM_PKG_NAME, DM_PKG_NAME, nullptr, &mode);
+    int32_t ret = ::ShiftLNNGear(DM_PKG_NAME, callerId.c_str(), nullptr, &mode);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]ShiftLNNGear error, failed ret: %{public}d", ret);
         return ret;
