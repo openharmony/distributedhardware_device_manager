@@ -2398,6 +2398,58 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
+
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid;
+    std::string networkId = "networkIdTest_001";
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid;
+    std::string networkId = "networkIdTest_002";
+    int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName_003";
+    std::string udid = "sewdwed98897";
+    std::string networkId = "networkIdTest_003";
+    int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::TestSi
+
+ze.Level0)
+{
+    std::string pkgName = "pkgName_003";
+    int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
