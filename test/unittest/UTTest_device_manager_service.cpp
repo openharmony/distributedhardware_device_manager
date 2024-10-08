@@ -2442,9 +2442,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_002, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::TestSi
-
-ze.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName_003";
     int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
