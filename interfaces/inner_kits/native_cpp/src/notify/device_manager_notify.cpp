@@ -823,7 +823,7 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
             return;
         }
         tempCbk = iter->second;
-        if (result != DM_OK || status > STATUS_DM_CLOSE_PIN_INPUT_UI || status < STATUS_DM_SHOW_AUTHORIZE_UI) {
+        if (result != DM_OK || status < STATUS_DM_SHOW_AUTHORIZE_UI) {
             LOGI("notify end, result: %{public}d, status: %{public}d", result, status);
             bindCallback_[pkgName].erase(targetId);
             if (bindCallback_[pkgName].empty()) {
