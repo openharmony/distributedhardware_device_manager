@@ -3087,7 +3087,8 @@ void DeviceManagerNapi::DeviceInfotoJsByNetworkId(const napi_env &env, const DmD
     SetValueInt32(env, "deviceType", (int)nidDevInfo.deviceTypeId, result);
 }
 
-bool DeviceManagerNapi::JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue)
+bool DeviceManagerNapi::JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName,
+                                           std::string &strValue)
 {
     napi_valuetype deviceIdType = napi_undefined;
     napi_typeof(env, value, &deviceIdType);
