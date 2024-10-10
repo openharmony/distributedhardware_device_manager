@@ -282,6 +282,9 @@ cJSON *RelationShipChangeMsg::ToArrayJson() const
     cJSON *arrayObj = cJSON_CreateArray();
     if (arrayObj == nullptr) {
         LOGE("cJSON_CreateArray failed");
+        if (payload != nullptr) {
+            delete[] payload;
+        }
         return nullptr;
     }
     for (uint32_t index = 0; index < len; index++) {
