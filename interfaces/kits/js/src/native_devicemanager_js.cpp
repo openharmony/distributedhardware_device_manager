@@ -3112,7 +3112,10 @@ napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info inf
     char networkIdValue[DM_NAPI_BUF_LENGTH] = {0};
     napi_get_value_string_utf8(env, argv[0], networkIdValue, networkIdLen + 1, &networkIdLen);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     auto *networkIdAsyncCallbackInfo = new NetworkIdAsyncCallbackInfo();
     networkIdAsyncCallbackInfo->env = env;
     networkIdAsyncCallbackInfo->deviceInfo = deviceInfo;
