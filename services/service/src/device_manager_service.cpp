@@ -294,7 +294,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
     }
     if (isRefresh) {
         CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-        int32_t ret = softbusListener_->ShiftLNNGear(isWakeUp);
+        int32_t ret = softbusListener_->ShiftLNNGear(isWakeUp, callerId);
         if (ret != DM_OK) {
             LOGE("ShiftLNNGear error, failed ret: %{public}d", ret);
             return ret;
