@@ -55,7 +55,6 @@ static void AccountBootCb(const char *key, const char *value, void *context)
     }
     dealThread.detach();
 #endif
-
 }
 
 AccountBootListener::AccountBootListener() : isRegAccountBootCb_(false),
