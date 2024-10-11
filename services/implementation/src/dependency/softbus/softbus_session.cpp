@@ -27,6 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = nullptr;
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
+constexpr int32_t DATA_LEN = 65535;
 
 static void OnShutdown(int32_t socket, ShutdownReason reason)
 {
@@ -179,7 +180,7 @@ void SoftbusSession::OnSessionClosed(int sessionId)
 
 void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    if (sessionId < 0 || data == nullptr || dataLen <= 0) {
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > DATA_LEN) {
         LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
             dataLen);
         return;

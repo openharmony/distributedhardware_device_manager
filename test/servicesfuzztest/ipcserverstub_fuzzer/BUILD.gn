@@ -69,6 +69,8 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "ipc:ipc_core",
     "ipc:ipc_single",

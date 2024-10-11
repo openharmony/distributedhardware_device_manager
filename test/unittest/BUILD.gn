@@ -93,6 +93,8 @@ ohos_unittest("UTTest_pin_auth") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -174,6 +176,8 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -672,6 +676,8 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -692,6 +698,8 @@ ohos_unittest("UTTest_ipc_server_listener") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "googletest:gmock",
   ]
@@ -708,6 +716,8 @@ ohos_unittest("UTTest_ipc_server_stub") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1150,6 +1160,8 @@ ohos_unittest("UTTest_discovery_filter") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1368,6 +1380,8 @@ ohos_unittest("UTTest_dm_publish_manager") {
 
   external_deps = [
     "cJSON:cjson",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1472,6 +1486,8 @@ ohos_static_library("device_manager_test_common") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
