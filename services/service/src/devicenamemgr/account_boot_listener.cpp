@@ -28,7 +28,9 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
     const char * const BOOTEVENT_ACCOUNT_READY = "bootevent.account.ready";
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     const char * const ACCOUNT_BOOT_EVENT = "account_boot_event";
+#endif
 }
 
 static void AccountBootCb(const char *key, const char *value, void *context)
