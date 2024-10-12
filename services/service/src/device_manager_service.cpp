@@ -1136,6 +1136,10 @@ void DeviceManagerService::UnloadDMServiceImplSo()
 bool DeviceManagerService::IsDMServiceAdapterLoad()
 {
     LOGI("DeviceManagerService::IsDMServiceAdapterLoad start.");
+    if (listener_ == nullptr) {
+        LOGE("Dm service is not init.");
+        return false;
+    }
     std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
     if (isAdapterSoLoaded_ && (dmServiceImplExt_ != nullptr)) {
         return true;
