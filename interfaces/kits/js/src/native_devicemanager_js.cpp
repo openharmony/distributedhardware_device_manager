@@ -3067,6 +3067,28 @@ void DeviceManagerNapi::DeviceInfotoJsByNetworkId(const napi_env &env, const DmD
     SetValueInt32(env, "deviceType", (int)nidDevInfo.deviceTypeId, result);
 }
 
+bool DeviceManagerNapi::JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName,
+                                           std::string &strValue)
+{
+    napi_valuetype deviceIdType = napi_undefined;
+    napi_typeof(env, value, &deviceIdType);
+    if (!CheckArgsType(env, deviceIdType == napi_string, valueName, "string")) {
+        return false;
+    }
+    size_t valueLen = 0;
+    napi_get_value_string_utf8(env, value, nullptr, 0, &valueLen);
+    if (!CheckArgsVal(env, valueLen > 0, valueName, "len == 0")) {
+        return false;
+    }
+    if (!CheckArgsVal(env, valueLen < DM_NAPI_BUF_LENGTH, valueName, "len >= MAXLEN")) {
+        return false;
+    }
+    char temp[DM_NAPI_BUF_LENGTH] = {0};
+    napi_get_value_string_utf8(env, value, temp, valueLen + 1, &valueLen);
+    strValue = temp;
+    return true;
+}
+
 napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
@@ -3081,23 +3103,20 @@ napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info inf
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_ASSERT(env, ((argc >= DM_NAPI_ARGS_ONE) && (argc <= DM_NAPI_ARGS_TWO)), "requires 1 or 2 parameter");
 
-    napi_valuetype networkIdValueType = napi_undefined;
-    napi_typeof(env, argv[0], &networkIdValueType);
-    if (!CheckArgsType(env, networkIdValueType == napi_string, "networkId", "string")) {
+    std::string networkId;
+    if (!JsToStringAndCheck(env, argv[0], "networkId", networkId)) {
         return nullptr;
     }
-    size_t networkIdLen = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &networkIdLen);
-    NAPI_ASSERT(env, networkIdLen < DM_NAPI_BUF_LENGTH, "typeLen >= MAXLEN");
-    char networkIdValue[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, argv[0], networkIdValue, networkIdLen + 1, &networkIdLen);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&deviceManagerWrapper));
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
     auto *networkIdAsyncCallbackInfo = new NetworkIdAsyncCallbackInfo();
     networkIdAsyncCallbackInfo->env = env;
     networkIdAsyncCallbackInfo->deviceInfo = deviceInfo;
     networkIdAsyncCallbackInfo->bundleName = deviceManagerWrapper->bundleName_;
-    networkIdAsyncCallbackInfo->networkId = std::string(networkIdValue);
+    networkIdAsyncCallbackInfo->networkId = networkId;
 
     if (argc == DM_NAPI_ARGS_ONE) {    // promise
         napi_deferred deferred;
