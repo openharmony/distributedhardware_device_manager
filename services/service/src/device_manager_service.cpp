@@ -1994,10 +1994,11 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::HandleImportCredentialStatus(int32_t result)
+void DeviceManagerService::HandleCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+                                                         int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleImportCredentialStatus(result);
+        dmServiceImpl_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
     }
 }
 } // namespace DistributedHardware

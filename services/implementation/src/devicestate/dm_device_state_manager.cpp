@@ -526,5 +526,22 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
     }
     softbusConnector_->ClearPkgName();
 }
+
+void DmDeviceStateManager::HandleCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+                                                         int32_t errcode)
+{
+    if (softbusConnector_ == nullptr || listener_ == nullptr) {
+        LOGE("Failed, callback_ptr is null.");
+        return;
+    }
+    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
+    if (pkgName.size() == 0) {
+        listener_->OnHandleCandidateRestrictStatus(std::string(DM_PKG_NAME), deviceId, deviceTypeId, errcode);
+    } else {
+        for (auto item : pkgName) {
+            listener_->OnHandleCandidateRestrictStatus(item, deviceId, deviceTypeId, errcode);
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

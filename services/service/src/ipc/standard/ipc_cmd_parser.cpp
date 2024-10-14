@@ -33,6 +33,7 @@
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
+#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_discovery_req.h"
@@ -1577,16 +1578,27 @@ ON_IPC_SET_REQUEST(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, std::shared_ptr<IpcReq
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::static_pointer_cast<IpcNotifyPublishResultReq>(pBaseReq);
+    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> pReq =
+        std::static_pointer_cast<IpcNotifyCandidateRestrictStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    int32_t result = pReq->GetResult();
+    std::string deviceId = pReq->GetDeviceId();
+    uint16_t deviceTypeId = pReq->GetDeviceTypeId();
+    int32_t errCode = pReq->GetErrCode();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteInt32(result)) {
-        LOGE("write result failed");
+    if (!data.WriteString(deviceId)) {
+        LOGE("write deviceId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteUint16(deviceTypeId)) {
+        LOGE("write deviceTypeId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(errCode)) {
+        LOGE("write errCode failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

@@ -26,6 +26,7 @@
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
+#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_device_found_req.h"
@@ -544,13 +545,17 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
     }
 }
 
-void DeviceManagerServiceListener::OnImportCredentialStateChange(const std::string &pkgName, int32_t result)
+void DeviceManagerServiceListener::OnHandleCandidateRestrictStatus(const std::string &pkgName,
+    const std::string &deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", pkgName.c_str());
+    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> pReq =
+        std::make_shared<IpcNotifyCandidateRestrictStatusReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetDeviceId(deviceId);
+    pReq->SetDeviceTypeId(deviceTypeId);
+    pReq->SetErrCode(errcode);
     if (pkgName == std::string(DM_PKG_NAME)) {
-        std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
-        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        pReq->SetResult(result);
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
             pReq->SetPkgName(it);
@@ -558,7 +563,6 @@ void DeviceManagerServiceListener::OnImportCredentialStateChange(const std::stri
         }
     } else {
         pReq->SetPkgName(pkgName);
-        pReq->SetResult(result);
         ipcServerListener_.SendRequest(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, pReq, pRsp);
     }
 }

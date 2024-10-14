@@ -67,7 +67,7 @@ static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
 static std::mutex g_lockDeviceIdSet;
 static std::mutex g_lockDevScreenStatusChange;
-static std::mutex g_lockImportCredentialStatus;
+static std::mutex g_lockCandidateRestrictStatus;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -121,6 +121,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
     .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
     .onNodeStatusChanged = SoftbusListener::OnDeviceScreenStatusChanged,
+    .onCandidateRestrict = SoftbusListener::OnCandidateRestrict,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -164,19 +165,20 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
-void SoftbusListener::ImportCredentialStatus(int32_t result)
+void SoftbusListener::CandidateRestrict(std::string deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
-    std::lock_guard<std::mutex> lock(g_lockImportCredentialStatus);
-    DeviceManagerService::GetInstance().HandleImportCredentialStatus(result);
+    std::lock_guard<std::mutex> lock(g_lockCandidateRestrictStatus);
+    DeviceManagerService::GetInstance().HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
 }
 
-void SoftbusListener::OnImportCredentialStatus(int32_t result)
+void SoftbusListener::OnCandidateRestrict(char *deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received import credential status callback from softbus.");
+    std::string deviceIdStr(deviceId);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ffrt::submit([=]() { ImportCredentialStatus(result); });
+        ffrt::submit([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });
     #else
-        std::thread importStatusChange([=]() { ImportCredentialStatus(result); });
+        std::thread importStatusChange([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });
         if (pthread_setname_np(importStatusChange.native_handle(), IMPORT_CREDENTIAL_STATUS) != DM_OK) {
             LOGE("devImportStatusChange setname failed.");
         }
