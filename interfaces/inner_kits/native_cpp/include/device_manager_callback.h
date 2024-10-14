@@ -155,7 +155,7 @@ public:
     {
     }
     virtual void OnCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                          int32_t errcode) = 0;
+                                           int32_t errcode) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

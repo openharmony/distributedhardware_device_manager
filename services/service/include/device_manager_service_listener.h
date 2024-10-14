@@ -73,8 +73,8 @@ public:
         const std::string &content) override;
     void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override;
     void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override;
-    void OnHandleCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId, uint16_t deviceTypeId,
-                                       int32_t errcode);
+    void OnHandleCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId,
+                                         uint16_t deviceTypeId, int32_t errcode);
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
