@@ -82,7 +82,6 @@ HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_003, testing::ext::TestSi
     std::map<std::string, std::string> filterOptions;
     int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
     EXPECT_EQ(true, checkSoftbusRes(ret));
- }
 }
 
 HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
