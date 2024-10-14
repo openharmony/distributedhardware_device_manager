@@ -1334,6 +1334,27 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     std::string pkgName;
     int32_t eventId = 0;
     std::string event;
+    std::string msg = "";
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+    msg =  R"(
+    {
+        "authType" : 1,
+        "userId" : "123",
+        "credentialData" : "cryptosupportData",
+        "CRYPTOSUPPORT" : "cryptosupportTest",
+        "credentialType" : 1,
+        "credentialId" : "104",
+        "NETWORK_ID" : "108",
+        "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+        "serverPk" : "hello",
+        "pkInfoSignature" : "world",
+        "pkInfo" : "pkginfo",
+        "peerDeviceId" : "3515656546"
+    })";
+    DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
+    std::string commonEventType = "helloworld";
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().ScreenCommonEventCallback(commonEventType);
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     EXPECT_NE(ret, DM_OK);
 }
@@ -1346,6 +1367,17 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level
     std::string event;
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t eventId = DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT;
+    std::string event;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
 HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level0)

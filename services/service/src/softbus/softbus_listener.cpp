@@ -52,6 +52,7 @@ constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
 constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
+constexpr uint32_t SOFTBUS_MAX_RETRY_TIME = 10;
 
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
@@ -394,16 +395,16 @@ SoftbusListener::~SoftbusListener()
 int32_t SoftbusListener::InitSoftbusListener()
 {
     int32_t ret;
-    int32_t retryTimes = 0;
+    uint32_t retryTimes = 0;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     do {
         ret = RegNodeDeviceStateCb(DM_PKG_NAME, &softbusNodeStateCb_);
         if (ret != DM_OK) {
             ++retryTimes;
-            LOGE("[SOFTBUS]RegNodeDeviceStateCb failed with ret: %{public}d, retryTimes: %{public}d.", ret, retryTimes);
+            LOGE("[SOFTBUS]RegNodeDeviceStateCb failed with ret: %{public}d, retryTimes: %{public}u.", ret, retryTimes);
             usleep(SOFTBUS_CHECK_INTERVAL);
         }
-    } while (ret != DM_OK);
+    } while (ret != DM_OK && retryTimes < SOFTBUS_MAX_RETRY_TIME);
 #endif
     return InitSoftPublishLNN();
 }
