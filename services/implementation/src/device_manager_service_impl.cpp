@@ -857,7 +857,7 @@ void DeviceManagerServiceImpl::HandleCandidateRestrictStatus(const std::string &
                                                              int32_t errcode)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
-    deviceStateMgr_->
+    deviceStateMgr_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

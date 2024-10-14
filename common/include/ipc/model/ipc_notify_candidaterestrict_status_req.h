@@ -87,7 +87,7 @@ public:
 private:
     std::string deviceId_;
     uint16_t deviceTypeId_ = 0;
-    int32_t errcode_ = 0
+    int32_t errcode_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

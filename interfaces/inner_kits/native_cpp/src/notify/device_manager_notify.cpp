@@ -1148,7 +1148,7 @@ void DeviceManagerNotify::OnDeviceScreenStatus(const std::string &pkgName, const
     tempCbk->OnDeviceScreenStatus(deviceInfo);
 }
 
-void RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
+void DeviceManagerNotify::RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
     std::shared_ptr<CandidateRestrictStatusCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
@@ -1159,7 +1159,7 @@ void RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
     candidateRestrictStatusCallback_[pkgName] = callback;
 }
 
-void UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName)
+void DeviceManagerNotify::UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -1169,8 +1169,8 @@ void UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName)
     candidateRestrictStatusCallback_.erase(pkgName);
 }
 
-void OnCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId, uint16_t deviceTypeId,
-                               int32_t errcode)
+void DeviceManagerNotify::OnCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId,
+                                                    uint16_t deviceTypeId, int32_t errcode)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
