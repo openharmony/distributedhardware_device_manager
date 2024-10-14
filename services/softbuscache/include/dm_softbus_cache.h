@@ -48,6 +48,7 @@ public:
     int32_t GetUdidByUdidHash(const std::string &udidHash, std::string &udid);
     int32_t GetUuidByUdid(const std::string &udid, std::string &uuid);
     int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId);
+    bool CheckIsOnline(const std::string &udidHash);
 private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
