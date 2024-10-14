@@ -853,6 +853,7 @@ void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &c
     if (handler != nullptr) {
         napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_ONE, &result, &callResult);
         napi_delete_reference(env_, creAsyncCallbackInfo_.callback);
+        creAsyncCallbackInfo_.callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
