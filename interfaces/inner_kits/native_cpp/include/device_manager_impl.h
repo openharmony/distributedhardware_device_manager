@@ -397,6 +397,9 @@ public:
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
     virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
         std::string &networkId) override;
+    virtual int32_t RegisterImportCredentialStatusCallback(const std::string &pkgName,
+        std::shared_ptr<ImportCredentialStatusCallback> callback) override;
+    virtual int32_t UnRegisterImportCredentialStatusCallback(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

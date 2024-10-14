@@ -148,6 +148,14 @@ public:
     }
     virtual void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) = 0;
 };
+
+class ImportCredentialStatusCallback {
+public:
+    virtual ~ImportCredentialStatusCallback()
+    {
+    }
+    virtual void OnImportCredentialStatus(int32_t result) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

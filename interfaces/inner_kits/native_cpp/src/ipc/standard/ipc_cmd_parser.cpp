@@ -1732,5 +1732,15 @@ ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_pt
     pRsp->SetNetWorkId(reply.ReadString());
     return DM_OK;
 }
+
+ON_IPC_CMD(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = data.ReadInt32();
+    DeviceManagerNotify::GetInstance().OnImportCredentialStatus(pkgName, result);
+
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

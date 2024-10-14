@@ -70,6 +70,9 @@ public:
     void RegisterDeviceScreenStatusCallback(const std::string &pkgName,
         std::shared_ptr<DeviceScreenStatusCallback> callback);
     void UnRegisterDeviceScreenStatusCallback(const std::string &pkgName);
+    void RegisterImportCredentialStatusCallback(const std::string &pkgName,
+        std::shared_ptr<ImportCredentialStatusCallback> callback);
+    void UnRegisterImportCredentialStatusCallback(const std::string &pkgName);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -116,6 +119,8 @@ public:
     void OnDeviceTrustChange(const std::string &pkgName, const std::string &udid, const std::string &uuid,
         int32_t authForm);
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
+    void OnImportCredentialStatus(const std::string &pkgName, int32_t result);
+
 private:
 #if !defined(__LITEOS_M__)
     std::mutex lock_;
@@ -133,6 +138,7 @@ private:
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
     std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
+    std::map<std::string, std::shared_ptr<ImportCredentialStatusCallback>> importCredentialStatusCallback_;
     std::mutex bindLock_;
 };
 } // namespace DistributedHardware

@@ -201,6 +201,7 @@ public:
         int32_t &screenStatus);
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
+    void HandleImportCredentialStatus(int32_t result);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

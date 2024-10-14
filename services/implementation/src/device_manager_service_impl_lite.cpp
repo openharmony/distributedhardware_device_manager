@@ -524,6 +524,12 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     return 0;
 }
 
+void DeviceManagerServiceImpl::HandleImportCredentialStatus(int32_t result)
+{
+    (void)result;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

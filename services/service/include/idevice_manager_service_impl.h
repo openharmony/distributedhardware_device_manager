@@ -273,6 +273,7 @@ public:
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
     virtual void HandleUserSwitched(int32_t switchUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
+    virtual void HandleImportCredentialStatus(int32_t result) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

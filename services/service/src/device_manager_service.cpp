@@ -1993,5 +1993,12 @@ void DeviceManagerService::SubscribePackageCommonEvent()
     }
 #endif
 }
+
+void DeviceManagerService::HandleImportCredentialStatus(int32_t result)
+{
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleImportCredentialStatus(result);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

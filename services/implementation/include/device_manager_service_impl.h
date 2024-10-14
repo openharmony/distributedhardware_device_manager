@@ -131,6 +131,7 @@ public:
     void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
+    void HandleImportCredentialStatus(int32_t result);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

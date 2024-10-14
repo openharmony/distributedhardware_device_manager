@@ -48,6 +48,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
+constexpr const char* IMPORT_CREDENTIAL_STATUS = "importCredentialStatus";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
@@ -66,6 +67,7 @@ static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
 static std::mutex g_lockDeviceIdSet;
 static std::mutex g_lockDevScreenStatusChange;
+static std::mutex g_lockImportCredentialStatus;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -160,6 +162,26 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
 {
     std::lock_guard<std::mutex> lock(g_lockDevScreenStatusChange);
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
+}
+
+void SoftbusListener::ImportCredentialStatus(int32_t result)
+{
+    std::lock_guard<std::mutex> lock(g_lockImportCredentialStatus);
+    DeviceManagerService::GetInstance().HandleImportCredentialStatus(result);
+}
+
+void SoftbusListener::OnImportCredentialStatus(int32_t result)
+{
+    LOGI("received import credential status callback from softbus.");
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        ffrt::submit([=]() { ImportCredentialStatus(result); });
+    #else
+        std::thread importStatusChange([=]() { ImportCredentialStatus(result); });
+        if (pthread_setname_np(importStatusChange.native_handle(), IMPORT_CREDENTIAL_STATUS) != DM_OK) {
+            LOGE("devImportStatusChange setname failed.");
+        }
+        importStatusChange.detach();
+    #endif
 }
 
 void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status)

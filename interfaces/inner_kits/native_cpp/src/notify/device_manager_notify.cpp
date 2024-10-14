@@ -1147,5 +1147,49 @@ void DeviceManagerNotify::OnDeviceScreenStatus(const std::string &pkgName, const
     }
     tempCbk->OnDeviceScreenStatus(deviceInfo);
 }
+
+void RegisterImportCredentialStatusCallback(const std::string &pkgName,
+    std::shared_ptr<ImportCredentialStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    importCredentialStatusCallback_[pkgName] = callback;
+}
+
+void UnRegisterImportCredentialStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    importCredentialStatusCallback_.erase(pkgName);
+}
+
+void OnImportCredentialStatus(const std::string &pkgName, int32_t result)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("In, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<ImportCredentialStatusCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (importCredentialStatusCallback_.find(pkgName) == importCredentialStatusCallback_.end()) {
+            LOGE("error, import credential status not register.");
+            return;
+        }
+        tempCbk = importCredentialStatusCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered import credential status callback is nullptr.");
+        return;
+    }
+    tempCbk->OnImportCredentialStatus(result);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

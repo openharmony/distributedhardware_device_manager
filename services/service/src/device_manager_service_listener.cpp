@@ -543,5 +543,24 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
         }
     }
 }
+
+void DeviceManagerServiceListener::OnImportCredentialStateChange(const std::string &pkgName, int32_t result)
+{
+    LOGI("In, pkgName = %{public}s", pkgName.c_str());
+    if (pkgName == std::string(DM_PKG_NAME)) {
+        std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
+        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+        pReq->SetResult(result);
+        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        for (const auto &it : PkgNameVec) {
+            pReq->SetPkgName(it);
+            ipcServerListener_.SendRequest(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, pReq, pRsp);
+        }
+    } else {
+        pReq->SetPkgName(pkgName);
+        pReq->SetResult(result);
+        ipcServerListener_.SendRequest(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, pReq, pRsp);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

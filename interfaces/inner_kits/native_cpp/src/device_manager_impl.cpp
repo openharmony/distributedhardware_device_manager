@@ -2436,5 +2436,28 @@ int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const 
     networkId = rsp->GetNetWorkId();
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::RegisterImportCredentialStatusCallback(const std::string &pkgName,
+    std::shared_ptr<ImportCredentialStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterImportCredentialStatusCallback(pkgName, callback);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterImportCredentialStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterImportCredentialStatusCallback(pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
