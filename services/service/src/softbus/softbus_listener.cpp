@@ -174,6 +174,9 @@ void SoftbusListener::CandidateRestrict(std::string deviceId, uint16_t deviceTyp
 void SoftbusListener::OnCandidateRestrict(char *deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received import credential status callback from softbus.");
+    if (deviceId == nullptr) {
+        return;
+    }
     std::string deviceIdStr(deviceId);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         ffrt::submit([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });

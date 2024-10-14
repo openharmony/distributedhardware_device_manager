@@ -117,6 +117,15 @@ public:
     }
     void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
 };
+
+class CandidateRestrictStatusCallbackTest : public CandidateRestrictStatusCallback {
+public:
+    virtual ~CandidateRestrictStatusCallbackTest()
+    {
+    }
+    void OnCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+                                   int32_t errcode) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 
