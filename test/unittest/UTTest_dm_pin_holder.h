@@ -192,6 +192,15 @@ public:
         (void)pkgName;
         (void)devInfo;
     }
+
+    void OnHandleCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId,
+                                         uint16_t deviceTypeId, int32_t errcode) override
+    {
+        (void)pkgName;
+        (void)deviceId;
+        (void)deviceTypeId;
+        (void)errcode;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -48,7 +48,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
-constexpr const char* IMPORT_CREDENTIAL_STATUS = "importCredentialStatus";
+constexpr const char* CANDIDATE_RESTRICT_STATUS = "candidateRestrictStatus";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
@@ -173,7 +173,7 @@ void SoftbusListener::CandidateRestrict(std::string deviceId, uint16_t deviceTyp
 
 void SoftbusListener::OnCandidateRestrict(char *deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
-    LOGI("received import credential status callback from softbus.");
+    LOGI("received candidate restrict status callback from softbus.");
     if (deviceId == nullptr) {
         return;
     }
@@ -181,11 +181,11 @@ void SoftbusListener::OnCandidateRestrict(char *deviceId, uint16_t deviceTypeId,
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         ffrt::submit([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });
     #else
-        std::thread importStatusChange([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });
-        if (pthread_setname_np(importStatusChange.native_handle(), IMPORT_CREDENTIAL_STATUS) != DM_OK) {
-            LOGE("devImportStatusChange setname failed.");
+        std::thread candidateRestrictStatus([=]() { CandidateRestrict(deviceIdStr, deviceTypeId, errcode); });
+        if (pthread_setname_np(candidateRestrictStatus.native_handle(), CANDIDATE_RESTRICT_STATUS) != DM_OK) {
+            LOGE("devcandidateRestrictStatus setname failed.");
         }
-        importStatusChange.detach();
+        candidateRestrictStatus.detach();
     #endif
 }
 
