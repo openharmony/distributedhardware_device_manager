@@ -154,7 +154,7 @@ HWTEST_F(SoftbusListenerTest, ConvertScreenStatusToDmDevice_001, testing::ext::T
         .authForm = DmAuthForm::ACROSS_ACCOUNT
     };
     int ret = softbusListener->ConvertScreenStatusToDmDevice(nodeInfo, devScreenStatus, devInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
