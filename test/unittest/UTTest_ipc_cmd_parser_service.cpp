@@ -1532,9 +1532,9 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY;
+    int32_t cmdCode = SERVER_HICHAIN_PROOF_STATUS_NOTIFY;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> req = nullptr;
+    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -1542,7 +1542,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyCandidateRestrictStatusReq>();
+    req = std::make_shared<IpcNotifyHichainProofExceptionStatusReq>();
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "012345678";
     uint16_t deviceTypeId = 0x00;
@@ -1559,7 +1559,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY;
+    int32_t cmdCode = SERVER_HICHAIN_PROOF_STATUS_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 } // namespace

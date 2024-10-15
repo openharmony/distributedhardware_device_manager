@@ -1148,28 +1148,28 @@ void DeviceManagerNotify::OnDeviceScreenStatus(const std::string &pkgName, const
     tempCbk->OnDeviceScreenStatus(deviceInfo);
 }
 
-void DeviceManagerNotify::RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
-    std::shared_ptr<CandidateRestrictStatusCallback> callback)
+void DeviceManagerNotify::RegisterHichainProofExceptionStatusCallback(const std::string &pkgName,
+    std::shared_ptr<HichainProofExceptionStatusCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    candidateRestrictStatusCallback_[pkgName] = callback;
+    hichainProofExceptionStatusCallback_[pkgName] = callback;
 }
 
-void DeviceManagerNotify::UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName)
+void DeviceManagerNotify::UnRegisterHichainProofExceptionStatusCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    candidateRestrictStatusCallback_.erase(pkgName);
+    hichainProofExceptionStatusCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId,
+void DeviceManagerNotify::OnHichainProofExceptionStatus(const std::string &pkgName, const std::string &deviceId,
                                                     uint16_t deviceTypeId, int32_t errcode)
 {
     if (pkgName.empty()) {
@@ -1177,20 +1177,20 @@ void DeviceManagerNotify::OnCandidateRestrictStatus(const std::string &pkgName, 
         return;
     }
     LOGI("In, pkgName:%{public}s", pkgName.c_str());
-    std::shared_ptr<CandidateRestrictStatusCallback> tempCbk;
+    std::shared_ptr<HichainProofExceptionStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (candidateRestrictStatusCallback_.find(pkgName) == candidateRestrictStatusCallback_.end()) {
-            LOGE("error, import credential status not register.");
+        if (hichainProofExceptionStatusCallback_.find(pkgName) == hichainProofExceptionStatusCallback_.end()) {
+            LOGE("error, hichain proof exception status not register.");
             return;
         }
-        tempCbk = candidateRestrictStatusCallback_[pkgName];
+        tempCbk = hichainProofExceptionStatusCallback_[pkgName];
     }
     if (tempCbk == nullptr) {
-        LOGE("error, registered import credential status callback is nullptr.");
+        LOGE("error, registered hichain proof exception status callback is nullptr.");
         return;
     }
-    tempCbk->OnCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+    tempCbk->OnHichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

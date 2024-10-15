@@ -552,12 +552,12 @@ void DeviceManagerServiceListener::RemoveOnlinePkgName(const DmDeviceInfo &info)
     }
 }
 
-void DeviceManagerServiceListener::OnHandleCandidateRestrictStatus(const std::string &pkgName,
+void DeviceManagerServiceListener::OnHichainProofExceptionStatus(const std::string &pkgName,
     const std::string &deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> pReq =
-        std::make_shared<IpcNotifyCandidateRestrictStatusReq>();
+    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> pReq =
+        std::make_shared<IpcNotifyHichainProofExceptionStatusReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetDeviceId(deviceId);
     pReq->SetDeviceTypeId(deviceTypeId);
@@ -566,11 +566,11 @@ void DeviceManagerServiceListener::OnHandleCandidateRestrictStatus(const std::st
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
             pReq->SetPkgName(it);
-            ipcServerListener_.SendRequest(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, pReq, pRsp);
+            ipcServerListener_.SendRequest(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, pReq, pRsp);
         }
     } else {
         pReq->SetPkgName(pkgName);
-        ipcServerListener_.SendRequest(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, pReq, pRsp);
+        ipcServerListener_.SendRequest(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, pReq, pRsp);
     }
 }
 } // namespace DistributedHardware

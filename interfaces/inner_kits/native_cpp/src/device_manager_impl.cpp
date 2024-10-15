@@ -2437,25 +2437,25 @@ int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const 
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
-    std::shared_ptr<CandidateRestrictStatusCallback> callback)
+int32_t DeviceManagerImpl::RegisterHichainProofExceptionStatusCallback(const std::string &pkgName,
+    std::shared_ptr<HichainProofExceptionStatusCallback> callback)
 {
     if (pkgName.empty() || callback == nullptr) {
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    DeviceManagerNotify::GetInstance().RegisterCandidateRestrictStatusCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().RegisterHichainProofExceptionStatusCallback(pkgName, callback);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName)
+int32_t DeviceManagerImpl::UnRegisterHichainProofExceptionStatusCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    DeviceManagerNotify::GetInstance().UnRegisterCandidateRestrictStatusCallback(pkgName);
+    DeviceManagerNotify::GetInstance().UnRegisterHichainProofExceptionStatusCallback(pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }

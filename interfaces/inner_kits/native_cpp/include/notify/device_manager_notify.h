@@ -70,9 +70,9 @@ public:
     void RegisterDeviceScreenStatusCallback(const std::string &pkgName,
         std::shared_ptr<DeviceScreenStatusCallback> callback);
     void UnRegisterDeviceScreenStatusCallback(const std::string &pkgName);
-    void RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
-        std::shared_ptr<CandidateRestrictStatusCallback> callback);
-    void UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName);
+    void RegisterHichainProofExceptionStatusCallback(const std::string &pkgName,
+        std::shared_ptr<HichainProofExceptionStatusCallback> callback);
+    void UnRegisterHichainProofExceptionStatusCallback(const std::string &pkgName);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -119,7 +119,7 @@ public:
     void OnDeviceTrustChange(const std::string &pkgName, const std::string &udid, const std::string &uuid,
         int32_t authForm);
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
-    void OnCandidateRestrictStatus(const std::string &pkgName, const std::string &deviceId, uint16_t deviceTypeId,
+    void OnHichainProofExceptionStatus(const std::string &pkgName, const std::string &deviceId, uint16_t deviceTypeId,
                                    int32_t errcode);
 
 private:
@@ -139,7 +139,7 @@ private:
     std::map<std::string, std::shared_ptr<PinHolderCallback>> pinHolderCallback_;
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
     std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
-    std::map<std::string, std::shared_ptr<CandidateRestrictStatusCallback>> candidateRestrictStatusCallback_;
+    std::map<std::string, std::shared_ptr<HichainProofExceptionStatusCallback>> hichainProofExceptionStatusCallback_;
     std::mutex bindLock_;
 };
 } // namespace DistributedHardware

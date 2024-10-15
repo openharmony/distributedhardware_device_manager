@@ -853,11 +853,11 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
 }
 
-void DeviceManagerServiceImpl::HandleCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+void DeviceManagerServiceImpl::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
                                                              int32_t errcode)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
-    deviceStateMgr_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+    deviceStateMgr_->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

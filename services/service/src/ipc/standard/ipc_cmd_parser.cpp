@@ -1573,13 +1573,13 @@ ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+ON_IPC_SET_REQUEST(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> pReq =
-        std::static_pointer_cast<IpcNotifyCandidateRestrictStatusReq>(pBaseReq);
+    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> pReq =
+        std::static_pointer_cast<IpcNotifyHichainProofExceptionStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
     uint16_t deviceTypeId = pReq->GetDeviceTypeId();
@@ -1604,7 +1604,7 @@ ON_IPC_SET_REQUEST(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, std::shared_ptr<IpcR
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");

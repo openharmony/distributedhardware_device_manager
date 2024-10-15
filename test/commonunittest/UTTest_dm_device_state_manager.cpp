@@ -258,7 +258,7 @@ HWTEST_F(DmDeviceStateManagerTest, HandleCandidateRestrictStatus_001, testing::e
     std::string deviceId = "1234567890";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    dmDeviceStateManager->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+    dmDeviceStateManager->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 } // namespace

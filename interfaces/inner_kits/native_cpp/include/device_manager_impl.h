@@ -397,9 +397,9 @@ public:
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
     virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
         std::string &networkId) override;
-    virtual int32_t RegisterCandidateRestrictStatusCallback(const std::string &pkgName,
-        std::shared_ptr<CandidateRestrictStatusCallback> callback) override;
-    virtual int32_t UnRegisterCandidateRestrictStatusCallback(const std::string &pkgName) override;
+    virtual int32_t RegisterHichainProofExceptionStatusCallback(const std::string &pkgName,
+        std::shared_ptr<HichainProofExceptionStatusCallback> callback) override;
+    virtual int32_t UnRegisterHichainProofExceptionStatusCallback(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

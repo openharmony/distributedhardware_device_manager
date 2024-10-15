@@ -20,12 +20,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcNotifyCandidateRestrictStatusReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcNotifyCandidateRestrictStatusReq);
+class IpcNotifyHichainProofExceptionStatusReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcNotifyHichainProofExceptionStatusReq);
 
 public:
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::GetPublishId
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetPublishId
      * @tc.desc: Get deviceId of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */
@@ -35,7 +35,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::SetPublishId
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetPublishId
      * @tc.desc: Set deviceId of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */
@@ -45,7 +45,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::GetResult
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetResult
      * @tc.desc: Get DeviceType of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */
@@ -55,7 +55,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::SetResult
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetResult
      * @tc.desc: Set DeviceType of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */
@@ -65,7 +65,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::GetErrCode
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetErrCode
      * @tc.desc: Get ErrCode of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */
@@ -75,7 +75,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyCandidateRestrictStatusReq::SetErrCode
+     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetErrCode
      * @tc.desc: Set ErrCode of the Ipc Notify Candidate Restrict Status Request
      * @tc.type: FUNC
      */

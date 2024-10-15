@@ -1507,7 +1507,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleCandidateRestrictStatus_101, testin
     std::string deviceId = "0123456789";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    deviceManagerServiceImpl_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+    deviceManagerServiceImpl_->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 } // namespace

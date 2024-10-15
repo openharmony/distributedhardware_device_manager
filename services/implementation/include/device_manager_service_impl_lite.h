@@ -137,7 +137,7 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(int32_t switchUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void HandleCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+    void HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
                                        int32_t errcode);
 
 private:

@@ -48,7 +48,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
-constexpr const char* CANDIDATE_RESTRICT_STATUS = "candidateRestrictStatus";
+constexpr const char* HICHAIN_PROOF_STATUS = "hichainProofStatus";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
@@ -121,7 +121,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
     .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
     .onNodeStatusChanged = SoftbusListener::OnDeviceScreenStatusChanged,
-    .onHichainProofException = SoftbusListener::OnHichainProofException,
+    .OnHichainProofStatus = SoftbusListener::OnHichainProofStatus,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -165,13 +165,13 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
-void SoftbusListener::HichainProofException(std::string deviceId, uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::HichainProofExceptionProcess(std::string deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     std::lock_guard<std::mutex> lock(g_lockCandidateRestrictStatus);
-    DeviceManagerService::GetInstance().HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+    DeviceManagerService::GetInstance().HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
 }
 
-void SoftbusListener::OnHichainProofException(const char *deviceId, uint32_t deviceIdLen, uint16_t deviceTypeId,
+void SoftbusListener::OnHichainProofStatus(const char *deviceId, uint32_t deviceIdLen, uint16_t deviceTypeId,
                                               int32_t errcode)
 {
     LOGI("received candidate restrict status callback from softbus.");
@@ -181,13 +181,13 @@ void SoftbusListener::OnHichainProofException(const char *deviceId, uint32_t dev
     }
     std::string deviceIdStr(deviceId, deviceIdLen);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ffrt::submit([=]() { HichainProofException(deviceIdStr, deviceTypeId, errcode); });
+        ffrt::submit([=]() { HichainProofExceptionProcess(deviceIdStr, deviceTypeId, errcode); });
     #else
-        std::thread candidateRestrictStatus([=]() { HichainProofException(deviceIdStr, deviceTypeId, errcode); });
-        if (pthread_setname_np(candidateRestrictStatus.native_handle(), CANDIDATE_RESTRICT_STATUS) != DM_OK) {
-            LOGE("devcandidateRestrictStatus setname failed.");
+        std::thread hichainProofStatus([=]() { HichainProofExceptionProcess(deviceIdStr, deviceTypeId, errcode); });
+        if (pthread_setname_np(hichainProofStatus.native_handle(), HICHAIN_PROOF_STATUS) != DM_OK) {
+            LOGE("hichainProofStatus setname failed.");
         }
-        candidateRestrictStatus.detach();
+        hichainProofStatus.detach();
     #endif
 }
 

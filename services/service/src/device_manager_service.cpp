@@ -1994,11 +1994,11 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::HandleCandidateRestrictStatus(const std::string &deviceId, uint16_t deviceTypeId,
+void DeviceManagerService::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
                                                          int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
+        dmServiceImpl_->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
     }
 }
 } // namespace DistributedHardware

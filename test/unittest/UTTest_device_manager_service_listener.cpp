@@ -440,7 +440,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnHandleCandidateRestrictStatus_001, 
     std::string deviceId = "0123456789";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    listener_->OnHandleCandidateRestrictStatus(pkgName, deviceId, deviceTypeId, errcode);
+    listener_->OnHichainProofExceptionStatus(pkgName, deviceId, deviceTypeId, errcode);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 } // namespace
