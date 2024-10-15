@@ -1502,10 +1502,10 @@ HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_104, testing::e
     EXPECT_EQ(authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
 
-HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_104, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceImplTest, HandleCandidateRestrictStatus_101, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "0123456789";
-    uint16_t deviceTypeId = "0x00";
+    uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
     deviceManagerServiceImpl_->HandleCandidateRestrictStatus(deviceId, deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);

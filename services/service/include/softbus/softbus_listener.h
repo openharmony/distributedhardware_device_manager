@@ -58,8 +58,9 @@ public:
     static void DeviceTrustedChange(const std::string &msg);
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
-    static void OnCandidateRestrict(char *deviceId, uint16_t deviceTypeId, int32_t errcode);
-    static void CandidateRestrict(std::string deviceId, uint16_t deviceTypeId, int32_t errcode);
+    static void OnHichainProofException(const char *deviceId, uint32_t deviceIdLen, uint16_t deviceTypeId,
+                                        int32_t errcode);
+    static void HichainProofException(std::string deviceId, uint16_t deviceTypeId, int32_t errcode);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();

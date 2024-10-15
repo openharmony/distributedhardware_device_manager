@@ -32,6 +32,7 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
+#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
@@ -1527,6 +1528,39 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level
         ret = ptr2(data, reply);
     }
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY;
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyCandidateRestrictStatusReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyCandidateRestrictStatusReq>();
+    std::string pkgName = "com.ohos.test";
+    std::string deviceId = "012345678";
+    uint16_t deviceTypeId = 0x00;
+    int32_t errcode = -1;
+    req->SetPkgName(pkgName);
+    req->SetDeviceId(deviceId);
+    req->SetDeviceTypeId(deviceTypeId);
+    req->SetErrCode(errcode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY;
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 } // namespace
 } // namespace DistributedHardware
