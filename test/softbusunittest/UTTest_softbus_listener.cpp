@@ -117,8 +117,44 @@ HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOnline(info);
     std::string callerId = "callerId";
     EXPECT_NE(softbusListener->ShiftLNNGear(false, callerId), DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string callerId;
+    EXPECT_EQ(softbusListener->ShiftLNNGear(false, callerId), ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(SoftbusListenerTest, ConvertScreenStatusToDmDevice_001, testing::ext::TestSize.Level0)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    NodeBasicInfo nodeInfo = {
+            .networkId = "123456",
+            .deviceName = "123456",
+            .deviceTypeId = 1
+        };
+    int32_t devScreenStatus = 1;
+    DmDeviceInfo devInfo = {
+        .deviceId = {"45688"},
+        .deviceName = {"device_001"},
+        .deviceTypeId = 12,
+        .extraData = "dsasweadwe65164654",
+        .networkId = {"8885665"},
+        .networkType = 21,
+        .range = 2,
+        .authForm = DmAuthForm::ACROSS_ACCOUNT
+    };
+    int ret = softbusListener->ConvertScreenStatusToDmDevice(nodeInfo, devScreenStatus, devInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level0)
@@ -705,6 +741,27 @@ HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Leve
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    NodeStatusType type = NodeStatusType::TYPE_SCREEN_STATUS;
+    NodeStatus *status = nullptr;
+    softbusListener->OnDeviceScreenStatusChanged(type, status);
+    NodeBasicInfo nodeBasicInfo = {
+        .deviceName = {"device_001"},
+        .networkId = {"network_001"},
+        .deviceTypeId = 16789,
+        .osType = 24,
+        .osVersion = {1}
+    };
+    NodeStatus nodeStatus = {
+        .authStatus = 0,
+        .dataBaseStatus = 1,
+        .meshType = 2,
+        .reserved = {1},
+        .basicInfo = nodeBasicInfo
+    };
+    status = &nodeStatus;
+    softbusListener->OnDeviceScreenStatusChanged(type, status);
+    type = NodeStatusType::TYPE_AUTH_STATUS;
+    softbusListener->OnDeviceScreenStatusChanged(type, status);
     int32_t ret = softbusListener->RefreshSoftbusLNN(pkgName.c_str(), dmSubInfo, customData);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }

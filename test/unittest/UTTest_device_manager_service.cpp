@@ -1506,7 +1506,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     {
         "authType" : 1,
         "userId" : "123",
-        "credentialData" :
+        "credentialData" : "cryptosupportData",
         "CRYPTOSUPPORT" : "cryptosupportTest",
         "credentialType" : 1,
         "credentialId" : "104",
@@ -2230,7 +2230,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     EXPECT_NE(ret, DM_OK);
 }
 
-/**
+/**ll
  * @tc.name: StartDeviceDiscovery_007
  * @tc.desc: Call StartDeviceDiscovery twice with pkgName not null and flag bit not false and return
  * ERR_DM_DISCOVERY_REPEATED
@@ -2240,10 +2240,10 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_007, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test7";
-    DmSubscribeInfo subscribeInfo;
+    uint16_t subscribeId = 1;
     std::string extra = "test";
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
+    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
     EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
