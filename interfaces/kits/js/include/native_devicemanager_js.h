@@ -320,6 +320,7 @@ public:
     static void JsObjectToInt(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                               int32_t &fieldRef);
     static std::string JsObjectToString(const napi_env &env, const napi_value &param);
+    static bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue);
     static int32_t JsToDmSubscribeInfo(const napi_env &env, const napi_value &object,
                                        OHOS::DistributedHardware::DmSubscribeInfo &info);
     static void JsToDmPublishInfo(const napi_env &env, const napi_value &object,
