@@ -2230,7 +2230,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     EXPECT_NE(ret, DM_OK);
 }
 
-/**ll
+/**
  * @tc.name: StartDeviceDiscovery_007
  * @tc.desc: Call StartDeviceDiscovery twice with pkgName not null and flag bit not false and return
  * ERR_DM_DISCOVERY_REPEATED
