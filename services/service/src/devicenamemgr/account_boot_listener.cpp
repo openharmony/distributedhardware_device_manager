@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include "common_event_support.h"
+#include "device_manager_service.h"
 #include "parameter.h"
 
 #include "dm_log.h"
@@ -32,6 +34,8 @@ namespace {
     const char * const ACCOUNT_BOOT_EVENT = "account_boot_event";
 #endif
 }
+
+std::mutex AccountBootListener::lock_;
 
 static void AccountBootCb(const char *key, const char *value, void *context)
 {
@@ -60,7 +64,8 @@ static void AccountBootCb(const char *key, const char *value, void *context)
 }
 
 AccountBootListener::AccountBootListener() : isRegAccountBootCb_(false),
-    localDeviceMgr_(std::make_shared<LocalDeviceNameMgr>())
+    localDeviceMgr_(std::make_shared<LocalDeviceNameMgr>()), isDmSaReady_(false), isDataShareReady_(false),
+    dataShareCommonEventManager_(std::make_shared<DmDataShareCommonEventManager>())
 {
     LOGI("Ctor AccountBootListener");
 }
@@ -94,6 +99,58 @@ void AccountBootListener::DoAccountBootProc()
     localDeviceMgr_->RegisterDisplayNameChangeCb();
     localDeviceMgr_->QueryLocalDeviceName();
     localDeviceMgr_->QueryLocalDisplayName();
+}
+
+void AccountBootListener::SetSaTriggerFlag(SaTriggerFlag triggerFlag)
+{
+    LOGI("start");
+    std::lock_guard<std::mutex> lock(lock_);
+    switch (triggerFlag) {
+        case DM_SA_READY:
+            isDmSaReady_ = true;
+            LOGI("DM SA ready!");
+            break;
+        case DATA_SHARE_SA_REDDY:
+            LOGI("DATA SHARE SA ready!");
+            this->InitDataShareEvent();
+            break;
+        default:
+            break;
+    }
+    if (isDmSaReady_ && isDataShareReady_) {
+        LOGI("dm and data_share is ready!");
+        this->RegisterAccountBootCb();
+    }
+}
+
+void AccountBootListener::InitDataShareEvent()
+{
+    LOGI("Start");
+    if (dataShareCommonEventManager_ == nullptr) {
+        dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
+    }
+    DataShareEventCallback callback = [=]() {
+        this->DataShareCallback();
+    };
+    std::vector<std::string> dataShareEventVec;
+    dataShareEventVec.emplace_back(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(dataShareEventVec, callback)) {
+        LOGI("Success");
+    }
+    return;
+}
+
+void AccountBootListener::DataShareCallback()
+{
+    LOGI("Start");
+    std::lock_guard<std::mutex> lock(lock_);
+    isDataShareReady_ = true;
+    LOGI("isDmSaReady_:%{public}d", std::atomic_load(&isDmSaReady_));
+    LOGI("isDataShareReady_:%{public}d", std::atomic_load(&isDataShareReady_));
+    if (isDmSaReady_ && isDataShareReady_) {
+        LOGI("dm and data_share is ready!");
+        this->RegisterAccountBootCb();
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -17,15 +17,23 @@
 #define OHOS_ACCOUNT_BOOT_LISTENER_H
 #include <atomic>
 
+#include "dm_data_share_common_event.h"
 #include "local_device_name_mgr.h"
 namespace OHOS {
 namespace DistributedHardware {
+typedef enum SaTriggerFlag {
+    DM_SA_READY,
+    DATA_SHARE_SA_REDDY
+} SaTriggerFlag;
 class AccountBootListener {
 public:
     AccountBootListener();
     ~AccountBootListener();
     void RegisterAccountBootCb();
     void DoAccountBootProc();
+    void SetSaTriggerFlag(SaTriggerFlag triggerFlag);
+    void InitDataShareEvent();
+    void DataShareCallback();
 private:
     /**
      * @brief flag for is registered callback for account boot event
@@ -34,6 +42,10 @@ private:
      */
     std::atomic<bool> isRegAccountBootCb_;
     std::shared_ptr<LocalDeviceNameMgr> localDeviceMgr_;
+    std::atomic<bool> isDmSaReady_;
+    std::atomic<bool> isDataShareReady_;
+    static std::mutex lock_;
+    std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

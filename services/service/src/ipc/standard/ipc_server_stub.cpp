@@ -86,7 +86,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-        accountBootListener_->RegisterAccountBootCb();
+        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DM_SA_READY);
         return;
     }
 
@@ -114,6 +114,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         KVAdapterManager::GetInstance().ReInit();
+        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DATA_SHARE_SA_REDDY);
         return;
     }
 #endif
