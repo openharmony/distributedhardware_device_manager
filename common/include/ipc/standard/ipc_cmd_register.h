@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 #include "device_manager_ipc_interface_code.h"
@@ -76,6 +77,7 @@ public:
      */
     void RegisterSetRequestFunc(int32_t cmdCode, SetIpcRequestFunc setIpcRequestFunc)
     {
+        std::lock_guard<std::mutex> autoLock(setIpcRequestFuncMapLock_);
         setIpcRequestFuncMap_.emplace(cmdCode, setIpcRequestFunc);
     };
 
@@ -86,6 +88,7 @@ public:
      */
     void RegisterReadResponseFunc(int32_t cmdCode, ReadResponseFunc readResponseFunc)
     {
+        std::lock_guard<std::mutex> autoLock(readResponseFuncMapLock_);
         readResponseFuncMap_.emplace(cmdCode, readResponseFunc);
     };
 
@@ -96,6 +99,7 @@ public:
      */
     void RegisterCmdProcessFunc(int32_t cmdCode, OnIpcCmdFunc onIpcCmdFunc)
     {
+        std::lock_guard<std::mutex> autoLock(onIpcCmdFuncMapLock_);
         onIpcCmdFuncMap_.emplace(cmdCode, onIpcCmdFunc);
     };
 
@@ -121,8 +125,11 @@ public:
     int32_t OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply);
 
 private:
+    std::mutex setIpcRequestFuncMapLock_;
     std::unordered_map<int32_t, SetIpcRequestFunc> setIpcRequestFuncMap_;
+    std::mutex readResponseFuncMapLock_;
     std::unordered_map<int32_t, ReadResponseFunc> readResponseFuncMap_;
+    std::mutex onIpcCmdFuncMapLock_;
     std::unordered_map<int32_t, OnIpcCmdFunc> onIpcCmdFuncMap_;
 };
 } // namespace DistributedHardware
