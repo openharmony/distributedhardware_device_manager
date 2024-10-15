@@ -2245,14 +2245,17 @@ bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const D
     req->SetAccessCallee(callee);
     int32_t ret = ipcClientProxy_->SendRequest(CHECK_ACCESS_CONTROL, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret);
         LOGE("CheckAccessControl Send Request failed ret: %{public}d", ret);
         return false;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret);
         LOGE("CheckAccessControl Failed with ret: %{public}d", ret);
         return false;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", DM_OK);
     return true;
 }
 
@@ -2265,14 +2268,17 @@ bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const D
     req->SetAccessCallee(callee);
     int32_t ret = ipcClientProxy_->SendRequest(CHECK_SAME_ACCOUNT, req, rsp);
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret);
         LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
         return false;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret);
         LOGE("CheckIsSameAccount Failed with ret: %{public}d", ret);
         return false;
     }
+    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", DM_OK);
     return true;
 }
 

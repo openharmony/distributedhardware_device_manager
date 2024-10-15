@@ -21,12 +21,17 @@
 #include <iomanip>
 #include <cJSON.h>
 #include <errors.h>
-
 #include "hisysevent.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "parameter.h"
-
+#include "accesstoken_kit.h"
+#include "access_token.h"
+#include "hap_token_info.h"
+#include "ipc_skeleton.h"
+#include "native_token_info.h"
+#include "tokenid_kit.h"
+using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
@@ -41,6 +46,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", info.stageRes,
@@ -54,6 +60,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", info.stageRes,
@@ -80,6 +87,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -95,6 +103,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", SOFTBUSNAME,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -123,6 +132,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
@@ -135,6 +145,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
             "ORG_PKG", ORGPKGNAME,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
@@ -147,6 +158,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", info.hostName,
             "FUNC", info.funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_DISCOVER),
             "BIZ_STAGE", static_cast<int32_t>(DisCoverStage::DISCOVER_USER_DEAL_RES),
             "STAGE_RES", info.stageRes,
@@ -170,6 +182,7 @@ bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::stri
         "ORG_PKG", ORGPKGNAME,
         "FUNC", "AuthenticateDevice",
         "HOST_PKG", pkgName,
+        "API_TYPE", GetApiType(),
         "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_AUTHCATION),
         "BIZ_STAGE", static_cast<int32_t>(AuthStage::AUTH_START),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -577,6 +590,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         "ORG_PKG", ORGPKGNAME,
         "HOST_PKG", info.hostName,
         "FUNC", info.funcName,
+        "API_TYPE", GetApiType(),
         "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_DELET_TRUST_RELATION),
         "BIZ_STAGE", static_cast<int32_t>(DeleteTrust::DELETE_TRUST),
         "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -604,6 +618,7 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "CreatePinHolder",
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -624,6 +639,7 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "CreatePinHolder",
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::CREATE_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -653,6 +669,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "DestroyPinHolder",
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -671,6 +688,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", "DestroyPinHolder",
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(AuthScene::DM_PIN_HOLDER),
             "BIZ_STAGE", static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -746,6 +764,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
                 "ORG_PKG", ORGPKGNAME,
                 "HOST_PKG", hostName,
                 "FUNC", funcName,
+                "API_TYPE", GetApiType(),
                 "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_TRUST_DEVICE_LIST),
                 "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -761,6 +780,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_TRUST_DEVICE_LIST),
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -786,6 +806,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_BEHAVIOR),
             "BIZ_STAGE", DEFAULT_STAGE,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -799,6 +820,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             "ORG_PKG", ORGPKGNAME,
             "HOST_PKG", hostName,
             "FUNC", funcName,
+            "API_TYPE", GetApiType(),
             "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_BEHAVIOR),
             "BIZ_STAGE", DEFAULT_STAGE,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -827,6 +849,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "ORG_PKG", ORGPKGNAME,
                 "HOST_PKG", hostName,
                 "FUNC", funcName,
+                "API_TYPE", GetApiType(),
                 "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_LOCAL_DEVICE_INFO),
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -842,6 +865,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "ORG_PKG", ORGPKGNAME,
                 "HOST_PKG", hostName,
                 "FUNC", funcName,
+                "API_TYPE", GetApiType(),
                 "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_LOCAL_DEVICE_INFO),
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -873,6 +897,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "ORG_PKG", ORGPKGNAME,
                 "HOST_PKG", hostName,
                 "FUNC", funcName,
+                "API_TYPE", GetApiType(),
                 "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_DEVICE_INFO),
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -889,6 +914,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "ORG_PKG", ORGPKGNAME,
                 "HOST_PKG", hostName,
                 "FUNC", funcName,
+                "API_TYPE", GetApiType(),
                 "BIZ_SCENE", static_cast<int32_t>(DiscoverScene::DM_GET_DEVICE_INFO),
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
@@ -968,6 +994,22 @@ int32_t DmRadarHelper::GetErrCode(int32_t errCode)
         return errCode;
     }
     return flag->second;
+}
+
+int32_t DmRadarHelper::GetApiType()
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("GetApiType GetCallingTokenID error.");
+        return static_cast<int32_t>(ApiType::API_UNKNOW);
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        return static_cast<int32_t>(ApiType::API_JS);
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        return static_cast<int32_t>(ApiType::API_NATIVE);
+    }
+    return static_cast<int32_t>(ApiType::API_UNKNOW);
 }
 
 IDmRadarHelper *CreateDmRadarInstance()
