@@ -545,6 +545,21 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
     }
 }
 
+void DeviceManagerServiceListener::RemoveOnlinePkgName(const DmDeviceInfo &info)
+{
+    LOGI("udidHash: %{public}s.", GetAnonyString(info.deviceId).c_str());
+    {
+        std::lock_guard<std::mutex> autoLock(alreadyOnlinePkgNameLock_);
+        for (auto item = alreadyOnlinePkgName_.begin(); item != alreadyOnlinePkgName_.end();) {
+            if (std::string(item->second.deviceId) == std::string(info.deviceId)) {
+                item = alreadyOnlinePkgName_.erase(item);
+            } else {
+                ++item;
+            }
+        }
+    }
+}
+
 void DeviceManagerServiceListener::OnHandleCandidateRestrictStatus(const std::string &pkgName,
     const std::string &deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
