@@ -1733,7 +1733,7 @@ ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_pt
     return DM_OK;
 }
 
-ON_IPC_CMD(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string deviceId = data.ReadString();

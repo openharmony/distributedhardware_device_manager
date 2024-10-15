@@ -566,11 +566,11 @@ void DeviceManagerServiceListener::OnHandleCandidateRestrictStatus(const std::st
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
             pReq->SetPkgName(it);
-            ipcServerListener_.SendRequest(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, pReq, pRsp);
+            ipcServerListener_.SendRequest(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, pReq, pRsp);
         }
     } else {
         pReq->SetPkgName(pkgName);
-        ipcServerListener_.SendRequest(SERVER_IMPORT_CREDENTIAL_STATE_NOTIFY, pReq, pRsp);
+        ipcServerListener_.SendRequest(SERVER_CANDIDATE_RESTRICT_STATUS_NOTIFY, pReq, pRsp);
     }
 }
 } // namespace DistributedHardware
