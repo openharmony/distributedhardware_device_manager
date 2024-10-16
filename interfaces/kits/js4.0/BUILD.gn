@@ -60,7 +60,6 @@ ohos_shared_library("distributeddevicemanager") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "napi:ace_napi",
-    "node:node_header_notice",
   ]
 
   subsystem_name = "distributedhardware"

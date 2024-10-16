@@ -51,7 +51,6 @@
                 "kv_store",
                 "memmgr",
                 "napi",
-                "node",
                 "openssl",
                 "os_account",
                 "power_manager",
