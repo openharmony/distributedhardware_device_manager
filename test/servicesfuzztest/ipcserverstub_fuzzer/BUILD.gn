@@ -68,6 +68,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
