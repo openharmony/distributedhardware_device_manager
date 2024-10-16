@@ -26,13 +26,13 @@
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
-#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_hichain_proof_status_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_server_stub.h"
@@ -556,8 +556,8 @@ void DeviceManagerServiceListener::OnHichainProofExceptionStatus(const std::stri
     const std::string &deviceId, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> pReq =
-        std::make_shared<IpcNotifyHichainProofExceptionStatusReq>();
+    std::shared_ptr<IpcNotifyHichainProofStatusReq> pReq =
+        std::make_shared<IpcNotifyHichainProofStatusReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetDeviceId(deviceId);
     pReq->SetDeviceTypeId(deviceTypeId);

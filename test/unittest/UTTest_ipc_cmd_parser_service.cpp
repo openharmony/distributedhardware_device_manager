@@ -32,10 +32,10 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
-#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
+#include "ipc_notify_hichain_proof_status_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
@@ -1534,7 +1534,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_HICHAIN_PROOF_STATUS_NOTIFY;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> req = nullptr;
+    std::shared_ptr<IpcNotifyHichainProofStatusReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -1542,7 +1542,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyHichainProofExceptionStatusReq>();
+    req = std::make_shared<IpcNotifyHichainProofStatusReq>();
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "012345678";
     uint16_t deviceTypeId = 0x00;

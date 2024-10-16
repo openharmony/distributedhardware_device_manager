@@ -854,7 +854,7 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
 }
 
 void DeviceManagerServiceImpl::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                                             int32_t errcode)
+                                                           int32_t errcode)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
     deviceStateMgr_->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);

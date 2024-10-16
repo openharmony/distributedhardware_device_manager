@@ -59,7 +59,7 @@ public:
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
     static void OnHichainProofStatus(const char *deviceId, uint32_t deviceIdLen, uint16_t deviceTypeId,
-                                        int32_t errcode);
+                                     int32_t errcode);
     static void HichainProofExceptionProcess(std::string deviceId, uint16_t deviceTypeId, int32_t errcode);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);

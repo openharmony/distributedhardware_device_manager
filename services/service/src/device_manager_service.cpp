@@ -1995,7 +1995,7 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 }
 
 void DeviceManagerService::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                                         int32_t errcode)
+                                                       int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);

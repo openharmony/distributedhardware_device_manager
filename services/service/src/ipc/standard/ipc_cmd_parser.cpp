@@ -33,12 +33,12 @@
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
-#include "ipc_notify_candidaterestrict_status_req.h"
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_found_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_hichain_proof_status_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_server_client_proxy.h"
@@ -1575,12 +1575,11 @@ ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    LOGI("In");
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcNotifyHichainProofExceptionStatusReq> pReq =
-        std::static_pointer_cast<IpcNotifyHichainProofExceptionStatusReq>(pBaseReq);
+    std::shared_ptr<IpcNotifyHichainProofStatusReq> pReq =
+        std::static_pointer_cast<IpcNotifyHichainProofStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
     uint16_t deviceTypeId = pReq->GetDeviceTypeId();
@@ -1602,7 +1601,6 @@ ON_IPC_SET_REQUEST(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, std::shared_ptr<IpcReq> p
         LOGE("write errCode failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    LOGI("End.");
     return DM_OK;
 }
 

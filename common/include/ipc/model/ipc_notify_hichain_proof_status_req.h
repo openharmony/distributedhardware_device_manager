@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_NOTIFY_CANDIDATERESTRICT_STATUS_REQ_H
-#define OHOS_DM_IPC_NOTIFY_CANDIDATERESTRICT_STATUS_REQ_H
+#ifndef OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H
+#define OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H
 
 #include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcNotifyHichainProofExceptionStatusReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcNotifyHichainProofExceptionStatusReq);
+class IpcNotifyHichainProofStatusReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcNotifyHichainProofStatusReq);
 
 public:
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetPublishId
-     * @tc.desc: Get deviceId of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::GetPublishId
+     * @tc.desc: Get deviceId of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     std::string GetDeviceId() const
@@ -35,8 +35,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetPublishId
-     * @tc.desc: Set deviceId of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::SetPublishId
+     * @tc.desc: Set deviceId of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     void SetDeviceId(const std::string &deviceId)
@@ -45,8 +45,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetResult
-     * @tc.desc: Get DeviceType of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::GetResult
+     * @tc.desc: Get DeviceType of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     uint16_t GetDeviceTypeId() const
@@ -55,8 +55,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetResult
-     * @tc.desc: Set DeviceType of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::SetResult
+     * @tc.desc: Set DeviceType of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     void SetDeviceTypeId(uint16_t deviceTypeId)
@@ -65,8 +65,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::GetErrCode
-     * @tc.desc: Get ErrCode of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::GetErrCode
+     * @tc.desc: Get ErrCode of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     int32_t GetErrCode() const
@@ -75,8 +75,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofExceptionStatusReq::SetErrCode
-     * @tc.desc: Set ErrCode of the Ipc Notify Candidate Restrict Status Request
+     * @tc.name: IpcNotifyHichainProofStatusReq::SetErrCode
+     * @tc.desc: Set ErrCode of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
     void SetErrCode(int32_t errcode)
@@ -91,4 +91,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_NOTIFY_CANDIDATERESTRICT_STATUS_REQ_H
+#endif // OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H

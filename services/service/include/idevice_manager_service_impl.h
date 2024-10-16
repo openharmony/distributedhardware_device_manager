@@ -274,7 +274,7 @@ public:
     virtual void HandleUserSwitched(int32_t switchUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                               int32_t errcode) = 0;
+                                             int32_t errcode) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
