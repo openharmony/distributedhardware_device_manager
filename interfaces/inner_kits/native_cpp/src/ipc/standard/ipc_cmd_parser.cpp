@@ -1735,6 +1735,7 @@ ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_pt
 
 ON_IPC_CMD(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
+    LOGI("In.");
     std::string pkgName = data.ReadString();
     std::string deviceId = data.ReadString();
     uint16_t deviceTypeId = data.ReadUint16();
@@ -1742,6 +1743,7 @@ ON_IPC_CMD(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, MessageParcel &data, MessageParce
     DeviceManagerNotify::GetInstance().OnHichainProofExceptionStatus(pkgName, deviceId, deviceTypeId, errCode);
 
     reply.WriteInt32(DM_OK);
+    LOGI("End.");
     return DM_OK;
 }
 } // namespace DistributedHardware

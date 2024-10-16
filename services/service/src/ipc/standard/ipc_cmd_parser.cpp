@@ -1575,6 +1575,7 @@ ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
+    LOGI("In");
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
@@ -1601,6 +1602,7 @@ ON_IPC_SET_REQUEST(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, std::shared_ptr<IpcReq> p
         LOGE("write errCode failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    LOGI("End.");
     return DM_OK;
 }
 
