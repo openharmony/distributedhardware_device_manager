@@ -528,7 +528,7 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
 }
 
 void DmDeviceStateManager::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                                         int32_t errcode)
+                                                       int32_t errcode)
 {
     if (softbusConnector_ == nullptr || listener_ == nullptr) {
         LOGE("Failed, callback_ptr is null.");
