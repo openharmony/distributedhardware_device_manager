@@ -138,7 +138,7 @@ public:
     void HandleUserSwitched(int32_t switchUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                       int32_t errcode);
+                                     int32_t errcode);
 
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);

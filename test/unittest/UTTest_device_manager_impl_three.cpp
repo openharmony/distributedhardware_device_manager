@@ -1345,7 +1345,6 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_003, testing::ext::TestSiz
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
-
 HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "";
