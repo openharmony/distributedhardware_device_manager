@@ -121,7 +121,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
     .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
     .onNodeStatusChanged = SoftbusListener::OnDeviceScreenStatusChanged,
-    .onHichainProofException = SoftbusListener::OnHichainProofStatus,
+    // .onHichainProofException = SoftbusListener::OnHichainProofStatus,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
