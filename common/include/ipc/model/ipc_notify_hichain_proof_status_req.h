@@ -25,7 +25,7 @@ class IpcNotifyHichainProofStatusReq : public IpcReq {
 
 public:
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::GetPublishId
+     * @tc.name: IpcNotifyHichainProofStatusReq::GetDeviceId
      * @tc.desc: Get deviceId of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
@@ -35,7 +35,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::SetPublishId
+     * @tc.name: IpcNotifyHichainProofStatusReq::SetDeviceId
      * @tc.desc: Set deviceId of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
@@ -45,7 +45,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::GetResult
+     * @tc.name: IpcNotifyHichainProofStatusReq::GetDeviceTypeId
      * @tc.desc: Get DeviceType of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
@@ -55,7 +55,7 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::SetResult
+     * @tc.name: IpcNotifyHichainProofStatusReq::SetDeviceTypeId
      * @tc.desc: Set DeviceType of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
      */
