@@ -109,6 +109,12 @@ enum class TrustStatus : int32_t {
     IS_TRUST = 0x1,
 };
 
+enum class ApiType : int32_t {
+    API_UNKNOW = 0x0,
+    API_JS = 0x1,
+    API_NATIVE = 0x2,
+};
+
 enum class CommServ : int32_t {
     NOT_USE_SOFTBUS = 0x0,
     USE_SOFTBUS = 0x1,
@@ -219,6 +225,7 @@ public:
 private:
     std::string GetAnonyUdid(std::string udid);
     std::string GetAnonyLocalUdid();
+    int32_t GetApiType();
 };
 
 extern "C" IDmRadarHelper *CreateDmRadarInstance();

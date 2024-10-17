@@ -476,6 +476,7 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d.", sessionId);
     }
+    LOGI("OnSessionOpened, peerDeviceId: %{public}s.", GetAnonyString(peerDeviceId).c_str());
     DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(static_cast<int32_t>(PinHolderStage::SESSION_OPENED),
         std::string("OnSessionOpened"), std::string(peerDeviceId));
     sessionId_ = sessionId;
