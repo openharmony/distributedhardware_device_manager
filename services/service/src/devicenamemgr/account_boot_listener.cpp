@@ -39,6 +39,10 @@ std::mutex AccountBootListener::lock_;
 
 static void AccountBootCb(const char *key, const char *value, void *context)
 {
+    if (key == nullptr || value == nullptr) {
+        LOGE("key or value is null, param is error!");
+        return;
+    }
     if (strcmp(key, BOOTEVENT_ACCOUNT_READY) != 0 || strcmp(value, "true") != 0) {
         return;
     }
@@ -117,6 +121,8 @@ void AccountBootListener::SetSaTriggerFlag(SaTriggerFlag triggerFlag)
         default:
             break;
     }
+    LOGI("isDmSaReady_:%{public}d,isDataShareReady_:%{public}d",
+        std::atomic_load(&isDmSaReady_),std::atomic_load(&isDataShareReady_));
     if (isDmSaReady_ && isDataShareReady_) {
         LOGI("dm and data_share is ready!");
         this->RegisterAccountBootCb();
@@ -145,8 +151,8 @@ void AccountBootListener::DataShareCallback()
     LOGI("Start");
     std::lock_guard<std::mutex> lock(lock_);
     isDataShareReady_ = true;
-    LOGI("isDmSaReady_:%{public}d", std::atomic_load(&isDmSaReady_));
-    LOGI("isDataShareReady_:%{public}d", std::atomic_load(&isDataShareReady_));
+    LOGI("isDmSaReady_:%{public}d,isDataShareReady_:%{public}d",
+        std::atomic_load(&isDmSaReady_),std::atomic_load(&isDataShareReady_));
     if (isDmSaReady_ && isDataShareReady_) {
         LOGI("dm and data_share is ready!");
         this->RegisterAccountBootCb();

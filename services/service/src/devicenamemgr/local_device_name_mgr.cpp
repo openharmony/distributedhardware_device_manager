@@ -76,6 +76,10 @@ int32_t LocalDeviceNameMgr::GetDeviceNameFromDataShareHelper(
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, std::shared_ptr<Uri> uri,
     const char *key, std::string &deviceName)
 {
+    if (uri == nullptr || key == nullptr) {
+        LOGE("uri or key is null, param is error!");
+        return ERR_DM_FAILED;
+    }
     int32_t numRows = 0;
     std::string val;
     std::vector<std::string> columns;
@@ -122,6 +126,7 @@ int32_t LocalDeviceNameMgr::GetUserDefinedDeviceName(std::shared_ptr<DataShare::
 {
     int32_t osAccountId = GetActiveOsAccountIds();
     if (osAccountId == ERR_DM_FAILED) {
+        LOGE("osAccountId acquire fail!");
         return ERR_DM_FAILED;
     }
     std::string accountIdStr = std::to_string(osAccountId);
@@ -136,6 +141,7 @@ int32_t LocalDeviceNameMgr::GetDisplayDeviceName(std::shared_ptr<DataShare::Data
 {
     int32_t osAccountId = GetActiveOsAccountIds();
     if (osAccountId == ERR_DM_FAILED) {
+        LOGE("osAccountId acquire fail!");
         return ERR_DM_FAILED;
     }
     std::string accountIdStr = std::to_string(osAccountId);
