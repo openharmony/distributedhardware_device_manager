@@ -1345,7 +1345,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_003, testing::ext::TestSiz
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
-HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
@@ -1354,7 +1354,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_001, tes
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_002, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.candidateRestrict01";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback = nullptr;
@@ -1362,7 +1362,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_002, tes
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_003, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.scandidateRestrict02";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
@@ -1371,14 +1371,14 @@ HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_003, tes
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerImplTest, UnRegisterCandidateRestrictStatusCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, UnRegisterHichainProofExceptionStatusCallback_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.candidateRestrict03";
     int32_t ret = DeviceManager::GetInstance().UnRegisterHichainProofExceptionStatusCallback(packName);
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerImplTest, UnRegisterCandidateRestrictStatusCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerImplTest, UnRegisterHichainProofExceptionStatusCallback_002, testing::ext::TestSize.Level0)
 {
     std::string packName = "";
     int32_t ret = DeviceManager::GetInstance().UnRegisterHichainProofExceptionStatusCallback(packName);
