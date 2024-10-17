@@ -2304,6 +2304,7 @@ int32_t DmAuthManager::CheckTrustState()
                 CompatiblePutAcl();
             }
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return ALREADY_BIND;
         }
