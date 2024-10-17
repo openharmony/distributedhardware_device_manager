@@ -530,18 +530,11 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
 void DmDeviceStateManager::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
                                                        int32_t errcode)
 {
-    if (softbusConnector_ == nullptr || listener_ == nullptr) {
-        LOGE("Failed, callback_ptr is null.");
+    if (listener_ == nullptr) {
+        LOGE("Failed, listener_ is null.");
         return;
     }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    if (pkgName.size() == 0) {
-        listener_->OnHichainProofExceptionStatus(std::string(DM_PKG_NAME), deviceId, deviceTypeId, errcode);
-    } else {
-        for (auto item : pkgName) {
-            listener_->OnHichainProofExceptionStatus(item, deviceId, deviceTypeId, errcode);
-        }
-    }
+    listener_->OnHichainProofExceptionStatus(std::string(DM_PKG_NAME), deviceId, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
