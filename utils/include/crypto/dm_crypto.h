@@ -27,6 +27,9 @@ public:
         const char *inBuf, uint32_t inLen);
     static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
     static std::string GetGroupIdHash(const std::string &groupId);
+    static int32_t GetSecRandom(uint8_t *out, size_t outLen);
+    static std::string GetSecSalt();
+    static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

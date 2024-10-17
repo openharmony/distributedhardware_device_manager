@@ -35,6 +35,7 @@ group("unittest") {
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
+    ":UTTest_dm_crypto",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_dfx",
@@ -1076,6 +1077,21 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
 }
 
 ## UnitTest UTTest_dm_distributed_hardware_load }}}
+
+## UnitTest UTTest_dm_crypto {{{
+ohos_unittest("UTTest_dm_crypto") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_crypto.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = []
+}
+
+## UnitTest UTTest_dm_crypto }}}
 
 ## UnitTest UTTest_dm_publish_manager {{{
 ohos_unittest("UTTest_dm_publish_manager") {
