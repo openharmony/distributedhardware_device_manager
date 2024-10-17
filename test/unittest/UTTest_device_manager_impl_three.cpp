@@ -1348,7 +1348,8 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_003, testing::ext::TestSiz
 HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "";
-    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback = std::make_shared<CandidateRestrictStatusCallbackTest>();
+    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
+        std::make_shared<CandidateRestrictStatusCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().RegisterHichainProofExceptionStatusCallback(packName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1364,7 +1365,8 @@ HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_002, tes
 HWTEST_F(DeviceManagerImplTest, RegisterCandidateRestrictStatusCallback_003, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.scandidateRestrict02";
-    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback = std::make_shared<CandidateRestrictStatusCallbackTest>();
+    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
+        std::make_shared<CandidateRestrictStatusCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().RegisterHichainProofExceptionStatusCallback(packName, callback);
     ASSERT_EQ(ret, DM_OK);
 }
