@@ -274,6 +274,7 @@ public:
     virtual void HandleUserSwitched(int32_t switchUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode) = 0;
+    virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

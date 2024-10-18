@@ -26,6 +26,7 @@
 #endif
 #include "system_ability_definition.h"
 
+#include "app_manager.h"
 #include "auth_message_processor.h"
 #include "common_event_support.h"
 #include "dm_ability_manager.h"
@@ -164,6 +165,25 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
     return DM_OK;
 }
 
+int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
+{
+    nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if (!jsonObject.is_discarded()) {
+        if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
+            int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+            if (bindLevel > APP || bindLevel < INVALID_TYPE) {
+                LOGE("bindlevel error %{public}d.", bindLevel);
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            if (bindLevel == DEVICE && !IsAllowDeviceBind()) {
+                LOGE("not allowd device level bind bindlevel: %{public}d.", bindLevel);
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+        }
+    }
+    return DM_OK;
+}
+
 void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
@@ -207,6 +227,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
+        authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
     }
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
@@ -245,6 +266,11 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        return ret;
+    }
+    ret = CheckAuthParamVaildExtra(extra);
+    if (ret != DM_OK) {
+        LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
         return ret;
     }
     isAuthenticateDevice_ = true;
@@ -1229,8 +1255,7 @@ void DmAuthManager::AuthenticateFinish()
     }
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
-        authResponseContext_->bindLevel == INVALIED_TYPE && softbusConnector_->CheckIsOnline(remoteDeviceId_) &&
-        authResponseContext_->isFinish) {
+        softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
 
@@ -2450,6 +2475,28 @@ int32_t DmAuthManager::GetTaskTimeout(const char* taskName, int32_t taskTimeOut)
         }
     }
     return taskTimeOut;
+}
+
+bool DmAuthManager::IsAllowDeviceBind()
+{
+    if (AppManager::GetInstance().IsSystemSA()) {
+        return true;
+    }
+    return false;
+}
+
+int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
+{
+    if (IsAllowDeviceBind()) {
+        if (bindLevel == INVALIED_TYPE || bindLevel > APP || bindLevel < DEVICE) {
+            return DEVICE;
+        }
+        return bindLevel;
+    }
+    if (bindLevel == INVALIED_TYPE || (bindLevel != APP && bindLevel != SERVICE)) {
+        return APP;
+    }
+    return bindLevel;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

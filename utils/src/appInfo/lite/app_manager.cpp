@@ -41,5 +41,10 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
     (void)appId;
     return DM_OK;
 }
+
+bool AppManager::IsSystemSA()
+{
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -948,6 +948,9 @@ bool DeviceManagerService::IsDMServiceImplReady()
     }
 
     dmServiceImpl_ = std::shared_ptr<IDeviceManagerServiceImpl>(func());
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
         dlclose(so_handle);
         dmServiceImpl_ = nullptr;
@@ -1982,7 +1985,10 @@ void DeviceManagerService::SubscribePackageCommonEvent()
     if (packageCommonEventManager_ == nullptr) {
         packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
     }
-    PackageEventCallback callback = [=](const auto &arg1, const auto &arg2) {
+    PackageEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
+        if (IsDMServiceImplReady()) {
+            dmServiceImpl_->ProcessAppUnintall(arg1, arg3);
+        }
         KVAdapterManager::GetInstance().AppUnintall(arg1);
     };
     std::vector<std::string> commonEventVec;

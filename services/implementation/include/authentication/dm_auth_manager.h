@@ -464,6 +464,7 @@ public:
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    int32_t CheckAuthParamVaildExtra(const std::string &extra);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
     std::string GetAccountGroupIdHash();
@@ -528,6 +529,8 @@ private:
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
+    bool IsAllowDeviceBind();
+    int32_t GetBindLevel(int32_t bindLevel);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

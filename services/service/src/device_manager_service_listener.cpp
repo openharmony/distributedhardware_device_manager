@@ -572,5 +572,17 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkg
         ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
     }
 }
+
+void DeviceManagerServiceListener::OnAppUnintall(const std::string &pkgName)
+{
+    std::lock_guard<std::mutex> autoLock(alreadyOnlinePkgNameLock_);
+    for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
+        if (it->first.find(pkgName) == 0) {
+            it = alreadyOnlinePkgName_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

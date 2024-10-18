@@ -36,6 +36,7 @@ using OHOS::EventFwk::CommonEventManager;
 constexpr const char* DEAL_THREAD = "package_common_event";
 #endif
 const std::string APP_ID = "appId";
+const std::string ACCESS_TOKEN_ID = "accessTokenId";
 constexpr int32_t MAX_TRY_TIMES = 3;
 
 std::vector<std::string> DmPackageEventSubscriber::GetSubscriberEventNameVec() const
@@ -136,6 +137,7 @@ void DmPackageEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     std::string appId = data.GetWant().GetStringParam(APP_ID);
+    int32_t accessTokenId = static_cast<int32_t>(data.GetWant().GetIntParam(ACCESS_TOKEN_ID, 0));
     LOGI("Received package event: %{public}s", receiveEvent.c_str());
 
     if (receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_FULLY_REMOVED &&
@@ -144,7 +146,7 @@ void DmPackageEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(appId, receiveEvent); });
+    ffrt::submit([=]() { callback_(appId, receiveEvent, accessTokenId); });
 #else
     std::thread dealThread([=]() { callback_(appId, receiveEvent); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);

@@ -137,5 +137,19 @@ bool AppManager::GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManag
     }
     return true;
 }
+
+bool AppManager::IsSystemSA()
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("IsSystemSA GetCallingTokenID error.");
+        return false;
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

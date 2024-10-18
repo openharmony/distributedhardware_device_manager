@@ -29,6 +29,7 @@ public:
     void RegisterCallerAppId(const std::string &pkgName);
     void UnRegisterCallerAppId(const std::string &pkgName);
     int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
+    bool IsSystemSA();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
