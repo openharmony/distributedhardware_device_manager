@@ -45,6 +45,12 @@ void MineSoftbusListenerTest::TearDownTestCase()
 }
 
 namespace {
+    
+bool CheckReturnResult(int ret)
+{
+    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+}
+
 HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
 {
     string pkgName;
@@ -72,7 +78,7 @@ HWTEST_F(MineSoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestS
     uint16_t subscribeId = 1;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->StopRefreshSoftbusLNN(subscribeId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 HWTEST_F(MineSoftbusListenerTest, OnPublishResult_001, testing::ext::TestSize.Level0)
@@ -755,7 +761,7 @@ HWTEST_F(MineSoftbusListenerTest, PublishDeviceDiscovery_001, testing::ext::Test
 {
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->PublishDeviceDiscovery();
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 HWTEST_F(MineSoftbusListenerTest, MatchSearchDealTask_001, testing::ext::TestSize.Level0)

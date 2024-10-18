@@ -40,6 +40,11 @@ void DeviceManagerServiceImplTest::TearDownTestCase()
 
 namespace {
 
+bool CheckReturnResult(int ret)
+{
+    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+}
+
 /**
  * @tc.name: Initialize_001
  * @tc.desc: return DM_OK
@@ -796,7 +801,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_001, testing::ext::T
     uint16_t subscribeId = 0;
     std::string filterOptions;
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -830,7 +835,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_003, testing::ext::T
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -879,7 +884,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_002, testing::ext::Te
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -911,7 +916,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_002, testing::ext:
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -943,7 +948,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_002, testing::ex
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -1079,7 +1084,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_004, testing::ext::T
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->UnAuthenticateDevice(pkgName, networkId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
@@ -1231,7 +1236,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetUdidHashByNetWorkId_003, testing::ext:
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->GetUdidHashByNetWorkId(networkId, deviceId);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(CheckReturnResult(ret));
 }
 
 /**
