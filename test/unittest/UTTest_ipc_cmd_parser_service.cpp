@@ -24,6 +24,7 @@
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
@@ -35,7 +36,6 @@
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
-#include "ipc_notify_hichain_proof_status_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
@@ -1532,9 +1532,9 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = SERVER_HICHAIN_PROOF_STATUS_NOTIFY;
+    int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyHichainProofStatusReq> req = nullptr;
+    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -1542,7 +1542,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyHichainProofStatusReq>();
+    req = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
     std::string pkgName = "com.ohos.test";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
@@ -1557,7 +1557,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
 {
-    int32_t cmdCode = SERVER_HICHAIN_PROOF_STATUS_NOTIFY;
+    int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 } // namespace

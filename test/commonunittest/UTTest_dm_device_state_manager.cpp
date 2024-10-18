@@ -257,7 +257,7 @@ HWTEST_F(DmDeviceStateManagerTest, HandleCandidateRestrictStatus_001, testing::e
 {
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    dmDeviceStateManager->HichainProofExceptionStatus(deviceTypeId, errcode);
+    dmDeviceStateManager->CredentialAuthStatus(deviceTypeId, errcode);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 } // namespace

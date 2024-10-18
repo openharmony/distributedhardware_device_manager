@@ -149,12 +149,12 @@ public:
     virtual void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) = 0;
 };
 
-class HichainProofExceptionStatusCallback {
+class CredentialAuthStatusCallback {
 public:
-    virtual ~HichainProofExceptionStatusCallback()
+    virtual ~CredentialAuthStatusCallback()
     {
     }
-    virtual void OnHichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode) = 0;
+    virtual void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H
-#define OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H
+#ifndef OHOS_DM_IPC_NOTIFY_CREDENTIAL_AUTH_STATUS_REQ_H
+#define OHOS_DM_IPC_NOTIFY_CREDENTIAL_AUTH_STATUS_REQ_H
 
 #include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcNotifyHichainProofStatusReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcNotifyHichainProofStatusReq);
+class IpcNotifyCredentialAuthStatusReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcNotifyCredentialAuthStatusReq);
 
 public:
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::GetDeviceTypeId
-     * @tc.desc: Get DeviceType of the Ipc Notify Hichain proof Status Request
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::GetDeviceTypeId
+     * @tc.desc: Get DeviceType of the Ipc Notify Credential Auth Status Request
      * @tc.type: FUNC
      */
     uint16_t GetDeviceTypeId() const
@@ -35,8 +35,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::SetDeviceTypeId
-     * @tc.desc: Set DeviceType of the Ipc Notify Hichain proof Status Request
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::SetDeviceTypeId
+     * @tc.desc: Set DeviceType of the Ipc Notify Credential Auth Status Request
      * @tc.type: FUNC
      */
     void SetDeviceTypeId(uint16_t deviceTypeId)
@@ -45,8 +45,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::GetErrCode
-     * @tc.desc: Get ErrCode of the Ipc Notify Hichain proof Status Request
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::GetErrCode
+     * @tc.desc: Get ErrCode of the Ipc Notify Credential Auth Status Request
      * @tc.type: FUNC
      */
     int32_t GetErrCode() const
@@ -55,8 +55,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::SetErrCode
-     * @tc.desc: Set ErrCode of the Ipc Notify Hichain proof Status Request
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::SetErrCode
+     * @tc.desc: Set ErrCode of the Ipc Notify Credential Auth Status Request
      * @tc.type: FUNC
      */
     void SetErrCode(int32_t errcode)
@@ -70,4 +70,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_NOTIFY_HICHAIN_PROOF_STATUS_REQ_H
+#endif // OHOS_DM_IPC_NOTIFY_CREDENTIAL_AUTH_STATUS_REQ_H

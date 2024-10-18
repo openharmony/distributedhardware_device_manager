@@ -201,7 +201,7 @@ public:
         int32_t &screenStatus);
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
-    void HichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode);
+    void CredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

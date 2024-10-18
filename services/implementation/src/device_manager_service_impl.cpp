@@ -853,10 +853,10 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
 }
 
-void DeviceManagerServiceImpl::HichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode)
+void DeviceManagerServiceImpl::CredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
-    deviceStateMgr_->HichainProofExceptionStatus(deviceTypeId, errcode);
+    deviceStateMgr_->CredentialAuthStatus(deviceTypeId, errcode);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

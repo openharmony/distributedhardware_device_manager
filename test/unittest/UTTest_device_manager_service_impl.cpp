@@ -1506,7 +1506,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleCandidateRestrictStatus_101, testin
 {
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    deviceManagerServiceImpl_->HichainProofExceptionStatus(deviceTypeId, errcode);
+    deviceManagerServiceImpl_->CredentialAuthStatus(deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 } // namespace

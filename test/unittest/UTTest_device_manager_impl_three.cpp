@@ -1350,7 +1350,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_001,
     std::string packName = "";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
         std::make_shared<CandidateRestrictStatusCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().RegisterHichainProofExceptionStatusCallback(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1358,7 +1358,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_002,
 {
     std::string packName = "com.ohos.candidateRestrict01";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback = nullptr;
-    int32_t ret = DeviceManager::GetInstance().RegisterHichainProofExceptionStatusCallback(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1367,21 +1367,21 @@ HWTEST_F(DeviceManagerImplTest, RegisterHichainProofExceptionStatusCallback_003,
     std::string packName = "com.ohos.scandidateRestrict02";
     std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
         std::make_shared<CandidateRestrictStatusCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().RegisterHichainProofExceptionStatusCallback(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
     ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterHichainProofExceptionStatusCallback_001, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.candidateRestrict03";
-    int32_t ret = DeviceManager::GetInstance().UnRegisterHichainProofExceptionStatusCallback(packName);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
     ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterHichainProofExceptionStatusCallback_002, testing::ext::TestSize.Level0)
 {
     std::string packName = "";
-    int32_t ret = DeviceManager::GetInstance().UnRegisterHichainProofExceptionStatusCallback(packName);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace

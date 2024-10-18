@@ -160,11 +160,11 @@ public:
     virtual void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceListener::OnHichainProofExceptionStatus
+     * @tc.name: IDeviceManagerServiceListener::OnCredentialAuthStatus
      * @tc.desc: Candidate Restrict Status Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId,
+    virtual void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
                                                int32_t errcode) = 0;
 };
 } // namespace DistributedHardware

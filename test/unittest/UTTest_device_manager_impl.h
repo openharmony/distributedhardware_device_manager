@@ -118,12 +118,12 @@ public:
     void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
 };
 
-class CandidateRestrictStatusCallbackTest : public HichainProofExceptionStatusCallback {
+class CandidateRestrictStatusCallbackTest : public CredentialAuthStatusCallback {
 public:
     virtual ~CandidateRestrictStatusCallbackTest()
     {
     }
-    void OnHichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode) override {}
+    void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

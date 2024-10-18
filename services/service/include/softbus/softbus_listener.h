@@ -58,8 +58,8 @@ public:
     static void DeviceTrustedChange(const std::string &msg);
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
-    static void OnHichainProofStatus(uint16_t deviceTypeId, int32_t errcode);
-    static void HichainProofExceptionProcess(uint16_t deviceTypeId, int32_t errcode);
+    static void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode);
+    static void CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();

@@ -1733,12 +1733,12 @@ ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_pt
     return DM_OK;
 }
 
-ON_IPC_CMD(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     uint16_t deviceTypeId = data.ReadUint16();
     int32_t errCode = data.ReadInt32();
-    DeviceManagerNotify::GetInstance().OnHichainProofExceptionStatus(pkgName, deviceTypeId, errCode);
+    DeviceManagerNotify::GetInstance().OnCredentialAuthStatus(pkgName, deviceTypeId, errCode);
 
     reply.WriteInt32(DM_OK);
     return DM_OK;

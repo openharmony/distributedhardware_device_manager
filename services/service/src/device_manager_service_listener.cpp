@@ -23,6 +23,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
@@ -32,7 +33,6 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
-#include "ipc_notify_hichain_proof_status_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_server_stub.h"
@@ -552,12 +552,12 @@ void DeviceManagerServiceListener::RemoveOnlinePkgName(const DmDeviceInfo &info)
     }
 }
 
-void DeviceManagerServiceListener::OnHichainProofExceptionStatus(const std::string &pkgName,
+void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkgName,
     uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcNotifyHichainProofStatusReq> pReq =
-        std::make_shared<IpcNotifyHichainProofStatusReq>();
+    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
+        std::make_shared<IpcNotifyCredentialAuthStatusReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetDeviceTypeId(deviceTypeId);
     pReq->SetErrCode(errcode);
@@ -565,11 +565,11 @@ void DeviceManagerServiceListener::OnHichainProofExceptionStatus(const std::stri
         std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
         for (const auto &it : PkgNameVec) {
             pReq->SetPkgName(it);
-            ipcServerListener_.SendRequest(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, pReq, pRsp);
+            ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
         }
     } else {
         pReq->SetPkgName(pkgName);
-        ipcServerListener_.SendRequest(SERVER_HICHAIN_PROOF_STATUS_NOTIFY, pReq, pRsp);
+        ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
     }
 }
 } // namespace DistributedHardware

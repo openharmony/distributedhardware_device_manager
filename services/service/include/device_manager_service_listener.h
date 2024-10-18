@@ -73,7 +73,7 @@ public:
         const std::string &content) override;
     void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override;
     void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override;
-    void OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override;
+    void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);

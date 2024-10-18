@@ -1994,10 +1994,10 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::HichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode)
+void DeviceManagerService::CredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HichainProofExceptionStatus(deviceTypeId, errcode);
+        dmServiceImpl_->CredentialAuthStatus(deviceTypeId, errcode);
     }
 }
 } // namespace DistributedHardware

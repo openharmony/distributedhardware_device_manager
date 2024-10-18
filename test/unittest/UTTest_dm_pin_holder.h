@@ -193,7 +193,7 @@ public:
         (void)devInfo;
     }
 
-    void OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override
+    void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override
     {
         (void)pkgName;
         (void)deviceTypeId;
