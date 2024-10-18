@@ -1544,11 +1544,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 
     req = std::make_shared<IpcNotifyHichainProofStatusReq>();
     std::string pkgName = "com.ohos.test";
-    std::string deviceId = "012345678";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
     req->SetPkgName(pkgName);
-    req->SetDeviceId(deviceId);
     req->SetDeviceTypeId(deviceTypeId);
     req->SetErrCode(errcode);
     if (ptr) {
