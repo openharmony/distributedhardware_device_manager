@@ -1169,8 +1169,8 @@ void DeviceManagerNotify::UnRegisterHichainProofExceptionStatusCallback(const st
     hichainProofExceptionStatusCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnHichainProofExceptionStatus(const std::string &pkgName, const std::string &deviceId,
-                                                        uint16_t deviceTypeId, int32_t errcode)
+void DeviceManagerNotify::OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId,
+                                                        int32_t errcode)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -1190,7 +1190,7 @@ void DeviceManagerNotify::OnHichainProofExceptionStatus(const std::string &pkgNa
         LOGE("error, registered hichain proof exception status callback is nullptr.");
         return;
     }
-    tempCbk->OnHichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
+    tempCbk->OnHichainProofExceptionStatus(deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

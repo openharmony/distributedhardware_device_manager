@@ -25,26 +25,6 @@ class IpcNotifyHichainProofStatusReq : public IpcReq {
 
 public:
     /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::GetDeviceId
-     * @tc.desc: Get deviceId of the Ipc Notify Hichain proof Status Request
-     * @tc.type: FUNC
-     */
-    std::string GetDeviceId() const
-    {
-        return deviceId_;
-    }
-
-    /**
-     * @tc.name: IpcNotifyHichainProofStatusReq::SetDeviceId
-     * @tc.desc: Set deviceId of the Ipc Notify Hichain proof Status Request
-     * @tc.type: FUNC
-     */
-    void SetDeviceId(const std::string &deviceId)
-    {
-        deviceId_ = deviceId;
-    }
-
-    /**
      * @tc.name: IpcNotifyHichainProofStatusReq::GetDeviceTypeId
      * @tc.desc: Get DeviceType of the Ipc Notify Hichain proof Status Request
      * @tc.type: FUNC
@@ -85,7 +65,6 @@ public:
     }
 
 private:
-    std::string deviceId_;
     uint16_t deviceTypeId_ = 0;
     int32_t errcode_ = 0;
 };

@@ -255,10 +255,9 @@ HWTEST_F(DmDeviceStateManagerTest, ProcNotifyEvent_001, testing::ext::TestSize.L
 
 HWTEST_F(DmDeviceStateManagerTest, HandleCandidateRestrictStatus_001, testing::ext::TestSize.Level0)
 {
-    std::string deviceId = "1234567890";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    dmDeviceStateManager->HichainProofExceptionStatus(deviceId, deviceTypeId, errcode);
+    dmDeviceStateManager->HichainProofExceptionStatus(deviceTypeId, errcode);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 } // namespace

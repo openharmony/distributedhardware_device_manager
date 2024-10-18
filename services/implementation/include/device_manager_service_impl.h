@@ -131,8 +131,7 @@ public:
     void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                     int32_t errcode);
+    void HichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

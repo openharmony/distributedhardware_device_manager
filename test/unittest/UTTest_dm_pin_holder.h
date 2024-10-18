@@ -193,11 +193,9 @@ public:
         (void)devInfo;
     }
 
-    void OnHichainProofExceptionStatus(const std::string &pkgName, const std::string &deviceId,
-                                       uint16_t deviceTypeId, int32_t errcode) override
+    void OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override
     {
         (void)pkgName;
-        (void)deviceId;
         (void)deviceTypeId;
         (void)errcode;
     }

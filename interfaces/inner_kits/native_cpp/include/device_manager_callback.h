@@ -154,8 +154,7 @@ public:
     virtual ~HichainProofExceptionStatusCallback()
     {
     }
-    virtual void OnHichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                               int32_t errcode) = 0;
+    virtual void OnHichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

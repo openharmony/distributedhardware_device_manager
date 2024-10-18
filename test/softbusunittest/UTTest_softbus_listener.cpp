@@ -731,13 +731,11 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     softbusListener->OnDeviceTrustedChange(type, msg1, msgLen2);
     softbusListener->OnDeviceTrustedChange(type, msg2, msgLen2);
     softbusListener->SendAclChangedBroadcast(msg);
-    char deviceId[DM_MAX_DEVICE_ID_LEN] = "XXX";
     uint16_t deviceTypeId = 0;
     int32_t errcode = -1;
-    softbusListener->OnHichainProofStatus(deviceId, DM_MAX_DEVICE_ID_LEN, deviceTypeId, errcode);
-    std::string deviceId2 = "1234567890";
+    softbusListener->OnHichainProofStatus(deviceTypeId, errcode);
     deviceTypeId = 0xA2F;
-    softbusListener->HichainProofExceptionProcess(deviceId2, deviceTypeId, errcode);
+    softbusListener->HichainProofExceptionProcess(deviceTypeId, errcode);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
 } // namespace

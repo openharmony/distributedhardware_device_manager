@@ -123,8 +123,7 @@ public:
     virtual ~CandidateRestrictStatusCallbackTest()
     {
     }
-    void OnHichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                       int32_t errcode) override {}
+    void OnHichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

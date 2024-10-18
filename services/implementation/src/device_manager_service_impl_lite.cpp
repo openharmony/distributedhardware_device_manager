@@ -524,10 +524,8 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     return 0;
 }
 
-void DeviceManagerServiceImpl::HichainProofExceptionStatus(const std::string &deviceId, uint16_t deviceTypeId,
-                                                           int32_t errcode)
+void DeviceManagerServiceImpl::HichainProofExceptionStatus(uint16_t deviceTypeId, int32_t errcode)
 {
-    (void)deviceId;
     (void)deviceTypeId;
     (void)errcode;
     return;

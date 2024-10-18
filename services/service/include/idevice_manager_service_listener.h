@@ -164,8 +164,8 @@ public:
      * @tc.desc: Candidate Restrict Status Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnHichainProofExceptionStatus(const std::string &pkgName, const std::string &deviceId,
-                                               uint16_t deviceTypeId, int32_t errcode) = 0;
+    virtual void OnHichainProofExceptionStatus(const std::string &pkgName, uint16_t deviceTypeId,
+                                               int32_t errcode) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
