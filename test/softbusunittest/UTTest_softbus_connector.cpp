@@ -105,7 +105,7 @@ std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<Device
 
 bool CheckReturnResult(int ret)
 {
-    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
 }
 /**
  * @tc.name: SoftbusConnector_001
