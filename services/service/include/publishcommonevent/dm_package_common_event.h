@@ -33,7 +33,7 @@ namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-using PackageEventCallback = std::function<void(std::string, std::string)>;
+using PackageEventCallback = std::function<void(std::string, std::string, int32_t)>;
 
 class DmPackageEventSubscriber : public CommonEventSubscriber {
 public:

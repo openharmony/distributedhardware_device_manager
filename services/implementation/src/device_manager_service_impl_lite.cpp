@@ -531,6 +531,13 @@ void DeviceManagerServiceImpl::HandleCredentialAuthStatus(uint16_t deviceTypeId,
     return;
 }
 
+int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId)
+{
+    (void)appId;
+    (void)accessTokenId;
+    return 0;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

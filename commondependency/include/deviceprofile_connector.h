@@ -134,6 +134,8 @@ public:
     int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, const std::string &localUdid);
     std::string HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId,
         const std::string &localUdid);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAccessControlProfile();
+    void DeleteAccessControlById(int64_t accessControlId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

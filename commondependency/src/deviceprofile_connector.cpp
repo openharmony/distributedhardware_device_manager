@@ -979,6 +979,20 @@ std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, c
     return pkgName;
 }
 
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
+{
+    std::vector<AccessControlProfile> profiles;
+    if (DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles) != DM_OK) {
+        LOGE("DP failed.");
+    }
+    return profiles;
+}
+
+void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
+{
+    DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(accessControlId);
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

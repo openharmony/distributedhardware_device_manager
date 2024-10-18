@@ -859,6 +859,43 @@ void DeviceManagerServiceImpl::HandleCredentialAuthStatus(uint16_t deviceTypeId,
     deviceStateMgr_->HandleCredentialAuthStatus(deviceTypeId, errcode);
 }
 
+int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, int32_t accessTokenId)
+{
+    CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    LOGI("delete ACL size is %{public}zu, appId %{public}s", profiles.size(), GetAnonyString(appId).c_str());
+    if (profiles.size() == 0) {
+        return DM_OK;
+    }
+    std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
+    std::vector<int32_t> userIdVec;
+    for (auto &item : profiles) {
+        int64_t tokenId = item.GetAccesser().GetAccesserTokenId();
+        if (accessTokenId != static_cast<int32_t>(tokenId)) {
+            continue;
+        }
+        DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        listener_->OnAppUnintall(item.GetAccesser().GetAccesserBundleName());
+        if (item.GetBindLevel() == DEVICE) {
+            userIdVec.push_back(item.GetAccesser().GetAccesserUserId());
+            delACLInfoVec.push_back(std::pair<int32_t, std::string>(item.GetAccesser().GetAccesserUserId(),
+                item.GetAccessee().GetAccesseeDeviceId()));
+        }
+    }
+    if (delACLInfoVec.size() == 0) {
+        LOGI("delACLInfoVec is empty");
+        return DM_OK;
+    }
+    if (userIdVec.size() == 0) {
+        LOGI("userIdVec is empty");
+        return DM_OK;
+    }
+    CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
+    hiChainConnector_->DeleteGroupByACL(delACLInfoVec, userIdVec);
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

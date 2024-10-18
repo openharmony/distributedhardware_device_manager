@@ -199,6 +199,11 @@ public:
         (void)deviceTypeId;
         (void)errcode;
     }
+
+    void OnAppUnintall(const std::string &pkgName) override
+    {
+        (void)pkgName;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

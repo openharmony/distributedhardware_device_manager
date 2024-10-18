@@ -166,8 +166,12 @@ public:
      * @tc.desc: Get GroupInfo of the HiChain Connector
      * @tc.type: FUNC
      */
-    int32_t GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
+    bool GetGroupInfo(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
+    
+    bool GetGroupInfoExt(const int32_t userId, const std::string &queryParams, std::vector<GroupInfo> &groupList);
 
+    bool GetGroupInfoCommon(const int32_t userId, const std::string &queryParams, const char* pkgName,
+        std::vector<GroupInfo> &groupList);
     /**
      * @tc.name: HiChainConnector::GetGroupType
      * @tc.desc: Get GroupType of the HiChain Connector
@@ -237,6 +241,11 @@ public:
         std::vector<GroupInfo> &groupList);
     void DeleteAllGroupByUdid(const std::string &udid);
     void DeleteP2PGroup(int32_t switchUserId);
+    int32_t DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
+        std::vector<int32_t> &userIdVec);
+    bool IsNeedDelete(std::string &groupName, int32_t userId,
+        std::vector<std::pair<int32_t, std::string>> &delACLInfoVec);
+
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);

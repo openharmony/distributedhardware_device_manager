@@ -40,6 +40,7 @@ const int32_t CREDENTIAL_NETWORK = 1;
 const int32_t DELAY_TIME_MS = 10000; // 10ms
 const int32_t FIELD_EXPIRE_TIME_VALUE = 7;
 const int32_t SAME_ACCOUNT = 1;
+const int32_t DEVICE_ID_HALF = 2;
 
 constexpr const char* DEVICE_ID = "DEVICE_ID";
 constexpr const char* FIELD_CREDENTIAL = "credential";
@@ -211,53 +212,36 @@ bool HiChainConnector::IsRedundanceGroup(const std::string &userId, int32_t auth
 
 bool HiChainConnector::GetGroupInfo(const std::string &queryParams, std::vector<GroupInfo> &groupList)
 {
-    char *groupVec = nullptr;
-    uint32_t num = 0;
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
         return false;
     }
-    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
-    if (ret != 0) {
-        LOGE("[HICHAIN]fail to get group info with ret:%{public}d.", ret);
-        return false;
-    }
-    if (groupVec == nullptr) {
-        LOGE("[HICHAIN]return groups info point is nullptr");
-        return false;
-    }
-    if (num == 0) {
-        LOGE("[HICHAIN]return groups info number is zero.");
-        return false;
-    }
-    LOGI("HiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
-    std::string relatedGroups = std::string(groupVec);
-    deviceGroupManager_->destroyInfo(&groupVec);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        LOGE("returnGroups parse error");
-        return false;
-    }
-    if (!jsonObject.is_array()) {
-        LOGE("json string is not array.");
-        return false;
-    }
-    std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
-    if (groupInfos.size() == 0) {
-        LOGE("HiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
-        return false;
-    }
-    groupList = groupInfos;
-    return true;
+    return GetGroupInfo(userId, queryParams, groupList);
 }
 
-int32_t HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &queryParams,
+bool HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &queryParams,
+    std::vector<GroupInfo> &groupList)
+{
+    return GetGroupInfoCommon(userId, queryParams, DM_PKG_NAME, groupList);
+}
+
+bool HiChainConnector::GetGroupInfoExt(const int32_t userId, const std::string &queryParams,
+    std::vector<GroupInfo> &groupList)
+{
+    return GetGroupInfoCommon(userId, queryParams, DM_PKG_NAME_EXT, groupList);
+}
+
+bool HiChainConnector::GetGroupInfoCommon(const int32_t userId, const std::string &queryParams, const char* pkgName,
     std::vector<GroupInfo> &groupList)
 {
     char *groupVec = nullptr;
     uint32_t num = 0;
-    int32_t ret = deviceGroupManager_->getGroupInfo(userId, DM_PKG_NAME, queryParams.c_str(), &groupVec, &num);
+    if (deviceGroupManager_ == nullptr) {
+        LOGE("deviceGroupManager_ is null");
+        return false;
+    }
+    int32_t ret = deviceGroupManager_->getGroupInfo(userId, pkgName, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
         LOGE("[HICHAIN]fail to get group info with ret:%{public}d.", ret);
         return false;
@@ -1222,6 +1206,54 @@ void HiChainConnector::DeleteP2PGroup(int32_t switchUserId)
             LOGE("failed to delete the user id group %{public}s", GetAnonyString(iter->groupId).c_str());
         }
     }
+}
+
+int32_t HiChainConnector::DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
+    std::vector<int32_t> &userIdVec)
+{
+    if (delACLInfoVec.size() == 0) {
+        LOGI("delACLInfoVec is empty");
+        return DM_OK;
+    }
+    if (userIdVec.size() == 0) {
+        LOGI("userIdVec is empty");
+        return DM_OK;
+    }
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
+    std::string queryParams = jsonObj.dump();
+    for (int32_t userId : userIdVec) {
+        std::vector<GroupInfo> groupList;
+        if (!GetGroupInfo(userId, queryParams, groupList)) {
+            continue;
+        }
+        for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+            if (!IsNeedDelete(iter->groupName, userId, delACLInfoVec)) {
+                continue;
+            }
+            if (DeleteGroup(userId, iter->groupId) != DM_OK) {
+                LOGE("failed to delete group %{public}s", GetAnonyString(iter->groupId).c_str());
+            }
+        }
+    }
+    return DM_OK;
+}
+
+bool HiChainConnector::IsNeedDelete(std::string &groupName, int32_t userId,
+    std::vector<std::pair<int32_t, std::string>> &delACLInfoVec)
+{
+    if (delACLInfoVec.size() == 0 || groupName.empty()) {
+        LOGI("delACLInfoVec or groupName is empty");
+        return false;
+    }
+    for (auto item : delACLInfoVec) {
+        uint32_t interceptLength = item.second.size() / DEVICE_ID_HALF;
+        std::string interceptUdid = item.second.substr(0, interceptLength);
+        if (groupName.find(interceptUdid) != std::string::npos && userId == item.first) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

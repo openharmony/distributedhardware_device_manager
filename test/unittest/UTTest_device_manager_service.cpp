@@ -1187,7 +1187,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSi
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
-    EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
+    EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
 /**
