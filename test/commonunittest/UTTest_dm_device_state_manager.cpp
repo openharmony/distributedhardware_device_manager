@@ -252,6 +252,14 @@ HWTEST_F(DmDeviceStateManagerTest, ProcNotifyEvent_001, testing::ext::TestSize.L
     dmDeviceStateManager->ChangeDeviceInfo(info);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DmDeviceStateManagerTest, HandleCandidateRestrictStatus_001, testing::ext::TestSize.Level0)
+{
+    uint16_t deviceTypeId = 0x00;
+    int32_t errcode = -1;
+    dmDeviceStateManager->HandleCredentialAuthStatus(deviceTypeId, errcode);
+    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

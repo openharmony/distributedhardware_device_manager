@@ -148,6 +148,14 @@ public:
     }
     virtual void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) = 0;
 };
+
+class CredentialAuthStatusCallback {
+public:
+    virtual ~CredentialAuthStatusCallback()
+    {
+    }
+    virtual void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

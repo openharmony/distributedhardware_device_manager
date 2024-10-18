@@ -526,5 +526,14 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
     }
     softbusConnector_->ClearPkgName();
 }
+
+void DmDeviceStateManager::HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+{
+    if (listener_ == nullptr) {
+        LOGE("Failed, listener_ is null.");
+        return;
+    }
+    listener_->OnCredentialAuthStatus(std::string(DM_PKG_NAME), deviceTypeId, errcode);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

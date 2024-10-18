@@ -48,6 +48,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
+constexpr const char* CREDENTIAL_AUTH_STATUS = "credentialAuthStatus";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
@@ -66,6 +67,7 @@ static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
 static std::mutex g_lockDeviceIdSet;
 static std::mutex g_lockDevScreenStatusChange;
+static std::mutex g_credentialAuthStatus;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -119,6 +121,7 @@ static INodeStateCb softbusNodeStateCb_ = {
     .onLocalNetworkIdChanged = SoftbusListener::OnLocalDevInfoChange,
     .onNodeDeviceTrustedChange = SoftbusListener::OnDeviceTrustedChange,
     .onNodeStatusChanged = SoftbusListener::OnDeviceScreenStatusChanged,
+    .onHichainProofException = SoftbusListener::OnCredentialAuthStatus,
 };
 
 static IRefreshCallback softbusRefreshCallback_ = {
@@ -160,6 +163,26 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
 {
     std::lock_guard<std::mutex> lock(g_lockDevScreenStatusChange);
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
+}
+
+void SoftbusListener::CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode)
+{
+    std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
+    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceTypeId, errcode);
+}
+
+void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+{
+    LOGI("received credential auth status callback from softbus.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+#else
+    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+    if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
+        LOGE("credentialAuthStatus setname failed.");
+    }
+    credentialAuthStatus.detach();
+#endif
 }
 
 void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status)

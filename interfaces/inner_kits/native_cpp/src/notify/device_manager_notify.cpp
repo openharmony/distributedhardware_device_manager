@@ -1147,5 +1147,50 @@ void DeviceManagerNotify::OnDeviceScreenStatus(const std::string &pkgName, const
     }
     tempCbk->OnDeviceScreenStatus(deviceInfo);
 }
+
+void DeviceManagerNotify::RegisterCredentialAuthStatusCallback(const std::string &pkgName,
+    std::shared_ptr<CredentialAuthStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    credentialAuthStatusCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterCredentialAuthStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    credentialAuthStatusCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
+                                                 int32_t errcode)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("In, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<CredentialAuthStatusCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (credentialAuthStatusCallback_.find(pkgName) == credentialAuthStatusCallback_.end()) {
+            LOGE("error, credential auth statusnot register.");
+            return;
+        }
+        tempCbk = credentialAuthStatusCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered credential auth status callback is nullptr.");
+        return;
+    }
+    tempCbk->OnCredentialAuthStatus(deviceTypeId, errcode);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

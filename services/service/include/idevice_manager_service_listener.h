@@ -158,6 +158,14 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) = 0;
+
+    /**
+     * @tc.name: IDeviceManagerServiceListener::OnCredentialAuthStatus
+     * @tc.desc: Candidate Restrict Status Change of the DeviceManager Service Listener
+     * @tc.type: FUNC
+     */
+    virtual void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
+                                               int32_t errcode) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

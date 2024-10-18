@@ -1501,6 +1501,14 @@ HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_104, testing::e
     DmAuthForm authForm = deviceManagerServiceImpl_->ConvertBindTypeToAuthForm(bindType);
     EXPECT_EQ(authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
+
+HWTEST_F(DeviceManagerServiceImplTest, CredentialAuthStatus_101, testing::ext::TestSize.Level0)
+{
+    uint16_t deviceTypeId = 0x00;
+    int32_t errcode = -1;
+    deviceManagerServiceImpl_->HandleCredentialAuthStatus(deviceTypeId, errcode);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
