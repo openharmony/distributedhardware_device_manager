@@ -48,7 +48,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
-constexpr const char* HICHAIN_PROOF_STATUS = "credentialAuthStatus";
+constexpr const char* CREDENTIAL_AUTH_STATUS = "credentialAuthStatus";
 #endif
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
@@ -178,7 +178,7 @@ void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errc
     ffrt::submit([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
 #else
     std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
-    if (pthread_setname_np(credentialAuthStatus.native_handle(), HICHAIN_PROOF_STATUS) != DM_OK) {
+    if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
         LOGE("credentialAuthStatus setname failed.");
     }
     credentialAuthStatus.detach();
