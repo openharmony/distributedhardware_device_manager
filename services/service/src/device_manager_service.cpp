@@ -1782,34 +1782,5 @@ int32_t DeviceManagerService::GetUdidHashByAnoyUdid(const std::string &anoyUdid,
     return DM_OK;
 }
 #endif
-
-void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
-{
-    if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleDeviceScreenStatusChange(deviceInfo);
-    }
-}
-
-int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
-    int32_t &screenStatus)
-{
-    LOGI("Begin pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetDeviceScreenStatus.", pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || networkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(networkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    int32_t ret = softbusListener_->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
-    if (ret != DM_OK) {
-        LOGE("GetDeviceScreenStatus failed, ret = %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

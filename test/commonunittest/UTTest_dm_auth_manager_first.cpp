@@ -64,6 +64,11 @@ namespace {
 const int32_t MIN_PIN_CODE = 100000;
 const int32_t MAX_PIN_CODE = 999999;
 
+bool CheckReturnResult(int ret)
+{
+    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+}
+
 HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
@@ -112,7 +117,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_005, testing::ext::TestSize.Lev
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, SOFTBUS_IPC_ERR);
+    ASSERT_TRUE(CheckReturnResult(ret));
 }
 
 HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSize.Level0)

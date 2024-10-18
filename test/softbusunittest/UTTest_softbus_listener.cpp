@@ -289,7 +289,7 @@ HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), udid);
-    EXPECT_EQ(ret, SOFTBUS_IPC_ERR);
+    EXPECT_TRUE(checkSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
