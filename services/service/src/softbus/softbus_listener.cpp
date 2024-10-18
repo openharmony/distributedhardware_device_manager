@@ -168,7 +168,7 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
 void SoftbusListener::CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode)
 {
     std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
-    DeviceManagerService::GetInstance().CredentialAuthStatus(deviceTypeId, errcode);
+    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceTypeId, errcode);
 }
 
 void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)

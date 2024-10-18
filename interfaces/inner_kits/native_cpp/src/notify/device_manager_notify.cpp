@@ -1170,7 +1170,7 @@ void DeviceManagerNotify::UnRegisterCredentialAuthStatusCallback(const std::stri
 }
 
 void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
-                                                        int32_t errcode)
+                                                 int32_t errcode)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");

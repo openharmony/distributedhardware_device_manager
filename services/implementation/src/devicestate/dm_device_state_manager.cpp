@@ -527,7 +527,7 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
     softbusConnector_->ClearPkgName();
 }
 
-void DmDeviceStateManager::CredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+void DmDeviceStateManager::HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
 {
     if (listener_ == nullptr) {
         LOGE("Failed, listener_ is null.");

@@ -1506,7 +1506,7 @@ HWTEST_F(DeviceManagerServiceImplTest, CredentialAuthStatus_101, testing::ext::T
 {
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    deviceManagerServiceImpl_->CredentialAuthStatus(deviceTypeId, errcode);
+    deviceManagerServiceImpl_->HandleCredentialAuthStatus(deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 } // namespace
