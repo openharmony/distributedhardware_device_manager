@@ -18,32 +18,33 @@
 #include <unistd.h>
 
 #include "device_manager_ipc_interface_code.h"
+#include "device_manager_notify.h"
+#include "dm_constants.h"
+#include "dm_device_info.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
-#include "ipc_register_listener_req.h"
-#include "ipc_get_trustdevice_rsp.h"
-#include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
-#include "ipc_get_trustdevice_req.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
-#include "ipc_publish_req.h"
-#include "ipc_unpublish_req.h"
-#include "ipc_set_useroperation_req.h"
-#include "ipc_unauthenticate_device_req.h"
-#include "ipc_authenticate_device_req.h"
+#include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
-#include "ipc_set_credential_req.h"
-#include "ipc_set_credential_rsp.h"
+#include "ipc_get_trustdevice_req.h"
+#include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_device_discovery_req.h"
+#include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_notify_event_req.h"
-#include "device_manager_notify.h"
+#include "ipc_publish_req.h"
+#include "ipc_register_listener_req.h"
 #include "ipc_req.h"
-#include "dm_device_info.h"
-#include "dm_constants.h"
+#include "ipc_set_credential_req.h"
+#include "ipc_set_credential_rsp.h"
+#include "ipc_set_useroperation_req.h"
+#include "ipc_start_discovery_req.h"
+#include "ipc_stop_discovery_req.h"
+#include "ipc_unauthenticate_device_req.h"
+#include "ipc_unpublish_req.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -270,7 +271,20 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_014, testing::ext::TestSize.L
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_008, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
+    MessageParcel data;
+    std::shared_ptr<IpcReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcReq>();
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
@@ -324,7 +338,26 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_020, testing::ext::TestSize.L
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_011, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 100;
+    DmDeviceBasicInfo deviceBasicInfo;
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    req->SetDeviceBasicInfo(deviceBasicInfo);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_021, testing::ext::TestSize.Level0)
@@ -342,7 +375,26 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_022, testing::ext::TestSize.L
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_012, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 100;
+    DmDeviceBasicInfo deviceBasicInfo;
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    req->SetDeviceBasicInfo(deviceBasicInfo);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
@@ -360,7 +412,26 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_024, testing::ext::TestSize.L
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_013, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 100;
+    DmDeviceBasicInfo deviceBasicInfo;
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    req->SetDeviceBasicInfo(deviceBasicInfo);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
@@ -378,7 +449,26 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_026, testing::ext::TestSize.L
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_014, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 100;
+    DmDeviceBasicInfo deviceBasicInfo;
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    req->SetDeviceBasicInfo(deviceBasicInfo);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
@@ -791,13 +881,31 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_025, testing::ext::TestSize.Level
     int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     MessageParcel data;
     MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
+    std::string pkgName = "pkgName";
     data.WriteString(pkgName);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
     if (ptr) {
         ret = ptr(data, reply);
     }
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+
+    data.WriteString(pkgName);
+    sptr<IRemoteObject> remoteObject = nullptr;
+    data.WriteRemoteObject(remoteObject);
+
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
+
+    data.WriteString(pkgName);
+    remoteObject = sptr<IpcClientStub>(new IpcClientStub());
+    data.WriteRemoteObject(remoteObject);
+
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_026, testing::ext::TestSize.Level0)
@@ -1200,6 +1308,82 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_052, testing::ext::TestSize.Level
     ASSERT_EQ(ret, DM_OK);
 }
 
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_053, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = IMPORT_CREDENTIAL;
+    int32_t ret = DM_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    std::string pkgName = "ohos.dm.test";
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
+    jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
+    std::string credentialInfo = jsonObject.dump();
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = DELETE_CREDENTIAL;
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr1 = GetIpcCmdFunc(cmdCode);
+    if (ptr1) {
+        ret = ptr1(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = REQUEST_CREDENTIAL;
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr2 = GetIpcCmdFunc(cmdCode);
+    if (ptr2) {
+        ret = ptr2(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_054, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = IMPORT_CREDENTIAL;
+    int32_t ret = DM_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    std::string pkgName = "ohos.dm.test";
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
+    jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
+    std::string credentialInfo = jsonObject.dump();
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = DELETE_CREDENTIAL;
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr1 = GetIpcCmdFunc(cmdCode);
+    if (ptr1) {
+        ret = ptr1(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = REQUEST_CREDENTIAL;
+    data.WriteString(pkgName);
+    data.WriteString(credentialInfo);
+    OnIpcCmdFunc ptr2 = GetIpcCmdFunc(cmdCode);
+    if (ptr2) {
+        ret = ptr2(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_016, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
@@ -1301,6 +1485,64 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_020, testing::ext::TestSize.
         ret = ptr(pReq, data);
     }
     ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_021, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    std::string pkgName = "com.ohos.test";
+    uint16_t subscribeId = 100;
+    DmDeviceBasicInfo deviceBasicInfo;
+    req->SetPkgName(pkgName);
+    req->SetSubscribeId(subscribeId);
+    req->SetDeviceBasicInfo(deviceBasicInfo);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = CHECK_ACCESS_CONTROL;
+    int32_t ret = DM_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = CHECK_SAME_ACCOUNT;
+    OnIpcCmdFunc ptr1 = GetIpcCmdFunc(cmdCode);
+    if (ptr1) {
+        ret = ptr1(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
+
+    cmdCode = SHIFT_LNN_GEAR;
+    OnIpcCmdFunc ptr2 = GetIpcCmdFunc(cmdCode);
+    if (ptr2) {
+        ret = ptr2(data, reply);
+    }
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
