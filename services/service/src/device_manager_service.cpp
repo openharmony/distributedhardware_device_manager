@@ -1760,7 +1760,7 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
-    if (!PermissionManager::GetInstance().CheckSystemSA(processName)) {
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }

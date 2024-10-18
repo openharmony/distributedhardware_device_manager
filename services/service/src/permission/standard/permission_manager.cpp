@@ -49,7 +49,7 @@ constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_
     "CollaborationFwk",
 };
 
-constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 8;
+constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 7;
 constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
@@ -58,6 +58,10 @@ constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME
     "distributed_bundle_framework",
     "ohos.dhardware",
     "ohos.security.distributed_access_token",
+};
+
+constexpr int32_t SETDNPOLICY_WHITE_LIST_NUM = 1;
+constexpr const static char g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "collaboration_service",
 };
 }
@@ -212,6 +216,24 @@ std::unordered_set<std::string> PermissionManager::GetSystemSA()
         systemSA.insert(tmp);
     }
     return systemSA;
+}
+
+bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_setDnPolicyWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
