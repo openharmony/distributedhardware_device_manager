@@ -41,21 +41,21 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
-
-    if (setIpcRequestFuncMap_.count(cmdCode) == 0) {
-        LOGE("cmdCode:%{public}d not register SetRequestFunc", cmdCode);
-        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    }
-
-    auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
-    if (setRequestMapIter != setIpcRequestFuncMap_.end()) {
-        SetIpcRequestFunc ptr = setRequestMapIter->second;
+    SetIpcRequestFunc ptr = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(setIpcRequestFuncMapLock_);
+        auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
+        if (setRequestMapIter == setIpcRequestFuncMap_.end()) {
+            LOGE("cmdCode:%{public}d not register SetRequestFunc", cmdCode);
+            return ERR_DM_UNSUPPORTED_IPC_COMMAND;
+        }
+        ptr = setRequestMapIter->second;
         if (ptr == nullptr) {
             LOGE("IpcCmdRegister::SetRequest setRequestMapIter->second is null");
             return ERR_DM_POINT_NULL;
         }
-        ret = (setRequestMapIter->second)(pBaseReq, data);
     }
+    ret = (ptr)(pBaseReq, data);
     return ret;
 }
 
@@ -65,15 +65,21 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
         LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
-    auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
-    if (readResponseMapIter == readResponseFuncMap_.end()) {
-        LOGE("cmdCode:%{public}d not register ReadResponseFunc", cmdCode);
-        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    ReadResponseFunc ptr = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(readResponseFuncMapLock_);
+        auto readResponseMapIter = readResponseFuncMap_.find(cmdCode);
+        if (readResponseMapIter == readResponseFuncMap_.end()) {
+            LOGE("cmdCode:%{public}d not register ReadResponseFunc", cmdCode);
+            return ERR_DM_UNSUPPORTED_IPC_COMMAND;
+        }
+        ptr = readResponseMapIter->second;
+        if (ptr == nullptr) {
+            LOGE("IpcCmdRegister::ReadResponse readResponseMapIter->second is null");
+            return ERR_DM_POINT_NULL;
+        }
     }
-    if (readResponseMapIter->second == nullptr) {
-        return ERR_DM_POINT_NULL;
-    }
-    return (readResponseMapIter->second)(reply, pBaseRsp);
+    return (ptr)(reply, pBaseRsp);
 }
 
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
@@ -82,15 +88,21 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
         LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
-    auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
-    if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
-        LOGE("cmdCode:%{public}d not register OnIpcCmdFunc", cmdCode);
-        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    OnIpcCmdFunc ptr = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(onIpcCmdFuncMapLock_);
+        auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);
+        if (onIpcCmdMapIter == onIpcCmdFuncMap_.end()) {
+            LOGE("cmdCode:%{public}d not register OnIpcCmdFunc", cmdCode);
+            return ERR_DM_UNSUPPORTED_IPC_COMMAND;
+        }
+        ptr = onIpcCmdMapIter->second;
+        if (ptr == nullptr) {
+            LOGE("IpcCmdRegister::OnIpcCmd onIpcCmdMapIter->second is null");
+            return ERR_DM_POINT_NULL;
+        }
     }
-    if (onIpcCmdMapIter->second ==  nullptr) {
-        return ERR_DM_POINT_NULL;
-    }
-    return (onIpcCmdMapIter->second)(data, reply);
+    return (ptr)(data, reply);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
