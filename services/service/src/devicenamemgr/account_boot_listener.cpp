@@ -35,12 +35,12 @@ namespace {
 #endif
 }
 
-std::mutex AccountBootListener::lock_;
+std::mutex AccountBootListener::depSaStatelock_;
 
 static void AccountBootCb(const char *key, const char *value, void *context)
 {
-    if (key == nullptr || value == nullptr) {
-        LOGE("key or value is null, param is error!");
+    if (key == nullptr || value == nullptr || context == nullptr) {
+        LOGE("key or value or context is null, param is error!");
         return;
     }
     if (strcmp(key, BOOTEVENT_ACCOUNT_READY) != 0 || strcmp(value, "true") != 0) {
@@ -108,21 +108,21 @@ void AccountBootListener::DoAccountBootProc()
 void AccountBootListener::SetSaTriggerFlag(SaTriggerFlag triggerFlag)
 {
     LOGI("start");
-    std::lock_guard<std::mutex> lock(lock_);
+    std::lock_guard<std::mutex> lock(depSaStatelock_);
     switch (triggerFlag) {
-        case DM_SA_READY:
+        case SaTriggerFlag::DM_SA_READY:
             isDmSaReady_ = true;
             LOGI("DM SA ready!");
             break;
-        case DATA_SHARE_SA_REDDY:
+        case SaTriggerFlag::DATA_SHARE_SA_REDDY:
             LOGI("DATA SHARE SA ready!");
             this->InitDataShareEvent();
             break;
         default:
             break;
     }
-    LOGI("isDmSaReady_:%{public}d,isDataShareReady_:%{public}d",
-        std::atomic_load(&isDmSaReady_),std::atomic_load(&isDataShareReady_));
+    LOGI("isDmSaReady_: %{public}d, isDataShareReady_: %{public}d",
+        std::atomic_load(&isDmSaReady_), std::atomic_load(&isDataShareReady_));
     if (isDmSaReady_ && isDataShareReady_) {
         LOGI("dm and data_share is ready!");
         this->RegisterAccountBootCb();
@@ -149,10 +149,10 @@ void AccountBootListener::InitDataShareEvent()
 void AccountBootListener::DataShareCallback()
 {
     LOGI("Start");
-    std::lock_guard<std::mutex> lock(lock_);
+    std::lock_guard<std::mutex> lock(depSaStatelock_);
     isDataShareReady_ = true;
-    LOGI("isDmSaReady_:%{public}d,isDataShareReady_:%{public}d",
-        std::atomic_load(&isDmSaReady_),std::atomic_load(&isDataShareReady_));
+    LOGI("isDmSaReady_: %{public}d, isDataShareReady_: %{public}d",
+        std::atomic_load(&isDmSaReady_), std::atomic_load(&isDataShareReady_));
     if (isDmSaReady_ && isDataShareReady_) {
         LOGI("dm and data_share is ready!");
         this->RegisterAccountBootCb();

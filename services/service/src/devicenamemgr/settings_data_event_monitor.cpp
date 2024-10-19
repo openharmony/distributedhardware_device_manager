@@ -34,6 +34,10 @@ void SettingsDataEventMonitor::OnChange()
     }
     LOGI("Settings OnChange type: %{public}d", (int32_t)monitorType_);
     std::shared_ptr<LocalDeviceNameMgr> localDevNameSPtr = localDeviceNameMgrWPtr_.lock();
+    if (localDevNameSPtr == nullptr) {
+        LOGE("localDevNameSPtr is null!");
+        return;
+    }
     switch (monitorType_) {
         case SettingsDataMonitorType::USER_DEFINED_DEVICE_NAME_MONITOR:
             localDevNameSPtr->QueryLocalDeviceName();

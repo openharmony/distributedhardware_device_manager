@@ -43,6 +43,7 @@ namespace {
     constexpr const char *USER_DEFINED_STRING = "settings.general.user_defined_device_name";
     constexpr const char *DISPLAY_DEVICE_NAME_STRING = "settings.general.display_device_name";
 }
+
 LocalDeviceNameMgr::LocalDeviceNameMgr() : localDeviceName_(""), localDisplayName_("")
 {
     LOGI("Ctor LocalDeviceNameMgr");
@@ -76,8 +77,8 @@ int32_t LocalDeviceNameMgr::GetDeviceNameFromDataShareHelper(
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, std::shared_ptr<Uri> uri,
     const char *key, std::string &deviceName)
 {
-    if (uri == nullptr || key == nullptr) {
-        LOGE("uri or key is null, param is error!");
+    if (dataShareHelper == nullptr || uri == nullptr || key == nullptr) {
+        LOGE("dataShareHelper or uri or key is null, param is error!");
         return ERR_DM_FAILED;
     }
     int32_t numRows = 0;
@@ -116,6 +117,10 @@ int32_t LocalDeviceNameMgr::GetDeviceNameFromDataShareHelper(
 int32_t LocalDeviceNameMgr::GetDefaultDeviceName(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
     std::string &deviceName)
 {
+    if (dataShareHelper == nullptr) {
+        LOGE("dataShareHelper is null, param is error!");
+        return ERR_DM_FAILED;
+    }
     std::shared_ptr<Uri> uri = std::make_shared<Uri>(SETTINGS_DATA_BASE_URI + "&key=" + PREDICATES_STRING);
     LOGI("get default deviceName");
     return GetDeviceNameFromDataShareHelper(dataShareHelper, uri, PREDICATES_STRING, deviceName);
@@ -124,6 +129,10 @@ int32_t LocalDeviceNameMgr::GetDefaultDeviceName(std::shared_ptr<DataShare::Data
 int32_t LocalDeviceNameMgr::GetUserDefinedDeviceName(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
     std::string &deviceName)
 {
+    if (dataShareHelper == nullptr) {
+        LOGE("dataShareHelper is null, param is error!");
+        return ERR_DM_FAILED;
+    }
     int32_t osAccountId = GetActiveOsAccountIds();
     if (osAccountId == ERR_DM_FAILED) {
         LOGE("osAccountId acquire fail!");
@@ -139,6 +148,10 @@ int32_t LocalDeviceNameMgr::GetUserDefinedDeviceName(std::shared_ptr<DataShare::
 int32_t LocalDeviceNameMgr::GetDisplayDeviceName(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
     std::string &deviceName)
 {
+    if (dataShareHelper == nullptr) {
+        LOGE("dataShareHelper is null, param is error!");
+        return ERR_DM_FAILED;
+    }
     int32_t osAccountId = GetActiveOsAccountIds();
     if (osAccountId == ERR_DM_FAILED) {
         LOGE("osAccountId acquire fail!");

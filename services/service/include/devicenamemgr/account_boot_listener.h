@@ -21,10 +21,11 @@
 #include "local_device_name_mgr.h"
 namespace OHOS {
 namespace DistributedHardware {
-typedef enum SaTriggerFlag {
-    DM_SA_READY,
-    DATA_SHARE_SA_REDDY
-} SaTriggerFlag;
+enum class SaTriggerFlag : int32_t {
+    DM_SA_READY = 0,
+    DATA_SHARE_SA_REDDY = 1
+};
+
 class AccountBootListener {
 public:
     AccountBootListener();
@@ -44,7 +45,7 @@ private:
     std::shared_ptr<LocalDeviceNameMgr> localDeviceMgr_;
     std::atomic<bool> isDmSaReady_;
     std::atomic<bool> isDataShareReady_;
-    static std::mutex lock_;
+    static std::mutex depSaStatelock_;
     std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 };
 } // namespace DistributedHardware
