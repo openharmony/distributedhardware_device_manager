@@ -656,6 +656,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
     } else {
         LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
     }
+    }
 }
 
 void DmAuthManager::HandleMemberJoinImportAuthCode(const int64_t requestId, const int32_t status)
@@ -861,7 +862,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         ProcessAuthRequest(sessionId);
     } else {
         LOGE("Invalied bind mode.");
-     }
+    }
 }
 
 void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
