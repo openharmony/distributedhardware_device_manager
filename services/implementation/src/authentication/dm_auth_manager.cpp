@@ -653,9 +653,9 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
             if (++authTimes_ >= MAX_AUTH_TIMES) {
                 authResponseContext_->isFinish = false;
             }
+        }
     } else {
         LOGE("DmAuthManager::OnMemberJoin failed, authRequestState_ or authResponseState_ is invalid.");
-    }
     }
 }
 
