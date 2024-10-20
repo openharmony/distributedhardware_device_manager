@@ -664,7 +664,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_003, testing:
 {
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId";
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
     EXPECT_EQ(ret, false);
 }
 

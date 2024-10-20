@@ -636,6 +636,8 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOffline(info);
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
