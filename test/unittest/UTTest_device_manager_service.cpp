@@ -198,7 +198,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_003, testing::ext::TestSi
     int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
-+
+
 /**
  * @tc.name: PublishDeviceDiscovery_001
  * @tc.desc: Publish device discovery and return ERR_DM_NO_PERMISSION
@@ -1528,7 +1528,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_005, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_006, testing::ext::TestSize.Level0)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
-    EXPECT_NE(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_007, testing::ext::TestSize.Level0)
@@ -1650,7 +1650,6 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
     EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == DM_OK || ret == SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
