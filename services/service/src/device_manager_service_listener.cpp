@@ -70,7 +70,7 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &deviceInfo,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("DeviceManagerServiceListener::SetDeviceInfo");
+    LOGD("DeviceManagerServiceListener::SetDeviceInfo");
     pReq->SetPkgName(pkgName);
     pReq->SetDeviceState(state);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

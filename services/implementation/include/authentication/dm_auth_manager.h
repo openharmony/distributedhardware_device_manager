@@ -182,6 +182,7 @@ typedef struct DmAuthResponseContext {
     std::string importAuthCode;
     std::string hostPkgLabel;
     bool isFinish = false;
+    std::string edition;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -493,8 +494,8 @@ private:
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     void CompatiblePutAcl();
-    void ProRespNegotiateExt(const int32_t &sessionId);
-    void ProRespNegotiate(const int32_t &sessionId);
+    void ProcRespNegotiateExt(const int32_t &sessionId);
+    void ProcRespNegotiate(const int32_t &sessionId);
     void AccountIdLogoutEventCallback(int32_t userId);
     void UserChangeEventCallback(int32_t userId);
     void GetAuthRequestContext();
@@ -503,6 +504,8 @@ private:
     void SrcSyncDeleteAclDone();
     void SinkSyncDeleteAclDone();
     int32_t CheckTrustState();
+    void ProcIncompatible(const int32_t &sessionId);
+    bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
 
 public:
     void RequestCredential();
@@ -545,6 +548,9 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
+    std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
+    std::string ConvertSinkVersion(const std::string &version);
+    void NegotiateRespMsg(const std::string &version);
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
     void SetAuthType(int32_t authType);
@@ -581,6 +587,7 @@ private:
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
+    std::string remoteVersion_ = "";
     std::string remoteUdidHash_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
 };

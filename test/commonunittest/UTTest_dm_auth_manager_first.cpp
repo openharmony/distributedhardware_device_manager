@@ -951,17 +951,17 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
     ASSERT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, ProRespNegotiateExt001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    authManager_->ProRespNegotiateExt(sessionId);
+    authManager_->ProcRespNegotiateExt(sessionId);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
-HWTEST_F(DmAuthManagerTest, ProRespNegotiate001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    authManager_->ProRespNegotiate(sessionId);
+    authManager_->ProcRespNegotiate(sessionId);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
