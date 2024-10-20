@@ -1047,7 +1047,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
         return ConfirmProcess(action);
     } else {
         LOGE("Invalied bind mode.");
-     }
+    }
     return DM_OK;
 }
 
@@ -1438,7 +1438,7 @@ void DmAuthManager::ShowStartAuthDialog()
             AddMember(pinCode);
         } else {
             LOGE("Invalied bind mode.");
-         }
+        }
         return;
     }
     if (IsScreenLocked()) {
