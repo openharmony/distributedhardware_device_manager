@@ -1496,6 +1496,314 @@ HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_007, testing::ext::TestSize
 }
 
 /**
+ * @tc.name: GetTrustedDeviceList_008
+ * @tc.desc: 1. set packName not null
+ *              set extra null
+ *              set deviceList null
+ *              set isRefresh true
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GetTrustedDeviceList_008, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::map<std::string, std::string> filterOptions;
+    bool isRefresh = false;
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, filterOptions, isRefresh, deviceList);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    packName = "packNameTest";
+    ret = DeviceManager::GetInstance().GetTrustedDeviceList(packName, filterOptions, isRefresh, deviceList);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
+
+/**
+ * @tc.name: ImportCredential_001
+ * @tc.desc: 1. set pkgName not null
+ *              set reqJsonStr null
+ *              set returnJsonStr null
+ *           2. call DeviceManagerImpl::ImportCredential with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, ImportCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string reqJsonStr = "";
+    std::string returnJsonStr = "";
+    int32_t ret = DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "";
+    reqJsonStr = "reqJsonStrTest";
+    ret = DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ret = DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: RequestCredential_001
+ * @tc.desc: 1. set pkgName not null
+ *              set reqJsonStr null
+ *              set returnJsonStr null
+ *           2. call DeviceManagerImpl::RequestCredential with parameter
+ *           3. check ret is DM_OK
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, RequestCredential_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string reqJsonStr = "";
+    std::string returnJsonStr = "";
+    int32_t ret = DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "";
+    reqJsonStr = "reqJsonStrTest";
+    ret = DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().CheckCredential(pkgName, reqJsonStr, returnJsonStr);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GenerateEncryptedUuid_001
+ * @tc.desc: 1. set packName null
+ *              set extra null
+ *              set deviceList null
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string uuid = "";
+    std::string appId = "";
+    std::string encryptedUuid = "";
+    int32_t ret = DeviceManager::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "";
+    uuid = "uuidTest";
+    ret = DeviceManager::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    ASSERT_EQ(ret, DM_OK);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetNetworkTypeByNetworkId_001
+ * @tc.desc: 1. set pkgName null
+ *              set networkId null
+ *              set networkType null
+ *           2. call DeviceManagerImpl::GetTrustedDeviceList with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string networkId = "";
+    int32_t netWorkType = 0;
+    int32_t ret = DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, networkId, netWorkType);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, networkId, netWorkType);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "";
+    networkId = "networkIdTest";
+    ret = DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, networkId, netWorkType);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, networkId, netWorkType);
+    ASSERT_EQ(ret, DM_OK);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().GetNetworkTypeByNetworkId(pkgName, networkId, netWorkType);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ImportAuthCode_001
+ * @tc.desc: 1. set packName null
+ *              set authCode null
+ *           2. call DeviceManagerImpl::ImportAuthCode with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string authCode = "";
+    int32_t ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "";
+    authCode = "authCodeTest";
+    ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    authCode = "authoCo";
+    ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: RegisterDiscoveryCallback_001
+ * @tc.desc: 1. set packName null
+ *              set discoverParam null
+ *              set filterOptions null
+ *              set callback null
+ *           2. call DeviceManagerImpl::RegisterDiscoveryCallback with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterDiscoveryCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    std::shared_ptr<DiscoveryCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegisterDiscoveryCallback(pkgName,
+        discoverParam, filterOptions, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().UnRegisterDiscoveryCallback(pkgName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StopDiscovering(pkgName, discoverParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().RegisterDiscoveryCallback(pkgName, discoverParam, filterOptions, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    ret = DeviceManager::GetInstance().UnRegisterDiscoveryCallback(pkgName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StopDiscovering(pkgName, discoverParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: StartAdvertising_001
+ * @tc.desc: 1. set packName null
+ *              set discoverParam null
+ *              set filterOptions null
+ *              set callback null
+ *           2. call DeviceManagerImpl::StartAdvertising with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, StartAdvertising_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::map<std::string, std::string> advertiseParam;
+    std::shared_ptr<PublishCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().StartAdvertising(pkgName, advertiseParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StopDiscovering(pkgName, advertiseParam);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().StartAdvertising(pkgName, advertiseParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().StopDiscovering(pkgName, advertiseParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    callback = std::make_shared<DevicePublishCallbackTest>();
+    ret = DeviceManager::GetInstance().StartAdvertising(pkgName, advertiseParam, callback);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: BindTarget_001
+ * @tc.desc: 1. set packName null
+ *              set targetId null
+ *              set unbindParam null
+ *              set callback null
+ *           2. call DeviceManagerImpl::BindTarget with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, BindTarget_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    PeerTargetId targetId;
+    std::map<std::string, std::string> unbindParam;
+    std::shared_ptr<BindTargetCallback> callback = nullptr;
+    std::shared_ptr<UnbindTargetCallback> uncallback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().BindTarget(pkgName, targetId, unbindParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().UnbindTarget(pkgName, targetId, unbindParam, uncallback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    targetId.deviceId = "deviceIdTest";
+    targetId.brMac = "brMacTest";
+    targetId.bleMac = "bleMacTest";
+    targetId.wifiIp = "wifiIpTest";
+    ret = DeviceManager::GetInstance().BindTarget(pkgName, targetId, unbindParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().UnbindTarget(pkgName, targetId, unbindParam, uncallback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().BindTarget(pkgName, targetId, unbindParam, callback);
+    ASSERT_EQ(ret, DM_OK);
+    ret = DeviceManager::GetInstance().UnbindTarget(pkgName, targetId, unbindParam, uncallback);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc: 1. set packName null
  *              set extra null
@@ -1762,6 +2070,35 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_005, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extra, callback);
     // 3. check ret is ERR_DM_INPUT_PARA_INVALID
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: RegisterDevStateCallback_006
+ * @tc.desc: 1. set packName not null
+ *              set extra not null
+ *              set callback null
+ *           2. call DeviceManagerImpl::RegisterDevStateCallback with parameter
+ *           3. check ret is ERR_DM_INPUT_PARA_INVALID
+ * deviceTypeId
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::map<std::string, std::string> extraParam;
+    std::shared_ptr<DeviceStateCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extraParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extraParam, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    callback = std::make_shared<DeviceStateCallbackTest>();
+    ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extraParam, callback);
+    ASSERT_EQ(ret, DM_OK);
+    pkgName = "";
+    ret = DeviceManager::GetInstance().RegisterDevStateCallback(pkgName, extraParam, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -2040,7 +2377,164 @@ HWTEST_F(DeviceManagerImplTest, IsSameAccount_002, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(pkgName, initCallback);
     bool ret = DeviceManager::GetInstance().IsSameAccount(udid);
-    ASSERT_EQ(ret, false);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: AddPublishCallback_001
+ * @tc.desc: 1. set udid and bundleName not null
+ *           2. call DeviceManagerImpl::AddPublishCallback with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, AddPublishcCllback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t ret = DeviceManagerImpl::GetInstance().AddPublishCallback(pkgName);
+    ASSERT_NE(ret, 0);
+    ret = DeviceManagerImpl::GetInstance().RemovePublishCallback(pkgName);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_001
+ * @tc.desc: 1. set udid and bundleName not null
+ *           2. call DeviceManagerImpl::RegisterPinHolderCallback with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, RegisterPinHolderCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::shared_ptr<PinHolderCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "pkgNameTest";
+    ret = DeviceManager::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: CreatePinHolder_001
+ * @tc.desc: 1. set udid and bundleName not null
+ *           2. call DeviceManagerImpl::CreatePinHolder with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, CreatePinHolder_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    PeerTargetId targetId;
+    DmPinType pinType = DmPinType::QR_CODE;
+    std::string payload = "payload";
+    int32_t ret = DeviceManager::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "com.ohos.test";
+    targetId.deviceId = "deviceIdTest";
+    targetId.brMac = "brMacTest";
+    targetId.bleMac = "bleMacTest";
+    targetId.wifiIp = "wifiIpTest";
+    pinType = static_cast<DmPinType>(6);
+    ret = DeviceManager::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pinType = DmPinType::QR_CODE;
+    payload.resize(DM_STRING_LENGTH_MAX * 2);
+    ret = DeviceManager::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    payload.resize(10);
+    ret = DeviceManager::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, DM_OK);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DestroyPinHolder_001
+ * @tc.desc: 1. set udid and bundleName not null
+ *           2. call DeviceManagerImpl::DestroyPinHolder with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, DestoryPinHolder_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    PeerTargetId targetId;
+    DmPinType pinType = DmPinType::QR_CODE;
+    std::string payload = "payload";
+    int32_t ret = DeviceManager::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "com.ohos.test";
+    targetId.deviceId = "deviceIdTest";
+    targetId.brMac = "brMacTest";
+    targetId.bleMac = "bleMacTest";
+    targetId.wifiIp = "wifiIpTest";
+    pinType = static_cast<DmPinType>(6);
+    ret = DeviceManager::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pinType = DmPinType::QR_CODE;
+    payload.resize(DM_STRING_LENGTH_MAX * 2);
+    ret = DeviceManager::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    payload.resize(10);
+    ret = DeviceManager::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, DM_OK);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DpAclAdd_001
+ * @tc.desc: 1. set DpAclAdd and Udid not null
+ *           2. call DeviceManagerImpl::DpAclAdd with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, DpAclAdd_001, testing::ext::TestSize.Level0)
+{
+    int64_t accessControlId = 0;
+    std::string udid = "udidTest";
+    int32_t bindType = PEER_TO_PEER;
+    int32_t ret = DeviceManager::GetInstance().DpAclAdd(accessControlId, udid, bindType);
+    ASSERT_EQ(ret, DM_OK);
+    bindType = IDENTICAL_ACCOUNT;
+    ret = DeviceManager::GetInstance().DpAclAdd(accessControlId, udid, bindType);
+    ASSERT_EQ(ret, DM_OK);
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    ret = DeviceManager::GetInstance().DpAclAdd(accessControlId, udid, bindType);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetDeviceSecurityLevel_001
+ * @tc.desc: 1. set DpAclAdd and Udid not null
+ *           2. call DeviceManagerImpl::GetDeviceSecurityLevel with parameter
+ *           3. check ret is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerImplTest, GetDeviceSecurityLevel_001, testing::ext::TestSize.Level0)
+{
+    int32_t securityLevel = 3;
+    std::string pkgName = "";
+    std::string netWorkId = "";
+    int32_t ret = DeviceManager::GetInstance().GetDeviceSecurityLevel(pkgName, netWorkId, securityLevel);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    pkgName = "com.ohos.test";
+    ret = DeviceManager::GetInstance().GetDeviceSecurityLevel(pkgName, netWorkId, securityLevel);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    netWorkId = "netWorkIdTest";
+    ret = DeviceManager::GetInstance().GetDeviceSecurityLevel(pkgName, netWorkId, securityLevel);
+    ASSERT_EQ(ret, DM_OK);
+    pkgName = "";
+    ret = DeviceManager::GetInstance().GetDeviceSecurityLevel(pkgName, netWorkId, securityLevel);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -739,5 +739,68 @@ HWTEST_F(DeviceProfileConnectorTest, IsSameAccount_002, testing::ext::TestSize.L
     int32_t ret = DeviceProfileConnector::GetInstance().IsSameAccount(udid);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    std::string trustDev = "";
+    std::string reqDev = "";
+    int32_t ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, INVALIED_TYPE);
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(DEVICE);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, DEVICE_PEER_TO_PEER_TYPE);
+    profile.SetBindType(DM_ACROSS_ACCOUNT);
+    profile.SetBindLevel(DEVICE);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, DEVICE_ACROSS_ACCOUNT_TYPE);
+    profile.SetBindLevel(APP);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, APP_ACROSS_ACCOUNT_TYPE);
+    profile.SetBindType(INVALIED_TYPE);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, INVALIED_TYPE);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    int32_t ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, false);
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
+    profile.accessee_.SetAccesseeBundleName("pkgName");
+    profile.accessee_.SetAccesseeDeviceId("localDeviceId");
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(DEVICE);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindLevel(APP);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindLevel(SERVICE);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindType(DM_ACROSS_ACCOUNT);
+    profile.SetBindLevel(DEVICE);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindLevel(APP);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindLevel(SERVICE);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    profile.SetBindType(INVALIED_TYPE);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, false);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
