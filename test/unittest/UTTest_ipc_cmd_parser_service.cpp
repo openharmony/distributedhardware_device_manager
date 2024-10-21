@@ -40,6 +40,7 @@
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
 #include "ipc_notify_credential_req.h"
+#include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
