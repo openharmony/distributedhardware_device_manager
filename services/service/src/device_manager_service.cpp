@@ -555,7 +555,7 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
     std::string udid = "";
     if (SoftbusListener::GetUdidByNetworkId(networkId.c_str(), udid) != DM_OK) {
         LOGE("UnAuthenticateDevice GetUdidByNetworkId error: udid: %{public}s", GetAnonyString(udid).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_FAILED;
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
