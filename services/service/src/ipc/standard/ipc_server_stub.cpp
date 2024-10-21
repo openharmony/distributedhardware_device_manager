@@ -15,10 +15,6 @@
 
 #include "ipc_server_stub.h"
 
-#include "device_manager_ipc_interface_code.h"
-#include "device_manager_service.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 #include "if_system_ability_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
@@ -31,9 +27,13 @@
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
 #endif // SUPPORT_MEMMGR
+
 #include "string_ex.h"
 #include "system_ability_definition.h"
-
+#include "device_manager_ipc_interface_code.h"
+#include "device_manager_service.h"
+#include "dm_constants.h"
+#include "dm_log.h"
 #include "multiple_user_connector.h"
 
 namespace OHOS {
@@ -47,6 +47,7 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
 {
     registerToService_ = false;
     state_ = ServiceRunningState::STATE_NOT_START;
+    accountBootListener_ = std::make_shared<AccountBootListener>();
 }
 
 void IpcServerStub::OnStart()
@@ -85,6 +86,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
+        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DM_SA_READY);
         return;
     }
 
@@ -112,6 +114,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         KVAdapterManager::GetInstance().ReInit();
+        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DATA_SHARE_SA_REDDY);
         return;
     }
 #endif

@@ -27,8 +27,10 @@
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "iremote_stub.h"
-#include "dm_single_instance.h"
 #include "system_ability.h"
+
+#include "account_boot_listener.h"
+#include "dm_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -160,6 +162,7 @@ private:
     mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
     std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
+    std::shared_ptr<AccountBootListener> accountBootListener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
