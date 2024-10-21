@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,13 +20,13 @@
 #include <functional>
 #include <securec.h>
 
-#include "parameter.h"
-#include "dm_anonymous.h"
-#include "dm_log.h"
-#include "dm_constants.h"
-#include "dm_random.h"
-#include "hichain_connector.h"
 #include "device_manager_service_listener.h"
+#include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "dm_credential_manager.h"
+#include "dm_log.h"
+#include "dm_random.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -232,6 +232,37 @@ HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: from_json_002
+ * @tc.desc: Pass in arguments to the from_JSON function and convert it to the correct value
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level0)
+{
+    GroupInfo groupInfo;
+    groupInfo.userId = "test";
+    groupInfo.groupName = "test";
+    nlohmann::json jsonObject;
+    jsonObject[FIELD_GROUP_NAME] = 0;
+    jsonObject[FIELD_GROUP_ID] = 0;
+    jsonObject[FIELD_GROUP_OWNER] = 0;
+    jsonObject[FIELD_GROUP_TYPE] = "test";
+    jsonObject[FIELD_GROUP_VISIBILITY] = "test";
+    jsonObject[FIELD_USER_ID] = "userId";
+    from_json(jsonObject, groupInfo);
+    EXPECT_EQ(groupInfo.userId, "userId");
+
+    jsonObject[FIELD_USER_ID] = "0";
+    jsonObject.erase(FIELD_GROUP_NAME);
+    jsonObject.erase(FIELD_GROUP_ID);
+    jsonObject.erase(FIELD_GROUP_OWNER);
+    jsonObject.erase(FIELD_GROUP_TYPE);
+    jsonObject.erase(FIELD_GROUP_VISIBILITY);
+    from_json(jsonObject, groupInfo);
+    EXPECT_EQ(groupInfo.groupName, "test");
+}
+
+/**
  * @tc.name: HiChainConnector_001
  * @tc.desc: Returns a new pointer to the HiChainConnector constructor new
  * @tc.type: FUNC
@@ -370,52 +401,87 @@ HWTEST_F(HichainConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: onRequest_003
+ * @tc.desc: Test the onRequest method of HiChainConnector to ensure it handles different
+ *           return values from GetPinCode correctly.
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 2;
+    int32_t operationCode = 3;
+    char *reqParams = nullptr;
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    std::shared_ptr<MockIHiChainConnectorCallback> mockCallback = std::make_shared<MockIHiChainConnectorCallback>();
+    hiChainConnector->hiChainConnectorCallback_ = mockCallback;
+    EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(ERR_DM_FAILED));
+    EXPECT_NE(hiChainConnector->onRequest(requestId, operationCode, reqParams), nullptr);
+
+    EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(DM_OK));
+    EXPECT_NE(hiChainConnector->onRequest(requestId, operationCode, reqParams), nullptr);
+}
+
+/**
  * @tc.name: GetConnectPara_001
- * @tc.desc: set para not null and go to the second branch
+ * @tc.desc: Test GetConnectPara method when hiChainConnectorCallback_ is set to nullptr,
+ *           ensuring it returns an empty string.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(HichainConnectorTest, GetConnectPara_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    hiChainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    std::string deviceId = "23445";
-    std::string reqDeviceId = "234566";
-    std::string p;
+    hiChainConnector->hiChainConnectorCallback_ = nullptr;
+    std::string deviceId = "12345";
+    std::string reqDeviceId = "12345";
     std::string ret = hiChainConnector->GetConnectPara(deviceId, reqDeviceId);
-    EXPECT_EQ(ret, p);
+    EXPECT_EQ(ret, "");
 }
 
 /**
  * @tc.name: GetConnectPara_002
- * @tc.desc:Empty deviceId so that jsonObject.is_discarded is null and the value of connectAddr is returned
+ * @tc.desc: Test GetConnectPara method with an empty deviceId to ensure JSON parsing fails
+ *           and returns an empty string.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
-    std::string reqDeviceId = "234566";
+    std::string reqDeviceId = "12345";
+    std::shared_ptr<MockIHiChainConnectorCallback> mockCallback = std::make_shared<MockIHiChainConnectorCallback>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    hiChainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+    hiChainConnector->hiChainConnectorCallback_ = mockCallback;
+    EXPECT_CALL(*mockCallback, GetConnectAddr(testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(R"({"key": "value"})"));
     std::string ret = hiChainConnector->GetConnectPara(deviceId, reqDeviceId);
-    EXPECT_EQ(ret, "");
+    EXPECT_NE(ret, "");
 }
 
 /**
  * @tc.name: GetConnectPara_003
- * @tc.desc: hiChainConnectorCallback_ is nullptr return ""
+ * @tc.desc: Test GetConnectPara method with invalid JSON returned by hiChainConnectorCallback_
+ *           to ensure it returns an empty string.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(HichainConnectorTest, GetConnectPara_003, testing::ext::TestSize.Level0)
 {
-    std::string deviceId = "deviceIdTest";
-    std::string reqDeviceId = "11369";
+    std::string deviceId;
+    std::string reqDeviceId = "12345";
+    std::shared_ptr<MockIHiChainConnectorCallback> mockCallback = std::make_shared<MockIHiChainConnectorCallback>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    hiChainConnector->hiChainConnectorCallback_ = nullptr;
+    hiChainConnector->hiChainConnectorCallback_ = mockCallback;
+    EXPECT_CALL(*mockCallback, GetConnectAddr(testing::_))
+        .Times(1)
+        .WillOnce(testing::Return("invalid json"));
     std::string ret = hiChainConnector->GetConnectPara(deviceId, reqDeviceId);
-    EXPECT_EQ(ret, "");
+    EXPECT_EQ(ret, "invalid json");
 }
 
 /**
@@ -502,12 +568,19 @@ HWTEST_F(HichainConnectorTest, GetSyncGroupList_002, testing::ext::TestSize.Leve
 {
     std::vector<GroupInfo> groupList;
     GroupInfo groupList1;
-    groupList1.groupName = "hichainconnector";
-    groupList1.groupId = "123456";
-    groupList1.groupOwner = "doftbus";
-    groupList1.groupType = 1;
-    groupList1.groupVisibility = 2;
+    groupList1.groupName = "groupName";
+    groupList1.groupId = 1;
+    groupList1.groupOwner = "ohos.distributedhardware.devicemanager";
+    groupList1.groupType = 7;
+    groupList1.groupVisibility = 1;
     groupList.push_back(groupList1);
+    GroupInfo groupList2;
+    groupList2.groupName = "hichainconnector";
+    groupList2.groupId = "123456";
+    groupList2.groupOwner = "doftbus";
+    groupList2.groupType = 1;
+    groupList2.groupVisibility = 2;
+    groupList.push_back(groupList2);
     std::vector<std::string> syncGroupList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int ret = hiChainConnector->GetSyncGroupList(groupList, syncGroupList);
@@ -573,6 +646,46 @@ HWTEST_F(HichainConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: onFinish_002
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int operationCode = GroupOperationCode::MEMBER_JOIN;
+    const char *returnData = "returnDataTest";
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hiChainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+    EXPECT_EQ(ret, DM_OK);
+    ret = hiChainConnector->UnRegisterHiChainCallback();
+    EXPECT_EQ(ret, DM_OK);
+
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    operationCode = GroupOperationCode::GROUP_CREATE;
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    hiChainConnector->networkStyle_ = 1;
+    hiChainConnector->hiChainResCallback_ = nullptr;
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<HiChainConnector> hiChainConn = std::make_shared<HiChainConnector>();
+    hiChainConnector->hiChainResCallback_ = std::make_shared<DmCredentialManager>(hiChainConn, listener);
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    operationCode = GroupOperationCode::GROUP_DISBAND;
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    hiChainConnector->hiChainResCallback_ = nullptr;
+    hiChainConnector->onFinish(requestId, operationCode, returnData);
+
+    EXPECT_EQ(hiChainConnector->hiChainConnectorCallback_, nullptr);
+}
+
+/**
  * @tc.name: onError_001
  * @tc.desc: return DM_OK
  * @tc.type: FUNC
@@ -597,6 +710,45 @@ HWTEST_F(HichainConnectorTest, onError_001, testing::ext::TestSize.Level0)
     operationCode = GroupOperationCode::GROUP_DISBAND;
     hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: onError_002
+ * @tc.desc: return DM_OK
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, onError_002, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    int operationCode = GroupOperationCode::MEMBER_JOIN;
+    int errorCode = 1;
+    const char *errorReturn = "errorReturnTest";
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hiChainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+    EXPECT_EQ(ret, DM_OK);
+    ret = hiChainConnector->UnRegisterHiChainCallback();
+    EXPECT_EQ(ret, DM_OK);
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    operationCode = GroupOperationCode::GROUP_CREATE;
+    hiChainConnector->networkStyle_ = 0;
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    hiChainConnector->networkStyle_ = 1;
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<HiChainConnector> hiChainConn = std::make_shared<HiChainConnector>();
+    hiChainConnector->hiChainResCallback_ = std::make_shared<DmCredentialManager>(hiChainConn, listener);
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    operationCode = GroupOperationCode::GROUP_DISBAND;
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+
+    hiChainConnector->hiChainResCallback_ = nullptr;
+    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
+    EXPECT_EQ(hiChainConnector->hiChainConnectorCallback_, nullptr);
 }
 
 /**
@@ -1167,6 +1319,35 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->GetTrustedDevicesUdid(jsonStr.c_str(), udidList);
     EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetTrustedDevicesUdid_003
+ * @tc.desc: Verify that the function returns DM_OK and correctly populates the udidList.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_003, testing::ext::TestSize.Level0)
+{
+    const char* jsonStr = R"({
+        "device1": {
+            "authId": "valid_udid_1"
+        },
+        "device2": {
+            "authId": 12345
+        },
+        "device3": {
+            "authId": "valid_udid_2"
+        }
+    })";
+
+    std::vector<std::string> udidList;
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    int32_t ret = hiChainConnector->GetTrustedDevicesUdid(jsonStr, udidList);
+    EXPECT_EQ(ret, DM_OK);
+
+    std::vector<std::string> expectedUdidList = {"valid_udid_1", "valid_udid_2"};
+    EXPECT_EQ(udidList, expectedUdidList);
 }
 
 /**
