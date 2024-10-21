@@ -12,16 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <securec.h>
 #include "UTTest_hichain_auth_connector.h"
-
 #include "dm_constants.h"
 #include "hichain_auth_connector.h"
+
+static int32_t g_processCredentialResultCode = -1;
+static std::string g_processCredentialReturnDataStr = "";
 
 namespace OHOS {
 namespace DistributedHardware {
 void HiChainAuthConnectorTest::SetUp()
 {
+    g_processCredentialResultCode = -1;
+    g_processCredentialReturnDataStr = "";
 }
 
 void HiChainAuthConnectorTest::TearDown()
@@ -157,6 +161,20 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
+HWTEST_F(HiChainAuthConnectorTest, onRequest_004, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 0;
+    int operationCode = 0;
+    char *reqParams = nullptr;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+    std::shared_ptr<MockIDmDeviceAuthCallback> mockCallback = std::make_shared<MockIDmDeviceAuthCallback>();
+    hiChainAuthConnector->dmDeviceAuthCallback_ = mockCallback;
+    EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(ERR_DM_FAILED));
+    EXPECT_NE(hiChainAuthConnector->onRequest(requestId, operationCode, reqParams), nullptr);
+}
+
 HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
 {
     int64_t requestId = 0;
@@ -228,6 +246,61 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_001, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_002, testing::ext::TestSize.Level0)
+{
+    std::string localUdid;
+    int32_t osAccountId = 0;
+    std::string publicKey;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = "{invalid_json}";;
+    int32_t ret = hiChain_->GenerateCredential(localUdid, osAccountId, publicKey);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string localUdid;
+    int32_t osAccountId = 0;
+    std::string publicKey;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": "not_an_int", "publicKey": "key"})";
+    int32_t ret = hiChain_->GenerateCredential(localUdid, osAccountId, publicKey);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string localUdid;
+    int32_t osAccountId = 0;
+    std::string publicKey;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": 1)";
+    int32_t ret = hiChain_->GenerateCredential(localUdid, osAccountId, publicKey);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_005, testing::ext::TestSize.Level0)
+{
+    std::string localUdid;
+    int32_t osAccountId = 0;
+    std::string publicKey;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": "key"})";
+    int32_t ret = hiChain_->GenerateCredential(localUdid, osAccountId, publicKey);
+    EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_006, testing::ext::TestSize.Level0)
+{
+    std::string localUdid;
+    int32_t osAccountId = 0;
+    std::string publicKey;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 0, "publicKey": "key"})";
+    int32_t ret = hiChain_->GenerateCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_001, testing::ext::TestSize.Level0)
 {
     std::string localUdid = "2131351352";
@@ -245,6 +318,84 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.L
     int32_t osAccountId = 1245;
     bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
     EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = "{invalid_json}";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": "not_an_int", "publicKey": "key"})";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": -1, "publicKey": "key"})";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": 0})";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": "string"})";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["result"] = 15;
+    jsonObject["publicKey"] = 0;
+    std::string localUdid = jsonObject.dump();
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 2, "publicKey": "string"})";
+    int32_t osAccountId = 1245;
+    bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, GetCredential_001, testing::ext::TestSize.Level0)
@@ -265,6 +416,72 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_002, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = "{invalid_json}";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": "not_an_int", "publicKey": "key"})";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_005, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": -1, "publicKey": "key"})";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_006, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": 0})";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_007, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": "string"})";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_008, testing::ext::TestSize.Level0)
+{
+    std::string publicKey = "test";
+    std::string localUdid = "test";
+    int32_t osAccountId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 2, "publicKey": "string"})";
+    int32_t ret = hiChain_->GetCredential(localUdid, osAccountId, publicKey);
+    EXPECT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(HiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.Level0)
 {
     int32_t localUdid = 0;
@@ -283,6 +500,50 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_003, testing::ext::TestSize.Level0)
+{
+    int32_t localUdid = 0;
+    std::string deviceId = "test";
+    std::string publicKey = "test";
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = "{invalid_json}";
+    int32_t ret = hiChain_->ImportCredential(localUdid, deviceId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_004, testing::ext::TestSize.Level0)
+{
+    int32_t localUdid = 0;
+    std::string deviceId = "test";
+    std::string publicKey = "test";
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": "not_an_int"})";
+    int32_t ret = hiChain_->ImportCredential(localUdid, deviceId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_005, testing::ext::TestSize.Level0)
+{
+    int32_t localUdid = 0;
+    std::string deviceId = "test";
+    std::string publicKey = "test";
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": -1})";
+    int32_t ret = hiChain_->ImportCredential(localUdid, deviceId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_006, testing::ext::TestSize.Level0)
+{
+    int32_t localUdid = 0;
+    std::string deviceId = "test";
+    std::string publicKey = "test";
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 0})";
+    int32_t ret = hiChain_->ImportCredential(localUdid, deviceId, publicKey);
+    EXPECT_EQ(ret, DM_OK);
+}
+
 HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
@@ -298,5 +559,56 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.
     int32_t ret = hiChain_->DeleteCredential(deviceId, userId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "test";
+    int32_t userId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = "{invalid_json}";
+    int32_t ret = hiChain_->DeleteCredential(deviceId, userId);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "test";
+    int32_t userId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": "not_an_int"})";
+    int32_t ret = hiChain_->DeleteCredential(deviceId, userId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_005, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "test";
+    int32_t userId = 0;
+    g_processCredentialResultCode = HC_SUCCESS;
+    g_processCredentialReturnDataStr = R"({"result": 100})";
+    int32_t ret = hiChain_->DeleteCredential(deviceId, userId);
+    EXPECT_EQ(ret, 100);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
+
+extern "C" __attribute__((constructor)) DEVICE_AUTH_API_PUBLIC int32_t ProcessCredential(int32_t operationCode,
+    const char *requestParams, char **returnData)
+{
+    if (requestParams == nullptr || returnData == nullptr) {
+        return -1;
+    }
+
+    if (g_processCredentialReturnDataStr.empty()) {
+        *returnData = nullptr;
+        return -1;
+    }
+
+    char *charArray = strdup(g_processCredentialReturnDataStr.c_str());
+    if (charArray == nullptr) {
+        return -1;
+    }
+
+    *returnData = charArray;
+    return g_processCredentialResultCode;
+}

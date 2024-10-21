@@ -16,6 +16,7 @@
 #ifndef OHOS_UTTEST_DM_CREDENTIAL_MANAGER_H
 #define OHOS_UTTEST_DM_CREDENTIAL_MANAGER_H
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "device_auth.h"
 #include "dm_credential_manager.h"
@@ -31,6 +32,17 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    std::shared_ptr<DeviceManagerServiceListener> listener_;
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<DmCredentialManager> dmCreMgr_;
+};
+
+class MockDeviceManagerServiceListener : public DeviceManagerServiceListener {
+public:
+    MockDeviceManagerServiceListener() = default;
+    ~MockDeviceManagerServiceListener() = default;
+    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS
