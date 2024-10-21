@@ -179,6 +179,12 @@ public:
         (void)result;
         (void)content;
     }
+
+    void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override
+    {
+        (void)pkgName;
+        (void)devInfo;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

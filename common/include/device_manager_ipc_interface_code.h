@@ -92,6 +92,8 @@ enum DMIpcCmdInterfaceCode {
     CHECK_SAME_ACCOUNT,
     SHIFT_LNN_GEAR,
     SET_DN_POLICY,
+    SERVER_DEVICE_SCREEN_STATE_NOTIFY,
+    GET_DEVICE_SCREEN_STATUS,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

@@ -938,6 +938,85 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound7, testing::ext::TestSize.Level0)
     auto map = DeviceManagerNotify::GetInstance().deviceDiscoveryCallbacks_[pkgName];
     EXPECT_EQ(map.empty(), false);
 }
+
+/**
+ * @tc.name: RegisterCredentialCallback_301
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterCredentialCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<CredentialCallback> callback = std::make_shared<CredentialCallbackTest>();
+    DeviceManagerNotify::GetInstance().credentialCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    DeviceManagerNotify::GetInstance().UnRegisterCredentialCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().credentialCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_302
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterCredentialCallback_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::shared_ptr<CredentialCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().credentialCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().credentialCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_303
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterCredentialCallback_303, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<CredentialCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().credentialCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().credentialCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_301
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::shared_ptr<PinHolderCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().pinHolderCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().pinHolderCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_302
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<PinHolderCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().pinHolderCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().pinHolderCallback_.empty(), true);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_303
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_303, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::shared_ptr<PinHolderCallback> callback = std::make_shared<PinHolderCallbackTest>();
+    DeviceManagerNotify::GetInstance().pinHolderCallback_.clear();
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().pinHolderCallback_.empty(), true);
+}
 } // namespace
 
 DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()

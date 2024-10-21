@@ -110,6 +110,15 @@ public:
     void OnDeviceChanged(const DmDeviceBasicInfo &deviceBasicInfo) override {}
     void OnDeviceReady(const DmDeviceBasicInfo &deviceBasicInfo) override {}
 };
+
+class PinHolderCallbackTest : public PinHolderCallback {
+public:
+    void OnPinHolderCreate(const std::string &deviceId, DmPinType pinType, const std::string &payload) {}
+    void OnPinHolderDestroy(DmPinType pinType, const std::string &payload) {}
+    void OnCreateResult(int32_t result) {}
+    void OnDestroyResult(int32_t result) {}
+    void OnPinHolderEvent(DmPinHolderEvent event, int32_t result, const std::string &content) {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

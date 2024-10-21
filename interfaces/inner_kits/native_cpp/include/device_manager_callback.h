@@ -132,6 +132,14 @@ public:
     virtual void OnDestroyResult(int32_t result) = 0;
     virtual void OnPinHolderEvent(DmPinHolderEvent event, int32_t result, const std::string &content) = 0;
 };
+
+class DeviceScreenStatusCallback {
+public:
+    virtual ~DeviceScreenStatusCallback()
+    {
+    }
+    virtual void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

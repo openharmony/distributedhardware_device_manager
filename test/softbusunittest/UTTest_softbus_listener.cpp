@@ -501,7 +501,7 @@ HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Le
         softbusListener = std::make_shared<SoftbusListener>();
     }
     auto ret = softbusListener->GetDmRadarHelperObj();
-    EXPECT_EQ(ret, nullptr);
+    EXPECT_NE(ret, nullptr);
 }
 
 HWTEST_F(SoftbusListenerTest, SetHostPkgName_001, testing::ext::TestSize.Level0)

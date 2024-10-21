@@ -476,5 +476,47 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoy(const std::string &p
     return DM_OK;
 }
 #endif
+
+void DeviceManagerServiceListener::SetDeviceScreenInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq,
+    const std::string &pkgName, const DmDeviceInfo &deviceInfo)
+{
+    LOGI("In");
+    pReq->SetPkgName(pkgName);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string appId = "";
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+        pReq->SetDeviceInfo(deviceInfo);
+        return;
+    }
+    DmDeviceInfo dmDeviceInfo = deviceInfo;
+    ConfuseUdidHash(pkgName, dmDeviceInfo);
+    pReq->SetDeviceInfo(dmDeviceInfo);
+    return;
+#endif
+    pReq->SetDeviceInfo(deviceInfo);
+}
+
+void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo)
+{
+    LOGI("In, pkgName = %{public}s", pkgName.c_str());
+    if (pkgName == std::string(DM_PKG_NAME)) {
+        std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
+        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        for (const auto &it : PkgNameVec) {
+            SetDeviceScreenInfo(pReq, it, devInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
+        }
+    } else {
+        std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
+        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+        std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetSystemSA();
+        notifyPkgnames.insert(pkgName);
+        for (const auto &it : notifyPkgnames) {
+            SetDeviceScreenInfo(pReq, it, devInfo);
+            ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

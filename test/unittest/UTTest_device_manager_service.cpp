@@ -68,7 +68,7 @@ void DeviceManagerServiceTest::SetUpTestCase()
 void DeviceManagerServiceTest::TearDownTestCase()
 {
 }
-
+namespace {
 void DeletePermission()
 {
     const int32_t permsNum = 1;
@@ -91,7 +91,6 @@ void DeletePermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-namespace {
 /**
  * @tc.name: InitDMServiceListener_001
  * @tc.desc: Init device manager listener and return DM_OK

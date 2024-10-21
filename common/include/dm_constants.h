@@ -230,6 +230,7 @@ constexpr const char* TOKENID = "tokenId";
 constexpr const char* DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 constexpr const char* PARAM_KEY_POLICY_STRATEGY_FOR_BLE = "DM_POLICY_STRATEGY_FOR_BLE";
 constexpr const char* PARAM_KEY_POLICY_TIME_OUT = "DM_POLICY_TIMEOUT";
+constexpr const char* DEVICE_SCREEN_STATUS = "DEVICE_SCREEN_STATUS";
 
 // screen state
 constexpr int32_t DM_SCREEN_UNKNOWN = -1;

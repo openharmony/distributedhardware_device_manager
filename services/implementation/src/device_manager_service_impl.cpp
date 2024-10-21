@@ -755,6 +755,44 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
     authMgr_->HandleDeviceNotTrust(udid);
 }
 
+void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
+{
+    LOGI("In");
+    CHECK_NULL_VOID(deviceStateMgr_);
+    CHECK_NULL_VOID(softbusConnector_);
+    std::string trustDeviceId = "";
+    if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
+        LOGE("get udid failed.");
+        return;
+    }
+    std::string udidHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHash.c_str(), udidHash.length()) != 0) {
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHash).c_str());
+        return;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = static_cast<std::string>(localUdid);
+    uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
+    LOGI("bind type is %{public}d.", bindType);
+    if (bindType == INVALIED_TYPE) {
+        return;
+    } else if (bindType == IDENTICAL_ACCOUNT_TYPE || bindType == DEVICE_PEER_TO_PEER_TYPE ||
+        bindType == DEVICE_ACROSS_ACCOUNT_TYPE) {
+        softbusConnector_->ClearPkgName();
+        LOGI("networkId: %{public}s", GetAnonyString(devInfo.networkId).c_str());
+    } else if (bindType == APP_PEER_TO_PEER_TYPE || bindType == APP_ACROSS_ACCOUNT_TYPE) {
+        std::vector<std::string> pkgNameVec =
+            DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(requestDeviceId, trustDeviceId);
+        if (pkgNameVec.size() == 0) {
+            LOGI("not need report pkgname");
+            return;
+        }
+        softbusConnector_->SetPkgNameVec(pkgNameVec);
+    }
+    deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
