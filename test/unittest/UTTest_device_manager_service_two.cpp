@@ -54,11 +54,11 @@ void DeletePermission()
  * @tc.name: RegisterDeviceManagerListener_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterDeviceManagerListener_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
     DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().RegisterDeviceManagerListener(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_ != nullptr, true);
 }
 

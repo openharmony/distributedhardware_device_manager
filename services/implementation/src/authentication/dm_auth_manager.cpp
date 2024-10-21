@@ -51,14 +51,14 @@ const int32_t INPUT_TIMEOUT = 60;
 const int32_t ADD_TIMEOUT = 10;
 const int32_t WAIT_NEGOTIATE_TIMEOUT = 10;
 const int32_t WAIT_REQUEST_TIMEOUT = 10;
-const int32_t CLONE_AUTHENTICATE_TIMEOUT = 20;
-const int32_t CLONE_CONFIRM_TIMEOUT = 10;
-const int32_t CLONE_NEGOTIATE_TIMEOUT = 10;
-const int32_t CLONE_INPUT_TIMEOUT = 10;
-const int32_t CLONE_ADD_TIMEOUT = 10;
-const int32_t CLONE_WAIT_NEGOTIATE_TIMEOUT = 10;
-const int32_t CLONE_WAIT_REQUEST_TIMEOUT = 10;
-const int32_t CLONE_SESSION_HEARTBEAT_TIMEOUT = 20;
+const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
+const int32_t CLONE_CONFIRM_TIMEOUT = 5;
+const int32_t CLONE_NEGOTIATE_TIMEOUT = 5;
+const int32_t CLONE_INPUT_TIMEOUT = 5;
+const int32_t CLONE_ADD_TIMEOUT = 5;
+const int32_t CLONE_WAIT_NEGOTIATE_TIMEOUT = 5;
+const int32_t CLONE_WAIT_REQUEST_TIMEOUT = 5;
+const int32_t CLONE_SESSION_HEARTBEAT_TIMEOUT = 10;
 const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
 const int32_t DEVICE_ID_HALF = 2;
 const int32_t MAX_AUTH_TIMES = 3;
@@ -806,15 +806,15 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && (authResponseContext_->bindLevel >= DEVICE &&
         authResponseContext_->bindLevel <= APP)) {
         ProcRespNegotiateExt(sessionId);
-        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
+            GetTaskTimeout(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
         authResponseContext_->bindLevel == INVALIED_TYPE) {
         ProcRespNegotiate(sessionId);
-        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK), WAIT_REQUEST_TIMEOUT,
-            [this] (std::string name) {
+        timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
+            GetTaskTimeout(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT), [this] (std::string name) {
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
     } else {
