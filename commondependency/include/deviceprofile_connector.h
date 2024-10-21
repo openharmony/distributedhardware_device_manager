@@ -150,6 +150,8 @@ public:
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void DeleteAccessControlList(const std::string &udid);
+    int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+        const std::string &udid, uint64_t &tokenId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

@@ -40,6 +40,7 @@ public:
     int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
     int32_t GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel);
     void UpdateDeviceInfoCache();
+    int32_t GetUdidByUdidHash(const std::string &udidHash, std::string &udid);
     void SaveLocalDeviceInfo();
     void DeleteLocalDeviceInfo();
     int32_t GetLocalDeviceInfo(DmDeviceInfo &nodeInfo);

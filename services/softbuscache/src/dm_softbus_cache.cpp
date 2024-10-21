@@ -371,5 +371,21 @@ int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceIn
         GetAnonyString(devInfo.deviceName).c_str(), devInfo.deviceTypeId);
     return ret;
 }
+
+int32_t SoftbusCache::GetUdidByUdidHash(const std::string &udidHash, std::string &udid)
+{
+    LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.deviceId) == udidHash) {
+                udid = item.first;
+                LOGI("GetUdidByUdidHash success udid %{public}s.", GetAnonyString(udid).c_str());
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_FAILED;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
