@@ -34,21 +34,21 @@ public:
     int32_t Init();
     void UnInit();
     void ReInit();
-    int32_t Put(const std::string &key, const DmKVValue &value);
+    int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
     int32_t Get(const std::string &key, DmKVValue &value);
     int32_t DeleteAgedEntry();
+    int32_t AppUnintall(const std::string &appId);
 
 private:
     KVAdapterManager() = default;
     ~KVAdapterManager() = default;
     inline bool IsTimeOut(int64_t sourceTime, int64_t targetTime, int64_t timeOut);
-    inline std::string AddPrefix(const std::string &key);
 
 private:
     std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
     std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
     std::mutex idCacheMapMtx_;
-    std::map<std::string, std::pair<std::string, int64_t>> idCacheMap_;
+    std::map<std::string, DmKVValue> idCacheMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

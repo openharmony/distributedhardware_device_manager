@@ -266,7 +266,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         }
         for (auto item : onlineDeviceList) {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            ConvertUdidHashToAnoy(item);
+            ConvertUdidHashToAnoyDeviceId(item);
 #endif
             std::string udid = "";
             SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
@@ -355,7 +355,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHashTemp = "";
-    if (ConvertUdidHashToAnoy(localDeviceId_, udidHashTemp) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(localDeviceId_, udidHashTemp) == DM_OK) {
         (void)memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
         if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
@@ -517,7 +517,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     std::string queryDeviceId = deviceId;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHash = "";
-    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+    if (GetUdidHashByAnoyDeviceId(deviceId, udidHash) == DM_OK) {
         queryDeviceId = udidHash;
     }
 #endif
@@ -596,7 +596,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     std::string queryDeviceId = deviceId;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHash = "";
-    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+    if (GetUdidHashByAnoyDeviceId(deviceId, udidHash) == DM_OK) {
         queryDeviceId = udidHash;
     }
 #endif
@@ -614,15 +614,14 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParamMap);
 }
 
-int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
+int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::UnBindDevice begin for pkgName = %{public}s, deviceId = %{public}s",
-        pkgName.c_str(), GetAnonyString(deviceId).c_str());
-    if (pkgName.empty() || deviceId.empty()) {
+    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
+    if (pkgName.empty() || udidHash.empty()) {
         LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -630,14 +629,37 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string realDeviceId = deviceId;
+    std::string realDeviceId = udidHash;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::string udidHash = "";
-    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
-        realDeviceId = udidHash;
+    std::string udidHashTemp = "";
+    if (GetUdidHashByAnoyDeviceId(udidHash, udidHashTemp) == DM_OK) {
+        realDeviceId = udidHashTemp;
     }
 #endif
-    return dmServiceImpl_->UnBindDevice(pkgName, realDeviceId);
+    std::string udid = "";
+    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+        LOGE("Get udid by udidhash failed.");
+        return ERR_DM_FAILED;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    uint64_t tokenId = 0;
+    int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
+    LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
+    if (bindLevel == INVALIED_BIND_LEVEL) {
+        LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
+        return ERR_DM_FAILED;
+    }
+    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
+        LOGE("dmServiceImpl_ UnBindDevice failed.");
+        return ERR_DM_FAILED;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<std::string> peerUdids;
+    peerUdids.emplace_back(udid);
+    SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId, bindLevel);
+#endif
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
@@ -1735,10 +1757,10 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-void DeviceManagerService::ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo)
+void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo)
 {
     std::string udidHashTemp = "";
-    if (ConvertUdidHashToAnoy(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
         (void)memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN);
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
@@ -1746,35 +1768,29 @@ void DeviceManagerService::ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo)
     }
 }
 
-int32_t DeviceManagerService::ConvertUdidHashToAnoy(const std::string &udidHash, std::string &result)
+int32_t DeviceManagerService::ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &result)
 {
     LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
     std::string appId = AppManager::GetInstance().GetAppId();
     if (appId.empty()) {
-        LOGI("GetAppId failed");
+        LOGD("GetAppId failed");
         return ERR_DM_FAILED;
     }
-    std::string udidTemp = udidHash + appId;
-    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(udidTemp, reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
-        LOGE("get deviceIdHash by udidTemp: %{public}s failed.", GetAnonyString(udidTemp).c_str());
-        return ERR_DM_FAILED;
-    }
-    result = std::string(deviceIdHash);
     DmKVValue kvValue;
-    kvValue.udidHash = udidHash;
-    kvValue.appID = appId;
-    kvValue.lastModifyTime = GetSecondsSince1970ToNow();
-    KVAdapterManager::GetInstance().Put(result, kvValue);
+    int32_t ret = Crypto::ConvertUdidHashToAnoyAndSave(appId, udidHash, kvValue);
+    if (ret != DM_OK) {
+        return ERR_DM_FAILED;
+    }
+    result = kvValue.anoyDeviceId;
     return DM_OK;
 }
 
-int32_t DeviceManagerService::GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash)
+int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash)
 {
-    LOGI("anoyUdid %{public}s.", GetAnonyString(anoyUdid).c_str());
-    DmKVValue kvValue ;
-    if (KVAdapterManager::GetInstance().Get(anoyUdid, kvValue) != DM_OK) {
-        LOGE("Get kv value from DB failed");
+    LOGI("anoyDeviceId %{public}s.", GetAnonyString(anoyDeviceId).c_str());
+    DmKVValue kvValue;
+    if (KVAdapterManager::GetInstance().Get(anoyDeviceId, kvValue) != DM_OK) {
+        LOGD("Get kv value from DB failed");
         return ERR_DM_FAILED;
     }
     udidHash = kvValue.udidHash;
@@ -1782,6 +1798,24 @@ int32_t DeviceManagerService::GetUdidHashByAnoyUdid(const std::string &anoyUdid,
     return DM_OK;
 }
 #endif
+
+void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId, int32_t bindLevel)
+{
+    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
+    if (bindLevel == DEVICE) {
+        SendDeviceUnBindBroadCast(peerUdids, userId);
+        return;
+    }
+    if (bindLevel == APP) {
+        SendAppUnBindBroadCast(peerUdids, userId, tokenId);
+        return;
+    }
+    if (bindLevel == SERVICE) {
+        SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
+        return;
+    }
+}
 
 void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
 {
@@ -1810,6 +1844,25 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
         return ret;
     }
     return DM_OK;
+}
+
+void DeviceManagerService::SubscribePackageCommonEvent()
+{
+    LOGI("Start");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (packageCommonEventManager_ == nullptr) {
+        packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
+    }
+    PackageEventCallback callback = [=](const auto &arg1, const auto &arg2) {
+        KVAdapterManager::GetInstance().AppUnintall(arg1);
+    };
+    std::vector<std::string> commonEventVec;
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_PACKAGE_FULLY_REMOVED);
+    if (packageCommonEventManager_->SubscribePackageCommonEvent(commonEventVec, callback)) {
+        LOGI("Success");
+    }
+#endif
 }
 } // namespace DistributedHardware
 } // namespace OHOS
