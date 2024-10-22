@@ -136,10 +136,10 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
 {
     (void)pkgName;
-    (void)udidHash;
+    (void)udid;
     (void)bindLevel;
     return DM_OK;
 }
