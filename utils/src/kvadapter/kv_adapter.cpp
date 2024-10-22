@@ -63,7 +63,7 @@ int32_t KVAdapter::Init()
         LOGE("CheckKvStore, left times: %{public}d, status: %{public}d", tryTimes, status);
         if (status == DistributedKv::Status::STORE_META_CHANGED ||
             status == DistributedKv::Status::SECURITY_LEVEL_ERROR ||
-            status == DistributedKv::Status::CRYPT_ERROR) {
+            status == DistributedKv::Status::DATA_CORRUPTED) {
             LOGE("init db error, remove and rebuild it");
             DeleteKvStore();
         }
