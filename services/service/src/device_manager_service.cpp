@@ -27,7 +27,6 @@
 #include "dm_softbus_cache.h"
 #include "parameter.h"
 #include "permission_manager.h"
-#include "relationship_sync_mgr.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "datetime_ex.h"
@@ -65,7 +64,6 @@ const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 constexpr const char* ALL_PKGNAME = "";
 constexpr const char* NETWORKID = "NETWORK_ID";
-constexpr uint32_t INVALIED_BIND_LEVEL = 0;
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -616,14 +614,15 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParamMap);
 }
 
-int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &deviceId)
 {
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (pkgName.empty() || udidHash.empty()) {
+    LOGI("DeviceManagerService::UnBindDevice begin for pkgName = %{public}s, deviceId = %{public}s",
+        pkgName.c_str(), GetAnonyString(deviceId).c_str());
+    if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -631,37 +630,14 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    std::string realDeviceId = udidHash;
+    std::string realDeviceId = deviceId;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::string udidHashTemp = "";
-    if (GetUdidHashByAnoyDeviceId(udidHash, udidHashTemp) == DM_OK) {
-        realDeviceId = udidHashTemp;
+    std::string udidHash = "";
+    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+        realDeviceId = udidHash;
     }
 #endif
-    std::string udid = "";
-    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
-        LOGE("Get udid by udidhash failed.");
-        return ERR_DM_FAILED;
-    }
-    char localUdid[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
-    uint64_t tokenId = 0;
-    int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
-    LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
-    if (bindLevel == INVALIED_BIND_LEVEL) {
-        LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
-        return ERR_DM_FAILED;
-    }
-    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
-        LOGE("dmServiceImpl_ UnBindDevice failed.");
-        return ERR_DM_FAILED;
-    }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::vector<std::string> peerUdids;
-    peerUdids.emplace_back(udid);
-    SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId, bindLevel);
-#endif
-    return DM_OK;
+    return dmServiceImpl_->UnBindDevice(pkgName, realDeviceId);
 }
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
@@ -1798,61 +1774,6 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
     udidHash = kvValue.udidHash;
     LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
     return DM_OK;
-}
-
-void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
-    uint64_t tokenId, int32_t bindLevel)
-{
-    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
-    if (bindLevel == DEVICE) {
-        SendDeviceUnBindBroadCast(peerUdids, userId);
-        return;
-    }
-    if (bindLevel == APP) {
-        SendAppUnBindBroadCast(peerUdids, userId, tokenId);
-        return;
-    }
-    if (bindLevel == SERVICE) {
-        SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
-        return;
-    }
-}
-
-void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::DEVICE_UNBIND;
-    msg.userId = static_cast<uint32_t>(userId);
-    msg.peerUdids = peerUdids;
-    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
-}
-
-void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
-    uint64_t tokenId)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::APP_UNBIND;
-    msg.userId = static_cast<uint32_t>(userId);
-    msg.peerUdids = peerUdids;
-    msg.tokenId = tokenId;
-    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
-}
-
-void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
-    uint64_t tokenId)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::SERVICE_UNBIND;
-    msg.userId = static_cast<uint32_t>(userId);
-    msg.peerUdids = peerUdids;
-    msg.tokenId = tokenId;
-    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 #endif
 
