@@ -70,6 +70,7 @@ if (defined(ohos_lite)) {
         "src/ipc/lite/ipc_server_stub.cpp",
         "src/permission/lite/permission_manager.cpp",
         "src/pinholder/pin_holder.cpp",
+        "src/pinholder/pin_holder_session.cpp",
         "src/softbus/mine_softbus_listener.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
@@ -121,7 +122,7 @@ if (defined(ohos_lite)) {
       "include/ipc/standard",
       "include/permission/standard",
       "include/pinholder",
-      "include/publishcommonevent",    
+      "include/publishcommonevent",
       "include/softbus",
       "${common_path}/include",
       "${common_path}/include/dfx",
