@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
         "include/ipc/lite",
         "include/permission/lite",
         "include/pinholder",
+        "include/relationshipsyncmgr",
         "${common_path}/include",
         "${common_path}/include/ipc",
         "${common_path}/include/ipc/lite",
@@ -70,7 +71,7 @@ if (defined(ohos_lite)) {
         "src/ipc/lite/ipc_server_stub.cpp",
         "src/permission/lite/permission_manager.cpp",
         "src/pinholder/pin_holder.cpp",
-        "src/pinholder/pin_holder_session.cpp",
+        "src/relationshipsyncmgr/relationship_sync_mgr.cpp",
         "src/softbus/mine_softbus_listener.cpp",
         "src/softbus/softbus_listener.cpp",
       ]
@@ -123,6 +124,7 @@ if (defined(ohos_lite)) {
       "include/permission/standard",
       "include/pinholder",
       "include/publishcommonevent",
+      "include/relationshipsyncmgr",      
       "include/softbus",
       "${common_path}/include",
       "${common_path}/include/dfx",
@@ -172,6 +174,7 @@ if (defined(ohos_lite)) {
       "src/publishcommonevent/dm_account_common_event.cpp",
       "src/publishcommonevent/dm_package_common_event.cpp",
       "src/publishcommonevent/dm_screen_common_event.cpp",
+      "src/relationshipsyncmgr/relationship_sync_mgr.cpp",      
       "src/softbus/mine_softbus_listener.cpp",
       "src/softbus/softbus_listener.cpp",
     ]
