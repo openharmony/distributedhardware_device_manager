@@ -633,7 +633,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     std::string realDeviceId = deviceId;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string udidHash = "";
-    if (GetUdidHashByAnoyUdid(deviceId, udidHash) == DM_OK) {
+    if (GetUdidHashByAnoyDeviceId(deviceId, udidHash) == DM_OK) {
         realDeviceId = udidHash;
     }
 #endif

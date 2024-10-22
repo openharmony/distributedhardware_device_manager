@@ -24,7 +24,6 @@
 #include "dm_single_instance.h"
 
 #include "kv_adapter.h"
-#include "dm_kv_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

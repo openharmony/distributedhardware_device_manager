@@ -136,8 +136,6 @@ public:
     int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void HandleDeviceNotTrust(const std::string &udid);
-    int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
-        const std::string &udid, uint64_t &tokenId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
 private:
