@@ -588,7 +588,7 @@ HWTEST_F(SoftbusListenerTest, GetDmRadarHelperObj_001, testing::ext::TestSize.Le
         softbusListener = std::make_shared<SoftbusListener>();
     }
     auto ret = softbusListener->GetDmRadarHelperObj();
-    EXPECT_EQ(ret, nullptr);
+    EXPECT_NE(ret, nullptr);
 }
 
 HWTEST_F(SoftbusListenerTest, SetHostPkgName_001, testing::ext::TestSize.Level0)
@@ -723,6 +723,8 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    NodeBasicInfo *info = nullptr;
+    softbusListener->OnSoftbusDeviceOffline(info);
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }

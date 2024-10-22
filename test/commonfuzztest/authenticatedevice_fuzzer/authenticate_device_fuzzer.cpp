@@ -275,6 +275,108 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
 }
+
+void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    AddPermission();
+    std::string str(reinterpret_cast<const char*>(data), size);
+
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ =
+        std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
+    std::string emptyStr = "";
+    DmDeviceInfo info;
+    DmDeviceBasicInfo deviceBasicInfo;
+    int32_t indexTwo = 2;
+    int32_t numOne = 1;
+    int32_t numOneTwoTimes = 11;
+    int32_t numOneThreeTimes = 111;
+    int32_t numOneSixTimes = 111111;
+
+    DeviceManagerImpl::GetInstance().ConvertDeviceInfoToDeviceBasicInfo(info, deviceBasicInfo);
+    DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, emptyStr, g_deviceList);
+    DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, emptyStr, false, g_deviceList);
+    DeviceManagerImpl::GetInstance().GetDeviceInfo(str, emptyStr, info);
+    DeviceManagerImpl::GetInstance().RegisterDevStatusCallback(str, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterDevStateCallback(str);
+    DeviceManagerImpl::GetInstance().UnRegisterDevStatusCallback(emptyStr);
+    DeviceManagerImpl::GetInstance().StartDeviceDiscovery(str, g_subscribeInfo, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().StartDeviceDiscovery(str, numOneSixTimes, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().StopDeviceDiscovery(str, numOneTwoTimes);
+    DeviceManagerImpl::GetInstance().StopDeviceDiscovery(numOneThreeTimes, "");
+    DeviceManagerImpl::GetInstance().PublishDeviceDiscovery(str, g_publishInfo, nullptr);
+    DeviceManagerImpl::GetInstance().UnPublishDeviceDiscovery(str, numOneTwoTimes);
+    DeviceManagerImpl::GetInstance().AuthenticateDevice(str, numOne, info, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().RegisterDeviceManagerFaCallback(str, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterDeviceManagerFaCallback(str);
+    DeviceManagerImpl::GetInstance().VerifyAuthentication(str, emptyStr, nullptr);
+    PeerTargetId targetId;
+    std::map<std::string, std::string> discoverParam;
+    DeviceManagerImpl::GetInstance().BindTarget(str, targetId, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().UnbindTarget(str, targetId, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, discoverParam, false, g_deviceList);
+    DeviceManagerImpl::GetInstance().RegisterDevStateCallback(str, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().AddDiscoveryCallback("test", nullptr);
+    DeviceManagerImpl::GetInstance().RemoveDiscoveryCallback("test");
+    DeviceManagerImpl::GetInstance().AddPublishCallback("test");
+    DeviceManagerImpl::GetInstance().RemovePublishCallback("test");
+    DeviceManagerImpl::GetInstance().RegisterPinHolderCallback(str, nullptr);
+    DeviceManagerImpl::GetInstance().GetDeviceSecurityLevel(str, emptyStr, indexTwo);
+    DeviceManagerImpl::GetInstance().IsSameAccount(emptyStr);
+}
+
+void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    AddPermission();
+    std::string str(reinterpret_cast<const char*>(data), size);
+
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ =
+        std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
+    std::string emptyStr = "";
+    DmDeviceInfo info;
+    DmDeviceBasicInfo deviceBasicInfo;
+    int32_t indexTwo = 2;
+    DmAuthParam dmFaParam;
+    DeviceManagerImpl::GetInstance().GetFaParam(str, dmFaParam);
+    DeviceManagerImpl::GetInstance().SetUserOperation(str, 1, emptyStr);
+    DeviceManagerImpl::GetInstance().GetUdidByNetworkId(str, emptyStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().GetUuidByNetworkId(str, emptyStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().RegisterDevStateCallback(str, emptyStr);
+    DeviceManagerImpl::GetInstance().UnRegisterDevStateCallback(str, emptyStr);
+    DeviceManagerImpl::GetInstance().RegisterUiStateCallback(str);
+    DeviceManagerImpl::GetInstance().UnRegisterUiStateCallback(str);
+    DeviceManagerImpl::GetInstance().RequestCredential(str, g_reqJsonStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().ImportCredential(str, emptyStr);
+    DeviceManagerImpl::GetInstance().DeleteCredential(str, emptyStr);
+    DeviceManagerImpl::GetInstance().RegisterCredentialCallback(str, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterCredentialCallback(str);
+    DeviceManagerImpl::GetInstance().NotifyEvent(str, 1, emptyStr);
+    DeviceManagerImpl::GetInstance().RequestCredential(str, g_returnStr);
+    DeviceManagerImpl::GetInstance().CheckCredential(str, g_reqJsonStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().GetEncryptedUuidByNetworkId(str, emptyStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().GenerateEncryptedUuid(str, emptyStr, emptyStr, g_returnStr);
+    DeviceManagerImpl::GetInstance().BindDevice(str, 1, emptyStr, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().UnBindDevice(str, emptyStr);
+    DeviceManagerImpl::GetInstance().GetNetworkTypeByNetworkId(str, emptyStr, indexTwo);
+    DeviceManagerImpl::GetInstance().ImportAuthCode(emptyStr, emptyStr);
+    DeviceManagerImpl::GetInstance().ExportAuthCode(g_returnStr);
+    std::map<std::string, std::string> discoverParam;
+    DeviceManagerImpl::GetInstance().StartDiscovering(str, discoverParam, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().StopDiscovering(str, discoverParam);
+    DeviceManagerImpl::GetInstance().RegisterDiscoveryCallback(str, discoverParam, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterDiscoveryCallback(str);
+    DeviceManagerImpl::GetInstance().StartAdvertising(str, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().StopAdvertising(str, discoverParam);
+    DeviceManagerImpl::GetInstance().SetDnPolicy(str, discoverParam);
+    DeviceManagerImpl::GetInstance().RegisterDeviceScreenStatusCallback(emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().UnRegisterDeviceScreenStatusCallback(emptyStr);
+    DeviceManagerImpl::GetInstance().GetDeviceScreenStatus(emptyStr, emptyStr, indexTwo);
+}
 }
 }
 
@@ -285,5 +387,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::AuthenticateDeviceFirstFuzzTest(data, size);
     OHOS::DistributedHardware::AuthenticateDeviceSecondFuzzTest(data, size);
     OHOS::DistributedHardware::AuthenticateDeviceThirdFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceFourthFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceFifthFuzzTest(data, size);
     return 0;
 }

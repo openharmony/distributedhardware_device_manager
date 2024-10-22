@@ -293,7 +293,10 @@ ohos_unittest("UTTest_dm_credential_manager") {
 ohos_unittest("UTTest_device_manager_service") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_device_manager_service.cpp" ]
+  sources = [
+    "UTTest_device_manager_service.cpp",
+    "UTTest_device_manager_service_two.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 

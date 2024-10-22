@@ -101,6 +101,15 @@ public:
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
                       int32_t reason) override {}
 };
+
+class DeviceScreenStatusCallbackTest : public DeviceScreenStatusCallback {
+public:
+    ~DeviceScreenStatusCallbackTest()
+    {
+    }
+    void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
+};
+
 } // namespace DistributedHardware
 } // namespace OHOS
 

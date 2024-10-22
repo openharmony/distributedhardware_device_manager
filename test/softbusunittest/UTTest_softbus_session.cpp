@@ -259,6 +259,9 @@ HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
     void *data = nullptr;
     unsigned int dataLen = 1;
     softbusSession->OnBytesReceived(sessionId, data, dataLen);
+    softbusSession->OnBytesReceived(sessionId, data, -1);
+    sessionId = -1;
+    softbusSession->OnBytesReceived(sessionId, data, dataLen);
     int ret = softbusSession->OnSessionOpened(sessionId, result);
     softbusSession->OnSessionClosed(sessionId);
     EXPECT_EQ(ret, DM_OK);

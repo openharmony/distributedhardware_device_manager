@@ -38,6 +38,8 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen);
+void VersionSplitToInt(const std::string &str, const char split, std::vector<int32_t> &numVec);
+bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int32_t> &sinkVecNum);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

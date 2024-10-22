@@ -36,6 +36,8 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_screen_status_req.h"
+#include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
@@ -2212,6 +2214,58 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
         return ret;
     }
     LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterDeviceScreenStatusCallback(const std::string &pkgName,
+    std::shared_ptr<DeviceScreenStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterDeviceScreenStatusCallback(pkgName, callback);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterDeviceScreenStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceScreenStatusCallback(pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
+    int32_t &screenStatus)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start: pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+
+    std::shared_ptr<IpcGetDeviceScreenStatusReq> req = std::make_shared<IpcGetDeviceScreenStatusReq>();
+    std::shared_ptr<IpcGetDeviceScreenStatusRsp> rsp = std::make_shared<IpcGetDeviceScreenStatusRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_SCREEN_STATUS, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    screenStatus = rsp->GetScreenStatus();
     return DM_OK;
 }
 } // namespace DistributedHardware

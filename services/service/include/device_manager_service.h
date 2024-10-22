@@ -197,7 +197,9 @@ public:
     void HandleDeviceNotTrust(const std::string &msg);
 
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
-
+    void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
+    int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
+        int32_t &screenStatus);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

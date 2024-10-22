@@ -23,6 +23,11 @@
 #include "dm_device_info.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
+#include "ipc_create_pin_holder_req.h"
+#include "ipc_destroy_pin_holder_req.h"
+#include "ipc_register_listener_req.h"
+#include "ipc_get_trustdevice_rsp.h"
+#include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
@@ -30,8 +35,13 @@
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
+#include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_discovery_req.h"
-#include "ipc_notify_device_discovery_req.h"
+#include "ipc_notify_dmfa_result_req.h"
+#include "ipc_notify_event_req.h"
+#include "ipc_notify_pin_holder_event_req.h"
+#include "ipc_notify_publish_result_req.h"
+#include "device_manager_notify.h"
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
@@ -272,7 +282,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_008, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
     MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
+    std::shared_ptr<IpcNotifyCredentialReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -280,7 +290,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_008, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcReq>();
+    req = std::make_shared<IpcNotifyCredentialReq>();
     if (ptr) {
         ret = ptr(req, data);
     }
@@ -339,7 +349,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_011, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -347,13 +357,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_011, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    req = std::make_shared<IpcCreatePinHolderReq>();
     std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    req->SetDeviceBasicInfo(deviceBasicInfo);
     if (ptr) {
         ret = ptr(req, data);
     }
@@ -376,7 +382,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_012, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -384,13 +390,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_012, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    req = std::make_shared<IpcDestroyPinHolderReq>();
     std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    req->SetDeviceBasicInfo(deviceBasicInfo);
     if (ptr) {
         ret = ptr(req, data);
     }
@@ -413,7 +415,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_013, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -421,13 +423,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_013, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    req = std::make_shared<IpcNotifyPublishResultReq>();
     std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    req->SetDeviceBasicInfo(deviceBasicInfo);
     if (ptr) {
         ret = ptr(req, data);
     }
@@ -450,7 +448,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_014, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -458,13 +456,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_014, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    req = std::make_shared<IpcNotifyPublishResultReq>();
     std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    req->SetDeviceBasicInfo(deviceBasicInfo);
     if (ptr) {
         ret = ptr(req, data);
     }
@@ -1491,7 +1485,7 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_021, testing::ext::TestSize.
 {
     int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
     MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> req = nullptr;
+    std::shared_ptr<IpcReq> req = nullptr;
     int ret = ERR_DM_FAILED;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -1499,13 +1493,9 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_021, testing::ext::TestSize.
     }
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    req = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
+    req = std::make_shared<IpcNotifyPinHolderEventReq>();
     std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
     req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    req->SetDeviceBasicInfo(deviceBasicInfo);
     if (ptr) {
         ret = ptr(req, data);
     }

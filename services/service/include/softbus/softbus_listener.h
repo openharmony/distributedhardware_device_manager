@@ -55,6 +55,8 @@ public:
     static void OnLocalDevInfoChange();
     static void OnDeviceNotTrusted(const char *msg);
     static void DeviceNotTrust(const std::string &msg);
+    static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
+    static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();
@@ -65,6 +67,8 @@ public:
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceBasicInfo &devInfo);
     static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);
+    static int32_t ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
+        DmDeviceInfo &devInfo);
 
     int32_t InitSoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
@@ -91,6 +95,7 @@ public:
     static IRefreshCallback &GetSoftbusRefreshCb();
     static void SetHostPkgName(const std::string hostName);
     static std::string GetHostPkgName();
+    int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
 private:
     int32_t InitSoftPublishLNN();
 

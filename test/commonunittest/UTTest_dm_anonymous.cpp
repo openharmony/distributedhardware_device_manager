@@ -242,6 +242,24 @@ HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level0)
 }
 
 /**
+ * @tc.name: IsUint32_001
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsUint32_001, testing::ext::TestSize.Level0)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : "authtypeTest"
+    }
+    )";
+    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    bool ret = IsUint32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, false);
+}
+
+/**
  * @tc.name: IsInt64_001
  * @tc.desc: Return true
  * @tc.type: FUNC
@@ -366,6 +384,28 @@ HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
     nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
     bool ret = IsBool(jsonObj, TAG_CRYPTO_SUPPORT);
     EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: ConvertCharArray2String_001
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, ConvertCharArray2String_001, testing::ext::TestSize.Level0)
+{
+    char *srcData = nullptr;
+    uint32_t srcLen = 0;
+    std::string ret = ConvertCharArray2String(srcData, srcLen);
+    EXPECT_EQ(ret, "");
+    srcLen = 40 * 1024 * 1024 * 2;
+    char *srcData1 = new char[srcLen]();
+    if (srcData1 == nullptr) {
+        return;
+    }
+    ret = ConvertCharArray2String(srcData1, srcLen);
+    EXPECT_EQ(ret, "");
+    delete[] srcData1;
 }
 } // namespace
 } // namespace DistributedHardware
