@@ -50,7 +50,6 @@ if (defined(ohos_lite)) {
         "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
-        "src/kvadapter/dm_kv_info.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
         "src/timer/lite/dm_timer.cpp",
       ]
@@ -101,6 +100,7 @@ if (defined(ohos_lite)) {
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
+      "src/kvadapter/dm_kv_info.cpp",
       "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
       "src/threadManager/dm_thread_manager.cpp",
