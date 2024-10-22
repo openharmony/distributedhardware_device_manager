@@ -1057,7 +1057,7 @@ HWTEST_F(DeviceManagerImplTest, UnAuthenticateDevice_101, testing::ext::TestSize
     // 3. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().UnAuthenticateDevice(packName, deviceInfo);
     // 4. check ret is ERR_DM_FAILED
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
