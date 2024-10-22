@@ -64,7 +64,7 @@ public:
     int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &udidHash,
         const std::string &bindParam);
 
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 

@@ -197,9 +197,9 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
 
 int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
-    if (pkgName.empty() || udid.empty()) {
+    if (pkgName.empty() || udidHash.empty()) {
         LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udid is %{public}s",
-            pkgName.c_str(), GetAnonyString(udid).c_str());
+            pkgName.c_str(), GetAnonyString(udidHash).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return authMgr_->UnBindDevice(pkgName, udidHash);
