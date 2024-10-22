@@ -319,7 +319,7 @@ int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
     return DM_OK;
 }
 
-int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -337,15 +337,12 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
             return ERR_DM_FAILED;
         }
     }
-    remoteDeviceId_ = SoftbusConnector::GetDeviceUdidByUdidHash(udidHash);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    if (!DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId_)) {
-        LOGE("The pkgname %{public}s cannot unbind.", pkgName.c_str());
-        return ERR_DM_FAILED;
+    if (bindLevel == DEVICE) {
+        DeleteGroup(pkgName, udid);
     }
-    SyncDeleteAcl(pkgName, remoteDeviceId_);
-    return DM_OK;
+    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel);
 }
 
 void DmAuthManager::SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId)

@@ -1150,10 +1150,11 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_001, testing::ext::TestSize.
 {
     std::string pkgName = "com.ohos.test";
     std::string udidHash;
+    int32_t bindLevel = 1;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash, bindLevel);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1166,10 +1167,11 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_002, testing::ext::TestSize.
 {
     std::string pkgName;
     std::string udidHash = "udidHash";
+    int32_t bindLevel = 1;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash, bindLevel);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1182,10 +1184,11 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_003, testing::ext::TestSize.
 {
     std::string pkgName = "com.ohos.test";
     std::string udidHash = "udidHash";
+    int32_t bindLevel = 2;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udidHash, bindLevel);
     EXPECT_NE(ret, DM_OK);
 }
 

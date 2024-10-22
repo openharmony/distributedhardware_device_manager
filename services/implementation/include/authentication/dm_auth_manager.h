@@ -219,7 +219,7 @@ public:
      * @param deviceId device id.
      * @return Return 0 if success.
      */
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
     /**
      * @tc.name: DmAuthManager::OnSessionOpened

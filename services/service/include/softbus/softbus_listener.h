@@ -95,6 +95,7 @@ public:
     static IRefreshCallback &GetSoftbusRefreshCb();
     static void SetHostPkgName(const std::string hostName);
     static std::string GetHostPkgName();
+    void SendAclChangedBroadcast(const std::string &msg);
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
 private:
     int32_t InitSoftPublishLNN();

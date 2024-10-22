@@ -210,6 +210,9 @@ private:
     void UnloadDMServiceAdapter();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
+    void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
+    void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
+    void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
     void AccountCommonEventCallback(int32_t userId, std::string commonEventType);

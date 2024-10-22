@@ -111,7 +111,7 @@ public:
      * @tc.desc: UnBindDevice Device of the device manager service impl
      * @tc.type: FUNC
      */
-    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceImpl::SetUserOperation

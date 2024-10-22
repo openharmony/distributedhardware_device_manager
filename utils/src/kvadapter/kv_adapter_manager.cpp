@@ -62,7 +62,6 @@ void KVAdapterManager::ReInit()
 
 int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVValue &value)
 {
-    std::string dmKey = AddPrefix(key);
     std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
     auto idIter = idCacheMap_.find(dmKey);

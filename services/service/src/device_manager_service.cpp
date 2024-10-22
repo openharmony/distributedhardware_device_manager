@@ -64,6 +64,7 @@ const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 constexpr const char* ALL_PKGNAME = "";
 constexpr const char* NETWORKID = "NETWORK_ID";
+constexpr uint32_t INVALIED_BIND_LEVEL = 0;
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -1797,7 +1798,6 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
     LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
     return DM_OK;
 }
-#endif
 
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel)
@@ -1816,6 +1816,44 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
         return;
     }
 }
+
+void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg.userId = static_cast<uint32_t>(userId);
+    msg.peerUdids = peerUdids;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    msg.userId = static_cast<uint32_t>(userId);
+    msg.peerUdids = peerUdids;
+    msg.tokenId = tokenId;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICE_UNBIND;
+    msg.userId = static_cast<uint32_t>(userId);
+    msg.peerUdids = peerUdids;
+    msg.tokenId = tokenId;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+#endif
 
 void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
 {

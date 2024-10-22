@@ -1020,6 +1020,14 @@ std::string SoftbusListener::GetHostPkgName()
     return hostName_;
 }
 
+void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
+{
+    LOGI("SendAclChangedBroadcast");
+    if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
+        LOGE("SyncTrustedRelationShip failed.");
+    }
+}
+
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()
 {
     return softbusRefreshCallback_;

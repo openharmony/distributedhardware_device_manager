@@ -591,7 +591,8 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::string udidHash = "udidHash";
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    int32_t bindLevel = 2;
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -599,9 +600,10 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "ohos_test";
     std::string udidHash = "222";
+    int32_t bindLevel = 2;
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
     authManager_->isAuthenticateDevice_ = true;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -609,9 +611,10 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "ohos_test";
     std::string udidHash = "222";
+    int32_t bindLevel = 2;
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
     authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -619,9 +622,10 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_004, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "ohos_test";
     std::string udidHash = "networkId";
+    int32_t bindLevel = 2;
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseContext_ = nullptr;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -629,13 +633,15 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_005, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "ohos_test";
     std::string udidHash = "networkId";
+    int32_t bindLevel = 2;
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash,bindLevel);
     ASSERT_EQ(ret, ERR_DM_FAILED);
     authManager_->isAuthenticateDevice_ = true;
-    ret = authManager_->UnBindDevice(pkgName, udidHash);
+    bindLevel = 1;
+    ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, DM_OK);
 }
 

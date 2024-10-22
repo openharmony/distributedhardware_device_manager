@@ -195,14 +195,15 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
     return authMgr_->AuthenticateDevice(pkgName, authType, udidHash, bindParam);
 }
 
-int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel)
 {
-    if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udidHash is %{public}s",
-            pkgName.c_str(), GetAnonyString(udidHash).c_str());
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udid is %{public}s",
+            pkgName.c_str(), GetAnonyString(udid).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return authMgr_->UnBindDevice(pkgName, udidHash);
+    return authMgr_->UnBindDevice(pkgName, udid, bindLevel);
 }
 
 int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
