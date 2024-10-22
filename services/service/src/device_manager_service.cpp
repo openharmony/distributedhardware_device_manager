@@ -1777,13 +1777,6 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
 }
 #endif
 
-void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
-{
-    if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleDeviceScreenStatusChange(deviceInfo);
-    }
-}
-
 int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
     int32_t &screenStatus)
 {

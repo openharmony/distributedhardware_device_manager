@@ -283,9 +283,6 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
-    virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
-    virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
-        const std::string &udid, uint64_t &tokenId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
