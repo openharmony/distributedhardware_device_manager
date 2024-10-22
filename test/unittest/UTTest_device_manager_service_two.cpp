@@ -322,6 +322,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
  */
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName;
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
@@ -337,6 +338,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
+    SetSetDnPolicyPermission();
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
@@ -349,6 +351,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level
  */
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
@@ -362,6 +365,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
  */
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "a100";
@@ -376,6 +380,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level
  */
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
