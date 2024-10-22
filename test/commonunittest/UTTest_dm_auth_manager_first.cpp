@@ -637,7 +637,7 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_005, testing::ext::TestSize.Level0)
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->isAuthenticateDevice_ = false;
-    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash,bindLevel);
+    int32_t ret = authManager_->UnBindDevice(pkgName, udidHash, bindLevel);
     ASSERT_EQ(ret, ERR_DM_FAILED);
     authManager_->isAuthenticateDevice_ = true;
     bindLevel = 1;
