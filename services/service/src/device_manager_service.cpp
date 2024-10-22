@@ -27,7 +27,7 @@
 #include "dm_softbus_cache.h"
 #include "parameter.h"
 #include "permission_manager.h"
-#include "relationship_sync_mgr.h"
+#include "relationship_sync_mgr.h" 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "datetime_ex.h"
