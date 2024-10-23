@@ -171,10 +171,15 @@ void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16
     DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
-void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen,
+                                             uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
-    std::string deviceList();
+    if (deviceList == nullptr || deviceListLen == 0) {
+        LOGE("[SOFTBUS]received invaild deviceList value.");
+        return;
+    }
+    std::string deviceList(deviceList, deviceListLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode); });
 #else
