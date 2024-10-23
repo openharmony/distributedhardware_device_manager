@@ -175,7 +175,7 @@ void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t de
                                              uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
-    if (deviceList == nullptr || deviceListLen == 0) {
+    if (deviceList == nullptr || deviceListLen > MAX_SOFTBUS_MSG_LEN) {
         LOGE("[SOFTBUS]received invaild deviceList value.");
         return;
     }
