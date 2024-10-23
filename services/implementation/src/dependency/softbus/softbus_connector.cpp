@@ -661,14 +661,14 @@ void SoftbusConnector::SetPkgNameVec(std::vector<std::string> pkgNameVec)
 
 std::vector<std::string> SoftbusConnector::GetPkgName()
 {
-    LOGI("SoftbusConnector::GetPkgName");
+    LOGI("In");
     std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
     return pkgNameVec_;
 }
 
 void SoftbusConnector::ClearPkgName()
 {
-    LOGI("SoftbusConnector::SetPkgName vec");
+    LOGI("In");
     std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
     pkgNameVec_.clear();
 }

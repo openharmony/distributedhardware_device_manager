@@ -385,7 +385,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGI("OnSoftbusDeviceFound: devId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
+    LOGI("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
         "isOnline=%{public}d", GetAnonyString(dmDevInfo.deviceId).c_str(),
         GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range, device->isOnline);
 
@@ -567,7 +567,7 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const std::string &capability,
     const std::string &customData)
 {
-    LOGI("PublishSoftbusLNN begin, publishId: %{public}d.", dmPubInfo.publishId);
+    LOGI("Begin, publishId: %{public}d.", dmPubInfo.publishId);
     PublishInfo publishInfo;
     publishInfo.publishId = dmPubInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
@@ -578,8 +578,8 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     publishInfo.dataLen = customData.length();
     publishInfo.ranging = dmPubInfo.ranging;
 
-    LOGI("PublishSoftbusLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
+    LOGI("Begin, mode: 0x%{public}x, medium: %{public}d, capability:"
+        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.mode,
         publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 
     int32_t ret = ::PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
@@ -592,7 +592,7 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
 
 int32_t SoftbusListener::StopPublishSoftbusLNN(int32_t publishId)
 {
-    LOGI("StopPublishSoftbusLNN begin, publishId: %{public}d.", publishId);
+    LOGI("Begin, publishId: %{public}d.", publishId);
     int32_t ret = ::StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
@@ -640,7 +640,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
             LOGE("ReportGetTrustDeviceList failed");
         }
     }
-    LOGI("GetTrustedDeviceList success from cache deviceInfoList size is %{public}zu.", deviceCount);
+    LOGI("Success from cache deviceInfoList size is %{public}zu.", deviceCount);
     return ret;
 }
 

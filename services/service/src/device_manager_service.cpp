@@ -202,7 +202,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (pinHolder_ == nullptr) {
         pinHolder_ = std::make_shared<PinHolder>(listener_);
     }
-    LOGI("DeviceManagerServiceListener init success.");
+    LOGI("Init success.");
     return DM_OK;
 }
 
@@ -230,7 +230,7 @@ void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    LOGI("DMSrc::GetTrustedDeviceList begin for pkgName = %{public}s.", pkgName.c_str());
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -282,7 +282,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh,
                                            bool isWakeUp)
 {
-    LOGI("DeviceManagerService::ShiftLNNGear begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
+    LOGD("Begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
         "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call ShiftLNNGear, pkgName = %{public}s", pkgName.c_str());
@@ -305,7 +305,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
-    LOGI("DeviceManagerService::GetDeviceInfo begin networkId %{public}s.", GetAnonyString(networkId).c_str());
+    LOGI("Begin networkId %{public}s.", GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission() &&
         !PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
@@ -325,7 +325,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
-    LOGI("DeviceManagerService::GetLocalDeviceInfo begin.");
+    LOGI("Begin.");
     bool isOnlyShowNetworkId = false;
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
@@ -407,7 +407,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         LOGE("The caller: %{public}s does not have permission to call StartDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StartDeviceDiscovery begin for pkgName = %{public}s, extra = %{public}s",
+    LOGI("Begin for pkgName = %{public}s, extra = %{public}s",
         pkgName.c_str(), extra.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -433,7 +433,7 @@ int32_t DeviceManagerService::StartDeviceDiscovery(const std::string &pkgName, c
         LOGE("The caller: %{public}s does not have permission to call StartDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("StartDeviceDiscovery begin for pkgName = %{public}s, filterOptions = %{public}s, subscribeId = %{public}d",
+    LOGI("Begin for pkgName = %{public}s, filterOptions = %{public}s, subscribeId = %{public}d",
         pkgName.c_str(), filterOptions.c_str(), subscribeId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -457,7 +457,7 @@ int32_t DeviceManagerService::StopDeviceDiscovery(const std::string &pkgName, ui
         LOGE("The caller: %{public}s does not have permission to call StopDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StopDeviceDiscovery begin for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -472,7 +472,7 @@ int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName,
         LOGE("The caller: %{public}s does not have permission to call PublishDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::PublishDeviceDiscovery begin for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -541,7 +541,7 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
         LOGE("The caller: %{public}s does not have permission to call UnAuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::UnAuthenticateDevice begin for pkgName = %{public}s, networkId = %{public}s",
+    LOGI("Begin for pkgName = %{public}s, networkId = %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
     if (pkgName.empty() || networkId.empty()) {
         LOGE("DeviceManagerService::UnAuthenticateDevice error: Invalid parameter, pkgName: %{public}s",
@@ -620,7 +620,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::UnBindDevice begin for pkgName = %{public}s, deviceId = %{public}s",
+    LOGI("Begin for pkgName = %{public}s, deviceId = %{public}s",
         pkgName.c_str(), GetAnonyString(deviceId).c_str());
     if (pkgName.empty() || deviceId.empty()) {
         LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
@@ -699,19 +699,19 @@ void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsi
 
 int DeviceManagerService::OnPinHolderSessionOpened(int sessionId, int result)
 {
-    LOGI("DeviceManagerService::OnPinHolderSessionOpened");
+    LOGI("In");
     return PinHolderSession::OnSessionOpened(sessionId, result);
 }
 
 void DeviceManagerService::OnPinHolderSessionClosed(int sessionId)
 {
-    LOGI("DeviceManagerService::OnPinHolderSessionClosed");
+    LOGI("In");
     PinHolderSession::OnSessionClosed(sessionId);
 }
 
 void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    LOGI("DeviceManagerService::OnPinHolderBytesReceived");
+    LOGI("In");
     PinHolderSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
@@ -917,7 +917,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
 bool DeviceManagerService::IsDMImplSoLoaded()
 {
-    LOGI("DeviceManagerService::IsDMImplSoLoaded");
+    LOGI("In");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     return isImplsoLoaded_;
 }
@@ -988,7 +988,7 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::GetEncryptedUuidByNetworkId for pkgName = %{public}s", pkgName.c_str());
+    LOGI("PkgName = %{public}s", pkgName.c_str());
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
     if (ret != DM_OK) {
@@ -1017,7 +1017,7 @@ int32_t DeviceManagerService::GenerateEncryptedUuid(const std::string &pkgName, 
 
 int32_t DeviceManagerService::CheckApiPermission(int32_t permissionLevel)
 {
-    LOGI("DeviceManagerService::CheckApiPermission permissionLevel: %{public}d", permissionLevel);
+    LOGI("PermissionLevel: %{public}d", permissionLevel);
     int32_t ret = ERR_DM_NO_PERMISSION;
     switch (permissionLevel) {
         case NORMAL:
@@ -1052,7 +1052,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
         LOGE("The caller: %{public}s does not have permission to call GetNetworkTypeByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::GetNetworkTypeByNetworkId begin for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
             GetAnonyString(netWorkId).c_str());
@@ -1114,7 +1114,7 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
 
 void DeviceManagerService::UnloadDMServiceImplSo()
 {
-    LOGI("DeviceManagerService::UnloadDMServiceImplSo start.");
+    LOGI("Start.");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
@@ -1135,7 +1135,7 @@ void DeviceManagerService::UnloadDMServiceImplSo()
 
 bool DeviceManagerService::IsDMServiceAdapterLoad()
 {
-    LOGI("DeviceManagerService::IsDMServiceAdapterLoad start.");
+    LOGI("Start.");
     if (listener_ == nullptr) {
         LOGE("Dm service is not init.");
         return false;
@@ -1173,13 +1173,13 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return false;
     }
     isAdapterSoLoaded_ = true;
-    LOGI("DeviceManagerService::IsDMServiceAdapterLoad sucess.");
+    LOGI("Success.");
     return true;
 }
 
 void DeviceManagerService::UnloadDMServiceAdapter()
 {
-    LOGI("DeviceManagerService::UnloadDMServiceAdapter start.");
+    LOGI("Start.");
     std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
     if (dmServiceImplExt_ != nullptr) {
         dmServiceImplExt_->Release();
@@ -1207,7 +1207,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StartDiscovering for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1226,7 +1226,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StopDiscovering for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1249,7 +1249,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::EnableDiscoveryListener for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1266,7 +1266,7 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::DisableDiscoveryListener for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1282,7 +1282,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StartAdvertising for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1298,7 +1298,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::StopAdvertising for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1321,7 +1321,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::BindTarget for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1361,7 +1361,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService::UnbindTarget for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1442,7 +1442,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::DestroyPinHolder begin.");
+    LOGI("Begin.");
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1484,7 +1484,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
         LOGE("The caller does not have permission to call DpAclAdd.");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("DeviceManagerService DpAclAdd start.");
+    LOGI("Start.");
     if (!IsDMServiceImplReady()) {
         LOGE("DpAclAdd failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -1497,7 +1497,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
 int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                                      int32_t &securityLevel)
 {
-    LOGI("DeviceManagerService::GetDeviceSecurityLevel begin pkgName: %{public}s, networkId: %{public}s",
+    LOGI("Begin pkgName: %{public}s, networkId: %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceSecurityLevel.", pkgName.c_str());
@@ -1519,7 +1519,7 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
 
 int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
 {
-    LOGI("DeviceManagerService::IsSameAccount networkId %{public}s.", GetAnonyString(networkId).c_str());
+    LOGI("NetworkId %{public}s.", GetAnonyString(networkId).c_str());
     if (!PermissionManager::GetInstance().CheckPermission()) {
         return ERR_DM_NO_PERMISSION;
     }
@@ -1573,7 +1573,7 @@ int32_t DeviceManagerService::InitAccountInfo()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     SubscribeAccountCommonEvent();
-    LOGI("InitAccountInfo success.");
+    LOGI("Success.");
 #endif
     return DM_OK;
 }
@@ -1582,7 +1582,7 @@ int32_t DeviceManagerService::InitScreenLockEvent()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     SubscribeScreenLockEvent();
-    LOGI("InitScreenLockEvent success.");
+    LOGI("Success.");
 #endif
     return DM_OK;
 }
@@ -1590,7 +1590,7 @@ int32_t DeviceManagerService::InitScreenLockEvent()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::SubscribeAccountCommonEvent()
 {
-    LOGI("DeviceManagerServiceImpl::SubscribeAccountCommonEvent");
+    LOGI("Start");
     if (accountCommonEventManager_ == nullptr) {
         accountCommonEventManager_ = std::make_shared<DmAccountCommonEventManager>();
     }
@@ -1602,14 +1602,14 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
-        LOGI("subscribe account common event success");
+        LOGI("Success");
     }
     return;
 }
 
 void DeviceManagerService::SubscribeScreenLockEvent()
 {
-    LOGI("DeviceManagerServiceImpl::SubscribeScreenLockEvent");
+    LOGI("Start");
     if (screenCommonEventManager_ == nullptr) {
         screenCommonEventManager_ = std::make_shared<DmScreenCommonEventManager>();
     }
@@ -1617,14 +1617,14 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     std::vector<std::string> screenEventVec;
     screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {
-        LOGI("subscribe screen common event success");
+        LOGI("Success");
     }
     return;
 }
 
 void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
 {
-    LOGI("AccountCommonEventCallback start, commonEventType: %{public}s", commonEventType.c_str());
+    LOGI("Start, commonEventType: %{public}s", commonEventType.c_str());
     if ((commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
         commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN)) {
         std::string accountId = MultipleUserConnector::GetOhosAccountId();
@@ -1667,7 +1667,7 @@ void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType
 
 void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
 {
-    LOGI("DeviceManagerService::HandleDeviceNotTrust.");
+    LOGI("Start.");
     if (msg.empty()) {
         LOGE("DeviceManagerService::HandleDeviceNotTrust msg is empty.");
         return;
@@ -1684,7 +1684,7 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
     std::string networkId = msgJsonObj[NETWORKID].get<std::string>();
     std::string udid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(networkId.c_str(), udid);
-    LOGI("HandleDeviceNotTrust networkId: %{public}s, udid: %{public}s.",
+    LOGI("NetworkId: %{public}s, udid: %{public}s.",
         GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceNotTrust(udid);
