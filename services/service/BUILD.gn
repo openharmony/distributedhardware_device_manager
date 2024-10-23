@@ -170,6 +170,7 @@ if (defined(ohos_lite)) {
       "src/pinholder/pin_holder.cpp",
       "src/pinholder/pin_holder_session.cpp",
       "src/publishcommonevent/dm_account_common_event.cpp",
+      "src/publishcommonevent/dm_package_common_event.cpp",
       "src/publishcommonevent/dm_screen_common_event.cpp",
       "src/softbus/mine_softbus_listener.cpp",
       "src/softbus/softbus_listener.cpp",

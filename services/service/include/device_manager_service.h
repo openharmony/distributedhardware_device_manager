@@ -33,6 +33,7 @@
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
+#include "dm_package_common_event.h"
 #include "dm_screen_common_event.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
@@ -200,6 +201,7 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus);
+    void SubscribePackageCommonEvent();
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
@@ -211,9 +213,9 @@ private:
     void AccountCommonEventCallback(int32_t userId, std::string commonEventType);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
-    void ConvertUdidHashToAnoy(DmDeviceInfo &deviceInfo);
-    int32_t ConvertUdidHashToAnoy(const std::string &udidHash, std::string &result);
-    int32_t GetUdidHashByAnoyUdid(const std::string &anoyUdid, std::string &udidHash);
+    void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
+    int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &anoyDeviceId);
+    int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
@@ -235,6 +237,7 @@ private:
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
+    std::shared_ptr<DmPackageCommonEventManager> packageCommonEventManager_;
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;

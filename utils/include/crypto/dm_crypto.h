@@ -16,6 +16,9 @@
 #ifndef OHOS_DM_CRYPTO_H
 #define OHOS_DM_CRYPTO_H
 #include <string>
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_kv_info.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,6 +33,15 @@ public:
     static int32_t GetSecRandom(uint8_t *out, size_t outLen);
     static std::string GetSecSalt();
     static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
+        DmKVValue &kvValue);
+    static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
+        DmKVValue &kvValue);
+    static int32_t GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue);
+    static int32_t ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,
+        DmKVValue &kvValue);
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

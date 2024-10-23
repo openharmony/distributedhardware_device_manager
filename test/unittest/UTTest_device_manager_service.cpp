@@ -2193,6 +2193,22 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
+
+HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "";
+    std::string result = "";
+    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "ikjwdncksd456";
+    std::string result = "";
+    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

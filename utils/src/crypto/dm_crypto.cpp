@@ -14,6 +14,10 @@
  */
 #include "dm_crypto.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "datetime_ex.h"
+#include "kv_adapter_manager.h"
+#endif
 #include <iostream>
 #include <sstream>
 
@@ -36,6 +40,9 @@ constexpr int HEX_DIGIT_MAX_NUM = 16;
 constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int32_t SALT_LENGTH = 8;
 const std::string SALT_DEFAULT = "salt_defsalt_def";
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#define DM_MAX_DEVICE_ID_LEN (97)
+#endif
 
 uint32_t HexifyLen(uint32_t len)
 {
@@ -202,5 +209,63 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
+    DmKVValue &kvValue)
+{
+    if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
+        kvValue.lastModifyTime = GetSecondsSince1970ToNow();
+        KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
+        return DM_OK;
+    }
+    int32_t ret = ConvertUdidHashToAnoyGenerate(appId, udidHash, kvValue);
+    if (ret != DM_OK) {
+        LOGE("failed");
+        return ERR_DM_FAILED;
+    }
+    KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
+    return DM_OK;
+}
+
+int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
+    DmKVValue &kvValue)
+{
+    LOGI("start.");
+    if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
+        return DM_OK;
+    }
+    return ConvertUdidHashToAnoyGenerate(appId, udidHash, kvValue);
+}
+
+int32_t Crypto::GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue)
+{
+    LOGI("start");
+    std::string udidPrefix = appId + DB_KEY_DELIMITER + udidHash;
+    if (KVAdapterManager::GetInstance().Get(udidPrefix, kvValue) != DM_OK) {
+        LOGI("Get kv value from DB failed");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t Crypto::ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,
+    DmKVValue &kvValue)
+{
+    LOGI("start.");
+    std::string salt = GetSecSalt();
+    std::string udidTemp = appId + DB_KEY_DELIMITER + udidHash + DB_KEY_DELIMITER + salt;
+    char anoyDeviceId[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (GetUdidHash(udidTemp, reinterpret_cast<uint8_t *>(anoyDeviceId)) != DM_OK) {
+        LOGE("get anoyDeviceId by udidTemp failed.");
+        return ERR_DM_FAILED;
+    }
+    kvValue.udidHash = udidHash;
+    kvValue.anoyDeviceId = std::string(anoyDeviceId);
+    kvValue.appID = appId;
+    kvValue.salt = salt;
+    kvValue.lastModifyTime = GetSecondsSince1970ToNow();
+    return DM_OK;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
