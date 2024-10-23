@@ -179,11 +179,11 @@ void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t de
         LOGE("[SOFTBUS]received invaild deviceList value.");
         return;
     }
-    std::string deviceList(deviceList, deviceListLen);
+    std::string deviceListStr(deviceList, deviceListLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode); });
+    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
 #else
-    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode); });
+    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
     if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
         LOGE("credentialAuthStatus setname failed.");
     }
