@@ -1169,8 +1169,8 @@ void DeviceManagerNotify::UnRegisterCredentialAuthStatusCallback(const std::stri
     credentialAuthStatusCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
-                                                 int32_t errcode)
+void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
+                                                 uint16_t deviceTypeId, int32_t errcode)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -1190,7 +1190,7 @@ void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, uin
         LOGE("error, registered credential auth status callback is nullptr.");
         return;
     }
-    tempCbk->OnCredentialAuthStatus(deviceTypeId, errcode);
+    tempCbk->OnCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

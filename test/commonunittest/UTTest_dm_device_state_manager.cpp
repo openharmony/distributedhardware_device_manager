@@ -255,9 +255,10 @@ HWTEST_F(DmDeviceStateManagerTest, ProcNotifyEvent_001, testing::ext::TestSize.L
 
 HWTEST_F(DmDeviceStateManagerTest, HandleCandidateRestrictStatus_001, testing::ext::TestSize.Level0)
 {
+    std::string deviceList;
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    dmDeviceStateManager->HandleCredentialAuthStatus(deviceTypeId, errcode);
+    dmDeviceStateManager->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 } // namespace

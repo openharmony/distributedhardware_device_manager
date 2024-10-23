@@ -165,19 +165,20 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
-void SoftbusListener::CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode)
 {
     std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
-    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceTypeId, errcode);
+    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
 void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
+    std::string deviceList();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode); });
 #else
-    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode); });
     if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
         LOGE("credentialAuthStatus setname failed.");
     }

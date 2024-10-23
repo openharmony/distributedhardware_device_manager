@@ -1504,9 +1504,10 @@ HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_104, testing::e
 
 HWTEST_F(DeviceManagerServiceImplTest, CredentialAuthStatus_101, testing::ext::TestSize.Level0)
 {
+    std::string deviceList;
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
-    deviceManagerServiceImpl_->HandleCredentialAuthStatus(deviceTypeId, errcode);
+    deviceManagerServiceImpl_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 } // namespace

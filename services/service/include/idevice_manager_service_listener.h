@@ -164,8 +164,8 @@ public:
      * @tc.desc: Candidate Restrict Status Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId,
-                                               int32_t errcode) = 0;
+    virtual void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
+                                        uint16_t deviceTypeId, int32_t errcode) = 0;
     virtual void OnAppUnintall(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware

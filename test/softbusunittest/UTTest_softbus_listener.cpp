@@ -791,8 +791,9 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     uint16_t deviceTypeId = 0;
     int32_t errcode = -1;
     softbusListener->OnCredentialAuthStatus(deviceTypeId, errcode);
+    std::string deviceList;
     deviceTypeId = 0xA2F;
-    softbusListener->CredentialAuthStatusProcess(deviceTypeId, errcode);
+    softbusListener->CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
 } // namespace

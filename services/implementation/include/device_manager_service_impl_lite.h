@@ -137,7 +137,7 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(int32_t switchUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode);
+    void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
 
 private:
