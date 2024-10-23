@@ -114,7 +114,7 @@ static IPublishCb softbusPublishCallback_ = {
 
 static INodeStateCb softbusNodeStateCb_ = {
     .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED |
-        EVENT_NODE_STATUS_CHANGED,
+        EVENT_NODE_STATUS_CHANGED | EVENT_NODE_HICHAIN_PROOF_EXCEPTION,
     .onNodeOnline = SoftbusListener::OnSoftbusDeviceOnline,
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
