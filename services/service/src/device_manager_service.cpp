@@ -2001,7 +2001,7 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 }
 
 void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
-    int32_t errcode)
+                                                      int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
