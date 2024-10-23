@@ -249,7 +249,6 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     }
     deviceList = rsp->GetDeviceVec();
     LOGI("Completed, device size %{public}zu", deviceList.size());
-        pkgName.c_str(), deviceList.size());
     return DM_OK;
 }
 
@@ -607,7 +606,7 @@ int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, 
     }
 
     DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
-    LOGI("Completed");;
+    LOGI("Completed");
     return DM_OK;
 }
 

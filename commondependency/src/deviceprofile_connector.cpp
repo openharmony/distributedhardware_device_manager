@@ -173,7 +173,6 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
     const std::string &trustDev, const std::string &reqDev)
 {
     LOGI("BindType %{public}d, bindLevel %{public}d",
-         profiles.GetBindType(), profiles.GetBindLevel());
         profiles.GetBindType(), profiles.GetBindLevel());
     uint32_t priority = INVALIED_TYPE;
     uint32_t bindType = profiles.GetBindType();
