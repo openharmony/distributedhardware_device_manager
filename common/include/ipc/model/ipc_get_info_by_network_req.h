@@ -44,8 +44,29 @@ public:
         netWorkId_ = netWorkId;
     }
 
+    /**
+     * @tc.name: IpcGetInfoByNetWorkReq::GetUdid
+     * @tc.desc: Ipc Get Info By NetWork request Get udid
+     * @tc.type: FUNC
+     */
+    const std::string GetUdid() const
+    {
+        return udid_;
+    }
+
+    /**
+     * @tc.name: IpcGetInfoByNetWorkReq::SetUdid
+     * @tc.desc: Ipc Get Info By NetWork request Set udid
+     * @tc.type: FUNC
+     */
+    void SetUdid(const std::string &udid)
+    {
+        udid_ = udid;
+    }
+
 private:
     std::string netWorkId_;
+    std::string udid_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
