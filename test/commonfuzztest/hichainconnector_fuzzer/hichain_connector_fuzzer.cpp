@@ -101,6 +101,21 @@ void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetRelatedGroupsCommon(deviceId, pkgNameStr.data(), groupList);
     hichainConnector->UnRegisterHiChainCallback();
 }
+
+void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
+{
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+
+    std::vector<GroupInfo> groupList;
+    nlohmann::json jsonDeviceList;
+    GroupInfo groupInfo;
+    std::vector<std::string>syncGroupList;
+    hichainConnector->GetSyncGroupList(groupList, syncGroupList);
+    hichainConnector->IsGroupInfoInvalid(groupInfo);
+    hichainConnector->UnRegisterHiChainGroupCallback();
+    hichainConnector->GetJsonStr(jsonDeviceList, "key");
+}
 }
 }
 
@@ -109,6 +124,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::HiChainConnectorFuzzTest(data, size);
-
+    OHOS::DistributedHardware::HiChainConnectorSecondFuzzTest(data, size);
     return 0;
 }
