@@ -1544,9 +1544,11 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 
     req = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
     std::string pkgName = "com.ohos.test";
+    std::string deviceList = "test";
     uint16_t deviceTypeId = 0x00;
     int32_t errcode = -1;
     req->SetPkgName(pkgName);
+    req->SetDeviceList(deviceList);
     req->SetDeviceTypeId(deviceTypeId);
     req->SetErrCode(errcode);
     if (ptr) {

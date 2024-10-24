@@ -58,8 +58,9 @@ public:
     static void DeviceTrustedChange(const std::string &msg);
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
-    static void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode);
-    static void CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode);
+    static void OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen, uint16_t deviceTypeId,
+                                       int32_t errcode);
+    static void CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();

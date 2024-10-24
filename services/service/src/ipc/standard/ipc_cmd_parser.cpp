@@ -1581,11 +1581,16 @@ ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq
     std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
         std::static_pointer_cast<IpcNotifyCredentialAuthStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
+    std::string deviceList = pReq->GetDeviceList();
     uint16_t deviceTypeId = pReq->GetDeviceTypeId();
     int32_t errCode = pReq->GetErrCode();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(deviceList)) {
+        LOGE("write deviceList failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteUint16(deviceTypeId)) {

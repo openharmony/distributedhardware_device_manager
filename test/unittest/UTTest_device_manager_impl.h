@@ -123,7 +123,7 @@ public:
     virtual ~CandidateRestrictStatusCallbackTest()
     {
     }
-    void OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode) override {}
+    void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

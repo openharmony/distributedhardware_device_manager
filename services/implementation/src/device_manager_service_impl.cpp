@@ -853,10 +853,11 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
 }
 
-void DeviceManagerServiceImpl::HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+                                                          int32_t errcode)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
-    deviceStateMgr_->HandleCredentialAuthStatus(deviceTypeId, errcode);
+    deviceStateMgr_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
 int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, int32_t accessTokenId)

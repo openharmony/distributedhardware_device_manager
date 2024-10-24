@@ -2000,10 +2000,11 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::HandleCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+                                                      int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleCredentialAuthStatus(deviceTypeId, errcode);
+        dmServiceImpl_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
     }
 }
 } // namespace DistributedHardware

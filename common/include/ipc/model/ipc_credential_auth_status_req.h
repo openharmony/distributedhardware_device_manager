@@ -25,6 +25,26 @@ class IpcNotifyCredentialAuthStatusReq : public IpcReq {
 
 public:
     /**
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::GetDeviceList
+     * @tc.desc: Get DeviceList of the Ipc Notify Credential Auth Status Request
+     * @tc.type: FUNC
+     */
+    std::string GetDeviceList() const
+    {
+        return deviceList_;
+    }
+
+    /**
+     * @tc.name: IpcNotifyCredentialAuthStatusReq::SetDeviceList
+     * @tc.desc: Set DeviceList of the Ipc Notify Credential Auth Status Request
+     * @tc.type: FUNC
+     */
+    void SetDeviceList(const std::string &deviceList)
+    {
+        deviceList_ = deviceList;
+    }
+
+    /**
      * @tc.name: IpcNotifyCredentialAuthStatusReq::GetDeviceTypeId
      * @tc.desc: Get DeviceType of the Ipc Notify Credential Auth Status Request
      * @tc.type: FUNC
@@ -65,6 +85,7 @@ public:
     }
 
 private:
+    std::string deviceList_;
     uint16_t deviceTypeId_ = 0;
     int32_t errcode_ = 0;
 };

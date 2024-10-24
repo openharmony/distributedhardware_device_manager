@@ -553,12 +553,13 @@ void DeviceManagerServiceListener::RemoveOnlinePkgName(const DmDeviceInfo &info)
 }
 
 void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkgName,
-    uint16_t deviceTypeId, int32_t errcode)
+    const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", pkgName.c_str());
     std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
         std::make_shared<IpcNotifyCredentialAuthStatusReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetDeviceList(deviceList);
     pReq->SetDeviceTypeId(deviceTypeId);
     pReq->SetErrCode(errcode);
     if (pkgName == std::string(DM_PKG_NAME)) {

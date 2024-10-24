@@ -193,9 +193,11 @@ public:
         (void)devInfo;
     }
 
-    void OnCredentialAuthStatus(const std::string &pkgName, uint16_t deviceTypeId, int32_t errcode) override
+    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList, uint16_t deviceTypeId,
+                                int32_t errcode) override
     {
         (void)pkgName;
+        (void)deviceList;
         (void)deviceTypeId;
         (void)errcode;
     }

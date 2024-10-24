@@ -114,7 +114,7 @@ static IPublishCb softbusPublishCallback_ = {
 
 static INodeStateCb softbusNodeStateCb_ = {
     .events = EVENT_NODE_STATE_ONLINE | EVENT_NODE_STATE_OFFLINE | EVENT_NODE_STATE_INFO_CHANGED |
-        EVENT_NODE_STATUS_CHANGED,
+        EVENT_NODE_STATUS_CHANGED | EVENT_NODE_HICHAIN_PROOF_EXCEPTION,
     .onNodeOnline = SoftbusListener::OnSoftbusDeviceOnline,
     .onNodeOffline = SoftbusListener::OnSoftbusDeviceOffline,
     .onNodeBasicInfoChanged = SoftbusListener::OnSoftbusDeviceInfoChanged,
@@ -165,19 +165,28 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
-void SoftbusListener::CredentialAuthStatusProcess(uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode)
 {
     std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
-    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceTypeId, errcode);
+    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
-void SoftbusListener::OnCredentialAuthStatus(uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen,
+                                             uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
+    if (deviceListLen > MAX_SOFTBUS_MSG_LEN) {
+        LOGE("[SOFTBUS]received invaild deviceList value.");
+        return;
+    }
+    std::string deviceListStr;
+    if (deviceList != nullptr) {
+        deviceListStr = std::string(deviceList, deviceListLen);
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
 #else
-    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceTypeId, errcode); });
+    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
     if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
         LOGE("credentialAuthStatus setname failed.");
     }
