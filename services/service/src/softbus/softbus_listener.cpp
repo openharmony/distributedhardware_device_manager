@@ -175,11 +175,14 @@ void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t de
                                              uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
-    if (deviceList == nullptr || deviceListLen > MAX_SOFTBUS_MSG_LEN) {
+    if (deviceListLen > MAX_SOFTBUS_MSG_LEN) {
         LOGE("[SOFTBUS]received invaild deviceList value.");
         return;
     }
-    std::string deviceListStr(deviceList, deviceListLen);
+    std::string deviceListStr;
+    if (deviceList != nullptr) {
+        deviceListStr = std::string(deviceList, deviceListLen);
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
 #else
