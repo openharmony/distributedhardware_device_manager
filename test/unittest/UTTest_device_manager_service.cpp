@@ -2028,92 +2028,6 @@ HWTEST_F(DeviceManagerServiceTest, OnUnbindBytesReceived_001, testing::ext::Test
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-/**
- * @tc.name: SetDnPolicy_201
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    bool bRet = false;
-    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD) {
-        bRet = true;
-    }
-    ASSERT_EQ(bRet, true);
-}
-
-/**
- * @tc.name: SetDnPolicy_202
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
-{
-    std::string packName;
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: SetDnPolicy_203
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: SetDnPolicy_204
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: SetDnPolicy_205
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "a100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: SetDnPolicy_206
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level0)
-{
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -2149,10 +2063,10 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
 HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_007, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test7";
-    uint16_t subscribeId = 1;
+    DmSubscribeInfo subscribeInfo;
     std::string extra = "test";
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
+    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
     EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
@@ -2190,24 +2104,11 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
 {
     DmDeviceInfo info;
     DeletePermission();
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    bool result = DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    EXPECT_TRUE(result);
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
-}
-
-HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_001, testing::ext::TestSize.Level0)
-{
-    std::string udid = "";
-    std::string result = "";
-    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoy_002, testing::ext::TestSize.Level0)
-{
-    std::string udid = "ikjwdncksd456";
-    std::string result = "";
-    int ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udid, result);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

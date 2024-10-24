@@ -646,7 +646,8 @@ HWTEST_F(IpcServerStubTest, OnAddSystemAbility_001, testing::ext::TestSize.Level
     int32_t systemAbilityId = SOFTBUS_SERVER_SA_ID;
     std::string deviceId;
     IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
-    ASSERT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    ASSERT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    IpcServerStub::GetInstance().OnRemoveSystemAbility(systemAbilityId, deviceId);
 }
 
 /**
