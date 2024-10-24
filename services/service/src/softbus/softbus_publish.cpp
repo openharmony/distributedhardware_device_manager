@@ -99,7 +99,7 @@ void SoftbusPublish::OnSoftbusPublishResult(int publishId, PublishResult result)
 
 int32_t SoftbusPublish::PublishSoftbusLNN()
 {
-    LOGI("SoftbusPublish::PublishSoftbusLNN begin.");
+    LOGI("Begin.");
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_PASSIVE;
@@ -108,7 +108,7 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = false;
 
-    LOGI("PublishSoftbusLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+    LOGI("Begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
         "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
         publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 
@@ -122,7 +122,7 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
 
 int32_t SoftbusPublish::StopPublishSoftbusLNN(int32_t publishId)
 {
-    LOGI("StopPublishSoftbusLNN begin, publishId: %{public}d.", publishId);
+    LOGI("Begin, publishId: %{public}d.", publishId);
     int32_t ret = StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);

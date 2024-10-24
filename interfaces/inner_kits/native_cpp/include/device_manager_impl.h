@@ -387,13 +387,14 @@ public:
     virtual int32_t ShiftLNNGear(const std::string &pkgName) override;
 
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) override;
+    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
+    virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
+        std::string &networkId) override;
     virtual int32_t RegisterDeviceScreenStatusCallback(const std::string &pkgName,
         std::shared_ptr<DeviceScreenStatusCallback> callback) override;
     virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) override;
     virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus) override;
-    virtual int32_t StopAuthenticateDevice(const std::string &pkgName) override;
-
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
