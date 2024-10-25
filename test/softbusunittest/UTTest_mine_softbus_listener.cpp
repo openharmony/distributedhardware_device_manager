@@ -49,7 +49,7 @@ namespace {
 bool CheckSoftbusRes(int ret)
 {
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR 
-    || ret == SOFTBUS_IPC_ERR ;
+        || ret == SOFTBUS_IPC_ERR ;
 }
 
 HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
