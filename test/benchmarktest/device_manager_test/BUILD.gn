@@ -27,7 +27,7 @@ ohos_benchmarktest("DeviceManagerTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ 
+  deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
   ]
