@@ -202,6 +202,7 @@ public:
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    int32_t SetLocalDeviceName(const std::string &localDeviceName);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

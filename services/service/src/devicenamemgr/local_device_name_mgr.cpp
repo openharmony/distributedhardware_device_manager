@@ -25,6 +25,7 @@
 #include "system_ability_definition.h"
 #include "uri.h"
 
+#include "device_manager_service.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "settings_data_event_monitor.h"
@@ -246,6 +247,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDisplayName()
     localDisplayName_ = localDisplayName;
     dataShareHelper->Release();
     LOGI("get display deviceName=%{public}s", localDisplayName.c_str());
+    DeviceManagerService::GetInstance().SetLocalDeviceName(localDisplayName);
     return DM_OK;
 }
 
