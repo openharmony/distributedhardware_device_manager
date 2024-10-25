@@ -969,6 +969,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
 
     if (authResponseContext_->isOnline && authResponseContext_->authed) {
         authRequestContext_->reason = DM_OK;
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
@@ -977,6 +978,7 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         (authResponseContext_->authed && !authResponseContext_->isOnline)) {
         softbusConnector_->JoinLnn(authRequestContext_->addr);
         authRequestContext_->reason = DM_OK;
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
