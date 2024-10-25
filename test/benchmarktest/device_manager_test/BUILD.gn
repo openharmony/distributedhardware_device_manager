@@ -28,7 +28,7 @@ ohos_benchmarktest("DeviceManagerTest") {
   }
 
   deps = [ 
-    "${innerkits_path}/native_cpp:devicemanagersdk" 
+    "${innerkits_path}/native_cpp:devicemanagersdk",
     "//third_party/benchmark:benchmark",
   ]
 
