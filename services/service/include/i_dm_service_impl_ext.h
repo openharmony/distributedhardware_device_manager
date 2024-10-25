@@ -98,7 +98,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
-};    
+};
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
